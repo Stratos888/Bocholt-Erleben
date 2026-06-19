@@ -3366,27 +3366,27 @@ body.is-feedback-open{
 
 /* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_OVERLAYS === */
 
-/* === BEGIN BLOCK: DESKTOP_IMAGE_CREDIT_ACCESS_MONOCHROME_POLISH_V1 | Zweck: entschaerft den Desktop-Bildnachweiszugang auf Cards; Umfang: nur visuelle Darstellung/Hover/Fokus der bestehenden .image-credit-access--desktop === */
+/* === BEGIN BLOCK: DESKTOP_IMAGE_CREDIT_ACCESS_MONOCHROME_POLISH_V2 | Zweck: macht den Desktop-Bildnachweiszugang auf Cards deutlich leiser, ohne Hover/Fokus und mobile Ausblendung zu verlieren; Umfang: nur .image-credit-access--desktop ab 761px === */
 @media (min-width: 761px){
   .image-credit-access--desktop,
   .image-credit-access--desktop:visited{
-    width: 28px;
-    height: 28px;
-    color: rgba(31, 41, 51, 0.68);
-    background: rgba(255, 255, 255, 0.62);
-    border: 1px solid rgba(31, 41, 51, 0.14);
-    box-shadow: 0 4px 12px rgba(31, 41, 51, 0.10);
-    opacity: 0.72;
+    width: 26px;
+    height: 26px;
+    color: rgba(31, 41, 51, 0.58);
+    background: rgba(255, 255, 255, 0.46);
+    border: 1px solid rgba(31, 41, 51, 0.10);
+    box-shadow: 0 3px 9px rgba(31, 41, 51, 0.060);
+    opacity: 0.48;
     transform: none;
-    backdrop-filter: blur(8px) saturate(1.02);
-    -webkit-backdrop-filter: blur(8px) saturate(1.02);
+    backdrop-filter: blur(8px) saturate(1.01);
+    -webkit-backdrop-filter: blur(8px) saturate(1.01);
   }
 
   .image-credit-access--desktop .image-credit-access__icon,
   .image-credit-access--desktop .image-credit-access__icon-svg,
   .image-credit-access--desktop svg{
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
     color: currentColor;
     stroke: currentColor;
   }
@@ -3431,4 +3431,4 @@ body.is-feedback-open{
     display: none !important;
   }
 }
-/* === END BLOCK: DESKTOP_IMAGE_CREDIT_ACCESS_MONOCHROME_POLISH_V1 === */
+/* === END BLOCK: DESKTOP_IMAGE_CREDIT_ACCESS_MONOCHROME_POLISH_V2 === */

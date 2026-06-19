@@ -4568,54 +4568,56 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
 /* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V10 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
 
-/* === BEGIN BLOCK: DESKTOP_PREMIUM_SHELL_CONTRACT_V2 | Zweck: setzt einen sichtbaren, gemeinsamen Desktop-Premium-Rail fuer Events und Aktivitaeten; Umfang: nur Desktop >=900px, breitere Content-Achse, kompaktere Hero-Buehne, klarere Feed-Surface, Activity-Filter/Grid-Verbund und Single-Event-Featured-Row; keine Mobile-, Daten-, Bild- oder Detailpanel-Aenderung === */
+/* === BEGIN BLOCK: DESKTOP_PREMIUM_SHELL_CONTRACT_V3 | Zweck: korrigiert den Desktop-Premium-Rail messbar: Hero bleibt breit genug, sichtbare Feed-/Grid-Surfaces laufen nicht mehr breiter als Card-/Control-Achse; Umfang: nur Desktop >=900px fuer Events und Aktivitaeten, V2 wird ersetzt, keine Mobile-, Daten-, Bild- oder Detailpanel-Logik === */
 @media (min-width: 900px){
   body.is-tabbar-hidden,
   body.page-route-activities{
     --desktop-shell-max: 1224px;
+    --desktop-feed-surface-max: 1152px;
     --desktop-shell-pad-x: 36px;
+    --desktop-feed-pad-x: 0px;
     --desktop-copy-surface-max: 35rem;
     --desktop-copy-max: 30rem;
   }
 
   body.is-tabbar-hidden .desktop-hero,
-  body.page-route-activities .desktop-hero,
-  body.is-tabbar-hidden .events-section,
-  body.page-route-activities .events-section,
-  body.page-route-activities .activity-finder-card{
+  body.page-route-activities .desktop-hero{
     width: min(calc(100% - clamp(72px, 7vw, 112px)), var(--desktop-shell-max));
     max-width: none;
-  }
-
-  body.is-tabbar-hidden .desktop-hero,
-  body.page-route-activities .desktop-hero{
-    min-height: 360px;
+    min-height: 356px;
     padding-top: 16px;
     padding-bottom: 10px;
   }
 
   body.is-tabbar-hidden .events-section,
+  body.page-route-activities .events-section,
+  body.page-route-activities .activity-finder-card{
+    width: min(calc(100% - clamp(72px, 7vw, 112px)), var(--desktop-feed-surface-max));
+    max-width: none;
+  }
+
+  body.is-tabbar-hidden .events-section,
   body.page-route-activities .events-section{
     margin-top: 10px;
-    padding: 22px var(--desktop-shell-pad-x) 38px;
-    border-radius: 26px 26px 0 0;
+    padding: 18px var(--desktop-feed-pad-x) 36px;
+    border-radius: 22px 22px 0 0;
     background:
       linear-gradient(
         180deg,
-        rgba(239,245,226,0.58) 0%,
-        rgba(231,238,213,0.34) 56px,
-        rgba(231,238,213,0.10) 124px,
+        rgba(239,245,226,0.30) 0%,
+        rgba(231,238,213,0.16) 48px,
+        rgba(231,238,213,0.050) 112px,
         rgba(231,238,213,0.00) 100%
       ),
       linear-gradient(
         180deg,
-        color-mix(in srgb, var(--home-rail-bg-start) 92%, rgba(247,249,244,0.92) 8%) 0%,
-        var(--home-rail-bg-end) 58%,
-        color-mix(in srgb, var(--home-rail-bg-end) 84%, rgba(219,226,203,0.988) 16%) 100%
+        color-mix(in srgb, var(--home-rail-bg-start) 72%, rgba(247,249,244,0.92) 28%) 0%,
+        color-mix(in srgb, var(--home-rail-bg-end) 76%, rgba(247,249,244,0.88) 24%) 58%,
+        color-mix(in srgb, var(--home-rail-bg-end) 62%, rgba(247,249,244,0.96) 38%) 100%
       );
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.52),
-      inset 0 18px 26px rgba(247,249,242,0.11);
+      inset 0 1px 0 rgba(255,255,255,0.34),
+      inset 0 12px 20px rgba(247,249,242,0.055);
   }
 
   body.is-tabbar-hidden .event-cards-grid,
@@ -4650,25 +4652,25 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
 
   body.page-route-activities .events-section.activity-feed-section{
     margin-top: 10px;
-    padding: 24px var(--desktop-shell-pad-x) 44px;
-    border-radius: 26px;
+    padding: 18px var(--desktop-feed-pad-x) 40px;
+    border-radius: 22px;
     background:
       linear-gradient(
         180deg,
-        rgba(239,245,226,0.66) 0%,
-        rgba(231,238,213,0.42) 64px,
-        rgba(231,238,213,0.16) 150px,
+        rgba(239,245,226,0.32) 0%,
+        rgba(231,238,213,0.18) 54px,
+        rgba(231,238,213,0.055) 132px,
         rgba(231,238,213,0.00) 100%
       ),
       linear-gradient(
         180deg,
-        color-mix(in srgb, var(--home-rail-bg-start) 91%, rgba(247,249,244,0.92) 9%) 0%,
-        var(--home-rail-bg-end) 58%,
-        color-mix(in srgb, var(--home-rail-bg-end) 83%, rgba(219,226,203,0.988) 17%) 100%
+        color-mix(in srgb, var(--home-rail-bg-start) 70%, rgba(247,249,244,0.92) 30%) 0%,
+        color-mix(in srgb, var(--home-rail-bg-end) 74%, rgba(247,249,244,0.88) 26%) 58%,
+        color-mix(in srgb, var(--home-rail-bg-end) 60%, rgba(247,249,244,0.96) 40%) 100%
       );
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.54),
-      inset 0 18px 28px rgba(247,249,242,0.12);
+      inset 0 1px 0 rgba(255,255,255,0.36),
+      inset 0 12px 22px rgba(247,249,242,0.060);
   }
 }
 
@@ -4717,14 +4719,16 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   body.is-tabbar-hidden,
   body.page-route-activities{
     --desktop-shell-max: 1224px;
+    --desktop-feed-surface-max: 1152px;
     --desktop-shell-pad-x: 36px;
+    --desktop-feed-pad-x: 0px;
   }
 
   body.is-tabbar-hidden .desktop-hero,
   body.page-route-activities .desktop-hero{
-    min-height: 360px;
+    min-height: 356px;
     padding-top: 16px;
     padding-bottom: 10px;
   }
 }
-/* === END BLOCK: DESKTOP_PREMIUM_SHELL_CONTRACT_V2 === */
+/* === END BLOCK: DESKTOP_PREMIUM_SHELL_CONTRACT_V3 === */
