@@ -782,7 +782,7 @@ $valueMetrics = $isUnlocked
   <script>
     // === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V32_MOBILE_TOOLTIP_OPTOUT | Zweck: rendert kompaktes Akquise-Dashboard, Tooltips, 28-Tage-Vergleich und internes Tracking-Opt-out; Umfang: ersetzt nur Dashboard-Logik dieser Seite ===
     const CHECKS = new Map();
-    const CORE_PAGES = ["/", "/angebote/", "/events-veroeffentlichen/", "/events-veroeffentlichen/einreichen/", "/events-veroeffentlichen/anbindung/", "/fuer-veranstalter/", "/ueber/", "/impressum/", "/datenschutz/"];
+    const CORE_PAGES = ["/", "/events/", "/aktivitaeten/", "/events-veroeffentlichen/", "/events-veroeffentlichen/einreichen/", "/events-veroeffentlichen/anbindung/", "/fuer-veranstalter/", "/ueber/", "/impressum/", "/datenschutz/"];
     const SEARCH_METRICS_URL = "/data/search-metrics.json";
     const VALUE_OPT_OUT_KEY = "be_value_metrics_opt_out";
 
