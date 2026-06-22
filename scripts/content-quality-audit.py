@@ -14,7 +14,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
+from urllib.parse import parse_qsl, urlencode, urlparse
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,6 +42,65 @@ TICKET_PORTAL_HOSTS = (
     "rausgegangen.de",
 )
 
+TRACKING_QUERY_KEYS = {
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+    "fbclid",
+    "gclid",
+    "mc_cid",
+    "mc_eid",
+}
+
+
+def normalize_redirect_path(path: str) -> str:
+    value = re.sub(r"/+", "/", norm(path) or "/").rstrip("/").lower()
+    return "" if value in {"", "/"} else value
+
+
+def normalize_redirect_query(query: str) -> str:
+    pairs = []
+    for key, value in parse_qsl(query or "", keep_blank_values=True):
+        key_norm = key.strip().lower()
+        if key_norm in TRACKING_QUERY_KEYS or key_norm.startswith("utm_"):
+            continue
+        pairs.append((key_norm, value.strip()))
+    return urlencode(sorted(pairs), doseq=True)
+
+
+def is_harmless_redirect(original_url: str, final_url: str) -> bool:
+    """True, wenn eine Weiterleitung technisch/canonical ist und keine Redaktionsaktion braucht.
+
+    Wichtig: Harmlos bedeutet nicht "nie wieder pruefen". Der URL-Check laeuft
+    bei jedem Audit erneut. Harmlos bedeutet nur: Dieser erfolgreiche Redirect wird
+    nicht als offene Arbeitsaufgabe in die Workbench geschrieben.
+    """
+    original = urlparse(norm(original_url))
+    final = urlparse(norm(final_url))
+    if not original.netloc or not final.netloc:
+        return False
+    if original.scheme not in {"http", "https"} or final.scheme not in {"http", "https"}:
+        return False
+    if original.netloc.lower().removeprefix("www.") != final.netloc.lower().removeprefix("www."):
+        return False
+
+    original_path = normalize_redirect_path(original.path)
+    final_path = normalize_redirect_path(final.path)
+    original_query = normalize_redirect_query(original.query)
+    final_query = normalize_redirect_query(final.query)
+
+    if original_path == final_path and original_query == final_query:
+        return True
+
+    # Viele kommunale/Museumsseiten leiten die Host-Root automatisch auf /de weiter.
+    # Das ist kein Content-Fehler, solange keine relevanten Query-Parameter verloren gehen.
+    root_language_paths = {"", "/de"}
+    if original_path in root_language_paths and final_path in root_language_paths and original_query == final_query:
+        return True
+
+    return False
 
 def url_host(value: str) -> str:
     return (urlparse(norm(value)).netloc or "").lower().removeprefix("www.")
@@ -228,6 +287,8 @@ def check_url(url: str) -> Tuple[str, str]:
                 final_url = response.geturl()
                 if 200 <= code < 400:
                     if final_url and final_url.rstrip("/") != url.rstrip("/"):
+                        if is_harmless_redirect(url, final_url):
+                            return "ok", f"{code} canonical -> {final_url}"
                         return "redirect", f"{code} -> {final_url}"
                     return "ok", str(code)
                 if 400 <= code < 500:
@@ -358,22 +419,10 @@ def audit_event_rows(
         if scope == "daily" and not in_daily_window:
             continue
 
-        if scope in {"daily", "full"}:
-            imminent = today <= start_date <= (today + timedelta(days=3))
-            checklist = "Titel, Datum, Start-/Endzeit, Ort/Adresse, Quelle, Ticketlink, Absage/Verschiebung, Beschreibung, Kategorie/Tags und Bild/Motiv vollständig gegen die Quelle prüfen."
-            issues.append(issue(
-                "critical" if imminent else "review_needed",
-                "event",
-                source_system,
-                content_id,
-                title,
-                "event_full_verification_due",
-                "Event muss vollständig fachlich re-verifiziert werden.",
-                checklist + " Wenn alles stimmt: in der Inbox als vollständig geprüft markieren. Wenn etwas abweicht: Felder im Events-Sheet korrigieren.",
-                date_value=date_value,
-                source_url=url,
-                public_url=public_url,
-            ))
+        # Vollständige Content-Sicherung läuft über konkrete Prüfregeln.
+        # Korrekte Inhalte erzeugen bewusst keinen offenen Workbench-Fall.
+        # Offene Aufgaben entstehen nur bei konkreten Abweichungen, Risiken oder
+        # nicht automatisch beurteilbaren Quellen.
 
         if time_value and not RE_TIME.match(time_value):
             issues.append(issue(
@@ -462,16 +511,16 @@ def audit_event_rows(
             ))
         elif network:
             status, detail = check_url(url)
-            if is_ticket_portal_url(url) and status in {"critical", "warning"}:
+            if is_ticket_portal_url(url):
                 issues.append(issue(
                     "review_needed" if in_daily_window else "warning",
                     "event",
                     source_system,
                     content_id,
                     title,
-                    "event_ticket_url_manual_check",
-                    f"Ticketportal konnte vom Bot nicht sicher geprüft werden: {detail}",
-                    "Ticketlink im Browser öffnen. Wenn der Ticket-/Buchungslink für Nutzer sinnvoll funktioniert: Ticketlink manuell bestätigen. Wenn er falsch ist: passende Eventquelle oder Ticket-URL im Sheet korrigieren.",
+                    "event_ticket_portal_as_primary_source",
+                    f"Als primäre Quelle ist ein Ticketportal hinterlegt: {url}",
+                    "Offizielle Event-/Veranstalterseite als Quelle bevorzugen. Ticketportal nur als Ticket-/Buchungslink verwenden; wenn aktuell kein getrenntes Ticket-Feld existiert, Fall bewusst prüfen und Quelle im Events-Sheet korrigieren.",
                     date_value=date_value,
                     source_url=url,
                     public_url=public_url,
@@ -613,18 +662,10 @@ def audit_activities(
                     public_url=public_url,
                 ))
 
-        issues.append(issue(
-            "review_needed",
-            "activity",
-            "offers_json",
-            content_id,
-            title,
-            "activity_full_verification_due",
-            "Activity muss vollständig fachlich re-verifiziert werden.",
-            "Quelle öffnen und Ort, Maps, Öffnungszeiten, Saison/Feiertage, Kosten, Beschreibung, Tags/Merkmale, Bild und Bildnachweis vollständig prüfen. Wenn alles stimmt: in der Inbox als vollständig geprüft markieren. Bei Abweichung: Patch nötig markieren.",
-            source_url=source_url,
-            public_url=public_url,
-        ))
+        # Activities erzeugen nur dann eine offene Aufgabe, wenn der Audit eine
+        # konkrete Abweichung, veraltete Quellenpruefung oder nicht automatisch
+        # beurteilbare Stelle findet. Ein korrekter Activity-Datensatz bleibt
+        # in der Workbench still.
 
         if content_id in seen_ids:
             issues.append(issue(
