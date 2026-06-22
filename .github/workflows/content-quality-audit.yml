@@ -8,6 +8,14 @@
 name: Content Quality Audit
 
 on:
+  push:
+    branches:
+      - staging
+    paths:
+      - ".github/workflows/content-quality-audit.yml"
+      - "scripts/content-quality-audit.py"
+      - "data/**"
+      - "api/events/public.php"
   workflow_dispatch:
     inputs:
       scope:
