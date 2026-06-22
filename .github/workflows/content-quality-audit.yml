@@ -225,7 +225,7 @@ jobs:
           PY
       # === END BLOCK: CONTENT_QUALITY_RUN_AUDIT_V1 ===
 
-      # === BEGIN BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V1 | Zweck: schreibt Audit-Ergebnisse in Content_Audit/Content_Audit_Staging; Umfang: ersetzt Tab-Inhalt, schreibt keine fachlichen Daten zurueck ===
+      # === BEGIN BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V2 | Zweck: schreibt offene Content-Verification-Faelle in Content_Audit/Content_Audit_Staging und erhaelt Review-Status bis zum naechsten Prueftermin; Umfang: ersetzt Tab-Inhalt, schreibt keine fachlichen Daten zurueck ===
       - name: Write Content_Audit sheet tab
         shell: bash
         env:
@@ -235,6 +235,7 @@ jobs:
           set -e
           python - <<'PY'
           import json, os, sys
+          from datetime import date, datetime
           from google.oauth2 import service_account
           from googleapiclient.discovery import build
           from googleapiclient.errors import HttpError
@@ -242,6 +243,16 @@ jobs:
           def fail(msg):
               print(f"❌ {msg}", file=sys.stderr)
               sys.exit(1)
+
+          def norm(value):
+              return str(value or "").strip()
+
+          def parse_date(value):
+              raw = norm(value)[:10]
+              try:
+                  return datetime.strptime(raw, "%Y-%m-%d").date()
+              except Exception:
+                  return None
 
           sheet_id = os.environ.get("SHEET_ID", "").strip()
           tab_name = os.environ.get("CONTENT_AUDIT_TAB", "Content_Audit").strip() or "Content_Audit"
@@ -291,29 +302,33 @@ jobs:
               "auto_fix_allowed",
               "auto_fix_done",
               "review_note",
+              "verified_at",
+              "next_review_at",
+              "action_state",
           ]
 
           generated_at = meta.get("generated_at", "")
+          generated_day = parse_date(generated_at) or date.today()
 
           previous_by_key = {}
           try:
               previous = service.spreadsheets().values().get(
                   spreadsheetId=sheet_id,
-                  range=f"{tab_name}!A:R",
+                  range=f"{tab_name}!A:U",
                   majorDimension="ROWS",
               ).execute().get("values", []) or []
           except HttpError:
               previous = []
 
           if len(previous) >= 3:
-              prev_header = previous[2]
-              prev_index = {name: idx for idx, name in enumerate(prev_header)}
+              prev_header = [norm(name) for name in previous[2]]
+              prev_index = {name: idx for idx, name in enumerate(prev_header) if name}
 
               def prev_value(row, name):
                   idx = prev_index.get(name)
                   if idx is None or idx >= len(row):
                       return ""
-                  return str(row[idx]).strip()
+                  return norm(row[idx])
 
               for row in previous[3:]:
                   key = "|".join([
@@ -325,9 +340,13 @@ jobs:
                   ])
                   if key.strip("|"):
                       previous_by_key[key] = {
+                          "status": prev_value(row, "status") or "open",
                           "first_seen_at": prev_value(row, "first_seen_at") or generated_at,
                           "occurrence_count": prev_value(row, "occurrence_count") or "1",
                           "review_note": prev_value(row, "review_note"),
+                          "verified_at": prev_value(row, "verified_at"),
+                          "next_review_at": prev_value(row, "next_review_at"),
+                          "action_state": prev_value(row, "action_state"),
                       }
 
           rows = [
@@ -335,6 +354,10 @@ jobs:
               [],
               header,
           ]
+
+          open_statuses = {"", "open"}
+          deferred_statuses = {"checked", "verified", "corrected", "snoozed"}
+          persistent_statuses = {"patch_needed", "source_unavailable", "blocked"}
 
           for item in sheet_issues:
               key = "|".join([
@@ -351,9 +374,29 @@ jobs:
               except ValueError:
                   occurrence_count = "1"
 
+              previous_status = previous_item.get("status", "open")
+              previous_next = previous_item.get("next_review_at", "")
+              previous_next_day = parse_date(previous_next)
+
+              status = item.get("status", "open") or "open"
+              review_note = previous_item.get("review_note", "")
+              verified_at = previous_item.get("verified_at", "")
+              next_review_at = previous_item.get("next_review_at", "")
+              action_state = previous_item.get("action_state", "")
+
+              if previous_status in persistent_statuses:
+                  status = previous_status
+              elif previous_status in deferred_statuses and previous_next_day and previous_next_day > generated_day:
+                  status = previous_status
+              elif previous_status in deferred_statuses and previous_next_day and previous_next_day <= generated_day:
+                  status = "open"
+                  action_state = "review_due_again"
+              elif previous_status not in open_statuses and previous_status not in deferred_statuses:
+                  status = previous_status
+
               rows.append([
                   item.get("severity", ""),
-                  item.get("status", ""),
+                  status,
                   item.get("content_type", ""),
                   item.get("source_system", ""),
                   item.get("content_id", ""),
@@ -369,12 +412,15 @@ jobs:
                   occurrence_count,
                   item.get("auto_fix_allowed", ""),
                   item.get("auto_fix_done", ""),
-                  previous_item.get("review_note", ""),
+                  review_note,
+                  verified_at,
+                  next_review_at,
+                  action_state,
               ])
 
           service.spreadsheets().values().clear(
               spreadsheetId=sheet_id,
-              range=f"{tab_name}!A:R",
+              range=f"{tab_name}!A:U",
               body={},
           ).execute()
           service.spreadsheets().values().update(
@@ -383,9 +429,9 @@ jobs:
               valueInputOption="RAW",
               body={"values": rows},
           ).execute()
-          print(f"✅ Content Audit written to {tab_name}: {len(sheet_issues)} open issues")
+          print(f"✅ Content Audit written to {tab_name}: {len(sheet_issues)} issues")
           PY
-      # === END BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V1 ===
+      # === END BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V2 ===
 
       # === BEGIN BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 | Zweck: macht Reports im Workflow nachvollziehbar; Umfang: Artefakt-Upload ohne Repo-Commit ===
       - name: Upload audit reports
