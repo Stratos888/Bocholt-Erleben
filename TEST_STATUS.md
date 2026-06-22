@@ -2,6 +2,35 @@
 
 # TEST STATUS — BOCHOLT ERLEBEN
 
+<!-- === BEGIN BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_22 | Zweck: macht das lange Testprotokoll fuer Folgechats current-first lesbar; Umfang: aktuelle Hauptbeweise, offene/geparkte Beweise, Umgang mit historischen Alt-Routen === -->
+## Aktueller Test-Index für Folgechats
+
+Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter bleiben als Beweisarchiv erhalten, sind aber nicht automatisch aktuelle Aufgaben.
+
+### Aktuell bestandene Hauptbeweise
+
+- Main-Merge und Live-Smoke bestanden; öffentliche Kernbereiche laden ohne bekannten Blocker.
+- Event-Visual-Motif-Fit ist für den aktuellen Sheet-Stand abgeschlossen; keine offenen Produktions-/Review-Gaps.
+- `/angebote/` ist Legacy-Redirect; kanonische Aktivitätenroute ist `/aktivitaeten/`.
+- Aktivitätspräsenz-Funnel ist unter `/aktivitaeten/sichtbar-werden/...` kanonisch; alte `/angebote/sichtbar-werden/...`-Routen sind nur Redirects.
+- Public-Shell/Footer-Konsistenz ist auf öffentlichen Neben-/Funnel-Seiten eingebracht und geprüft.
+- Reporting-/Tracking-Hardening ist live bewiesen: Anbieter-/CTA-Klick auf `/aktivitaeten/sichtbar-werden/` wurde im Dashboard gezählt.
+- CSS-Governance ist eingeführt; CSS-Audit, `style.css`-Entry-Point und ZIP-first-Fallback sind geprüft.
+- Aktivitätspräsenz-Funnel und Stripe-Rücksprunglogik sind statisch gegen die neue Route geprüft.
+
+### Offene oder bewusst geparkte Beweise
+
+- KI-/Inbox-/Visual-Key-Handoff nach dem nächsten automatischen `main`-Suchlauf prüfen; Kontrolltermin: Dienstag, 2026-06-23, 11:00 Uhr.
+- 28-/30-Tage-Reporting-Datenlauf abwarten, bevor Akquise-/Feedbackberichte als belastbar gelten.
+- Activity-Visual-Restschuld (`fallback`, `needs_review`) ist bewusst späterer Qualitätsworkpack.
+- Echte Zahlungs-/Webhook-/Stripe-Livefälle bleiben nur dann erneut zu testen, wenn ein konkreter Zahlungsflow geändert wurde oder ein neues Symptom auftritt.
+
+### Hinweis zu historischen Blöcken
+
+- Alte Erwähnungen von `/angebote/...` in früheren Testblöcken sind historische Nachweise, nicht aktuelle Informationsarchitektur.
+- Bei Widerspruch gilt: `MASTER.md` für strategische Steuerung, `ROADMAP.md` für aktuelle Taktik, `ENGINEERING.md` für Arbeitsregeln.
+<!-- === END BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_22 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_MAIN_MERGE_LIVE_SMOKE_2026_06_19 | Zweck: dokumentiert erfolgreichen Main-Merge, Live-Smoke und nachgezogenen Today-Card-Alignment-Fix; Umfang: Abschlussanker vor KI-Suchlauf-Handoff-Test === -->
 ## Main-Merge / Live-Smoke – bestanden (2026-06-19)
 

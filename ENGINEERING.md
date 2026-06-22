@@ -116,6 +116,43 @@ Rules:
 - Do not redefine product rules from `Produktvertrag.md` inside `MASTER.md`, UI copy, or ad-hoc chat reasoning.
 - If a contradiction is found, resolve it at the canonical source first.
 
+
+---
+
+## 3A. DOCUMENTATION GOVERNANCE
+
+Documentation is part of project control. It must be current-first and role-clean so future ChatGPT work does not reactivate obsolete tasks.
+
+### Canonical document roles
+
+- `MASTER.md` = short strategic control, current focus, frozen areas, permanent product direction.
+- `ROADMAP.md` = current tactical backlog, active/geparkte/wartende workpacks, next proofs.
+- `ENGINEERING.md` = hard working rules, patch modes, audits, fallback workflows.
+- `TEST_STATUS.md` = proof archive and current test index, not product definition.
+- `Produktvertrag.md` = product model, prices, tariffs, funnel/product logic.
+
+### Current-first rule
+
+- Active steering information belongs at the top of `MASTER.md`, `ROADMAP.md` or the index of `TEST_STATUS.md`.
+- Long history must not be appended to `MASTER.md` as active context.
+- `ROADMAP.md` must not become an undifferentiated archive; old blocks may remain only when the current top block clearly overrides them.
+- `TEST_STATUS.md` may stay long, but must keep a current index near the top.
+- Historical route names, old screenshots and old test paths in `TEST_STATUS.md` are evidence, not current architecture.
+
+### Documentation patch rule
+
+- A Doku patch must state which owner document it changes and why.
+- Prefer small current-state/index updates over mass rewriting old history.
+- If an old block is obsolete but still useful as evidence, leave it in `TEST_STATUS.md`; do not copy it into `MASTER.md` or the active ROADMAP section.
+- If a contradiction is found, fix the canonical source first and only then adjust secondary references.
+- Do not add broad future plans unless they become an active, geparkt or wartend workpack.
+
+### Archive rule
+
+- Use archive movement only for clearly obsolete large documentation clusters.
+- Do not create `docs/archive/` churn just to make a small current-state correction.
+- Archive moves, deletions or file splits are their own workpack and should not be mixed with UI, feature or visual patches.
+
 ---
 
 ## 4. WORKING MODES

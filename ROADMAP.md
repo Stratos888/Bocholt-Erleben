@@ -18,21 +18,29 @@ Kanonische Rollen:
 
 ---
 
-<!-- === BEGIN BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_19 | Zweck: konsolidiert den aktuellen taktischen Fokus nach Main-Merge und Live-Smoke; Umfang: naechster Beweis, Freeze-Grenzen und nachgelagerte Prozesshaertung === -->
-## Aktuelle taktische Priorität – Stand 2026-06-19
+<!-- === BEGIN BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_22 | Zweck: haelt den aktuellen taktischen Stand nach Route-, Footer-, Reporting-, CSS- und Doku-Governance-Abschluss fest; Umfang: erledigt/geparkt/wartend/naechste Beweise === -->
+## Aktuelle taktische Priorität – Stand 2026-06-22
 
 Dieser Block überschreibt ältere "nächster Workpack"-Formulierungen weiter unten, wenn sie dem aktuellen Stand widersprechen.
 
-### Abgeschlossen seit letztem Prioritätsblock
+### Aktuell erledigt
 
-- `staging` wurde erfolgreich nach `main` gemerged.
-- Der Live-Bereich wurde manuell geprüft und wirkt stabil.
-- Der Desktop-Alignment-Fehler der drei Today-Cards wurde nach dem Merge behoben.
+- `/angebote/` ist als eigenständige Content-Route bereinigt und leitet auf `/aktivitaeten/`.
+- Der Aktivitätspräsenz-Funnel ist kanonisch unter `/aktivitaeten/sichtbar-werden/...` erreichbar; alte `/angebote/sichtbar-werden/...`-Routen sind Redirects.
+- Public-Shell/Footer-Konsistenz ist auf öffentlichen Neben- und Funnel-Seiten hergestellt.
+- Reporting-/Tracking-Hardening ist technisch abgeschlossen und live bewiesen:
+  - `Nutzwert-Klicks` stieg im Live-Dashboard von 75 auf 76.
+  - `Veranstalter-CTA` stieg von 3 auf 4.
+- CSS-Governance ist eingeführt:
+  - `style.css` ist reiner CSS-Entry-Point.
+  - CSS-Governance-Audit läuft fail-fast im Deploy.
+  - ZIP-first-Webupload-Fallback ohne Wrapper-Dateien ist dokumentiert.
+- Aktivitätspräsenz-Funnel und Stripe-Rücksprunglogik wurden statisch gegen die neue Route geprüft.
 - Event-Visual-Motif-Fit ist für den aktuellen Sheet-Stand abgeschlossen:
-  - keine offenen `gap_to_produce`-Motive
-  - keine offenen `candidate_to_integrate`-Motive
-  - keine offenen `review_rules`-Motive
-  - leerer Gap-Backlog für den geprüften Stand
+  - keine offenen `gap_to_produce`-Motive,
+  - keine offenen `candidate_to_integrate`-Motive,
+  - keine offenen `review_rules`-Motive,
+  - leerer Gap-Backlog für den geprüften Stand.
 
 ### Nächster operativer Punkt
 
@@ -53,39 +61,20 @@ Zu prüfen:
 
 Wichtig: Eine Chat-Simulation oder ein `staging`-Workflow-Lauf ersetzt diesen Beweis nicht. Der vollständige Beweis muss auf `main` gegen die echte Google-Sheet-Kette erfolgen.
 
-### Aktuell gefreezt oder nicht erneut breit öffnen
+### Bewusst geparkt
+
+- Activity-Visual-Restschuld (`fallback`, `needs_review`) erst später als eigener Qualitätsworkpack öffnen.
+- 28-/30-Tage-Reporting-Datenlauf abwarten, bevor Akquise-/Feedbackberichte als belastbar bewertet werden.
+- KI-/Inbox-Prozesshärtung erst nach dem echten Main-Handoff-Beweis starten.
+- Keine weitere Event-Visual-Produktion ohne neuen Sheet-Bedarf, neuen Gap-Backlog oder bewusste strategische Poolentscheidung.
+
+### Nicht als nächstes starten
 
 - Kein neuer breiter UI-/Feature-Workpack bis nach dem KI-/Inbox-Handoff-Beweis.
-- Event-Visual-Produktion nur bei neuem Sheet-Bedarf, neuem Gap-Backlog oder bewusster strategischer Poolentscheidung.
-- Event-Visual-Duplicate-Cleanup nur bei konkretem sichtbaren Symptom oder neuem Eventdatenstand öffnen.
-- Event-Card Normal State Polish bleibt gefreezt.
-- Event-Detailpanel bleibt gefreezt.
-- Activity-Öffnungsstatus-Massenpflege bleibt abgeschlossen; nur gezielte Sonderfälle.
-
-### Getrennter Folge-Workstream
-
-Activity-Premium-Visuals bleiben ein eigener Qualitäts-Workstream:
-
-- ein exklusives Premium-Hauptbild pro Activity
-- keine Wiederverwendung aus dem Event-Visual-Pool
-- zuerst gezielte Bildrecherche/-bewertung
-- danach nur geprüfte, rechtlich saubere und qualitativ bessere Kandidaten integrieren
-
-### Nachgelagerter Prozessverbesserungs-Punkt
-
-KI-/Inbox-Prozess erst nach dem Main-Handoff-Beweis konsolidieren.
-
-Ziel:
-- `data/inbox_manual.json` nicht mehr als persistenten Repo-Puffer für temporäre Event-Kandidaten verwenden.
-- KI-/Manual-Kandidaten direkt oder über ein temporäres GitHub-Run-Artefakt in die Google-Sheet-Inbox überführen.
-- Import-/Cleanup-Rhythmus vereinheitlichen: wöchentlich passend zur KI-Suche plus manuell auslösbar bei Bedarf.
-- Prüfen, ob `duplikat` als finaler Inbox-Status im Cleanup mit archiviert werden soll.
-
-Bewertung:
-- Kein aktueller Blocker für Main/Live.
-- Separater Prozess-Härtungsworkpack nach dem echten KI-/Inbox-Handoff-Beweis.
-
-<!-- === END BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_19 === -->
+- Kein weiterer Event-Card-Polish ohne konkretes Symptom.
+- Keine erneute pauschale Activity-Öffnungsstatus-Massenpflege.
+- Kein CSS-/Doku-Großrefactoring ohne konkreten aktuellen Steuerungsgewinn.
+<!-- === END BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_22 === -->
 
 <!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_GAPS_CLOSED_2026_06_18 | Zweck: schliesst den aktiven Event-Visual-Motiv-Fit-Produktionsblock fuer aktuellen Sheet-Stand; Umfang: Reststatus und naechste Arbeit nur bei neuem Bedarf === -->
 ## Event Visual Motif-Fit – aktuelle Sheet-Gaps geschlossen (2026-06-18)

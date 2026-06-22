@@ -38,19 +38,21 @@ The following workpack is intentionally on hold:
 
 ## CURRENT FOCUS
 
-<!-- === BEGIN BLOCK: MASTER_POST_MAIN_MERGE_2026_06_19 | Zweck: setzt den aktuellen Projektsteuerungsstand nach Main-Merge und Live-Smoke; Umfang: naechster operativer Beweis und bewusste Nicht-Ziele === -->
-### Nach Main-Merge: KI-/Inbox-Visual-Key-Handoff beweisen
+<!-- === BEGIN BLOCK: MASTER_CURRENT_CONTROL_2026_06_22 | Zweck: konsolidiert aktuellen Live-/Staging-Stand fuer Folgechats; Umfang: abgeschlossene Stabilisierung, geparkte Punkte, naechster operativer Beweis === -->
+### Aktueller Steuerungsstand: stabilisierte Live-Basis, KI-/Inbox-Beweis als nächster Timer-Punkt
 
-Stand: 2026-06-19.
+Stand: 2026-06-22.
 
-Aktueller Zustand:
+Aktuell abgeschlossen und nicht erneut öffnen ohne konkretes Symptom:
 
-- `staging` wurde erfolgreich nach `main` gemerged.
-- Der Live-Bereich wurde manuell geprüft und wirkt stabil.
-- Der Desktop-Alignment-Fehler der drei Today-Cards wurde nach dem Main-Merge behoben und live kontrolliert.
-- Der Event-Visual-Motif-Fit-Block ist für den aktuellen Sheet-Stand abgeschlossen; es gibt keine offenen `gap_to_produce`-, `candidate_to_integrate`- oder `review_rules`-Motive.
+- `/angebote/` ist nur noch Legacy-Redirect auf `/aktivitaeten/`; die Aktivitätspräsenz läuft kanonisch unter `/aktivitaeten/sichtbar-werden/...`.
+- Öffentliche Neben-/Funnel-Seiten nutzen den zentralen Footer/Shell-Abschluss.
+- Reporting-/Tracking-Hardening ist technisch abgeschlossen und live bewiesen: `/aktivitaeten/sichtbar-werden/` zählt live als Anbieter-/CTA-Klick im internen Nutzwert-Dashboard.
+- CSS-Governance ist eingeführt: `style.css` ist nur CSS-Entry-Point, CSS-Audit ist im Deploy verankert, ZIP-first-Webupload ist als Fallback dokumentiert.
+- Aktivitätspräsenz-Funnel und Stripe-Rücksprunglogik sind statisch gegen die neue Route geprüft.
+- Event-Visual-Motif-Fit ist für den aktuellen Sheet-Stand abgeschlossen; es gibt keine offenen `gap_to_produce`-, `candidate_to_integrate`- oder `review_rules`-Motive.
 
-Nächster operativer Beweis:
+Nächster operativer Beweis bleibt bewusst terminiert:
 
 - Den nächsten automatischen KI-Suchlauf auf `main` bzw. den nächsten tatsächlichen Manual-KI-Intake-Lauf prüfen.
 - Geplanter Kontrollzeitpunkt: Dienstag, 2026-06-23, 11:00 Uhr.
@@ -64,13 +66,19 @@ Zu prüfen:
 5. Der spätere Build übernimmt den Key in die deployten Eventdaten.
 6. Event-Cards erhalten dadurch automatisch passende Bilder aus dem Event-Visual-Pool.
 
-Bis zu diesem Beweis nicht starten:
+Bewusst geparkt:
+
+- Activity-Visual-Restschuld / `fallback` / `needs_review` erst später gezielt öffnen.
+- 28-/30-Tage-Reporting-Datenlauf abwarten, bevor Akquise- oder Feedbackberichte als belastbar bewertet werden.
+- Keine weitere KI-/Inbox-Prozesshärtung vor dem echten Main-Handoff-Beweis.
+
+Bis zum KI-/Inbox-Beweis nicht starten:
 
 - kein neuer breiter UI-/Feature-Workpack,
 - kein erneuter Event-Visual-Produktionslauf ohne neuen Sheet-Bedarf,
 - keine pauschale Activity-Öffnungsstatus-Massenpflege,
-- keine Prozesshärtung des KI-/Inbox-Flows vor dem echten Main-Beweis.
-<!-- === END BLOCK: MASTER_POST_MAIN_MERGE_2026_06_19 === -->
+- keine CSS-/Doku-Großkonsolidierung ohne konkreten aktuellen Steuerungsgewinn.
+<!-- === END BLOCK: MASTER_CURRENT_CONTROL_2026_06_22 === -->
 
 ---
 
@@ -138,25 +146,3 @@ Bis zu diesem Beweis nicht starten:
 - Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.
 
 <!-- === END CANONICAL MASTER FILE === -->
-
-<!-- === BEGIN BLOCK: MASTER_CURRENT_PROJECT_CONTINUATION_2026_06_09 | Zweck: ersetzt veralteten Today-Home-Fortsetzungspunkt durch aktuellen Steuerungsstand; Umfang: KI-Intake, Event-Visual-Freeze, Activity-Visuals, Activity-Opening === -->
-## Aktueller Fortsetzungspunkt – KI-Intake Main-Beweis und getrennte Premium-Visual-Workstreams
-
-Stand: 2026-06-09, `staging` ZIP-Snapshot.
-
-Aktuell verbindlich:
-
-- Der nächste operative Pipeline-Beweis ist der Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main`.
-- Auf `staging` ist die echte Google-Sheet-Kette bewusst nicht vollständig prüfbar, weil der Workflow per Branch-Guard geschützt ist.
-- Nach dem Suchlauf ist zu prüfen, ob `Inbox.visual_key`, Dropdown, redaktionelle Key-Änderung, `Events.visual_key`, Build und Eventbild-Ausspielung zusammen funktionieren.
-- Event-Visual-Duplicate-Cleanup ist vorerst gefreezt; Folgearbeit dort nur bei konkretem sichtbaren Symptom oder bewusstem neuen Eventdatenstand.
-- Activity-Premium-Visuals sind ein eigener Qualitäts-Workstream mit exklusiven Bildern pro Activity und dürfen nicht mit Event-Visuals vermischt werden.
-- Activity-Opening-Status ist grundsätzlich umgesetzt; Folgearbeit nur noch gezielt an Saisonlogik, Detailtexten und Sonderfällen.
-
-Nicht als nächstes starten:
-
-- kein weiterer breiter Event-Card-Polish ohne konkretes Symptom
-- keine erneute pauschale Activity-Öffnungszeiten-Massenpflege
-- keine KI-Chat-Simulation als Ersatz für den späteren `main`-Beweis
-- keine Vermischung von Roadmap-Konsolidierung, Bildproduktion und App-Logik in einem Patch
-<!-- === END BLOCK: MASTER_CURRENT_PROJECT_CONTINUATION_2026_06_09 === -->
