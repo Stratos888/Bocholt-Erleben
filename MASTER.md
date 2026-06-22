@@ -39,7 +39,7 @@ The following workpack is intentionally on hold:
 ## CURRENT FOCUS
 
 <!-- === BEGIN BLOCK: MASTER_CURRENT_CONTROL_2026_06_22 | Zweck: konsolidiert aktuellen Live-/Staging-Stand fuer Folgechats; Umfang: abgeschlossene Stabilisierung, geparkte Punkte, naechster operativer Beweis === -->
-### Aktueller Steuerungsstand: stabilisierte Live-Basis, KI-/Inbox-Beweis als nächster Timer-Punkt
+### Aktueller Steuerungsstand: stabilisierte Live-Basis, Content-Sicherung vor weiterem Wachstum
 
 Stand: 2026-06-22.
 
@@ -52,28 +52,28 @@ Aktuell abgeschlossen und nicht erneut öffnen ohne konkretes Symptom:
 - Aktivitätspräsenz-Funnel und Stripe-Rücksprunglogik sind statisch gegen die neue Route geprüft.
 - Event-Visual-Motif-Fit ist für den aktuellen Sheet-Stand abgeschlossen; es gibt keine offenen `gap_to_produce`-, `candidate_to_integrate`- oder `review_rules`-Motive.
 
-Nächster operativer Beweis bleibt bewusst terminiert:
+Aktueller nächster Haupt-Workpack:
 
-- Den nächsten automatischen KI-Suchlauf auf `main` bzw. den nächsten tatsächlichen Manual-KI-Intake-Lauf prüfen.
-- Geplanter Kontrollzeitpunkt: Dienstag, 2026-06-23, 11:00 Uhr.
-
-Zu prüfen:
-
-1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
-2. Das Dropdown für `Inbox.visual_key` enthält die erlaubten Keys aus `data/event_visual_pool.json`.
-3. Ein redaktionell geänderter `visual_key` bleibt beim Übernehmen erhalten.
-4. `Events.visual_key` wird korrekt geschrieben.
-5. Der spätere Build übernimmt den Key in die deployten Eventdaten.
-6. Event-Cards erhalten dadurch automatisch passende Bilder aus dem Event-Visual-Pool.
+- Content Quality Guard einführen, bevor weiterer SEO-/Content-Ausbau oder Anbieter-Akquise gestartet wird.
+- Der Guard prüft die echten aktuellen Quellen des Projekts:
+  1. Google-Sheet-Tab `Events` für redaktionelle Events.
+  2. `/api/events/public.php` für freigegebene DB-/Veranstalter-Events.
+  3. `data/offers.json` für Activities.
+- Prüfergebnisse werden in den Google-Sheet-Tab `Content_Audit` geschrieben; auf `staging` in `Content_Audit_Staging`.
+- Fachliche Inhalte werden nicht blind automatisch überschrieben; sichere technische Abfangfälle, Warnungen und Review-Fälle werden klar getrennt.
 
 Bewusst geparkt:
 
-- Activity-Visual-Restschuld / `fallback` / `needs_review` erst später gezielt öffnen.
+- Den nächsten automatischen KI-Suchlauf auf `main` bzw. den nächsten tatsächlichen Manual-KI-Intake-Lauf prüfen.
+- Geplanter Kontrollzeitpunkt dafür bleibt: Dienstag, 2026-06-23, 11:00 Uhr.
+- Activity-Visual-Restschuld / `fallback` / `needs_review` nur gezielt öffnen, wenn der Content Quality Guard konkrete Review-Fälle bestätigt.
 - 28-/30-Tage-Reporting-Datenlauf abwarten, bevor Akquise- oder Feedbackberichte als belastbar bewertet werden.
 - Keine weitere KI-/Inbox-Prozesshärtung vor dem echten Main-Handoff-Beweis.
 
-Bis zum KI-/Inbox-Beweis nicht starten:
+Bis zur Einführung und ersten Bewertung des Content Quality Guard nicht starten:
 
+- keine SEO-Themenseiten,
+- kein größerer Activity-/Content-Ausbau,
 - kein neuer breiter UI-/Feature-Workpack,
 - kein erneuter Event-Visual-Produktionslauf ohne neuen Sheet-Bedarf,
 - keine pauschale Activity-Öffnungsstatus-Massenpflege,
@@ -140,9 +140,9 @@ Bis zum KI-/Inbox-Beweis nicht starten:
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.
-- First operational proof after the successful Main merge and Live smoke: evaluate the next automatic `main` search run for Manual-KI-Intake / Visual-Key-Handoff.
-- Do not treat a `staging` workflow attempt or chat simulation as the final proof; the real Google-Sheet chain must be verified on `main`.
-- Activity-Premium-Visuals continue as a separate workstream and must not reopen the frozen Event-Visual-Duplicate-Cleanup without a concrete symptom.
+- Current next workpack: introduce and validate the Content Quality Guard against the real Sheet-/DB-/Repo content sources.
+- Manual-KI-Intake / Visual-Key-Handoff remains parked until the scheduled real `main` check; do not treat a `staging` workflow attempt or chat simulation as the final proof.
+- Activity-Premium-Visuals continue as a separate workstream and must not reopen the frozen Event-Visual-Duplicate-Cleanup without a concrete symptom or Content-Quality-Guard finding.
 - Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.
 
 <!-- === END CANONICAL MASTER FILE === -->

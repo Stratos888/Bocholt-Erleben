@@ -89,6 +89,18 @@ Never stack a new patch on unrelated uncommitted WIP.
 - Production KI workflows run on `main` only and must target the live Inbox/push path.
 - `Inbox → Events` import is production-only and must not run on `staging`.
 
+### Content Quality Guard rule
+
+- Regular content quality checks must follow the actual source ownership:
+  1. Google Sheet tab `Events` for editorial events.
+  2. Public DB/API feed `/api/events/public.php` for approved organizer events.
+  3. `data/offers.json` for Activities.
+- Audit results are written to `Content_Audit` on live/main and `Content_Audit_Staging` on staging.
+- Audit workflows may write audit rows, summaries and review recommendations, but must not silently overwrite editorial source rows.
+- Deterministic auto-handling is allowed only for safe technical cases, for example expired Events being excluded by the build/runtime feed.
+- Semantically uncertain findings, such as changed times, cancellations, moved locations, unreachable sources, ambiguous redirects or stale Activity availability, must become `review_needed` or `warning`, not a blind data mutation.
+- Activities remain repo-/JSON-owned; Activity corrections require a visible repo patch unless a future owner contract explicitly moves them into a Sheet-backed source.
+
 ---
 
 ## 2. PROOF BEFORE PATCH

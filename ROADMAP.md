@@ -42,35 +42,38 @@ Dieser Block überschreibt ältere "nächster Workpack"-Formulierungen weiter un
   - keine offenen `review_rules`-Motive,
   - leerer Gap-Backlog für den geprüften Stand.
 
-### Nächster operativer Punkt
+### Neuer nächster Haupt-Workpack
 
-Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main` bewerten.
+Content Quality Guard als dauerhafte Sicherung vor weiterem Content-/SEO-Wachstum einführen.
 
-Geplanter Kontrollzeitpunkt:
+Ziel:
 
-- Dienstag, 2026-06-23, 11:00 Uhr.
+- Redaktionelle Events aus dem Google-Sheet-Tab `Events`, freigegebene DB-/Veranstalter-Events aus `/api/events/public.php` und Activities aus `data/offers.json` regelmäßig automatisch prüfen.
+- Ergebnisse in den Google-Sheet-Tab `Content_Audit` schreiben; auf `staging` in `Content_Audit_Staging`.
+- Harte technische Fehler, sichere Auto-Abfangfälle und fachliche Review-Fälle strikt trennen.
+- Keine unsichere KI- oder Website-Textauswertung darf fachliche Inhalte blind überschreiben.
 
-Zu prüfen:
+Akzeptanzkriterien:
 
-1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
-2. Das Dropdown für `Inbox.visual_key` enthält die erlaubten Keys aus `data/event_visual_pool.json`.
-3. Ein redaktionell geänderter `visual_key` bleibt beim Übernehmen erhalten.
-4. `Events.visual_key` wird korrekt geschrieben.
-5. Der spätere Build übernimmt den Key in die deployten Eventdaten.
-6. Event-Cards erhalten dadurch automatisch passende Bilder aus dem Event-Visual-Pool.
-
-Wichtig: Eine Chat-Simulation oder ein `staging`-Workflow-Lauf ersetzt diesen Beweis nicht. Der vollständige Beweis muss auf `main` gegen die echte Google-Sheet-Kette erfolgen.
+1. Workflow `.github/workflows/content-quality-audit.yml` läuft manuell, täglich und wöchentlich.
+2. Script `scripts/content-quality-audit.py` prüft Sheet-Events, optionale Public-DB-Events und Activities.
+3. Der Audit erzeugt JSON-/Markdown-Reports und schreibt die tabellarische Review-Liste ins Google Sheet.
+4. Automatisch als erledigt markiert werden nur deterministische Fälle wie sicher abgelaufene Events, die vom Build nicht mehr ausgespielt werden.
+5. Unsichere fachliche Fälle landen als `review_needed` oder `warning` im Audit-Tab, nicht als automatische Datenänderung.
+6. Der bestehende Sheet-first-Prozess bleibt erhalten: `Events` bleibt fachliche Event-Quelle; Anbieter-Events bleiben DB/API; Activities bleiben Repo-/JSON-geführt.
 
 ### Bewusst geparkt
 
-- Activity-Visual-Restschuld (`fallback`, `needs_review`) erst später als eigener Qualitätsworkpack öffnen.
+- Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main` bewerten.
+- Activity-Visual-Restschuld (`fallback`, `needs_review`) erst später als eigener Qualitätsworkpack öffnen, sofern der neue Content Quality Guard konkrete Review-Fälle ausweist.
 - 28-/30-Tage-Reporting-Datenlauf abwarten, bevor Akquise-/Feedbackberichte als belastbar bewertet werden.
 - KI-/Inbox-Prozesshärtung erst nach dem echten Main-Handoff-Beweis starten.
 - Keine weitere Event-Visual-Produktion ohne neuen Sheet-Bedarf, neuen Gap-Backlog oder bewusste strategische Poolentscheidung.
 
 ### Nicht als nächstes starten
 
-- Kein neuer breiter UI-/Feature-Workpack bis nach dem KI-/Inbox-Handoff-Beweis.
+- Keine SEO-Themenseiten und kein größerer Activity-Ausbau, bevor der Content Quality Guard eingeführt und einmal bewertet wurde.
+- Kein neuer breiter UI-/Feature-Workpack ohne konkretes Symptom.
 - Kein weiterer Event-Card-Polish ohne konkretes Symptom.
 - Keine erneute pauschale Activity-Öffnungsstatus-Massenpflege.
 - Kein CSS-/Doku-Großrefactoring ohne konkreten aktuellen Steuerungsgewinn.
@@ -375,21 +378,22 @@ Akzeptanzkriterien:
 
 ## P0.5 — Inhaltsqualität, Prüfläufe und kontrolliertes Self-Healing
 
-<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_SELF_HEALING_V1_2026_05_31 | Zweck: nimmt regelmäßige Live-Content-Prüfung, Warnlogik und sichere automatische Korrekturen als späteren Workstream auf; Umfang: Events aus Google Sheet/DB, Activities aus offers.json, Audit-Reports, Auto-Fix-Grenzen === -->
+<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_SELF_HEALING_V1_2026_05_31 | Zweck: nimmt regelmäßige Live-Content-Prüfung, Warnlogik und sichere automatische Korrekturen als aktiven Workstream auf; Umfang: Events aus Google Sheet/DB, Activities aus offers.json, Audit-Reports, Google-Sheet-Reviewtab, Auto-Fix-Grenzen === -->
 
-Status 2026-05-31:
+Status 2026-06-22:
 
-- Der generierte Event-Feed `data/events.json` wurde aus dem Repository entfernt.
-- Fachliche Event-Quelle bleibt das Google Sheet; zugelassene Veranstalter-Einreichungen kommen zusätzlich aus der DB/API.
-- `data/events.json` bleibt nur ein generiertes Deploy-/Runtime-Artefakt, weil Frontend, SEO-Schema und Service Worker den Feed zur Laufzeit laden.
-- Dadurch ist die bisherige Repo-Verwirrung durch stale Event-JSON reduziert.
-- Der nächste Qualitätsbedarf liegt nicht bei weiterer Discovery allein, sondern bei regelmäßiger Prüfung bereits live sichtbarer Inhalte.
+- Der generierte Event-Feed `data/events.json` wurde aus dem Repository entfernt bzw. ist nur noch Deploy-/Runtime-Artefakt.
+- Fachliche Event-Quelle bleibt das Google Sheet, Tab `Events`.
+- Zugelassene Veranstalter-Einreichungen kommen zusätzlich aus der DB/API über `/api/events/public.php`.
+- Activities bleiben aktuell Repo-/JSON-geführt über `data/offers.json`.
+- Der nächste Qualitätsbedarf liegt vor weiterem SEO-/Content-Wachstum bei regelmäßiger Prüfung bereits live sichtbarer Inhalte.
 
 Ziel:
 
 - Live sichtbare Events und Aktivitäten werden regelmäßig auf technische und fachliche Auffälligkeiten geprüft.
-- Der Prüflauf unterscheidet klar zwischen sicher automatisch korrigierbaren Fällen und Fällen, die eine Warnung bzw. redaktionelle Prüfung brauchen.
+- Der Prüflauf unterscheidet klar zwischen sicher automatisch abgefangenen Fällen und Fällen, die eine Warnung bzw. redaktionelle Prüfung brauchen.
 - Automatische Korrekturen dürfen nur erfolgen, wenn die Änderung deterministisch belegbar und regressionsarm ist.
+- Unsichere KI-/Website-Textinterpretationen dürfen fachliche Inhalte nicht blind überschreiben.
 
 Warum:
 
@@ -398,39 +402,43 @@ Warum:
 - Manuelle Vollkontrolle aller Live-Inhalte ist langfristig nicht realistisch.
 - Blinde Auto-Korrekturen wären aber riskanter als ein fehlender Prüflauf.
 
-Scope für den späteren Workstream:
+Scope des dauerhaften Workstreams:
 
-- Events aus dem live generierten Sheet-Feed.
+- Redaktionelle Events aus dem Google-Sheet-Tab `Events`.
 - Genehmigte öffentliche DB-Events aus `/api/events/public.php`.
 - Aktivitäten aus `data/offers.json`.
 - Quellen-URLs, Event-URLs, Website-Links, Maps-Ziele und Bild-URLs.
-- Prüfbericht für interne Nutzung.
-- Optional später: Audit-Status im internen Dashboard.
+- Ergebnis als JSON-/Markdown-Report im Workflow und als Google-Sheet-Tab:
+  - `Content_Audit` auf live/main.
+  - `Content_Audit_Staging` auf staging.
+- Optional später: Darstellung im internen Dashboard, sofern der Sheet-Tab nicht mehr ausreicht.
 
-Nicht im Scope der ersten Umsetzung:
+Harte Grenzen:
 
 - Kein automatisches Umschreiben freier Beschreibungstexte.
 - Kein automatisches Löschen von Events nur wegen temporär nicht erreichbarer Quelle.
 - Kein blindes Überschreiben des Google Sheets durch unsichere KI-Auswertung.
-- Kein Anbieterbericht oder öffentliche Qualitätsanzeige.
+- Kein automatisches Ändern von Activity-Daten in `data/offers.json`; dafür bleibt ein sichtbarer Repo-Patch nötig.
+- Kein Anbieterbericht oder öffentliche Qualitätsanzeige aus ungeprüften Audit-Befunden.
 
 Empfohlener Prüfrhythmus:
 
 - Events, leichtgewichtig: täglich, Fokus auf die nächsten 14 Tage.
 - Events, tiefer Quellencheck: wöchentlich für den relevanten Zukunftsbestand.
+- DB-/Veranstalter-Events: täglich über `/api/events/public.php`.
 - Aktivitäten, technischer Check: wöchentlich.
-- Aktivitäten, tiefer Plausibilitäts-/Quellencheck: monatlich.
+- Aktivitäten, tiefer Plausibilitäts-/Quellencheck: monatlich bzw. über `checked_at`-Alterung.
 
-Sichere Auto-Fix-Kandidaten ohne KI:
+Sichere Auto-Fix-/Auto-Abfang-Kandidaten ohne KI:
 
 - abgelaufene Events nicht mehr ausspielen bzw. beim Feed-Build ausschließen.
-- kaputte Bild-URLs durch vorhandene Fallback-Logik abfangen.
+- kaputte Bild-URLs durch vorhandene Fallback-Logik abfangen, sofern Fallback vorhanden ist.
 - fehlende Pflichtfelder blockieren oder in Review markieren.
 - harte Duplikate nach stabiler ID oder eindeutigem Schlüssel unterdrücken.
 - permanente Redirects protokollieren und später kontrolliert übernehmen.
-- strukturierte Quelldaten übernehmen, wenn JSON-LD, ICS oder API-Daten eindeutig demselben Event zugeordnet werden können.
+- strukturierte Quelldaten übernehmen, wenn JSON-LD, ICS oder API-Daten eindeutig demselben Event zugeordnet werden können; bis dahin nur Review-Empfehlung.
 
-Nicht sicher ohne KI oder spezialisierten Quellenparser:
+Nicht sicher ohne spezialisierte Quellenparser oder redaktionelle Prüfung:
 
 - geänderte Uhrzeiten aus freiem Website-Text erkennen.
 - verschobene oder abgesagte Events sicher interpretieren.
@@ -441,40 +449,32 @@ Nicht sicher ohne KI oder spezialisierten Quellenparser:
 Benachrichtigungs- und Reaktionslogik:
 
 - `auto_fixed`: keine Sofortwarnung; Aufnahme in Tages-/Wochenprotokoll.
-- `warning`: im internen Dashboard oder Audit-Report sichtbar machen.
-- `review_needed`: interne Warnung erzeugen; nicht automatisch öffentlich ändern.
-- `critical`: Push/E-Mail oder deutlich sichtbarer interner Hinweis.
+- `warning`: im `Content_Audit`-Tab oder Audit-Report sichtbar machen.
+- `review_needed`: interne Review-Arbeit erzeugen; nicht automatisch öffentlich ändern.
+- `critical`: deutlich sichtbarer interner Hinweis im Audit-Tab; Deploy bleibt durch bestehende technische Gates geschützt.
 - `source_unreachable`: protokollieren; erst nach Wiederholung oder besonderer Kritikalität eskalieren.
 
-Mögliche technische Bausteine:
+Technische Bausteine:
 
-- neuer Workflow `content-quality-audit.yml`.
-- neues Script `scripts/content-quality-audit.py` für harte technische Checks.
-- später optional `scripts/content-source-audit.py` für Quellenvergleich.
-- Ergebnisdatei oder Sheet-Tab `Content_Audit`.
-- Google-Sheets-Schreibrechte nur für einen eng begrenzten späteren Auto-Fix-Workflow, nicht für den normalen Deploy.
+- Workflow `.github/workflows/content-quality-audit.yml`.
+- Script `scripts/content-quality-audit.py` für harte technische Checks, Quellen-/Linkprüfungen und Review-Klassifizierung.
+- Workflow-Reports `data/content-quality-report.json` und `data/content-quality-report.md` als nicht committete Workflow-Artefakte.
+- Google-Sheet-Zieltab `Content_Audit` / `Content_Audit_Staging`.
+- Google-Sheets-Schreibrechte nur für Audit-Zeilen, nicht für fachliche Datenmutation in `Events`, `Inbox` oder Activity-Quellen.
 
-Akzeptanzkriterien für Phase 1:
+Akzeptanzkriterien:
 
 - Der Audit läuft unabhängig vom normalen Deploy.
-- Der Audit prüft den echten Live-/Runtime-Bestand, nicht eine stale Repo-Kopie.
+- Der Audit prüft den echten Sheet-/Runtime-/Repo-Bestand, nicht eine stale Event-JSON-Kopie.
 - Der Audit erzeugt einen verständlichen Bericht mit Severity, betroffener Quelle und empfohlener Aktion.
 - Harte technische Fehler sind klar von fachlichen Unsicherheiten getrennt.
 - Kein unsicherer Befund verändert automatisch öffentliche Inhalte.
-
-Akzeptanzkriterien für spätere Auto-Fix-Phase:
-
-- Jede Auto-Korrektur ist nachvollziehbar protokolliert.
-- Auto-Fixes sind auf deterministische Fälle begrenzt.
-- Für Google-Sheet-Änderungen gibt es Schreibschutzlogik, Audit-Log und möglichst eine Rücknahmeoption.
-- KI darf nur als Assistenz für semantische Prüfung eingesetzt werden, nicht als alleiniger Grund für blindes Überschreiben.
-- Bei widersprüchlichen Quellen gewinnt nicht automatisch die externe Quelle; der Fall geht in Review.
+- Jede deterministische Auto-Abfanglogik ist nachvollziehbar protokolliert.
 
 Prioritätseinordnung:
 
-- Nicht vor den aktuell laufenden Messwert-/Akquise-Wartepunkten erzwingen.
-- Sinnvoller Anschluss nach stabiler Nutzwertmessung und bevor größere Content-Mengen weiter ausgebaut werden.
-- Phase 1 kann klein und technisch beginnen, ohne die Produktoberfläche zu verändern.
+- Dieser Workstream kommt vor SEO-Themenseiten, größerem Activity-Ausbau und Anbieter-Akquise.
+- Ziel ist nicht mehr Content um jeden Preis, sondern belastbarer, regelmäßig kontrollierter Content als Wachstumsbasis.
 
 <!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_SELF_HEALING_V1_2026_05_31 === -->
 
