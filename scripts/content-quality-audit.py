@@ -33,6 +33,23 @@ SEVERITY_RANK = {
 EVENT_REQUIRED_FIELDS = ["id", "title", "date", "city", "location", "kategorie"]
 ACTIVITY_REQUIRED_FIELDS = ["id", "title", "location", "description", "url", "visual_key", "opening_status"]
 SAFE_IMAGE_STATUSES = {"ready", "usable", "fallback"}
+TICKET_PORTAL_HOSTS = (
+    "reservix.de",
+    "eventim.de",
+    "ticket.io",
+    "adticket.de",
+    "pretix.eu",
+    "rausgegangen.de",
+)
+
+
+def url_host(value: str) -> str:
+    return (urlparse(norm(value)).netloc or "").lower().removeprefix("www.")
+
+
+def is_ticket_portal_url(value: str) -> bool:
+    host = url_host(value)
+    return any(host == portal or host.endswith("." + portal) for portal in TICKET_PORTAL_HOSTS)
 
 
 @dataclass
@@ -341,6 +358,23 @@ def audit_event_rows(
         if scope == "daily" and not in_daily_window:
             continue
 
+        if scope in {"daily", "full"}:
+            imminent = today <= start_date <= (today + timedelta(days=3))
+            checklist = "Titel, Datum, Start-/Endzeit, Ort/Adresse, Quelle, Ticketlink, Absage/Verschiebung, Beschreibung, Kategorie/Tags und Bild/Motiv vollständig gegen die Quelle prüfen."
+            issues.append(issue(
+                "critical" if imminent else "review_needed",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_full_verification_due",
+                "Event muss vollständig fachlich re-verifiziert werden.",
+                checklist + " Wenn alles stimmt: in der Inbox als vollständig geprüft markieren. Wenn etwas abweicht: Felder im Events-Sheet korrigieren.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+            ))
+
         if time_value and not RE_TIME.match(time_value):
             issues.append(issue(
                 "critical" if in_daily_window else "review_needed",
@@ -428,7 +462,21 @@ def audit_event_rows(
             ))
         elif network:
             status, detail = check_url(url)
-            if status == "critical":
+            if is_ticket_portal_url(url) and status in {"critical", "warning"}:
+                issues.append(issue(
+                    "review_needed" if in_daily_window else "warning",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_ticket_url_manual_check",
+                    f"Ticketportal konnte vom Bot nicht sicher geprüft werden: {detail}",
+                    "Ticketlink im Browser öffnen. Wenn der Ticket-/Buchungslink für Nutzer sinnvoll funktioniert: Ticketlink manuell bestätigen. Wenn er falsch ist: passende Eventquelle oder Ticket-URL im Sheet korrigieren.",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                ))
+            elif status == "critical":
                 issues.append(issue(
                     "critical" if in_daily_window else "review_needed",
                     "event",
@@ -564,6 +612,19 @@ def audit_activities(
                     source_url=source_url,
                     public_url=public_url,
                 ))
+
+        issues.append(issue(
+            "review_needed",
+            "activity",
+            "offers_json",
+            content_id,
+            title,
+            "activity_full_verification_due",
+            "Activity muss vollständig fachlich re-verifiziert werden.",
+            "Quelle öffnen und Ort, Maps, Öffnungszeiten, Saison/Feiertage, Kosten, Beschreibung, Tags/Merkmale, Bild und Bildnachweis vollständig prüfen. Wenn alles stimmt: in der Inbox als vollständig geprüft markieren. Bei Abweichung: Patch nötig markieren.",
+            source_url=source_url,
+            public_url=public_url,
+        ))
 
         if content_id in seen_ids:
             issues.append(issue(

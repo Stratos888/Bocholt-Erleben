@@ -46,7 +46,7 @@ Umfang:
     .brand { display:flex; align-items:baseline; gap:10px; padding-top: 8px; }
     .title { font-weight: 800; line-height: 1.1; }
     .inboxToolbar { display:flex; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
-    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_CSS_V1 | Zweck: trennt normale Event-Kuratierung und Content-Pruefung in derselben Inbox-Oberflaeche sichtbar, ohne Workflows zu vermischen; Umfang: Mode-Switch und Audit-Karten-Ergaenzungen === */
+    /* === BEGIN BLOCK: INBOX_CONTENT_VERIFICATION_WORKBENCH_CSS_V1 | Zweck: fuehrt Audit-Faelle als klare Content-Pruefaufgaben mit Anweisung, Checkliste und Korrekturfeldern; Umfang: Mode-Switch und Verification-Karten-Ergaenzungen === */
     .reviewModeSwitch { display:flex; gap:7px; flex-wrap:wrap; margin: 9px 0 0; }
     .reviewModeSwitch .btn { padding: 7px 10px; font-size: 13px; }
     .reviewModeSwitch .is-active { border-color: rgba(38,118,62,.42); background: rgba(38,118,62,.075); font-weight: 800; }
@@ -54,10 +54,20 @@ Umfang:
     .auditIssueBox--critical { border-color:rgba(160,0,0,.35); background:rgba(160,0,0,.065); }
     .auditIssueBox--review_needed { border-color:rgba(155,112,0,.32); background:rgba(155,112,0,.065); }
     .auditIssueBox--warning { border-color:rgba(42,95,150,.25); background:rgba(42,95,150,.055); }
-    .auditUrlEdit { display:grid; gap:6px; margin-top:8px; }
-    .auditUrlEdit input { width:100%; box-sizing:border-box; padding:10px 12px; border-radius:12px; border:1px solid rgba(0,0,0,.18); font:inherit; background:transparent; }
+    .auditInstructionBox { display:grid; gap:8px; margin:0; padding:12px; border-radius:14px; border:1px solid rgba(38,118,62,.22); background:rgba(38,118,62,.055); font-size:14px; line-height:1.38; }
+    .auditInstructionBox strong { display:block; margin-bottom:2px; }
+    .auditChecklist { margin: 0; padding-left: 20px; display:grid; gap:5px; font-size:13.5px; line-height:1.32; }
+    .auditFormGrid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+    .auditField { display:grid; gap:4px; }
+    .auditField--wide { grid-column: 1 / -1; }
+    .auditField label { font-size:12px; font-weight:760; opacity:.78; }
+    .auditField input,
+    .auditField textarea { width:100%; box-sizing:border-box; padding:9px 10px; border-radius:12px; border:1px solid rgba(0,0,0,.18); font:inherit; background:transparent; }
+    .auditField textarea { min-height:76px; resize:vertical; }
     .auditActionHint { font-size:12.5px; line-height:1.35; opacity:.76; }
-    /* === END BLOCK: INBOX_CONTENT_AUDIT_MODE_CSS_V1 === */
+    .auditStateNote { border-radius:12px; padding:9px 10px; background:rgba(0,0,0,.035); font-size:13px; line-height:1.35; }
+    @media (max-width: 560px) { .auditFormGrid { grid-template-columns:1fr; } }
+    /* === END BLOCK: INBOX_CONTENT_VERIFICATION_WORKBENCH_CSS_V1 === */
     .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.16); font-size: 12px; }
     .muted { opacity: .72; }
     .status { margin-top: 8px; font-size: 13px; }
@@ -606,7 +616,7 @@ Umfang:
       }
     }
 
-    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_FETCH_V1 | Zweck: laedt offene Content-Quality-Faelle aus dem geschuetzten Backend statt aus dem normalen Event-Kandidaten-Feed; Umfang: Fetch- und Helper-Funktionen === */
+    /* === BEGIN BLOCK: INBOX_CONTENT_VERIFICATION_FETCH_V2 | Zweck: laedt offene Content-Verification-Faelle aus dem geschuetzten Backend statt aus dem normalen Event-Kandidaten-Feed; Umfang: Fetch- und Helper-Funktionen === */
     function isContentAuditItem(item) {
       return String(item && item.review_source || "") === "content_audit";
     }
@@ -621,13 +631,32 @@ Umfang:
       return labels[key] || key || "Content-Prüfung";
     }
 
+    function formatContentAuditStatus(value) {
+      const key = trimValue(value) || "open";
+      const labels = {
+        open: "offen",
+        patch_needed: "Patch nötig",
+        source_unavailable: "Quelle unklar",
+        blocked: "blockiert",
+        snoozed: "zurückgestellt",
+        verified: "geprüft",
+        corrected: "korrigiert"
+      };
+      return labels[key] || key;
+    }
+
+    function isContentAuditEventItem(item) {
+      return trimValue(item.content_type) === "event" && trimValue(item.source_system) === "sheet_events";
+    }
+
+    function isContentAuditActivityItem(item) {
+      return trimValue(item.content_type) === "activity" && trimValue(item.source_system) === "offers_json";
+    }
+
     function isContentAuditEventSourceUrlIssue(item) {
-      const sourceSystem = trimValue(item.source_system);
-      const contentType = trimValue(item.content_type);
       const issueCode = trimValue(item.issue_code);
-      return contentType === "event"
-        && sourceSystem === "sheet_events"
-        && ["event_source_url_broken", "event_source_url_redirect", "event_source_url_unstable"].includes(issueCode);
+      return isContentAuditEventItem(item)
+        && ["event_source_url_broken", "event_source_url_redirect", "event_source_url_unstable", "event_ticket_url_manual_check"].includes(issueCode);
     }
 
     async function fetchContentAuditReviewItems() {
@@ -663,7 +692,7 @@ Umfang:
         return { items: [], total: 0, error: "content_audit_network_failed" };
       }
     }
-    /* === END BLOCK: INBOX_CONTENT_AUDIT_FETCH_V1 === */
+    /* === END BLOCK: INBOX_CONTENT_VERIFICATION_FETCH_V2 === */
 
     function normalizeSheetReviewItem(item) {
       return {
@@ -1372,7 +1401,7 @@ Umfang:
       // === END BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
     }
 
-    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_RENDER_AND_ACTIONS_V1 | Zweck: macht offene Audit-Faelle in der Inbox bearbeitbar und erlaubt sichere Sheet-Event-URL-Korrekturen; Umfang: eigener Render- und Write-Pfad fuer review_source=content_audit === */
+    /* === BEGIN BLOCK: INBOX_CONTENT_VERIFICATION_RENDER_AND_ACTIONS_V2 | Zweck: macht Content-Quality-Faelle als klare Pruefaufgaben mit Checkliste, Korrekturfeldern und eindeutigen Statusaktionen bearbeitbar; Umfang: eigener Render- und Write-Pfad fuer review_source=content_audit === */
     function buildContentAuditRows(item) {
       return [
         ["Typ", trimValue(item.content_type)],
@@ -1380,18 +1409,196 @@ Umfang:
         ["ID", trimValue(item.content_id)],
         ["Datum", formatGermanDate(item.date)],
         ["Issue-Code", trimValue(item.issue_code)],
+        ["Status", formatContentAuditStatus(item.status)],
         ["Erstmals gesehen", formatGermanDateTime(item.first_seen_at)],
         ["Zuletzt gesehen", formatGermanDateTime(item.last_seen_at)],
         ["Anzahl", trimValue(item.occurrence_count)],
+        ["Nächste Prüfung", formatGermanDate(item.next_review_at)],
         ["Tab", trimValue(item.sheet_tab)]
       ].filter(([, value]) => trimValue(value));
+    }
+
+    function contentAuditGuide(item) {
+      const code = trimValue(item.issue_code);
+      const type = trimValue(item.content_type);
+      const source = trimValue(item.source_system);
+      const guides = {
+        event_full_verification_due: {
+          actionTitle: "Event vollständig gegen die Quelle prüfen",
+          why: "Datum, Uhrzeit, Ort oder Absage können sich ändern. Dieser Check macht den Event-Datensatz bewusst verifiziert.",
+          action: "Öffne die Quelle. Vergleiche Titel, Datum, Start-/Endzeit, Ort/Adresse, Ticketlink, Status/Absage, Beschreibung, Kategorie/Tags und Bild. Wenn alles stimmt: „Vollständig geprüft“ klicken. Wenn etwas abweicht: Felder unten korrigieren und speichern.",
+          checklist: ["Titel stimmt", "Datum stimmt", "Startzeit und Endzeit stimmen", "Ort/Adresse stimmt", "Quelle/Ticketlink funktioniert", "keine Absage oder Verschiebung erkennbar", "Beschreibung/Kategorie/Tags passen", "Bild/Motiv passt"],
+          nextReviewDays: 7
+        },
+        event_source_url_broken: {
+          actionTitle: "Kaputte Eventquelle beheben",
+          why: "Eine kaputte Quelle schwächt Vertrauen und verhindert Nachprüfung.",
+          action: "Öffne die Quelle. Suche die korrekte Eventseite. Wenn du eine neue URL findest, unten eintragen und speichern. Wenn die Quelle nur temporär nicht erreichbar ist: 7 Tage zurückstellen.",
+          checklist: ["Quelle im Browser öffnen", "neue korrekte Eventquelle suchen", "URL im Events-Sheet speichern oder Fall zurückstellen"],
+          nextReviewDays: 7
+        },
+        event_source_url_redirect: {
+          actionTitle: "Weiterleitung bewusst übernehmen oder bestätigen",
+          why: "Redirects können harmlos sein, aber auch auf eine allgemeinere oder falsche Seite führen.",
+          action: "Öffne die Quelle. Wenn die Zielseite fachlich korrekt ist, die finale URL unten speichern. Wenn die Weiterleitung bewusst akzeptiert werden soll, vollständig geprüft markieren.",
+          checklist: ["Quelle öffnen", "finale Zielseite fachlich prüfen", "finale URL speichern oder bewusst bestätigen"],
+          nextReviewDays: 14
+        },
+        event_source_url_unstable: {
+          actionTitle: "Unsichere Eventquelle manuell prüfen",
+          why: "Der Bot konnte die Quelle nicht sicher bewerten. Für Nutzer kann sie trotzdem funktionieren.",
+          action: "Quelle im Browser öffnen. Wenn sie funktioniert und der Inhalt stimmt: vollständig geprüft. Wenn sie falsch ist: URL korrigieren. Wenn sie temporär nicht erreichbar ist: 7 Tage zurückstellen.",
+          checklist: ["Quelle im Browser testen", "Eventdaten vergleichen", "bestätigen, korrigieren oder zurückstellen"],
+          nextReviewDays: 7
+        },
+        event_ticket_url_manual_check: {
+          actionTitle: "Ticketportal manuell prüfen",
+          why: "Ticketportale wie Reservix blockieren Bot-Prüfungen oft. Das ist nicht automatisch ein Fehler.",
+          action: "Ticketlink im Browser öffnen. Wenn der Ticket-/Buchungslink für Nutzer sinnvoll funktioniert, vollständig geprüft klicken. Wenn eigentlich eine redaktionelle Quelle fehlt, passende Quelle/URL unten korrigieren.",
+          checklist: ["Ticketlink im Browser öffnen", "prüfen, ob Nutzer sinnvoll buchen/Informationen sehen", "Ticketlink bestätigen oder bessere Quelle speichern"],
+          nextReviewDays: 14
+        },
+        event_time_format_unusual: {
+          actionTitle: "Eventzeit prüfen und korrigieren",
+          why: "Ungewöhnliche Zeitformate können auf falsche oder schwer lesbare Angaben hinweisen.",
+          action: "Quelle öffnen, Start-/Endzeit vergleichen und unten im Feld „Uhrzeit“ im Format HH:MM oder HH:MM–HH:MM speichern.",
+          checklist: ["Startzeit prüfen", "Endzeit prüfen", "Uhrzeit im Sheet korrigieren"],
+          nextReviewDays: 7
+        },
+        activity_full_verification_due: {
+          actionTitle: "Activity vollständig gegen die Quelle prüfen",
+          why: "Öffnungszeiten, Saison, Preise oder Nutzbarkeit können sich ändern. Diese Activity gilt erst nach vollständigem Check als qualitätsgesichert.",
+          action: "Quelle öffnen. Prüfe Ort, Maps, Öffnungszeiten, Saison/Feiertage, Kosten, Beschreibung, Tags/Merkmale, Bild und Bildnachweis. Wenn alles stimmt: vollständig geprüft. Wenn etwas geändert werden muss: Patch nötig markieren.",
+          checklist: ["Ort/Maps stimmt", "Öffnungszeiten stimmen", "Saison/Feiertage geprüft", "Kosten/Eintritt geprüft", "Beschreibung stimmt", "Tags/Merkmale passen", "Bild und Bildnachweis passen"],
+          nextReviewDays: 30
+        },
+        activity_required_field_missing: {
+          actionTitle: "Activity-Datensatz per Repo-Patch korrigieren",
+          why: "Activities liegen in data/offers.json und dürfen nicht unsichtbar über die Inbox überschrieben werden.",
+          action: "Quelle öffnen, fehlendes Feld fachlich bestimmen und „Patch nötig markieren“ klicken. Danach erstellen wir einen bewussten Repo-Patch.",
+          checklist: ["Quelle öffnen", "fehlenden Wert bestimmen", "Patch nötig markieren"],
+          nextReviewDays: 30
+        },
+        activity_image_needs_review: {
+          actionTitle: "Activity-Bild bewusst prüfen",
+          why: "Bilder mit needs_review sind noch nicht final freigegeben.",
+          action: "Öffentliche Seite und Quelle öffnen. Wenn Bild passt, später per Repo-Patch freigeben. Wenn es nicht passt, Ersatzbild/Patch vorbereiten.",
+          checklist: ["Bild in Card-Kontext ansehen", "Motiv-Fit prüfen", "Bildnachweis prüfen", "Patch nötig markieren"],
+          nextReviewDays: 30
+        },
+        activity_source_url_redirect: {
+          actionTitle: "Activity-Redirect prüfen",
+          why: "Eine weitergeleitete Quelle kann korrekt sein, sollte aber bewusst in data/offers.json nachgezogen werden.",
+          action: "Quelle öffnen, finale Zielseite prüfen und bei korrekter Zielseite Patch nötig markieren, damit die URL später im Repo aktualisiert wird.",
+          checklist: ["Quelle öffnen", "finale Zielseite prüfen", "Patch nötig markieren oder vollständig bestätigen"],
+          nextReviewDays: 30
+        },
+        activity_check_too_old: {
+          actionTitle: "Activity-Öffnungszeiten erneut prüfen",
+          why: "Der letzte fachliche Check ist zu alt; Öffnungszeiten/Saison können sich geändert haben.",
+          action: "Quelle öffnen, Öffnungszeiten und Saisonangaben vergleichen. Wenn alles stimmt: vollständig geprüft. Bei Änderung: Patch nötig markieren.",
+          checklist: ["Öffnungszeiten prüfen", "Saison/Feiertage prüfen", "Kosten prüfen", "Patch nötig oder vollständig geprüft"],
+          nextReviewDays: 30
+        }
+      };
+
+      return guides[code] || {
+        actionTitle: type === "activity" ? "Activity-Fall fachlich prüfen" : "Event-Fall fachlich prüfen",
+        why: "Der Guard hat einen Qualitätsfall gefunden, der nicht blind automatisch korrigiert wird.",
+        action: trimValue(item.recommended_action) || "Quelle öffnen, Angaben prüfen und den passenden Abschluss-Button verwenden.",
+        checklist: source === "offers_json" ? ["Quelle öffnen", "Angaben vergleichen", "Patch nötig markieren oder vollständig geprüft"] : ["Quelle öffnen", "Angaben vergleichen", "Events-Sheet korrigieren oder vollständig geprüft"],
+        nextReviewDays: type === "activity" ? 30 : 7
+      };
+    }
+
+    function eventFieldValue(item, name) {
+      const fields = item && item.event_fields && typeof item.event_fields === "object" ? item.event_fields : {};
+      return trimValue(fields[name]);
+    }
+
+    function renderAuditChecklist(items) {
+      return `<ul class="auditChecklist">${items.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>`;
+    }
+
+    function renderEventCorrectionForm(item, suggestedUrl) {
+      if (!isContentAuditEventItem(item)) return "";
+      const sourceValue = suggestedUrl || eventFieldValue(item, "source_url") || eventFieldValue(item, "url") || eventFieldValue(item, "event_url") || trimValue(item.source_url);
+      return `
+        <section class="reviewSection" aria-label="Eventdaten korrigieren">
+          <div class="reviewSectionTitle">Eventdaten im Sheet korrigieren</div>
+          <div class="auditActionHint">Nur ändern, wenn du die Abweichung in der Quelle gesehen hast. Leere Felder bleiben unverändert, wenn sie im Sheet nicht existieren.</div>
+          <div class="auditFormGrid">
+            <div class="auditField auditField--wide">
+              <label for="auditEventTitle">Titel</label>
+              <input id="auditEventTitle" type="text" value="${escapeHtml(eventFieldValue(item, "title") || item.title)}" autocomplete="off" />
+            </div>
+            <div class="auditField">
+              <label for="auditEventDate">Startdatum YYYY-MM-DD</label>
+              <input id="auditEventDate" type="text" value="${escapeHtml(eventFieldValue(item, "date") || item.date)}" inputmode="numeric" autocomplete="off" />
+            </div>
+            <div class="auditField">
+              <label for="auditEventEndDate">Enddatum YYYY-MM-DD</label>
+              <input id="auditEventEndDate" type="text" value="${escapeHtml(eventFieldValue(item, "endDate") || eventFieldValue(item, "end_date"))}" inputmode="numeric" autocomplete="off" />
+            </div>
+            <div class="auditField">
+              <label for="auditEventTime">Uhrzeit</label>
+              <input id="auditEventTime" type="text" value="${escapeHtml(eventFieldValue(item, "time"))}" autocomplete="off" />
+            </div>
+            <div class="auditField">
+              <label for="auditEventCity">Stadt</label>
+              <input id="auditEventCity" type="text" value="${escapeHtml(eventFieldValue(item, "city"))}" autocomplete="off" />
+            </div>
+            <div class="auditField auditField--wide">
+              <label for="auditEventLocation">Ort / Location</label>
+              <input id="auditEventLocation" type="text" value="${escapeHtml(eventFieldValue(item, "location"))}" autocomplete="off" />
+            </div>
+            <div class="auditField auditField--wide">
+              <label for="auditEventSourceUrl">Quelle / Ticketlink</label>
+              <input id="auditEventSourceUrl" type="url" value="${escapeHtml(sourceValue)}" inputmode="url" autocomplete="off" />
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function collectEventUpdateFields() {
+      const value = (id) => trimValue(document.getElementById(id)?.value);
+      const updates = {
+        title: value("auditEventTitle"),
+        date: value("auditEventDate"),
+        time: value("auditEventTime"),
+        city: value("auditEventCity"),
+        location: value("auditEventLocation")
+      };
+
+      const endDate = value("auditEventEndDate");
+      if (endDate) {
+        updates.endDate = endDate;
+        updates.end_date = endDate;
+      }
+
+      const sourceUrl = value("auditEventSourceUrl");
+      if (sourceUrl) {
+        updates.source_url = sourceUrl;
+        updates.url = sourceUrl;
+        updates.event_url = sourceUrl;
+        updates.ticket_url = sourceUrl;
+      }
+
+      Object.keys(updates).forEach((key) => {
+        if (!updates[key]) delete updates[key];
+      });
+      return updates;
     }
 
     function renderContentAuditCurrent(totalCount) {
       const it = current;
       const severity = trimValue(it.severity);
       const severityLabel = formatContentAuditSeverity(severity);
-      const canUpdateEventUrl = isContentAuditEventSourceUrlIssue(it);
+      const statusLabel = formatContentAuditStatus(it.status);
+      const guide = contentAuditGuide(it);
+      const canEditEvent = isContentAuditEventItem(it);
+      const isActivity = isContentAuditActivityItem(it);
       const suggestedUrl = trimValue(it.suggested_url) || trimValue(it.source_url);
       const auditRowsHtml = buildContentAuditRows(it).map(([label, value]) => `
         <div class="reviewRow">
@@ -1406,10 +1613,24 @@ Umfang:
             <div class="reviewBadgeRow">
               <span class="originBadge">Content-Prüfung</span>
               <span class="reviewChip reviewChip--waiting">${escapeHtml(severityLabel)}</span>
+              <span class="reviewChip">${escapeHtml(statusLabel)}</span>
             </div>
             <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
             <div class="reviewMetaLine">${escapeHtml([formatGermanDate(it.date), trimValue(it.content_type), trimValue(it.issue_code)].filter(Boolean).join(" · "))}</div>
           </header>
+
+          <section class="reviewSection" aria-label="Konkrete Aktion">
+            <div class="reviewSectionTitle">Jetzt zu tun</div>
+            <div class="auditInstructionBox">
+              <div><strong>${escapeHtml(guide.actionTitle)}</strong>${escapeHtml(guide.action)}</div>
+              <div><strong>Warum:</strong> ${escapeHtml(guide.why)}</div>
+            </div>
+          </section>
+
+          <section class="reviewSection" aria-label="Prüfliste">
+            <div class="reviewSectionTitle">Prüfliste</div>
+            ${renderAuditChecklist(guide.checklist)}
+          </section>
 
           <section class="reviewSection" aria-label="Prüfbefund">
             <div class="reviewSectionTitle">Prüfbefund</div>
@@ -1422,22 +1643,23 @@ Umfang:
           <section class="reviewSection" aria-label="Links">
             <div class="reviewSectionTitle">Links</div>
             <div class="urlBox">
-              ${it.public_url ? `<div class="urlLine"><strong>Öffentliche Seite:</strong> ${escapeHtml(it.public_url)}</div>` : ``}
-              ${it.source_url ? `<div class="urlLine"><strong>Quelle:</strong> ${escapeHtml(it.source_url)}</div>` : ``}
+              ${it.public_url ? `<div class="urlLine"><strong>Eintrag auf Website:</strong> ${escapeHtml(it.public_url)}</div>` : ``}
+              ${it.source_url ? `<div class="urlLine"><strong>Quelle/Ticketlink:</strong> ${escapeHtml(it.source_url)}</div>` : ``}
             </div>
-            ${canUpdateEventUrl ? `
-              <div class="auditUrlEdit">
-                <label class="rejectLabel" for="auditNewUrl">Neue Event-Quell-URL</label>
-                <input id="auditNewUrl" type="url" value="${escapeHtml(suggestedUrl)}" inputmode="url" autocomplete="off" />
-                <div class="auditActionHint">Speichert die URL direkt in der passenden Event-Zeile im Google-Sheet-Tab „Events“. Wenn du nichts sicher korrigieren kannst, nutze „Später“.</div>
-              </div>
-            ` : `
-              <div class="auditActionHint">Dieser Fall wird nicht automatisch korrigiert. Öffne die Quelle bzw. bereite bei Activities einen bewussten Repo-Patch vor.</div>
-            `}
+            <div class="auditActionHint">Erst Quelle öffnen und fachlich vergleichen. Danach unten entweder korrigieren, vollständig geprüft markieren, zurückstellen oder Patch nötig markieren.</div>
           </section>
 
-          <details class="reviewDisclosure" open>
-            <summary>Prüfdaten</summary>
+          ${renderEventCorrectionForm(it, suggestedUrl)}
+
+          ${isActivity ? `
+            <section class="reviewSection" aria-label="Activity-Hinweis">
+              <div class="reviewSectionTitle">Activity-Korrektur</div>
+              <div class="auditStateNote">Diese Activity kommt aus <strong>data/offers.json</strong>. Die Inbox überschreibt sie nicht direkt. Wenn Öffnungszeiten, Bild, Tags, visual_key oder Quelle geändert werden müssen, markiere den Fall als „Patch nötig“.</div>
+            </section>
+          ` : ``}
+
+          <details class="reviewDisclosure">
+            <summary>Technische Prüfdaten</summary>
             <div class="reviewDisclosureBody reviewGrid">
               ${auditRowsHtml}
             </div>
@@ -1447,11 +1669,12 @@ Umfang:
 
           <section class="reviewSection reviewSection--actions" aria-label="Content-Prüfaktionen">
             <div class="actions actions--compact">
-              ${canUpdateEventUrl ? `<button id="btnAuditSaveUrl" class="btn btn-good actionPrimary" type="button">Neue URL speichern</button>` : ``}
-              <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${it.public_url ? "" : "disabled"}>Öffentliche Seite</button>
-              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${it.source_url ? "" : "disabled"}>Quelle</button>
-              <button id="btnAuditChecked" class="btn btn-good" type="button">Als geprüft markieren</button>
-              <button id="btnLater" class="btn" type="button">Später</button>
+              ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button">Eventdaten im Sheet speichern</button>` : ``}
+              <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${it.public_url ? "" : "disabled"}>Eintrag öffnen</button>
+              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${it.source_url ? "" : "disabled"}>Quelle/Ticketlink öffnen</button>
+              <button id="btnAuditVerified" class="btn btn-good" type="button">Vollständig geprüft</button>
+              ${isActivity ? `<button id="btnAuditPatchNeeded" class="btn btn-bad" type="button">Patch nötig markieren</button>` : ``}
+              <button id="btnAuditSnooze" class="btn" type="button">7 Tage zurückstellen</button>
             </div>
           </section>
         </article>
@@ -1465,17 +1688,29 @@ Umfang:
         const url = trimValue(it.source_url);
         if (url) window.open(url, "_blank", "noopener,noreferrer");
       });
-      document.getElementById("btnLater").addEventListener("click", deferCurrentItem);
-      document.getElementById("btnAuditChecked").addEventListener("click", () => writeContentAuditAction(it, "mark_checked"));
+      document.getElementById("btnAuditVerified").addEventListener("click", () => writeContentAuditAction(it, "verify_full", {
+        next_review_days: guide.nextReviewDays || (isActivity ? 30 : 7),
+        review_note: "Über interne Inbox vollständig fachlich geprüft."
+      }));
+      document.getElementById("btnAuditSnooze").addEventListener("click", () => writeContentAuditAction(it, "snooze", {
+        next_review_days: 7,
+        review_note: "Über interne Inbox 7 Tage zurückgestellt."
+      }));
 
-      const saveUrlButton = document.getElementById("btnAuditSaveUrl");
-      if (saveUrlButton) {
-        saveUrlButton.addEventListener("click", () => {
-          const input = document.getElementById("auditNewUrl");
-          writeContentAuditAction(it, "update_event_source_url", {
-            new_url: input ? trimValue(input.value) : ""
-          });
-        });
+      const patchButton = document.getElementById("btnAuditPatchNeeded");
+      if (patchButton) {
+        patchButton.addEventListener("click", () => writeContentAuditAction(it, "mark_patch_needed", {
+          review_note: "Repo-Patch nötig: Activity-Datensatz/Visuals/Öffnungszeiten fachlich korrigieren."
+        }));
+      }
+
+      const saveFieldsButton = document.getElementById("btnAuditSaveFields");
+      if (saveFieldsButton) {
+        saveFieldsButton.addEventListener("click", () => writeContentAuditAction(it, "update_event_fields", {
+          event_updates: collectEventUpdateFields(),
+          next_review_days: guide.nextReviewDays || 7,
+          review_note: "Eventdaten über interne Inbox korrigiert und fachlich geprüft."
+        }));
       }
     }
 
@@ -1483,7 +1718,7 @@ Umfang:
       const ok = await ensureUnlocked();
       if (!ok) return;
 
-      ["btnAuditSaveUrl", "btnAuditChecked", "btnLater", "btnOpenEvent", "btnOpenSource"].forEach((id) => {
+      ["btnAuditSaveFields", "btnAuditVerified", "btnAuditSnooze", "btnAuditPatchNeeded", "btnOpenEvent", "btnOpenSource"].forEach((id) => {
         const button = document.getElementById(id);
         if (button) button.disabled = true;
       });
@@ -1494,12 +1729,17 @@ Umfang:
           row_number: Number(it.row_number || 0),
           content_id: trimValue(it.content_id),
           issue_code: trimValue(it.issue_code),
-          review_note: action === "update_event_source_url" ? "Über interne Inbox korrigiert." : "Über interne Inbox geprüft.",
           ...extra
         };
 
         await postJson(CONTENT_AUDIT_UPDATE_API_URL, payload);
-        setStatus(action === "update_event_source_url" ? "Content-Fall korrigiert." : "Content-Fall markiert.");
+        const labels = {
+          update_event_fields: "Eventdaten korrigiert.",
+          verify_full: "Content-Fall vollständig geprüft.",
+          snooze: "Content-Fall 7 Tage zurückgestellt.",
+          mark_patch_needed: "Content-Fall als Patch nötig markiert."
+        };
+        setStatus(labels[action] || "Content-Fall aktualisiert.");
         showNext(totalLoaded);
       } catch (error) {
         console.error(error);
@@ -1508,7 +1748,7 @@ Umfang:
         setStatus("");
       }
     }
-    /* === END BLOCK: INBOX_CONTENT_AUDIT_RENDER_AND_ACTIONS_V1 === */
+    /* === END BLOCK: INBOX_CONTENT_VERIFICATION_RENDER_AND_ACTIONS_V2 === */
 
     async function approveReject(status) {
       if (!current) return;

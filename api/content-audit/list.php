@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-/* === BEGIN FILE: api/content-audit/list.php | Zweck: liefert offene Content-Quality-Befunde fuer die interne Inbox-Ansicht; Umfang: geschuetzter Read-Endpunkt fuer Content_Audit/Content_Audit_Staging === */
+/* === BEGIN FILE: api/content-audit/list.php | Zweck: liefert offene Content-Verification-Befunde fuer die interne Inbox-Ansicht; Umfang: geschuetzter Read-Endpunkt fuer Content_Audit/Content_Audit_Staging inklusive Event-Felddaten === */
 
 require dirname(__DIR__) . '/_bootstrap.php';
 
@@ -34,9 +34,90 @@ function cal_severity_rank(string $severity): int
     };
 }
 
+function cal_read_table_indexed(string $range): array
+{
+    $response = be_google_sheets_values_get($range);
+    $values = $response['values'] ?? [];
+    if (!is_array($values) || count($values) < 1) {
+        return [[], [], []];
+    }
+
+    $header = is_array($values[0] ?? null) ? array_map(static fn($value) => trim((string)$value), $values[0]) : [];
+    $index = [];
+    foreach ($header as $position => $name) {
+        if ($name !== '') {
+            $index[$name] = $position;
+        }
+    }
+
+    return [$values, $header, $index];
+}
+
+function cal_event_lookup_by_id(): array
+{
+    try {
+        [$values, $header, $index] = cal_read_table_indexed('Events!A:ZZ');
+    } catch (Throwable) {
+        return [];
+    }
+
+    if (!isset($index['id']) || count($values) < 2) {
+        return [];
+    }
+
+    $wanted = [
+        'id',
+        'title',
+        'date',
+        'endDate',
+        'end_date',
+        'time',
+        'city',
+        'location',
+        'address',
+        'kategorie',
+        'tags',
+        'source_url',
+        'url',
+        'event_url',
+        'ticket_url',
+        'description',
+        'visual_key',
+    ];
+
+    $out = [];
+    for ($i = 1; $i < count($values); $i++) {
+        $row = is_array($values[$i]) ? $values[$i] : [];
+        $id = cal_cell($row, $index, 'id');
+        if ($id === '') {
+            continue;
+        }
+
+        $fields = [];
+        foreach ($wanted as $name) {
+            if (isset($index[$name])) {
+                $fields[$name] = cal_cell($row, $index, $name);
+            }
+        }
+        $fields['_row_number'] = (string)($i + 1);
+        $out[$id] = $fields;
+    }
+
+    return $out;
+}
+
+function cal_suggested_redirect_url(string $issueText): string
+{
+    if (preg_match('/->\s*(https?:\/\/\S+)/u', $issueText, $match)) {
+        return rtrim((string)$match[1], " \t\n\r\0\x0B.,)");
+    }
+
+    return '';
+}
+
 try {
     $tabName = be_content_audit_tab_name();
-    $response = be_google_sheets_values_get($tabName . '!A:R');
+    $response = be_google_sheets_values_get($tabName . '!A:U');
     $values = $response['values'] ?? [];
 
     if (!is_array($values) || count($values) < 3) {
@@ -52,6 +133,8 @@ try {
         ]);
     }
 
+    $eventById = cal_event_lookup_by_id();
+
     $metaRow = is_array($values[0] ?? null) ? $values[0] : [];
     $generatedAt = trim((string)($metaRow[1] ?? ''));
     $header = is_array($values[2] ?? null) ? array_map(static fn($value) => trim((string)$value), $values[2]) : [];
@@ -63,7 +146,7 @@ try {
     }
 
     $items = [];
-    $hiddenStatuses = ['done', 'checked', 'resolved', 'ignored', 'archived'];
+    $hiddenStatuses = ['done', 'checked', 'verified', 'corrected', 'resolved', 'ignored', 'archived', 'snoozed'];
     $visibleSeverities = ['critical', 'review_needed', 'warning'];
 
     for ($i = 3; $i < count($values); $i++) {
@@ -84,10 +167,11 @@ try {
         $issueCode = cal_cell($row, $index, 'issue_code');
         $sourceUrl = cal_cell($row, $index, 'source_url');
         $issueText = cal_cell($row, $index, 'issue_text');
-        $suggestedUrl = '';
+        $suggestedUrl = cal_suggested_redirect_url($issueText);
 
-        if (preg_match('/->\s*(https?:\/\/\S+)/u', $issueText, $match)) {
-            $suggestedUrl = rtrim((string)$match[1], " \t\n\r\0\x0B.,)");
+        $eventFields = [];
+        if ($contentType === 'event' && $contentId !== '' && isset($eventById[$contentId])) {
+            $eventFields = $eventById[$contentId];
         }
 
         $items[] = [
@@ -115,8 +199,12 @@ try {
             'auto_fix_allowed' => cal_cell($row, $index, 'auto_fix_allowed'),
             'auto_fix_done' => cal_cell($row, $index, 'auto_fix_done'),
             'review_note' => cal_cell($row, $index, 'review_note'),
+            'verified_at' => cal_cell($row, $index, 'verified_at'),
+            'next_review_at' => cal_cell($row, $index, 'next_review_at'),
+            'action_state' => cal_cell($row, $index, 'action_state'),
             'url' => cal_cell($row, $index, 'public_url'),
             'suggested_url' => $suggestedUrl,
+            'event_fields' => $eventFields,
         ];
     }
 
@@ -124,6 +212,11 @@ try {
         $severity = cal_severity_rank((string)($a['severity'] ?? '')) <=> cal_severity_rank((string)($b['severity'] ?? ''));
         if ($severity !== 0) {
             return $severity;
+        }
+
+        $status = strcmp((string)($a['status'] ?? ''), (string)($b['status'] ?? ''));
+        if ($status !== 0) {
+            return $status;
         }
 
         return strcmp((string)($a['date'] ?? ''), (string)($b['date'] ?? ''));
