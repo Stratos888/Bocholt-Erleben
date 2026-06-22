@@ -222,6 +222,9 @@ Umfang:
     let queue = [];
     let current = null;
     let totalLoaded = 0;
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_NAV_STATE_V1 | Zweck: erlaubt Vor-/Weiter-Navigation in Content-Prueffaellen ohne Statusaenderung; Umfang: nur Sitzungszustand fuer die Content-Pruefung === */
+    let contentAuditHistory = [];
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_NAV_STATE_V1 === */
 
     // Token nur im RAM (keine Storage APIs)
     let sessionToken = "";
@@ -721,6 +724,7 @@ Umfang:
           const auditResult = await fetchContentAuditReviewItems();
           queue = Array.isArray(auditResult.items) ? auditResult.items : [];
           totalLoaded = Number(auditResult.total || queue.length || 0);
+          contentAuditHistory = [];
 
           refreshLock();
           if (auditResult.error) {
@@ -791,6 +795,27 @@ Umfang:
       current = queue.shift() || null;
       renderCurrent(totalCount);
     }
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_NAVIGATION_V1 | Zweck: blaettert in Content-Prueffaellen vor/zurueck, ohne einen Fall zu bestaetigen, zurueckzustellen oder sonst zu veraendern; Umfang: reine UI-Navigation innerhalb der geladenen Queue === */
+    function showNextContentAuditItem() {
+      if (!isContentAuditItem(current) || !queue.length) return;
+      contentAuditHistory.push(current);
+      current = queue.shift() || null;
+      setStatus("Nur weitergeblättert – kein Status wurde geändert.");
+      renderCurrent(totalLoaded);
+    }
+
+    function showPreviousContentAuditItem() {
+      if (!isContentAuditItem(current) || !contentAuditHistory.length) return;
+      if (current) queue.unshift(current);
+      current = contentAuditHistory.pop() || null;
+      setStatus("Nur zurückgeblättert – kein Status wurde geändert.");
+      renderCurrent(totalLoaded);
+    }
+
+    function contentAuditSessionCount() {
+      return contentAuditHistory.length + queue.length + (current ? 1 : 0);
+    }
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_NAVIGATION_V1 === */
     /* === BEGIN BLOCK: REVIEW_DEFER_CURRENT_ITEM_V1 | Zweck: verschiebt den aktuell angezeigten Fall ans Ende der aktuellen Inbox-Sitzung, ohne DB- oder Sheet-Status zu ändern; Umfang: reine UI-Navigation === */
     function deferCurrentItem() {
       if (!current) return;
@@ -1161,9 +1186,13 @@ Umfang:
     function renderCurrent(totalCount) {
       refreshLock();
 
-      const remaining = queue.length + (current ? 1 : 0);
+      /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_PROGRESS_NAV_AWARE_V1 | Zweck: zeigt bei Content-Pruefung alle geladenen offenen Faelle weiter korrekt an, auch wenn der Nutzer nur vor/zurueck blaettert; Umfang: ersetzt Progress-Berechnung === */
+      const remaining = isContentAuditItem(current)
+        ? contentAuditSessionCount()
+        : queue.length + (current ? 1 : 0);
       elLeft.textContent = remaining ? `${remaining} übrig` : `0 übrig`;
       elRight.textContent = totalCount ? `Inbox: ${totalCount}` : "";
+      /* === END BLOCK: INBOX_CONTENT_AUDIT_PROGRESS_NAV_AWARE_V1 === */
 
       if (!current) {
         elOne.innerHTML = `
@@ -1668,6 +1697,12 @@ Umfang:
           <div id="reviewCardNotice" class="reviewNotice" hidden role="status" aria-live="polite"></div>
 
           <section class="reviewSection reviewSection--actions" aria-label="Content-Prüfaktionen">
+            <div class="auditActionHint"><strong>Navigation:</strong> „Vorheriger Fall“ und „Nächster Fall“ ändern nichts. Nutze sie nur zum Blättern. Statusänderungen passieren nur über die Abschlussbuttons.</div>
+            <div class="actions actions--compact">
+              <button id="btnAuditPrevious" class="btn" type="button" ${contentAuditHistory.length ? "" : "disabled"}>← Vorheriger Fall</button>
+              <button id="btnAuditNext" class="btn" type="button" ${queue.length ? "" : "disabled"}>Nächster Fall →</button>
+            </div>
+            <div class="auditActionHint"><strong>Abschluss:</strong> Klicke hier erst, wenn du den aktuellen Fall wirklich entschieden hast.</div>
             <div class="actions actions--compact">
               ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button">Eventdaten im Sheet speichern</button>` : ``}
               <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${it.public_url ? "" : "disabled"}>Eintrag öffnen</button>
@@ -1680,6 +1715,8 @@ Umfang:
         </article>
       `;
 
+      document.getElementById("btnAuditPrevious").addEventListener("click", showPreviousContentAuditItem);
+      document.getElementById("btnAuditNext").addEventListener("click", showNextContentAuditItem);
       document.getElementById("btnOpenEvent").addEventListener("click", () => {
         const url = trimValue(it.public_url);
         if (url) window.open(url, "_blank", "noopener,noreferrer");
@@ -1718,7 +1755,7 @@ Umfang:
       const ok = await ensureUnlocked();
       if (!ok) return;
 
-      ["btnAuditSaveFields", "btnAuditVerified", "btnAuditSnooze", "btnAuditPatchNeeded", "btnOpenEvent", "btnOpenSource"].forEach((id) => {
+      ["btnAuditSaveFields", "btnAuditVerified", "btnAuditSnooze", "btnAuditPatchNeeded", "btnAuditPrevious", "btnAuditNext", "btnOpenEvent", "btnOpenSource"].forEach((id) => {
         const button = document.getElementById(id);
         if (button) button.disabled = true;
       });
