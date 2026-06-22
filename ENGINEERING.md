@@ -551,6 +551,21 @@ Fallback-Einschränkungen:
 - Bevorzugt werden konkrete Block-Ersetzungen mit eindeutigem BEGIN-/END-Marker oder vollständige kleine Dateiänderungen.
 - Nach manueller Änderung muss der Nutzer im GitHub-Diff prüfen, ob ausschließlich die beabsichtigten Dateien und Blöcke geändert wurden.
 - Wenn ein sicherer Git-Patch-Check nicht möglich ist, muss der Patch kleiner und deterministischer sein als im normalen Codespaces-Workflow.
+
+### ZIP-first Webupload-Fallback
+
+Wenn Codespaces nicht verfügbar ist und der Nutzer ein aktuelles Projekt-ZIP liefert, ist der bevorzugte Fallback für kleine bis mittlere Patches:
+
+1. Nutzer liefert eine aktuelle ZIP des Zielbranches.
+2. ChatGPT prüft die Baseline lokal gegen den Zielzustand.
+3. ChatGPT erstellt ein Patch-ZIP in echter Repo-Root-Struktur.
+4. Das Patch-ZIP enthält ausschließlich Dateien/Ordner, die ins Repo übernommen werden sollen.
+5. Keine Wrapper-/Hilfsdateien im Patch-ZIP: keine `README.txt`, keine `MANIFEST.json`, kein `UPLOAD_TO_REPO_ROOT`.
+6. Nutzer entpackt das Patch-ZIP und lädt den entpackten Inhalt per GitHub Drag & Drop auf den Zielbranch hoch.
+7. Nutzer wartet den Deploy ab und liefert danach eine neue ZIP zur finalen Prüfung.
+8. ChatGPT prüft den neuen ZIP-Stand gegen Zielzustand, Checks und mögliche Restverweise.
+
+Dieser Fallback ist bevorzugt für Doku-, HTML-, CSS-, statische JS-, kleine PHP- und kleine Tool-/Audit-Patches. Nicht bevorzugt ist er für große Refactorings, viele Löschungen, Dateiumbenennungen, komplexe Merge-Konflikte oder Asset-Massenänderungen.
 <!-- === END BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 === -->
 
 ## Eventdaten-Quelle: Sheet-first
