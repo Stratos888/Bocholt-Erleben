@@ -263,11 +263,12 @@ Patch the owning file first.
 
 Ownership:
 
-- `css/style.css` = public CSS entrypoint / import order only
-- `css/base.css` = tokens, foundation, app-wide primitives
-- `css/pages.css` = content/static page styling
+- `css/style.css` = public CSS entrypoint / import order only; no selectors, no visual fixes
+- `css/base.css` = tokens, reset, foundation, app-wide primitives
+- `css/pages.css` = public content pages, static pages, funnel pages and legal pages
 - `css/components.css` = reusable UI components and component states
-- `css/home.css` = home, hero, feed, search-row layout
+- `css/home.css` = historical Discovery/Event/Activity shell owner; frozen against new large UI blocks
+- `css/today.css` = Today/Home-specific surface and recommendation layout
 - `css/overlays.css` = detailpanel, sheets, modals, overlay locks
 
 Rules:
@@ -276,6 +277,10 @@ Rules:
 - Layout fixes belong in the owning layout file, not in component files.
 - Overlay mechanics belong in `css/overlays.css`.
 - Cross-file fixes are allowed only if root cause proves they are necessary.
+- `css/home.css` must not be used as the default dumping ground for new visual patches.
+- New large CSS blocks require an owner decision first: existing owner, new owner file, or conscious extraction from an old owner.
+- If an existing owner block is touched, prefer replacing/consolidating that owner block over appending a later override block.
+- CSS governance is enforced by `tools/audit-css-governance.py`; do not bypass it to ship cosmetic patches.
 
 ---
 
@@ -329,8 +334,11 @@ Asset/versioning rules:
 
 - `css/style.css` is the public CSS entrypoint and must not be deleted.
 - `css/style.css` owns CSS import order only.
+- `css/style.css` must remain import-only; real selectors belong in owner files.
+- Public HTML files must load `/css/style.css` as the single CSS entrypoint.
+- Source-level CSS cache keys must stay consistent and are checked by `tools/audit-css-governance.py`.
 - Do not patch `css/style.css` for normal visual changes unless the import order or actual CSS entrypoint changes.
-- Do not manually bump asset query versions in multiple HTML files for normal CSS/JS edits.
+- Do not manually bump asset query versions in multiple HTML files for normal CSS/JS edits, except in an intentional CSS-governance/cache-key normalization patch.
 - The deploy workflow replaces existing `?v=...` asset references with the generated `BUILD_ID`.
 - Only touch asset references manually when a new asset is introduced, an asset is renamed, or a script/link tag is missing completely.
 
