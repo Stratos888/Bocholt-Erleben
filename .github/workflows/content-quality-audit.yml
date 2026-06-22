@@ -1,0 +1,385 @@
+# === BEGIN BLOCK: CONTENT QUALITY AUDIT WORKFLOW V1 ===
+# Zweck:
+# - Prueft redaktionelle Sheet-Events, oeffentliche DB-Events und Activities regelmaessig.
+# - Schreibt den Bericht in den Google-Sheet-Tab Content_Audit.
+# - Aendert keine fachlichen Inhalte automatisch.
+# === END BLOCK: CONTENT QUALITY AUDIT WORKFLOW V1 ===
+
+name: Content Quality Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "Audit-Scope"
+        required: false
+        default: "full"
+        type: choice
+        options:
+          - daily
+          - full
+  schedule:
+    # Taeglich: zeitnahe Events + Quellen-/Link-Auffaelligkeiten.
+    - cron: "35 5 * * *"
+    # Woechentlich Montag: voller Activity-/Event-Bestand.
+    - cron: "55 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  content_quality_audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      # === BEGIN BLOCK: CONTENT_QUALITY_CHECKOUT_AND_PYTHON_V1 | Zweck: Baseline fuer Audit-Script bereitstellen; Umfang: Checkout + Python + Google Sheets Dependencies ===
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Google Sheets dependencies
+        shell: bash
+        run: |
+          set -e
+          python -m pip install --upgrade pip
+          pip install google-api-python-client google-auth
+      # === END BLOCK: CONTENT_QUALITY_CHECKOUT_AND_PYTHON_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_RESOLVE_SCOPE_AND_TARGET_V1 | Zweck: trennt daily/full und live/staging Sheet-/Runtime-Ziele; Umfang: setzt Audit-ENV fuer Folge-Schritte ===
+      - name: Resolve audit scope and target
+        shell: bash
+        env:
+          INPUT_SCOPE: ${{ github.event.inputs.scope }}
+          LIVE_SHEET_ID: ${{ secrets.LIVE_SHEET_ID }}
+          LEGACY_SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: |
+          set -e
+
+          BE_SHEET_ID="${LIVE_SHEET_ID:-${LEGACY_SHEET_ID:-}}"
+          if [ -z "$BE_SHEET_ID" ]; then
+            echo "❌ LIVE_SHEET_ID oder SHEET_ID fehlt."
+            exit 1
+          fi
+
+          if [ -n "${INPUT_SCOPE:-}" ]; then
+            AUDIT_SCOPE="$INPUT_SCOPE"
+          elif [ "$(date -u +%u)" = "1" ]; then
+            AUDIT_SCOPE="full"
+          else
+            AUDIT_SCOPE="daily"
+          fi
+
+          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
+            APP_BASE_URL="https://staging.bocholt-erleben.de"
+            CONTENT_AUDIT_TAB="Content_Audit_Staging"
+          else
+            APP_BASE_URL="https://bocholt-erleben.de"
+            CONTENT_AUDIT_TAB="Content_Audit"
+          fi
+
+          echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
+          echo "AUDIT_SCOPE=$AUDIT_SCOPE" >> "$GITHUB_ENV"
+          echo "APP_BASE_URL=$APP_BASE_URL" >> "$GITHUB_ENV"
+          echo "CONTENT_AUDIT_TAB=$CONTENT_AUDIT_TAB" >> "$GITHUB_ENV"
+
+          echo "Audit scope: $AUDIT_SCOPE"
+          echo "Audit runtime: $APP_BASE_URL"
+          echo "Audit sheet tab: $CONTENT_AUDIT_TAB"
+      # === END BLOCK: CONTENT_QUALITY_RESOLVE_SCOPE_AND_TARGET_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_EXPORT_EVENTS_SHEET_V1 | Zweck: liest die kanonischen redaktionellen Events direkt aus dem Google Sheet; Umfang: exportiert Events!A:ZZ nach data/events.tsv ===
+      - name: Export Events tab for audit
+        timeout-minutes: 6
+        shell: bash
+        env:
+          SHEET_ID: ${{ env.BE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -e
+          python - <<'PY'
+          import csv, json, os, socket, ssl, sys, time
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
+          from googleapiclient.errors import HttpError
+
+          def fail(msg):
+              print(f"❌ {msg}", file=sys.stderr)
+              sys.exit(1)
+
+          sheet_id = os.environ.get("SHEET_ID", "").strip()
+          sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+          if not sheet_id:
+              fail("ENV SHEET_ID fehlt.")
+          if not sa_json:
+              fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
+
+          try:
+              sa_info = json.loads(sa_json)
+          except Exception:
+              fail("GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.")
+
+          socket.setdefaulttimeout(90)
+          scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+          creds = service_account.Credentials.from_service_account_info(sa_info, scopes=scopes)
+          service = build("sheets", "v4", credentials=creds, cache_discovery=False)
+
+          def fetch_values(range_name, label, attempts=4):
+              last_exc = None
+              for attempt in range(1, attempts + 1):
+                  try:
+                      print(f"↻ {label}: Versuch {attempt}/{attempts}")
+                      res = service.spreadsheets().values().get(
+                          spreadsheetId=sheet_id,
+                          range=range_name,
+                          majorDimension="ROWS",
+                      ).execute(num_retries=4)
+                      return res.get("values", []) or []
+                  except HttpError as exc:
+                      status = getattr(exc.resp, "status", None)
+                      retryable = status in (408, 429, 500, 502, 503, 504)
+                      last_exc = exc
+                      if (not retryable) or attempt >= attempts:
+                          raise
+                      time.sleep(attempt * 5)
+                  except (TimeoutError, socket.timeout, ssl.SSLError, OSError) as exc:
+                      last_exc = exc
+                      if attempt >= attempts:
+                          raise
+                      time.sleep(attempt * 5)
+              raise last_exc or RuntimeError(f"{label}: unbekannter Exportfehler")
+
+          values = fetch_values("Events!A:ZZ", "Events-Tab")
+          if not values:
+              fail("Events-Tab ist leer oder nicht lesbar.")
+
+          header = [str(h).strip() for h in (values[0] or [])]
+          required = ["id", "title", "date", "city", "location", "kategorie"]
+          missing = [col for col in required if col not in header]
+          if missing:
+              fail(f"Events-Header unvollständig. Fehlende Spalten: {missing}. Header={header}")
+
+          rows = []
+          for raw in values[1:]:
+              row = [(raw[i].strip() if i < len(raw) and raw[i] is not None else "") for i in range(len(header))]
+              if any(row):
+                  rows.append(row)
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/events.tsv", "w", encoding="utf-8", newline="") as handle:
+              writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
+              writer.writerow(header)
+              writer.writerows(rows)
+
+          print(f"✅ Export OK: {len(rows)} Events-Zeilen nach data/events.tsv")
+          PY
+          test -s data/events.tsv
+      # === END BLOCK: CONTENT_QUALITY_EXPORT_EVENTS_SHEET_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_FETCH_PUBLIC_DB_EVENTS_V1 | Zweck: erfasst genehmigte DB-/Veranstalter-Events aus dem oeffentlichen Runtime-Feed; Umfang: best-effort API Snapshot fuer Audit ===
+      - name: Fetch public DB events for audit
+        shell: bash
+        run: |
+          set -e
+          mkdir -p data
+          if curl -fsSL --max-time 20 "${APP_BASE_URL}/api/events/public.php" -o data/public-db-events.json; then
+            echo "✅ Public DB events snapshot fetched."
+          else
+            echo '{"status":"unavailable","events":[]}' > data/public-db-events.json
+            echo "⚠️ Public DB events snapshot unavailable; audit continues with Sheet/Activities."
+          fi
+      # === END BLOCK: CONTENT_QUALITY_FETCH_PUBLIC_DB_EVENTS_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_RUN_AUDIT_V1 | Zweck: fuehrt den eigentlichen Guard gegen Sheet-, DB- und Activity-Quellen aus; Umfang: Report in JSON/Markdown ohne fachliche Auto-Aenderung ===
+      - name: Run Content Quality Audit
+        shell: bash
+        run: |
+          set -e
+          python scripts/content-quality-audit.py \
+            --scope "$AUDIT_SCOPE" \
+            --network \
+            --base-url "$APP_BASE_URL" \
+            --output-json data/content-quality-report.json \
+            --output-md data/content-quality-report.md
+
+          echo "=== Content quality summary ==="
+          python - <<'PY'
+          import json
+          report = json.load(open('data/content-quality-report.json', encoding='utf-8'))
+          print(json.dumps(report['summary'], ensure_ascii=False, indent=2))
+          PY
+      # === END BLOCK: CONTENT_QUALITY_RUN_AUDIT_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V1 | Zweck: schreibt Audit-Ergebnisse in Content_Audit/Content_Audit_Staging; Umfang: ersetzt Tab-Inhalt, schreibt keine fachlichen Daten zurueck ===
+      - name: Write Content_Audit sheet tab
+        shell: bash
+        env:
+          SHEET_ID: ${{ env.BE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -e
+          python - <<'PY'
+          import json, os, sys
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
+          from googleapiclient.errors import HttpError
+
+          def fail(msg):
+              print(f"❌ {msg}", file=sys.stderr)
+              sys.exit(1)
+
+          sheet_id = os.environ.get("SHEET_ID", "").strip()
+          tab_name = os.environ.get("CONTENT_AUDIT_TAB", "Content_Audit").strip() or "Content_Audit"
+          sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+          if not sheet_id:
+              fail("ENV SHEET_ID fehlt.")
+          if not sa_json:
+              fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
+
+          report = json.load(open("data/content-quality-report.json", encoding="utf-8"))
+          issues = report.get("issues") or []
+          meta = report.get("meta") or {}
+          summary = report.get("summary") or {}
+
+          scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+          creds = service_account.Credentials.from_service_account_info(json.loads(sa_json), scopes=scopes)
+          service = build("sheets", "v4", credentials=creds, cache_discovery=False)
+
+          spreadsheet = service.spreadsheets().get(spreadsheetId=sheet_id).execute()
+          sheets = spreadsheet.get("sheets", [])
+          existing = {s.get("properties", {}).get("title"): s.get("properties", {}).get("sheetId") for s in sheets}
+
+          if tab_name not in existing:
+              service.spreadsheets().batchUpdate(
+                  spreadsheetId=sheet_id,
+                  body={"requests": [{"addSheet": {"properties": {"title": tab_name}}}]},
+              ).execute()
+              print(f"✅ Sheet tab angelegt: {tab_name}")
+
+          header = [
+              "severity",
+              "status",
+              "content_type",
+              "source_system",
+              "content_id",
+              "title",
+              "date",
+              "issue_code",
+              "issue_text",
+              "recommended_action",
+              "source_url",
+              "public_url",
+              "first_seen_at",
+              "last_seen_at",
+              "occurrence_count",
+              "auto_fix_allowed",
+              "auto_fix_done",
+              "review_note",
+          ]
+
+          generated_at = meta.get("generated_at", "")
+
+          previous_by_key = {}
+          try:
+              previous = service.spreadsheets().values().get(
+                  spreadsheetId=sheet_id,
+                  range=f"{tab_name}!A:R",
+                  majorDimension="ROWS",
+              ).execute().get("values", []) or []
+          except HttpError:
+              previous = []
+
+          if len(previous) >= 3:
+              prev_header = previous[2]
+              prev_index = {name: idx for idx, name in enumerate(prev_header)}
+
+              def prev_value(row, name):
+                  idx = prev_index.get(name)
+                  if idx is None or idx >= len(row):
+                      return ""
+                  return str(row[idx]).strip()
+
+              for row in previous[3:]:
+                  key = "|".join([
+                      prev_value(row, "content_type"),
+                      prev_value(row, "source_system"),
+                      prev_value(row, "content_id"),
+                      prev_value(row, "issue_code"),
+                      prev_value(row, "source_url"),
+                  ])
+                  if key.strip("|"):
+                      previous_by_key[key] = {
+                          "first_seen_at": prev_value(row, "first_seen_at") or generated_at,
+                          "occurrence_count": prev_value(row, "occurrence_count") or "1",
+                          "review_note": prev_value(row, "review_note"),
+                      }
+
+          rows = [
+              ["generated_at", generated_at, "scope", meta.get("scope", ""), "network_checks", str(meta.get("network_checks", "")), "summary", json.dumps(summary, ensure_ascii=False)],
+              [],
+              header,
+          ]
+
+          for item in issues:
+              key = "|".join([
+                  item.get("content_type", ""),
+                  item.get("source_system", ""),
+                  item.get("content_id", ""),
+                  item.get("issue_code", ""),
+                  item.get("source_url", ""),
+              ])
+              previous_item = previous_by_key.get(key, {})
+              first_seen_at = previous_item.get("first_seen_at") or generated_at
+              try:
+                  occurrence_count = str(int(previous_item.get("occurrence_count") or "0") + 1) if previous_item else "1"
+              except ValueError:
+                  occurrence_count = "1"
+
+              rows.append([
+                  item.get("severity", ""),
+                  item.get("status", ""),
+                  item.get("content_type", ""),
+                  item.get("source_system", ""),
+                  item.get("content_id", ""),
+                  item.get("title", ""),
+                  item.get("date", ""),
+                  item.get("issue_code", ""),
+                  item.get("issue_text", ""),
+                  item.get("recommended_action", ""),
+                  item.get("source_url", ""),
+                  item.get("public_url", ""),
+                  first_seen_at,
+                  generated_at,
+                  occurrence_count,
+                  item.get("auto_fix_allowed", ""),
+                  item.get("auto_fix_done", ""),
+                  previous_item.get("review_note", ""),
+              ])
+
+          service.spreadsheets().values().clear(
+              spreadsheetId=sheet_id,
+              range=f"{tab_name}!A:R",
+              body={},
+          ).execute()
+          service.spreadsheets().values().update(
+              spreadsheetId=sheet_id,
+              range=f"{tab_name}!A1",
+              valueInputOption="RAW",
+              body={"values": rows},
+          ).execute()
+          print(f"✅ Content Audit written to {tab_name}: {len(issues)} issues")
+          PY
+      # === END BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 | Zweck: macht Reports im Workflow nachvollziehbar; Umfang: Artefakt-Upload ohne Repo-Commit ===
+      - name: Upload audit reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-quality-report-${{ env.AUDIT_SCOPE }}
+          path: |
+            data/content-quality-report.json
+            data/content-quality-report.md
+      # === END BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 ===
