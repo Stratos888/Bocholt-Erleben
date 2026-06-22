@@ -352,6 +352,14 @@ jobs:
           head -n 60 data/inbox.json || true
       # === END BLOCK: BUILD EVENTS + INBOX FEEDS (TSV -> JSON, fail-fast where needed) ===
 
+      # === BEGIN BLOCK: DEPLOY_CSS_GOVERNANCE_AUDIT_V1 | Zweck: stoppt Deploys, wenn CSS-Entry, Cache-Buster oder Owner-Grenzen verletzt werden; Umfang: ergänzt nur den fail-fast Audit-Step vor Build-Version/Deploy-Artefakt ===
+      - name: Audit CSS governance
+        shell: bash
+        run: |
+          set -e
+          python3 tools/audit-css-governance.py
+      # === END BLOCK: DEPLOY_CSS_GOVERNANCE_AUDIT_V1 ===
+
       - name: Compute build version
         shell: bash
         run: |
