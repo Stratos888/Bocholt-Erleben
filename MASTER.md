@@ -60,7 +60,9 @@ Aktueller nächster Haupt-Workpack:
   2. `/api/events/public.php` für freigegebene DB-/Veranstalter-Events.
   3. `data/offers.json` für Activities.
 - Prüfergebnisse werden in den Google-Sheet-Tab `Content_Audit` geschrieben; auf `staging` in `Content_Audit_Staging`.
+- Die private `/inbox/` ist die Arbeitsoberfläche: normale Event-Kandidaten und Content-Prüfung bleiben als getrennte Queues sichtbar, werden aber in derselben UI bearbeitet.
 - Fachliche Inhalte werden nicht blind automatisch überschrieben; sichere technische Abfangfälle, Warnungen und Review-Fälle werden klar getrennt.
+- Sichere Event-Quell-URL-Korrekturen dürfen aus der Content-Prüfung gezielt in den Sheet-Tab `Events` geschrieben werden; Activity-Korrekturen bleiben repo-/patchgeführt.
 
 Bewusst geparkt:
 

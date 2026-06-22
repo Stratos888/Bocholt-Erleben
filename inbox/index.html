@@ -46,6 +46,18 @@ Umfang:
     .brand { display:flex; align-items:baseline; gap:10px; padding-top: 8px; }
     .title { font-weight: 800; line-height: 1.1; }
     .inboxToolbar { display:flex; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_CSS_V1 | Zweck: trennt normale Event-Kuratierung und Content-Pruefung in derselben Inbox-Oberflaeche sichtbar, ohne Workflows zu vermischen; Umfang: Mode-Switch und Audit-Karten-Ergaenzungen === */
+    .reviewModeSwitch { display:flex; gap:7px; flex-wrap:wrap; margin: 9px 0 0; }
+    .reviewModeSwitch .btn { padding: 7px 10px; font-size: 13px; }
+    .reviewModeSwitch .is-active { border-color: rgba(38,118,62,.42); background: rgba(38,118,62,.075); font-weight: 800; }
+    .auditIssueBox { display:grid; gap:7px; margin:0; padding:11px 12px; border-radius:14px; border:1px solid rgba(155,112,0,.28); background:rgba(155,112,0,.055); font-size:14px; line-height:1.35; }
+    .auditIssueBox--critical { border-color:rgba(160,0,0,.35); background:rgba(160,0,0,.065); }
+    .auditIssueBox--review_needed { border-color:rgba(155,112,0,.32); background:rgba(155,112,0,.065); }
+    .auditIssueBox--warning { border-color:rgba(42,95,150,.25); background:rgba(42,95,150,.055); }
+    .auditUrlEdit { display:grid; gap:6px; margin-top:8px; }
+    .auditUrlEdit input { width:100%; box-sizing:border-box; padding:10px 12px; border-radius:12px; border:1px solid rgba(0,0,0,.18); font:inherit; background:transparent; }
+    .auditActionHint { font-size:12.5px; line-height:1.35; opacity:.76; }
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_MODE_CSS_V1 === */
     .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.16); font-size: 12px; }
     .muted { opacity: .72; }
     .status { margin-top: 8px; font-size: 13px; }
@@ -136,6 +148,13 @@ Umfang:
 
     <div id="statusLine" class="status muted"></div>
 
+    <!-- === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_SWITCH_V1 | Zweck: macht Content-Pruefung in derselben privaten Inbox bearbeitbar, aber getrennt von neuen Event-Kandidaten; Umfang: zwei Mode-Buttons === -->
+    <div class="reviewModeSwitch" aria-label="Review-Bereich">
+      <button id="modeCurationBtn" class="btn is-active" type="button">Neue Events</button>
+      <button id="modeAuditBtn" class="btn" type="button">Content-Prüfung</button>
+    </div>
+    <!-- === END BLOCK: INBOX_CONTENT_AUDIT_MODE_SWITCH_V1 === -->
+
     <section id="one"></section>
 
     <div class="footer">
@@ -164,6 +183,10 @@ Umfang:
     // - Nur Endpoint-Konstanten für inbox/index.html
     const API_URL  = "https://script.google.com/macros/s/AKfycbxU3MYnINbhk-1XFehzGRYeto3f4BH9fyL6RmMlQPwmTt_wciHoESRo27nx1-KSIAos/exec";
     const SUBMISSIONS_REVIEW_API_URL = "/api/submissions/review-list.php";
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_ENDPOINTS_V1 | Zweck: laedt und bearbeitet Content-Quality-Faelle aus Content_Audit/Content_Audit_Staging ueber geschuetzte Backend-Endpunkte; Umfang: Endpoint-Konstanten === */
+    const CONTENT_AUDIT_LIST_API_URL = "/api/content-audit/list.php";
+    const CONTENT_AUDIT_UPDATE_API_URL = "/api/content-audit/update.php";
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_ENDPOINTS_V1 === */
 
     /* === BEGIN BLOCK: INBOX_PUSH_ENDPOINTS_V1 | Zweck: interne Browser-Push-Registrierung nur für diese private Inbox-Seite; Umfang: Push-Endpunkt-Konstanten === */
     const PUSH_CONFIG_API_URL = "/api/push/config.php";
@@ -180,6 +203,11 @@ Umfang:
     const elRight = document.getElementById("progressRight");
     const elPushBtn = document.getElementById("pushBtn");
     const elLocalPushTestBtn = document.getElementById("localPushTestBtn");
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_STATE_V1 | Zweck: haelt Kuratierung und Content-Pruefung als getrennte Queues in einer UI; Umfang: DOM-Referenzen und Mode-State === */
+    const elModeCurationBtn = document.getElementById("modeCurationBtn");
+    const elModeAuditBtn = document.getElementById("modeAuditBtn");
+    let activeReviewMode = "curation";
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_MODE_STATE_V1 === */
     
     let queue = [];
     let current = null;
@@ -217,6 +245,31 @@ Umfang:
       });
     }
     /* === END BLOCK: INBOX_PUSH_BUTTON_BINDING_V1 === */
+
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_BINDINGS_V1 | Zweck: wechselt zwischen Event-Kuratierung und Content-Pruefung ohne Vermischung der Queues; Umfang: Mode-Button-Listener === */
+    function refreshReviewModeButtons() {
+      if (elModeCurationBtn) elModeCurationBtn.classList.toggle("is-active", activeReviewMode === "curation");
+      if (elModeAuditBtn) elModeAuditBtn.classList.toggle("is-active", activeReviewMode === "content_audit");
+    }
+
+    async function switchReviewMode(mode) {
+      activeReviewMode = mode === "content_audit" ? "content_audit" : "curation";
+      refreshReviewModeButtons();
+      const ok = await ensureUnlocked();
+      if (!ok) {
+        renderLockedState();
+        return;
+      }
+      await loadAndShow();
+    }
+
+    if (elModeCurationBtn) {
+      elModeCurationBtn.addEventListener("click", () => switchReviewMode("curation"));
+    }
+    if (elModeAuditBtn) {
+      elModeAuditBtn.addEventListener("click", () => switchReviewMode("content_audit"));
+    }
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_MODE_BINDINGS_V1 === */
         /* === BEGIN BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BINDING_V1 | Zweck: testet lokale Notification-Anzeige auf genau diesem Gerät ohne Server-Push; Umfang: zusätzlicher Diagnose-Button === */
     if (elLocalPushTestBtn) {
       elLocalPushTestBtn.addEventListener("click", async () => {
@@ -553,6 +606,65 @@ Umfang:
       }
     }
 
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_FETCH_V1 | Zweck: laedt offene Content-Quality-Faelle aus dem geschuetzten Backend statt aus dem normalen Event-Kandidaten-Feed; Umfang: Fetch- und Helper-Funktionen === */
+    function isContentAuditItem(item) {
+      return String(item && item.review_source || "") === "content_audit";
+    }
+
+    function formatContentAuditSeverity(value) {
+      const key = trimValue(value);
+      const labels = {
+        critical: "kritisch",
+        review_needed: "Prüfung nötig",
+        warning: "Hinweis"
+      };
+      return labels[key] || key || "Content-Prüfung";
+    }
+
+    function isContentAuditEventSourceUrlIssue(item) {
+      const sourceSystem = trimValue(item.source_system);
+      const contentType = trimValue(item.content_type);
+      const issueCode = trimValue(item.issue_code);
+      return contentType === "event"
+        && sourceSystem === "sheet_events"
+        && ["event_source_url_broken", "event_source_url_redirect", "event_source_url_unstable"].includes(issueCode);
+    }
+
+    async function fetchContentAuditReviewItems() {
+      if (!reviewApiPassword) {
+        return { items: [], total: 0, error: "content_audit_locked" };
+      }
+
+      try {
+        const response = await fetch(CONTENT_AUDIT_LIST_API_URL, {
+          method: "GET",
+          credentials: "same-origin",
+          headers: {
+            Accept: "application/json",
+            "X-BE-Review-Password": reviewApiPassword
+          },
+          cache: "no-store"
+        });
+
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload || payload.status !== "ok") {
+          return { items: [], total: 0, error: payload?.message || "content_audit_load_failed" };
+        }
+
+        const items = Array.isArray(payload.data?.items) ? payload.data.items : [];
+        return {
+          items,
+          total: Number(payload.data?.total || items.length || 0),
+          tabName: trimValue(payload.data?.tab_name),
+          generatedAt: trimValue(payload.data?.generated_at),
+          error: ""
+        };
+      } catch (_error) {
+        return { items: [], total: 0, error: "content_audit_network_failed" };
+      }
+    }
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_FETCH_V1 === */
+
     function normalizeSheetReviewItem(item) {
       return {
         ...item,
@@ -575,6 +687,27 @@ Umfang:
       totalLoaded = 0;
 
       try {
+        /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_LOAD_BRANCH_V1 | Zweck: laedt Content-Pruefung als eigene Queue, damit Audit-Faelle nicht mit neuen Event-Kandidaten vermischt werden; Umfang: frueher Branch in loadAndShow === */
+        if (activeReviewMode === "content_audit") {
+          const auditResult = await fetchContentAuditReviewItems();
+          queue = Array.isArray(auditResult.items) ? auditResult.items : [];
+          totalLoaded = Number(auditResult.total || queue.length || 0);
+
+          refreshLock();
+          if (auditResult.error) {
+            setStatus("Content-Prüfung konnte nicht geladen werden: " + auditResult.error);
+          } else if (queue.length > 0) {
+            const generated = auditResult.generatedAt ? ` · Stand: ${auditResult.generatedAt}` : "";
+            setStatus(`Content-Prüfung: ${queue.length} offene Fälle${generated}`);
+          } else {
+            setStatus("Content-Prüfung: keine offenen Fälle.");
+          }
+
+          showNext(totalLoaded);
+          return;
+        }
+        /* === END BLOCK: INBOX_CONTENT_AUDIT_LOAD_BRANCH_V1 === */
+
         const [res, submissionsResult] = await Promise.all([
           jsonp(API_URL, { action: "listReview" }),
           fetchSubmissionReviewItems()
@@ -1013,6 +1146,13 @@ Umfang:
         return;
       }
 
+      /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_RENDER_BRANCH_V1 | Zweck: rendert Content-Quality-Faelle als eigene Arbeitskarte statt sie durch die Event-Kandidaten-Logik zu schicken; Umfang: frueher Render-Branch === */
+      if (isContentAuditItem(current)) {
+        renderContentAuditCurrent(totalCount);
+        return;
+      }
+      /* === END BLOCK: INBOX_CONTENT_AUDIT_RENDER_BRANCH_V1 === */
+
       // === BEGIN BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
       // Zweck:
       // - Zeigt alle entscheidungsrelevanten Eventdaten inkl. endDate, Kategorie, URLs, Dedupe-Hinweise
@@ -1231,6 +1371,144 @@ Umfang:
       document.getElementById("btnNo").addEventListener("click", () => approveReject("verworfen"));
       // === END BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
     }
+
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_RENDER_AND_ACTIONS_V1 | Zweck: macht offene Audit-Faelle in der Inbox bearbeitbar und erlaubt sichere Sheet-Event-URL-Korrekturen; Umfang: eigener Render- und Write-Pfad fuer review_source=content_audit === */
+    function buildContentAuditRows(item) {
+      return [
+        ["Typ", trimValue(item.content_type)],
+        ["Quelle", trimValue(item.source_system)],
+        ["ID", trimValue(item.content_id)],
+        ["Datum", formatGermanDate(item.date)],
+        ["Issue-Code", trimValue(item.issue_code)],
+        ["Erstmals gesehen", formatGermanDateTime(item.first_seen_at)],
+        ["Zuletzt gesehen", formatGermanDateTime(item.last_seen_at)],
+        ["Anzahl", trimValue(item.occurrence_count)],
+        ["Tab", trimValue(item.sheet_tab)]
+      ].filter(([, value]) => trimValue(value));
+    }
+
+    function renderContentAuditCurrent(totalCount) {
+      const it = current;
+      const severity = trimValue(it.severity);
+      const severityLabel = formatContentAuditSeverity(severity);
+      const canUpdateEventUrl = isContentAuditEventSourceUrlIssue(it);
+      const suggestedUrl = trimValue(it.suggested_url) || trimValue(it.source_url);
+      const auditRowsHtml = buildContentAuditRows(it).map(([label, value]) => `
+        <div class="reviewRow">
+          <div class="reviewLabel">${escapeHtml(label)}</div>
+          <div class="reviewValue">${escapeHtml(value)}</div>
+        </div>
+      `).join("");
+
+      elOne.innerHTML = `
+        <article class="card reviewCard">
+          <header class="reviewCardHead">
+            <div class="reviewBadgeRow">
+              <span class="originBadge">Content-Prüfung</span>
+              <span class="reviewChip reviewChip--waiting">${escapeHtml(severityLabel)}</span>
+            </div>
+            <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
+            <div class="reviewMetaLine">${escapeHtml([formatGermanDate(it.date), trimValue(it.content_type), trimValue(it.issue_code)].filter(Boolean).join(" · "))}</div>
+          </header>
+
+          <section class="reviewSection" aria-label="Prüfbefund">
+            <div class="reviewSectionTitle">Prüfbefund</div>
+            <div class="auditIssueBox auditIssueBox--${escapeHtml(severity)}">
+              <strong>${escapeHtml(it.issue_text || "Content-Fall prüfen")}</strong>
+              <span>${escapeHtml(it.recommended_action || "Bitte fachlich prüfen.")}</span>
+            </div>
+          </section>
+
+          <section class="reviewSection" aria-label="Links">
+            <div class="reviewSectionTitle">Links</div>
+            <div class="urlBox">
+              ${it.public_url ? `<div class="urlLine"><strong>Öffentliche Seite:</strong> ${escapeHtml(it.public_url)}</div>` : ``}
+              ${it.source_url ? `<div class="urlLine"><strong>Quelle:</strong> ${escapeHtml(it.source_url)}</div>` : ``}
+            </div>
+            ${canUpdateEventUrl ? `
+              <div class="auditUrlEdit">
+                <label class="rejectLabel" for="auditNewUrl">Neue Event-Quell-URL</label>
+                <input id="auditNewUrl" type="url" value="${escapeHtml(suggestedUrl)}" inputmode="url" autocomplete="off" />
+                <div class="auditActionHint">Speichert die URL direkt in der passenden Event-Zeile im Google-Sheet-Tab „Events“. Wenn du nichts sicher korrigieren kannst, nutze „Später“.</div>
+              </div>
+            ` : `
+              <div class="auditActionHint">Dieser Fall wird nicht automatisch korrigiert. Öffne die Quelle bzw. bereite bei Activities einen bewussten Repo-Patch vor.</div>
+            `}
+          </section>
+
+          <details class="reviewDisclosure" open>
+            <summary>Prüfdaten</summary>
+            <div class="reviewDisclosureBody reviewGrid">
+              ${auditRowsHtml}
+            </div>
+          </details>
+
+          <div id="reviewCardNotice" class="reviewNotice" hidden role="status" aria-live="polite"></div>
+
+          <section class="reviewSection reviewSection--actions" aria-label="Content-Prüfaktionen">
+            <div class="actions actions--compact">
+              ${canUpdateEventUrl ? `<button id="btnAuditSaveUrl" class="btn btn-good actionPrimary" type="button">Neue URL speichern</button>` : ``}
+              <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${it.public_url ? "" : "disabled"}>Öffentliche Seite</button>
+              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${it.source_url ? "" : "disabled"}>Quelle</button>
+              <button id="btnAuditChecked" class="btn btn-good" type="button">Als geprüft markieren</button>
+              <button id="btnLater" class="btn" type="button">Später</button>
+            </div>
+          </section>
+        </article>
+      `;
+
+      document.getElementById("btnOpenEvent").addEventListener("click", () => {
+        const url = trimValue(it.public_url);
+        if (url) window.open(url, "_blank", "noopener,noreferrer");
+      });
+      document.getElementById("btnOpenSource").addEventListener("click", () => {
+        const url = trimValue(it.source_url);
+        if (url) window.open(url, "_blank", "noopener,noreferrer");
+      });
+      document.getElementById("btnLater").addEventListener("click", deferCurrentItem);
+      document.getElementById("btnAuditChecked").addEventListener("click", () => writeContentAuditAction(it, "mark_checked"));
+
+      const saveUrlButton = document.getElementById("btnAuditSaveUrl");
+      if (saveUrlButton) {
+        saveUrlButton.addEventListener("click", () => {
+          const input = document.getElementById("auditNewUrl");
+          writeContentAuditAction(it, "update_event_source_url", {
+            new_url: input ? trimValue(input.value) : ""
+          });
+        });
+      }
+    }
+
+    async function writeContentAuditAction(it, action, extra = {}) {
+      const ok = await ensureUnlocked();
+      if (!ok) return;
+
+      ["btnAuditSaveUrl", "btnAuditChecked", "btnLater", "btnOpenEvent", "btnOpenSource"].forEach((id) => {
+        const button = document.getElementById(id);
+        if (button) button.disabled = true;
+      });
+
+      try {
+        const payload = {
+          action,
+          row_number: Number(it.row_number || 0),
+          content_id: trimValue(it.content_id),
+          issue_code: trimValue(it.issue_code),
+          review_note: action === "update_event_source_url" ? "Über interne Inbox korrigiert." : "Über interne Inbox geprüft.",
+          ...extra
+        };
+
+        await postJson(CONTENT_AUDIT_UPDATE_API_URL, payload);
+        setStatus(action === "update_event_source_url" ? "Content-Fall korrigiert." : "Content-Fall markiert.");
+        showNext(totalLoaded);
+      } catch (error) {
+        console.error(error);
+        renderContentAuditCurrent(totalLoaded);
+        setReviewCardNotice("Content-Fall konnte nicht aktualisiert werden: " + (error?.message || error), "error");
+        setStatus("");
+      }
+    }
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_RENDER_AND_ACTIONS_V1 === */
 
     async function approveReject(status) {
       if (!current) return;
@@ -1594,6 +1872,7 @@ Umfang:
     // Umfang:
     // - Ersetzt Init-Block
     (async function init() {
+      refreshReviewModeButtons();
       refreshLock();
 
       try {

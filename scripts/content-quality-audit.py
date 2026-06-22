@@ -335,8 +335,7 @@ def audit_event_rows(
                 auto_fix_allowed=True,
                 auto_fix_done=True,
             ))
-            if scope == "daily":
-                continue
+            continue
 
         in_daily_window = today <= start_date <= horizon_end
         if scope == "daily" and not in_daily_window:

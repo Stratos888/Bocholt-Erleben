@@ -50,6 +50,7 @@ Ziel:
 
 - Redaktionelle Events aus dem Google-Sheet-Tab `Events`, freigegebene DB-/Veranstalter-Events aus `/api/events/public.php` und Activities aus `data/offers.json` regelmäßig automatisch prüfen.
 - Ergebnisse in den Google-Sheet-Tab `Content_Audit` schreiben; auf `staging` in `Content_Audit_Staging`.
+- Offene Audit-Fälle nicht im Sheet abarbeiten lassen, sondern in der privaten `/inbox/` als eigener Bereich „Content-Prüfung“ anzeigen.
 - Harte technische Fehler, sichere Auto-Abfangfälle und fachliche Review-Fälle strikt trennen.
 - Keine unsichere KI- oder Website-Textauswertung darf fachliche Inhalte blind überschreiben.
 
@@ -57,10 +58,12 @@ Akzeptanzkriterien:
 
 1. Workflow `.github/workflows/content-quality-audit.yml` läuft manuell, täglich und wöchentlich.
 2. Script `scripts/content-quality-audit.py` prüft Sheet-Events, optionale Public-DB-Events und Activities.
-3. Der Audit erzeugt JSON-/Markdown-Reports und schreibt die tabellarische Review-Liste ins Google Sheet.
-4. Automatisch als erledigt markiert werden nur deterministische Fälle wie sicher abgelaufene Events, die vom Build nicht mehr ausgespielt werden.
-5. Unsichere fachliche Fälle landen als `review_needed` oder `warning` im Audit-Tab, nicht als automatische Datenänderung.
-6. Der bestehende Sheet-first-Prozess bleibt erhalten: `Events` bleibt fachliche Event-Quelle; Anbieter-Events bleiben DB/API; Activities bleiben Repo-/JSON-geführt.
+3. Der Audit erzeugt JSON-/Markdown-Reports und schreibt die offene Review-Liste ins Google Sheet; `auto_fixed`-Altfälle bleiben im Report, aber nicht als offene Arbeitsliste.
+4. Die private `/inbox/` zeigt eine getrennte Queue „Content-Prüfung“ aus `Content_Audit`/`Content_Audit_Staging`.
+5. Sichere Event-Quell-URL-Korrekturen können aus der Inbox gezielt in den Sheet-Tab `Events` geschrieben werden; sonstige fachliche Korrekturen bleiben bewusst manuell bzw. patchgeführt.
+6. Automatisch als erledigt markiert werden nur deterministische Fälle wie sicher abgelaufene Events, die vom Build nicht mehr ausgespielt werden.
+7. Unsichere fachliche Fälle landen als `review_needed` oder `warning` im Audit-Tab, nicht als automatische Datenänderung.
+8. Der bestehende Sheet-first-Prozess bleibt erhalten: `Events` bleibt fachliche Event-Quelle; Anbieter-Events bleiben DB/API; Activities bleiben Repo-/JSON-geführt.
 
 ### Bewusst geparkt
 
