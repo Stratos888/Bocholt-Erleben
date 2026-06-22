@@ -8,14 +8,6 @@
 name: Content Quality Audit
 
 on:
-  push:
-    branches:
-      - staging
-    paths:
-      - ".github/workflows/content-quality-audit.yml"
-      - "scripts/content-quality-audit.py"
-      - "data/**"
-      - "api/events/public.php"
   workflow_dispatch:
     inputs:
       scope:
@@ -26,6 +18,14 @@ on:
         options:
           - daily
           - full
+  push:
+    branches:
+      - staging
+    paths:
+      - ".github/workflows/content-quality-audit.yml"
+      - "scripts/content-quality-audit.py"
+      - "data/**"
+      - "api/events/public.php"
   schedule:
     # Taeglich: zeitnahe Events + Quellen-/Link-Auffaelligkeiten.
     - cron: "35 5 * * *"
@@ -62,6 +62,8 @@ jobs:
         shell: bash
         env:
           INPUT_SCOPE: ${{ github.event.inputs.scope }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
           LIVE_SHEET_ID: ${{ secrets.LIVE_SHEET_ID }}
           LEGACY_SHEET_ID: ${{ secrets.SHEET_ID }}
         run: |
@@ -75,7 +77,9 @@ jobs:
 
           if [ -n "${INPUT_SCOPE:-}" ]; then
             AUDIT_SCOPE="$INPUT_SCOPE"
-          elif [ "$(date -u +%u)" = "1" ]; then
+          elif [ "${EVENT_NAME:-}" = "push" ]; then
+            AUDIT_SCOPE="full"
+          elif [ "${EVENT_SCHEDULE:-}" = "55 5 * * 1" ]; then
             AUDIT_SCOPE="full"
           else
             AUDIT_SCOPE="daily"
@@ -249,6 +253,7 @@ jobs:
 
           report = json.load(open("data/content-quality-report.json", encoding="utf-8"))
           issues = report.get("issues") or []
+          sheet_issues = [item for item in issues if item.get("severity") in {"critical", "review_needed", "warning"}]
           meta = report.get("meta") or {}
           summary = report.get("summary") or {}
 
@@ -331,7 +336,7 @@ jobs:
               header,
           ]
 
-          for item in issues:
+          for item in sheet_issues:
               key = "|".join([
                   item.get("content_type", ""),
                   item.get("source_system", ""),
@@ -378,7 +383,7 @@ jobs:
               valueInputOption="RAW",
               body={"values": rows},
           ).execute()
-          print(f"✅ Content Audit written to {tab_name}: {len(issues)} issues")
+          print(f"✅ Content Audit written to {tab_name}: {len(sheet_issues)} open issues")
           PY
       # === END BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V1 ===
 
