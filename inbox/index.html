@@ -66,6 +66,12 @@ Umfang:
     .auditField textarea { min-height:76px; resize:vertical; }
     .auditActionHint { font-size:12.5px; line-height:1.35; opacity:.76; }
     .auditStateNote { border-radius:12px; padding:9px 10px; background:rgba(0,0,0,.035); font-size:13px; line-height:1.35; }
+    /* === BEGIN BLOCK: INBOX_REPO_PATCH_BUNDLE_CSS_V1 | Zweck: macht Repo-Patch-Kandidaten als Sammelpaket sichtbar und kopierbar, ohne Daten zu ändern; Umfang: nur Content-Prüfung-Bündelanzeige === */
+    .auditBundleBox { display:grid; gap:8px; margin:0; padding:11px 12px; border-radius:14px; border:1px solid rgba(38,118,62,.22); background:rgba(38,118,62,.04); font-size:13.5px; line-height:1.35; }
+    .auditBundleList { margin:0; padding-left:18px; display:grid; gap:4px; }
+    .auditBundleActions { display:flex; gap:8px; flex-wrap:wrap; margin-top:2px; }
+    .auditBundleActions .btn { padding:7px 10px; font-size:13px; }
+    /* === END BLOCK: INBOX_REPO_PATCH_BUNDLE_CSS_V1 === */
     @media (max-width: 560px) { .auditFormGrid { grid-template-columns:1fr; } }
     /* === END BLOCK: INBOX_CONTENT_VERIFICATION_WORKBENCH_CSS_V1 === */
     .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.16); font-size: 12px; }
@@ -1649,6 +1655,101 @@ Umfang:
       return updates;
     }
 
+    /* === BEGIN BLOCK: INBOX_REPO_PATCH_BUNDLE_EXPORT_V1 | Zweck: bündelt Repo-Patch-Kandidaten aus der geladenen Content-Prüfung und macht sie als kopierbares Paket verfügbar; Umfang: reine UI-/Exportlogik, keine Status- oder Datenänderung === */
+    function contentAuditAllLoadedItems() {
+      return [...contentAuditHistory, ...(current ? [current] : []), ...queue].filter(isContentAuditItem);
+    }
+
+    function isRepoPatchCandidateItem(item) {
+      const category = trimValue(item.process_category);
+      const owner = trimValue(item.correction_owner);
+      const group = trimValue(item.workbench_group);
+      return category === "repo_patch_candidate" || owner === "repo_patch" || group.toLowerCase().includes("repo-patch");
+    }
+
+    function repoPatchCandidateItems() {
+      const seen = new Set();
+      return contentAuditAllLoadedItems().filter((item) => {
+        if (!isRepoPatchCandidateItem(item)) return false;
+        const key = [trimValue(item.content_type), trimValue(item.content_id), trimValue(item.issue_code)].join("::");
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function buildRepoPatchCandidatePayload(items) {
+      return {
+        type: "bocholt_content_quality_repo_patch_candidates",
+        generated_at: new Date().toISOString(),
+        source: "inbox_content_pruefung",
+        instruction: "Diese Fälle sind Repo-Patch-Kandidaten. Bitte fachlich prüfen, bündeln und erst danach einen bewussten Sammelpatch erstellen. Keine Daten blind überschreiben.",
+        candidates: items.map((item) => ({
+          content_type: trimValue(item.content_type),
+          source_system: trimValue(item.source_system),
+          content_id: trimValue(item.content_id),
+          title: trimValue(item.title),
+          issue_code: trimValue(item.issue_code),
+          issue_text: trimValue(item.issue_text),
+          recommended_action: trimValue(item.recommended_action),
+          source_url: trimValue(item.source_url),
+          public_url: trimValue(item.public_url),
+          process_category: trimValue(item.process_category),
+          correction_owner: trimValue(item.correction_owner),
+          workbench_group: trimValue(item.workbench_group),
+          automation_policy: trimValue(item.automation_policy)
+        }))
+      };
+    }
+
+    function renderRepoPatchCandidateBundle() {
+      const items = repoPatchCandidateItems();
+      if (!items.length) return "";
+      const maxVisible = 6;
+      const listItems = items.slice(0, maxVisible).map((item) => `
+        <li><strong>${escapeHtml(item.title || item.content_id || "ohne Titel")}</strong> · ${escapeHtml(item.issue_code || "ohne Issue-Code")}</li>
+      `).join("");
+      const more = items.length > maxVisible ? `<li>… ${escapeHtml(String(items.length - maxVisible))} weitere</li>` : "";
+      return `
+        <section class="reviewSection" aria-label="Repo-Patch-Paket">
+          <div class="reviewSectionTitle">Repo-Patch-Paket</div>
+          <div class="auditBundleBox">
+            <div><strong>${escapeHtml(String(items.length))} Repo-Patch-Kandidat${items.length === 1 ? "" : "en"}</strong> in der geladenen Content-Prüfung.</div>
+            <div>Diese Fälle werden nicht einzeln in der Inbox korrigiert. Sie werden gesammelt geprüft und später als bewusster Repo-Patch vorbereitet.</div>
+            <ul class="auditBundleList">${listItems}${more}</ul>
+            <div class="auditBundleActions">
+              <button id="btnCopyRepoPatchCandidates" class="btn" type="button">Patch-Kandidaten kopieren</button>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    async function copyRepoPatchCandidatesToClipboard() {
+      const items = repoPatchCandidateItems();
+      const payload = JSON.stringify(buildRepoPatchCandidatePayload(items), null, 2);
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(payload);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = payload;
+          textarea.setAttribute("readonly", "readonly");
+          textarea.style.position = "fixed";
+          textarea.style.left = "-9999px";
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textarea);
+        }
+        setStatus(`${items.length} Repo-Patch-Kandidat${items.length === 1 ? "" : "en"} kopiert. Keine Daten wurden geändert.`);
+      } catch (error) {
+        console.error(error);
+        setStatus("Patch-Kandidaten konnten nicht kopiert werden. Bitte technische Prüfdaten manuell sichern.");
+      }
+    }
+    /* === END BLOCK: INBOX_REPO_PATCH_BUNDLE_EXPORT_V1 === */
+
     function renderContentAuditCurrent(totalCount) {
       const it = current;
       const severity = trimValue(it.severity);
@@ -1677,6 +1778,8 @@ Umfang:
             <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
             <div class="reviewMetaLine">${escapeHtml([formatGermanDate(it.date), trimValue(it.content_type), trimValue(it.issue_code)].filter(Boolean).join(" · "))}</div>
           </header>
+
+          ${renderRepoPatchCandidateBundle()}
 
           <section class="reviewSection" aria-label="Konkrete Aktion">
             <div class="reviewSectionTitle">Jetzt zu tun</div>
@@ -1757,6 +1860,10 @@ Umfang:
         const url = trimValue(it.source_url);
         if (url) window.open(url, "_blank", "noopener,noreferrer");
       });
+      const copyRepoPatchButton = document.getElementById("btnCopyRepoPatchCandidates");
+      if (copyRepoPatchButton) {
+        copyRepoPatchButton.addEventListener("click", copyRepoPatchCandidatesToClipboard);
+      }
       document.getElementById("btnAuditVerified").addEventListener("click", () => writeContentAuditAction(it, "verify_full", {
         next_review_days: guide.nextReviewDays || (isActivity ? 30 : 7),
         review_note: "Über interne Inbox vollständig fachlich geprüft."
