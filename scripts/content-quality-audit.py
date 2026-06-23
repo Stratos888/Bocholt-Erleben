@@ -134,6 +134,10 @@ class Issue:
     status: str
     content_type: str
     source_system: str
+    process_category: str
+    correction_owner: str
+    workbench_group: str
+    automation_policy: str
     content_id: str
     title: str
     date: str
@@ -145,6 +149,94 @@ class Issue:
     auto_fix_allowed: str
     auto_fix_done: str
 
+
+
+def infer_process_metadata(
+    *,
+    severity: str,
+    content_type: str,
+    source_system: str,
+    issue_code: str,
+    auto_fix_allowed: bool,
+    auto_fix_done: bool,
+) -> Dict[str, str]:
+    """Classify issues by intended work route, not only by severity.
+
+    These fields make the report/workbench process-oriented:
+    - what can be auto-handled,
+    - what needs Sheet/DB/repo handling,
+    - what belongs to the separate visual-fit workflow.
+    """
+    code = norm(issue_code)
+    ctype = norm(content_type)
+    source = norm(source_system)
+
+    if severity == "auto_fixed" or auto_fix_done:
+        return {
+            "process_category": "auto_resolved",
+            "correction_owner": "audit_script",
+            "workbench_group": "Automatisch erledigt",
+            "automation_policy": "safe_auto_resolved",
+        }
+
+    visual_markers = (
+        "visual",
+        "image",
+        "bild",
+        "motif",
+    )
+    if any(marker in code for marker in visual_markers):
+        return {
+            "process_category": "visual_fit_candidate",
+            "correction_owner": "visual_workflow",
+            "workbench_group": "Visual-Fit",
+            "automation_policy": "human_decision_required",
+        }
+
+    if source == "offers_json":
+        if "source_url" in code or "opening" in code or "check" in code:
+            return {
+                "process_category": "repo_patch_candidate",
+                "correction_owner": "repo_patch",
+                "workbench_group": "Repo-Patch / Activity-Prüfung",
+                "automation_policy": "proposal_only",
+            }
+        return {
+            "process_category": "repo_patch_candidate",
+            "correction_owner": "repo_patch",
+            "workbench_group": "Repo-Patch-Kandidat",
+            "automation_policy": "proposal_only",
+        }
+
+    if source == "public_db_events_api":
+        return {
+            "process_category": "db_review_candidate",
+            "correction_owner": "db_review",
+            "workbench_group": "DB-/Anbieter-Review",
+            "automation_policy": "proposal_only",
+        }
+
+    if ctype == "event" and source in {"sheet_events", "runtime_events_json"}:
+        if "ticket" in code or "source_url" in code or code in {"event_source_url_missing", "event_source_url_invalid"}:
+            return {
+                "process_category": "sheet_update_candidate",
+                "correction_owner": "content_inbox_to_sheet",
+                "workbench_group": "Sheet-/Quellenkorrektur",
+                "automation_policy": "human_review_before_write",
+            }
+        return {
+            "process_category": "sheet_update_candidate",
+            "correction_owner": "content_inbox_to_sheet",
+            "workbench_group": "Sheet-Event-Korrektur",
+            "automation_policy": "human_review_before_write",
+        }
+
+    return {
+        "process_category": "needs_human_decision",
+        "correction_owner": "content_inbox",
+        "workbench_group": "Entscheidung nötig",
+        "automation_policy": "human_decision_required",
+    }
 
 def norm(value: Any) -> str:
     if value is None:
@@ -199,11 +291,23 @@ def issue(
     auto_fix_allowed: bool = False,
     auto_fix_done: bool = False,
 ) -> Issue:
+    process = infer_process_metadata(
+        severity=severity,
+        content_type=content_type,
+        source_system=source_system,
+        issue_code=issue_code,
+        auto_fix_allowed=auto_fix_allowed,
+        auto_fix_done=auto_fix_done,
+    )
     return Issue(
         severity=severity,
         status="open" if severity != "auto_fixed" else "done",
         content_type=content_type,
         source_system=source_system,
+        process_category=process["process_category"],
+        correction_owner=process["correction_owner"],
+        workbench_group=process["workbench_group"],
+        automation_policy=process["automation_policy"],
         content_id=norm(content_id),
         title=norm(title),
         date=norm(date_value),
@@ -892,10 +996,23 @@ def audit_activities(
 def summarize(issues: List[Issue]) -> Dict[str, Any]:
     counts: Dict[str, int] = {"critical": 0, "review_needed": 0, "warning": 0, "auto_fixed": 0}
     by_type: Dict[str, int] = {}
+    by_process_category: Dict[str, int] = {}
+    by_correction_owner: Dict[str, int] = {}
+    by_workbench_group: Dict[str, int] = {}
     for item in issues:
         counts[item.severity] = counts.get(item.severity, 0) + 1
         by_type[item.content_type] = by_type.get(item.content_type, 0) + 1
-    return {"counts": counts, "by_type": by_type, "total": len(issues)}
+        by_process_category[item.process_category] = by_process_category.get(item.process_category, 0) + 1
+        by_correction_owner[item.correction_owner] = by_correction_owner.get(item.correction_owner, 0) + 1
+        by_workbench_group[item.workbench_group] = by_workbench_group.get(item.workbench_group, 0) + 1
+    return {
+        "counts": counts,
+        "by_type": by_type,
+        "by_process_category": by_process_category,
+        "by_correction_owner": by_correction_owner,
+        "by_workbench_group": by_workbench_group,
+        "total": len(issues),
+    }
 
 
 def write_json_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> None:
@@ -925,17 +1042,27 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
         f"- Warning: {summary['counts'].get('warning', 0)}",
         f"- Auto fixed: {summary['counts'].get('auto_fixed', 0)}",
         "",
+        "## Process categories",
+        "",
+        *[f"- {key}: {value}" for key, value in sorted(summary.get("by_process_category", {}).items())],
+        "",
+        "## Correction owners",
+        "",
+        *[f"- {key}: {value}" for key, value in sorted(summary.get("by_correction_owner", {}).items())],
+        "",
         "## Issues",
         "",
-        "| Severity | Type | Source | ID | Title | Issue | Action |",
-        "|---|---|---|---|---|---|---|",
+        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action |",
+        "|---|---|---|---|---|---|---|---|---|",
     ]
-    for item in sorted(issues, key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.content_type, x.date, x.title)):
+    for item in sorted(issues, key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.workbench_group, x.content_type, x.date, x.title)):
         def cell(value: str) -> str:
             return norm(value).replace("|", "\\|").replace("\n", " ")[:240]
         lines.append(
             "| " + " | ".join([
                 cell(item.severity),
+                cell(item.workbench_group),
+                cell(item.correction_owner),
                 cell(item.content_type),
                 cell(item.source_system),
                 cell(item.content_id),
@@ -1017,7 +1144,7 @@ def main() -> None:
             args.base_url,
         ))
 
-    issues.sort(key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.content_type, x.date, x.title, x.issue_code))
+    issues.sort(key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.workbench_group, x.content_type, x.date, x.title, x.issue_code))
 
     meta = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),

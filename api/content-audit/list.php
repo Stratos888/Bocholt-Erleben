@@ -117,7 +117,7 @@ function cal_suggested_redirect_url(string $issueText): string
 
 try {
     $tabName = be_content_audit_tab_name();
-    $response = be_google_sheets_values_get($tabName . '!A:U');
+    $response = be_google_sheets_values_get($tabName . '!A:Y');
     $values = $response['values'] ?? [];
 
     if (!is_array($values) || count($values) < 3) {
@@ -185,6 +185,10 @@ try {
             'status' => $status,
             'content_type' => $contentType,
             'source_system' => $sourceSystem,
+            'process_category' => cal_cell($row, $index, 'process_category'),
+            'correction_owner' => cal_cell($row, $index, 'correction_owner'),
+            'workbench_group' => cal_cell($row, $index, 'workbench_group'),
+            'automation_policy' => cal_cell($row, $index, 'automation_policy'),
             'content_id' => $contentId,
             'title' => cal_cell($row, $index, 'title'),
             'date' => cal_cell($row, $index, 'date'),
@@ -212,6 +216,11 @@ try {
         $severity = cal_severity_rank((string)($a['severity'] ?? '')) <=> cal_severity_rank((string)($b['severity'] ?? ''));
         if ($severity !== 0) {
             return $severity;
+        }
+
+        $group = strcmp((string)($a['workbench_group'] ?? ''), (string)($b['workbench_group'] ?? ''));
+        if ($group !== 0) {
+            return $group;
         }
 
         $status = strcmp((string)($a['status'] ?? ''), (string)($b['status'] ?? ''));

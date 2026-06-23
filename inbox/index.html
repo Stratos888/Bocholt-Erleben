@@ -1433,6 +1433,10 @@ Umfang:
     /* === BEGIN BLOCK: INBOX_CONTENT_VERIFICATION_RENDER_AND_ACTIONS_V2 | Zweck: macht Content-Quality-Faelle als klare Pruefaufgaben mit Checkliste, Korrekturfeldern und eindeutigen Statusaktionen bearbeitbar; Umfang: eigener Render- und Write-Pfad fuer review_source=content_audit === */
     function buildContentAuditRows(item) {
       return [
+        ["Arbeitsbereich", trimValue(item.workbench_group)],
+        ["Prozesskategorie", trimValue(item.process_category)],
+        ["Korrekturweg", trimValue(item.correction_owner)],
+        ["Automatik-Regel", trimValue(item.automation_policy)],
         ["Typ", trimValue(item.content_type)],
         ["Quelle", trimValue(item.source_system)],
         ["ID", trimValue(item.content_id)],
@@ -1487,6 +1491,13 @@ Umfang:
           checklist: ["Ticketlink im Browser öffnen", "prüfen, ob Nutzer sinnvoll buchen/Informationen sehen", "Ticketlink bestätigen oder bessere Quelle speichern"],
           nextReviewDays: 14
         },
+        event_ticket_portal_as_primary_source: {
+          actionTitle: "Offizielle Eventquelle statt Ticketportal setzen",
+          why: "Ticketportale sind Buchungslinks. Die primäre Quelle soll die offizielle Event- oder Veranstalterseite sein, damit Datum, Ort und Status belastbar nachprüfbar bleiben.",
+          action: "Offizielle Event-/Veranstalterseite suchen und nur nach Prüfung unten als Quelle speichern. Das Ticketportal nicht blind als Hauptquelle bestätigen.",
+          checklist: ["Ticketportal öffnen und Event identifizieren", "offizielle Event-/Veranstalterseite suchen", "Datum/Uhrzeit/Ort vergleichen", "offizielle Quelle in der Content-Prüfung speichern oder Fall zurückstellen"],
+          nextReviewDays: 14
+        },
         event_time_format_unusual: {
           actionTitle: "Eventzeit prüfen und korrigieren",
           why: "Ungewöhnliche Zeitformate können auf falsche oder schwer lesbare Angaben hinweisen.",
@@ -1535,7 +1546,7 @@ Umfang:
         actionTitle: type === "activity" ? "Activity-Fall fachlich prüfen" : "Event-Fall fachlich prüfen",
         why: "Der Guard hat einen Qualitätsfall gefunden, der nicht blind automatisch korrigiert wird.",
         action: trimValue(item.recommended_action) || "Quelle öffnen, Angaben prüfen und den passenden Abschluss-Button verwenden.",
-        checklist: source === "offers_json" ? ["Quelle öffnen", "Angaben vergleichen", "Patch nötig markieren oder vollständig geprüft"] : ["Quelle öffnen", "Angaben vergleichen", "Events-Sheet korrigieren oder vollständig geprüft"],
+        checklist: source === "offers_json" ? ["Quelle öffnen", "Angaben vergleichen", "Patch nötig markieren oder vollständig geprüft"] : ["Quelle öffnen", "Angaben vergleichen", "über Content-Prüfung korrigieren oder vollständig geprüft"],
         nextReviewDays: type === "activity" ? 30 : 7
       };
     }
@@ -1554,8 +1565,8 @@ Umfang:
       const sourceValue = suggestedUrl || eventFieldValue(item, "source_url") || eventFieldValue(item, "url") || eventFieldValue(item, "event_url") || trimValue(item.source_url);
       return `
         <section class="reviewSection" aria-label="Eventdaten korrigieren">
-          <div class="reviewSectionTitle">Eventdaten im Sheet korrigieren</div>
-          <div class="auditActionHint">Nur ändern, wenn du die Abweichung in der Quelle gesehen hast. Leere Felder bleiben unverändert, wenn sie im Sheet nicht existieren.</div>
+          <div class="reviewSectionTitle">Eventdaten über Content-Prüfung korrigieren</div>
+          <div class="auditActionHint">Nur ändern, wenn du die Abweichung in der Quelle gesehen hast. Gespeichert wird im Hintergrund in die kanonische Eventquelle; du musst nicht direkt im Sheet arbeiten.</div>
           <div class="auditFormGrid">
             <div class="auditField auditField--wide">
               <label for="auditEventTitle">Titel</label>
@@ -1611,7 +1622,6 @@ Umfang:
         updates.source_url = sourceUrl;
         updates.url = sourceUrl;
         updates.event_url = sourceUrl;
-        updates.ticket_url = sourceUrl;
       }
 
       Object.keys(updates).forEach((key) => {
@@ -1641,6 +1651,7 @@ Umfang:
           <header class="reviewCardHead">
             <div class="reviewBadgeRow">
               <span class="originBadge">Content-Prüfung</span>
+              ${it.workbench_group ? `<span class="reviewChip">${escapeHtml(it.workbench_group)}</span>` : ``}
               <span class="reviewChip reviewChip--waiting">${escapeHtml(severityLabel)}</span>
               <span class="reviewChip">${escapeHtml(statusLabel)}</span>
             </div>
