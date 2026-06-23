@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import html
 import json
 import re
 import socket
@@ -17,10 +18,38 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
+from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+
 ROOT = Path(__file__).resolve().parents[1]
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RE_TIME = re.compile(r"^\s*(\d{1,2})[:.](\d{2})(?:\s*[-–]\s*(\d{1,2})[:.](\d{2}))?\s*$")
 HTTP_TIMEOUT_SECONDS = 12
+SOURCE_TEXT_TIMEOUT_SECONDS = 10
+SOURCE_TEXT_MAX_BYTES = 350_000
+
+GERMAN_MONTHS = {
+    1: ("januar", "jan"),
+    2: ("februar", "feb"),
+    3: ("märz", "maerz", "mrz"),
+    4: ("april", "apr"),
+    5: ("mai",),
+    6: ("juni", "jun"),
+    7: ("juli", "jul"),
+    8: ("august", "aug"),
+    9: ("september", "sep"),
+    10: ("oktober", "okt"),
+    11: ("november", "nov"),
+    12: ("dezember", "dez"),
+}
+
+CONTENT_STOPWORDS = {
+    "und", "oder", "der", "die", "das", "den", "dem", "des", "ein", "eine", "einer", "eines",
+    "mit", "für", "fuer", "von", "vom", "zur", "zum", "auf", "bei", "am", "im", "in", "an",
+    "open", "air", "show", "concert", "the", "gold", "bocholt", "borken", "rhede", "ahaus",
+    "veranstaltung", "event", "live", "2026", "2025",
+}
+
+SOURCE_TEXT_CACHE: Dict[str, Tuple[str, str, str]] = {}
 
 SEVERITY_RANK = {
     "critical": 0,
@@ -150,10 +179,32 @@ class Issue:
     suggested_url: str
     suggested_url_label: str
     suggestion_reason: str
+    evidence_status: str
+    evidence_summary: str
+    evidence_checked_fields: str
+    evidence_missing_fields: str
     public_url: str
     auto_fix_allowed: str
     auto_fix_done: str
 
+
+@dataclass
+class Observation:
+    content_type: str
+    source_system: str
+    content_id: str
+    title: str
+    date: str
+    check_code: str
+    check_status: str
+    workbench_group: str
+    checked_url: str
+    checked_fields: str
+    missing_fields: str
+    summary: str
+
+
+OBSERVATIONS: List[Observation] = []
 
 
 def infer_process_metadata(
@@ -345,6 +396,10 @@ def issue(
     suggested_url: str = "",
     suggested_url_label: str = "",
     suggestion_reason: str = "",
+    evidence_status: str = "",
+    evidence_summary: str = "",
+    evidence_checked_fields: str = "",
+    evidence_missing_fields: str = "",
     public_url: str = "",
     auto_fix_allowed: bool = False,
     auto_fix_done: bool = False,
@@ -376,6 +431,10 @@ def issue(
         suggested_url=norm(suggested_url),
         suggested_url_label=norm(suggested_url_label),
         suggestion_reason=norm(suggestion_reason),
+        evidence_status=norm(evidence_status),
+        evidence_summary=norm(evidence_summary),
+        evidence_checked_fields=norm(evidence_checked_fields),
+        evidence_missing_fields=norm(evidence_missing_fields),
         public_url=norm(public_url),
         auto_fix_allowed="yes" if auto_fix_allowed else "no",
         auto_fix_done="yes" if auto_fix_done else "no",
@@ -529,6 +588,430 @@ def check_url(url: str) -> Tuple[str, str]:
     return "warning", "url_check_unknown"
 
 
+def text_probe_url(url: str) -> Tuple[str, str, str]:
+    """Fetch readable page text for evidence checks without changing data.
+
+    Returns (status, detail, text). status: ok|warning|critical.
+    This is deliberately separate from check_url: a source may be reachable but
+    not text-readable by the bot. That should usually be an observation, not an
+    immediate user task.
+    """
+    url = norm(url)
+    if not is_http_url(url):
+        return "warning", "url_not_http", ""
+    if url in SOURCE_TEXT_CACHE:
+        return SOURCE_TEXT_CACHE[url]
+
+    headers = {
+        "User-Agent": "Bocholt-Erleben-ContentEvidenceProbe/1.0 (+https://bocholt-erleben.de)",
+        "Accept": "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.7",
+    }
+    try:
+        request = Request(url, method="GET", headers=headers)
+        with urlopen(request, timeout=SOURCE_TEXT_TIMEOUT_SECONDS, context=ssl.create_default_context()) as response:
+            code = getattr(response, "status", 0) or 0
+            raw = response.read(SOURCE_TEXT_MAX_BYTES)
+            content_type = (response.headers.get("content-type") or "").lower()
+            charset_match = re.search(r"charset=([^;]+)", content_type)
+            charset = charset_match.group(1).strip() if charset_match else "utf-8"
+            try:
+                body = raw.decode(charset, errors="ignore")
+            except LookupError:
+                body = raw.decode("utf-8", errors="ignore")
+            text = html_to_text(body)
+            status = "ok" if 200 <= code < 400 and text else "warning"
+            detail = str(code) if text else f"{code}: no_text"
+            SOURCE_TEXT_CACHE[url] = (status, detail, text)
+            return SOURCE_TEXT_CACHE[url]
+    except HTTPError as exc:
+        result = ("critical" if 400 <= exc.code < 500 else "warning", str(exc.code), "")
+    except (TimeoutError, socket.timeout, URLError, OSError, ssl.SSLError) as exc:
+        result = ("warning", f"{type(exc).__name__}: {exc}", "")
+    SOURCE_TEXT_CACHE[url] = result
+    return result
+
+
+def html_to_text(value: str) -> str:
+    value = re.sub(r"<script\b[^>]*>.*?</script>", " ", value, flags=re.I | re.S)
+    value = re.sub(r"<style\b[^>]*>.*?</style>", " ", value, flags=re.I | re.S)
+    value = re.sub(r"<[^>]+>", " ", value)
+    value = html.unescape(value)
+    value = re.sub(r"\s+", " ", value)
+    return value.strip()
+
+
+def evidence_text(value: str) -> str:
+    text = norm(value).lower()
+    replacements = {
+        "ä": "ae",
+        "ö": "oe",
+        "ü": "ue",
+        "ß": "ss",
+        "–": "-",
+        "—": "-",
+    }
+    for src, target in replacements.items():
+        text = text.replace(src, target)
+    return re.sub(r"\s+", " ", text)
+
+
+def significant_tokens(value: str, *, min_len: int = 4, max_tokens: int = 8) -> list[str]:
+    text = evidence_text(value)
+    raw = re.findall(r"[a-z0-9][a-z0-9-]+", text)
+    tokens: list[str] = []
+    for token in raw:
+        token = token.strip("-")
+        if len(token) < min_len or token in CONTENT_STOPWORDS:
+            continue
+        if token not in tokens:
+            tokens.append(token)
+        if len(tokens) >= max_tokens:
+            break
+    return tokens
+
+
+def text_has_tokens(text: str, tokens: list[str], *, minimum: int = 1) -> bool:
+    haystack = evidence_text(text)
+    hits = 0
+    for token in tokens:
+        if token and token in haystack:
+            hits += 1
+        if hits >= minimum:
+            return True
+    return False
+
+
+def date_variants(value: str) -> list[str]:
+    parsed = parse_iso_date(value)
+    if parsed is None:
+        return []
+    day = parsed.day
+    month = parsed.month
+    year = parsed.year
+    variants = [
+        f"{year}-{month:02d}-{day:02d}",
+        f"{day:02d}.{month:02d}.{year}",
+        f"{day}.{month}.{year}",
+        f"{day:02d}/{month:02d}/{year}",
+        f"{day}/{month}/{year}",
+    ]
+    for month_name in GERMAN_MONTHS.get(month, ()):  # includes Dutch-compatible names for most months used here
+        variants.extend([
+            f"{day}. {month_name} {year}",
+            f"{day} {month_name} {year}",
+        ])
+    return [evidence_text(v) for v in variants]
+
+
+def time_variants(value: str) -> list[str]:
+    match = RE_TIME.match(norm(value))
+    if not match:
+        return []
+    parts = [(match.group(1), match.group(2))]
+    if match.group(3) and match.group(4):
+        parts.append((match.group(3), match.group(4)))
+    variants: list[str] = []
+    for hour_raw, minute_raw in parts:
+        hour = int(hour_raw)
+        minute = int(minute_raw)
+        variants.extend([
+            f"{hour:02d}:{minute:02d}",
+            f"{hour}:{minute:02d}",
+            f"{hour:02d}.{minute:02d}",
+            f"{hour}.{minute:02d}",
+            f"{hour} uhr",
+            f"{hour:02d} uhr",
+        ])
+    return [evidence_text(v) for v in variants]
+
+
+def text_has_any_variant(text: str, variants: list[str]) -> bool:
+    haystack = evidence_text(text)
+    return any(variant and variant in haystack for variant in variants)
+
+
+def add_observation(
+    *,
+    content_type: str,
+    source_system: str,
+    content_id: str,
+    title: str,
+    date_value: str = "",
+    check_code: str,
+    check_status: str,
+    workbench_group: str,
+    checked_url: str = "",
+    checked_fields: Iterable[str] = (),
+    missing_fields: Iterable[str] = (),
+    summary: str,
+) -> None:
+    OBSERVATIONS.append(Observation(
+        content_type=norm(content_type),
+        source_system=norm(source_system),
+        content_id=norm(content_id),
+        title=norm(title),
+        date=norm(date_value),
+        check_code=norm(check_code),
+        check_status=norm(check_status),
+        workbench_group=norm(workbench_group),
+        checked_url=norm(checked_url),
+        checked_fields=", ".join([norm(item) for item in checked_fields if norm(item)]),
+        missing_fields=", ".join([norm(item) for item in missing_fields if norm(item)]),
+        summary=norm(summary),
+    ))
+
+
+def evaluate_event_source_evidence(row: Dict[str, str], source_system: str, evidence_url: str, *, today: date, network: bool) -> Dict[str, str]:
+    content_id = norm(row.get("id") or row.get("event_id") or row.get("submission_id"))
+    title = norm(row.get("title"))
+    date_value = norm(row.get("date") or row.get("start_date"))
+    time_value = norm(row.get("time"))
+    city = norm(row.get("city"))
+    location = norm(row.get("location"))
+    checked_fields: list[str] = []
+    missing_fields: list[str] = []
+
+    if not network or not is_http_url(evidence_url):
+        return {
+            "evidence_status": "not_checked",
+            "evidence_summary": "Quellen-Faktenprobe nicht ausgeführt.",
+            "evidence_checked_fields": "",
+            "evidence_missing_fields": "",
+        }
+
+    status, detail, text = text_probe_url(evidence_url)
+    if status != "ok" or not text:
+        add_observation(
+            content_type="event",
+            source_system=source_system,
+            content_id=content_id,
+            title=title,
+            date_value=date_value,
+            check_code="event_source_fact_evidence",
+            check_status="source_text_unavailable",
+            workbench_group="Quellenprüfung",
+            checked_url=evidence_url,
+            summary=f"Quelle erreichbar/fetchbar nicht ausreichend für Textvergleich: {detail}",
+        )
+        return {
+            "evidence_status": "source_text_unavailable",
+            "evidence_summary": f"Quelle konnte für Faktenvergleich nicht als Text gelesen werden: {detail}",
+            "evidence_checked_fields": "",
+            "evidence_missing_fields": "source_text",
+        }
+
+    title_tokens = significant_tokens(title)
+    title_ok = text_has_tokens(text, title_tokens, minimum=min(2, max(1, len(title_tokens)))) if title_tokens else True
+    checked_fields.append("title")
+    if not title_ok:
+        missing_fields.append("title")
+
+    date_ok = text_has_any_variant(text, date_variants(date_value)) if date_value else True
+    checked_fields.append("date")
+    if not date_ok:
+        missing_fields.append("date")
+
+    time_tokens = time_variants(time_value)
+    if time_tokens:
+        time_ok = text_has_any_variant(text, time_tokens)
+        checked_fields.append("time")
+        if not time_ok:
+            missing_fields.append("time")
+
+    location_tokens = significant_tokens(" ".join([city, location]), max_tokens=6)
+    if location_tokens:
+        location_ok = text_has_tokens(text, location_tokens, minimum=1)
+        checked_fields.append("location")
+        if not location_ok:
+            missing_fields.append("location")
+
+    required_missing = set(missing_fields)
+    if not required_missing:
+        evidence_status = "source_confirms_key_facts"
+        summary = "Quelle enthält die automatisch prüfbaren Kernfakten."
+    elif "date" in required_missing or ("time" in required_missing and parse_iso_date(date_value) and parse_iso_date(date_value) <= today + timedelta(days=14)):
+        evidence_status = "source_evidence_weak"
+        summary = "Quelle enthält nicht alle automatisch prüfbaren Kernfakten; fachliche Prüfung sinnvoll."
+    else:
+        evidence_status = "source_evidence_partial"
+        summary = "Quelle enthält nur einen Teil der automatisch prüfbaren Kernfakten."
+
+    add_observation(
+        content_type="event",
+        source_system=source_system,
+        content_id=content_id,
+        title=title,
+        date_value=date_value,
+        check_code="event_source_fact_evidence",
+        check_status=evidence_status,
+        workbench_group="Faktenprüfung",
+        checked_url=evidence_url,
+        checked_fields=checked_fields,
+        missing_fields=missing_fields,
+        summary=summary,
+    )
+
+    return {
+        "evidence_status": evidence_status,
+        "evidence_summary": summary,
+        "evidence_checked_fields": ", ".join(checked_fields),
+        "evidence_missing_fields": ", ".join(missing_fields),
+    }
+
+
+def evaluate_activity_source_evidence(offer: Dict[str, Any], source_url: str, *, network: bool) -> Dict[str, str]:
+    content_id = norm(offer.get("id"))
+    title = norm(offer.get("title"))
+    opening_status = offer.get("opening_status") if isinstance(offer.get("opening_status"), dict) else {}
+    public_label = norm(opening_status.get("public_label"))
+    detail_note = norm(opening_status.get("detail_note"))
+    status_type = norm(opening_status.get("type"))
+
+    if not network or not is_http_url(source_url):
+        return {
+            "evidence_status": "not_checked",
+            "evidence_summary": "Activity-Faktenprobe nicht ausgeführt.",
+            "evidence_checked_fields": "",
+            "evidence_missing_fields": "",
+        }
+
+    status, detail, text = text_probe_url(source_url)
+    if status != "ok" or not text:
+        add_observation(
+            content_type="activity",
+            source_system="offers_json",
+            content_id=content_id,
+            title=title,
+            check_code="activity_source_fact_evidence",
+            check_status="source_text_unavailable",
+            workbench_group="Activity-Prüfung",
+            checked_url=source_url,
+            summary=f"Quelle konnte für Activity-Faktenvergleich nicht als Text gelesen werden: {detail}",
+        )
+        return {
+            "evidence_status": "source_text_unavailable",
+            "evidence_summary": f"Quelle konnte für Activity-Faktenvergleich nicht als Text gelesen werden: {detail}",
+            "evidence_checked_fields": "",
+            "evidence_missing_fields": "source_text",
+        }
+
+    checked_fields: list[str] = []
+    missing_fields: list[str] = []
+    title_tokens = significant_tokens(title, max_tokens=5)
+    if title_tokens:
+        checked_fields.append("title")
+        if not text_has_tokens(text, title_tokens, minimum=1):
+            missing_fields.append("title")
+
+    opening_probe = " ".join([public_label, detail_note])
+    opening_variants = [evidence_text(v) for v in re.findall(r"\d{1,2}[:.]\d{2}|\d{1,2}\s*uhr|sonnenaufgang|sonnenuntergang|täglich|taeglich|di\b|do\b|so\b|mo\b|fr\b|sa\b|montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag", opening_probe, flags=re.I)]
+    if opening_variants or status_type in {"regular_hours", "free_access", "seasonal_hours"}:
+        checked_fields.append("opening_status")
+        if opening_variants and not text_has_any_variant(text, opening_variants):
+            missing_fields.append("opening_status")
+
+    if not missing_fields:
+        evidence_status = "source_confirms_key_facts"
+        summary = "Activity-Quelle enthält die automatisch prüfbaren Kernhinweise."
+    else:
+        evidence_status = "source_evidence_partial"
+        summary = "Activity-Quelle enthält nicht alle automatisch prüfbaren Hinweise; bei Gelegenheit fachlich prüfen."
+
+    add_observation(
+        content_type="activity",
+        source_system="offers_json",
+        content_id=content_id,
+        title=title,
+        check_code="activity_source_fact_evidence",
+        check_status=evidence_status,
+        workbench_group="Activity-Prüfung",
+        checked_url=source_url,
+        checked_fields=checked_fields,
+        missing_fields=missing_fields,
+        summary=summary,
+    )
+    return {
+        "evidence_status": evidence_status,
+        "evidence_summary": summary,
+        "evidence_checked_fields": ", ".join(checked_fields),
+        "evidence_missing_fields": ", ".join(missing_fields),
+    }
+
+
+def visual_specific_motif_gap(title: str, visual_key: str) -> str:
+    title_norm = evidence_text(title)
+    key_norm = evidence_text(visual_key)
+    if re.search(r"\b(dart|darts)\b", title_norm) and "dart" not in key_norm:
+        return "darts"
+    if re.search(r"\b(fecht|fencing|fencer)\b", title_norm) and not any(marker in key_norm for marker in ("fecht", "fenc")):
+        return "fencing"
+    return ""
+
+
+def audit_event_visual_fit_candidates(occurrences: list[Dict[str, str]], source_system: str, base_url: str) -> List[Issue]:
+    issues: List[Issue] = []
+    public_url = f"{base_url.rstrip('/')}/events/" if base_url else ""
+
+    for item in occurrences:
+        motif_gap = visual_specific_motif_gap(item.get("title", ""), item.get("visual_key", ""))
+        if motif_gap:
+            issues.append(issue(
+                "review_needed",
+                "event",
+                source_system,
+                item.get("content_id", ""),
+                item.get("title", ""),
+                "event_visual_specific_motif_gap",
+                f"Eventtitel nennt ein spezifisches Motiv ({motif_gap}), aber der visual_key ist nicht spezifisch genug: {item.get('visual_key', '')}",
+                "Im separaten Visual-Fit-Workflow prüfen: passenden visual_key wählen, Key verfeinern oder neues Bildmotiv produzieren. Nicht blind ein generisches Bild verwenden.",
+                date_value=item.get("date", ""),
+                source_url=item.get("source_url", ""),
+                public_url=public_url,
+                evidence_status="visual_fit_candidate",
+                evidence_summary="Spezifischer Eventtitel benötigt Motiv-Fit-Prüfung.",
+                evidence_checked_fields="title, visual_key",
+                evidence_missing_fields="specific_visual_key",
+            ))
+
+    by_key: Dict[str, list[Dict[str, str]]] = {}
+    for item in occurrences:
+        key = norm(item.get("visual_key"))
+        if key:
+            by_key.setdefault(key, []).append(item)
+
+    for visual_key, items in by_key.items():
+        dated = [(parse_iso_date(item.get("date", "")), item) for item in items]
+        dated = [(day, item) for day, item in dated if day is not None]
+        if len(dated) < 3:
+            continue
+        dated.sort(key=lambda pair: pair[0])
+        for start_index, (start_day, _) in enumerate(dated):
+            cluster = [item for day, item in dated[start_index:] if day <= start_day + timedelta(days=7)]
+            title_count = len({norm_key(item.get("title", "")) for item in cluster})
+            if len(cluster) >= 3 and title_count >= 3:
+                first = cluster[0]
+                issues.append(issue(
+                    "warning",
+                    "event",
+                    source_system,
+                    f"visual-reuse-{visual_key}-{start_day.isoformat()}",
+                    f"Visual-Fit prüfen: {visual_key}",
+                    "event_visual_reuse_cluster",
+                    f"visual_key wird in kurzer Zeit für {len(cluster)} unterschiedliche Events genutzt: {visual_key}",
+                    "Im separaten Visual-Fit-Workflow prüfen, ob Bild-/Key-Wiederholung im Feed noch hochwertig wirkt oder zusätzliche Motive nötig sind.",
+                    date_value=start_day.isoformat(),
+                    source_url=first.get("source_url", ""),
+                    public_url=public_url,
+                    evidence_status="visual_fit_candidate",
+                    evidence_summary="Mehrere unterschiedliche Events teilen in kurzer Zeit denselben visual_key.",
+                    evidence_checked_fields="date, title, visual_key",
+                    evidence_missing_fields="visual_diversity_review",
+                ))
+                break
+
+    return issues
+
+
 def audit_event_rows(
     rows: List[Dict[str, str]],
     source_system: str,
@@ -543,6 +1026,7 @@ def audit_event_rows(
     issues: List[Issue] = []
     seen_ids: Dict[str, str] = {}
     seen_fp: Dict[str, str] = {}
+    visual_occurrences: list[Dict[str, str]] = []
 
     horizon_end = today + timedelta(days=horizon_days)
 
@@ -641,6 +1125,16 @@ def audit_event_rows(
         if scope == "daily" and not in_daily_window:
             continue
 
+        visual_key_for_fit = norm(row.get("visual_key"))
+        if visual_key_for_fit:
+            visual_occurrences.append({
+                "content_id": content_id,
+                "title": title,
+                "date": date_value,
+                "visual_key": visual_key_for_fit,
+                "source_url": url,
+            })
+
         if time_value and not RE_TIME.match(time_value):
             issues.append(issue(
                 "critical" if in_daily_window else "review_needed",
@@ -728,7 +1222,9 @@ def audit_event_rows(
             ))
         elif is_ticket_portal_url(url):
             suggested_url = source_suggestion.get("suggested_url", "")
+            evidence = {}
             if suggested_url:
+                evidence = evaluate_event_source_evidence(row, source_system, suggested_url, today=today, network=network)
                 action_text = "Empfohlene offizielle Event-/Veranstalterquelle in der Content-Prüfung vergleichen und erst nach Prüfung speichern. Ticketportal nur als Ticket-/Buchungslink führen, sobald ein separates Ticketfeld verfügbar ist."
             else:
                 action_text = "Offizielle Event-/Veranstalterquelle bevorzugen. Ticketportal nur als Ticket-/Buchungslink führen, sobald ein separates Ticketfeld verfügbar ist."
@@ -746,6 +1242,10 @@ def audit_event_rows(
                 suggested_url=suggested_url,
                 suggested_url_label=source_suggestion.get("suggested_url_label", ""),
                 suggestion_reason=source_suggestion.get("suggestion_reason", ""),
+                evidence_status=evidence.get("evidence_status", ""),
+                evidence_summary=evidence.get("evidence_summary", ""),
+                evidence_checked_fields=evidence.get("evidence_checked_fields", ""),
+                evidence_missing_fields=evidence.get("evidence_missing_fields", ""),
                 public_url=public_url,
             ))
         elif network:
@@ -793,9 +1293,85 @@ def audit_event_rows(
                     public_url=public_url,
                 ))
 
+            # Faktenprobe: beobachtet, ob die Quelle die Kernangaben wirklich trägt.
+            # Nur starke Schwächen werden als Quellenprüfung sichtbar; normale Teilunsicherheiten bleiben im Report als Observation.
+            if in_daily_window and is_http_url(url):
+                evidence = evaluate_event_source_evidence(row, source_system, url, today=today, network=network)
+                if evidence.get("evidence_status") == "source_evidence_weak":
+                    issues.append(issue(
+                        "warning",
+                        "event",
+                        source_system,
+                        content_id,
+                        title,
+                        "event_source_facts_not_confirmed",
+                        "Die Quelle bestätigt die automatisch prüfbaren Kernfakten nicht ausreichend.",
+                        "Quelle fachlich prüfen: Datum, Uhrzeit, Ort und Titel gegen den Eventdatensatz vergleichen. Nicht automatisch überschreiben.",
+                        date_value=date_value,
+                        source_url=url,
+                        evidence_status=evidence.get("evidence_status", ""),
+                        evidence_summary=evidence.get("evidence_summary", ""),
+                        evidence_checked_fields=evidence.get("evidence_checked_fields", ""),
+                        evidence_missing_fields=evidence.get("evidence_missing_fields", ""),
+                        public_url=public_url,
+                    ))
+
         visual_key = norm(row.get("visual_key"))
-        if visual_key:
-            pool = event_visual_pools.get(visual_key)
+        inferred_visual_key = infer_event_visual_key(
+            title=row.get("title"),
+            description=row.get("description"),
+            category=row.get("kategorie"),
+            location=row.get("location"),
+        )
+        if not visual_key:
+            add_observation(
+                content_type="event",
+                source_system=source_system,
+                content_id=content_id,
+                title=title,
+                date_value=date_value,
+                check_code="event_visual_key_inference",
+                check_status="visual_key_missing",
+                workbench_group="Visual-Fit",
+                checked_fields=("title", "description", "kategorie", "location"),
+                missing_fields=("visual_key",),
+                summary=f"Kein visual_key gesetzt; deterministischer Vorschlag wäre {inferred_visual_key}.",
+            )
+            if in_daily_window:
+                issues.append(issue(
+                    "warning",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_visual_key_missing",
+                    "Event hat keinen visual_key für den Event-Visual-Pool.",
+                    f"Im separaten Visual-Fit-Workflow prüfen und passenden visual_key setzen. Automatischer Vorschlag: {inferred_visual_key}",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                    evidence_status="visual_key_missing",
+                    evidence_summary=f"Deterministischer Vorschlag: {inferred_visual_key}",
+                    evidence_checked_fields="title, description, kategorie, location",
+                    evidence_missing_fields="visual_key",
+                ))
+        else:
+            normalized_visual_key = normalize_event_visual_key(visual_key) or visual_key
+            if inferred_visual_key and normalized_visual_key != inferred_visual_key:
+                add_observation(
+                    content_type="event",
+                    source_system=source_system,
+                    content_id=content_id,
+                    title=title,
+                    date_value=date_value,
+                    check_code="event_visual_key_inference",
+                    check_status="visual_key_differs_from_rule",
+                    workbench_group="Visual-Fit",
+                    checked_fields=("title", "description", "kategorie", "location", "visual_key"),
+                    missing_fields=(),
+                    summary=f"Gesetzter visual_key {visual_key}; deterministische Regel würde {inferred_visual_key} vorschlagen.",
+                )
+            pool = event_visual_pools.get(normalized_visual_key)
             if pool is None:
                 issues.append(issue(
                     "critical",
@@ -825,6 +1401,7 @@ def audit_event_rows(
                     public_url=public_url,
                 ))
 
+    issues.extend(audit_event_visual_fit_candidates(visual_occurrences, source_system, base_url))
     return issues
 
 
@@ -1101,6 +1678,11 @@ def audit_activities(
                     public_url=public_url,
                 ))
 
+            # Activity-Faktenproben werden in V1 nicht fuer alle Activities gezogen,
+            # damit der woechentliche Audit nicht durch viele externe Seiten blockiert.
+            # Quellenfehler/alte Pruefstaende bleiben als Aufgaben sichtbar;
+            # die eigentliche Activity-Faktenvertiefung ist ein separater Ausbau.
+
     return issues
 
 
@@ -1126,12 +1708,30 @@ def summarize(issues: List[Issue]) -> Dict[str, Any]:
     }
 
 
+def summarize_observations(observations: List[Observation]) -> Dict[str, Any]:
+    by_status: Dict[str, int] = {}
+    by_code: Dict[str, int] = {}
+    by_type: Dict[str, int] = {}
+    for item in observations:
+        by_status[item.check_status] = by_status.get(item.check_status, 0) + 1
+        by_code[item.check_code] = by_code.get(item.check_code, 0) + 1
+        by_type[item.content_type] = by_type.get(item.content_type, 0) + 1
+    return {
+        "total": len(observations),
+        "by_status": by_status,
+        "by_code": by_code,
+        "by_type": by_type,
+    }
+
+
 def write_json_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "meta": meta,
         "summary": summarize(issues),
+        "observations_summary": summarize_observations(OBSERVATIONS),
         "issues": [asdict(item) for item in issues],
+        "observations": [asdict(item) for item in OBSERVATIONS],
     }
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -1139,6 +1739,7 @@ def write_json_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> 
 def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     summary = summarize(issues)
+    observation_summary = summarize_observations(OBSERVATIONS)
     lines = [
         "# Content Quality Report",
         "",
@@ -1161,10 +1762,15 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
         "",
         *[f"- {key}: {value}" for key, value in sorted(summary.get("by_correction_owner", {}).items())],
         "",
+        "## Evidence observations",
+        "",
+        f"- Total observations: {observation_summary.get('total', 0)}",
+        *[f"- {key}: {value}" for key, value in sorted(observation_summary.get("by_status", {}).items())],
+        "",
         "## Issues",
         "",
-        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL |",
-        "|---|---|---|---|---|---|---|---|---|---|",
+        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL | Evidence |",
+        "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for item in sorted(issues, key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.workbench_group, x.content_type, x.date, x.title)):
         def cell(value: str) -> str:
@@ -1181,6 +1787,7 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
                 cell(item.issue_text),
                 cell(item.recommended_action),
                 cell(item.suggested_url),
+                cell(item.evidence_status),
             ]) + " |"
         )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")

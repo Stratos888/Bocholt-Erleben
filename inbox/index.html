@@ -1443,6 +1443,10 @@ Umfang:
         ["Prozesskategorie", trimValue(item.process_category)],
         ["Korrekturweg", trimValue(item.correction_owner)],
         ["Automatik-Regel", trimValue(item.automation_policy)],
+        ["Faktenprobe", trimValue(item.evidence_status)],
+        ["Faktenprobe Kurzbefund", trimValue(item.evidence_summary)],
+        ["Geprüfte Felder", trimValue(item.evidence_checked_fields)],
+        ["Nicht bestätigt", trimValue(item.evidence_missing_fields)],
         ["Typ", trimValue(item.content_type)],
         ["Quelle", trimValue(item.source_system)],
         ["ID", trimValue(item.content_id)],
@@ -1578,6 +1582,25 @@ Umfang:
             <strong>${escapeHtml(label)}</strong><br />
             <span>${escapeHtml(suggestedUrl)}</span>
             ${reason ? `<br /><span>${escapeHtml(reason)}</span>` : ``}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderEvidenceSummary(item) {
+      const status = trimValue(item.evidence_status);
+      const summary = trimValue(item.evidence_summary);
+      const checked = trimValue(item.evidence_checked_fields);
+      const missing = trimValue(item.evidence_missing_fields);
+      if (!status && !summary && !checked && !missing) return "";
+      return `
+        <section class="reviewSection" aria-label="Faktenprobe">
+          <div class="reviewSectionTitle">Faktenprobe</div>
+          <div class="auditStateNote">
+            ${status ? `<div><strong>Status:</strong> ${escapeHtml(status)}</div>` : ``}
+            ${summary ? `<div>${escapeHtml(summary)}</div>` : ``}
+            ${checked ? `<div><strong>Automatisch geprüft:</strong> ${escapeHtml(checked)}</div>` : ``}
+            ${missing ? `<div><strong>Nicht automatisch bestätigt:</strong> ${escapeHtml(missing)}</div>` : ``}
           </div>
         </section>
       `;
@@ -1759,7 +1782,11 @@ Umfang:
           process_category: trimValue(item.process_category),
           correction_owner: trimValue(item.correction_owner),
           workbench_group: trimValue(item.workbench_group),
-          automation_policy: trimValue(item.automation_policy)
+          automation_policy: trimValue(item.automation_policy),
+          evidence_status: trimValue(item.evidence_status),
+          evidence_summary: trimValue(item.evidence_summary),
+          evidence_checked_fields: trimValue(item.evidence_checked_fields),
+          evidence_missing_fields: trimValue(item.evidence_missing_fields)
         }))
       };
     }
@@ -1884,6 +1911,8 @@ Umfang:
           </section>
 
           ${renderSourceSuggestion(it)}
+
+          ${renderEvidenceSummary(it)}
 
           ${renderEventCorrectionForm(it, suggestedUrl)}
 
