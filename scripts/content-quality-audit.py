@@ -14,7 +14,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qsl, urlencode, urlparse
+from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,65 +42,6 @@ TICKET_PORTAL_HOSTS = (
     "rausgegangen.de",
 )
 
-TRACKING_QUERY_KEYS = {
-    "utm_source",
-    "utm_medium",
-    "utm_campaign",
-    "utm_term",
-    "utm_content",
-    "fbclid",
-    "gclid",
-    "mc_cid",
-    "mc_eid",
-}
-
-
-def normalize_redirect_path(path: str) -> str:
-    value = re.sub(r"/+", "/", norm(path) or "/").rstrip("/").lower()
-    return "" if value in {"", "/"} else value
-
-
-def normalize_redirect_query(query: str) -> str:
-    pairs = []
-    for key, value in parse_qsl(query or "", keep_blank_values=True):
-        key_norm = key.strip().lower()
-        if key_norm in TRACKING_QUERY_KEYS or key_norm.startswith("utm_"):
-            continue
-        pairs.append((key_norm, value.strip()))
-    return urlencode(sorted(pairs), doseq=True)
-
-
-def is_harmless_redirect(original_url: str, final_url: str) -> bool:
-    """True, wenn eine Weiterleitung technisch/canonical ist und keine Redaktionsaktion braucht.
-
-    Wichtig: Harmlos bedeutet nicht "nie wieder pruefen". Der URL-Check laeuft
-    bei jedem Audit erneut. Harmlos bedeutet nur: Dieser erfolgreiche Redirect wird
-    nicht als offene Arbeitsaufgabe in die Workbench geschrieben.
-    """
-    original = urlparse(norm(original_url))
-    final = urlparse(norm(final_url))
-    if not original.netloc or not final.netloc:
-        return False
-    if original.scheme not in {"http", "https"} or final.scheme not in {"http", "https"}:
-        return False
-    if original.netloc.lower().removeprefix("www.") != final.netloc.lower().removeprefix("www."):
-        return False
-
-    original_path = normalize_redirect_path(original.path)
-    final_path = normalize_redirect_path(final.path)
-    original_query = normalize_redirect_query(original.query)
-    final_query = normalize_redirect_query(final.query)
-
-    if original_path == final_path and original_query == final_query:
-        return True
-
-    # Viele kommunale/Museumsseiten leiten die Host-Root automatisch auf /de weiter.
-    # Das ist kein Content-Fehler, solange keine relevanten Query-Parameter verloren gehen.
-    root_language_paths = {"", "/de"}
-    if original_path in root_language_paths and final_path in root_language_paths and original_query == final_query:
-        return True
-
-    return False
 
 def url_host(value: str) -> str:
     return (urlparse(norm(value)).netloc or "").lower().removeprefix("www.")
@@ -109,6 +50,82 @@ def url_host(value: str) -> str:
 def is_ticket_portal_url(value: str) -> bool:
     host = url_host(value)
     return any(host == portal or host.endswith("." + portal) for portal in TICKET_PORTAL_HOSTS)
+
+
+def normalized_url_parts(value: str) -> tuple[str, str, str]:
+    parsed = urlparse(norm(value))
+    host = (parsed.netloc or "").lower().removeprefix("www.")
+    path = re.sub(r"/{2,}", "/", parsed.path or "/")
+    if path != "/":
+        path = path.rstrip("/")
+    query = parsed.query or ""
+    return host, path, query
+
+
+def strip_benign_path_prefix(path: str) -> str:
+    value = path or "/"
+    for prefix in ("/de", "/de-de", "/deutsch"):
+        if value == prefix:
+            return "/"
+        if value.startswith(prefix + "/"):
+            return value[len(prefix):] or "/"
+    return value
+
+
+def parse_redirect_target(detail: str) -> str:
+    match = re.search(r"->\s*(\S+)", norm(detail))
+    return match.group(1) if match else ""
+
+
+def is_benign_redirect(source_url: str, detail: str) -> bool:
+    target_url = parse_redirect_target(detail)
+    if not target_url:
+        return False
+    source_host, source_path, source_query = normalized_url_parts(source_url)
+    target_host, target_path, target_query = normalized_url_parts(target_url)
+    if not source_host or source_host != target_host:
+        return False
+
+    source_clean = strip_benign_path_prefix(source_path)
+    target_clean = strip_benign_path_prefix(target_path)
+    if source_clean != target_clean:
+        return False
+
+    # Tracking- und Sortierparameter gelten nicht als redaktioneller Arbeitsfall.
+    ignored_params = ("utm_", "mtm_", "fbclid", "gclid")
+    def relevant_query(raw: str) -> list[str]:
+        if not raw:
+            return []
+        parts = []
+        for part in raw.split("&"):
+            key = part.split("=", 1)[0].lower()
+            if key.startswith(ignored_params) or key in ignored_params:
+                continue
+            parts.append(part)
+        return sorted(parts)
+
+    return relevant_query(source_query) == relevant_query(target_query)
+
+
+def is_transient_network_warning(detail: str) -> bool:
+    value = norm(detail).lower()
+    transient_markers = (
+        "timeouterror",
+        "timed out",
+        "temporarily unavailable",
+        "temporary failure",
+        "connection reset",
+        "connection aborted",
+        "remote end closed",
+    )
+    hard_markers = (
+        "certificate_verify_failed",
+        "hostname mismatch",
+        "ssl:",
+    )
+    if any(marker in value for marker in hard_markers):
+        return False
+    return any(marker in value for marker in transient_markers)
 
 
 @dataclass
@@ -287,8 +304,6 @@ def check_url(url: str) -> Tuple[str, str]:
                 final_url = response.geturl()
                 if 200 <= code < 400:
                     if final_url and final_url.rstrip("/") != url.rstrip("/"):
-                        if is_harmless_redirect(url, final_url):
-                            return "ok", f"{code} canonical -> {final_url}"
                         return "redirect", f"{code} -> {final_url}"
                     return "ok", str(code)
                 if 400 <= code < 500:
@@ -419,11 +434,6 @@ def audit_event_rows(
         if scope == "daily" and not in_daily_window:
             continue
 
-        # Vollständige Content-Sicherung läuft über konkrete Prüfregeln.
-        # Korrekte Inhalte erzeugen bewusst keinen offenen Workbench-Fall.
-        # Offene Aufgaben entstehen nur bei konkreten Abweichungen, Risiken oder
-        # nicht automatisch beurteilbaren Quellen.
-
         if time_value and not RE_TIME.match(time_value):
             issues.append(issue(
                 "critical" if in_daily_window else "review_needed",
@@ -509,23 +519,23 @@ def audit_event_rows(
                 source_url=url,
                 public_url=public_url,
             ))
+        elif is_ticket_portal_url(url):
+            issues.append(issue(
+                "review_needed",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_ticket_portal_as_primary_source",
+                "Als primaere Eventquelle ist ein Ticketportal hinterlegt.",
+                "Offizielle Event-/Veranstalterquelle bevorzugen. Ticketportal nur als Ticket-/Buchungslink fuehren, sobald ein separates Ticketfeld verfuegbar ist.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+            ))
         elif network:
             status, detail = check_url(url)
-            if is_ticket_portal_url(url):
-                issues.append(issue(
-                    "review_needed" if in_daily_window else "warning",
-                    "event",
-                    source_system,
-                    content_id,
-                    title,
-                    "event_ticket_portal_as_primary_source",
-                    f"Als primäre Quelle ist ein Ticketportal hinterlegt: {url}",
-                    "Offizielle Event-/Veranstalterseite als Quelle bevorzugen. Ticketportal nur als Ticket-/Buchungslink verwenden; wenn aktuell kein getrenntes Ticket-Feld existiert, Fall bewusst prüfen und Quelle im Events-Sheet korrigieren.",
-                    date_value=date_value,
-                    source_url=url,
-                    public_url=public_url,
-                ))
-            elif status == "critical":
+            if status == "critical":
                 issues.append(issue(
                     "critical" if in_daily_window else "review_needed",
                     "event",
@@ -539,7 +549,7 @@ def audit_event_rows(
                     source_url=url,
                     public_url=public_url,
                 ))
-            elif status == "warning":
+            elif status == "warning" and not is_transient_network_warning(detail):
                 issues.append(issue(
                     "review_needed" if in_daily_window else "warning",
                     "event",
@@ -553,7 +563,7 @@ def audit_event_rows(
                     source_url=url,
                     public_url=public_url,
                 ))
-            elif status == "redirect":
+            elif status == "redirect" and not is_benign_redirect(url, detail):
                 issues.append(issue(
                     "warning",
                     "event",
@@ -562,7 +572,7 @@ def audit_event_rows(
                     title,
                     "event_source_url_redirect",
                     f"Quelle leitet weiter: {detail}",
-                    "Redirect protokollieren; Ziel-URL nur nach bewusster Prüfung übernehmen.",
+                    "Redirect nur prüfen, wenn Zielseite fachlich abweicht, auf eine fremde Domain wechselt oder nicht mehr die konkrete Event-/Veranstalterquelle ist.",
                     date_value=date_value,
                     source_url=url,
                     public_url=public_url,
@@ -662,11 +672,6 @@ def audit_activities(
                     public_url=public_url,
                 ))
 
-        # Activities erzeugen nur dann eine offene Aufgabe, wenn der Audit eine
-        # konkrete Abweichung, veraltete Quellenpruefung oder nicht automatisch
-        # beurteilbare Stelle findet. Ein korrekter Activity-Datensatz bleibt
-        # in der Workbench still.
-
         if content_id in seen_ids:
             issues.append(issue(
                 "critical",
@@ -712,7 +717,8 @@ def audit_activities(
             ))
 
         image_quality = norm(offer.get("image_quality"))
-        if image_quality in {"needs_review", "blocked"}:
+        safe_pool_image = pool is not None and pool_has_safe_image(pool)
+        if image_quality == "blocked" or (image_quality == "needs_review" and not safe_pool_image):
             issues.append(issue(
                 "review_needed",
                 "activity",
@@ -721,7 +727,7 @@ def audit_activities(
                 title,
                 "activity_image_needs_review",
                 f"Activity-Bildstatus ist {image_quality}.",
-                "Bild bewusst prüfen, ersetzen oder Status dokumentiert freigeben.",
+                "Bild bewusst prüfen, ersetzen oder Status dokumentiert freigeben. Wenn bereits ein sicheres Poolbild vorhanden ist, image_quality per Repo-Patch bereinigen.",
                 source_url=source_url,
                 public_url=public_url,
             ))
@@ -853,7 +859,7 @@ def audit_activities(
                     source_url=source_url,
                     public_url=public_url,
                 ))
-            elif status == "warning":
+            elif status == "warning" and not is_transient_network_warning(detail):
                 issues.append(issue(
                     "warning",
                     "activity",
@@ -866,7 +872,7 @@ def audit_activities(
                     source_url=source_url,
                     public_url=public_url,
                 ))
-            elif status == "redirect":
+            elif status == "redirect" and not is_benign_redirect(source_url, detail):
                 issues.append(issue(
                     "warning",
                     "activity",
@@ -875,7 +881,7 @@ def audit_activities(
                     title,
                     "activity_source_url_redirect",
                     f"Activity-Quelle leitet weiter: {detail}",
-                    "Redirect protokollieren; Ziel-URL nur bewusst übernehmen.",
+                    "Redirect nur prüfen, wenn Zielseite fachlich abweicht, auf eine fremde Domain wechselt oder nicht mehr die konkrete Activity-/Anbieterquelle ist.",
                     source_url=source_url,
                     public_url=public_url,
                 ))
