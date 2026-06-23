@@ -42,6 +42,8 @@ TICKET_PORTAL_HOSTS = (
     "rausgegangen.de",
 )
 
+SOURCE_SUGGESTIONS_PATH = ROOT / "data/content_source_suggestions.json"
+
 
 def url_host(value: str) -> str:
     return (urlparse(norm(value)).netloc or "").lower().removeprefix("www.")
@@ -145,6 +147,9 @@ class Issue:
     issue_text: str
     recommended_action: str
     source_url: str
+    suggested_url: str
+    suggested_url_label: str
+    suggestion_reason: str
     public_url: str
     auto_fix_allowed: str
     auto_fix_done: str
@@ -287,6 +292,9 @@ def issue(
     *,
     date_value: str = "",
     source_url: str = "",
+    suggested_url: str = "",
+    suggested_url_label: str = "",
+    suggestion_reason: str = "",
     public_url: str = "",
     auto_fix_allowed: bool = False,
     auto_fix_done: bool = False,
@@ -315,6 +323,9 @@ def issue(
         issue_text=issue_text,
         recommended_action=recommended_action,
         source_url=norm(source_url),
+        suggested_url=norm(suggested_url),
+        suggested_url_label=norm(suggested_url_label),
+        suggestion_reason=norm(suggestion_reason),
         public_url=norm(public_url),
         auto_fix_allowed="yes" if auto_fix_allowed else "no",
         auto_fix_done="yes" if auto_fix_done else "no",
@@ -327,6 +338,46 @@ def load_json(path: Path, *, required: bool = True) -> Any:
             raise FileNotFoundError(f"JSON fehlt: {path}")
         return None
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+
+
+def load_source_suggestions(path: Path = SOURCE_SUGGESTIONS_PATH) -> Dict[str, Dict[str, str]]:
+    """Load curated source suggestions for cases the audit cannot search safely.
+
+    The file is not a data-fix source. It only lets the workbench propose
+    a reviewed official source so the user does not have to research obvious
+    replacements manually. Actual event data is changed only after inbox review.
+    """
+    data = load_json(path, required=False) or {}
+    raw_events = data.get("events") if isinstance(data, dict) else {}
+    if not isinstance(raw_events, dict):
+        return {}
+
+    out: Dict[str, Dict[str, str]] = {}
+    for key, item in raw_events.items():
+        if not isinstance(item, dict):
+            continue
+        url = norm(item.get("suggested_url"))
+        if not is_http_url(url):
+            continue
+        out[norm(key)] = {
+            "suggested_url": url,
+            "suggested_url_label": norm(item.get("label") or item.get("suggested_url_label")),
+            "suggestion_reason": norm(item.get("reason") or item.get("suggestion_reason")),
+        }
+    return out
+
+
+def source_suggestion_for_event(row: Dict[str, str], suggestions: Dict[str, Dict[str, str]]) -> Dict[str, str]:
+    content_id = norm(row.get("id") or row.get("event_id") or row.get("submission_id"))
+    title_key = norm_key(row.get("title"))
+
+    for key in (content_id, title_key):
+        if key and key in suggestions:
+            return suggestions[key]
+
+    return {"suggested_url": "", "suggested_url_label": "", "suggestion_reason": ""}
 
 
 def read_tsv(path: Path) -> List[Dict[str, str]]:
@@ -432,6 +483,7 @@ def audit_event_rows(
     rows: List[Dict[str, str]],
     source_system: str,
     event_visual_pools: Dict[str, Dict[str, Any]],
+    source_suggestions: Dict[str, Dict[str, str]],
     today: date,
     horizon_days: int,
     scope: str,
@@ -452,6 +504,7 @@ def audit_event_rows(
         time_value = norm(row.get("time"))
         url = norm(row.get("source_url") or row.get("url") or row.get("event_url"))
         public_url = f"{base_url.rstrip('/')}/events/" if base_url else ""
+        source_suggestion = source_suggestion_for_event(row, source_suggestions)
 
         for field in EVENT_REQUIRED_FIELDS:
             if not norm(row.get(field)):
@@ -624,6 +677,11 @@ def audit_event_rows(
                 public_url=public_url,
             ))
         elif is_ticket_portal_url(url):
+            suggested_url = source_suggestion.get("suggested_url", "")
+            if suggested_url:
+                action_text = "Empfohlene offizielle Event-/Veranstalterquelle in der Content-Prüfung vergleichen und erst nach Prüfung speichern. Ticketportal nur als Ticket-/Buchungslink führen, sobald ein separates Ticketfeld verfügbar ist."
+            else:
+                action_text = "Offizielle Event-/Veranstalterquelle bevorzugen. Ticketportal nur als Ticket-/Buchungslink führen, sobald ein separates Ticketfeld verfügbar ist."
             issues.append(issue(
                 "review_needed",
                 "event",
@@ -632,9 +690,12 @@ def audit_event_rows(
                 title,
                 "event_ticket_portal_as_primary_source",
                 "Als primaere Eventquelle ist ein Ticketportal hinterlegt.",
-                "Offizielle Event-/Veranstalterquelle bevorzugen. Ticketportal nur als Ticket-/Buchungslink fuehren, sobald ein separates Ticketfeld verfuegbar ist.",
+                action_text,
                 date_value=date_value,
                 source_url=url,
+                suggested_url=suggested_url,
+                suggested_url_label=source_suggestion.get("suggested_url_label", ""),
+                suggestion_reason=source_suggestion.get("suggestion_reason", ""),
                 public_url=public_url,
             ))
         elif network:
@@ -1052,8 +1113,8 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
         "",
         "## Issues",
         "",
-        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action |",
-        "|---|---|---|---|---|---|---|---|---|",
+        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL |",
+        "|---|---|---|---|---|---|---|---|---|---|",
     ]
     for item in sorted(issues, key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.workbench_group, x.content_type, x.date, x.title)):
         def cell(value: str) -> str:
@@ -1069,6 +1130,7 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
                 cell(item.title),
                 cell(item.issue_text),
                 cell(item.recommended_action),
+                cell(item.suggested_url),
             ]) + " |"
         )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -1094,6 +1156,7 @@ def main() -> None:
     today = date.today()
     event_pools = load_visual_pools(ROOT / args.event_visual_pool)
     activity_pools = load_visual_pools(ROOT / args.activity_visual_pool)
+    source_suggestions = load_source_suggestions()
 
     event_rows, event_source = load_events(ROOT / args.events_tsv, ROOT / args.events_json)
     db_event_rows = load_db_events(ROOT / args.db_events_json)
@@ -1116,6 +1179,7 @@ def main() -> None:
             event_rows,
             event_source,
             event_pools,
+            source_suggestions,
             today,
             args.horizon_days,
             args.scope,
@@ -1128,6 +1192,7 @@ def main() -> None:
             db_event_rows,
             "public_db_events_api",
             event_pools,
+            source_suggestions,
             today,
             args.horizon_days,
             args.scope,
@@ -1154,6 +1219,7 @@ def main() -> None:
         "event_source": event_source,
         "db_events_loaded": len(db_event_rows),
         "base_url": args.base_url,
+        "source_suggestions_loaded": len(source_suggestions),
     }
 
     write_json_report(ROOT / args.output_json, issues, meta)

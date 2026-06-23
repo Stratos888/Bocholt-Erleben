@@ -1494,8 +1494,8 @@ Umfang:
         event_ticket_portal_as_primary_source: {
           actionTitle: "Offizielle Eventquelle statt Ticketportal setzen",
           why: "Ticketportale sind Buchungslinks. Die primäre Quelle soll die offizielle Event- oder Veranstalterseite sein, damit Datum, Ort und Status belastbar nachprüfbar bleiben.",
-          action: "Offizielle Event-/Veranstalterseite suchen und nur nach Prüfung unten als Quelle speichern. Das Ticketportal nicht blind als Hauptquelle bestätigen.",
-          checklist: ["Ticketportal öffnen und Event identifizieren", "offizielle Event-/Veranstalterseite suchen", "Datum/Uhrzeit/Ort vergleichen", "offizielle Quelle in der Content-Prüfung speichern oder Fall zurückstellen"],
+          action: "Wenn eine empfohlene offizielle Quelle angezeigt wird, diese öffnen, gegen Datum/Uhrzeit/Ort vergleichen und erst danach unten speichern. Falls kein Vorschlag vorhanden ist: Fall zurückstellen oder Quelle recherchieren lassen. Das Ticketportal nicht blind als Hauptquelle bestätigen.",
+          checklist: ["Ticketportal öffnen und Event identifizieren", "empfohlene offizielle Quelle öffnen, falls vorhanden", "Datum/Uhrzeit/Ort vergleichen", "offizielle Quelle in der Content-Prüfung speichern oder Fall zurückstellen"],
           nextReviewDays: 14
         },
         event_time_format_unusual: {
@@ -1560,6 +1560,23 @@ Umfang:
       return `<ul class="auditChecklist">${items.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>`;
     }
 
+    function renderSourceSuggestion(item) {
+      const suggestedUrl = trimValue(item.suggested_url);
+      if (!suggestedUrl) return "";
+      const label = trimValue(item.suggested_url_label) || "Empfohlene offizielle Quelle";
+      const reason = trimValue(item.suggestion_reason);
+      return `
+        <section class="reviewSection" aria-label="Empfohlene Quelle">
+          <div class="reviewSectionTitle">Empfohlene Quelle</div>
+          <div class="auditStateNote">
+            <strong>${escapeHtml(label)}</strong><br />
+            <span>${escapeHtml(suggestedUrl)}</span>
+            ${reason ? `<br /><span>${escapeHtml(reason)}</span>` : ``}
+          </div>
+        </section>
+      `;
+    }
+
     function renderEventCorrectionForm(item, suggestedUrl) {
       if (!isContentAuditEventItem(item)) return "";
       const sourceValue = suggestedUrl || eventFieldValue(item, "source_url") || eventFieldValue(item, "url") || eventFieldValue(item, "event_url") || trimValue(item.source_url);
@@ -1593,7 +1610,7 @@ Umfang:
               <input id="auditEventLocation" type="text" value="${escapeHtml(eventFieldValue(item, "location"))}" autocomplete="off" />
             </div>
             <div class="auditField auditField--wide">
-              <label for="auditEventSourceUrl">Quelle / Ticketlink</label>
+              <label for="auditEventSourceUrl">Offizielle Quelle</label>
               <input id="auditEventSourceUrl" type="url" value="${escapeHtml(sourceValue)}" inputmode="url" autocomplete="off" />
             </div>
           </div>
@@ -1689,6 +1706,8 @@ Umfang:
             <div class="auditActionHint">Erst Quelle öffnen und fachlich vergleichen. Danach unten entweder korrigieren, vollständig geprüft markieren, zurückstellen oder Patch nötig markieren.</div>
           </section>
 
+          ${renderSourceSuggestion(it)}
+
           ${renderEventCorrectionForm(it, suggestedUrl)}
 
           ${isActivity ? `
@@ -1715,7 +1734,7 @@ Umfang:
             </div>
             <div class="auditActionHint"><strong>Abschluss:</strong> Klicke hier erst, wenn du den aktuellen Fall wirklich entschieden hast.</div>
             <div class="actions actions--compact">
-              ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button">Eventdaten im Sheet speichern</button>` : ``}
+              ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button">Eventdaten speichern</button>` : ``}
               <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${it.public_url ? "" : "disabled"}>Eintrag öffnen</button>
               <button id="btnOpenSource" class="btn sourceBtn" type="button" ${it.source_url ? "" : "disabled"}>Quelle/Ticketlink öffnen</button>
               <button id="btnAuditVerified" class="btn btn-good" type="button">Vollständig geprüft</button>

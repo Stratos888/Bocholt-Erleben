@@ -117,7 +117,7 @@ function cal_suggested_redirect_url(string $issueText): string
 
 try {
     $tabName = be_content_audit_tab_name();
-    $response = be_google_sheets_values_get($tabName . '!A:Y');
+    $response = be_google_sheets_values_get($tabName . '!A:AB');
     $values = $response['values'] ?? [];
 
     if (!is_array($values) || count($values) < 3) {
@@ -167,7 +167,10 @@ try {
         $issueCode = cal_cell($row, $index, 'issue_code');
         $sourceUrl = cal_cell($row, $index, 'source_url');
         $issueText = cal_cell($row, $index, 'issue_text');
-        $suggestedUrl = cal_suggested_redirect_url($issueText);
+        $suggestedUrl = cal_cell($row, $index, 'suggested_url');
+        if ($suggestedUrl === '') {
+            $suggestedUrl = cal_suggested_redirect_url($issueText);
+        }
 
         $eventFields = [];
         if ($contentType === 'event' && $contentId !== '' && isset($eventById[$contentId])) {
@@ -196,6 +199,9 @@ try {
             'issue_text' => $issueText,
             'recommended_action' => cal_cell($row, $index, 'recommended_action'),
             'source_url' => $sourceUrl,
+            'suggested_url' => $suggestedUrl,
+            'suggested_url_label' => cal_cell($row, $index, 'suggested_url_label'),
+            'suggestion_reason' => cal_cell($row, $index, 'suggestion_reason'),
             'public_url' => cal_cell($row, $index, 'public_url'),
             'first_seen_at' => cal_cell($row, $index, 'first_seen_at'),
             'last_seen_at' => cal_cell($row, $index, 'last_seen_at'),
@@ -207,7 +213,6 @@ try {
             'next_review_at' => cal_cell($row, $index, 'next_review_at'),
             'action_state' => cal_cell($row, $index, 'action_state'),
             'url' => cal_cell($row, $index, 'public_url'),
-            'suggested_url' => $suggestedUrl,
             'event_fields' => $eventFields,
         ];
     }
