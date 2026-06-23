@@ -288,6 +288,10 @@ jobs:
               "status",
               "content_type",
               "source_system",
+              "process_category",
+              "correction_owner",
+              "workbench_group",
+              "automation_policy",
               "content_id",
               "title",
               "date",
@@ -314,7 +318,7 @@ jobs:
           try:
               previous = service.spreadsheets().values().get(
                   spreadsheetId=sheet_id,
-                  range=f"{tab_name}!A:U",
+                  range=f"{tab_name}!A:Y",
                   majorDimension="ROWS",
               ).execute().get("values", []) or []
           except HttpError:
@@ -399,6 +403,10 @@ jobs:
                   status,
                   item.get("content_type", ""),
                   item.get("source_system", ""),
+                  item.get("process_category", ""),
+                  item.get("correction_owner", ""),
+                  item.get("workbench_group", ""),
+                  item.get("automation_policy", ""),
                   item.get("content_id", ""),
                   item.get("title", ""),
                   item.get("date", ""),
@@ -420,7 +428,7 @@ jobs:
 
           service.spreadsheets().values().clear(
               spreadsheetId=sheet_id,
-              range=f"{tab_name}!A:U",
+              range=f"{tab_name}!A:Y",
               body={},
           ).execute()
           service.spreadsheets().values().update(
