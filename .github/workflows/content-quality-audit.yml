@@ -24,6 +24,7 @@ on:
     paths:
       - ".github/workflows/content-quality-audit.yml"
       - "scripts/content-quality-audit.py"
+      - "data/content_source_suggestions.json"
       - "data/**"
       - "api/events/public.php"
   schedule:
@@ -299,6 +300,9 @@ jobs:
               "issue_text",
               "recommended_action",
               "source_url",
+              "suggested_url",
+              "suggested_url_label",
+              "suggestion_reason",
               "public_url",
               "first_seen_at",
               "last_seen_at",
@@ -318,7 +322,7 @@ jobs:
           try:
               previous = service.spreadsheets().values().get(
                   spreadsheetId=sheet_id,
-                  range=f"{tab_name}!A:Y",
+                  range=f"{tab_name}!A:AB",
                   majorDimension="ROWS",
               ).execute().get("values", []) or []
           except HttpError:
@@ -414,6 +418,9 @@ jobs:
                   item.get("issue_text", ""),
                   item.get("recommended_action", ""),
                   item.get("source_url", ""),
+                  item.get("suggested_url", ""),
+                  item.get("suggested_url_label", ""),
+                  item.get("suggestion_reason", ""),
                   item.get("public_url", ""),
                   first_seen_at,
                   generated_at,
@@ -428,7 +435,7 @@ jobs:
 
           service.spreadsheets().values().clear(
               spreadsheetId=sheet_id,
-              range=f"{tab_name}!A:Y",
+              range=f"{tab_name}!A:AB",
               body={},
           ).execute()
           service.spreadsheets().values().update(
