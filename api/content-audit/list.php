@@ -34,6 +34,72 @@ function cal_severity_rank(string $severity): int
     };
 }
 
+/* === BEGIN BLOCK: CONTENT_AUDIT_QUEUE_ROUTING_V1 | Zweck: trennt zentrale Inbox-Navigation von reinen Arbeitspaket-/Warnfaellen; Umfang: Sortier- und Queue-Rollenlogik ohne Datenänderung === */
+function cal_workbench_group_rank(string $group): int
+{
+    return match ($group) {
+        'Repo-Datenpatch' => 10,
+        'Sheet-/Quellenkorrektur' => 20,
+        'Quellenprüfung' => 30,
+        'Faktencheck' => 40,
+        'Activity-Prüfung' => 50,
+        'DB-/Anbieter-Review' => 60,
+        'Visual-Fit' => 70,
+        'Beobachten / Retry' => 80,
+        default => 90,
+    };
+}
+
+function cal_content_audit_queue_role(array $item): string
+{
+    $category = (string)($item['process_category'] ?? '');
+    $severity = (string)($item['severity'] ?? '');
+
+    if ($severity === 'critical' || $severity === 'review_needed') {
+        return 'main_queue';
+    }
+
+    return match ($category) {
+        'fact_check_candidate',
+        'visual_fit_candidate',
+        'source_retry_observation' => 'package_only',
+        default => 'main_queue',
+    };
+}
+
+function cal_sort_content_audit_items(array &$items): void
+{
+    usort($items, static function (array $a, array $b): int {
+        $role = strcmp((string)($a['queue_role'] ?? ''), (string)($b['queue_role'] ?? ''));
+        if ($role !== 0) {
+            return $role;
+        }
+
+        $severity = cal_severity_rank((string)($a['severity'] ?? '')) <=> cal_severity_rank((string)($b['severity'] ?? ''));
+        if ($severity !== 0) {
+            return $severity;
+        }
+
+        $group = cal_workbench_group_rank((string)($a['workbench_group'] ?? '')) <=> cal_workbench_group_rank((string)($b['workbench_group'] ?? ''));
+        if ($group !== 0) {
+            return $group;
+        }
+
+        $status = strcmp((string)($a['status'] ?? ''), (string)($b['status'] ?? ''));
+        if ($status !== 0) {
+            return $status;
+        }
+
+        $date = strcmp((string)($a['date'] ?? ''), (string)($b['date'] ?? ''));
+        if ($date !== 0) {
+            return $date;
+        }
+
+        return strcmp((string)($a['title'] ?? ''), (string)($b['title'] ?? ''));
+    });
+}
+/* === END BLOCK: CONTENT_AUDIT_QUEUE_ROUTING_V1 === */
+
 function cal_read_table_indexed(string $range): array
 {
     $response = be_google_sheets_values_get($range);
@@ -226,7 +292,7 @@ try {
             $eventFields = $eventById[$contentId];
         }
 
-        $items[] = [
+        $item = [
             'review_source' => 'content_audit',
             'intake_origin' => 'content_quality',
             'intake_origin_label' => 'Content-Prüfung',
@@ -268,32 +334,22 @@ try {
             'url' => cal_cell($row, $index, 'public_url'),
             'event_fields' => $eventFields,
         ];
+        $item['queue_role'] = cal_content_audit_queue_role($item);
+        $items[] = $item;
     }
 
-    usort($items, static function (array $a, array $b): int {
-        $severity = cal_severity_rank((string)($a['severity'] ?? '')) <=> cal_severity_rank((string)($b['severity'] ?? ''));
-        if ($severity !== 0) {
-            return $severity;
-        }
+    cal_sort_content_audit_items($items);
 
-        $group = strcmp((string)($a['workbench_group'] ?? ''), (string)($b['workbench_group'] ?? ''));
-        if ($group !== 0) {
-            return $group;
-        }
-
-        $status = strcmp((string)($a['status'] ?? ''), (string)($b['status'] ?? ''));
-        if ($status !== 0) {
-            return $status;
-        }
-
-        return strcmp((string)($a['date'] ?? ''), (string)($b['date'] ?? ''));
-    });
+    $mainItems = array_values(array_filter($items, static fn(array $item): bool => (string)($item['queue_role'] ?? '') !== 'package_only'));
+    $packageItems = $items;
 
     be_json_response(200, [
         'status' => 'ok',
         'data' => [
-            'items' => $items,
-            'total' => count($items),
+            'items' => $mainItems,
+            'package_items' => $packageItems,
+            'total' => count($mainItems),
+            'package_total' => count($packageItems),
             'tab_name' => $tabName,
             'generated_at' => $generatedAt,
         ],
