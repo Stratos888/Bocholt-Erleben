@@ -1,641 +1,152 @@
-# ENGINEERING RULES — BOCHOLT ERLEBEN
+# MASTER CONTROL FILE — BOCHOLT ERLEBEN
 
-<!-- === BEGIN CANONICAL ENGINEERING FILE: Hard implementation rules only === -->
+<!-- === BEGIN CANONICAL MASTER FILE: Strategic project control only === -->
 
-<!-- === BEGIN BLOCK: ENGINEERING_CHATGPT_EXECUTION_ROUTER_V1 | Zweck: macht die Engineering-Regeln fuer ChatGPT als ausfuehrende KI sofort anwendbar; Umfang: Start-Gates, Mode-Router, Preview-vor-Deploy, Dirty-Tree-Disziplin === -->
-## 0. CHATGPT EXECUTION ROUTER
+## PROJECT GOAL
 
-These rules are optimized for ChatGPT executing project work. Apply this router before any patch, command sequence, commit, or deploy recommendation.
+Bocholt erleben is a mobile-first production event discovery PWA for Bocholt.
 
-### 0.1 Start gate for every work item
+The product must feel:
 
-Before starting implementation work:
+- trustworthy
+- calm
+- modern
+- stable
+- easy to scan
 
-1. Establish the current baseline:
-   - In Codespaces/repo work: use `git status --short`, current branch and current `HEAD`.
-   - In ZIP-only review work: use the uploaded ZIP as the visible baseline.
-   - If both exist, the user's current Codespaces/repo output overrides an older ZIP.
-2. If the working tree is dirty:
-   - Do not start a new workpack.
-   - First classify the existing changes as:
-     - current work to continue,
-     - unrelated WIP to stash,
-     - changes to commit,
-     - changes to discard.
-3. Choose exactly one primary working mode:
-   - UI/CSS/static JS polish → Mode A.
-   - New route/content hub → Mode B.
-   - Feature/logic/data/backend → Mode C.
-4. Identify owner files before patching.
-5. Prefer one small, sustainable next step over broad patch bundles.
+Business goals:
 
-### 0.2 Validation router
-
-Use the cheapest reliable validation environment for the task:
-
-- UI/CSS/static JS visual polish:
-  - Use Codespaces Preview on port `8000` before commit/push whenever the change can be validated locally.
-  - Do not use staging deploy as the first visual feedback loop.
-  - Staging remains useful after commit/push or when service worker/build/runtime behavior must be validated.
-- Backend/PHP/API/DB/Stripe/mail/STRATO/deploy behavior:
-  - Validate with the relevant lint, smoke, API, database or staging checks.
-  - Codespaces static preview is not sufficient.
-- Data/Sheet/Event pipeline work:
-  - Verify the source of truth first.
-  - Do not treat generated repo artifacts as editorial truth.
-- Visual asset quality work:
-  - Use pool/audit/asset contracts first.
-  - Do not permanently fix weak individual images with ad-hoc CSS.
-
-### 0.3 Commit and deploy discipline
-
-For UI polish:
-
-1. Patch locally.
-2. Run syntax/diff checks.
-3. Preview locally via Codespaces when applicable.
-4. Only then commit.
-5. Push/deploy only after local validation or when deploy-specific validation is required.
-
-Never stack a new patch on unrelated uncommitted WIP.
-<!-- === END BLOCK: ENGINEERING_CHATGPT_EXECUTION_ROUTER_V1 === -->
-
-## 1. SOURCE OF TRUTH
-
-- In Codespaces/repo workflows, the current branch, current `HEAD`, and visible file contents are the canonical working baseline.
-- In ZIP-only analysis workflows, the uploaded ZIP is the canonical visible baseline.
-- If the user provides newer terminal output, file excerpts, screenshots, or confirms manual edits, that newer evidence overrides older ZIP contents.
-- Never patch without visible current code for the affected file(s).
-
-### Data source rule
-
-- Production/staging event data is hybrid.
-- The public event feed consists of:
-  1. Google Sheets tab `Events` as the editorial source for KI-/Sheet- and manually maintained events. During deploy, this tab is exported to `data/events.tsv` and transformed into the generated runtime feed `/data/events.json`.
-  2. Approved DB submissions from `/api/events/public.php` for organizer submissions after final review approval.
-- Organizer submissions are not written back into the Google Sheet as part of the V1 publishing flow.
-- `data/events.tsv` and `data/events.json` are generated during deploy and must not be maintained or reviewed as repository source files.
-- `data/events.json` must still exist in the deployed runtime because the frontend, SEO schema and service worker load it.
-- A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale; the repository copy should not be tracked.
-- Treat `data/search-metrics.json` as a runtime/deploy artifact as well. A local ZIP value such as `not_configured` does not invalidate a live dashboard proof; live measurement state must be judged from the deployed live dashboard/export, not from stale repository artifacts.
-- The Kuratier-Inbox is also hybrid:
-  1. Google Sheet / generated Inbox data for KI-/Sheet candidates.
-  2. DB submissions for organizer single-event, membership and activity-presence submissions.
-- Google-Sheet-Inbox data is separated by tab, not by separate sheet:
-  - `main` / live uses `Inbox` and `Inbox_Archive`.
-  - `staging` uses `Inbox_Staging` and `Inbox_Archive_Staging`.
-- Deploy must resolve the Inbox tab by branch and export from that resolved tab.
-- Staging must never read or write the live `Inbox` tab for KI-/Sheet candidates.
-- Production KI workflows run on `main` only and must target the live Inbox/push path.
-- `Inbox → Events` import is production-only and must not run on `staging`.
-
-### Content Quality Guard rule
-
-- Regular content quality checks must follow the actual source ownership:
-  1. Google Sheet tab `Events` for editorial events.
-  2. Public DB/API feed `/api/events/public.php` for approved organizer events.
-  3. `data/offers.json` for Activities.
-- Audit results are written to `Content_Audit` on live/main and `Content_Audit_Staging` on staging.
-- The private `/inbox/` is the human workbench: event candidates and content-quality findings must remain separate queues, but use the same review UI.
-- The audit is action-only for the user-facing workbench:
-  - every run checks the relevant source set again,
-  - correct/benign results do not become review tasks,
-  - only real errors, real uncertainty or required patch/sheet actions appear as open findings.
-- Harmless canonical redirects, language-path redirects and one-off transient network timeouts are not user tasks, but must be rechecked on the next run.
-- Audit workflows may write audit rows, summaries and review recommendations, but must not silently overwrite editorial source rows.
-- Deterministic auto-handling is allowed only for safe technical cases, for example expired Events being excluded by the build/runtime feed.
-- Semantically uncertain findings, such as changed times, cancellations, moved locations, unreachable sources, problematic redirects, ticket portals as primary Event source or stale Activity availability, must become `review_needed` or `warning`, not a blind data mutation.
-- A reviewer may intentionally update safe Event source URLs from the Content-Prüfung queue; this writes to the canonical Google Sheet `Events` tab.
-- Activities remain repo-/JSON-owned; Activity corrections require a visible repo patch unless a future owner contract explicitly moves them into a Sheet-backed source.
-- Event visual-key and concrete image-fit correctness is a separate quality domain. It may be surfaced by the Content Guard, but rule/motif changes, image production and pool updates must be handled through the Visual Workflow and not mixed into generic link/date/opening-status fixes.
+- reliable event discovery
+- reliable organizer onboarding
+- fair but monetizable event/location publishing
 
 ---
 
-## 2. PROOF BEFORE PATCH
+## FROZEN AREAS
 
-- Never guess.
-- For bugs: prove root cause before patching.
-- For UI work: use the real ZIP, the real file structure, and the provided screenshots.
-- Never claim certainty without proof.
+The following areas are frozen unless a concrete bug is proven:
 
----
+- Event Feed core UX
+- Event Detailpanel
+- Event-Card Normal State Polish
 
-## 3. CANONICAL PROJECT HIERARCHY
+The following workpack is intentionally on hold:
 
-Use this hierarchy when documents, screenshots, or repo leftovers create ambiguity:
-
-1. visible current code from the uploaded ZIP
-2. `Produktvertrag.md` for canonical product logic
-3. `MASTER.md` for strategic direction / frozen areas / current focus
-4. `ROADMAP.md` for tactical prioritized workpacks / To-dos
-5. `ENGINEERING.md` for implementation rules and working modes
-
-Rules:
-
-- Do not treat old routes, leftover files, or repo presence alone as canonical product truth.
-- Do not redefine product rules from `Produktvertrag.md` inside `MASTER.md`, UI copy, or ad-hoc chat reasoning.
-- If a contradiction is found, resolve it at the canonical source first.
-
+- State Transition & Hierarchy Polish
 
 ---
 
-## 3A. DOCUMENTATION GOVERNANCE
+## CURRENT FOCUS
 
-Documentation is part of project control. It must be current-first and role-clean so future ChatGPT work does not reactivate obsolete tasks.
+<!-- === BEGIN BLOCK: MASTER_CURRENT_CONTROL_2026_06_23 | Zweck: konsolidiert strategischen Steuerungsstand fuer nachhaltige Content-Sicherung; Umfang: action-only Content-Audit, separate Visual-Key-Fit-Roadmap, keine weiteren Growth-Arbeiten vor Stabilisierung === -->
+### Aktueller Steuerungsstand: Content-Sicherung vor weiterem Wachstum
 
-### Canonical document roles
+Stand: 2026-06-23.
 
-- `MASTER.md` = short strategic control, current focus, frozen areas, permanent product direction.
-- `ROADMAP.md` = current tactical backlog, active/geparkte/wartende workpacks, next proofs.
-- `ENGINEERING.md` = hard working rules, patch modes, audits, fallback workflows.
-- `TEST_STATUS.md` = proof archive and current test index, not product definition.
-- `Produktvertrag.md` = product model, prices, tariffs, funnel/product logic.
+Aktuell abgeschlossen und nicht erneut öffnen ohne konkretes Symptom:
 
-### Current-first rule
+- `/angebote/` ist nur noch Legacy-Redirect auf `/aktivitaeten/`; die Aktivitätspräsenz läuft kanonisch unter `/aktivitaeten/sichtbar-werden/...`.
+- Öffentliche Neben-/Funnel-Seiten nutzen den zentralen Footer/Shell-Abschluss.
+- Reporting-/Tracking-Hardening ist technisch abgeschlossen und live bewiesen.
+- CSS-Governance ist eingeführt.
+- Event-Visual-Motif-Fit ist für den bisherigen Sheet-Stand technisch abgeschlossen.
+- Content-Quality-Grundsystem existiert: Workflow, Script, Google-Sheet-Audittab und `/inbox/`-Arbeitsbereich.
 
-- Active steering information belongs at the top of `MASTER.md`, `ROADMAP.md` or the index of `TEST_STATUS.md`.
-- Long history must not be appended to `MASTER.md` as active context.
-- `ROADMAP.md` must not become an undifferentiated archive; old blocks may remain only when the current top block clearly overrides them.
-- `TEST_STATUS.md` may stay long, but must keep a current index near the top.
-- Historical route names, old screenshots and old test paths in `TEST_STATUS.md` are evidence, not current architecture.
+Aktueller strategischer Zielzustand:
 
-### Documentation patch rule
+- Der Content Quality Guard ist ein automatischer Prüf- und Vorentscheidungsprozess, nicht eine wöchentliche manuelle Vollprüfung.
+- Jedes regelmäßige Audit prüft die relevanten Quellen erneut:
+  1. Google-Sheet `Events` für redaktionelle Events.
+  2. DB/API für freigegebene Veranstalter-Events.
+  3. `data/offers.json` für Activities.
+- Sichere technische Fälle werden automatisch behandelt oder still protokolliert, zum Beispiel abgelaufene ausgeblendete Events, harmlose Canonical-/Sprach-Redirects oder einzelne temporäre Netzwerkaussetzer.
+- In der Content-Prüfung erscheinen nur Fälle, bei denen wirklich etwas zu tun ist und die nicht sicher automatisch durch das Prüfskript gelöst werden können.
+- Die private `/inbox/` ist die Arbeitsoberfläche für Content-Prüfung und Korrektur. Der Nutzer soll nicht direkt im Google Sheet arbeiten müssen.
+- Source Ownership bleibt trotzdem erhalten:
+  - Sheet-Events werden aus der Content-Prüfung heraus kontrolliert ins Google Sheet `Events` zurückgeschrieben.
+  - Anbieter-/DB-Events werden über Review-/Adminlogik bzw. DB-Owner korrigiert.
+  - Activities bleiben repo-/JSON-owned und werden in V1 als Patch-Kandidaten gesammelt; später kann daraus ein PR-/Patchpaket-Workflow werden.
+- Keine KI- oder Website-Textauswertung darf fachliche Inhalte blind überschreiben. Semantische Änderungen brauchen eine explizite geprüfte Aktion.
+- Eine 0%-Fehlerquote wird nicht behauptet. Der Qualitätsstandard lautet: alle Quellen regelmäßig prüfen, sichere Fälle automatisch abräumen, keine bekannten ungeprüften kritischen Fehler online lassen und nur echte Restaufgaben zur Bewertung vorlegen.
 
-- A Doku patch must state which owner document it changes and why.
-- Prefer small current-state/index updates over mass rewriting old history.
-- If an old block is obsolete but still useful as evidence, leave it in `TEST_STATUS.md`; do not copy it into `MASTER.md` or the active ROADMAP section.
-- If a contradiction is found, fix the canonical source first and only then adjust secondary references.
-- Do not add broad future plans unless they become an active, geparkt or wartend workpack.
+Separater strategischer Punkt:
 
-### Archive rule
+- KI-Visual-Key-/Bild-Fit-Qualität wird als eigener Workstream geführt.
+- Die Event-Suche muss passende `visual_key`/`visual_motif`-Zuordnungen liefern oder fehlende/unsichere Bildpassung als Gap ausgeben.
+- Geprüft werden muss nicht nur, ob ein Bild existiert, sondern ob das konkrete Bild bzw. Motiv zum Event passt und nicht zu oft im gleichen Kontext wiederholt wird.
+- Dieser Punkt wird nicht mit der Datenwahrheitsprüfung vermischt.
 
-- Use archive movement only for clearly obsolete large documentation clusters.
-- Do not create `docs/archive/` churn just to make a small current-state correction.
-- Archive moves, deletions or file splits are their own workpack and should not be mixed with UI, feature or visual patches.
+Bewusst geparkt:
 
----
-
-## 4. WORKING MODES
-
-Every chat must run in exactly one primary mode.
-
-### MODE A — UI POLISH / EXISTING PAGE OPTIMIZATION
-
-Preferred input:
-
-1. uploaded ZIP
-2. target page
-3. 3 screenshots:
-   - mobile
-   - desktop normal
-   - desktop wide
-4. 1 clear goal sentence
-
-Execution loop:
-
-1. Check baseline and dirty working tree first.
-2. Define page contract:
-   - Goal
-   - Freeze
-   - Target State
-   - Acceptance Criteria
-3. Identify owner files and define only 3 main gaps.
-4. Deliver 1 consolidated main patch.
-5. Validate locally with Codespaces Preview on port `8000` before commit/push whenever the change is UI/CSS/static JS and does not require backend/deploy behavior.
-6. Deliver at most 1 polish patch.
-7. Freeze the page.
-
-Do not drift into open-ended visual iteration loops. Do not use staging deploy as the first visual feedback loop for changes that can be checked in Codespaces Preview.
-
-### MODE B — NEW ROUTE / CONTENT HUB
-
-Preferred input:
-
-1. uploaded ZIP
-2. target route
-3. page purpose
-4. desired blocks / order
-5. 1 reference page
-
-Execution loop:
-
-1. define page contract:
-   - Goal
-   - Audience
-   - Page Role
-   - Freeze
-   - Acceptance Criteria
-2. define content / structure contract:
-   - required blocks
-   - block order
-   - CTA logic
-   - excluded content
-3. deliver 1 consolidated multi-file implementation patch
-4. review once
-5. freeze the page structure
-
-Do not start with CSS polish before the structure contract is clear.
-
-### MODE C — FEATURE / LOGIC / DATA
-
-Preferred input:
-
-1. uploaded ZIP
-2. user flow
-3. trigger
-4. data source
-5. desired behavior
-6. definition of done
-
-Execution loop:
-
-1. define flow contract / root-cause contract
-2. identify owner files
-3. deliver 1 consolidated implementation patch
-4. provide smoke-test proof points
-
-Do not mix feature work with unrelated UI polish in the same workpack.
+- Weiterer SEO-/Content-Ausbau.
+- Anbieter-Akquise mit Qualitätsversprechen.
+- Neue Event-Visual-Produktion ohne konkreten Gap.
+- Pauschale manuelle Vollprüfung aller Inhalte in der Inbox.
+<!-- === END BLOCK: MASTER_CURRENT_CONTROL_2026_06_23 === -->
 
 ---
 
-## 5. ONE CHAT = ONE WORKPACK
+## PERMANENT PRODUCT DECISIONS
 
-- Each chat should focus on one primary workpack only.
-- Do not mix UI polish, new route design, feature logic, and product-governance changes in the same implementation round unless root cause proves they are inseparable.
+- Product type: event website / PWA, not a city app
+- Mobile-first, quiet modern UI
+- Existing design tokens must be reused before new tokens are added
+- All overlays render in a dedicated overlay root directly under `body`
+- Deploy must fail fast on broken asset references
 
----
+<!-- === BEGIN BLOCK: MASTER_PREMIUM_VISUAL_CONTRACT_2026_06_01 | Zweck: verankert die dauerhafte Bild-/Visual-Produktentscheidung; Umfang: Event- und Activity-Card-Bilder, Today Home, Feed-Cards, Premium-Qualitaet === -->
+### Premium visual contract
 
-## 6. PATCH OUTPUT CONTRACT
+- Event- und Activity-Card-Bilder werden kuenftig als kuratierte 16:9-WebP-Card-Assets verstanden, nicht als beliebige Rohbilder, die im Layout gerettet werden.
+- Bevorzugte Quellenhierarchie: eigene/exklusive Premium-Echtfotos, vom Veranstalter bzw. Rechteinhaber freigegebene Premium-Echtfotos, sonstige rechtlich einwandfreie und qualitativ starke Fotos, danach selbst erzeugte symbolische KI-Premium-Visuals.
+- Rechtlich einwandfrei bedeutet: Quelle, Lizenz/Rechtebasis, Urheber-/Credit-Angaben und ggf. Nutzungserlaubnis sind belegbar; unklare, nur scheinbar freie oder nicht sauber zuordenbare Bilder gelten nicht als `ready`.
+- Wenn kein rechtlich einwandfreies Premium-Echtfoto verfuegbar ist, ist ein selbst erzeugtes symbolisches KI-Premium-Visual der bevorzugte Standard-Fallback.
+- Prominente Flaechen wie Today Home duerfen nur `ready`-Visuals oder bewusst freigegebene `fallback`-Visuals nutzen.
+- Schwache Bilder werden ersetzt, zurueckgestuft oder aus prominenten Flaechen ausgeschlossen; sie werden nicht dauerhaft per CSS, Crop-Rateversuchen oder Einzel-Focal-Point-Hotfixes kaschiert.
+- Fuer Visuals gelten die Statuswerte `ready`, `usable`, `fallback`, `needs_review` und `blocked`.
+- CSS liefert den stabilen Rahmen fuer Bildausspielung, ist aber nicht das Rettungssystem fuer ungeeignete Motive, schlechte Ausschnitte oder zu grosse Rohdateien.
+- Perspektivischer Zielzustand ist ein internes Visual-Audit bzw. Vorschau-Raster, das Bilder in echten Card-Kontexten prueft: Today Mobile, Today Desktop, Events Feed, Activities Feed und spaeter Detail-/Hero-Kontexte.
 
-Default output format:
+<!-- === END BLOCK: MASTER_PREMIUM_VISUAL_CONTRACT_2026_06_01 === -->
 
-- Use a unified Git patch whenever the current ZIP/repo baseline is visible and the change can be applied safely with `git apply`.
-- The user validates first with `git apply --check patch.diff` before applying the patch.
-- The patch must be consolidated, owner-file focused, and free of unrelated edits.
-- After the user has provided the required baseline proof, do not default back to prose-only insertion instructions.
-- Do not provide vague placement instructions such as `append at the end`, `insert after this section`, or `add this block` as the primary patch format when a Git patch is safe.
-- Do not provide long manual copy/paste snippets when a unified Git patch can safely express the same change.
+### Product governance
 
-Fallback format:
+- `Produktvertrag.md` is the only canonical source for:
+  - organizer membership model
+  - tariff names
+  - pricing
+  - token / event quota logic
+  - event submission and approval rules
+- `MASTER.md` may define strategic direction, but must not redefine canonical product mechanics from `Produktvertrag.md`.
 
-- Use concrete replace instructions only when a Git patch would be unsafe, too ambiguous, or when the affected file has diverged from the visible baseline.
-- The fallback must still be deterministic and copy/paste-safe.
-- Always specify all of the following:
-  - file
-  - exact block to replace, preferably by existing begin/end marker comments
-  - exact BEGIN line or unique BEGIN marker
-  - exact END line or unique END marker
-  - complete replacement block
-- Never split one logical replacement into drifting snippets.
-- Never include nested fenced code blocks inside a copy/paste block.
-- Consolidate overlapping edits into one replacement per file.
-- Do not append drifting snippets.
-- When inserting or replacing code blocks, use clear begin/end marker comments where technically appropriate.
+### Information architecture
 
-Baseline rule for Git patches:
-
-- Before a Git patch is created, the current repository state must be proven with:
-  - `git status --short`
-  - `git branch --show-current`
-  - `git pull --ff-only`
-  - `git rev-parse --short HEAD`
-- A Git patch may only be created against that proven branch and commit SHA, or against a fresh ZIP exported from that same state.
-- Every Git patch must be validated with `git apply --check patch.diff` before it is applied.
-- If `git apply --check patch.diff` fails, the patch must not be applied or manually repaired.
-- In that case, re-check the current repository state and create a new patch from the updated baseline.
-
-Assistant response discipline:
-
-- For implementation work, answer with the next concrete action only.
-- When a patch is requested or clearly needed, provide the patch as one terminal-ready Git patch creation block.
-- Do not describe where the user should manually paste code when a safe Git patch is possible.
-- Do not mix patch delivery with broad planning text.
-- If a documentation change is needed, treat documentation files like normal owner files and patch them with the same rules.
-- If the safe patch format is unclear, stop and ask for the missing baseline or affected file content instead of guessing.
-
----
-## 7. OWNER-FILE RULE
-
-Patch the owning file first.
-
-Ownership:
-
-- `css/style.css` = public CSS entrypoint / import order only; no selectors, no visual fixes
-- `css/base.css` = tokens, reset, foundation, app-wide primitives
-- `css/pages.css` = public content pages, static pages, funnel pages and legal pages
-- `css/components.css` = reusable UI components and component states
-- `css/home.css` = historical Discovery/Event/Activity shell owner; frozen against new large UI blocks
-- `css/today.css` = Today/Home-specific surface and recommendation layout
-- `css/overlays.css` = detailpanel, sheets, modals, overlay locks
-
-Rules:
-
-- Components style themselves; page/layout files place them.
-- Layout fixes belong in the owning layout file, not in component files.
-- Overlay mechanics belong in `css/overlays.css`.
-- Cross-file fixes are allowed only if root cause proves they are necessary.
-- `css/home.css` must not be used as the default dumping ground for new visual patches.
-- New large CSS blocks require an owner decision first: existing owner, new owner file, or conscious extraction from an old owner.
-- If an existing owner block is touched, prefer replacing/consolidating that owner block over appending a later override block.
-- CSS governance is enforced by `tools/audit-css-governance.py`; do not bypass it to ship cosmetic patches.
+- `/` is the canonical Today/Home recommendation entry and current public home.
+- `/events/` is the canonical event search and browsing route.
+- `/aktivitaeten/` is the canonical activities search and browsing route.
+- `/angebote/` is a legacy redirect to `/aktivitaeten/` and must not contain independent activities content.
+- `/aktivitaeten/sichtbar-werden/` is the canonical activity-presence decision page.
+- `/aktivitaeten/sichtbar-werden/einreichen/` is the canonical activity-presence submission page.
+- `/aktivitaeten/sichtbar-werden/erfolg/` is the canonical activity-presence success/status page.
+- `/events-veroeffentlichen/` is the canonical organizer funnel overview.
+- `/events-veroeffentlichen/einreichen/` is the canonical single-event submission route.
+- `/events-veroeffentlichen/anbindung/` is the canonical automatic-takeover request route.
+- `/fuer-veranstalter/` is the canonical organizer membership route.
+- `/ueber/` is the canonical trust/explanation page.
+- `/veroeffentlichung-erklaert/` is the canonical central explanation route for publication, review, payment/freigabe, fairness and activity-vs-event distinction.
+- `/info/` is legacy backup/redirect only and is not the current canonical information hub.
+- Success, cancellation, login, dashboard and inbox routes are functional routes, not public SEO landing pages unless explicitly promoted.
+- Legacy routes or older pages may still temporarily exist in the repo during migration, but repo presence alone is not canonical information architecture.
+- The locations modal is final as an explanation / entry layer, not as a pricing table.
 
 ---
 
-## 8. TOKEN-FIRST RULE
-
-- Reuse existing design tokens first.
-- Introduce new values as tokens only when they are truly reusable.
-- Avoid repeated hardcoded UI values.
-
----
-
-## 9. UI-POLISH / NO-HOTFIX RULE
-
-- UI-polish patches should be CSS-only unless root cause proves otherwise.
-- Do not spread small visual fixes across multiple files without proof.
-- Do not solve UI regressions by appending late override blocks when the affected component already has an owner block.
-- Prefer one consolidated owner replacement over stacked override chains.
-- A staging branch is for validating sustainable fixes, not for shipping quick temporary fixes.
-- If a patch creates this pattern, it is not acceptable as final implementation:
-
-```text
-base rule
-→ desktop override
-→ polish override
-→ mobile restore override
-→ later counter-override
-
-The correct pattern is:
-single owner block
-→ shared component base
-→ mobile contract
-→ desktop contract
-→ narrow/wide breakpoint refinements
-Before patching UI regressions, identify whether the real problem is a missing owner, conflicting owners, or a broken breakpoint boundary.
-
-## 10. OVERLAY RULE
-
-- All overlays must render in a dedicated overlay root directly under `body`.
-- Never render overlays inside sticky, transformed, or backdrop-filter containers.
-
----
-
-## 11. DEPLOY / ASSET SAFETY
-
-- Preserve deterministic build and versioning behavior.
-- Never break service worker, cache, or asset-reference logic.
-- Broken asset references are fail-fast.
-- Validate on `staging` before `main`, except for urgent live hotfixes.
-
-Asset/versioning rules:
-
-- `css/style.css` is the public CSS entrypoint and must not be deleted.
-- `css/style.css` owns CSS import order only.
-- `css/style.css` must remain import-only; real selectors belong in owner files.
-- Public HTML files must load `/css/style.css` as the single CSS entrypoint.
-- Source-level CSS cache keys must stay consistent and are checked by `tools/audit-css-governance.py`.
-- Do not patch `css/style.css` for normal visual changes unless the import order or actual CSS entrypoint changes.
-- Do not manually bump asset query versions in multiple HTML files for normal CSS/JS edits, except in an intentional CSS-governance/cache-key normalization patch.
-- The deploy workflow replaces existing `?v=...` asset references with the generated `BUILD_ID`.
-- Only touch asset references manually when a new asset is introduced, an asset is renamed, or a script/link tag is missing completely.
-
-
-<!-- === BEGIN BLOCK: ENGINEERING_PREMIUM_VISUAL_ASSET_CONTRACT_2026_06_01 | Zweck: technische Regeln fuer nachhaltige Premium-Bildausspielung; Umfang: Event-/Activity-Card-Assets, Statuslogik, Cropping-Grenzen, Audit-Pflicht === -->
-## 11.1 PREMIUM VISUAL ASSET CONTRACT
-
-For event and activity visuals, the default solution is not manual crop guessing. The default solution is a prepared, reviewed card asset.
-
-Rules:
-
-- Card visuals should be prepared as 16:9 WebP assets for card contexts.
-- Preferred visual source hierarchy:
-  1. own/exclusive premium real photo,
-  2. premium real photo explicitly cleared by organizer/rightsholder,
-  3. otherwise legally clean and high-quality photo with documented source, rights basis, license and required credit,
-  4. self-generated symbolic AI premium visual,
-  5. legacy external image only as temporary non-ready source material.
-- If a legally clean premium real photo is not available, the default replacement path is a self-generated symbolic AI premium visual, not manual crop rescue of a weak external image.
-- Raw large source images, arbitrary external images, unclear-license images or unreviewed crops must not be promoted into premium surfaces directly.
-- Visual status values are:
-  - `ready`: approved for premium card use.
-  - `usable`: acceptable in normal lists, but not automatically approved for Today/Home prominence.
-  - `fallback`: approved symbolic fallback when no better specific visual exists.
-  - `needs_review`: not allowed in prominent surfaces.
-  - `blocked`: not allowed.
-- Today/Home and other prominent recommendation surfaces may use only `ready` visuals or deliberately approved `fallback` visuals.
-- If a visual looks weak because of subject, crop, clutter, pipes, signs, harsh shadows, poor resolution, unclear rights or inconsistent style, do not solve it as a permanent CSS/object-position hotfix.
-- Replace with a cleared premium photo, regenerate as symbolic AI premium visual, downgrade or exclude weak visuals instead of masking them with layout code.
-- CSS may define the stable rendering frame, aspect ratio and fallback object-position; CSS must not become the quality-control system for individual images.
-- A future visual-audit view should preview assets in real card contexts before they are marked `ready`.
-
-Implementation guidance:
-
-- Extend existing visual pools or item data only through clear owner files.
-- Keep one shared standard for Today cards and feed cards unless a later proof shows a real context-specific requirement.
-- Prefer generated/prepared card assets over trying to rescue unsuitable source images at runtime.
-- When adding a new visual workpack, include checks for file existence, format, reasonable size, status and visual preview readiness.
-
-<!-- === END BLOCK: ENGINEERING_PREMIUM_VISUAL_ASSET_CONTRACT_2026_06_01 === -->
-
-## 12. DEPRECATED PROMPT FILES
-
-If deprecated prompt files still exist, they are not canonical workflow controllers.
-
-Canonical project control is limited to:
-
-- `Produktvertrag.md`
-- `MASTER.md`
-- `ENGINEERING.md`
-- the uploaded ZIP
-- the active workpack input
-
-<!-- BEGIN PATCH_WORKFLOW_CORRECTION_V1 -->
-
-## Patch workflow correction
-
-For all future repo patches, use this order:
-
-1. First prove the current repo baseline:
-   - git status --short
-   - git branch --show-current
-   - git pull --ff-only
-   - git rev-parse --short HEAD
-
-2. Create patches only against the proven repo baseline.
-
-3. Default patch delivery is a copyable terminal block in chat. Use a temporary `patch.diff` in the repo for normal Git patches, or a guarded script patch when targeted replacements are safer.
-   Do not provide separate sandbox/download patch files unless the user explicitly requests a downloadable file.
-
-4. If the user applies the patch in Codespaces, the repo baseline is more important than an uploaded ZIP.
-
-5. For Git patches, always run:
-   - git apply --check patch.diff
-   - git apply patch.diff
-   - rm patch.diff
-   - git diff --check
-   - git --no-pager diff -- <affected-file>
-
-   Do not use plain `git diff -- <affected-file>` in Codespaces workflows, because it can open the terminal pager and look like a frozen command. If the pager opens anyway, exit it with `q`.
-
-6. If git apply --check fails:
-   - stop immediately
-   - verify the working tree
-   - inspect the current owner block
-   - do not retry with a similar large patch
-
-7. For CSS/UI polish with many small declarations, prefer a robust script patch over a large Git diff.
-
-8. A robust script patch must:
-   - target only the relevant owner file or owner block
-   - verify every selector/block uniquely before writing
-   - abort without writing if anything is missing or ambiguous
-   - end with git diff --check and git --no-pager diff -- <affected-file>
-
-9. If block markers are inconsistent, patch against the real current marker state. Marker cleanup must be explicit and must not change runtime behavior.
-
-10. After every failed patch attempt, run:
-   - git status --short
-   - git --no-pager diff -- <affected-file>
-
-11. No blind retries.
-
-Correct sequence after a failed patch:
-
-failure
--> verify working tree
--> inspect current owner/block
--> identify mismatch
--> create smaller corrected patch
--> validate fail-fast
-
-<!-- END PATCH_WORKFLOW_CORRECTION_V1 -->
-<!-- BEGIN UI_DASHBOARD_PATCH_DISCIPLINE_V1 -->
-
-## UI-/Dashboard-Patch-Disziplin
-
-Für größere UI-, Dashboard- oder Strukturpolish-Arbeiten gilt zusätzlich:
-
-1. Keine größeren UI-/Dashboard-Patches auf einem dirty Working Tree.
-   - Wenn bereits uncommitted Änderungen vorhanden sind, zuerst entscheiden:
-     - gezielt finalisieren und prüfen, oder
-     - vollständig zurücksetzen und sauber neu starten.
-   - Keine neuen großen Patches auf halbfertige Zwischenstände stapeln.
-
-2. Vor größeren UI-/Dashboard-Patches zuerst eine Owner-Map erstellen.
-   - Struktur/HTML-Owner
-   - Rendering-/State-Owner
-   - Styling-/CSS-Owner
-   - bestehende Logik, die ersetzt oder ausdrücklich behalten wird
-   - mögliche doppelte Alt-/Neu-Logik identifizieren, bevor gepatcht wird.
-
-3. Große Terminal-Heredocs vermeiden.
-   - Bevorzugt kleine, robuste Script-Patches mit eindeutigen Ankern.
-   - Jeder Script-Patch muss abbrechen, wenn ein Anker fehlt oder mehrdeutig ist.
-   - Lange Copy/Paste-Blöcke nur verwenden, wenn sie wirklich die sicherste Option sind.
-
-4. Korrekturschleifen hart begrenzen.
-   - Wenn nach einem größeren Patch mehr als ein Korrekturpatch nötig wird: stoppen.
-   - Danach Diff prüfen und entscheiden:
-     - konsolidieren, oder
-     - Working Tree zurücksetzen und neu aufbauen.
-   - Nicht weiterflicken.
-
-5. Dashboard-V2-/Layout-Arbeiten als eigenen Workpack behandeln.
-   - Erst Zielzustand und Reihenfolge definieren.
-   - Dann ein kleiner, testbarer Strukturpatch.
-   - Danach maximal ein Polish-Patch.
-   - Erst nach Screenshot-/Smoke-Proof dokumentieren oder committen.
-
-<!-- END UI_DASHBOARD_PATCH_DISCIPLINE_V1 -->
-
-<!-- === BEGIN BLOCK: ENGINEERING_CODESPACES_PREVIEW_WORKFLOW_V1 | Zweck: dokumentiert schnellen lokalen UI-Preview-Workflow in Codespaces; Umfang: statische PWA-Ansichten, nicht Backend-/Deploy-Validierung === -->
-## Codespaces Preview für schnelle UI-Prüfungen
-
-Für schnelle UI-, CSS- und statische JS-Prüfungen kann in Codespaces ein lokaler Preview-Server genutzt werden. Das spart Zwischen-Deploys auf `staging` und ist besonders geeignet für Card-Layouts, Detailpanel, Header, Bottom-Navigation, responsive Verhalten und Bilddarstellung.
-
-Start im Repo-Root:
-
-    python3 -m http.server 8000 --bind 0.0.0.0 > /tmp/bocholt-preview.log 2>&1 &
-    echo $! > /tmp/bocholt-preview.pid
-
-Danach in Codespaces den Port `8000` über den Reiter `Ports` öffnen. Wichtige lokale Prüfrouten:
-
-- `/`
-- `/events/`
-- `/aktivitaeten/`
-- `/ueber/`
-- `/events-veroeffentlichen/`
-
-Bei PWA-/Browser-Cache-Problemen einen Cache-Buster nutzen, z. B. `?preview=ui-check`.
-
-Stoppen:
-
-    kill "$(cat /tmp/bocholt-preview.pid)"
-    rm -f /tmp/bocholt-preview.pid /tmp/bocholt-preview.log
-
-Grenze: Diese Preview ersetzt keine produktionsnahe Prüfung von STRATO, PHP-Endpunkten, Stripe, Webhooks, Mailversand oder Deploy-spezifischem Verhalten. Für solche Themen bleibt `staging` die maßgebliche Validierungsumgebung. Einzelne lokale Console-Warnungen durch Codespaces-/GitHub-Preview-Redirects oder fehlende generierte Datenexporte sind für reine UI-Prüfungen nicht automatisch blockierend.
-<!-- === END BLOCK: ENGINEERING_CODESPACES_PREVIEW_WORKFLOW_V1 === -->
-
-<!-- === BEGIN BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 | Zweck: begrenzt Codespaces-Verbrauch und definiert sicheren Fallback bei ausgeschöpftem Kontingent; Umfang: Machine-Type, parallele Codespaces, Webeditor-/Local-Git-Fallback === -->
-## Codespaces Cost Discipline und Quota-Fallback
-
-Codespaces ist die bevorzugte Ausführungsumgebung für Repo-Patches, lokale Preview, Checks, Commit und Push. Codespaces ist nicht als dauerhafte Denk-, Planungs- oder Parallel-Chat-Umgebung zu behandeln.
-
-### Standardregeln
-
-- Für dieses Projekt ist `2-core` der Standard-Maschinentyp.
-- `4-core` oder größer darf nur genutzt werden, wenn ein konkreter schwerer Arbeitsschritt dies rechtfertigt, z. B. große Bildkonvertierungen, ungewöhnlich langsame Voll-Audits oder ein späterer echter Build-Prozess.
-- Pro Repo soll normalerweise maximal ein aktiver Codespace genutzt werden.
-- Mehrere parallele Chats dürfen nicht gleichzeitig konkurrierende Repo-Patches gegen denselben Branch liefern.
-- Analyse, Planung, ZIP-Review, Bildprompt-Arbeit und längere UI-Bewertung sollen möglichst ohne laufenden Codespace stattfinden.
-- Nach abgeschlossenem Commit/Push oder längerer Pause soll der Codespace gestoppt werden oder durch einen kurzen Idle-Timeout auslaufen.
-
-### Quota-Fallback ohne Codespaces
-
-Wenn das Codespaces-Kontingent ausgeschöpft ist oder Codespaces bewusst nicht genutzt werden soll, darf auf einen reduzierten Fallback-Workflow gewechselt werden.
-
-Zulässige Fallback-Wege:
-
-- GitHub-Webeditor für kleine, klar begrenzte Änderungen.
-- Lokales Git auf dem Nutzer-PC, wenn verfügbar.
-- ZIP-only Analyse durch ChatGPT mit anschließenden manuellen Ersetzungspatches.
-
-Fallback-Einschränkungen:
-
-- Keine großen UI-/CSS-Polish-Patches ohne lokale oder staging-nahe Sichtprüfung.
-- Keine breit gestreuten Multi-Datei-Änderungen ohne aktuelle sichtbare Baseline.
-- Keine unsicheren Snippet-Ergänzungen.
-- Bevorzugt werden konkrete Block-Ersetzungen mit eindeutigem BEGIN-/END-Marker oder vollständige kleine Dateiänderungen.
-- Nach manueller Änderung muss der Nutzer im GitHub-Diff prüfen, ob ausschließlich die beabsichtigten Dateien und Blöcke geändert wurden.
-- Wenn ein sicherer Git-Patch-Check nicht möglich ist, muss der Patch kleiner und deterministischer sein als im normalen Codespaces-Workflow.
-
-### ZIP-first Webupload-Fallback
-
-Wenn Codespaces nicht verfügbar ist und der Nutzer ein aktuelles Projekt-ZIP liefert, ist der bevorzugte Fallback für kleine bis mittlere Patches:
-
-1. Nutzer liefert eine aktuelle ZIP des Zielbranches.
-2. ChatGPT prüft die Baseline lokal gegen den Zielzustand.
-3. ChatGPT erstellt ein Patch-ZIP in echter Repo-Root-Struktur.
-4. Das Patch-ZIP enthält ausschließlich Dateien/Ordner, die ins Repo übernommen werden sollen.
-5. Keine Wrapper-/Hilfsdateien im Patch-ZIP: keine `README.txt`, keine `MANIFEST.json`, kein `UPLOAD_TO_REPO_ROOT`.
-6. Nutzer entpackt das Patch-ZIP und lädt den entpackten Inhalt per GitHub Drag & Drop auf den Zielbranch hoch.
-7. Nutzer wartet den Deploy ab und liefert danach eine neue ZIP zur finalen Prüfung.
-8. ChatGPT prüft den neuen ZIP-Stand gegen Zielzustand, Checks und mögliche Restverweise.
-
-Dieser Fallback ist bevorzugt für Doku-, HTML-, CSS-, statische JS-, kleine PHP- und kleine Tool-/Audit-Patches. Nicht bevorzugt ist er für große Refactorings, viele Löschungen, Dateiumbenennungen, komplexe Merge-Konflikte oder Asset-Massenänderungen.
-<!-- === END BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 === -->
-
-## Eventdaten-Quelle: Sheet-first
-
-Redaktionelle Events haben eine feste Quellenhierarchie:
-
-1. Kanonische Bearbeitungsquelle ist das Google Sheet, Tab `Events`.
-2. `data/events.tsv` und `data/events.json` sind erzeugte Artefakte aus dem Deploy-/Export-Prozess.
-3. Ein lokales `data/events.json` im Repo oder Codespace ist nur dann belastbar, wenn es unmittelbar aus dem aktuellen Sheet exportiert bzw. im Deploy neu erzeugt wurde.
-4. `/api/events/public.php` ist eine zusätzliche Quelle für freigegebene DB-/Veranstalter-Events, aber nicht die Quelle für redaktionelle Sheet-Events.
-
-Konsequenz:
-- Bei Fragen wie „welche Events sind aktuell sichtbar?“ oder „welche Event-Visual-Gaps existieren?“ darf nicht blind vom lokalen `data/events.json` ausgegangen werden.
-- Vor datenabhängigen Analysen muss geklärt werden, ob die Analyse auf frischem Sheet-Export, Deploy-Artefakt oder nur lokalem Repo-Snapshot basiert.
-- `data/events.json` ist Website-Feed und Build-Artefakt, nicht redaktionelle Source of Truth.
-
+## NEXT WORKPACK
+
+- Work from `ROADMAP.md` as the tactical prioritized backlog.
+- Current next workpack: introduce and validate the Content Quality Guard against the real Sheet-/DB-/Repo content sources.
+- Manual-KI-Intake / Visual-Key-Handoff remains parked until the scheduled real `main` check; do not treat a `staging` workflow attempt or chat simulation as the final proof.
+- Activity-Premium-Visuals continue as a separate workstream and must not reopen the frozen Event-Visual-Duplicate-Cleanup without a concrete symptom or Content-Quality-Guard finding.
+- Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.
+
+<!-- === END CANONICAL MASTER FILE === -->
