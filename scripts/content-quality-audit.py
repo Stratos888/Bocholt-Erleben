@@ -165,12 +165,13 @@ def infer_process_metadata(
     auto_fix_allowed: bool,
     auto_fix_done: bool,
 ) -> Dict[str, str]:
-    """Classify issues by intended work route, not only by severity.
+    """Classify issues by work route, not only by severity.
 
-    These fields make the report/workbench process-oriented:
-    - what can be auto-handled,
-    - what needs Sheet/DB/repo handling,
-    - what belongs to the separate visual-fit workflow.
+    Zielbild:
+    - sichere technische Faelle verschwinden als auto_resolved aus der Arbeit,
+    - echte Repo-Datenluecken werden als bewusstes Patch-Paket gebuendelt,
+    - Quellen-/Retry-Faelle werden erst geprueft und nicht vorschnell gepatcht,
+    - Visual-Fit bleibt ein eigener Workstream.
     """
     code = norm(issue_code)
     ctype = norm(content_type)
@@ -198,19 +199,68 @@ def infer_process_metadata(
             "automation_policy": "human_decision_required",
         }
 
-    if source == "offers_json":
-        if "source_url" in code or "opening" in code or "check" in code:
-            return {
-                "process_category": "repo_patch_candidate",
-                "correction_owner": "repo_patch",
-                "workbench_group": "Repo-Patch / Activity-Prüfung",
-                "automation_policy": "proposal_only",
-            }
+    retry_codes = {
+        "activity_source_url_unstable",
+        "event_source_url_unstable",
+    }
+    if code in retry_codes:
         return {
-            "process_category": "repo_patch_candidate",
+            "process_category": "source_retry_observation",
+            "correction_owner": "audit_retry",
+            "workbench_group": "Beobachten / Retry",
+            "automation_policy": "retry_before_human_decision",
+        }
+
+    source_review_codes = {
+        "activity_source_url_redirect",
+        "activity_source_url_broken",
+        "activity_source_missing",
+        "activity_source_url_invalid",
+        "event_source_url_redirect",
+        "event_source_url_broken",
+        "event_source_url_missing",
+        "event_source_url_invalid",
+    }
+    if code in source_review_codes:
+        return {
+            "process_category": "source_review_candidate",
+            "correction_owner": "content_inbox_source_check",
+            "workbench_group": "Quellenprüfung",
+            "automation_policy": "human_review_before_write",
+        }
+
+    activity_review_codes = {
+        "activity_checked_at_missing_or_invalid",
+        "activity_check_too_old",
+        "activity_check_aging",
+    }
+    if code in activity_review_codes:
+        return {
+            "process_category": "activity_review_candidate",
+            "correction_owner": "content_inbox_activity_check",
+            "workbench_group": "Activity-Prüfung",
+            "automation_policy": "human_review_before_repo_patch",
+        }
+
+    repo_data_patch_codes = {
+        "activity_required_field_missing",
+        "activity_duplicate_id",
+        "activities_json_invalid",
+    }
+    if source == "offers_json" and code in repo_data_patch_codes:
+        return {
+            "process_category": "repo_data_patch_candidate",
             "correction_owner": "repo_patch",
-            "workbench_group": "Repo-Patch-Kandidat",
+            "workbench_group": "Repo-Datenpatch",
             "automation_policy": "proposal_only",
+        }
+
+    if source == "offers_json":
+        return {
+            "process_category": "activity_review_candidate",
+            "correction_owner": "content_inbox_activity_check",
+            "workbench_group": "Activity-Prüfung",
+            "automation_policy": "human_review_before_repo_patch",
         }
 
     if source == "public_db_events_api":

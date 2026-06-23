@@ -1655,22 +1655,80 @@ Umfang:
       return updates;
     }
 
-    /* === BEGIN BLOCK: INBOX_REPO_PATCH_BUNDLE_EXPORT_V1 | Zweck: bündelt Repo-Patch-Kandidaten aus der geladenen Content-Prüfung und macht sie als kopierbares Paket verfügbar; Umfang: reine UI-/Exportlogik, keine Status- oder Datenänderung === */
+    /* === BEGIN BLOCK: INBOX_CONTENT_WORK_PACKAGE_EXPORT_V2 | Zweck: trennt Content-Prueffaelle in saubere Arbeitspakete (Repo-Datenpatch, Quellencheck, Retry/Beobachten, Visual-Fit), damit keine fachlich unterschiedlichen Faelle blind zusammen gepatcht werden; Umfang: reine UI-/Exportlogik, keine Status- oder Datenänderung === */
     function contentAuditAllLoadedItems() {
       return [...contentAuditHistory, ...(current ? [current] : []), ...queue].filter(isContentAuditItem);
     }
 
-    function isRepoPatchCandidateItem(item) {
+    function contentAuditWorkRoute(item) {
       const category = trimValue(item.process_category);
       const owner = trimValue(item.correction_owner);
-      const group = trimValue(item.workbench_group);
-      return category === "repo_patch_candidate" || owner === "repo_patch" || group.toLowerCase().includes("repo-patch");
+      const group = trimValue(item.workbench_group).toLowerCase();
+      const code = trimValue(item.issue_code);
+      const source = trimValue(item.source_system);
+
+      if (category === "repo_data_patch_candidate" || group.includes("repo-datenpatch")) return "repo_data_patch";
+      if (category === "source_review_candidate" || group.includes("quellenprüfung")) return "source_check";
+      if (category === "source_retry_observation" || group.includes("retry")) return "retry_observation";
+      if (category === "visual_fit_candidate" || group.includes("visual-fit")) return "visual_fit";
+      if (category === "activity_review_candidate" || group.includes("activity-prüfung")) return "activity_check";
+
+      const visualMarkers = ["visual", "image", "bild", "motif"];
+      if (visualMarkers.some((marker) => code.includes(marker))) return "visual_fit";
+
+      if (code === "activity_source_url_unstable" || code === "event_source_url_unstable") return "retry_observation";
+      if (code.includes("source_url_redirect") || code.includes("source_url_broken") || code.includes("source_missing") || code.includes("source_url_invalid")) return "source_check";
+      if (code.includes("checked_at") || code.includes("check_too_old") || code.includes("check_aging")) return "activity_check";
+
+      const directRepoCodes = ["activity_required_field_missing", "activity_duplicate_id", "activities_json_invalid"];
+      if (source === "offers_json" && directRepoCodes.includes(code)) return "repo_data_patch";
+
+      if (category === "repo_patch_candidate" || owner === "repo_patch" || group.includes("repo-patch")) return "repo_data_patch";
+      return "other";
     }
 
-    function repoPatchCandidateItems() {
+    const contentAuditWorkPackages = {
+      repo_data_patch: {
+        title: "Repo-Datenpatch-Paket",
+        label: "Repo-Datenpatch",
+        copyLabel: "Repo-Datenpatch kopieren",
+        description: "Direkt patchbare Datenlücken aus dem Repo. Diese Fälle können später gebündelt als bewusster Repo-Patch vorbereitet werden.",
+        instruction: "Bitte nur diese direkten Repo-Datenfälle patchen. Quellen-/Retry-/Visual-Fit-Fälle nicht in denselben Patch mischen. Keine Daten blind überschreiben."
+      },
+      source_check: {
+        title: "Quellencheck-Paket",
+        label: "Quellencheck",
+        copyLabel: "Quellencheck kopieren",
+        description: "Quellenfälle, bei denen zuerst fachlich geprüft werden muss, ob die Zielseite stimmt oder eine bessere Quelle nötig ist. Erst danach entsteht ggf. ein Repo- oder Sheet-Fix.",
+        instruction: "Bitte diese Quellenfälle zuerst fachlich prüfen. Nur wenn die Zielquelle belastbar besser ist, danach einen getrennten Korrekturpatch oder Inbox-Speicherfall vorbereiten."
+      },
+      activity_check: {
+        title: "Activity-Prüfpaket",
+        label: "Activity-Prüfung",
+        copyLabel: "Activity-Prüfung kopieren",
+        description: "Activity-Fälle, bei denen Öffnungszeiten, checked_at, Saison oder fachliche Angaben geprüft werden müssen. Erst danach wird entschieden, ob ein Repo-Patch nötig ist.",
+        instruction: "Bitte diese Activity-Fälle fachlich gegen die Quelle prüfen und erst danach einen Repo-Patch vorbereiten."
+      },
+      retry_observation: {
+        title: "Beobachten-/Retry-Paket",
+        label: "Beobachten / Retry",
+        copyLabel: "Retry-Fälle kopieren",
+        description: "Technisch wackelige Einzelfälle. Nicht sofort patchen. Beim nächsten Audit erneut prüfen und erst bei Wiederholung eskalieren.",
+        instruction: "Bitte diese Fälle nicht sofort patchen. Erst bei wiederholtem Auftreten oder echtem Quellenfehler in Quellencheck/Patch überführen."
+      },
+      visual_fit: {
+        title: "Visual-Fit-Paket",
+        label: "Visual-Fit",
+        copyLabel: "Visual-Fit-Fälle kopieren",
+        description: "Bild-/Visual-Key-/Motiv-Fälle. Diese gehören in den separaten Visual-Fit-Workflow, nicht in normale Daten- oder Quellenpatches.",
+        instruction: "Bitte diese Fälle im separaten Visual-Fit-Workflow bewerten. Kein Bild blind ersetzen und keine Visual Keys ohne Motivprüfung setzen."
+      }
+    };
+
+    function contentAuditPackageItems(route) {
       const seen = new Set();
       return contentAuditAllLoadedItems().filter((item) => {
-        if (!isRepoPatchCandidateItem(item)) return false;
+        if (contentAuditWorkRoute(item) !== route) return false;
         const key = [trimValue(item.content_type), trimValue(item.content_id), trimValue(item.issue_code)].join("::");
         if (seen.has(key)) return false;
         seen.add(key);
@@ -1678,12 +1736,15 @@ Umfang:
       });
     }
 
-    function buildRepoPatchCandidatePayload(items) {
+    function buildContentAuditPackagePayload(route, items) {
+      const config = contentAuditWorkPackages[route] || contentAuditWorkPackages.repo_data_patch;
       return {
-        type: "bocholt_content_quality_repo_patch_candidates",
+        type: "bocholt_content_quality_work_package",
+        route,
+        label: config.label,
         generated_at: new Date().toISOString(),
         source: "inbox_content_pruefung",
-        instruction: "Diese Fälle sind Repo-Patch-Kandidaten. Bitte fachlich prüfen, bündeln und erst danach einen bewussten Sammelpatch erstellen. Keine Daten blind überschreiben.",
+        instruction: config.instruction,
         candidates: items.map((item) => ({
           content_type: trimValue(item.content_type),
           source_system: trimValue(item.source_system),
@@ -1693,6 +1754,7 @@ Umfang:
           issue_text: trimValue(item.issue_text),
           recommended_action: trimValue(item.recommended_action),
           source_url: trimValue(item.source_url),
+          suggested_url: trimValue(item.suggested_url),
           public_url: trimValue(item.public_url),
           process_category: trimValue(item.process_category),
           correction_owner: trimValue(item.correction_owner),
@@ -1702,8 +1764,10 @@ Umfang:
       };
     }
 
-    function renderRepoPatchCandidateBundle() {
-      const items = repoPatchCandidateItems();
+    function renderContentAuditPackage(route) {
+      const config = contentAuditWorkPackages[route];
+      if (!config) return "";
+      const items = contentAuditPackageItems(route);
       if (!items.length) return "";
       const maxVisible = 6;
       const listItems = items.slice(0, maxVisible).map((item) => `
@@ -1711,23 +1775,31 @@ Umfang:
       `).join("");
       const more = items.length > maxVisible ? `<li>… ${escapeHtml(String(items.length - maxVisible))} weitere</li>` : "";
       return `
-        <section class="reviewSection" aria-label="Repo-Patch-Paket">
-          <div class="reviewSectionTitle">Repo-Patch-Paket</div>
+        <section class="reviewSection" aria-label="${escapeHtml(config.title)}">
+          <div class="reviewSectionTitle">${escapeHtml(config.title)}</div>
           <div class="auditBundleBox">
-            <div><strong>${escapeHtml(String(items.length))} Repo-Patch-Kandidat${items.length === 1 ? "" : "en"}</strong> in der geladenen Content-Prüfung.</div>
-            <div>Diese Fälle werden nicht einzeln in der Inbox korrigiert. Sie werden gesammelt geprüft und später als bewusster Repo-Patch vorbereitet.</div>
+            <div><strong>${escapeHtml(String(items.length))} ${escapeHtml(config.label)}-Fall${items.length === 1 ? "" : "e"}</strong> in der geladenen Content-Prüfung.</div>
+            <div>${escapeHtml(config.description)}</div>
             <ul class="auditBundleList">${listItems}${more}</ul>
             <div class="auditBundleActions">
-              <button id="btnCopyRepoPatchCandidates" class="btn" type="button">Patch-Kandidaten kopieren</button>
+              <button class="btn" type="button" data-audit-bundle-copy="${escapeHtml(route)}">${escapeHtml(config.copyLabel)}</button>
             </div>
           </div>
         </section>
       `;
     }
 
-    async function copyRepoPatchCandidatesToClipboard() {
-      const items = repoPatchCandidateItems();
-      const payload = JSON.stringify(buildRepoPatchCandidatePayload(items), null, 2);
+    function renderContentAuditWorkPackages() {
+      const currentRoute = contentAuditWorkRoute(current || {});
+      const routes = [currentRoute, "repo_data_patch", "source_check", "activity_check", "retry_observation", "visual_fit"]
+        .filter((route, index, arr) => route && route !== "other" && arr.indexOf(route) === index);
+      return routes.map(renderContentAuditPackage).join("");
+    }
+
+    async function copyContentAuditPackageToClipboard(route) {
+      const items = contentAuditPackageItems(route);
+      const payload = JSON.stringify(buildContentAuditPackagePayload(route, items), null, 2);
+      const config = contentAuditWorkPackages[route] || contentAuditWorkPackages.repo_data_patch;
       try {
         if (navigator.clipboard && window.isSecureContext) {
           await navigator.clipboard.writeText(payload);
@@ -1742,13 +1814,13 @@ Umfang:
           document.execCommand("copy");
           document.body.removeChild(textarea);
         }
-        setStatus(`${items.length} Repo-Patch-Kandidat${items.length === 1 ? "" : "en"} kopiert. Keine Daten wurden geändert.`);
+        setStatus(`${items.length} ${config.label}-Fall${items.length === 1 ? "" : "e"} kopiert. Keine Daten wurden geändert.`);
       } catch (error) {
         console.error(error);
-        setStatus("Patch-Kandidaten konnten nicht kopiert werden. Bitte technische Prüfdaten manuell sichern.");
+        setStatus("Arbeitspaket konnte nicht kopiert werden. Bitte technische Prüfdaten manuell sichern.");
       }
     }
-    /* === END BLOCK: INBOX_REPO_PATCH_BUNDLE_EXPORT_V1 === */
+    /* === END BLOCK: INBOX_CONTENT_WORK_PACKAGE_EXPORT_V2 === */
 
     function renderContentAuditCurrent(totalCount) {
       const it = current;
@@ -1779,7 +1851,7 @@ Umfang:
             <div class="reviewMetaLine">${escapeHtml([formatGermanDate(it.date), trimValue(it.content_type), trimValue(it.issue_code)].filter(Boolean).join(" · "))}</div>
           </header>
 
-          ${renderRepoPatchCandidateBundle()}
+          ${renderContentAuditWorkPackages()}
 
           <section class="reviewSection" aria-label="Konkrete Aktion">
             <div class="reviewSectionTitle">Jetzt zu tun</div>
@@ -1860,10 +1932,9 @@ Umfang:
         const url = trimValue(it.source_url);
         if (url) window.open(url, "_blank", "noopener,noreferrer");
       });
-      const copyRepoPatchButton = document.getElementById("btnCopyRepoPatchCandidates");
-      if (copyRepoPatchButton) {
-        copyRepoPatchButton.addEventListener("click", copyRepoPatchCandidatesToClipboard);
-      }
+      document.querySelectorAll("[data-audit-bundle-copy]").forEach((button) => {
+        button.addEventListener("click", () => copyContentAuditPackageToClipboard(trimValue(button.getAttribute("data-audit-bundle-copy"))));
+      });
       document.getElementById("btnAuditVerified").addEventListener("click", () => writeContentAuditAction(it, "verify_full", {
         next_review_days: guide.nextReviewDays || (isActivity ? 30 : 7),
         review_note: "Über interne Inbox vollständig fachlich geprüft."
