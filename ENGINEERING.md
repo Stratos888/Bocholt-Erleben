@@ -1,635 +1,1046 @@
-# ENGINEERING RULES — BOCHOLT ERLEBEN
-
-<!-- === BEGIN CANONICAL ENGINEERING FILE: Hard implementation rules only === -->
-
-<!-- === BEGIN BLOCK: ENGINEERING_CHATGPT_EXECUTION_ROUTER_V1 | Zweck: macht die Engineering-Regeln fuer ChatGPT als ausfuehrende KI sofort anwendbar; Umfang: Start-Gates, Mode-Router, Preview-vor-Deploy, Dirty-Tree-Disziplin === -->
-## 0. CHATGPT EXECUTION ROUTER
-
-These rules are optimized for ChatGPT executing project work. Apply this router before any patch, command sequence, commit, or deploy recommendation.
-
-### 0.1 Start gate for every work item
-
-Before starting implementation work:
-
-1. Establish the current baseline:
-   - In Codespaces/repo work: use `git status --short`, current branch and current `HEAD`.
-   - In ZIP-only review work: use the uploaded ZIP as the visible baseline.
-   - If both exist, the user's current Codespaces/repo output overrides an older ZIP.
-2. If the working tree is dirty:
-   - Do not start a new workpack.
-   - First classify the existing changes as:
-     - current work to continue,
-     - unrelated WIP to stash,
-     - changes to commit,
-     - changes to discard.
-3. Choose exactly one primary working mode:
-   - UI/CSS/static JS polish → Mode A.
-   - New route/content hub → Mode B.
-   - Feature/logic/data/backend → Mode C.
-4. Identify owner files before patching.
-5. Prefer one small, sustainable next step over broad patch bundles.
-
-### 0.2 Validation router
-
-Use the cheapest reliable validation environment for the task:
-
-- UI/CSS/static JS visual polish:
-  - Use Codespaces Preview on port `8000` before commit/push whenever the change can be validated locally.
-  - Do not use staging deploy as the first visual feedback loop.
-  - Staging remains useful after commit/push or when service worker/build/runtime behavior must be validated.
-- Backend/PHP/API/DB/Stripe/mail/STRATO/deploy behavior:
-  - Validate with the relevant lint, smoke, API, database or staging checks.
-  - Codespaces static preview is not sufficient.
-- Data/Sheet/Event pipeline work:
-  - Verify the source of truth first.
-  - Do not treat generated repo artifacts as editorial truth.
-- Visual asset quality work:
-  - Use pool/audit/asset contracts first.
-  - Do not permanently fix weak individual images with ad-hoc CSS.
-
-### 0.3 Commit and deploy discipline
-
-For UI polish:
-
-1. Patch locally.
-2. Run syntax/diff checks.
-3. Preview locally via Codespaces when applicable.
-4. Only then commit.
-5. Push/deploy only after local validation or when deploy-specific validation is required.
-
-Never stack a new patch on unrelated uncommitted WIP.
-<!-- === END BLOCK: ENGINEERING_CHATGPT_EXECUTION_ROUTER_V1 === -->
-
-## 1. SOURCE OF TRUTH
-
-- In Codespaces/repo workflows, the current branch, current `HEAD`, and visible file contents are the canonical working baseline.
-- In ZIP-only analysis workflows, the uploaded ZIP is the canonical visible baseline.
-- If the user provides newer terminal output, file excerpts, screenshots, or confirms manual edits, that newer evidence overrides older ZIP contents.
-- Never patch without visible current code for the affected file(s).
-
-### Data source rule
-
-- Production/staging event data is hybrid.
-- The public event feed consists of:
-  1. Google Sheets tab `Events` as the editorial source for KI-/Sheet- and manually maintained events. During deploy, this tab is exported to `data/events.tsv` and transformed into the generated runtime feed `/data/events.json`.
-  2. Approved DB submissions from `/api/events/public.php` for organizer submissions after final review approval.
-- Organizer submissions are not written back into the Google Sheet as part of the V1 publishing flow.
-- `data/events.tsv` and `data/events.json` are generated during deploy and must not be maintained or reviewed as repository source files.
-- `data/events.json` must still exist in the deployed runtime because the frontend, SEO schema and service worker load it.
-- A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale; the repository copy should not be tracked.
-- Treat `data/search-metrics.json` as a runtime/deploy artifact as well. A local ZIP value such as `not_configured` does not invalidate a live dashboard proof; live measurement state must be judged from the deployed live dashboard/export, not from stale repository artifacts.
-- The Kuratier-Inbox is also hybrid:
-  1. Google Sheet / generated Inbox data for KI-/Sheet candidates.
-  2. DB submissions for organizer single-event, membership and activity-presence submissions.
-- Google-Sheet-Inbox data is separated by tab, not by separate sheet:
-  - `main` / live uses `Inbox` and `Inbox_Archive`.
-  - `staging` uses `Inbox_Staging` and `Inbox_Archive_Staging`.
-- Deploy must resolve the Inbox tab by branch and export from that resolved tab.
-- Staging must never read or write the live `Inbox` tab for KI-/Sheet candidates.
-- Production KI workflows run on `main` only and must target the live Inbox/push path.
-- `Inbox → Events` import is production-only and must not run on `staging`.
-
-### Content Quality Guard rule
-
-- Regular content quality checks must follow the actual source ownership:
-  1. Google Sheet tab `Events` for editorial events.
-  2. Public DB/API feed `/api/events/public.php` for approved organizer events.
-  3. `data/offers.json` for Activities.
-- Audit results are written to `Content_Audit` on live/main and `Content_Audit_Staging` on staging.
-- The private `/inbox/` is the human workbench: event candidates and content-quality findings must remain separate queues, but use the same review UI.
-- Audit workflows may write audit rows, summaries and review recommendations, but must not silently overwrite editorial source rows.
-- Deterministic auto-handling is allowed only for safe technical cases, for example expired Events being excluded by the build/runtime feed.
-- Semantically uncertain findings, such as changed times, cancellations, moved locations, unreachable sources, ambiguous redirects or stale Activity availability, must become `review_needed` or `warning`, not a blind data mutation.
-- A reviewer may intentionally update safe Event source URLs from the Content-Prüfung queue; this writes to the canonical Google Sheet `Events` tab.
-- Activities remain repo-/JSON-owned; Activity corrections require a visible repo patch unless a future owner contract explicitly moves them into a Sheet-backed source.
-
----
-
-## 2. PROOF BEFORE PATCH
-
-- Never guess.
-- For bugs: prove root cause before patching.
-- For UI work: use the real ZIP, the real file structure, and the provided screenshots.
-- Never claim certainty without proof.
-
----
-
-## 3. CANONICAL PROJECT HIERARCHY
-
-Use this hierarchy when documents, screenshots, or repo leftovers create ambiguity:
-
-1. visible current code from the uploaded ZIP
-2. `Produktvertrag.md` for canonical product logic
-3. `MASTER.md` for strategic direction / frozen areas / current focus
-4. `ROADMAP.md` for tactical prioritized workpacks / To-dos
-5. `ENGINEERING.md` for implementation rules and working modes
-
-Rules:
-
-- Do not treat old routes, leftover files, or repo presence alone as canonical product truth.
-- Do not redefine product rules from `Produktvertrag.md` inside `MASTER.md`, UI copy, or ad-hoc chat reasoning.
-- If a contradiction is found, resolve it at the canonical source first.
-
-
----
-
-## 3A. DOCUMENTATION GOVERNANCE
-
-Documentation is part of project control. It must be current-first and role-clean so future ChatGPT work does not reactivate obsolete tasks.
-
-### Canonical document roles
-
-- `MASTER.md` = short strategic control, current focus, frozen areas, permanent product direction.
-- `ROADMAP.md` = current tactical backlog, active/geparkte/wartende workpacks, next proofs.
-- `ENGINEERING.md` = hard working rules, patch modes, audits, fallback workflows.
-- `TEST_STATUS.md` = proof archive and current test index, not product definition.
-- `Produktvertrag.md` = product model, prices, tariffs, funnel/product logic.
-
-### Current-first rule
-
-- Active steering information belongs at the top of `MASTER.md`, `ROADMAP.md` or the index of `TEST_STATUS.md`.
-- Long history must not be appended to `MASTER.md` as active context.
-- `ROADMAP.md` must not become an undifferentiated archive; old blocks may remain only when the current top block clearly overrides them.
-- `TEST_STATUS.md` may stay long, but must keep a current index near the top.
-- Historical route names, old screenshots and old test paths in `TEST_STATUS.md` are evidence, not current architecture.
-
-### Documentation patch rule
-
-- A Doku patch must state which owner document it changes and why.
-- Prefer small current-state/index updates over mass rewriting old history.
-- If an old block is obsolete but still useful as evidence, leave it in `TEST_STATUS.md`; do not copy it into `MASTER.md` or the active ROADMAP section.
-- If a contradiction is found, fix the canonical source first and only then adjust secondary references.
-- Do not add broad future plans unless they become an active, geparkt or wartend workpack.
-
-### Archive rule
-
-- Use archive movement only for clearly obsolete large documentation clusters.
-- Do not create `docs/archive/` churn just to make a small current-state correction.
-- Archive moves, deletions or file splits are their own workpack and should not be mixed with UI, feature or visual patches.
-
----
-
-## 4. WORKING MODES
-
-Every chat must run in exactly one primary mode.
-
-### MODE A — UI POLISH / EXISTING PAGE OPTIMIZATION
-
-Preferred input:
-
-1. uploaded ZIP
-2. target page
-3. 3 screenshots:
-   - mobile
-   - desktop normal
-   - desktop wide
-4. 1 clear goal sentence
-
-Execution loop:
-
-1. Check baseline and dirty working tree first.
-2. Define page contract:
-   - Goal
-   - Freeze
-   - Target State
-   - Acceptance Criteria
-3. Identify owner files and define only 3 main gaps.
-4. Deliver 1 consolidated main patch.
-5. Validate locally with Codespaces Preview on port `8000` before commit/push whenever the change is UI/CSS/static JS and does not require backend/deploy behavior.
-6. Deliver at most 1 polish patch.
-7. Freeze the page.
-
-Do not drift into open-ended visual iteration loops. Do not use staging deploy as the first visual feedback loop for changes that can be checked in Codespaces Preview.
-
-### MODE B — NEW ROUTE / CONTENT HUB
-
-Preferred input:
-
-1. uploaded ZIP
-2. target route
-3. page purpose
-4. desired blocks / order
-5. 1 reference page
-
-Execution loop:
-
-1. define page contract:
-   - Goal
-   - Audience
-   - Page Role
-   - Freeze
-   - Acceptance Criteria
-2. define content / structure contract:
-   - required blocks
-   - block order
-   - CTA logic
-   - excluded content
-3. deliver 1 consolidated multi-file implementation patch
-4. review once
-5. freeze the page structure
-
-Do not start with CSS polish before the structure contract is clear.
-
-### MODE C — FEATURE / LOGIC / DATA
-
-Preferred input:
-
-1. uploaded ZIP
-2. user flow
-3. trigger
-4. data source
-5. desired behavior
-6. definition of done
-
-Execution loop:
-
-1. define flow contract / root-cause contract
-2. identify owner files
-3. deliver 1 consolidated implementation patch
-4. provide smoke-test proof points
-
-Do not mix feature work with unrelated UI polish in the same workpack.
-
----
-
-## 5. ONE CHAT = ONE WORKPACK
-
-- Each chat should focus on one primary workpack only.
-- Do not mix UI polish, new route design, feature logic, and product-governance changes in the same implementation round unless root cause proves they are inseparable.
-
----
-
-## 6. PATCH OUTPUT CONTRACT
-
-Default output format:
-
-- Use a unified Git patch whenever the current ZIP/repo baseline is visible and the change can be applied safely with `git apply`.
-- The user validates first with `git apply --check patch.diff` before applying the patch.
-- The patch must be consolidated, owner-file focused, and free of unrelated edits.
-- After the user has provided the required baseline proof, do not default back to prose-only insertion instructions.
-- Do not provide vague placement instructions such as `append at the end`, `insert after this section`, or `add this block` as the primary patch format when a Git patch is safe.
-- Do not provide long manual copy/paste snippets when a unified Git patch can safely express the same change.
-
-Fallback format:
-
-- Use concrete replace instructions only when a Git patch would be unsafe, too ambiguous, or when the affected file has diverged from the visible baseline.
-- The fallback must still be deterministic and copy/paste-safe.
-- Always specify all of the following:
-  - file
-  - exact block to replace, preferably by existing begin/end marker comments
-  - exact BEGIN line or unique BEGIN marker
-  - exact END line or unique END marker
-  - complete replacement block
-- Never split one logical replacement into drifting snippets.
-- Never include nested fenced code blocks inside a copy/paste block.
-- Consolidate overlapping edits into one replacement per file.
-- Do not append drifting snippets.
-- When inserting or replacing code blocks, use clear begin/end marker comments where technically appropriate.
-
-Baseline rule for Git patches:
-
-- Before a Git patch is created, the current repository state must be proven with:
-  - `git status --short`
-  - `git branch --show-current`
-  - `git pull --ff-only`
-  - `git rev-parse --short HEAD`
-- A Git patch may only be created against that proven branch and commit SHA, or against a fresh ZIP exported from that same state.
-- Every Git patch must be validated with `git apply --check patch.diff` before it is applied.
-- If `git apply --check patch.diff` fails, the patch must not be applied or manually repaired.
-- In that case, re-check the current repository state and create a new patch from the updated baseline.
-
-Assistant response discipline:
-
-- For implementation work, answer with the next concrete action only.
-- When a patch is requested or clearly needed, provide the patch as one terminal-ready Git patch creation block.
-- Do not describe where the user should manually paste code when a safe Git patch is possible.
-- Do not mix patch delivery with broad planning text.
-- If a documentation change is needed, treat documentation files like normal owner files and patch them with the same rules.
-- If the safe patch format is unclear, stop and ask for the missing baseline or affected file content instead of guessing.
-
----
-## 7. OWNER-FILE RULE
-
-Patch the owning file first.
-
-Ownership:
-
-- `css/style.css` = public CSS entrypoint / import order only; no selectors, no visual fixes
-- `css/base.css` = tokens, reset, foundation, app-wide primitives
-- `css/pages.css` = public content pages, static pages, funnel pages and legal pages
-- `css/components.css` = reusable UI components and component states
-- `css/home.css` = historical Discovery/Event/Activity shell owner; frozen against new large UI blocks
-- `css/today.css` = Today/Home-specific surface and recommendation layout
-- `css/overlays.css` = detailpanel, sheets, modals, overlay locks
-
-Rules:
-
-- Components style themselves; page/layout files place them.
-- Layout fixes belong in the owning layout file, not in component files.
-- Overlay mechanics belong in `css/overlays.css`.
-- Cross-file fixes are allowed only if root cause proves they are necessary.
-- `css/home.css` must not be used as the default dumping ground for new visual patches.
-- New large CSS blocks require an owner decision first: existing owner, new owner file, or conscious extraction from an old owner.
-- If an existing owner block is touched, prefer replacing/consolidating that owner block over appending a later override block.
-- CSS governance is enforced by `tools/audit-css-governance.py`; do not bypass it to ship cosmetic patches.
-
----
-
-## 8. TOKEN-FIRST RULE
-
-- Reuse existing design tokens first.
-- Introduce new values as tokens only when they are truly reusable.
-- Avoid repeated hardcoded UI values.
-
----
-
-## 9. UI-POLISH / NO-HOTFIX RULE
-
-- UI-polish patches should be CSS-only unless root cause proves otherwise.
-- Do not spread small visual fixes across multiple files without proof.
-- Do not solve UI regressions by appending late override blocks when the affected component already has an owner block.
-- Prefer one consolidated owner replacement over stacked override chains.
-- A staging branch is for validating sustainable fixes, not for shipping quick temporary fixes.
-- If a patch creates this pattern, it is not acceptable as final implementation:
-
-```text
-base rule
-→ desktop override
-→ polish override
-→ mobile restore override
-→ later counter-override
-
-The correct pattern is:
-single owner block
-→ shared component base
-→ mobile contract
-→ desktop contract
-→ narrow/wide breakpoint refinements
-Before patching UI regressions, identify whether the real problem is a missing owner, conflicting owners, or a broken breakpoint boundary.
-
-## 10. OVERLAY RULE
-
-- All overlays must render in a dedicated overlay root directly under `body`.
-- Never render overlays inside sticky, transformed, or backdrop-filter containers.
-
----
-
-## 11. DEPLOY / ASSET SAFETY
-
-- Preserve deterministic build and versioning behavior.
-- Never break service worker, cache, or asset-reference logic.
-- Broken asset references are fail-fast.
-- Validate on `staging` before `main`, except for urgent live hotfixes.
-
-Asset/versioning rules:
-
-- `css/style.css` is the public CSS entrypoint and must not be deleted.
-- `css/style.css` owns CSS import order only.
-- `css/style.css` must remain import-only; real selectors belong in owner files.
-- Public HTML files must load `/css/style.css` as the single CSS entrypoint.
-- Source-level CSS cache keys must stay consistent and are checked by `tools/audit-css-governance.py`.
-- Do not patch `css/style.css` for normal visual changes unless the import order or actual CSS entrypoint changes.
-- Do not manually bump asset query versions in multiple HTML files for normal CSS/JS edits, except in an intentional CSS-governance/cache-key normalization patch.
-- The deploy workflow replaces existing `?v=...` asset references with the generated `BUILD_ID`.
-- Only touch asset references manually when a new asset is introduced, an asset is renamed, or a script/link tag is missing completely.
-
-
-<!-- === BEGIN BLOCK: ENGINEERING_PREMIUM_VISUAL_ASSET_CONTRACT_2026_06_01 | Zweck: technische Regeln fuer nachhaltige Premium-Bildausspielung; Umfang: Event-/Activity-Card-Assets, Statuslogik, Cropping-Grenzen, Audit-Pflicht === -->
-## 11.1 PREMIUM VISUAL ASSET CONTRACT
-
-For event and activity visuals, the default solution is not manual crop guessing. The default solution is a prepared, reviewed card asset.
-
-Rules:
-
-- Card visuals should be prepared as 16:9 WebP assets for card contexts.
-- Preferred visual source hierarchy:
-  1. own/exclusive premium real photo,
-  2. premium real photo explicitly cleared by organizer/rightsholder,
-  3. otherwise legally clean and high-quality photo with documented source, rights basis, license and required credit,
-  4. self-generated symbolic AI premium visual,
-  5. legacy external image only as temporary non-ready source material.
-- If a legally clean premium real photo is not available, the default replacement path is a self-generated symbolic AI premium visual, not manual crop rescue of a weak external image.
-- Raw large source images, arbitrary external images, unclear-license images or unreviewed crops must not be promoted into premium surfaces directly.
-- Visual status values are:
-  - `ready`: approved for premium card use.
-  - `usable`: acceptable in normal lists, but not automatically approved for Today/Home prominence.
-  - `fallback`: approved symbolic fallback when no better specific visual exists.
-  - `needs_review`: not allowed in prominent surfaces.
-  - `blocked`: not allowed.
-- Today/Home and other prominent recommendation surfaces may use only `ready` visuals or deliberately approved `fallback` visuals.
-- If a visual looks weak because of subject, crop, clutter, pipes, signs, harsh shadows, poor resolution, unclear rights or inconsistent style, do not solve it as a permanent CSS/object-position hotfix.
-- Replace with a cleared premium photo, regenerate as symbolic AI premium visual, downgrade or exclude weak visuals instead of masking them with layout code.
-- CSS may define the stable rendering frame, aspect ratio and fallback object-position; CSS must not become the quality-control system for individual images.
-- A future visual-audit view should preview assets in real card contexts before they are marked `ready`.
-
-Implementation guidance:
-
-- Extend existing visual pools or item data only through clear owner files.
-- Keep one shared standard for Today cards and feed cards unless a later proof shows a real context-specific requirement.
-- Prefer generated/prepared card assets over trying to rescue unsuitable source images at runtime.
-- When adding a new visual workpack, include checks for file existence, format, reasonable size, status and visual preview readiness.
-
-<!-- === END BLOCK: ENGINEERING_PREMIUM_VISUAL_ASSET_CONTRACT_2026_06_01 === -->
-
-## 12. DEPRECATED PROMPT FILES
-
-If deprecated prompt files still exist, they are not canonical workflow controllers.
-
-Canonical project control is limited to:
-
-- `Produktvertrag.md`
-- `MASTER.md`
-- `ENGINEERING.md`
-- the uploaded ZIP
-- the active workpack input
-
-<!-- BEGIN PATCH_WORKFLOW_CORRECTION_V1 -->
-
-## Patch workflow correction
-
-For all future repo patches, use this order:
-
-1. First prove the current repo baseline:
-   - git status --short
-   - git branch --show-current
-   - git pull --ff-only
-   - git rev-parse --short HEAD
-
-2. Create patches only against the proven repo baseline.
-
-3. Default patch delivery is a copyable terminal block in chat. Use a temporary `patch.diff` in the repo for normal Git patches, or a guarded script patch when targeted replacements are safer.
-   Do not provide separate sandbox/download patch files unless the user explicitly requests a downloadable file.
-
-4. If the user applies the patch in Codespaces, the repo baseline is more important than an uploaded ZIP.
-
-5. For Git patches, always run:
-   - git apply --check patch.diff
-   - git apply patch.diff
-   - rm patch.diff
-   - git diff --check
-   - git --no-pager diff -- <affected-file>
-
-   Do not use plain `git diff -- <affected-file>` in Codespaces workflows, because it can open the terminal pager and look like a frozen command. If the pager opens anyway, exit it with `q`.
-
-6. If git apply --check fails:
-   - stop immediately
-   - verify the working tree
-   - inspect the current owner block
-   - do not retry with a similar large patch
-
-7. For CSS/UI polish with many small declarations, prefer a robust script patch over a large Git diff.
-
-8. A robust script patch must:
-   - target only the relevant owner file or owner block
-   - verify every selector/block uniquely before writing
-   - abort without writing if anything is missing or ambiguous
-   - end with git diff --check and git --no-pager diff -- <affected-file>
-
-9. If block markers are inconsistent, patch against the real current marker state. Marker cleanup must be explicit and must not change runtime behavior.
-
-10. After every failed patch attempt, run:
-   - git status --short
-   - git --no-pager diff -- <affected-file>
-
-11. No blind retries.
-
-Correct sequence after a failed patch:
-
-failure
--> verify working tree
--> inspect current owner/block
--> identify mismatch
--> create smaller corrected patch
--> validate fail-fast
-
-<!-- END PATCH_WORKFLOW_CORRECTION_V1 -->
-<!-- BEGIN UI_DASHBOARD_PATCH_DISCIPLINE_V1 -->
-
-## UI-/Dashboard-Patch-Disziplin
-
-Für größere UI-, Dashboard- oder Strukturpolish-Arbeiten gilt zusätzlich:
-
-1. Keine größeren UI-/Dashboard-Patches auf einem dirty Working Tree.
-   - Wenn bereits uncommitted Änderungen vorhanden sind, zuerst entscheiden:
-     - gezielt finalisieren und prüfen, oder
-     - vollständig zurücksetzen und sauber neu starten.
-   - Keine neuen großen Patches auf halbfertige Zwischenstände stapeln.
-
-2. Vor größeren UI-/Dashboard-Patches zuerst eine Owner-Map erstellen.
-   - Struktur/HTML-Owner
-   - Rendering-/State-Owner
-   - Styling-/CSS-Owner
-   - bestehende Logik, die ersetzt oder ausdrücklich behalten wird
-   - mögliche doppelte Alt-/Neu-Logik identifizieren, bevor gepatcht wird.
-
-3. Große Terminal-Heredocs vermeiden.
-   - Bevorzugt kleine, robuste Script-Patches mit eindeutigen Ankern.
-   - Jeder Script-Patch muss abbrechen, wenn ein Anker fehlt oder mehrdeutig ist.
-   - Lange Copy/Paste-Blöcke nur verwenden, wenn sie wirklich die sicherste Option sind.
-
-4. Korrekturschleifen hart begrenzen.
-   - Wenn nach einem größeren Patch mehr als ein Korrekturpatch nötig wird: stoppen.
-   - Danach Diff prüfen und entscheiden:
-     - konsolidieren, oder
-     - Working Tree zurücksetzen und neu aufbauen.
-   - Nicht weiterflicken.
-
-5. Dashboard-V2-/Layout-Arbeiten als eigenen Workpack behandeln.
-   - Erst Zielzustand und Reihenfolge definieren.
-   - Dann ein kleiner, testbarer Strukturpatch.
-   - Danach maximal ein Polish-Patch.
-   - Erst nach Screenshot-/Smoke-Proof dokumentieren oder committen.
-
-<!-- END UI_DASHBOARD_PATCH_DISCIPLINE_V1 -->
-
-<!-- === BEGIN BLOCK: ENGINEERING_CODESPACES_PREVIEW_WORKFLOW_V1 | Zweck: dokumentiert schnellen lokalen UI-Preview-Workflow in Codespaces; Umfang: statische PWA-Ansichten, nicht Backend-/Deploy-Validierung === -->
-## Codespaces Preview für schnelle UI-Prüfungen
-
-Für schnelle UI-, CSS- und statische JS-Prüfungen kann in Codespaces ein lokaler Preview-Server genutzt werden. Das spart Zwischen-Deploys auf `staging` und ist besonders geeignet für Card-Layouts, Detailpanel, Header, Bottom-Navigation, responsive Verhalten und Bilddarstellung.
-
-Start im Repo-Root:
-
-    python3 -m http.server 8000 --bind 0.0.0.0 > /tmp/bocholt-preview.log 2>&1 &
-    echo $! > /tmp/bocholt-preview.pid
-
-Danach in Codespaces den Port `8000` über den Reiter `Ports` öffnen. Wichtige lokale Prüfrouten:
-
-- `/`
-- `/events/`
-- `/aktivitaeten/`
-- `/ueber/`
-- `/events-veroeffentlichen/`
-
-Bei PWA-/Browser-Cache-Problemen einen Cache-Buster nutzen, z. B. `?preview=ui-check`.
-
-Stoppen:
-
-    kill "$(cat /tmp/bocholt-preview.pid)"
-    rm -f /tmp/bocholt-preview.pid /tmp/bocholt-preview.log
-
-Grenze: Diese Preview ersetzt keine produktionsnahe Prüfung von STRATO, PHP-Endpunkten, Stripe, Webhooks, Mailversand oder Deploy-spezifischem Verhalten. Für solche Themen bleibt `staging` die maßgebliche Validierungsumgebung. Einzelne lokale Console-Warnungen durch Codespaces-/GitHub-Preview-Redirects oder fehlende generierte Datenexporte sind für reine UI-Prüfungen nicht automatisch blockierend.
-<!-- === END BLOCK: ENGINEERING_CODESPACES_PREVIEW_WORKFLOW_V1 === -->
-
-<!-- === BEGIN BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 | Zweck: begrenzt Codespaces-Verbrauch und definiert sicheren Fallback bei ausgeschöpftem Kontingent; Umfang: Machine-Type, parallele Codespaces, Webeditor-/Local-Git-Fallback === -->
-## Codespaces Cost Discipline und Quota-Fallback
-
-Codespaces ist die bevorzugte Ausführungsumgebung für Repo-Patches, lokale Preview, Checks, Commit und Push. Codespaces ist nicht als dauerhafte Denk-, Planungs- oder Parallel-Chat-Umgebung zu behandeln.
-
-### Standardregeln
-
-- Für dieses Projekt ist `2-core` der Standard-Maschinentyp.
-- `4-core` oder größer darf nur genutzt werden, wenn ein konkreter schwerer Arbeitsschritt dies rechtfertigt, z. B. große Bildkonvertierungen, ungewöhnlich langsame Voll-Audits oder ein späterer echter Build-Prozess.
-- Pro Repo soll normalerweise maximal ein aktiver Codespace genutzt werden.
-- Mehrere parallele Chats dürfen nicht gleichzeitig konkurrierende Repo-Patches gegen denselben Branch liefern.
-- Analyse, Planung, ZIP-Review, Bildprompt-Arbeit und längere UI-Bewertung sollen möglichst ohne laufenden Codespace stattfinden.
-- Nach abgeschlossenem Commit/Push oder längerer Pause soll der Codespace gestoppt werden oder durch einen kurzen Idle-Timeout auslaufen.
-
-### Quota-Fallback ohne Codespaces
-
-Wenn das Codespaces-Kontingent ausgeschöpft ist oder Codespaces bewusst nicht genutzt werden soll, darf auf einen reduzierten Fallback-Workflow gewechselt werden.
-
-Zulässige Fallback-Wege:
-
-- GitHub-Webeditor für kleine, klar begrenzte Änderungen.
-- Lokales Git auf dem Nutzer-PC, wenn verfügbar.
-- ZIP-only Analyse durch ChatGPT mit anschließenden manuellen Ersetzungspatches.
-
-Fallback-Einschränkungen:
-
-- Keine großen UI-/CSS-Polish-Patches ohne lokale oder staging-nahe Sichtprüfung.
-- Keine breit gestreuten Multi-Datei-Änderungen ohne aktuelle sichtbare Baseline.
-- Keine unsicheren Snippet-Ergänzungen.
-- Bevorzugt werden konkrete Block-Ersetzungen mit eindeutigem BEGIN-/END-Marker oder vollständige kleine Dateiänderungen.
-- Nach manueller Änderung muss der Nutzer im GitHub-Diff prüfen, ob ausschließlich die beabsichtigten Dateien und Blöcke geändert wurden.
-- Wenn ein sicherer Git-Patch-Check nicht möglich ist, muss der Patch kleiner und deterministischer sein als im normalen Codespaces-Workflow.
-
-### ZIP-first Webupload-Fallback
-
-Wenn Codespaces nicht verfügbar ist und der Nutzer ein aktuelles Projekt-ZIP liefert, ist der bevorzugte Fallback für kleine bis mittlere Patches:
-
-1. Nutzer liefert eine aktuelle ZIP des Zielbranches.
-2. ChatGPT prüft die Baseline lokal gegen den Zielzustand.
-3. ChatGPT erstellt ein Patch-ZIP in echter Repo-Root-Struktur.
-4. Das Patch-ZIP enthält ausschließlich Dateien/Ordner, die ins Repo übernommen werden sollen.
-5. Keine Wrapper-/Hilfsdateien im Patch-ZIP: keine `README.txt`, keine `MANIFEST.json`, kein `UPLOAD_TO_REPO_ROOT`.
-6. Nutzer entpackt das Patch-ZIP und lädt den entpackten Inhalt per GitHub Drag & Drop auf den Zielbranch hoch.
-7. Nutzer wartet den Deploy ab und liefert danach eine neue ZIP zur finalen Prüfung.
-8. ChatGPT prüft den neuen ZIP-Stand gegen Zielzustand, Checks und mögliche Restverweise.
-
-Dieser Fallback ist bevorzugt für Doku-, HTML-, CSS-, statische JS-, kleine PHP- und kleine Tool-/Audit-Patches. Nicht bevorzugt ist er für große Refactorings, viele Löschungen, Dateiumbenennungen, komplexe Merge-Konflikte oder Asset-Massenänderungen.
-<!-- === END BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 === -->
-
-## Eventdaten-Quelle: Sheet-first
-
-Redaktionelle Events haben eine feste Quellenhierarchie:
-
-1. Kanonische Bearbeitungsquelle ist das Google Sheet, Tab `Events`.
-2. `data/events.tsv` und `data/events.json` sind erzeugte Artefakte aus dem Deploy-/Export-Prozess.
-3. Ein lokales `data/events.json` im Repo oder Codespace ist nur dann belastbar, wenn es unmittelbar aus dem aktuellen Sheet exportiert bzw. im Deploy neu erzeugt wurde.
-4. `/api/events/public.php` ist eine zusätzliche Quelle für freigegebene DB-/Veranstalter-Events, aber nicht die Quelle für redaktionelle Sheet-Events.
-
-Konsequenz:
-- Bei Fragen wie „welche Events sind aktuell sichtbar?“ oder „welche Event-Visual-Gaps existieren?“ darf nicht blind vom lokalen `data/events.json` ausgegangen werden.
-- Vor datenabhängigen Analysen muss geklärt werden, ob die Analyse auf frischem Sheet-Export, Deploy-Artefakt oder nur lokalem Repo-Snapshot basiert.
-- `data/events.json` ist Website-Feed und Build-Artefakt, nicht redaktionelle Source of Truth.
-
+#!/usr/bin/env python3
+# === BEGIN BLOCK: CONTENT_QUALITY_GUARD_V1 | Zweck: prueft Sheet-Events, DB-Events und Activities auf harte Inhalts-/Runtime-Risiken; Umfang: lokaler Audit ohne Google-Sheet-Schreibzugriff ===
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+import re
+import socket
+import ssl
+import sys
+from dataclasses import asdict, dataclass
+from datetime import date, datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlparse
+from urllib.request import Request, urlopen
+
+ROOT = Path(__file__).resolve().parents[1]
+RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+RE_TIME = re.compile(r"^\s*(\d{1,2})[:.](\d{2})(?:\s*[-–]\s*(\d{1,2})[:.](\d{2}))?\s*$")
+HTTP_TIMEOUT_SECONDS = 12
+
+SEVERITY_RANK = {
+    "critical": 0,
+    "review_needed": 1,
+    "warning": 2,
+    "auto_fixed": 3,
+    "ok": 4,
+}
+
+EVENT_REQUIRED_FIELDS = ["id", "title", "date", "city", "location", "kategorie"]
+ACTIVITY_REQUIRED_FIELDS = ["id", "title", "location", "description", "url", "visual_key", "opening_status"]
+SAFE_IMAGE_STATUSES = {"ready", "usable", "fallback"}
+TICKET_PORTAL_HOSTS = (
+    "reservix.de",
+    "eventim.de",
+    "ticket.io",
+    "adticket.de",
+    "pretix.eu",
+    "rausgegangen.de",
+)
+
+
+def url_host(value: str) -> str:
+    return (urlparse(norm(value)).netloc or "").lower().removeprefix("www.")
+
+
+def is_ticket_portal_url(value: str) -> bool:
+    host = url_host(value)
+    return any(host == portal or host.endswith("." + portal) for portal in TICKET_PORTAL_HOSTS)
+
+
+def normalized_url_parts(value: str) -> tuple[str, str, str]:
+    parsed = urlparse(norm(value))
+    host = (parsed.netloc or "").lower().removeprefix("www.")
+    path = re.sub(r"/{2,}", "/", parsed.path or "/")
+    if path != "/":
+        path = path.rstrip("/")
+    query = parsed.query or ""
+    return host, path, query
+
+
+def strip_benign_path_prefix(path: str) -> str:
+    value = path or "/"
+    for prefix in ("/de", "/de-de", "/deutsch"):
+        if value == prefix:
+            return "/"
+        if value.startswith(prefix + "/"):
+            return value[len(prefix):] or "/"
+    return value
+
+
+def parse_redirect_target(detail: str) -> str:
+    match = re.search(r"->\s*(\S+)", norm(detail))
+    return match.group(1) if match else ""
+
+
+def is_benign_redirect(source_url: str, detail: str) -> bool:
+    target_url = parse_redirect_target(detail)
+    if not target_url:
+        return False
+    source_host, source_path, source_query = normalized_url_parts(source_url)
+    target_host, target_path, target_query = normalized_url_parts(target_url)
+    if not source_host or source_host != target_host:
+        return False
+
+    source_clean = strip_benign_path_prefix(source_path)
+    target_clean = strip_benign_path_prefix(target_path)
+    if source_clean != target_clean:
+        return False
+
+    # Tracking- und Sortierparameter gelten nicht als redaktioneller Arbeitsfall.
+    ignored_params = ("utm_", "mtm_", "fbclid", "gclid")
+    def relevant_query(raw: str) -> list[str]:
+        if not raw:
+            return []
+        parts = []
+        for part in raw.split("&"):
+            key = part.split("=", 1)[0].lower()
+            if key.startswith(ignored_params) or key in ignored_params:
+                continue
+            parts.append(part)
+        return sorted(parts)
+
+    return relevant_query(source_query) == relevant_query(target_query)
+
+
+def is_transient_network_warning(detail: str) -> bool:
+    value = norm(detail).lower()
+    transient_markers = (
+        "timeouterror",
+        "timed out",
+        "temporarily unavailable",
+        "temporary failure",
+        "connection reset",
+        "connection aborted",
+        "remote end closed",
+    )
+    hard_markers = (
+        "certificate_verify_failed",
+        "hostname mismatch",
+        "ssl:",
+    )
+    if any(marker in value for marker in hard_markers):
+        return False
+    return any(marker in value for marker in transient_markers)
+
+
+@dataclass
+class Issue:
+    severity: str
+    status: str
+    content_type: str
+    source_system: str
+    content_id: str
+    title: str
+    date: str
+    issue_code: str
+    issue_text: str
+    recommended_action: str
+    source_url: str
+    public_url: str
+    auto_fix_allowed: str
+    auto_fix_done: str
+
+
+def norm(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value).replace("\u00a0", " ").strip()
+
+
+def norm_key(value: Any) -> str:
+    return re.sub(r"\s+", " ", norm(value).lower())
+
+
+def parse_iso_date(value: str) -> Optional[date]:
+    value = norm(value)
+    if not value or not RE_DATE.match(value):
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def is_http_url(value: str) -> bool:
+    parsed = urlparse(norm(value))
+    return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+
+
+def is_local_path(value: str) -> bool:
+    value = norm(value)
+    return value.startswith("/") and not value.startswith("//")
+
+
+def local_path_exists(path_value: str) -> bool:
+    value = norm(path_value).split("?", 1)[0]
+    if not is_local_path(value):
+        return False
+    return (ROOT / value.lstrip("/")).exists()
+
+
+def issue(
+    severity: str,
+    content_type: str,
+    source_system: str,
+    content_id: str,
+    title: str,
+    issue_code: str,
+    issue_text: str,
+    recommended_action: str,
+    *,
+    date_value: str = "",
+    source_url: str = "",
+    public_url: str = "",
+    auto_fix_allowed: bool = False,
+    auto_fix_done: bool = False,
+) -> Issue:
+    return Issue(
+        severity=severity,
+        status="open" if severity != "auto_fixed" else "done",
+        content_type=content_type,
+        source_system=source_system,
+        content_id=norm(content_id),
+        title=norm(title),
+        date=norm(date_value),
+        issue_code=issue_code,
+        issue_text=issue_text,
+        recommended_action=recommended_action,
+        source_url=norm(source_url),
+        public_url=norm(public_url),
+        auto_fix_allowed="yes" if auto_fix_allowed else "no",
+        auto_fix_done="yes" if auto_fix_done else "no",
+    )
+
+
+def load_json(path: Path, *, required: bool = True) -> Any:
+    if not path.exists():
+        if required:
+            raise FileNotFoundError(f"JSON fehlt: {path}")
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def read_tsv(path: Path) -> List[Dict[str, str]]:
+    if not path.exists():
+        return []
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle, delimiter="\t")
+        if not reader.fieldnames:
+            return []
+        reader.fieldnames = [(name or "").lstrip("\ufeff").strip() for name in reader.fieldnames]
+        rows: List[Dict[str, str]] = []
+        for raw in reader:
+            row = {(key or "").lstrip("\ufeff").strip(): norm(value) for key, value in raw.items()}
+            if any(row.values()):
+                rows.append(row)
+        return rows
+
+
+def load_events(events_tsv: Path, events_json: Path) -> Tuple[List[Dict[str, str]], str]:
+    rows = read_tsv(events_tsv)
+    if rows:
+        return rows, "sheet_events"
+
+    data = load_json(events_json, required=False)
+    if isinstance(data, list):
+        return [{str(k): norm(v) for k, v in item.items()} for item in data if isinstance(item, dict)], "runtime_events_json"
+
+    return [], "sheet_events"
+
+
+def load_db_events(path: Path) -> List[Dict[str, str]]:
+    data = load_json(path, required=False)
+    if data is None:
+        return []
+    if isinstance(data, list):
+        raw_items = data
+    elif isinstance(data, dict):
+        raw_items = data.get("events") or data.get("items") or data.get("data") or []
+    else:
+        raw_items = []
+    out: List[Dict[str, str]] = []
+    for item in raw_items:
+        if isinstance(item, dict):
+            out.append({str(k): norm(v) for k, v in item.items()})
+    return out
+
+
+def load_visual_pools(path: Path) -> Dict[str, Dict[str, Any]]:
+    data = load_json(path, required=False) or {}
+    pools = data.get("pools") if isinstance(data, dict) else {}
+    return pools if isinstance(pools, dict) else {}
+
+
+def pool_has_safe_image(pool: Dict[str, Any]) -> bool:
+    images = pool.get("images") if isinstance(pool, dict) else []
+    if not isinstance(images, list):
+        return False
+    return any(isinstance(img, dict) and norm(img.get("status")) in SAFE_IMAGE_STATUSES for img in images)
+
+
+def check_url(url: str) -> Tuple[str, str]:
+    """Returns (status, detail). status: ok|redirect|warning|critical."""
+    url = norm(url)
+    if not url:
+        return "warning", "url_empty"
+    if not is_http_url(url):
+        return "warning", "url_not_http"
+
+    headers = {
+        "User-Agent": "Bocholt-Erleben-ContentQualityGuard/1.0 (+https://bocholt-erleben.de)",
+        "Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
+    }
+
+    for method in ("HEAD", "GET"):
+        try:
+            request = Request(url, method=method, headers=headers)
+            with urlopen(request, timeout=HTTP_TIMEOUT_SECONDS, context=ssl.create_default_context()) as response:
+                code = getattr(response, "status", 0) or 0
+                final_url = response.geturl()
+                if 200 <= code < 400:
+                    if final_url and final_url.rstrip("/") != url.rstrip("/"):
+                        return "redirect", f"{code} -> {final_url}"
+                    return "ok", str(code)
+                if 400 <= code < 500:
+                    return "critical", str(code)
+                if code >= 500:
+                    return "warning", str(code)
+        except HTTPError as exc:
+            if method == "HEAD" and exc.code in {403, 405, 406}:
+                continue
+            if 400 <= exc.code < 500:
+                return "critical", str(exc.code)
+            return "warning", str(exc.code)
+        except (TimeoutError, socket.timeout, URLError, OSError, ssl.SSLError) as exc:
+            if method == "HEAD":
+                continue
+            return "warning", f"{type(exc).__name__}: {exc}"
+
+    return "warning", "url_check_unknown"
+
+
+def audit_event_rows(
+    rows: List[Dict[str, str]],
+    source_system: str,
+    event_visual_pools: Dict[str, Dict[str, Any]],
+    today: date,
+    horizon_days: int,
+    scope: str,
+    network: bool,
+    base_url: str,
+) -> List[Issue]:
+    issues: List[Issue] = []
+    seen_ids: Dict[str, str] = {}
+    seen_fp: Dict[str, str] = {}
+
+    horizon_end = today + timedelta(days=horizon_days)
+
+    for row in rows:
+        content_id = norm(row.get("id") or row.get("event_id") or row.get("submission_id"))
+        title = norm(row.get("title"))
+        date_value = norm(row.get("date") or row.get("start_date"))
+        end_date_value = norm(row.get("endDate") or row.get("end_date"))
+        time_value = norm(row.get("time"))
+        url = norm(row.get("source_url") or row.get("url") or row.get("event_url"))
+        public_url = f"{base_url.rstrip('/')}/events/" if base_url else ""
+
+        for field in EVENT_REQUIRED_FIELDS:
+            if not norm(row.get(field)):
+                issues.append(issue(
+                    "critical",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_required_field_missing",
+                    f"Pflichtfeld fehlt: {field}",
+                    "Quelle im Google Sheet bzw. Review-System korrigieren; Deploy darf diesen Datensatz nicht ungeprüft veröffentlichen.",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                ))
+
+        start_date = parse_iso_date(date_value)
+        if not start_date:
+            issues.append(issue(
+                "critical",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_invalid_date",
+                f"Ungültiges Eventdatum: {date_value!r}",
+                "Datum in der fachlichen Quelle auf YYYY-MM-DD korrigieren.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+            ))
+            continue
+
+        end_date = parse_iso_date(end_date_value) if end_date_value else start_date
+        if end_date is None:
+            issues.append(issue(
+                "critical",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_invalid_end_date",
+                f"Ungültiges Enddatum: {end_date_value!r}",
+                "Enddatum in der fachlichen Quelle auf YYYY-MM-DD korrigieren oder entfernen.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+            ))
+        elif end_date < start_date:
+            issues.append(issue(
+                "critical",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_end_before_start",
+                "Enddatum liegt vor Startdatum.",
+                "Enddatum oder Startdatum in der fachlichen Quelle korrigieren.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+            ))
+
+        if end_date and end_date < today:
+            issues.append(issue(
+                "auto_fixed",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_expired_hidden_by_build",
+                "Event liegt sicher in der Vergangenheit und wird vom Build/Feed nicht mehr öffentlich ausgespielt.",
+                "Keine Sofortaktion nötig; alte Sheet-Zeilen können später redaktionell archiviert werden.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+                auto_fix_allowed=True,
+                auto_fix_done=True,
+            ))
+            continue
+
+        in_daily_window = today <= start_date <= horizon_end
+        if scope == "daily" and not in_daily_window:
+            continue
+
+        if time_value and not RE_TIME.match(time_value):
+            issues.append(issue(
+                "critical" if in_daily_window else "review_needed",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_time_format_unusual",
+                f"Uhrzeit hat ein nicht erwartetes Format: {time_value!r}",
+                "Uhrzeit im Sheet prüfen; für kommende Events ist das kritisch.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+            ))
+
+        if content_id:
+            duplicate_id = seen_ids.get(content_id)
+            if duplicate_id:
+                issues.append(issue(
+                    "critical",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_duplicate_id",
+                    f"Doppelte Event-ID: {content_id}",
+                    "Eine ID in der fachlichen Quelle ändern; Deploy darf doppelte IDs nicht akzeptieren.",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                ))
+            seen_ids[content_id] = title
+
+        fp = "|".join([
+            norm_key(title),
+            date_value,
+            norm_key(time_value),
+            norm_key(row.get("city")),
+            norm_key(row.get("location")),
+        ])
+        if fp.strip("|"):
+            if fp in seen_fp:
+                issues.append(issue(
+                    "review_needed",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_possible_duplicate",
+                    "Mögliches Event-Duplikat nach Titel, Datum, Uhrzeit, Stadt und Ort.",
+                    "Im Sheet bzw. Review-System prüfen, ob beide Zeilen wirklich unterschiedliche Termine sind.",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                ))
+            seen_fp[fp] = content_id or title
+
+        if not url:
+            issues.append(issue(
+                "critical" if in_daily_window else "review_needed",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_source_url_missing",
+                "Keine Event-/Quellen-URL vorhanden.",
+                "Quelle ergänzen; bei zeitnahen Events ist fehlende Prüfbarkeit kritisch.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+            ))
+        elif not is_http_url(url):
+            issues.append(issue(
+                "review_needed",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_source_url_invalid",
+                f"Quellen-/Event-URL ist keine http(s)-URL: {url}",
+                "URL in der fachlichen Quelle korrigieren.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+            ))
+        elif is_ticket_portal_url(url):
+            issues.append(issue(
+                "review_needed",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_ticket_portal_as_primary_source",
+                "Als primaere Eventquelle ist ein Ticketportal hinterlegt.",
+                "Offizielle Event-/Veranstalterquelle bevorzugen. Ticketportal nur als Ticket-/Buchungslink fuehren, sobald ein separates Ticketfeld verfuegbar ist.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+            ))
+        elif network:
+            status, detail = check_url(url)
+            if status == "critical":
+                issues.append(issue(
+                    "critical" if in_daily_window else "review_needed",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_source_url_broken",
+                    f"Quelle/Event-Link antwortet kritisch: {detail}",
+                    "Quelle manuell prüfen; nicht automatisch löschen oder umschreiben.",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                ))
+            elif status == "warning" and not is_transient_network_warning(detail):
+                issues.append(issue(
+                    "review_needed" if in_daily_window else "warning",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_source_url_unstable",
+                    f"Quelle/Event-Link konnte nicht sicher geprüft werden: {detail}",
+                    "Bei Wiederholung oder zeitnahen Events manuell prüfen.",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                ))
+            elif status == "redirect" and not is_benign_redirect(url, detail):
+                issues.append(issue(
+                    "warning",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_source_url_redirect",
+                    f"Quelle leitet weiter: {detail}",
+                    "Redirect nur prüfen, wenn Zielseite fachlich abweicht, auf eine fremde Domain wechselt oder nicht mehr die konkrete Event-/Veranstalterquelle ist.",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                ))
+
+        visual_key = norm(row.get("visual_key"))
+        if visual_key:
+            pool = event_visual_pools.get(visual_key)
+            if pool is None:
+                issues.append(issue(
+                    "critical",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_visual_key_unknown",
+                    f"visual_key ist nicht im Event-Visual-Pool vorhanden: {visual_key}",
+                    "visual_key im Sheet korrigieren oder Pool bewusst erweitern.",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                ))
+            elif not pool_has_safe_image(pool):
+                issues.append(issue(
+                    "critical",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_visual_key_without_safe_image",
+                    f"visual_key hat kein ready/usable/fallback-Bild: {visual_key}",
+                    "Pool-Bild bereitstellen oder sicheren Ersatz-Key setzen.",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                ))
+
+    return issues
+
+
+def audit_activities(
+    offers_json: Path,
+    activity_visual_pools: Dict[str, Dict[str, Any]],
+    today: date,
+    network: bool,
+    base_url: str,
+) -> List[Issue]:
+    data = load_json(offers_json, required=False) or {}
+    offers = data.get("offers") if isinstance(data, dict) else []
+    if not isinstance(offers, list):
+        return [issue(
+            "critical",
+            "activity",
+            "offers_json",
+            "offers",
+            "Activities",
+            "activities_json_invalid",
+            "data/offers.json enthält keine gültige offers-Liste.",
+            "JSON-Struktur reparieren; Activities dürfen ohne valide Quelle nicht zuverlässig ausgespielt werden.",
+            public_url=f"{base_url.rstrip('/')}/aktivitaeten/" if base_url else "",
+        )]
+
+    issues: List[Issue] = []
+    seen_ids: set[str] = set()
+    public_url = f"{base_url.rstrip('/')}/aktivitaeten/" if base_url else ""
+
+    for offer in offers:
+        if not isinstance(offer, dict):
+            continue
+
+        content_id = norm(offer.get("id"))
+        title = norm(offer.get("title"))
+        url = norm(offer.get("url"))
+        image = norm(offer.get("image"))
+        visual_key = norm(offer.get("visual_key"))
+        opening_status = offer.get("opening_status") if isinstance(offer.get("opening_status"), dict) else {}
+        checked_at = norm(opening_status.get("checked_at")) if opening_status else ""
+        source_url = norm(opening_status.get("source_url")) or url
+
+        for field in ACTIVITY_REQUIRED_FIELDS:
+            value = offer.get(field)
+            if isinstance(value, dict):
+                missing = not value
+            else:
+                missing = not norm(value)
+            if missing:
+                issues.append(issue(
+                    "critical" if field in {"id", "title", "opening_status"} else "review_needed",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_required_field_missing",
+                    f"Pflicht-/Kernfeld fehlt: {field}",
+                    "Activity-Datensatz per bewusstem Repo-Patch korrigieren.",
+                    source_url=source_url,
+                    public_url=public_url,
+                ))
+
+        if content_id in seen_ids:
+            issues.append(issue(
+                "critical",
+                "activity",
+                "offers_json",
+                content_id,
+                title,
+                "activity_duplicate_id",
+                f"Doppelte Activity-ID: {content_id}",
+                "Eine ID in data/offers.json korrigieren; doppelte IDs sind nicht zulässig.",
+                source_url=source_url,
+                public_url=public_url,
+            ))
+        if content_id:
+            seen_ids.add(content_id)
+
+        pool = activity_visual_pools.get(visual_key) if visual_key else None
+        if visual_key and pool is None:
+            issues.append(issue(
+                "critical",
+                "activity",
+                "offers_json",
+                content_id,
+                title,
+                "activity_visual_key_unknown",
+                f"visual_key ist nicht im Activity-Visual-Pool vorhanden: {visual_key}",
+                "visual_key oder Activity-Visual-Pool per Repo-Patch korrigieren; vorhandenes Bild nicht blind ersetzen.",
+                source_url=source_url,
+                public_url=public_url,
+            ))
+        elif pool is not None and not pool_has_safe_image(pool):
+            issues.append(issue(
+                "review_needed",
+                "activity",
+                "offers_json",
+                content_id,
+                title,
+                "activity_visual_key_without_safe_image",
+                f"visual_key hat kein ready/usable/fallback-Bild: {visual_key}",
+                "Pool-Bild prüfen oder sicheren Ersatz bereitstellen.",
+                source_url=source_url,
+                public_url=public_url,
+            ))
+
+        image_quality = norm(offer.get("image_quality"))
+        safe_pool_image = pool is not None and pool_has_safe_image(pool)
+        if image_quality == "blocked" or (image_quality == "needs_review" and not safe_pool_image):
+            issues.append(issue(
+                "review_needed",
+                "activity",
+                "offers_json",
+                content_id,
+                title,
+                "activity_image_needs_review",
+                f"Activity-Bildstatus ist {image_quality}.",
+                "Bild bewusst prüfen, ersetzen oder Status dokumentiert freigeben. Wenn bereits ein sicheres Poolbild vorhanden ist, image_quality per Repo-Patch bereinigen.",
+                source_url=source_url,
+                public_url=public_url,
+            ))
+
+        if image:
+            if is_local_path(image) and not local_path_exists(image):
+                issues.append(issue(
+                    "critical",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_local_image_missing",
+                    f"Lokales Activity-Bild fehlt: {image}",
+                    "Bilddatei ergänzen oder Datensatz auf sicheres Pool-/Fallbackbild umstellen.",
+                    source_url=source_url,
+                    public_url=public_url,
+                ))
+            elif is_http_url(image) and network:
+                status, detail = check_url(image)
+                if status == "critical":
+                    issues.append(issue(
+                        "review_needed",
+                        "activity",
+                        "offers_json",
+                        content_id,
+                        title,
+                        "activity_external_image_broken",
+                        f"Externes Bild antwortet kritisch: {detail}",
+                        "Bildquelle prüfen; keine automatische Übernahme fremder Ersatzbilder.",
+                        source_url=source_url,
+                        public_url=public_url,
+                    ))
+        else:
+            issues.append(issue(
+                "review_needed",
+                "activity",
+                "offers_json",
+                content_id,
+                title,
+                "activity_image_missing",
+                "Activity hat kein Bildfeld.",
+                "Bild/Visual-Key prüfen und per Repo-Patch korrigieren.",
+                source_url=source_url,
+                public_url=public_url,
+            ))
+
+        checked_date = parse_iso_date(checked_at)
+        if not checked_date:
+            issues.append(issue(
+                "review_needed",
+                "activity",
+                "offers_json",
+                content_id,
+                title,
+                "activity_checked_at_missing_or_invalid",
+                f"opening_status.checked_at fehlt oder ist ungültig: {checked_at!r}",
+                "Activity-Quelle prüfen und checked_at aktualisieren.",
+                source_url=source_url,
+                public_url=public_url,
+            ))
+        else:
+            age_days = (today - checked_date).days
+            if age_days > 90:
+                issues.append(issue(
+                    "review_needed",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_check_too_old",
+                    f"Activity-Quellenprüfung ist {age_days} Tage alt.",
+                    "Quelle fachlich prüfen und checked_at per Repo-Patch aktualisieren.",
+                    source_url=source_url,
+                    public_url=public_url,
+                ))
+            elif age_days > 45:
+                issues.append(issue(
+                    "warning",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_check_aging",
+                    f"Activity-Quellenprüfung ist {age_days} Tage alt.",
+                    "Für monatliche/regelmäßige Pflege vormerken.",
+                    source_url=source_url,
+                    public_url=public_url,
+                ))
+
+        if not source_url:
+            issues.append(issue(
+                "review_needed",
+                "activity",
+                "offers_json",
+                content_id,
+                title,
+                "activity_source_missing",
+                "Keine prüfbare Activity-Quelle vorhanden.",
+                "Quelle ergänzen; ohne Quelle keine belastbare langfristige Content-Sicherung.",
+                source_url=source_url,
+                public_url=public_url,
+            ))
+        elif not is_http_url(source_url):
+            issues.append(issue(
+                "review_needed",
+                "activity",
+                "offers_json",
+                content_id,
+                title,
+                "activity_source_url_invalid",
+                f"Activity-Quelle ist keine http(s)-URL: {source_url}",
+                "Quellen-URL per Repo-Patch korrigieren.",
+                source_url=source_url,
+                public_url=public_url,
+            ))
+        elif network:
+            status, detail = check_url(source_url)
+            if status == "critical":
+                issues.append(issue(
+                    "review_needed",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_source_url_broken",
+                    f"Activity-Quelle antwortet kritisch: {detail}",
+                    "Quelle manuell prüfen; Activity nicht automatisch löschen.",
+                    source_url=source_url,
+                    public_url=public_url,
+                ))
+            elif status == "warning" and not is_transient_network_warning(detail):
+                issues.append(issue(
+                    "warning",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_source_url_unstable",
+                    f"Activity-Quelle konnte nicht sicher geprüft werden: {detail}",
+                    "Bei Wiederholung manuell prüfen.",
+                    source_url=source_url,
+                    public_url=public_url,
+                ))
+            elif status == "redirect" and not is_benign_redirect(source_url, detail):
+                issues.append(issue(
+                    "warning",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_source_url_redirect",
+                    f"Activity-Quelle leitet weiter: {detail}",
+                    "Redirect nur prüfen, wenn Zielseite fachlich abweicht, auf eine fremde Domain wechselt oder nicht mehr die konkrete Activity-/Anbieterquelle ist.",
+                    source_url=source_url,
+                    public_url=public_url,
+                ))
+
+    return issues
+
+
+def summarize(issues: List[Issue]) -> Dict[str, Any]:
+    counts: Dict[str, int] = {"critical": 0, "review_needed": 0, "warning": 0, "auto_fixed": 0}
+    by_type: Dict[str, int] = {}
+    for item in issues:
+        counts[item.severity] = counts.get(item.severity, 0) + 1
+        by_type[item.content_type] = by_type.get(item.content_type, 0) + 1
+    return {"counts": counts, "by_type": by_type, "total": len(issues)}
+
+
+def write_json_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "meta": meta,
+        "summary": summarize(issues),
+        "issues": [asdict(item) for item in issues],
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    summary = summarize(issues)
+    lines = [
+        "# Content Quality Report",
+        "",
+        f"Generated: `{meta['generated_at']}`",
+        f"Scope: `{meta['scope']}`",
+        f"Network checks: `{meta['network_checks']}`",
+        "",
+        "## Summary",
+        "",
+        f"- Critical: {summary['counts'].get('critical', 0)}",
+        f"- Review needed: {summary['counts'].get('review_needed', 0)}",
+        f"- Warning: {summary['counts'].get('warning', 0)}",
+        f"- Auto fixed: {summary['counts'].get('auto_fixed', 0)}",
+        "",
+        "## Issues",
+        "",
+        "| Severity | Type | Source | ID | Title | Issue | Action |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for item in sorted(issues, key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.content_type, x.date, x.title)):
+        def cell(value: str) -> str:
+            return norm(value).replace("|", "\\|").replace("\n", " ")[:240]
+        lines.append(
+            "| " + " | ".join([
+                cell(item.severity),
+                cell(item.content_type),
+                cell(item.source_system),
+                cell(item.content_id),
+                cell(item.title),
+                cell(item.issue_text),
+                cell(item.recommended_action),
+            ]) + " |"
+        )
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Bocholt erleben Content Quality Guard")
+    parser.add_argument("--scope", choices=["deploy-gate", "daily", "full"], default="deploy-gate")
+    parser.add_argument("--events-tsv", default="data/events.tsv")
+    parser.add_argument("--events-json", default="data/events.json")
+    parser.add_argument("--db-events-json", default="data/public-db-events.json")
+    parser.add_argument("--offers-json", default="data/offers.json")
+    parser.add_argument("--event-visual-pool", default="data/event_visual_pool.json")
+    parser.add_argument("--activity-visual-pool", default="data/activity_visual_pool.json")
+    parser.add_argument("--output-json", default="data/content-quality-report.json")
+    parser.add_argument("--output-md", default="data/content-quality-report.md")
+    parser.add_argument("--base-url", default="https://bocholt-erleben.de")
+    parser.add_argument("--horizon-days", type=int, default=14)
+    parser.add_argument("--network", action="store_true")
+    parser.add_argument("--fail-on-critical", action="store_true")
+    args = parser.parse_args()
+
+    today = date.today()
+    event_pools = load_visual_pools(ROOT / args.event_visual_pool)
+    activity_pools = load_visual_pools(ROOT / args.activity_visual_pool)
+
+    event_rows, event_source = load_events(ROOT / args.events_tsv, ROOT / args.events_json)
+    db_event_rows = load_db_events(ROOT / args.db_events_json)
+
+    issues: List[Issue] = []
+    if not event_rows:
+        issues.append(issue(
+            "critical",
+            "event",
+            "sheet_events",
+            "events",
+            "Events",
+            "events_source_missing",
+            "Keine Sheet-/Runtime-Events für den Audit gefunden.",
+            "Workflow-Export aus dem Google Sheet prüfen.",
+            public_url=f"{args.base_url.rstrip('/')}/events/",
+        ))
+    else:
+        issues.extend(audit_event_rows(
+            event_rows,
+            event_source,
+            event_pools,
+            today,
+            args.horizon_days,
+            args.scope,
+            args.network,
+            args.base_url,
+        ))
+
+    if db_event_rows:
+        issues.extend(audit_event_rows(
+            db_event_rows,
+            "public_db_events_api",
+            event_pools,
+            today,
+            args.horizon_days,
+            args.scope,
+            args.network,
+            args.base_url,
+        ))
+
+    if args.scope in {"deploy-gate", "full"}:
+        issues.extend(audit_activities(
+            ROOT / args.offers_json,
+            activity_pools,
+            today,
+            args.network,
+            args.base_url,
+        ))
+
+    issues.sort(key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.content_type, x.date, x.title, x.issue_code))
+
+    meta = {
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "scope": args.scope,
+        "network_checks": bool(args.network),
+        "horizon_days": args.horizon_days,
+        "event_source": event_source,
+        "db_events_loaded": len(db_event_rows),
+        "base_url": args.base_url,
+    }
+
+    write_json_report(ROOT / args.output_json, issues, meta)
+    write_markdown_report(ROOT / args.output_md, issues, meta)
+
+    summary = summarize(issues)
+    print("✅ Content Quality Audit written")
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+
+    if args.fail_on_critical and summary["counts"].get("critical", 0):
+        print("❌ Content Quality Guard found critical issues.", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
+# === END BLOCK: CONTENT_QUALITY_GUARD_V1 ===
