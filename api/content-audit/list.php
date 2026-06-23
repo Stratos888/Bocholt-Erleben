@@ -106,6 +106,37 @@ function cal_event_lookup_by_id(): array
     return $out;
 }
 
+
+function cal_source_suggestion_lookup(): array
+{
+    $path = dirname(__DIR__, 2) . '/data/content_source_suggestions.json';
+    if (!is_file($path)) {
+        return [];
+    }
+
+    $payload = json_decode((string)file_get_contents($path), true);
+    if (!is_array($payload)) {
+        return [];
+    }
+
+    $events = $payload['events'] ?? [];
+    return is_array($events) ? $events : [];
+}
+
+function cal_curated_source_suggestion(array $lookup, string $contentType, string $contentId): array
+{
+    if ($contentType !== 'event' || $contentId === '' || !isset($lookup[$contentId]) || !is_array($lookup[$contentId])) {
+        return [];
+    }
+
+    $item = $lookup[$contentId];
+    return [
+        'suggested_url' => trim((string)($item['suggested_url'] ?? '')),
+        'suggested_url_label' => trim((string)($item['label'] ?? $item['suggested_url_label'] ?? '')),
+        'suggestion_reason' => trim((string)($item['reason'] ?? $item['suggestion_reason'] ?? '')),
+    ];
+}
+
 function cal_suggested_redirect_url(string $issueText): string
 {
     if (preg_match('/->\s*(https?:\/\/\S+)/u', $issueText, $match)) {
@@ -117,7 +148,7 @@ function cal_suggested_redirect_url(string $issueText): string
 
 try {
     $tabName = be_content_audit_tab_name();
-    $response = be_google_sheets_values_get($tabName . '!A:AB');
+    $response = be_google_sheets_values_get($tabName . '!A:AZ');
     $values = $response['values'] ?? [];
 
     if (!is_array($values) || count($values) < 3) {
@@ -134,6 +165,7 @@ try {
     }
 
     $eventById = cal_event_lookup_by_id();
+    $sourceSuggestionByEventId = cal_source_suggestion_lookup();
 
     $metaRow = is_array($values[0] ?? null) ? $values[0] : [];
     $generatedAt = trim((string)($metaRow[1] ?? ''));
@@ -168,6 +200,19 @@ try {
         $sourceUrl = cal_cell($row, $index, 'source_url');
         $issueText = cal_cell($row, $index, 'issue_text');
         $suggestedUrl = cal_cell($row, $index, 'suggested_url');
+        $suggestedUrlLabel = cal_cell($row, $index, 'suggested_url_label');
+        $suggestionReason = cal_cell($row, $index, 'suggestion_reason');
+
+        $curatedSuggestion = cal_curated_source_suggestion($sourceSuggestionByEventId, $contentType, $contentId);
+        if ($suggestedUrl === '' && ($curatedSuggestion['suggested_url'] ?? '') !== '') {
+            $suggestedUrl = $curatedSuggestion['suggested_url'];
+        }
+        if ($suggestedUrlLabel === '' && ($curatedSuggestion['suggested_url_label'] ?? '') !== '') {
+            $suggestedUrlLabel = $curatedSuggestion['suggested_url_label'];
+        }
+        if ($suggestionReason === '' && ($curatedSuggestion['suggestion_reason'] ?? '') !== '') {
+            $suggestionReason = $curatedSuggestion['suggestion_reason'];
+        }
         if ($suggestedUrl === '') {
             $suggestedUrl = cal_suggested_redirect_url($issueText);
         }
@@ -200,8 +245,8 @@ try {
             'recommended_action' => cal_cell($row, $index, 'recommended_action'),
             'source_url' => $sourceUrl,
             'suggested_url' => $suggestedUrl,
-            'suggested_url_label' => cal_cell($row, $index, 'suggested_url_label'),
-            'suggestion_reason' => cal_cell($row, $index, 'suggestion_reason'),
+            'suggested_url_label' => $suggestedUrlLabel,
+            'suggestion_reason' => $suggestionReason,
             'public_url' => cal_cell($row, $index, 'public_url'),
             'first_seen_at' => cal_cell($row, $index, 'first_seen_at'),
             'last_seen_at' => cal_cell($row, $index, 'last_seen_at'),

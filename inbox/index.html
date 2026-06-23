@@ -1568,7 +1568,7 @@ Umfang:
       return `
         <section class="reviewSection" aria-label="Empfohlene Quelle">
           <div class="reviewSectionTitle">Empfohlene Quelle</div>
-          <div class="auditStateNote">
+          <div class="auditStateNote auditStateNote--suggestedSource">
             <strong>${escapeHtml(label)}</strong><br />
             <span>${escapeHtml(suggestedUrl)}</span>
             ${reason ? `<br /><span>${escapeHtml(reason)}</span>` : ``}
@@ -1579,7 +1579,9 @@ Umfang:
 
     function renderEventCorrectionForm(item, suggestedUrl) {
       if (!isContentAuditEventItem(item)) return "";
-      const sourceValue = suggestedUrl || eventFieldValue(item, "source_url") || eventFieldValue(item, "url") || eventFieldValue(item, "event_url") || trimValue(item.source_url);
+      const issueCode = trimValue(item.issue_code);
+      const currentSourceValue = eventFieldValue(item, "source_url") || eventFieldValue(item, "url") || eventFieldValue(item, "event_url") || trimValue(item.source_url);
+      const sourceValue = suggestedUrl || (issueCode === "event_ticket_portal_as_primary_source" ? "" : currentSourceValue);
       return `
         <section class="reviewSection" aria-label="Eventdaten korrigieren">
           <div class="reviewSectionTitle">Eventdaten über Content-Prüfung korrigieren</div>
@@ -1655,7 +1657,7 @@ Umfang:
       const guide = contentAuditGuide(it);
       const canEditEvent = isContentAuditEventItem(it);
       const isActivity = isContentAuditActivityItem(it);
-      const suggestedUrl = trimValue(it.suggested_url) || trimValue(it.source_url);
+      const suggestedUrl = trimValue(it.suggested_url);
       const auditRowsHtml = buildContentAuditRows(it).map(([label, value]) => `
         <div class="reviewRow">
           <div class="reviewLabel">${escapeHtml(label)}</div>
