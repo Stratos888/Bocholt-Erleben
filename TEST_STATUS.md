@@ -31,6 +31,114 @@ Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter ble
 - Bei Widerspruch gilt: `MASTER.md` für strategische Steuerung, `ROADMAP.md` für aktuelle Taktik, `ENGINEERING.md` für Arbeitsregeln.
 <!-- === END BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_22 === -->
 
+<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_INDEX_2026_06_24 | Zweck: macht den aktuellen Content-Pruefprozess-Stand im Test-Index sichtbar; Umfang: Audit-Report, Inbox-Pakete, Visual-Fit-V2, offene Folgebeweise === -->
+## Aktueller Test-Index Zusatz – Content-Prüfung V2 (2026-06-24)
+
+Status: Prozess-V2 auf Staging geprüft; Grundprozess bestanden, offene Arbeitspakete bleiben fachlich zu bearbeiten.
+
+Bestandene Beweise:
+
+- Content Quality Audit läuft nach Deploy und erzeugt `content-quality-report-full`.
+- Der Report enthält Prozesskategorien, Correction Owner, Workbench-Gruppen und Automation Policy.
+- Die Workbench `/inbox/` zeigt Arbeitspakete getrennt an:
+  - Repo-Datenpatch.
+  - Quellencheck.
+  - Faktencheck.
+  - Beobachten / Retry.
+  - Visual-Fit.
+- Repo-Datenpatch-Paket enthält die drei echten Activity-Datenlücken und nicht mehr Redirect-/Retry-Fälle.
+- Sheet-/Quellenkorrektur ist über die Content-Inbox vorbereitet; Borken Open Air zeigt eine empfohlene offizielle Quelle und befüllt das Quellenfeld mit dieser URL, ohne automatisch zu speichern.
+- Quellencheck und Retry werden nicht mehr mit Repo-Datenpatches vermischt.
+- Faktencheck V1 und Visual-Fit V2 sind im Report aktiv.
+- Visual-Fit V2 liefert konkrete Vorschläge für `visual_key`, `visual_motif`, Motivrolle und Asset-Status.
+
+Letzter belegter Audit-Stand:
+
+- Critical: 0.
+- Review needed: 5.
+- Warnings: 16.
+- Automatisch erledigt: 118.
+- Arbeitspakete: Repo-Datenpatch 3, Sheet-/Quellenkorrektur 1, Quellenprüfung 2, Faktencheck 3, Visual-Fit 12, Automatisch erledigt 118.
+
+Offene Folgebeweise:
+
+- Visual-Fit-Paket fachlich bewerten und daraus konkrete Folgeaktionen ableiten.
+- Repo-Datenpatch-Paket als bewussten Sammelpatch vorbereiten und testen.
+- Quellencheck-/Faktencheck-Fälle fachlich prüfen.
+- UI/UX der Content-Inbox erst am Ende polieren.
+<!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_INDEX_2026_06_24 === -->
+
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_PROOF_2026_06_24 | Zweck: dokumentiert den bestandenen Staging-Prozessbeweis fuer Content Quality Guard V2; Umfang: Reportzahlen, Paketlogik, Inbox-Screenshots, Grenzen === -->
+## Content Quality Guard V2 – Prozessbeweis bestanden (2026-06-24)
+
+Status: bestanden als Prozessgrundlage; fachliche Paketbearbeitung offen.
+
+### Geprüfter Umfang
+
+- Automatischer Content-Audit nach Deploy.
+- Audit-Report `content-quality-report-full`.
+- `/inbox/` Content-Prüfung.
+- Sheet-/Quellenkorrektur-Fall `Borken Open Air - ABBA Gold The Concert Show`.
+- Repo-Datenpatch-Paket am Beispiel `Bürgerpark Rhede`.
+- Pakettrennung für Quellencheck, Faktencheck und Visual-Fit.
+
+### Report-Beweis
+
+Letzter geprüfter Staging-Report:
+
+- `critical`: 0.
+- `review_needed`: 5.
+- `warning`: 16.
+- `auto_fixed` / automatisch erledigt: 118.
+- `by_workbench_group`:
+  - Automatisch erledigt: 118.
+  - Visual-Fit: 12.
+  - Repo-Datenpatch: 3.
+  - Faktencheck: 3.
+  - Quellenprüfung: 2.
+  - Sheet-/Quellenkorrektur: 1.
+
+### Bestandene Detailbeweise
+
+- Borken Open Air:
+  - Ticketportal als Primärquelle wird erkannt.
+  - Empfohlene offizielle Quelle wird angezeigt.
+  - Feld `Offizielle Quelle` wird mit der empfohlenen Quelle vorbefüllt.
+  - Es erfolgt keine automatische Speicherung.
+- Repo-Datenpatch-Paket:
+  - Enthält `Bürgerpark Rhede`, `Suderwicker Märchenspielplatz`, `Waldlehrpfad am Vossenpand`.
+  - Enthält nicht mehr `Unterduikmuseum Aalten` oder `Witte Venn`.
+- Quellencheck:
+  - `Unterduikmuseum Aalten` wird als Quellencheck geführt, nicht als Repo-Datenpatch.
+- Retry/Beobachten:
+  - technisch wackelige Quellen werden nicht als direkter Patchkandidat behandelt.
+- Faktencheck:
+  - `Farm & Country Fair`, `Pokémon-Tag`, `Playfountain - Bocholter Wasserspaß` werden als Prüfstichprobe geführt, nicht als bestätigte Korrektur.
+- Visual-Fit:
+  - Visual-Fit-Fälle werden separat vom normalen Content-/Datenpatch-Prozess geführt.
+  - Der Report enthält vorgeschlagene `visual_key`-/`visual_motif`-Werte und Asset-Status.
+
+### Ergebnisbewertung
+
+- Der Content-Prüfprozess ist als automatische Vorprüfung und Paketierungslogik belastbar.
+- Zielerreichung: ca. 90 %.
+- Der Prozess ist noch kein Ersatz für fachliche Entscheidungen bei Quellenwiderspruch, Öffnungszeiten-/Kostenunsicherheit oder Bild-Motiv-Bewertung.
+
+### Nicht Bestandteil dieses Abschlusses
+
+- Kein Daten-Cleanup.
+- Kein automatisches Setzen von `visual_key` oder `visual_motif`.
+- Kein automatisches Überschreiben von Sheet-, DB- oder Repo-Inhalten.
+- Kein UI/UX-Polish.
+
+### Nächster Testfokus
+
+- Visual-Fit-Paket fachlich bewerten.
+- Danach erst konkrete Sammelpatches oder Sheet-/Quellenkorrekturen aus den geprüften Paketen ableiten.
+<!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_PROOF_2026_06_24 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_MAIN_MERGE_LIVE_SMOKE_2026_06_19 | Zweck: dokumentiert erfolgreichen Main-Merge, Live-Smoke und nachgezogenen Today-Card-Alignment-Fix; Umfang: Abschlussanker vor KI-Suchlauf-Handoff-Test === -->
 ## Main-Merge / Live-Smoke – bestanden (2026-06-19)
 

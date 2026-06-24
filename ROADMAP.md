@@ -18,6 +18,96 @@ Kanonische Rollen:
 
 ---
 
+<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_PROCESS_V2_STATUS_2026_06_24 | Zweck: dokumentiert den aktuellen Zielabgleich nach Content-Facts-/Visual-Fit-Prozesspatches; Umfang: Status, erreichte Prozessfaehigkeiten, offene Workpacks, naechste Reihenfolge === -->
+## Content-Prüfung – aktueller Zielabgleich nach Prozess V2 (2026-06-24)
+
+Dieser Block ist die aktuelle taktische Steuerung für die Content-Prüfung. Er konkretisiert den Zielzustand aus `ROADMAP_CONTENT_QUALITY_TARGET_STATE_2026_06_23` und überschreibt ältere offene Content-Quality-To-dos, soweit sie durch den Prozess-V2-Stand erledigt sind.
+
+### Aktueller Reifegrad
+
+Stand: ca. 90 % des angestrebten Content-Prüfprozesses.
+
+Belegt durch den letzten Staging-Audit-Report nach Visual-Fit-Prozess V2:
+
+- `critical`: 0.
+- `review_needed`: 5.
+- `warning`: 16.
+- `auto_fixed` / automatisch erledigt: 118.
+- Arbeitspakete: Repo-Datenpatch 3, Sheet-/Quellenkorrektur 1, Quellenprüfung 2, Faktencheck 3, Visual-Fit 12, Automatisch erledigt 118.
+
+### Was jetzt erreicht ist
+
+- Der Audit unterscheidet nicht mehr nur Fehler/kein Fehler, sondern Prozesskategorien und Korrektur-Owner:
+  - `auto_resolved` / `audit_script`.
+  - `repo_data_patch_candidate` / `repo_patch`.
+  - `sheet_update_candidate` / `content_inbox_to_sheet`.
+  - `source_review_candidate` / `content_inbox_source_check`.
+  - `fact_check_candidate` / `content_inbox_fact_check`.
+  - `visual_fit_candidate` / `visual_workflow`.
+- `/inbox/` bündelt die Content-Prüfung in Arbeitspakete statt in eine pauschale Einzelfallliste.
+- Sheet-/Quellenkorrekturen laufen konzeptionell über die Content-Inbox, nicht über direkte Nutzerarbeit im Google Sheet.
+- Repo-owned Activities werden nicht unsichtbar in der Inbox überschrieben, sondern als Repo-Datenpatch-Kandidaten gesammelt.
+- Quellencheck, Faktencheck, Retry/Beobachten und Visual-Fit sind getrennte Pakete und werden nicht mehr mit normalen Datenpatches vermischt.
+- Für Ticketportal-Fälle kann der Audit eine empfohlene offizielle Quelle aus `data/content_source_suggestions.json` in die Inbox bringen; Speichern bleibt eine bewusste Aktion.
+- Faktenprobe V1 prüft bei geeigneten Eventquellen automatisch, ob Titel, Datum, Uhrzeit und Ort ausreichend in der Quelle bestätigt werden.
+- Visual-Fit V2 erzeugt für fehlende Event-Visual-Zuordnungen konkrete Vorschläge für `visual_key`, `visual_motif`, Motivrolle und Asset-Status.
+
+### Aktuelle offene Arbeitspakete aus dem letzten Audit
+
+Repo-Datenpatch:
+
+- `Bürgerpark Rhede` – `visual_key` fehlt.
+- `Suderwicker Märchenspielplatz` – `visual_key` fehlt.
+- `Waldlehrpfad am Vossenpand` – `visual_key` fehlt.
+
+Sheet-/Quellenkorrektur:
+
+- `Borken Open Air - ABBA Gold The Concert Show` – Ticketportal ist als Primärquelle hinterlegt; empfohlene offizielle Quelle ist vorbereitet.
+
+Quellenprüfung:
+
+- `Kubaai / Aa-Promenade erleben` – Quelle antwortet kritisch / muss geprüft werden.
+- `Unterduikmuseum Aalten` – Redirect muss fachlich geprüft werden.
+
+Faktencheck:
+
+- `Farm & Country Fair`.
+- `Pokémon-Tag`.
+- `Playfountain - Bocholter Wasserspaß`.
+
+Visual-Fit:
+
+- 12 Fälle, darunter konkrete `visual_key`-/`visual_motif`-Vorschläge sowie ein Asset-Gap-Fall (`Bocholter Gesundheitstage`).
+- Visual-Fit-Fälle sind keine normalen Datenfehler, sondern gehören in den separaten Bild-/Motiv-Workflow.
+
+### Was noch fehlt
+
+- Visual-Fit-Fälle fachlich bewerten: Welche Vorschläge können übernommen werden, welche brauchen neue Bilder, welche brauchen Regelverfeinerung?
+- Aus dem Repo-Datenpatch-Paket einen bewussten Sammelpatch erzeugen.
+- Quellencheck- und Faktencheck-Pakete fachlich prüfen und erst danach ggf. Sheet-/Repo-Korrekturen ableiten.
+- Repo-Patch-Paket/Export später automatischer machen; aktuell ist die Paketkopie für ChatGPT-Patchvorbereitung ausreichend.
+- UI/UX der Content-Inbox bleibt bewusst ganz am Schluss.
+
+### Nächste Reihenfolge
+
+1. Kein weiterer Grundprozess-Patch ohne konkreten Befund.
+2. Visual-Fit-Paket fachlich auswerten und in Gruppen aufteilen:
+   - direkt übernehmbarer Visual-Key-/Motif-Vorschlag.
+   - neue Bildproduktion / Asset-Gap.
+   - Regelverfeinerung nötig.
+   - echte Nutzer-Bildentscheidung nötig.
+3. Danach Repo-Datenpatch-Paket für die drei Activity-`visual_key`-Lücken vorbereiten.
+4. Danach Quellencheck-/Faktencheck-Pakete prüfen.
+5. Danach erst UI/UX-Polish der Content-Inbox.
+
+### Harte Grenzen
+
+- Keine fachlichen Daten automatisch überschreiben.
+- Keine Daten-Cleanup-Patches nur zum optischen Schließen des Reports.
+- Keine neue SEO-/Content-Ausweitung vor Abschluss der offenen Content-Prüfpakete.
+- Keine Bildproduktion ohne konkreten Visual-Gap oder bestätigten Visual-Fit-Bedarf.
+<!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_PROCESS_V2_STATUS_2026_06_24 === -->
+
 <!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_TARGET_STATE_2026_06_23 | Zweck: haelt den Zielzustand des automatischen Content-Pruefprozesses und die aktuelle Standortbestimmung fest; Umfang: Events, Activities, Anbieter-Events, Korrekturwege, Visual-Fit-Abgrenzung === -->
 ## Aktuelle taktische Priorität – Content-Prüfung Zielzustand (2026-06-23)
 

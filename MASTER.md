@@ -41,7 +41,7 @@ The following workpack is intentionally on hold:
 <!-- === BEGIN BLOCK: MASTER_CURRENT_CONTROL_2026_06_23 | Zweck: konsolidiert strategischen Steuerungsstand fuer nachhaltige Content-Sicherung; Umfang: action-only Content-Audit, separate Visual-Key-Fit-Roadmap, keine weiteren Growth-Arbeiten vor Stabilisierung === -->
 ### Aktueller Steuerungsstand: Content-Sicherung vor weiterem Wachstum
 
-Stand: 2026-06-23.
+Stand: 2026-06-24.
 
 Aktuell abgeschlossen und nicht erneut öffnen ohne konkretes Symptom:
 
@@ -51,6 +51,7 @@ Aktuell abgeschlossen und nicht erneut öffnen ohne konkretes Symptom:
 - CSS-Governance ist eingeführt.
 - Event-Visual-Motif-Fit ist für den bisherigen Sheet-Stand technisch abgeschlossen.
 - Content-Quality-Grundsystem existiert: Workflow, Script, Google-Sheet-Audittab und `/inbox/`-Arbeitsbereich.
+- Content Quality Guard V2 ist auf Staging als Prozessgrundlage belegt: Audit-Report mit Prozesskategorien, Arbeitspaketen und Correction Ownern; `/inbox/` zeigt Repo-Datenpatch, Quellencheck, Faktencheck, Beobachten/Retry und Visual-Fit getrennt.
 
 Aktueller strategischer Zielzustand:
 
@@ -144,9 +145,9 @@ Bewusst geparkt:
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.
-- Current next workpack: introduce and validate the Content Quality Guard against the real Sheet-/DB-/Repo content sources.
-- Manual-KI-Intake / Visual-Key-Handoff remains parked until the scheduled real `main` check; do not treat a `staging` workflow attempt or chat simulation as the final proof.
-- Activity-Premium-Visuals continue as a separate workstream and must not reopen the frozen Event-Visual-Duplicate-Cleanup without a concrete symptom or Content-Quality-Guard finding.
+- Current next workpack: evaluate the Content Quality Visual-Fit package and derive concrete follow-up actions before any further growth or UI polish.
+- Content Quality Guard V2 is no longer a basic-introduction workpack; further changes need a concrete finding from the current packages.
+- Manual-KI-Intake / Visual-Key-Handoff and Activity-Premium-Visuals remain separate workstreams and must only be reopened when the current Content-Quality/Visual-Fit package produces a concrete need.
 - Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.
 
 <!-- === END CANONICAL MASTER FILE === -->
