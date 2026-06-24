@@ -61,7 +61,9 @@ Aktueller strategischer Zielzustand:
   2. DB/API für freigegebene Veranstalter-Events.
   3. `data/offers.json` für Activities.
 - Sichere technische Fälle werden automatisch behandelt oder still protokolliert, zum Beispiel abgelaufene ausgeblendete Events, harmlose Canonical-/Sprach-Redirects oder einzelne temporäre Netzwerkaussetzer.
-- In der Content-Prüfung erscheinen nur Fälle, bei denen wirklich etwas zu tun ist und die nicht sicher automatisch durch das Prüfskript gelöst werden können.
+- In der Content-Prüfung erscheinen nur Fälle, bei denen wirklich etwas zu tun ist und die weder durch das Prüfskript noch durch einen frischen KI-Faktencheck sicher geklärt werden können.
+- Für Quellen, die das GitHub-/HTTP-Prüfskript blockieren, schwer lesbar sind oder Fakten nicht eindeutig maschinell bestätigen, ist ein zweistufiger Prüfmodus vorgesehen: billiges Audit-Skript zuerst, gezielter KI-Faktencheck nur als Fallback.
+- KI-Faktenchecks müssen gecacht werden: Wenn Quelle und Inhalt unverändert sind und `verified_until` noch gilt, wird nicht jede Woche erneut teuer geprüft.
 - Die private `/inbox/` ist die Arbeitsoberfläche für Content-Prüfung und Korrektur. Der Nutzer soll nicht direkt im Google Sheet arbeiten müssen.
 - Source Ownership bleibt trotzdem erhalten:
   - Sheet-Events werden aus der Content-Prüfung heraus kontrolliert ins Google Sheet `Events` zurückgeschrieben.
@@ -83,6 +85,7 @@ Bewusst geparkt:
 - Anbieter-Akquise mit Qualitätsversprechen.
 - Neue Event-Visual-Produktion ohne konkreten Gap.
 - Pauschale manuelle Vollprüfung aller Inhalte in der Inbox.
+- Pauschaler KI-Prüflauf über alle Inhalte ohne Kandidatenfilter, Cache und Budgetgrenze.
 <!-- === END BLOCK: MASTER_CURRENT_CONTROL_2026_06_23 === -->
 
 ---
@@ -145,8 +148,8 @@ Bewusst geparkt:
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.
-- Current next workpack: evaluate the Content Quality Visual-Fit package and derive concrete follow-up actions before any further growth or UI polish.
-- Content Quality Guard V2 is no longer a basic-introduction workpack; further changes need a concrete finding from the current packages.
+- Current next workpack: design and implement the Content Quality AI verification fallback with verification cache, priority rules and budget limits before increasing factual check depth further.
+- Content Quality Guard V2 is no longer a basic-introduction workpack; further changes need a concrete finding from the current packages or from the AI-fallback/cache design.
 - Manual-KI-Intake / Visual-Key-Handoff and Activity-Premium-Visuals remain separate workstreams and must only be reopened when the current Content-Quality/Visual-Fit package produces a concrete need.
 - Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.
 

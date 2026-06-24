@@ -102,13 +102,18 @@ Never stack a new patch on unrelated uncommitted WIP.
   - safe technical findings are auto-handled or silently observed,
   - correct/benign results do not become review tasks,
   - only findings that cannot be solved safely by the audit itself appear as open work.
-- Harmless canonical redirects, language-path redirects and one-off transient network timeouts are not user tasks, but must be rechecked on the next run.
-- Audit workflows may write audit rows, summaries and review recommendations, but must not silently overwrite editorial source rows.
+- Harmless canonical redirects, language-path redirects and one-off transient network timeouts are not user tasks, but must be rechecked by cheap technical checks on the next run.
+- HTTP 429, bot protection, blocked pages, repeated timeouts or weak fact confirmation are not automatically user tasks. They should become typed `ai_verification_candidate` / retry candidates before they are escalated to the Inbox.
+- AI verification must be a targeted fallback, not a replacement for the audit. Do not send all content through AI by default.
+- AI verification must use a cache/validity model. A fresh `confirmed` result with unchanged `source_fingerprint` and `content_fingerprint` must suppress repeat KI checks until `verified_until` or `next_check_at` requires it.
+- KI checks must be budgeted and prioritized by risk, for example near-term Events, blocked official sources, source/ticket conflicts, or stale Activity opening data.
+- Audit workflows may write audit rows, summaries, verification metadata and review recommendations, but must not silently overwrite editorial source rows.
 - Deterministic auto-handling is allowed only for safe technical cases, for example expired Events being excluded by the build/runtime feed, benign redirects being suppressed as tasks, or duplicate stale findings being kept out of the active queue.
 - Semantically uncertain findings, such as changed times, cancellations, moved locations, unreachable sources, problematic redirects, ticket portals as primary Event source or stale Activity availability, must become `review_needed`, `warning` or a typed correction candidate, not a blind data mutation.
 - The user should not be instructed to edit Google Sheets directly. For Sheet-owned Events, `/inbox/` → Content-Prüfung is the intended correction surface; an explicit reviewed action may write back to the canonical Google Sheet `Events` tab.
 - Approved organizer events are DB/API-owned; their correction path must stay in the review/admin/DB workflow and must not be routed through the editorial Sheet.
 - Activities remain repo-/JSON-owned in V1. Activity corrections must be collected as visible repo patch candidates unless a future owner contract explicitly moves them into a Sheet-/DB-backed source.
+- KI facts-check results must be stored as structured states such as `confirmed`, `conflict`, `better_source_found`, `not_found` or `uncertain`. Free-text KI output alone is not sufficient for automated routing.
 - Event visual-key and concrete image-fit correctness is a separate quality domain. It may be surfaced by the Content Guard as `visual_fit_candidate`, but rule/motif changes, image production and pool updates must be handled through the Visual Workflow and not mixed into generic link/date/opening-status fixes.
 
 ---

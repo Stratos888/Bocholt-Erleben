@@ -18,6 +18,100 @@ Kanonische Rollen:
 
 ---
 
+<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_AI_VERIFICATION_CACHE_2026_06_24 | Zweck: definiert den naechsten Zielzustand fuer KI-Faktencheck-Fallback, Pruef-Cache und Kostenbremse; Umfang: Events, Activities, blockierte Quellen, verified_until, Budget-/Prioritaetslogik === -->
+## Content-Prüfung – nächster Zielzustand: KI-Faktencheck-Fallback mit Prüfcache (2026-06-24)
+
+Dieser Block ist der nächste aktive Content-Quality-Workpack nach Prozess V2. Er überschreibt nicht die Paketlogik aus V2, sondern ergänzt sie um eine bessere fachliche Prüftiefe ohne unnötige KI-Kosten.
+
+### Warum dieser Workpack nötig ist
+
+Ein reiner HTTP-/GitHub-Prüflauf reicht nicht für alle Quellen:
+
+- Stadt-/Veranstalterseiten können `429`, Bot-Schutz, Timeouts oder schwer lesbare HTML-Strukturen liefern.
+- Wenn solche Fälle direkt in der Inbox landen, wird die Content-Prüfung wieder manuell und laut.
+- Wenn stattdessen alle Inhalte jede Woche per KI geprüft werden, wird der Prozess unnötig teuer und schwer steuerbar.
+
+Ziel ist daher ein Hybridprozess:
+
+1. Das billige Audit-Skript prüft alle technischen und eindeutig maschinellen Regeln.
+2. Nur blockierte, schwer lesbare oder fachlich unsichere Fälle werden `ai_verification_candidate`.
+3. Der bestehende bezahlte KI-Suchlauf/Faktencheck prüft nur diese priorisierten Kandidaten.
+4. Ein Prüfcache verhindert erneute KI-Kosten, solange Inhalt und Quelle unverändert und die Bestätigung noch gültig ist.
+5. In `/inbox/` landen nur Konflikte, fehlende belastbare Quellen, vorgeschlagene Änderungen oder echte Nutzerentscheidungen.
+
+### Prüfstatus / Cache-Zielmodell
+
+Jeder prüfbare Inhalt soll perspektivisch interne Prüfdaten führen:
+
+- `last_verified_at`
+- `verified_until`
+- `verified_by`: `script`, `ai`, `user`
+- `verification_status`: `confirmed`, `uncertain`, `conflict`, `failed`
+- `verification_reason`
+- `source_fingerprint`
+- `content_fingerprint`
+- `next_check_at`
+
+Regel:
+
+- Wenn Quelle und Inhalt unverändert sind und `verified_until` noch nicht abgelaufen ist, wird kein neuer teurer KI-Faktencheck gestartet.
+- Wenn URL, Datum, Uhrzeit, Ort, Beschreibung, Quelle oder Quellinhalt wesentlich abweichen, wird der Cache ungültig.
+- Technische Billigchecks dürfen trotzdem regelmäßig laufen, auch wenn ein KI-Cache noch gültig ist.
+
+### Priorität und Prüffrequenz
+
+Events:
+
+- Neue Events: sofort prüfen.
+- Events weiter als 30 Tage entfernt: grob prüfen, KI nur bei starkem Risiko oder unsicherer Quelle.
+- Events in 14–30 Tagen: wöchentlich technisch prüfen; KI nur bei fehlender Bestätigung, Blockade oder Konflikt.
+- Events unter 14 Tagen: stärker priorisieren; KI-Fallback bei Unsicherheit erlaubt, aber nicht bei frischem gültigem Cache.
+- Events mit früherem Konflikt: kürzerer Prüfintervall.
+
+Activities:
+
+- Freie Orte, Parks, Spielplätze: tieferer Check typischerweise alle 90–180 Tage oder bei Quellenänderung.
+- Museen, Badeseen, saisonale Orte, Preise/Öffnungszeiten: 30–90 Tage bzw. vor Saison/Feiertagen.
+- Instabile Quellen: erst Retry/technische Beobachtung, dann KI-Fallback, erst danach Inbox-Fall.
+
+### KI-Faktencheck soll liefern
+
+Strukturiertes Ergebnis, nicht Freitext als Korrektur:
+
+- `confirmed`: Quelle bestätigt die vorhandenen Daten ausreichend.
+- `conflict`: Datum/Uhrzeit/Ort/Quelle widerspricht den vorhandenen Daten.
+- `better_source_found`: offizielle Ersatzquelle gefunden.
+- `not_found`: keine belastbare Quelle gefunden.
+- `uncertain`: KI kann nicht sicher entscheiden.
+
+Erst `conflict`, `better_source_found`, `not_found` oder `uncertain` werden als echte Content-Inbox-Fälle relevant. `confirmed` aktualisiert nur den Prüfcache.
+
+### Kostenbremse / Budgetregel
+
+- Kein pauschaler KI-Lauf über alle Inhalte.
+- KI nur für priorisierte Kandidaten mit konkretem Grund: `429`, Bot-Schutz, wiederholter Timeout, schwache Faktenbestätigung, Ticketportal als Primärquelle, nahe Events mit Unsicherheit, schwer lesbare Activity-Öffnungszeiten.
+- Pro Lauf muss es eine Maximalzahl bzw. Budgetgrenze geben. Wenn mehr Kandidaten existieren, werden sie nach Risiko sortiert.
+- Wiederholte KI-Prüfung ist nur erlaubt, wenn `verified_until` abgelaufen ist oder Fingerprints sich geändert haben.
+
+### Akzeptanzkriterien für den nächsten Prozesspatch
+
+- Audit erzeugt `ai_verification_candidate` statt direkte Nutzeraufgabe für blockierte/unsichere Quellen.
+- Report zeigt, welche Fälle per Script geprüft, per Cache übersprungen, an KI übergeben oder in die Inbox eskaliert wurden.
+- KI-Fallback-Input ist strukturiert und budgetierbar.
+- Bestätigte KI-Ergebnisse setzen einen Prüfstatus mit Ablaufdatum.
+- Frisch bestätigte, unveränderte Inhalte werden nicht jede Woche erneut teuer geprüft.
+- Keine KI-Antwort überschreibt fachliche Daten automatisch; Änderungen bleiben bestätigungspflichtig.
+
+### Nicht-Ziel in diesem Workpack
+
+- Kein UI/UX-Polish der Inbox.
+- Kein direkter Daten-Cleanup nur zum Schließen aktueller Reports.
+- Kein Vollscan aller Inhalte per KI.
+- Keine automatische Bildproduktion und keine Visual-Key-Änderung als Nebenwirkung des Faktenchecks.
+<!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_AI_VERIFICATION_CACHE_2026_06_24 === -->
+
+---
+
 <!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_PROCESS_V2_STATUS_2026_06_24 | Zweck: dokumentiert den aktuellen Zielabgleich nach Content-Facts-/Visual-Fit-Prozesspatches; Umfang: Status, erreichte Prozessfaehigkeiten, offene Workpacks, naechste Reihenfolge === -->
 ## Content-Prüfung – aktueller Zielabgleich nach Prozess V2 (2026-06-24)
 
@@ -90,14 +184,14 @@ Visual-Fit:
 
 ### Nächste Reihenfolge
 
-1. Kein weiterer Grundprozess-Patch ohne konkreten Befund.
-2. Visual-Fit-Paket fachlich auswerten und in Gruppen aufteilen:
+1. Nächster Grundprozess-Patch nur für den belegten Befund: blockierte/unsichere Quellen brauchen KI-Faktencheck-Fallback mit Prüfcache, nicht direkte Nutzeraufgaben oder pauschale KI-Kosten.
+2. Danach Visual-Fit-Paket fachlich auswerten und in Gruppen aufteilen:
    - direkt übernehmbarer Visual-Key-/Motif-Vorschlag.
    - neue Bildproduktion / Asset-Gap.
    - Regelverfeinerung nötig.
    - echte Nutzer-Bildentscheidung nötig.
 3. Danach Repo-Datenpatch-Paket für die drei Activity-`visual_key`-Lücken vorbereiten.
-4. Danach Quellencheck-/Faktencheck-Pakete prüfen.
+4. Danach Quellencheck-/Faktencheck-Pakete mit Cache-/KI-Fallbacklogik prüfen.
 5. Danach erst UI/UX-Polish der Content-Inbox.
 
 ### Harte Grenzen

@@ -62,13 +62,44 @@ Letzter belegter Audit-Stand:
 
 Offene Folgebeweise:
 
+- KI-Faktencheck-Fallback mit Prüfcache implementieren und testen: blockierte/unsichere Quellen dürfen nicht direkt als Nutzeraufgaben oder pauschale KI-Kosten enden.
 - Visual-Fit-Paket fachlich bewerten und daraus konkrete Folgeaktionen ableiten.
 - Repo-Datenpatch-Paket als bewussten Sammelpatch vorbereiten und testen.
-- Quellencheck-/Faktencheck-Fälle fachlich prüfen.
+- Quellencheck-/Faktencheck-Fälle nach Cache-/KI-Fallbacklogik fachlich prüfen.
 - UI/UX der Content-Inbox erst am Ende polieren.
 <!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_INDEX_2026_06_24 === -->
 
 
+
+<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_AI_CACHE_TARGET_2026_06_24 | Zweck: dokumentiert den naechsten noch nicht implementierten Beweis fuer KI-Faktencheck-Fallback und Pruefcache; Umfang: Ziel, Nicht-Beweis, Akzeptanzkriterien === -->
+## Content Quality – KI-Faktencheck-Fallback / Prüfcache Zielbeweis offen (2026-06-24)
+
+Status: Zielzustand dokumentiert, noch nicht implementiert und noch nicht getestet.
+
+Auslöser:
+
+- Die feldgenauere Faktenprüfung hat gezeigt, dass direkte HTTP-/GitHub-Zugriffe auf offizielle Quellen nicht immer zuverlässig sind, z. B. durch `429`, Bot-Schutz oder schwer lesbare Seiten.
+- Solche Fälle dürfen nicht automatisch zu Nutzeraufgaben werden.
+- Gleichzeitig darf nicht jede Woche der gesamte Contentbestand teuer per KI geprüft werden.
+
+Zu beweisender Zielzustand:
+
+- Audit-Skript bleibt die billige erste Prüfschicht.
+- Unsichere/blockierte Fälle werden als `ai_verification_candidate` markiert und priorisiert.
+- KI-Faktencheck läuft nur für priorisierte Kandidaten innerhalb eines Budget-/Mengenlimits.
+- Bestätigte KI-Ergebnisse setzen einen Prüfstatus mit `last_verified_at`, `verified_until`, `verified_by`, `verification_status`, `source_fingerprint`, `content_fingerprint` und `next_check_at`.
+- Frisch bestätigte, unveränderte Inhalte werden nicht erneut teuer geprüft.
+- Nur Konflikte, fehlende belastbare Quellen, bessere Quellenvorschläge oder unsichere KI-Ergebnisse erscheinen in der Content-Inbox.
+- KI-Ergebnisse überschreiben keine fachlichen Daten automatisch.
+
+Nicht als bestanden betrachten, bis ein echter Staging-Report zeigt:
+
+- Anzahl der Script-geprüften Fälle.
+- Anzahl der cache-bestätigt übersprungenen Fälle.
+- Anzahl der KI-Kandidaten.
+- Anzahl der tatsächlich eskalierten Inbox-Fälle.
+- Nachweis, dass mindestens ein blockierter/unsicherer Fall nicht direkt als Nutzeraufgabe, sondern korrekt als KI-Fallback-/Retry-Kandidat behandelt wurde.
+<!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_AI_CACHE_TARGET_2026_06_24 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_PROOF_2026_06_24 | Zweck: dokumentiert den bestandenen Staging-Prozessbeweis fuer Content Quality Guard V2; Umfang: Reportzahlen, Paketlogik, Inbox-Screenshots, Grenzen === -->
 ## Content Quality Guard V2 – Prozessbeweis bestanden (2026-06-24)
