@@ -89,19 +89,23 @@ jobs:
           if [ "${GITHUB_REF_NAME}" = "staging" ]; then
             APP_BASE_URL="https://staging.bocholt-erleben.de"
             CONTENT_AUDIT_TAB="Content_Audit_Staging"
+            CONTENT_VERIFICATION_CACHE_TAB="Content_Verification_Cache_Staging"
           else
             APP_BASE_URL="https://bocholt-erleben.de"
             CONTENT_AUDIT_TAB="Content_Audit"
+            CONTENT_VERIFICATION_CACHE_TAB="Content_Verification_Cache"
           fi
 
           echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
           echo "AUDIT_SCOPE=$AUDIT_SCOPE" >> "$GITHUB_ENV"
           echo "APP_BASE_URL=$APP_BASE_URL" >> "$GITHUB_ENV"
           echo "CONTENT_AUDIT_TAB=$CONTENT_AUDIT_TAB" >> "$GITHUB_ENV"
+          echo "CONTENT_VERIFICATION_CACHE_TAB=$CONTENT_VERIFICATION_CACHE_TAB" >> "$GITHUB_ENV"
 
           echo "Audit scope: $AUDIT_SCOPE"
           echo "Audit runtime: $APP_BASE_URL"
           echo "Audit sheet tab: $CONTENT_AUDIT_TAB"
+          echo "Verification cache tab: $CONTENT_VERIFICATION_CACHE_TAB"
       # === END BLOCK: CONTENT_QUALITY_RESOLVE_SCOPE_AND_TARGET_V1 ===
 
       # === BEGIN BLOCK: CONTENT_QUALITY_EXPORT_EVENTS_SHEET_V1 | Zweck: liest die kanonischen redaktionellen Events direkt aus dem Google Sheet; Umfang: exportiert Events!A:ZZ nach data/events.tsv ===
@@ -206,6 +210,75 @@ jobs:
           fi
       # === END BLOCK: CONTENT_QUALITY_FETCH_PUBLIC_DB_EVENTS_V1 ===
 
+      # === BEGIN BLOCK: CONTENT_QUALITY_EXPORT_VERIFICATION_CACHE_V1 | Zweck: liest den persistenten KI-Pruefcache aus Google Sheets; Umfang: exportiert Content_Verification_Cache nach data/content-verification-cache.json, ohne fachliche Daten zu ändern ===
+      - name: Export verification cache
+        timeout-minutes: 4
+        shell: bash
+        env:
+          SHEET_ID: ${{ env.BE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -e
+          python - <<'PY'
+          import json, os, sys
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
+          from googleapiclient.errors import HttpError
+
+          def norm(value):
+              return str(value or '').strip()
+
+          def write_empty(reason):
+              os.makedirs('data', exist_ok=True)
+              with open('data/content-verification-cache.json', 'w', encoding='utf-8') as handle:
+                  json.dump({'items': [], 'meta': {'status': 'empty', 'reason': reason}}, handle, ensure_ascii=False, indent=2)
+                  handle.write('\n')
+              print(f'ℹ️ Verification cache empty: {reason}')
+
+          sheet_id = os.environ.get('SHEET_ID', '').strip()
+          tab_name = os.environ.get('CONTENT_VERIFICATION_CACHE_TAB', 'Content_Verification_Cache').strip() or 'Content_Verification_Cache'
+          sa_json = os.environ.get('GOOGLE_SERVICE_ACCOUNT_JSON', '').strip()
+          if not sheet_id or not sa_json:
+              write_empty('missing_sheet_or_service_account')
+              sys.exit(0)
+
+          creds = service_account.Credentials.from_service_account_info(
+              json.loads(sa_json),
+              scopes=['https://www.googleapis.com/auth/spreadsheets.readonly'],
+          )
+          service = build('sheets', 'v4', credentials=creds, cache_discovery=False)
+          try:
+              values = service.spreadsheets().values().get(
+                  spreadsheetId=sheet_id,
+                  range=f'{tab_name}!A:Z',
+                  majorDimension='ROWS',
+              ).execute(num_retries=3).get('values', []) or []
+          except HttpError as exc:
+              if getattr(exc.resp, 'status', None) == 400:
+                  write_empty('cache_tab_missing')
+                  sys.exit(0)
+              raise
+
+          if len(values) < 2:
+              write_empty('cache_tab_without_rows')
+              sys.exit(0)
+
+          header = [norm(name) for name in values[0]]
+          items = []
+          for raw in values[1:]:
+              row = {header[i]: norm(raw[i]) if i < len(raw) else '' for i in range(len(header)) if header[i]}
+              if any(row.values()):
+                  items.append(row)
+
+          os.makedirs('data', exist_ok=True)
+          with open('data/content-verification-cache.json', 'w', encoding='utf-8') as handle:
+              json.dump({'items': items, 'meta': {'status': 'ok', 'tab': tab_name}}, handle, ensure_ascii=False, indent=2)
+              handle.write('\n')
+          print(f'✅ Verification cache exported from {tab_name}: {len(items)} rows')
+          PY
+          test -s data/content-verification-cache.json
+      # === END BLOCK: CONTENT_QUALITY_EXPORT_VERIFICATION_CACHE_V1 ===
+
       # === BEGIN BLOCK: CONTENT_QUALITY_RUN_AUDIT_V1 | Zweck: fuehrt den eigentlichen Guard gegen Sheet-, DB- und Activity-Quellen aus; Umfang: Report in JSON/Markdown ohne fachliche Auto-Aenderung ===
       - name: Run Content Quality Audit
         shell: bash
@@ -215,6 +288,9 @@ jobs:
             --scope "$AUDIT_SCOPE" \
             --network \
             --base-url "$APP_BASE_URL" \
+            --verification-cache-json data/content-verification-cache.json \
+            --ai-candidates-json data/content-ai-verification-candidates.json \
+            --ai-max-candidates "${AI_VERIFICATION_MAX_CANDIDATES:-12}" \
             --output-json data/content-quality-report.json \
             --output-md data/content-quality-report.md
 
@@ -312,6 +388,16 @@ jobs:
               "evidence_checked_fields",
               "evidence_missing_fields",
               "evidence_field_statuses",
+              "verification_key",
+              "verification_status",
+              "verified_by",
+              "last_verified_at",
+              "verified_until",
+              "source_fingerprint",
+              "content_fingerprint",
+              "next_check_at",
+              "ai_candidate_priority",
+              "ai_candidate_reason",
               "public_url",
               "first_seen_at",
               "last_seen_at",
@@ -331,7 +417,7 @@ jobs:
           try:
               previous = service.spreadsheets().values().get(
                   spreadsheetId=sheet_id,
-                  range=f"{tab_name}!A:AK",
+                  range=f"{tab_name}!A:AZ",
                   majorDimension="ROWS",
               ).execute().get("values", []) or []
           except HttpError:
@@ -439,6 +525,16 @@ jobs:
                   item.get("evidence_checked_fields", ""),
                   item.get("evidence_missing_fields", ""),
                   item.get("evidence_field_statuses", ""),
+                  item.get("verification_key", ""),
+                  item.get("verification_status", ""),
+                  item.get("verified_by", ""),
+                  item.get("last_verified_at", ""),
+                  item.get("verified_until", ""),
+                  item.get("source_fingerprint", ""),
+                  item.get("content_fingerprint", ""),
+                  item.get("next_check_at", ""),
+                  item.get("ai_candidate_priority", ""),
+                  item.get("ai_candidate_reason", ""),
                   item.get("public_url", ""),
                   first_seen_at,
                   generated_at,
@@ -453,7 +549,7 @@ jobs:
 
           service.spreadsheets().values().clear(
               spreadsheetId=sheet_id,
-              range=f"{tab_name}!A:AK",
+              range=f"{tab_name}!A:AZ",
               body={},
           ).execute()
           service.spreadsheets().values().update(
@@ -462,6 +558,56 @@ jobs:
               valueInputOption="RAW",
               body={"values": rows},
           ).execute()
+
+          cache_tab = os.environ.get("CONTENT_VERIFICATION_CACHE_TAB", "Content_Verification_Cache").strip() or "Content_Verification_Cache"
+          spreadsheet = service.spreadsheets().get(spreadsheetId=sheet_id).execute()
+          sheets = spreadsheet.get("sheets", [])
+          existing = {s.get("properties", {}).get("title"): s.get("properties", {}).get("sheetId") for s in sheets}
+          cache_header = [[
+              "verification_key",
+              "content_type",
+              "source_system",
+              "content_id",
+              "title",
+              "source_url",
+              "verification_status",
+              "verified_by",
+              "last_verified_at",
+              "verified_until",
+              "verification_reason",
+              "source_fingerprint",
+              "content_fingerprint",
+              "next_check_at",
+              "better_source_url",
+              "field_findings_json",
+          ]]
+          if cache_tab not in existing:
+              service.spreadsheets().batchUpdate(
+                  spreadsheetId=sheet_id,
+                  body={"requests": [{"addSheet": {"properties": {"title": cache_tab}}}]},
+              ).execute()
+              service.spreadsheets().values().update(
+                  spreadsheetId=sheet_id,
+                  range=f"{cache_tab}!A1",
+                  valueInputOption="RAW",
+                  body={"values": cache_header},
+              ).execute()
+              print(f"✅ Verification cache tab angelegt: {cache_tab}")
+          else:
+              current_header = service.spreadsheets().values().get(
+                  spreadsheetId=sheet_id,
+                  range=f"{cache_tab}!A1:P1",
+                  majorDimension="ROWS",
+              ).execute().get("values", []) or []
+              if not current_header or not any(current_header[0]):
+                  service.spreadsheets().values().update(
+                      spreadsheetId=sheet_id,
+                      range=f"{cache_tab}!A1",
+                      valueInputOption="RAW",
+                      body={"values": cache_header},
+                  ).execute()
+                  print(f"✅ Verification cache header gesetzt: {cache_tab}")
+
           print(f"✅ Content Audit written to {tab_name}: {len(sheet_issues)} issues")
           PY
       # === END BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V2 ===
@@ -474,4 +620,6 @@ jobs:
           path: |
             data/content-quality-report.json
             data/content-quality-report.md
+            data/content-ai-verification-candidates.json
+            data/content-verification-cache.json
       # === END BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 ===
