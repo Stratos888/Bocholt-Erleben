@@ -28,6 +28,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+from event_visual_motifs import infer_event_visual_fit, normalize_event_visual_motif
 
 
 # === BEGIN BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
@@ -324,6 +325,20 @@ def main() -> None:
             category=category,
             location=location,
         )
+
+        raw_visual_motif = norm(inb.get("visual_motif", ""))
+        normalized_visual_motif = normalize_event_visual_motif(raw_visual_motif, final_visual_key)
+        if raw_visual_motif and not normalized_visual_motif:
+            fail(f"Inbox: ungültiges visual_motif für '{title}': {raw_visual_motif}")
+        visual_fit = infer_event_visual_fit(
+            title=title,
+            description=description,
+            category=category,
+            location=location,
+            visual_key=final_visual_key,
+            visual_motif=normalized_visual_motif,
+        )
+        final_visual_motif = normalized_visual_motif or visual_fit.get("visual_motif", "")
         # === END BLOCK: INBOX_TO_EVENTS_VISUAL_KEY_EDITOR_VALIDATION_V1 ===
 
         source_fields = {
@@ -339,6 +354,7 @@ def main() -> None:
             "url": norm(inb.get("url", "")) or norm(inb.get("source_url", "")),
             "description": description,
             "visual_key": final_visual_key,
+            "visual_motif": final_visual_motif,
         }
 
         row: List[str] = []

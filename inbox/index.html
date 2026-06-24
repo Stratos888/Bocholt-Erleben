@@ -1458,6 +1458,10 @@ Umfang:
         ["Automatik-Regel", trimValue(item.automation_policy)],
         ["Queue-Rolle", trimValue(item.queue_role)],
         ["Faktenprobe", trimValue(item.evidence_status)],
+        ["Visual-Key-Vorschlag", trimValue(item.suggested_visual_key)],
+        ["Visual-Motiv-Vorschlag", trimValue(item.suggested_visual_motif)],
+        ["Visual-Motiv-Rolle", trimValue(item.suggested_visual_motif_role)],
+        ["Visual-Asset-Status", trimValue(item.visual_asset_status)],
         ["Faktenprobe Kurzbefund", trimValue(item.evidence_summary)],
         ["Geprüfte Felder", trimValue(item.evidence_checked_fields)],
         ["Nicht bestätigt", trimValue(item.evidence_missing_fields)],
@@ -1563,6 +1567,48 @@ Umfang:
           action: "Quelle öffnen, Öffnungszeiten und Saisonangaben vergleichen. Wenn alles stimmt: vollständig geprüft. Bei Änderung: Patch nötig markieren.",
           checklist: ["Öffnungszeiten prüfen", "Saison/Feiertage prüfen", "Kosten prüfen", "Patch nötig oder vollständig geprüft"],
           nextReviewDays: 30
+        },
+        event_visual_key_missing_ready_candidate: {
+          actionTitle: "Visual-Key-Vorschlag prüfen",
+          why: "Für das Event fehlt ein visual_key, aber der Audit kann einen passenden Key und ein vorhandenes Motiv vorschlagen.",
+          action: "Im Visual-Fit-Paket prüfen, ob visual_key und visual_motif fachlich passen. Erst danach gesammelt in Sheet/Workflow übernehmen.",
+          checklist: ["Eventtitel prüfen", "visual_key-Vorschlag prüfen", "visual_motif-Vorschlag prüfen", "Bildmotiv im Pool prüfen", "später gesammelt übernehmen oder ablehnen"],
+          nextReviewDays: 30
+        },
+        event_visual_key_missing_asset_gap: {
+          actionTitle: "Visual-Gap statt falschem Bild",
+          why: "Für das Event fehlt ein visual_key und der vorgeschlagene Motivbedarf hat kein fertiges Asset.",
+          action: "Im Visual-Fit-Workflow entscheiden: neues Bildmotiv produzieren, Key/Motiv verfeinern oder bewusst Fallback nutzen.",
+          checklist: ["Eventmotiv bestimmen", "fehlendes Asset prüfen", "Bildproduktion oder Key-Verfeinerung planen", "nicht blind Fallback setzen"],
+          nextReviewDays: 30
+        },
+        event_visual_key_missing_needs_decision: {
+          actionTitle: "Visual-Zuordnung manuell entscheiden",
+          why: "Der Audit kann keinen eindeutig sicheren Visual-Fit ableiten.",
+          action: "Im Visual-Fit-Workflow manuell bewerten, ob bestehende Keys reichen oder ein neuer Motivbedarf entsteht.",
+          checklist: ["Eventkontext prüfen", "Key-Vorschlag prüfen", "Motiv-/Assetstatus prüfen", "Entscheidung dokumentieren"],
+          nextReviewDays: 30
+        },
+        event_visual_motif_missing_specific: {
+          actionTitle: "Spezifisches Visual-Motiv prüfen",
+          why: "Der visual_key ist vorhanden, aber ohne visual_motif kann die Website ein zu generisches Bild verwenden.",
+          action: "Im Visual-Fit-Paket prüfen, ob das vorgeschlagene visual_motif übernommen werden soll oder ob ein neutraler Fallback bewusst reicht.",
+          checklist: ["visual_key prüfen", "visual_motif-Vorschlag prüfen", "Pool-Bild prüfen", "später gesammelt übernehmen oder ablehnen"],
+          nextReviewDays: 30
+        },
+        event_visual_motif_unknown: {
+          actionTitle: "Unbekanntes Visual-Motiv prüfen",
+          why: "Das gesetzte visual_motif passt nicht zum aktuellen Motiv-Regelwerk.",
+          action: "Motiv im Sheet korrigieren oder Regelwerk bewusst erweitern. Nicht automatisch überschreiben.",
+          checklist: ["gesetztes visual_motif prüfen", "Regelwerk prüfen", "Korrektur oder Erweiterung vorbereiten"],
+          nextReviewDays: 30
+        },
+        event_visual_motif_without_ready_asset: {
+          actionTitle: "Visual-Motiv ohne fertiges Bild",
+          why: "Das Motiv ist fachlich erkennbar, aber es gibt noch kein fertiges ready-Bild im Pool.",
+          action: "Visual-Gap in den Bildproduktionsworkflow übernehmen oder bewusst anderes Motiv wählen.",
+          checklist: ["Motivbedarf prüfen", "Assetstatus prüfen", "Bildproduktion planen", "kein falsches Bild erzwingen"],
+          nextReviewDays: 30
         }
       };
 
@@ -1615,6 +1661,26 @@ Umfang:
             ${summary ? `<div>${escapeHtml(summary)}</div>` : ``}
             ${checked ? `<div><strong>Automatisch geprüft:</strong> ${escapeHtml(checked)}</div>` : ``}
             ${missing ? `<div><strong>Nicht automatisch bestätigt:</strong> ${escapeHtml(missing)}</div>` : ``}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderVisualFitSuggestion(item) {
+      const key = trimValue(item.suggested_visual_key);
+      const motif = trimValue(item.suggested_visual_motif);
+      const role = trimValue(item.suggested_visual_motif_role);
+      const assetStatus = trimValue(item.visual_asset_status);
+      if (!key && !motif && !role && !assetStatus) return "";
+      return `
+        <section class="reviewSection" aria-label="Visual-Fit-Vorschlag">
+          <div class="reviewSectionTitle">Visual-Fit-Vorschlag</div>
+          <div class="auditStateNote">
+            ${key ? `<div><strong>visual_key:</strong> ${escapeHtml(key)}</div>` : ``}
+            ${motif ? `<div><strong>visual_motif:</strong> ${escapeHtml(motif)}</div>` : ``}
+            ${role ? `<div><strong>Motiv-Rolle:</strong> ${escapeHtml(role)}</div>` : ``}
+            ${assetStatus ? `<div><strong>Asset-Status:</strong> ${escapeHtml(assetStatus)}</div>` : ``}
+            <div>Nur Vorschlag für den Visual-Fit-Workflow. Nicht automatisch speichern oder Bild blind ersetzen.</div>
           </div>
         </section>
       `;
@@ -1771,8 +1837,8 @@ Umfang:
         title: "Visual-Fit-Paket",
         label: "Visual-Fit",
         copyLabel: "Visual-Fit-Fälle kopieren",
-        description: "Bild-/Visual-Key-/Motiv-Fälle. Diese gehören in den separaten Visual-Fit-Workflow, nicht in normale Daten- oder Quellenpatches.",
-        instruction: "Bitte diese Fälle im separaten Visual-Fit-Workflow bewerten. Kein Bild blind ersetzen und keine Visual Keys ohne Motivprüfung setzen."
+        description: "Bild-/visual_key-/visual_motif-/Motiv-Fälle. Diese gehören in den separaten Visual-Fit-Workflow, nicht in normale Daten- oder Quellenpatches.",
+        instruction: "Bitte diese Fälle im separaten Visual-Fit-Workflow bewerten. Kein Bild blind ersetzen und keine visual_keys/visual_motifs ohne Motivprüfung setzen."
       }
     };
 
@@ -1806,6 +1872,10 @@ Umfang:
           recommended_action: trimValue(item.recommended_action),
           source_url: trimValue(item.source_url),
           suggested_url: trimValue(item.suggested_url),
+          suggested_visual_key: trimValue(item.suggested_visual_key),
+          suggested_visual_motif: trimValue(item.suggested_visual_motif),
+          suggested_visual_motif_role: trimValue(item.suggested_visual_motif_role),
+          visual_asset_status: trimValue(item.visual_asset_status),
           public_url: trimValue(item.public_url),
           process_category: trimValue(item.process_category),
           correction_owner: trimValue(item.correction_owner),
@@ -1942,6 +2012,8 @@ Umfang:
           ${renderSourceSuggestion(it)}
 
           ${renderEvidenceSummary(it)}
+
+          ${renderVisualFitSuggestion(it)}
 
           ${renderEventCorrectionForm(it, suggestedUrl)}
 

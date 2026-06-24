@@ -19,6 +19,11 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+from event_visual_motifs import (
+    event_visual_motif_role,
+    infer_event_visual_fit,
+    normalize_event_visual_motif,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -179,6 +184,10 @@ class Issue:
     suggested_url: str
     suggested_url_label: str
     suggestion_reason: str
+    suggested_visual_key: str
+    suggested_visual_motif: str
+    suggested_visual_motif_role: str
+    visual_asset_status: str
     evidence_status: str
     evidence_summary: str
     evidence_checked_fields: str
@@ -408,6 +417,10 @@ def issue(
     suggested_url: str = "",
     suggested_url_label: str = "",
     suggestion_reason: str = "",
+    suggested_visual_key: str = "",
+    suggested_visual_motif: str = "",
+    suggested_visual_motif_role: str = "",
+    visual_asset_status: str = "",
     evidence_status: str = "",
     evidence_summary: str = "",
     evidence_checked_fields: str = "",
@@ -443,6 +456,10 @@ def issue(
         suggested_url=norm(suggested_url),
         suggested_url_label=norm(suggested_url_label),
         suggestion_reason=norm(suggestion_reason),
+        suggested_visual_key=norm(suggested_visual_key),
+        suggested_visual_motif=norm(suggested_visual_motif),
+        suggested_visual_motif_role=norm(suggested_visual_motif_role),
+        visual_asset_status=norm(visual_asset_status),
         evidence_status=norm(evidence_status),
         evidence_summary=norm(evidence_summary),
         evidence_checked_fields=norm(evidence_checked_fields),
@@ -950,12 +967,52 @@ def evaluate_activity_source_evidence(offer: Dict[str, Any], source_url: str, *,
     }
 
 
-def visual_specific_motif_gap(title: str, visual_key: str) -> str:
+
+def event_visual_pool_payload(event_visual_pools: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    return {"pools": event_visual_pools}
+
+
+def event_visual_fit_from_row(row: Dict[str, str], event_visual_pools: Dict[str, Dict[str, Any]]) -> Dict[str, str]:
+    visual_key = norm(row.get("visual_key"))
+    visual_motif = norm(row.get("visual_motif") or row.get("image_visual_motif") or row.get("visualMotif"))
+    fit = infer_event_visual_fit(
+        title=row.get("title", ""),
+        description=row.get("description", ""),
+        category=row.get("kategorie", ""),
+        location=row.get("location", ""),
+        visual_key=visual_key,
+        visual_motif=visual_motif,
+        pool_payload=event_visual_pool_payload(event_visual_pools),
+    )
+    fit["visual_motif_role"] = event_visual_motif_role(fit.get("visual_key", ""), fit.get("visual_motif", ""))
+    fit["source_visual_key"] = visual_key
+    fit["source_visual_motif"] = visual_motif
+    return fit
+
+
+def visual_fit_summary(fit: Dict[str, str]) -> str:
+    key = norm(fit.get("visual_key")) or "<kein visual_key>"
+    motif = norm(fit.get("visual_motif")) or "<kein visual_motif>"
+    status = norm(fit.get("visual_asset_status")) or "review"
+    role = norm(fit.get("visual_motif_role")) or "unknown"
+    return f"Vorschlag: visual_key={key}, visual_motif={motif}, role={role}, asset_status={status}."
+
+
+def event_visual_missing_issue_code(fit: Dict[str, str]) -> str:
+    status = norm(fit.get("visual_asset_status"))
+    if status == "needs_asset":
+        return "event_visual_key_missing_asset_gap"
+    if status == "review":
+        return "event_visual_key_missing_needs_decision"
+    return "event_visual_key_missing_ready_candidate"
+
+
+def visual_specific_motif_gap(title: str, visual_key: str, visual_motif: str = "") -> str:
     title_norm = evidence_text(title)
-    key_norm = evidence_text(visual_key)
-    if re.search(r"\b(dart|darts)\b", title_norm) and "dart" not in key_norm:
+    fit_norm = " ".join([evidence_text(visual_key), evidence_text(visual_motif)]).strip()
+    if re.search(r"\b(dart|darts)\b", title_norm) and "dart" not in fit_norm:
         return "darts"
-    if re.search(r"\b(fecht|fencing|fencer)\b", title_norm) and not any(marker in key_norm for marker in ("fecht", "fenc")):
+    if re.search(r"\b(fecht|fencing|fencer)\b", title_norm) and not any(marker in fit_norm for marker in ("fecht", "fenc")):
         return "fencing"
     return ""
 
@@ -965,7 +1022,7 @@ def audit_event_visual_fit_candidates(occurrences: list[Dict[str, str]], source_
     public_url = f"{base_url.rstrip('/')}/events/" if base_url else ""
 
     for item in occurrences:
-        motif_gap = visual_specific_motif_gap(item.get("title", ""), item.get("visual_key", ""))
+        motif_gap = visual_specific_motif_gap(item.get("title", ""), item.get("visual_key", ""), item.get("visual_motif", ""))
         if motif_gap:
             issues.append(issue(
                 "review_needed",
@@ -1329,12 +1386,25 @@ def audit_event_rows(
                     ))
 
         visual_key = norm(row.get("visual_key"))
-        inferred_visual_key = infer_event_visual_key(
-            title=row.get("title"),
-            description=row.get("description"),
-            category=row.get("kategorie"),
-            location=row.get("location"),
-        )
+        visual_motif = norm(row.get("visual_motif") or row.get("image_visual_motif") or row.get("visualMotif"))
+        visual_fit = event_visual_fit_from_row(row, event_visual_pools)
+        suggested_visual_key = norm(visual_fit.get("visual_key"))
+        suggested_visual_motif = norm(visual_fit.get("visual_motif"))
+        suggested_visual_motif_role = norm(visual_fit.get("visual_motif_role"))
+        visual_asset_status = norm(visual_fit.get("visual_asset_status"))
+        visual_summary = visual_fit_summary(visual_fit)
+
+        if suggested_visual_key:
+            visual_occurrences.append({
+                "content_id": content_id,
+                "title": title,
+                "date": date_value,
+                "source_url": url,
+                "visual_key": suggested_visual_key if not visual_key else (normalize_event_visual_key(visual_key) or visual_key),
+                "visual_motif": suggested_visual_motif,
+                "visual_asset_status": visual_asset_status,
+            })
+
         if not visual_key:
             add_observation(
                 content_type="event",
@@ -1342,33 +1412,44 @@ def audit_event_rows(
                 content_id=content_id,
                 title=title,
                 date_value=date_value,
-                check_code="event_visual_key_inference",
+                check_code="event_visual_fit_inference",
                 check_status="visual_key_missing",
                 workbench_group="Visual-Fit",
                 checked_fields=("title", "description", "kategorie", "location"),
                 missing_fields=("visual_key",),
-                summary=f"Kein visual_key gesetzt; deterministischer Vorschlag wäre {inferred_visual_key}.",
+                summary=f"Kein visual_key gesetzt. {visual_summary}",
             )
             if in_daily_window:
+                code = event_visual_missing_issue_code(visual_fit)
                 issues.append(issue(
                     "warning",
                     "event",
                     source_system,
                     content_id,
                     title,
-                    "event_visual_key_missing",
+                    code,
                     "Event hat keinen visual_key für den Event-Visual-Pool.",
-                    f"Im separaten Visual-Fit-Workflow prüfen und passenden visual_key setzen. Automatischer Vorschlag: {inferred_visual_key}",
+                    "Im separaten Visual-Fit-Workflow prüfen: vorgeschlagenen visual_key/visual_motif übernehmen, Visual-Key-Regel verfeinern oder bei fehlendem Asset ein neues Motiv produzieren. Keine Bildzuordnung blind setzen.",
                     date_value=date_value,
                     source_url=url,
                     public_url=public_url,
+                    suggested_visual_key=suggested_visual_key,
+                    suggested_visual_motif=suggested_visual_motif,
+                    suggested_visual_motif_role=suggested_visual_motif_role,
+                    visual_asset_status=visual_asset_status,
                     evidence_status="visual_key_missing",
-                    evidence_summary=f"Deterministischer Vorschlag: {inferred_visual_key}",
-                    evidence_checked_fields="title, description, kategorie, location",
+                    evidence_summary=visual_summary,
+                    evidence_checked_fields="title, description, kategorie, location, event_visual_pool",
                     evidence_missing_fields="visual_key",
                 ))
         else:
             normalized_visual_key = normalize_event_visual_key(visual_key) or visual_key
+            inferred_visual_key = infer_event_visual_key(
+                title=row.get("title"),
+                description=row.get("description"),
+                category=row.get("kategorie"),
+                location=row.get("location"),
+            )
             if inferred_visual_key and normalized_visual_key != inferred_visual_key:
                 add_observation(
                     content_type="event",
@@ -1376,13 +1457,84 @@ def audit_event_rows(
                     content_id=content_id,
                     title=title,
                     date_value=date_value,
-                    check_code="event_visual_key_inference",
+                    check_code="event_visual_fit_inference",
                     check_status="visual_key_differs_from_rule",
                     workbench_group="Visual-Fit",
                     checked_fields=("title", "description", "kategorie", "location", "visual_key"),
                     missing_fields=(),
-                    summary=f"Gesetzter visual_key {visual_key}; deterministische Regel würde {inferred_visual_key} vorschlagen.",
+                    summary=f"Gesetzter visual_key {visual_key}; Regelvorschlag {inferred_visual_key}. {visual_summary}",
                 )
+
+            if not visual_motif and suggested_visual_motif and suggested_visual_motif_role == "specific" and in_daily_window:
+                issues.append(issue(
+                    "warning",
+                    "event",
+                    source_system,
+                    content_id,
+                    title,
+                    "event_visual_motif_missing_specific",
+                    "Event hat einen visual_key, aber kein spezifisches visual_motif; dadurch kann im Feed ein zu generisches Bild erscheinen.",
+                    "Im separaten Visual-Fit-Workflow prüfen: vorgeschlagenes visual_motif übernehmen oder bewusst beim neutralen Fallback bleiben. Keine Bildzuordnung blind setzen.",
+                    date_value=date_value,
+                    source_url=url,
+                    public_url=public_url,
+                    suggested_visual_key=suggested_visual_key,
+                    suggested_visual_motif=suggested_visual_motif,
+                    suggested_visual_motif_role=suggested_visual_motif_role,
+                    visual_asset_status=visual_asset_status,
+                    evidence_status="visual_motif_missing_specific",
+                    evidence_summary=visual_summary,
+                    evidence_checked_fields="title, description, kategorie, location, visual_key, event_visual_pool",
+                    evidence_missing_fields="visual_motif",
+                ))
+
+            if visual_motif:
+                normalized_visual_motif = normalize_event_visual_motif(visual_motif, normalized_visual_key)
+                if not normalized_visual_motif:
+                    issues.append(issue(
+                        "warning",
+                        "event",
+                        source_system,
+                        content_id,
+                        title,
+                        "event_visual_motif_unknown",
+                        f"visual_motif ist für den visual_key nicht im Motiv-Regelwerk vorhanden: {visual_motif}",
+                        "visual_motif im Sheet korrigieren oder Motiv-Regelwerk bewusst erweitern.",
+                        date_value=date_value,
+                        source_url=url,
+                        public_url=public_url,
+                        suggested_visual_key=suggested_visual_key,
+                        suggested_visual_motif=suggested_visual_motif,
+                        suggested_visual_motif_role=suggested_visual_motif_role,
+                        visual_asset_status=visual_asset_status,
+                        evidence_status="visual_motif_unknown",
+                        evidence_summary=visual_summary,
+                        evidence_checked_fields="visual_key, visual_motif, motif_rules",
+                        evidence_missing_fields="valid_visual_motif",
+                    ))
+                elif visual_asset_status == "needs_asset":
+                    issues.append(issue(
+                        "warning",
+                        "event",
+                        source_system,
+                        content_id,
+                        title,
+                        "event_visual_motif_without_ready_asset",
+                        f"visual_motif hat kein ready-Bild im Event-Visual-Pool: {visual_motif}",
+                        "Visual-Gap in separatem Visual-Fit-Workflow behandeln: passendes Asset produzieren oder bewusst anderes Motiv wählen.",
+                        date_value=date_value,
+                        source_url=url,
+                        public_url=public_url,
+                        suggested_visual_key=suggested_visual_key,
+                        suggested_visual_motif=suggested_visual_motif,
+                        suggested_visual_motif_role=suggested_visual_motif_role,
+                        visual_asset_status=visual_asset_status,
+                        evidence_status="visual_motif_needs_asset",
+                        evidence_summary=visual_summary,
+                        evidence_checked_fields="visual_key, visual_motif, event_visual_pool",
+                        evidence_missing_fields="ready_visual_asset",
+                    ))
+
             pool = event_visual_pools.get(normalized_visual_key)
             if pool is None:
                 issues.append(issue(
@@ -1397,6 +1549,10 @@ def audit_event_rows(
                     date_value=date_value,
                     source_url=url,
                     public_url=public_url,
+                    suggested_visual_key=suggested_visual_key,
+                    suggested_visual_motif=suggested_visual_motif,
+                    suggested_visual_motif_role=suggested_visual_motif_role,
+                    visual_asset_status=visual_asset_status,
                 ))
             elif not pool_has_safe_image(pool):
                 issues.append(issue(
@@ -1411,6 +1567,10 @@ def audit_event_rows(
                     date_value=date_value,
                     source_url=url,
                     public_url=public_url,
+                    suggested_visual_key=suggested_visual_key,
+                    suggested_visual_motif=suggested_visual_motif,
+                    suggested_visual_motif_role=suggested_visual_motif_role,
+                    visual_asset_status=visual_asset_status,
                 ))
 
     issues.extend(audit_event_visual_fit_candidates(visual_occurrences, source_system, base_url))
@@ -1781,8 +1941,8 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
         "",
         "## Issues",
         "",
-        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL | Evidence |",
-        "|---|---|---|---|---|---|---|---|---|---|---|",
+        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL | Visual Key | Visual Motif | Visual Asset | Evidence |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for item in sorted(issues, key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.workbench_group, x.content_type, x.date, x.title)):
         def cell(value: str) -> str:
@@ -1799,6 +1959,9 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
                 cell(item.issue_text),
                 cell(item.recommended_action),
                 cell(item.suggested_url),
+                cell(item.suggested_visual_key),
+                cell(item.suggested_visual_motif),
+                cell(item.visual_asset_status),
                 cell(item.evidence_status),
             ]) + " |"
         )

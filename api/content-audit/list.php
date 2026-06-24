@@ -149,6 +149,8 @@ function cal_event_lookup_by_id(): array
         'ticket_url',
         'description',
         'visual_key',
+        'visual_motif',
+        'image_visual_motif',
     ];
 
     $out = [];
@@ -268,6 +270,10 @@ try {
         $suggestedUrl = cal_cell($row, $index, 'suggested_url');
         $suggestedUrlLabel = cal_cell($row, $index, 'suggested_url_label');
         $suggestionReason = cal_cell($row, $index, 'suggestion_reason');
+        $suggestedVisualKey = cal_cell($row, $index, 'suggested_visual_key');
+        $suggestedVisualMotif = cal_cell($row, $index, 'suggested_visual_motif');
+        $suggestedVisualMotifRole = cal_cell($row, $index, 'suggested_visual_motif_role');
+        $visualAssetStatus = cal_cell($row, $index, 'visual_asset_status');
         $evidenceStatus = cal_cell($row, $index, 'evidence_status');
         $evidenceSummary = cal_cell($row, $index, 'evidence_summary');
         $evidenceCheckedFields = cal_cell($row, $index, 'evidence_checked_fields');
@@ -317,6 +323,10 @@ try {
             'suggested_url' => $suggestedUrl,
             'suggested_url_label' => $suggestedUrlLabel,
             'suggestion_reason' => $suggestionReason,
+            'suggested_visual_key' => $suggestedVisualKey,
+            'suggested_visual_motif' => $suggestedVisualMotif,
+            'suggested_visual_motif_role' => $suggestedVisualMotifRole,
+            'visual_asset_status' => $visualAssetStatus,
             'evidence_status' => $evidenceStatus,
             'evidence_summary' => $evidenceSummary,
             'evidence_checked_fields' => $evidenceCheckedFields,
