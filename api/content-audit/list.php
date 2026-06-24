@@ -278,6 +278,7 @@ try {
         $evidenceSummary = cal_cell($row, $index, 'evidence_summary');
         $evidenceCheckedFields = cal_cell($row, $index, 'evidence_checked_fields');
         $evidenceMissingFields = cal_cell($row, $index, 'evidence_missing_fields');
+        $evidenceFieldStatuses = cal_cell($row, $index, 'evidence_field_statuses');
 
         $curatedSuggestion = cal_curated_source_suggestion($sourceSuggestionByEventId, $contentType, $contentId);
         if ($suggestedUrl === '' && ($curatedSuggestion['suggested_url'] ?? '') !== '') {
@@ -331,6 +332,7 @@ try {
             'evidence_summary' => $evidenceSummary,
             'evidence_checked_fields' => $evidenceCheckedFields,
             'evidence_missing_fields' => $evidenceMissingFields,
+            'evidence_field_statuses' => $evidenceFieldStatuses,
             'public_url' => cal_cell($row, $index, 'public_url'),
             'first_seen_at' => cal_cell($row, $index, 'first_seen_at'),
             'last_seen_at' => cal_cell($row, $index, 'last_seen_at'),

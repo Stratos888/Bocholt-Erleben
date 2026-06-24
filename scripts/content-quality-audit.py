@@ -54,6 +54,12 @@ CONTENT_STOPWORDS = {
     "veranstaltung", "event", "live", "2026", "2025",
 }
 
+GENERIC_LOCATION_WORDS = {
+    "innenstadt", "stadt", "zentrum", "city", "marktplatz", "markt", "anlage", "halle",
+    "bocholt", "borken", "rhede", "ahaus", "isselburg", "wesel", "reken", "hamminkeln",
+}
+
+
 SOURCE_TEXT_CACHE: Dict[str, Tuple[str, str, str]] = {}
 
 SEVERITY_RANK = {
@@ -192,6 +198,7 @@ class Issue:
     evidence_summary: str
     evidence_checked_fields: str
     evidence_missing_fields: str
+    evidence_field_statuses: str
     public_url: str
     auto_fix_allowed: str
     auto_fix_done: str
@@ -425,6 +432,7 @@ def issue(
     evidence_summary: str = "",
     evidence_checked_fields: str = "",
     evidence_missing_fields: str = "",
+    evidence_field_statuses: str = "",
     public_url: str = "",
     auto_fix_allowed: bool = False,
     auto_fix_done: bool = False,
@@ -464,6 +472,7 @@ def issue(
         evidence_summary=norm(evidence_summary),
         evidence_checked_fields=norm(evidence_checked_fields),
         evidence_missing_fields=norm(evidence_missing_fields),
+        evidence_field_statuses=norm(evidence_field_statuses),
         public_url=norm(public_url),
         auto_fix_allowed="yes" if auto_fix_allowed else "no",
         auto_fix_done="yes" if auto_fix_done else "no",
@@ -759,6 +768,58 @@ def text_has_any_variant(text: str, variants: list[str]) -> bool:
     return any(variant and variant in haystack for variant in variants)
 
 
+def parse_time_range(value: str) -> Dict[str, list[str]]:
+    match = RE_TIME.match(norm(value))
+    if not match:
+        return {}
+    start_hour, start_minute = int(match.group(1)), int(match.group(2))
+    result = {"start_time": single_time_variants(start_hour, start_minute)}
+    if match.group(3) and match.group(4):
+        end_hour, end_minute = int(match.group(3)), int(match.group(4))
+        result["end_time"] = single_time_variants(end_hour, end_minute)
+    return result
+
+
+def single_time_variants(hour: int, minute: int) -> list[str]:
+    variants = [
+        f"{hour:02d}:{minute:02d}",
+        f"{hour}:{minute:02d}",
+        f"{hour:02d}.{minute:02d}",
+        f"{hour}.{minute:02d}",
+    ]
+    # Nur volle Stunden bekommen Uhr-Varianten ohne Minuten. Sonst wäre 18:30 durch "18 Uhr" falsch bestätigt.
+    if minute == 0:
+        variants.extend([
+            f"{hour} uhr",
+            f"{hour:02d} uhr",
+        ])
+    else:
+        variants.extend([
+            f"{hour}:{minute:02d} uhr",
+            f"{hour:02d}:{minute:02d} uhr",
+            f"{hour}.{minute:02d} uhr",
+        ])
+    return [evidence_text(v) for v in variants]
+
+
+def date_field_variants(name: str, value: str) -> tuple[str, list[str]]:
+    return name, date_variants(value)
+
+
+def field_status_text(statuses: Dict[str, str]) -> str:
+    return "; ".join(f"{key}={value}" for key, value in statuses.items() if value)
+
+
+def field_label_list(statuses: Dict[str, str], wanted: set[str]) -> list[str]:
+    return [key for key, value in statuses.items() if value in wanted]
+
+
+def location_specific_tokens(location: str, city: str) -> list[str]:
+    tokens = significant_tokens(location, min_len=3, max_tokens=5)
+    city_tokens = set(significant_tokens(city, min_len=3, max_tokens=5))
+    return [token for token in tokens if token not in city_tokens and token not in GENERIC_LOCATION_WORDS]
+
+
 def add_observation(
     *,
     content_type: str,
@@ -791,14 +852,22 @@ def add_observation(
 
 
 def evaluate_event_source_evidence(row: Dict[str, str], source_system: str, evidence_url: str, *, today: date, network: bool) -> Dict[str, str]:
+    """Compare event core facts against source text with explicit field-level proof.
+
+    This is still not a 100% semantic truth check. It is a stronger, auditable
+    evidence probe: every checked field is classified separately so the report
+    can show what was confirmed, what was not automatically confirmed, and what
+    was not applicable.
+    """
     content_id = norm(row.get("id") or row.get("event_id") or row.get("submission_id"))
     title = norm(row.get("title"))
     date_value = norm(row.get("date") or row.get("start_date"))
+    end_date_value = norm(row.get("endDate") or row.get("end_date"))
     time_value = norm(row.get("time"))
     city = norm(row.get("city"))
     location = norm(row.get("location"))
     checked_fields: list[str] = []
-    missing_fields: list[str] = []
+    field_statuses: Dict[str, str] = {}
 
     if not network or not is_http_url(evidence_url):
         return {
@@ -806,6 +875,7 @@ def evaluate_event_source_evidence(row: Dict[str, str], source_system: str, evid
             "evidence_summary": "Quellen-Faktenprobe nicht ausgeführt.",
             "evidence_checked_fields": "",
             "evidence_missing_fields": "",
+            "evidence_field_statuses": "",
         }
 
     status, detail, text = text_probe_url(evidence_url)
@@ -827,43 +897,68 @@ def evaluate_event_source_evidence(row: Dict[str, str], source_system: str, evid
             "evidence_summary": f"Quelle konnte für Faktenvergleich nicht als Text gelesen werden: {detail}",
             "evidence_checked_fields": "",
             "evidence_missing_fields": "source_text",
+            "evidence_field_statuses": "source_text=unavailable",
         }
 
     title_tokens = significant_tokens(title)
-    title_ok = text_has_tokens(text, title_tokens, minimum=min(2, max(1, len(title_tokens)))) if title_tokens else True
-    checked_fields.append("title")
-    if not title_ok:
-        missing_fields.append("title")
+    if title_tokens:
+        checked_fields.append("title")
+        title_minimum = min(3, max(1, len(title_tokens))) if len(title_tokens) >= 3 else len(title_tokens)
+        title_ok = text_has_tokens(text, title_tokens, minimum=title_minimum)
+        field_statuses["title"] = "confirmed" if title_ok else "not_confirmed"
 
-    date_ok = text_has_any_variant(text, date_variants(date_value)) if date_value else True
-    checked_fields.append("date")
-    if not date_ok:
-        missing_fields.append("date")
+    if date_value:
+        checked_fields.append("date")
+        field_statuses["date"] = "confirmed" if text_has_any_variant(text, date_variants(date_value)) else "not_confirmed"
 
-    time_tokens = time_variants(time_value)
-    if time_tokens:
-        time_ok = text_has_any_variant(text, time_tokens)
-        checked_fields.append("time")
-        if not time_ok:
-            missing_fields.append("time")
+    if end_date_value and end_date_value != date_value:
+        checked_fields.append("end_date")
+        field_statuses["end_date"] = "confirmed" if text_has_any_variant(text, date_variants(end_date_value)) else "not_confirmed"
 
-    location_tokens = significant_tokens(" ".join([city, location]), max_tokens=6)
-    if location_tokens:
-        location_ok = text_has_tokens(text, location_tokens, minimum=1)
+    time_checks = parse_time_range(time_value)
+    for field_name, variants in time_checks.items():
+        checked_fields.append(field_name)
+        field_statuses[field_name] = "confirmed" if text_has_any_variant(text, variants) else "not_confirmed"
+
+    city_tokens = significant_tokens(city, min_len=3, max_tokens=4)
+    if city_tokens:
+        checked_fields.append("city")
+        field_statuses["city"] = "confirmed" if text_has_tokens(text, city_tokens, minimum=1) else "not_confirmed"
+
+    specific_location_tokens = location_specific_tokens(location, city)
+    generic_location_tokens = significant_tokens(location, min_len=3, max_tokens=4)
+    if specific_location_tokens:
         checked_fields.append("location")
-        if not location_ok:
-            missing_fields.append("location")
+        # Bei spezifischem Ort reichen nicht nur Stadt/Gattungswörter. Mindestens ein spezifisches Token muss vorkommen.
+        field_statuses["location"] = "confirmed" if text_has_tokens(text, specific_location_tokens, minimum=1) else "not_confirmed"
+    elif generic_location_tokens:
+        checked_fields.append("location")
+        # Generische Orte wie Innenstadt/Marktplatz werden geprüft, aber nur als schwacher Nachweis gewertet.
+        field_statuses["location"] = "weak_confirmed" if text_has_tokens(text, generic_location_tokens, minimum=1) else "not_confirmed"
 
-    required_missing = set(missing_fields)
-    if not required_missing:
-        evidence_status = "source_confirms_key_facts"
-        summary = "Quelle enthält die automatisch prüfbaren Kernfakten."
-    elif "date" in required_missing or ("time" in required_missing and parse_iso_date(date_value) and parse_iso_date(date_value) <= today + timedelta(days=14)):
+    missing_fields = field_label_list(field_statuses, {"not_confirmed"})
+    weak_fields = field_label_list(field_statuses, {"weak_confirmed"})
+    confirmed_fields = field_label_list(field_statuses, {"confirmed", "weak_confirmed"})
+
+    hard_missing = set(missing_fields)
+    near_event = bool(parse_iso_date(date_value) and parse_iso_date(date_value) <= today + timedelta(days=14))
+    date_or_time_missing = bool(hard_missing.intersection({"date", "end_date", "start_time", "end_time"}))
+    title_missing_with_date = "title" in hard_missing and "date" in hard_missing
+    location_missing_near = "location" in hard_missing and near_event
+
+    if not missing_fields:
+        if weak_fields:
+            evidence_status = "source_confirms_core_facts_with_weak_location"
+            summary = "Quelle bestätigt Datum/Uhrzeit/Titel; Ortsnachweis ist nur generisch automatisch bestätigt."
+        else:
+            evidence_status = "source_confirms_key_facts"
+            summary = "Quelle enthält die automatisch prüfbaren Kernfakten feldgenau."
+    elif date_or_time_missing or title_missing_with_date or location_missing_near:
         evidence_status = "source_evidence_weak"
-        summary = "Quelle enthält nicht alle automatisch prüfbaren Kernfakten; fachliche Prüfung sinnvoll."
+        summary = "Quelle bestätigt mindestens einen fachlich wichtigen Kernwert nicht automatisch; Faktencheck sinnvoll."
     else:
         evidence_status = "source_evidence_partial"
-        summary = "Quelle enthält nur einen Teil der automatisch prüfbaren Kernfakten."
+        summary = "Quelle bestätigt einen Teil der Kernfakten; keine sichere automatische Vollbestätigung."
 
     add_observation(
         content_type="event",
@@ -877,7 +972,7 @@ def evaluate_event_source_evidence(row: Dict[str, str], source_system: str, evid
         checked_url=evidence_url,
         checked_fields=checked_fields,
         missing_fields=missing_fields,
-        summary=summary,
+        summary=f"{summary} Feldstatus: {field_status_text(field_statuses)}",
     )
 
     return {
@@ -885,10 +980,12 @@ def evaluate_event_source_evidence(row: Dict[str, str], source_system: str, evid
         "evidence_summary": summary,
         "evidence_checked_fields": ", ".join(checked_fields),
         "evidence_missing_fields": ", ".join(missing_fields),
+        "evidence_field_statuses": field_status_text(field_statuses),
     }
 
 
 def evaluate_activity_source_evidence(offer: Dict[str, Any], source_url: str, *, network: bool) -> Dict[str, str]:
+    """Probe Activity source text for title/opening hints without writing data."""
     content_id = norm(offer.get("id"))
     title = norm(offer.get("title"))
     opening_status = offer.get("opening_status") if isinstance(offer.get("opening_status"), dict) else {}
@@ -902,6 +999,7 @@ def evaluate_activity_source_evidence(offer: Dict[str, Any], source_url: str, *,
             "evidence_summary": "Activity-Faktenprobe nicht ausgeführt.",
             "evidence_checked_fields": "",
             "evidence_missing_fields": "",
+            "evidence_field_statuses": "",
         }
 
     status, detail, text = text_probe_url(source_url)
@@ -922,29 +1020,46 @@ def evaluate_activity_source_evidence(offer: Dict[str, Any], source_url: str, *,
             "evidence_summary": f"Quelle konnte für Activity-Faktenvergleich nicht als Text gelesen werden: {detail}",
             "evidence_checked_fields": "",
             "evidence_missing_fields": "source_text",
+            "evidence_field_statuses": "source_text=unavailable",
         }
 
     checked_fields: list[str] = []
-    missing_fields: list[str] = []
+    field_statuses: Dict[str, str] = {}
+
     title_tokens = significant_tokens(title, max_tokens=5)
     if title_tokens:
         checked_fields.append("title")
-        if not text_has_tokens(text, title_tokens, minimum=1):
-            missing_fields.append("title")
+        field_statuses["title"] = "confirmed" if text_has_tokens(text, title_tokens, minimum=1) else "not_confirmed"
 
     opening_probe = " ".join([public_label, detail_note])
-    opening_variants = [evidence_text(v) for v in re.findall(r"\d{1,2}[:.]\d{2}|\d{1,2}\s*uhr|sonnenaufgang|sonnenuntergang|täglich|taeglich|di\b|do\b|so\b|mo\b|fr\b|sa\b|montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag", opening_probe, flags=re.I)]
-    if opening_variants or status_type in {"regular_hours", "free_access", "seasonal_hours"}:
+    opening_variants = [
+        evidence_text(v)
+        for v in re.findall(
+            r"\d{1,2}[:.]\d{2}|\d{1,2}\s*uhr|sonnenaufgang|sonnenuntergang|täglich|taeglich|di\b|do\b|so\b|mo\b|fr\b|sa\b|montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|brutzeit|saison|ferien|feiertag",
+            opening_probe,
+            flags=re.I,
+        )
+    ]
+    if opening_variants or status_type in {"regular_hours", "seasonal_hours", "seasonal_recommended", "free_access", "check_required"}:
         checked_fields.append("opening_status")
-        if opening_variants and not text_has_any_variant(text, opening_variants):
-            missing_fields.append("opening_status")
+        if not opening_variants:
+            field_statuses["opening_status"] = "not_checkable"
+        elif text_has_any_variant(text, opening_variants):
+            field_statuses["opening_status"] = "confirmed"
+        else:
+            field_statuses["opening_status"] = "not_confirmed"
 
+    missing_fields = field_label_list(field_statuses, {"not_confirmed"})
     if not missing_fields:
-        evidence_status = "source_confirms_key_facts"
-        summary = "Activity-Quelle enthält die automatisch prüfbaren Kernhinweise."
+        if "not_checkable" in field_statuses.values():
+            evidence_status = "source_evidence_partial"
+            summary = "Activity-Quelle ist lesbar, aber Öffnungs-/Saisonlogik ist nicht vollständig automatisch beweisbar."
+        else:
+            evidence_status = "source_confirms_key_facts"
+            summary = "Activity-Quelle enthält die automatisch prüfbaren Kernhinweise feldgenau."
     else:
         evidence_status = "source_evidence_partial"
-        summary = "Activity-Quelle enthält nicht alle automatisch prüfbaren Hinweise; bei Gelegenheit fachlich prüfen."
+        summary = "Activity-Quelle enthält nicht alle automatisch prüfbaren Hinweise; Activity-Faktencheck sinnvoll."
 
     add_observation(
         content_type="activity",
@@ -957,13 +1072,14 @@ def evaluate_activity_source_evidence(offer: Dict[str, Any], source_url: str, *,
         checked_url=source_url,
         checked_fields=checked_fields,
         missing_fields=missing_fields,
-        summary=summary,
+        summary=f"{summary} Feldstatus: {field_status_text(field_statuses)}",
     )
     return {
         "evidence_status": evidence_status,
         "evidence_summary": summary,
         "evidence_checked_fields": ", ".join(checked_fields),
         "evidence_missing_fields": ", ".join(missing_fields),
+        "evidence_field_statuses": field_status_text(field_statuses),
     }
 
 
@@ -1315,6 +1431,7 @@ def audit_event_rows(
                 evidence_summary=evidence.get("evidence_summary", ""),
                 evidence_checked_fields=evidence.get("evidence_checked_fields", ""),
                 evidence_missing_fields=evidence.get("evidence_missing_fields", ""),
+                evidence_field_statuses=evidence.get("evidence_field_statuses", ""),
                 public_url=public_url,
             ))
         elif network:
@@ -1382,6 +1499,7 @@ def audit_event_rows(
                         evidence_summary=evidence.get("evidence_summary", ""),
                         evidence_checked_fields=evidence.get("evidence_checked_fields", ""),
                         evidence_missing_fields=evidence.get("evidence_missing_fields", ""),
+                        evidence_field_statuses=evidence.get("evidence_field_statuses", ""),
                         public_url=public_url,
                     ))
 
@@ -1850,10 +1968,10 @@ def audit_activities(
                     public_url=public_url,
                 ))
 
-            # Activity-Faktenproben werden in V1 nicht fuer alle Activities gezogen,
-            # damit der woechentliche Audit nicht durch viele externe Seiten blockiert.
-            # Quellenfehler/alte Pruefstaende bleiben als Aufgaben sichtbar;
-            # die eigentliche Activity-Faktenvertiefung ist ein separater Ausbau.
+            # Activity-Faktenproben bleiben bewusst ein separater Ausbau.
+            # Der naechste sichere Sprung liegt zuerst bei feldgenauer Event-Faktenpruefung;
+            # Activity-Oeffnungszeiten/Kosten/Saison duerfen nicht durch eine zu grobe Textprobe verrauscht werden.
+
 
     return issues
 
@@ -1941,8 +2059,8 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
         "",
         "## Issues",
         "",
-        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL | Visual Key | Visual Motif | Visual Asset | Evidence |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL | Visual Key | Visual Motif | Visual Asset | Evidence | Field status |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for item in sorted(issues, key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.workbench_group, x.content_type, x.date, x.title)):
         def cell(value: str) -> str:
@@ -1963,6 +2081,7 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
                 cell(item.suggested_visual_motif),
                 cell(item.visual_asset_status),
                 cell(item.evidence_status),
+                cell(item.evidence_field_statuses),
             ]) + " |"
         )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")

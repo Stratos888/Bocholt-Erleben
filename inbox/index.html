@@ -1465,6 +1465,7 @@ Umfang:
         ["Faktenprobe Kurzbefund", trimValue(item.evidence_summary)],
         ["Geprüfte Felder", trimValue(item.evidence_checked_fields)],
         ["Nicht bestätigt", trimValue(item.evidence_missing_fields)],
+        ["Feldstatus", trimValue(item.evidence_field_statuses)],
         ["Typ", trimValue(item.content_type)],
         ["Quelle", trimValue(item.source_system)],
         ["ID", trimValue(item.content_id)],
@@ -1652,7 +1653,8 @@ Umfang:
       const summary = trimValue(item.evidence_summary);
       const checked = trimValue(item.evidence_checked_fields);
       const missing = trimValue(item.evidence_missing_fields);
-      if (!status && !summary && !checked && !missing) return "";
+      const fieldStatuses = trimValue(item.evidence_field_statuses);
+      if (!status && !summary && !checked && !missing && !fieldStatuses) return "";
       return `
         <section class="reviewSection" aria-label="Faktenprobe">
           <div class="reviewSectionTitle">Faktenprobe</div>
@@ -1661,6 +1663,7 @@ Umfang:
             ${summary ? `<div>${escapeHtml(summary)}</div>` : ``}
             ${checked ? `<div><strong>Automatisch geprüft:</strong> ${escapeHtml(checked)}</div>` : ``}
             ${missing ? `<div><strong>Nicht automatisch bestätigt:</strong> ${escapeHtml(missing)}</div>` : ``}
+            ${fieldStatuses ? `<div><strong>Feldstatus:</strong> ${escapeHtml(fieldStatuses)}</div>` : ``}
           </div>
         </section>
       `;
@@ -1885,7 +1888,8 @@ Umfang:
           evidence_status: trimValue(item.evidence_status),
           evidence_summary: trimValue(item.evidence_summary),
           evidence_checked_fields: trimValue(item.evidence_checked_fields),
-          evidence_missing_fields: trimValue(item.evidence_missing_fields)
+          evidence_missing_fields: trimValue(item.evidence_missing_fields),
+          evidence_field_statuses: trimValue(item.evidence_field_statuses)
         }))
       };
     }
