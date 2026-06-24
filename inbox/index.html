@@ -230,6 +230,7 @@ Umfang:
     let totalLoaded = 0;
     /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_NAV_STATE_V1 | Zweck: erlaubt Vor-/Weiter-Navigation in Content-Prueffaellen ohne Statusaenderung; Umfang: nur Sitzungszustand fuer die Content-Pruefung === */
     let contentAuditHistory = [];
+    let contentAuditPackagePool = [];
     /* === END BLOCK: INBOX_CONTENT_AUDIT_NAV_STATE_V1 === */
 
     // Token nur im RAM (keine Storage APIs)
@@ -349,6 +350,7 @@ Umfang:
       queue = [];
       current = null;
       totalLoaded = 0;
+      contentAuditPackagePool = [];
       setStatus("Kuratier-Inbox gesperrt. Bitte neu laden und Passwort eingeben.");
       elLeft.textContent = "";
       elRight.textContent = "";
@@ -690,9 +692,12 @@ Umfang:
         }
 
         const items = Array.isArray(payload.data?.items) ? payload.data.items : [];
+        const packageItems = Array.isArray(payload.data?.package_items) ? payload.data.package_items : items;
         return {
           items,
+          packageItems,
           total: Number(payload.data?.total || items.length || 0),
+          packageTotal: Number(payload.data?.package_total || packageItems.length || 0),
           tabName: trimValue(payload.data?.tab_name),
           generatedAt: trimValue(payload.data?.generated_at),
           error: ""
@@ -729,6 +734,7 @@ Umfang:
         if (activeReviewMode === "content_audit") {
           const auditResult = await fetchContentAuditReviewItems();
           queue = Array.isArray(auditResult.items) ? auditResult.items : [];
+          contentAuditPackagePool = Array.isArray(auditResult.packageItems) ? auditResult.packageItems : queue;
           totalLoaded = Number(auditResult.total || queue.length || 0);
           contentAuditHistory = [];
 
@@ -737,7 +743,12 @@ Umfang:
             setStatus("Content-Prüfung konnte nicht geladen werden: " + auditResult.error);
           } else if (queue.length > 0) {
             const generated = auditResult.generatedAt ? ` · Stand: ${auditResult.generatedAt}` : "";
-            setStatus(`Content-Prüfung: ${queue.length} offene Fälle${generated}`);
+            const packageTotal = Number(auditResult.packageTotal || contentAuditPackagePool.length || queue.length || 0);
+            const packageHint = packageTotal > queue.length ? ` · ${packageTotal} Fälle in Arbeitspaketen` : "";
+            setStatus(`Content-Prüfung: ${queue.length} zentrale Fälle${packageHint}${generated}`);
+          } else if (contentAuditPackagePool.length > 0) {
+            const generated = auditResult.generatedAt ? ` · Stand: ${auditResult.generatedAt}` : "";
+            setStatus(`Content-Prüfung: keine zentralen Fälle · ${contentAuditPackagePool.length} Fälle nur in Arbeitspaketen${generated}`);
           } else {
             setStatus("Content-Prüfung: keine offenen Fälle.");
           }
@@ -1443,6 +1454,7 @@ Umfang:
         ["Prozesskategorie", trimValue(item.process_category)],
         ["Korrekturweg", trimValue(item.correction_owner)],
         ["Automatik-Regel", trimValue(item.automation_policy)],
+        ["Queue-Rolle", trimValue(item.queue_role)],
         ["Faktenprobe", trimValue(item.evidence_status)],
         ["Faktenprobe Kurzbefund", trimValue(item.evidence_summary)],
         ["Geprüfte Felder", trimValue(item.evidence_checked_fields)],
@@ -1680,7 +1692,10 @@ Umfang:
 
     /* === BEGIN BLOCK: INBOX_CONTENT_WORK_PACKAGE_EXPORT_V2 | Zweck: trennt Content-Prueffaelle in saubere Arbeitspakete (Repo-Datenpatch, Quellencheck, Retry/Beobachten, Visual-Fit), damit keine fachlich unterschiedlichen Faelle blind zusammen gepatcht werden; Umfang: reine UI-/Exportlogik, keine Status- oder Datenänderung === */
     function contentAuditAllLoadedItems() {
-      return [...contentAuditHistory, ...(current ? [current] : []), ...queue].filter(isContentAuditItem);
+      const base = contentAuditPackagePool.length
+        ? contentAuditPackagePool
+        : [...contentAuditHistory, ...(current ? [current] : []), ...queue];
+      return base.filter(isContentAuditItem);
     }
 
     function contentAuditWorkRoute(item) {
@@ -1692,6 +1707,7 @@ Umfang:
 
       if (category === "repo_data_patch_candidate" || group.includes("repo-datenpatch")) return "repo_data_patch";
       if (category === "source_review_candidate" || group.includes("quellenprüfung")) return "source_check";
+      if (category === "fact_check_candidate" || group.includes("faktencheck")) return "fact_check";
       if (category === "source_retry_observation" || group.includes("retry")) return "retry_observation";
       if (category === "visual_fit_candidate" || group.includes("visual-fit")) return "visual_fit";
       if (category === "activity_review_candidate" || group.includes("activity-prüfung")) return "activity_check";
@@ -1701,6 +1717,7 @@ Umfang:
 
       if (code === "activity_source_url_unstable" || code === "event_source_url_unstable") return "retry_observation";
       if (code.includes("source_url_redirect") || code.includes("source_url_broken") || code.includes("source_missing") || code.includes("source_url_invalid")) return "source_check";
+      if (code.includes("facts_not_confirmed") || code.includes("fact_evidence")) return "fact_check";
       if (code.includes("checked_at") || code.includes("check_too_old") || code.includes("check_aging")) return "activity_check";
 
       const directRepoCodes = ["activity_required_field_missing", "activity_duplicate_id", "activities_json_invalid"];
@@ -1724,6 +1741,13 @@ Umfang:
         copyLabel: "Quellencheck kopieren",
         description: "Quellenfälle, bei denen zuerst fachlich geprüft werden muss, ob die Zielseite stimmt oder eine bessere Quelle nötig ist. Erst danach entsteht ggf. ein Repo- oder Sheet-Fix.",
         instruction: "Bitte diese Quellenfälle zuerst fachlich prüfen. Nur wenn die Zielquelle belastbar besser ist, danach einen getrennten Korrekturpatch oder Inbox-Speicherfall vorbereiten."
+      },
+      fact_check: {
+        title: "Faktencheck-Paket",
+        label: "Faktencheck",
+        copyLabel: "Faktencheck kopieren",
+        description: "Fälle, bei denen die Quelle technisch erreichbar ist, aber Datum, Uhrzeit, Ort oder Titel nicht ausreichend automatisch bestätigt wurden. Das ist eine Prüfstichprobe, noch keine Korrektur.",
+        instruction: "Bitte diese Faktenfälle gegen die Quelle prüfen. Nur wenn die Quelle wirklich widerspricht, danach eine Sheet-/Inbox-Korrektur vorbereiten. Schwache automatische Texttreffer nicht blind als Fehler behandeln."
       },
       activity_check: {
         title: "Activity-Prüfpaket",
@@ -1783,6 +1807,7 @@ Umfang:
           correction_owner: trimValue(item.correction_owner),
           workbench_group: trimValue(item.workbench_group),
           automation_policy: trimValue(item.automation_policy),
+          queue_role: trimValue(item.queue_role),
           evidence_status: trimValue(item.evidence_status),
           evidence_summary: trimValue(item.evidence_summary),
           evidence_checked_fields: trimValue(item.evidence_checked_fields),
@@ -1818,7 +1843,7 @@ Umfang:
 
     function renderContentAuditWorkPackages() {
       const currentRoute = contentAuditWorkRoute(current || {});
-      const routes = [currentRoute, "repo_data_patch", "source_check", "activity_check", "retry_observation", "visual_fit"]
+      const routes = [currentRoute, "repo_data_patch", "source_check", "fact_check", "activity_check", "retry_observation", "visual_fit"]
         .filter((route, index, arr) => route && route !== "other" && arr.indexOf(route) === index);
       return routes.map(renderContentAuditPackage).join("");
     }

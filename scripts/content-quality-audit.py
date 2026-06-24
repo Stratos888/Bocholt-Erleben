@@ -236,6 +236,18 @@ def infer_process_metadata(
             "automation_policy": "safe_auto_resolved",
         }
 
+    fact_check_codes = {
+        "event_source_facts_not_confirmed",
+        "activity_source_facts_not_confirmed",
+    }
+    if code in fact_check_codes:
+        return {
+            "process_category": "fact_check_candidate",
+            "correction_owner": "content_inbox_fact_check",
+            "workbench_group": "Faktencheck",
+            "automation_policy": "human_review_before_write",
+        }
+
     visual_markers = (
         "visual",
         "image",
@@ -1306,7 +1318,7 @@ def audit_event_rows(
                         title,
                         "event_source_facts_not_confirmed",
                         "Die Quelle bestätigt die automatisch prüfbaren Kernfakten nicht ausreichend.",
-                        "Quelle fachlich prüfen: Datum, Uhrzeit, Ort und Titel gegen den Eventdatensatz vergleichen. Nicht automatisch überschreiben.",
+                        "Im Faktencheck-Paket prüfen: Datum, Uhrzeit, Ort und Titel gegen die Quelle vergleichen. Nur bei echter Abweichung entsteht danach eine Korrektur.",
                         date_value=date_value,
                         source_url=url,
                         evidence_status=evidence.get("evidence_status", ""),
