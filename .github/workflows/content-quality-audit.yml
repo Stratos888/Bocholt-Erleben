@@ -393,6 +393,9 @@ jobs:
               "verified_by",
               "last_verified_at",
               "verified_until",
+              "verification_reason",
+              "better_source_url",
+              "field_findings_json",
               "source_fingerprint",
               "content_fingerprint",
               "next_check_at",
@@ -423,6 +426,7 @@ jobs:
           except HttpError:
               previous = []
 
+          previous_rows = []
           if len(previous) >= 3:
               prev_header = [norm(name) for name in previous[2]]
               prev_index = {name: idx for idx, name in enumerate(prev_header) if name}
@@ -434,6 +438,10 @@ jobs:
                   return norm(row[idx])
 
               for row in previous[3:]:
+                  previous_row = {name: prev_value(row, name) for name in prev_header if name}
+                  if any(previous_row.values()):
+                      previous_rows.append(previous_row)
+
                   key = "|".join([
                       prev_value(row, "content_type"),
                       prev_value(row, "source_system"),
@@ -450,6 +458,17 @@ jobs:
                           "verified_at": prev_value(row, "verified_at"),
                           "next_review_at": prev_value(row, "next_review_at"),
                           "action_state": prev_value(row, "action_state"),
+                          "verification_key": prev_value(row, "verification_key"),
+                          "verification_status": prev_value(row, "verification_status"),
+                          "verified_by": prev_value(row, "verified_by"),
+                          "last_verified_at": prev_value(row, "last_verified_at"),
+                          "verified_until": prev_value(row, "verified_until"),
+                          "verification_reason": prev_value(row, "verification_reason"),
+                          "better_source_url": prev_value(row, "better_source_url"),
+                          "field_findings_json": prev_value(row, "field_findings_json"),
+                          "source_fingerprint": prev_value(row, "source_fingerprint"),
+                          "content_fingerprint": prev_value(row, "content_fingerprint"),
+                          "next_check_at": prev_value(row, "next_check_at"),
                       }
 
           rows = [
@@ -461,6 +480,10 @@ jobs:
           open_statuses = {"", "open"}
           deferred_statuses = {"checked", "verified", "corrected", "snoozed"}
           persistent_statuses = {"patch_needed", "source_unavailable", "blocked"}
+
+          def cached_previous_value(previous_item, name, current_value=""):
+              value = previous_item.get(name, "") if isinstance(previous_item, dict) else ""
+              return value if value else current_value
 
           for item in sheet_issues:
               key = "|".join([
@@ -497,6 +520,29 @@ jobs:
               elif previous_status not in open_statuses and previous_status not in deferred_statuses:
                   status = previous_status
 
+              verification_status = item.get("verification_status", "")
+              verified_by = item.get("verified_by", "")
+              last_verified_at = item.get("last_verified_at", "")
+              verified_until = item.get("verified_until", "")
+              verification_reason = item.get("verification_reason", "")
+              better_source_url = item.get("better_source_url", "")
+              field_findings_json = item.get("field_findings_json", "")
+              source_fingerprint = item.get("source_fingerprint", "")
+              content_fingerprint = item.get("content_fingerprint", "")
+              next_check_at = item.get("next_check_at", "")
+
+              if previous_item.get("verification_status"):
+                  verification_status = cached_previous_value(previous_item, "verification_status", verification_status)
+                  verified_by = cached_previous_value(previous_item, "verified_by", verified_by)
+                  last_verified_at = cached_previous_value(previous_item, "last_verified_at", last_verified_at)
+                  verified_until = cached_previous_value(previous_item, "verified_until", verified_until)
+                  verification_reason = cached_previous_value(previous_item, "verification_reason", verification_reason)
+                  better_source_url = cached_previous_value(previous_item, "better_source_url", better_source_url)
+                  field_findings_json = cached_previous_value(previous_item, "field_findings_json", field_findings_json)
+                  source_fingerprint = cached_previous_value(previous_item, "source_fingerprint", source_fingerprint)
+                  content_fingerprint = cached_previous_value(previous_item, "content_fingerprint", content_fingerprint)
+                  next_check_at = cached_previous_value(previous_item, "next_check_at", next_check_at)
+
               rows.append([
                   item.get("severity", ""),
                   status,
@@ -526,13 +572,16 @@ jobs:
                   item.get("evidence_missing_fields", ""),
                   item.get("evidence_field_statuses", ""),
                   item.get("verification_key", ""),
-                  item.get("verification_status", ""),
-                  item.get("verified_by", ""),
-                  item.get("last_verified_at", ""),
-                  item.get("verified_until", ""),
-                  item.get("source_fingerprint", ""),
-                  item.get("content_fingerprint", ""),
-                  item.get("next_check_at", ""),
+                  verification_status,
+                  verified_by,
+                  last_verified_at,
+                  verified_until,
+                  verification_reason,
+                  better_source_url,
+                  field_findings_json,
+                  source_fingerprint,
+                  content_fingerprint,
+                  next_check_at,
                   item.get("ai_candidate_priority", ""),
                   item.get("ai_candidate_reason", ""),
                   item.get("public_url", ""),
@@ -608,6 +657,137 @@ jobs:
                   ).execute()
                   print(f"✅ Verification cache header gesetzt: {cache_tab}")
 
+          # === BEGIN BLOCK: CONTENT_QUALITY_VERIFICATION_CACHE_WRITEBACK_V1 | Zweck: uebernimmt bestaetigte KI-/manuelle Faktenchecks aus dem vorherigen Content_Audit in den persistenten Pruefcache; Umfang: confirmed-only Cache-Merge ohne fachliche Datenaenderung ===
+          def build_cache_item_from_audit_row(row):
+              if norm(row.get("process_category")) != "ai_verification_candidate":
+                  return None, "not_ai_verification_candidate"
+              if norm(row.get("verification_status")).lower() != "confirmed":
+                  return None, "not_confirmed"
+
+              key = norm(row.get("verification_key"))
+              source_fingerprint = norm(row.get("source_fingerprint"))
+              content_fingerprint = norm(row.get("content_fingerprint"))
+              verified_until_raw = norm(row.get("verified_until") or row.get("next_review_at") or row.get("next_check_at"))
+              verified_until_day = parse_date(verified_until_raw)
+              if not key:
+                  return None, "missing_verification_key"
+              if not source_fingerprint or not content_fingerprint:
+                  return None, "missing_fingerprint"
+              if verified_until_day is None:
+                  return None, "missing_or_invalid_verified_until"
+              if verified_until_day < generated_day:
+                  return None, "verified_until_expired"
+
+              last_verified_at = norm(row.get("last_verified_at") or row.get("verified_at") or generated_at)
+              next_check_at = norm(row.get("next_check_at") or verified_until_day.isoformat())
+              verification_reason = norm(
+                  row.get("verification_reason")
+                  or row.get("review_note")
+                  or "Im Content_Audit als confirmed akzeptiert."
+              )
+
+              return {
+                  "verification_key": key,
+                  "content_type": norm(row.get("content_type")),
+                  "source_system": norm(row.get("source_system")),
+                  "content_id": norm(row.get("content_id")),
+                  "title": norm(row.get("title")),
+                  "source_url": norm(row.get("source_url")),
+                  "verification_status": "confirmed",
+                  "verified_by": norm(row.get("verified_by") or "user"),
+                  "last_verified_at": last_verified_at,
+                  "verified_until": verified_until_day.isoformat(),
+                  "verification_reason": verification_reason,
+                  "source_fingerprint": source_fingerprint,
+                  "content_fingerprint": content_fingerprint,
+                  "next_check_at": next_check_at,
+                  "better_source_url": norm(row.get("better_source_url") or row.get("suggested_url")),
+                  "field_findings_json": norm(row.get("field_findings_json")),
+              }, "accepted"
+
+          accepted_cache_items = []
+          cache_skip_counts = {}
+          for previous_row in previous_rows:
+              cache_item, cache_reason = build_cache_item_from_audit_row(previous_row)
+              if cache_item:
+                  accepted_cache_items.append(cache_item)
+              else:
+                  cache_skip_counts[cache_reason] = cache_skip_counts.get(cache_reason, 0) + 1
+
+          cache_header_values = cache_header[0]
+          existing_cache_by_key = {}
+          try:
+              cache_values = service.spreadsheets().values().get(
+                  spreadsheetId=sheet_id,
+                  range=f"{cache_tab}!A:Z",
+                  majorDimension="ROWS",
+              ).execute().get("values", []) or []
+          except HttpError:
+              cache_values = []
+
+          if len(cache_values) >= 2:
+              existing_cache_header = [norm(name) for name in cache_values[0]]
+              for raw in cache_values[1:]:
+                  cache_row = {
+                      existing_cache_header[i]: norm(raw[i]) if i < len(raw) else ""
+                      for i in range(len(existing_cache_header))
+                      if existing_cache_header[i]
+                  }
+                  key = norm(cache_row.get("verification_key"))
+                  if key:
+                      existing_cache_by_key[key] = cache_row
+
+          existing_cache_rows_before_merge = len(existing_cache_by_key)
+          for item in accepted_cache_items:
+              existing_cache_by_key[item["verification_key"]] = item
+
+          if accepted_cache_items:
+              merged_cache_rows = []
+              for item in sorted(
+                  existing_cache_by_key.values(),
+                  key=lambda row: (norm(row.get("content_type")), norm(row.get("title")), norm(row.get("content_id"))),
+              ):
+                  merged_cache_rows.append([norm(item.get(name)) for name in cache_header_values])
+
+              service.spreadsheets().values().clear(
+                  spreadsheetId=sheet_id,
+                  range=f"{cache_tab}!A:Z",
+                  body={},
+              ).execute()
+              service.spreadsheets().values().update(
+                  spreadsheetId=sheet_id,
+                  range=f"{cache_tab}!A1",
+                  valueInputOption="RAW",
+                  body={"values": [cache_header_values] + merged_cache_rows},
+              ).execute()
+              cache_writeback_status = "written"
+          else:
+              cache_writeback_status = "no_confirmed_rows"
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/content-verification-cache-writeback.json", "w", encoding="utf-8") as handle:
+              json.dump({
+                  "status": cache_writeback_status,
+                  "tab": cache_tab,
+                  "accepted_count": len(accepted_cache_items),
+                  "existing_cache_rows_before_merge": existing_cache_rows_before_merge,
+                  "cache_rows_after_merge": len(existing_cache_by_key),
+                  "skip_counts": cache_skip_counts,
+                  "accepted": [
+                      {
+                          "verification_key": item.get("verification_key", ""),
+                          "content_id": item.get("content_id", ""),
+                          "title": item.get("title", ""),
+                          "verified_until": item.get("verified_until", ""),
+                      }
+                      for item in accepted_cache_items
+                  ],
+              }, handle, ensure_ascii=False, indent=2)
+              handle.write("\n")
+
+          print(f"✅ Verification cache writeback: {cache_writeback_status}, accepted={len(accepted_cache_items)}")
+          # === END BLOCK: CONTENT_QUALITY_VERIFICATION_CACHE_WRITEBACK_V1 ===
+
           print(f"✅ Content Audit written to {tab_name}: {len(sheet_issues)} issues")
           PY
       # === END BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V2 ===
@@ -622,4 +802,5 @@ jobs:
             data/content-quality-report.md
             data/content-ai-verification-candidates.json
             data/content-verification-cache.json
+            data/content-verification-cache-writeback.json
       # === END BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 ===
