@@ -303,6 +303,10 @@ jobs:
               "suggested_url",
               "suggested_url_label",
               "suggestion_reason",
+              "suggested_visual_key",
+              "suggested_visual_motif",
+              "suggested_visual_motif_role",
+              "visual_asset_status",
               "evidence_status",
               "evidence_summary",
               "evidence_checked_fields",
@@ -326,7 +330,7 @@ jobs:
           try:
               previous = service.spreadsheets().values().get(
                   spreadsheetId=sheet_id,
-                  range=f"{tab_name}!A:AF",
+                  range=f"{tab_name}!A:AJ",
                   majorDimension="ROWS",
               ).execute().get("values", []) or []
           except HttpError:
@@ -425,6 +429,10 @@ jobs:
                   item.get("suggested_url", ""),
                   item.get("suggested_url_label", ""),
                   item.get("suggestion_reason", ""),
+                  item.get("suggested_visual_key", ""),
+                  item.get("suggested_visual_motif", ""),
+                  item.get("suggested_visual_motif_role", ""),
+                  item.get("visual_asset_status", ""),
                   item.get("evidence_status", ""),
                   item.get("evidence_summary", ""),
                   item.get("evidence_checked_fields", ""),
@@ -443,7 +451,7 @@ jobs:
 
           service.spreadsheets().values().clear(
               spreadsheetId=sheet_id,
-              range=f"{tab_name}!A:AF",
+              range=f"{tab_name}!A:AJ",
               body={},
           ).execute()
           service.spreadsheets().values().update(
