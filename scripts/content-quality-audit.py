@@ -292,6 +292,7 @@ def infer_process_metadata(
 
     fact_check_codes = {
         "event_source_facts_not_confirmed",
+        "event_source_has_time_but_dataset_missing_time",
         "activity_source_facts_not_confirmed",
     }
     if code in fact_check_codes:
@@ -1096,6 +1097,18 @@ def text_has_any_variant(text: str, variants: list[str]) -> bool:
     return any(variant and variant in haystack for variant in variants)
 
 
+def source_text_has_time_hint(text: str) -> bool:
+    """Detect plausible event-time hints in source text when the dataset has no time value.
+
+    This is intentionally only a hint. It must not auto-write event times because
+    page footers, opening hours or unrelated programme blocks can contain times.
+    """
+    haystack = evidence_text(text)
+    if not haystack:
+        return False
+    return bool(re.search(r"\b(?:[01]?\d|2[0-3])[:.][0-5]\d(?:\s*(?:uhr|uur))?\b|\b(?:[01]?\d|2[0-3])\s*(?:uhr|uur)\b", haystack))
+
+
 def parse_time_range(value: str) -> Dict[str, list[str]]:
     match = RE_TIME.match(norm(value))
     if not match:
@@ -1204,6 +1217,8 @@ def evaluate_event_source_evidence(row: Dict[str, str], source_system: str, evid
             "evidence_checked_fields": "",
             "evidence_missing_fields": "",
             "evidence_field_statuses": "",
+            "source_time_hint_status": "",
+            "source_time_hint_summary": "",
         }
 
     status, detail, text = text_probe_url(evidence_url)
@@ -1226,6 +1241,8 @@ def evaluate_event_source_evidence(row: Dict[str, str], source_system: str, evid
             "evidence_checked_fields": "",
             "evidence_missing_fields": "source_text",
             "evidence_field_statuses": "source_text=unavailable",
+            "source_time_hint_status": "",
+            "source_time_hint_summary": "",
         }
 
     title_tokens = significant_tokens(title)
@@ -1263,6 +1280,16 @@ def evaluate_event_source_evidence(row: Dict[str, str], source_system: str, evid
         checked_fields.append("location")
         # Generische Orte wie Innenstadt/Marktplatz werden geprüft, aber nur als schwacher Nachweis gewertet.
         field_statuses["location"] = "weak_confirmed" if text_has_tokens(text, generic_location_tokens, minimum=1) else "not_confirmed"
+
+    source_time_hint_status = ""
+    source_time_hint_summary = ""
+    if not time_value and source_text_has_time_hint(text):
+        context_ok = any(field_statuses.get(name) == "confirmed" for name in ("title", "date", "end_date"))
+        if context_ok:
+            checked_fields.append("source_time_hint")
+            source_time_hint_status = "source_has_time_but_dataset_missing_time"
+            source_time_hint_summary = "Quelle enthält mindestens eine konkrete Uhrzeit, der Datensatz hat aber kein time-Feld."
+            field_statuses["source_time_hint"] = source_time_hint_status
 
     missing_fields = field_label_list(field_statuses, {"not_confirmed"})
     weak_fields = field_label_list(field_statuses, {"weak_confirmed"})
@@ -1309,6 +1336,8 @@ def evaluate_event_source_evidence(row: Dict[str, str], source_system: str, evid
         "evidence_checked_fields": ", ".join(checked_fields),
         "evidence_missing_fields": ", ".join(missing_fields),
         "evidence_field_statuses": field_status_text(field_statuses),
+        "source_time_hint_status": source_time_hint_status,
+        "source_time_hint_summary": source_time_hint_summary,
     }
 
 
@@ -1945,6 +1974,26 @@ def audit_event_rows(
                             ai_candidate_reason=verification.get("ai_candidate_reason", ""),
                             public_url=public_url,
                         ))
+
+                if evidence.get("source_time_hint_status") == "source_has_time_but_dataset_missing_time":
+                    issues.append(issue(
+                        "warning",
+                        "event",
+                        source_system,
+                        content_id,
+                        title,
+                        "event_source_has_time_but_dataset_missing_time",
+                        "Quelle nennt mindestens eine konkrete Uhrzeit, der Datensatz enthält aber keine Uhrzeit.",
+                        "Zeitangabe fachlich prüfen und nur nach bestätigter Quelle im Sheet ergänzen; keine automatische Korrektur.",
+                        date_value=date_value,
+                        source_url=url,
+                        evidence_status=evidence.get("source_time_hint_status", ""),
+                        evidence_summary=evidence.get("source_time_hint_summary", ""),
+                        evidence_checked_fields=evidence.get("evidence_checked_fields", ""),
+                        evidence_missing_fields="dataset_time",
+                        evidence_field_statuses=evidence.get("evidence_field_statuses", ""),
+                        public_url=public_url,
+                    ))
 
         visual_key = norm(row.get("visual_key"))
         visual_motif = norm(row.get("visual_motif") or row.get("image_visual_motif") or row.get("visualMotif"))
