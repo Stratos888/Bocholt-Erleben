@@ -90,10 +90,12 @@ jobs:
             APP_BASE_URL="https://staging.bocholt-erleben.de"
             CONTENT_AUDIT_TAB="Content_Audit_Staging"
             CONTENT_VERIFICATION_CACHE_TAB="Content_Verification_Cache_Staging"
+            CONTENT_VERIFICATION_ACCEPTANCE_TAB="Content_Verification_Acceptance_Staging"
           else
             APP_BASE_URL="https://bocholt-erleben.de"
             CONTENT_AUDIT_TAB="Content_Audit"
             CONTENT_VERIFICATION_CACHE_TAB="Content_Verification_Cache"
+            CONTENT_VERIFICATION_ACCEPTANCE_TAB="Content_Verification_Acceptance"
           fi
 
           echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
@@ -101,11 +103,13 @@ jobs:
           echo "APP_BASE_URL=$APP_BASE_URL" >> "$GITHUB_ENV"
           echo "CONTENT_AUDIT_TAB=$CONTENT_AUDIT_TAB" >> "$GITHUB_ENV"
           echo "CONTENT_VERIFICATION_CACHE_TAB=$CONTENT_VERIFICATION_CACHE_TAB" >> "$GITHUB_ENV"
+          echo "CONTENT_VERIFICATION_ACCEPTANCE_TAB=$CONTENT_VERIFICATION_ACCEPTANCE_TAB" >> "$GITHUB_ENV"
 
           echo "Audit scope: $AUDIT_SCOPE"
           echo "Audit runtime: $APP_BASE_URL"
           echo "Audit sheet tab: $CONTENT_AUDIT_TAB"
           echo "Verification cache tab: $CONTENT_VERIFICATION_CACHE_TAB"
+          echo "Verification acceptance tab: $CONTENT_VERIFICATION_ACCEPTANCE_TAB"
       # === END BLOCK: CONTENT_QUALITY_RESOLVE_SCOPE_AND_TARGET_V1 ===
 
       # === BEGIN BLOCK: CONTENT_QUALITY_EXPORT_EVENTS_SHEET_V1 | Zweck: liest die kanonischen redaktionellen Events direkt aus dem Google Sheet; Umfang: exportiert Events!A:ZZ nach data/events.tsv ===
@@ -630,6 +634,26 @@ jobs:
               "better_source_url",
               "field_findings_json",
           ]]
+          acceptance_tab = os.environ.get("CONTENT_VERIFICATION_ACCEPTANCE_TAB", "Content_Verification_Acceptance").strip() or "Content_Verification_Acceptance"
+          acceptance_header = [[
+              "verification_key",
+              "verification_status",
+              "verified_by",
+              "last_verified_at",
+              "verified_until",
+              "verification_reason",
+              "better_source_url",
+              "field_findings_json",
+              "source_fingerprint",
+              "content_fingerprint",
+              "content_type",
+              "source_system",
+              "content_id",
+              "title",
+              "source_url",
+              "action_state",
+              "processed_at",
+          ]]
           if cache_tab not in existing:
               service.spreadsheets().batchUpdate(
                   spreadsheetId=sheet_id,
@@ -657,7 +681,34 @@ jobs:
                   ).execute()
                   print(f"✅ Verification cache header gesetzt: {cache_tab}")
 
-          # === BEGIN BLOCK: CONTENT_QUALITY_VERIFICATION_CACHE_WRITEBACK_V1 | Zweck: uebernimmt bestaetigte KI-/manuelle Faktenchecks aus dem vorherigen Content_Audit in den persistenten Pruefcache; Umfang: confirmed-only Cache-Merge ohne fachliche Datenaenderung ===
+          if acceptance_tab not in existing:
+              service.spreadsheets().batchUpdate(
+                  spreadsheetId=sheet_id,
+                  body={"requests": [{"addSheet": {"properties": {"title": acceptance_tab}}}]},
+              ).execute()
+              service.spreadsheets().values().update(
+                  spreadsheetId=sheet_id,
+                  range=f"{acceptance_tab}!A1",
+                  valueInputOption="RAW",
+                  body={"values": acceptance_header},
+              ).execute()
+              print(f"✅ Verification acceptance tab angelegt: {acceptance_tab}")
+          else:
+              current_acceptance_header = service.spreadsheets().values().get(
+                  spreadsheetId=sheet_id,
+                  range=f"{acceptance_tab}!A1:Q1",
+                  majorDimension="ROWS",
+              ).execute().get("values", []) or []
+              if not current_acceptance_header or not any(current_acceptance_header[0]):
+                  service.spreadsheets().values().update(
+                      spreadsheetId=sheet_id,
+                      range=f"{acceptance_tab}!A1",
+                      valueInputOption="RAW",
+                      body={"values": acceptance_header},
+                  ).execute()
+                  print(f"✅ Verification acceptance header gesetzt: {acceptance_tab}")
+
+          # === BEGIN BLOCK: CONTENT_QUALITY_VERIFICATION_CACHE_WRITEBACK_V2 | Zweck: uebernimmt bestaetigte KI-/manuelle Faktenchecks aus separater Acceptance-Schicht oder vorherigem Content_Audit in den persistenten Pruefcache; Umfang: confirmed-only Cache-Merge ohne fachliche Datenaenderung ===
           def build_cache_item_from_audit_row(row):
               if norm(row.get("process_category")) != "ai_verification_candidate":
                   return None, "not_ai_verification_candidate"
@@ -705,14 +756,77 @@ jobs:
                   "field_findings_json": norm(row.get("field_findings_json")),
               }, "accepted"
 
-          accepted_cache_items = []
+          context_by_verification_key = {}
+          for item in sheet_issues:
+              key = norm(item.get("verification_key"))
+              if key:
+                  context_by_verification_key[key] = {str(k): norm(v) for k, v in item.items()}
+          for previous_row in previous_rows:
+              key = norm(previous_row.get("verification_key"))
+              if key and key not in context_by_verification_key:
+                  context_by_verification_key[key] = previous_row
+
+          def read_acceptance_rows():
+              try:
+                  values = service.spreadsheets().values().get(
+                      spreadsheetId=sheet_id,
+                      range=f"{acceptance_tab}!A:Z",
+                      majorDimension="ROWS",
+                  ).execute().get("values", []) or []
+              except HttpError:
+                  return []
+              if len(values) < 2:
+                  return []
+              row_header = [norm(name) for name in values[0]]
+              out = []
+              for raw in values[1:]:
+                  row = {
+                      row_header[i]: norm(raw[i]) if i < len(raw) else ""
+                      for i in range(len(row_header))
+                      if row_header[i]
+                  }
+                  if any(row.values()):
+                      out.append(row)
+              return out
+
+          def merge_acceptance_context(row):
+              key = norm(row.get("verification_key"))
+              merged = dict(context_by_verification_key.get(key, {})) if key else {}
+              for name, value in row.items():
+                  if norm(value):
+                      merged[name] = norm(value)
+              if key and not norm(merged.get("verification_key")):
+                  merged["verification_key"] = key
+              if key and not norm(merged.get("process_category")):
+                  merged["process_category"] = "ai_verification_candidate"
+              return merged
+
+          acceptance_rows = read_acceptance_rows()
+          accepted_cache_by_key = {}
+          accepted_source_by_key = {}
           cache_skip_counts = {}
+
           for previous_row in previous_rows:
               cache_item, cache_reason = build_cache_item_from_audit_row(previous_row)
               if cache_item:
-                  accepted_cache_items.append(cache_item)
+                  key = cache_item["verification_key"]
+                  accepted_cache_by_key[key] = cache_item
+                  accepted_source_by_key[key] = "previous_audit"
               else:
                   cache_skip_counts[cache_reason] = cache_skip_counts.get(cache_reason, 0) + 1
+
+          for acceptance_row in acceptance_rows:
+              merged_row = merge_acceptance_context(acceptance_row)
+              cache_item, cache_reason = build_cache_item_from_audit_row(merged_row)
+              if cache_item:
+                  key = cache_item["verification_key"]
+                  accepted_cache_by_key[key] = cache_item
+                  accepted_source_by_key[key] = "acceptance_tab"
+              else:
+                  cache_key = f"acceptance_{cache_reason}"
+                  cache_skip_counts[cache_key] = cache_skip_counts.get(cache_key, 0) + 1
+
+          accepted_cache_items = list(accepted_cache_by_key.values())
 
           cache_header_values = cache_header[0]
           existing_cache_by_key = {}
@@ -770,6 +884,8 @@ jobs:
                   "status": cache_writeback_status,
                   "tab": cache_tab,
                   "accepted_count": len(accepted_cache_items),
+                  "acceptance_rows_read": len(acceptance_rows),
+                  "accepted_sources": accepted_source_by_key,
                   "existing_cache_rows_before_merge": existing_cache_rows_before_merge,
                   "cache_rows_after_merge": len(existing_cache_by_key),
                   "skip_counts": cache_skip_counts,
@@ -779,6 +895,7 @@ jobs:
                           "content_id": item.get("content_id", ""),
                           "title": item.get("title", ""),
                           "verified_until": item.get("verified_until", ""),
+                          "source": accepted_source_by_key.get(item.get("verification_key", ""), ""),
                       }
                       for item in accepted_cache_items
                   ],
@@ -786,7 +903,7 @@ jobs:
               handle.write("\n")
 
           print(f"✅ Verification cache writeback: {cache_writeback_status}, accepted={len(accepted_cache_items)}")
-          # === END BLOCK: CONTENT_QUALITY_VERIFICATION_CACHE_WRITEBACK_V1 ===
+          # === END BLOCK: CONTENT_QUALITY_VERIFICATION_CACHE_WRITEBACK_V2 ===
 
           print(f"✅ Content Audit written to {tab_name}: {len(sheet_issues)} issues")
           PY
