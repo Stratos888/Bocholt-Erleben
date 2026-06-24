@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import html
 import json
 import re
@@ -83,6 +84,21 @@ TICKET_PORTAL_HOSTS = (
 )
 
 SOURCE_SUGGESTIONS_PATH = ROOT / "data/content_source_suggestions.json"
+AI_VERIFICATION_CACHE_DAYS = 21
+AI_VERIFICATION_ACTIVITY_CACHE_DAYS = 60
+AI_VERIFICATION_DEFAULT_MAX_CANDIDATES = 12
+
+
+VERIFICATION_CACHE: Dict[str, Dict[str, str]] = {}
+VERIFICATION_STATS: Dict[str, int] = {
+    "cache_entries_loaded": 0,
+    "cache_hits": 0,
+    "cache_stale": 0,
+    "ai_candidates_total": 0,
+    "ai_candidates_selected": 0,
+    "ai_candidates_deferred_by_budget": 0,
+}
+AI_VERIFICATION_CANDIDATES: List[Dict[str, Any]] = []
 
 
 def url_host(value: str) -> str:
@@ -199,6 +215,16 @@ class Issue:
     evidence_checked_fields: str
     evidence_missing_fields: str
     evidence_field_statuses: str
+    verification_key: str
+    verification_status: str
+    verified_by: str
+    last_verified_at: str
+    verified_until: str
+    source_fingerprint: str
+    content_fingerprint: str
+    next_check_at: str
+    ai_candidate_priority: str
+    ai_candidate_reason: str
     public_url: str
     auto_fix_allowed: str
     auto_fix_done: str
@@ -250,6 +276,18 @@ def infer_process_metadata(
             "correction_owner": "audit_script",
             "workbench_group": "Automatisch erledigt",
             "automation_policy": "safe_auto_resolved",
+        }
+
+    ai_verification_codes = {
+        "event_ai_verification_candidate",
+        "activity_ai_verification_candidate",
+    }
+    if code in ai_verification_codes:
+        return {
+            "process_category": "ai_verification_candidate",
+            "correction_owner": "ai_fact_check_fallback",
+            "workbench_group": "KI-Faktencheck",
+            "automation_policy": "ai_fallback_budgeted_no_auto_write",
         }
 
     fact_check_codes = {
@@ -433,6 +471,16 @@ def issue(
     evidence_checked_fields: str = "",
     evidence_missing_fields: str = "",
     evidence_field_statuses: str = "",
+    verification_key: str = "",
+    verification_status: str = "",
+    verified_by: str = "",
+    last_verified_at: str = "",
+    verified_until: str = "",
+    source_fingerprint: str = "",
+    content_fingerprint: str = "",
+    next_check_at: str = "",
+    ai_candidate_priority: str = "",
+    ai_candidate_reason: str = "",
     public_url: str = "",
     auto_fix_allowed: bool = False,
     auto_fix_done: bool = False,
@@ -473,6 +521,16 @@ def issue(
         evidence_checked_fields=norm(evidence_checked_fields),
         evidence_missing_fields=norm(evidence_missing_fields),
         evidence_field_statuses=norm(evidence_field_statuses),
+        verification_key=norm(verification_key),
+        verification_status=norm(verification_status),
+        verified_by=norm(verified_by),
+        last_verified_at=norm(last_verified_at),
+        verified_until=norm(verified_until),
+        source_fingerprint=norm(source_fingerprint),
+        content_fingerprint=norm(content_fingerprint),
+        next_check_at=norm(next_check_at),
+        ai_candidate_priority=norm(ai_candidate_priority),
+        ai_candidate_reason=norm(ai_candidate_reason),
         public_url=norm(public_url),
         auto_fix_allowed="yes" if auto_fix_allowed else "no",
         auto_fix_done="yes" if auto_fix_done else "no",
@@ -525,6 +583,276 @@ def source_suggestion_for_event(row: Dict[str, str], suggestions: Dict[str, Dict
             return suggestions[key]
 
     return {"suggested_url": "", "suggested_url_label": "", "suggestion_reason": ""}
+
+
+def stable_hash(parts: Iterable[Any]) -> str:
+    payload = "\n".join(norm(part) for part in parts)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:24]
+
+
+def verification_key(content_type: str, source_system: str, content_id: str, source_url: str) -> str:
+    return stable_hash([content_type, source_system, content_id, normalized_url_parts(source_url) if source_url else ""])
+
+
+def source_fingerprint_for_url(source_url: str) -> str:
+    host, path, query = normalized_url_parts(source_url)
+    return stable_hash([host, path, query]) if host else ""
+
+
+def event_content_fingerprint(row: Dict[str, str], source_url: str) -> str:
+    return stable_hash([
+        row.get("id") or row.get("event_id") or row.get("submission_id"),
+        row.get("title"),
+        row.get("date") or row.get("start_date"),
+        row.get("endDate") or row.get("end_date"),
+        row.get("time"),
+        row.get("city"),
+        row.get("location"),
+        row.get("address"),
+        row.get("kategorie"),
+        row.get("source_url") or row.get("url") or row.get("event_url") or source_url,
+    ])
+
+
+def activity_content_fingerprint(offer: Dict[str, Any], source_url: str) -> str:
+    opening_status = offer.get("opening_status") if isinstance(offer.get("opening_status"), dict) else {}
+    return stable_hash([
+        offer.get("id"),
+        offer.get("title"),
+        offer.get("location"),
+        offer.get("description"),
+        source_url,
+        opening_status.get("type"),
+        opening_status.get("public_label"),
+        opening_status.get("detail_note"),
+        opening_status.get("source_url"),
+    ])
+
+
+def load_verification_cache(path: Path) -> Dict[str, Dict[str, str]]:
+    data = load_json(path, required=False)
+    items: list[Any]
+    if isinstance(data, dict):
+        raw_items = data.get("items") or data.get("cache") or data.get("rows") or []
+        items = raw_items if isinstance(raw_items, list) else []
+    elif isinstance(data, list):
+        items = data
+    else:
+        items = []
+
+    out: Dict[str, Dict[str, str]] = {}
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        key = norm(item.get("verification_key"))
+        if not key:
+            key = verification_key(
+                norm(item.get("content_type")),
+                norm(item.get("source_system")),
+                norm(item.get("content_id")),
+                norm(item.get("source_url")),
+            )
+        if not key:
+            continue
+        out[key] = {str(k): norm(v) for k, v in item.items()}
+        out[key]["verification_key"] = key
+    return out
+
+
+def parse_cache_date(value: str) -> Optional[date]:
+    return parse_iso_date(norm(value)[:10])
+
+
+def verification_cache_match(key: str, source_fingerprint: str, content_fingerprint: str, today: date) -> Dict[str, str]:
+    entry = VERIFICATION_CACHE.get(key) or {}
+    if not entry:
+        return {}
+
+    status = norm(entry.get("verification_status"))
+    verified_until = parse_cache_date(entry.get("verified_until", ""))
+    source_ok = norm(entry.get("source_fingerprint")) == norm(source_fingerprint)
+    content_ok = norm(entry.get("content_fingerprint")) == norm(content_fingerprint)
+    if status == "confirmed" and verified_until and verified_until >= today and source_ok and content_ok:
+        VERIFICATION_STATS["cache_hits"] += 1
+        return entry
+
+    VERIFICATION_STATS["cache_stale"] += 1
+    return {}
+
+
+def is_ai_fallback_url_detail(detail: str) -> bool:
+    value = norm(detail).lower()
+    markers = (
+        "429",
+        "403",
+        "401",
+        "bot",
+        "captcha",
+        "cloudflare",
+        "forbidden",
+        "too many requests",
+        "access denied",
+        "source_text_unavailable",
+        "no_text",
+        "timed out",
+        "timeouterror",
+        "url_check_unknown",
+    )
+    return any(marker in value for marker in markers)
+
+
+def ai_priority_for_event(date_value: str, reason: str, today: date) -> int:
+    day = parse_iso_date(date_value)
+    if day is None:
+        return 70
+    days_until = (day - today).days
+    reason_norm = norm(reason).lower()
+    if "ticket" in reason_norm or "conflict" in reason_norm:
+        bonus = 15
+    elif "429" in reason_norm or "bot" in reason_norm or "403" in reason_norm:
+        bonus = 10
+    else:
+        bonus = 0
+    if days_until < 0:
+        return 0
+    if days_until <= 7:
+        return 100 + bonus
+    if days_until <= 14:
+        return 90 + bonus
+    if days_until <= 30:
+        return 75 + bonus
+    return 45 + bonus
+
+
+def ai_priority_label(priority: int) -> str:
+    if priority >= 100:
+        return "p0_near_term"
+    if priority >= 85:
+        return "p1_soon"
+    if priority >= 65:
+        return "p2_medium"
+    return "p3_low"
+
+
+def add_ai_verification_candidate(
+    *,
+    content_type: str,
+    source_system: str,
+    content_id: str,
+    title: str,
+    date_value: str = "",
+    source_url: str,
+    reason: str,
+    current_data: Dict[str, Any],
+    source_fingerprint: str,
+    content_fingerprint: str,
+    priority: int,
+    today: date,
+    evidence_status: str = "",
+    evidence_summary: str = "",
+    evidence_checked_fields: str = "",
+    evidence_missing_fields: str = "",
+    evidence_field_statuses: str = "",
+) -> Dict[str, str]:
+    key = verification_key(content_type, source_system, content_id, source_url)
+    cache_entry = verification_cache_match(key, source_fingerprint, content_fingerprint, today)
+    if cache_entry:
+        add_observation(
+            content_type=content_type,
+            source_system=source_system,
+            content_id=content_id,
+            title=title,
+            date_value=date_value,
+            check_code="ai_verification_cache",
+            check_status="cache_hit_confirmed",
+            workbench_group="KI-Faktencheck",
+            checked_url=source_url,
+            checked_fields=current_data.keys(),
+            summary=f"Frische KI-Bestätigung im Prüfcache bis {cache_entry.get('verified_until', '')}; kein erneuter KI-Faktencheck.",
+        )
+        return {
+            "cache_hit": "yes",
+            "verification_key": key,
+            "verification_status": cache_entry.get("verification_status", "confirmed"),
+            "verified_by": cache_entry.get("verified_by", "ai"),
+            "last_verified_at": cache_entry.get("last_verified_at", ""),
+            "verified_until": cache_entry.get("verified_until", ""),
+            "source_fingerprint": source_fingerprint,
+            "content_fingerprint": content_fingerprint,
+            "next_check_at": cache_entry.get("next_check_at", cache_entry.get("verified_until", "")),
+            "ai_candidate_priority": ai_priority_label(priority),
+            "ai_candidate_reason": reason,
+        }
+
+    VERIFICATION_STATS["ai_candidates_total"] += 1
+    candidate = {
+        "verification_key": key,
+        "priority": priority,
+        "priority_label": ai_priority_label(priority),
+        "reason": norm(reason),
+        "content_type": norm(content_type),
+        "source_system": norm(source_system),
+        "content_id": norm(content_id),
+        "title": norm(title),
+        "date": norm(date_value),
+        "source_url": norm(source_url),
+        "source_fingerprint": norm(source_fingerprint),
+        "content_fingerprint": norm(content_fingerprint),
+        "evidence_status": norm(evidence_status),
+        "evidence_summary": norm(evidence_summary),
+        "evidence_checked_fields": norm(evidence_checked_fields),
+        "evidence_missing_fields": norm(evidence_missing_fields),
+        "evidence_field_statuses": norm(evidence_field_statuses),
+        "current_data": current_data,
+        "expected_result_schema": {
+            "verification_status": ["confirmed", "conflict", "better_source_found", "not_found", "uncertain"],
+            "verified_until": "YYYY-MM-DD",
+            "verification_reason": "short factual explanation",
+            "better_source_url": "optional official source URL",
+            "field_findings": "object keyed by checked field",
+        },
+    }
+    AI_VERIFICATION_CANDIDATES.append(candidate)
+    return {
+        "cache_hit": "no",
+        "verification_key": key,
+        "verification_status": "candidate",
+        "verified_by": "",
+        "last_verified_at": "",
+        "verified_until": "",
+        "source_fingerprint": source_fingerprint,
+        "content_fingerprint": content_fingerprint,
+        "next_check_at": today.isoformat(),
+        "ai_candidate_priority": ai_priority_label(priority),
+        "ai_candidate_reason": reason,
+    }
+
+
+def selected_ai_candidates(limit: int) -> list[Dict[str, Any]]:
+    limit = max(0, limit)
+    unique: Dict[str, Dict[str, Any]] = {}
+    for item in AI_VERIFICATION_CANDIDATES:
+        key = norm(item.get("verification_key"))
+        if not key:
+            continue
+        previous = unique.get(key)
+        if previous is None or int(item.get("priority") or 0) > int(previous.get("priority") or 0):
+            unique[key] = item
+    ordered = sorted(unique.values(), key=lambda item: (-int(item.get("priority") or 0), norm(item.get("date")), norm(item.get("title"))))
+    selected = ordered[:limit] if limit else []
+    VERIFICATION_STATS["ai_candidates_selected"] = len(selected)
+    VERIFICATION_STATS["ai_candidates_deferred_by_budget"] = max(0, len(ordered) - len(selected))
+    return selected
+
+
+def write_ai_candidates_report(path: Path, candidates: list[Dict[str, Any]], meta: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "meta": meta,
+        "verification_summary": dict(VERIFICATION_STATS),
+        "candidates": candidates,
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def read_tsv(path: Path) -> List[Dict[str, str]]:
@@ -1435,35 +1763,119 @@ def audit_event_rows(
                 public_url=public_url,
             ))
         elif network:
+            source_fp = source_fingerprint_for_url(url)
+            content_fp = event_content_fingerprint(row, url)
+            current_event_data = {
+                "title": title,
+                "date": date_value,
+                "end_date": end_date_value,
+                "time": time_value,
+                "city": norm(row.get("city")),
+                "location": norm(row.get("location")),
+                "address": norm(row.get("address")),
+                "category": norm(row.get("kategorie")),
+                "source_url": url,
+            }
             status, detail = check_url(url)
             if status == "critical":
-                issues.append(issue(
-                    "critical" if in_daily_window else "review_needed",
-                    "event",
-                    source_system,
-                    content_id,
-                    title,
-                    "event_source_url_broken",
-                    f"Quelle/Event-Link antwortet kritisch: {detail}",
-                    "Quelle manuell prüfen; nicht automatisch löschen oder umschreiben.",
-                    date_value=date_value,
-                    source_url=url,
-                    public_url=public_url,
-                ))
+                if is_ai_fallback_url_detail(detail):
+                    reason = f"Quelle ist technisch blockiert/unsicher und wird gezielt per KI-Fallback geprüft: {detail}"
+                    verification = add_ai_verification_candidate(
+                        content_type="event",
+                        source_system=source_system,
+                        content_id=content_id,
+                        title=title,
+                        date_value=date_value,
+                        source_url=url,
+                        reason=reason,
+                        current_data=current_event_data,
+                        source_fingerprint=source_fp,
+                        content_fingerprint=content_fp,
+                        priority=ai_priority_for_event(date_value, reason, today),
+                        today=today,
+                    )
+                    if verification.get("cache_hit") != "yes":
+                        issues.append(issue(
+                            "warning",
+                            "event",
+                            source_system,
+                            content_id,
+                            title,
+                            "event_ai_verification_candidate",
+                            "Quelle kann durch den technischen Audit nicht belastbar geprüft werden.",
+                            "Strukturierten KI-Faktencheck innerhalb des Budgetlimits ausführen. Nur Konflikt, bessere Quelle, not_found oder uncertain werden danach als Nutzeraufgabe eskaliert.",
+                            date_value=date_value,
+                            source_url=url,
+                            evidence_status="source_blocked_or_unreadable",
+                            evidence_summary=detail,
+                            verification_key=verification.get("verification_key", ""),
+                            verification_status=verification.get("verification_status", ""),
+                            verified_by=verification.get("verified_by", ""),
+                            last_verified_at=verification.get("last_verified_at", ""),
+                            verified_until=verification.get("verified_until", ""),
+                            source_fingerprint=source_fp,
+                            content_fingerprint=content_fp,
+                            next_check_at=verification.get("next_check_at", ""),
+                            ai_candidate_priority=verification.get("ai_candidate_priority", ""),
+                            ai_candidate_reason=verification.get("ai_candidate_reason", ""),
+                            public_url=public_url,
+                        ))
+                else:
+                    issues.append(issue(
+                        "critical" if in_daily_window else "review_needed",
+                        "event",
+                        source_system,
+                        content_id,
+                        title,
+                        "event_source_url_broken",
+                        f"Quelle/Event-Link antwortet kritisch: {detail}",
+                        "Quelle manuell prüfen; nicht automatisch löschen oder umschreiben.",
+                        date_value=date_value,
+                        source_url=url,
+                        public_url=public_url,
+                    ))
             elif status == "warning" and not is_transient_network_warning(detail):
-                issues.append(issue(
-                    "review_needed" if in_daily_window else "warning",
-                    "event",
-                    source_system,
-                    content_id,
-                    title,
-                    "event_source_url_unstable",
-                    f"Quelle/Event-Link konnte nicht sicher geprüft werden: {detail}",
-                    "Bei Wiederholung oder zeitnahen Events manuell prüfen.",
+                reason = f"Quelle ist fuer den technischen Audit nicht sicher lesbar: {detail}"
+                verification = add_ai_verification_candidate(
+                    content_type="event",
+                    source_system=source_system,
+                    content_id=content_id,
+                    title=title,
                     date_value=date_value,
                     source_url=url,
-                    public_url=public_url,
-                ))
+                    reason=reason,
+                    current_data=current_event_data,
+                    source_fingerprint=source_fp,
+                    content_fingerprint=content_fp,
+                    priority=ai_priority_for_event(date_value, reason, today),
+                    today=today,
+                )
+                if verification.get("cache_hit") != "yes":
+                    issues.append(issue(
+                        "warning",
+                        "event",
+                        source_system,
+                        content_id,
+                        title,
+                        "event_ai_verification_candidate",
+                        "Quelle/Event-Link konnte technisch nicht sicher geprüft werden.",
+                        "Strukturierten KI-Faktencheck innerhalb des Budgetlimits ausführen oder bei Budgetüberschreitung priorisiert zurückstellen.",
+                        date_value=date_value,
+                        source_url=url,
+                        evidence_status="source_unstable_or_unreadable",
+                        evidence_summary=detail,
+                        verification_key=verification.get("verification_key", ""),
+                        verification_status=verification.get("verification_status", ""),
+                        verified_by=verification.get("verified_by", ""),
+                        last_verified_at=verification.get("last_verified_at", ""),
+                        verified_until=verification.get("verified_until", ""),
+                        source_fingerprint=source_fp,
+                        content_fingerprint=content_fp,
+                        next_check_at=verification.get("next_check_at", ""),
+                        ai_candidate_priority=verification.get("ai_candidate_priority", ""),
+                        ai_candidate_reason=verification.get("ai_candidate_reason", ""),
+                        public_url=public_url,
+                    ))
             elif status == "redirect" and not is_benign_redirect(url, detail):
                 issues.append(issue(
                     "warning",
@@ -1480,28 +1892,59 @@ def audit_event_rows(
                 ))
 
             # Faktenprobe: beobachtet, ob die Quelle die Kernangaben wirklich trägt.
-            # Nur starke Schwächen werden als Quellenprüfung sichtbar; normale Teilunsicherheiten bleiben im Report als Observation.
+            # Starke Unsicherheit wird jetzt zuerst als KI-Fallback-Kandidat statt als direkte Nutzeraufgabe geführt.
             if in_daily_window and is_http_url(url):
                 evidence = evaluate_event_source_evidence(row, source_system, url, today=today, network=network)
                 if evidence.get("evidence_status") == "source_evidence_weak":
-                    issues.append(issue(
-                        "warning",
-                        "event",
-                        source_system,
-                        content_id,
-                        title,
-                        "event_source_facts_not_confirmed",
-                        "Die Quelle bestätigt die automatisch prüfbaren Kernfakten nicht ausreichend.",
-                        "Im Faktencheck-Paket prüfen: Datum, Uhrzeit, Ort und Titel gegen die Quelle vergleichen. Nur bei echter Abweichung entsteht danach eine Korrektur.",
+                    reason = "Automatischer Quellenvergleich bestaetigt fachlich wichtige Kernfelder nicht ausreichend."
+                    verification = add_ai_verification_candidate(
+                        content_type="event",
+                        source_system=source_system,
+                        content_id=content_id,
+                        title=title,
                         date_value=date_value,
                         source_url=url,
+                        reason=reason,
+                        current_data=current_event_data,
+                        source_fingerprint=source_fp,
+                        content_fingerprint=content_fp,
+                        priority=ai_priority_for_event(date_value, reason, today),
+                        today=today,
                         evidence_status=evidence.get("evidence_status", ""),
                         evidence_summary=evidence.get("evidence_summary", ""),
                         evidence_checked_fields=evidence.get("evidence_checked_fields", ""),
                         evidence_missing_fields=evidence.get("evidence_missing_fields", ""),
                         evidence_field_statuses=evidence.get("evidence_field_statuses", ""),
-                        public_url=public_url,
-                    ))
+                    )
+                    if verification.get("cache_hit") != "yes":
+                        issues.append(issue(
+                            "warning",
+                            "event",
+                            source_system,
+                            content_id,
+                            title,
+                            "event_ai_verification_candidate",
+                            "Die Quelle bestätigt die automatisch prüfbaren Kernfakten nicht ausreichend.",
+                            "Strukturierten KI-Faktencheck ausführen. Nur bei Konflikt, besserer Quelle, not_found oder uncertain wird eine Content-Inbox-Aufgabe daraus.",
+                            date_value=date_value,
+                            source_url=url,
+                            evidence_status=evidence.get("evidence_status", ""),
+                            evidence_summary=evidence.get("evidence_summary", ""),
+                            evidence_checked_fields=evidence.get("evidence_checked_fields", ""),
+                            evidence_missing_fields=evidence.get("evidence_missing_fields", ""),
+                            evidence_field_statuses=evidence.get("evidence_field_statuses", ""),
+                            verification_key=verification.get("verification_key", ""),
+                            verification_status=verification.get("verification_status", ""),
+                            verified_by=verification.get("verified_by", ""),
+                            last_verified_at=verification.get("last_verified_at", ""),
+                            verified_until=verification.get("verified_until", ""),
+                            source_fingerprint=source_fp,
+                            content_fingerprint=content_fp,
+                            next_check_at=verification.get("next_check_at", ""),
+                            ai_candidate_priority=verification.get("ai_candidate_priority", ""),
+                            ai_candidate_reason=verification.get("ai_candidate_reason", ""),
+                            public_url=public_url,
+                        ))
 
         visual_key = norm(row.get("visual_key"))
         visual_motif = norm(row.get("visual_motif") or row.get("image_visual_motif") or row.get("visualMotif"))
@@ -1927,33 +2370,112 @@ def audit_activities(
                 public_url=public_url,
             ))
         elif network:
+            source_fp = source_fingerprint_for_url(source_url)
+            content_fp = activity_content_fingerprint(offer, source_url)
+            current_activity_data = {
+                "title": title,
+                "location": norm(offer.get("location")),
+                "source_url": source_url,
+                "opening_type": norm(opening_status.get("type")) if opening_status else "",
+                "opening_label": norm(opening_status.get("public_label")) if opening_status else "",
+                "opening_detail": norm(opening_status.get("detail_note")) if opening_status else "",
+                "checked_at": checked_at,
+            }
             status, detail = check_url(source_url)
             if status == "critical":
-                issues.append(issue(
-                    "review_needed",
-                    "activity",
-                    "offers_json",
-                    content_id,
-                    title,
-                    "activity_source_url_broken",
-                    f"Activity-Quelle antwortet kritisch: {detail}",
-                    "Quelle manuell prüfen; Activity nicht automatisch löschen.",
-                    source_url=source_url,
-                    public_url=public_url,
-                ))
+                if is_ai_fallback_url_detail(detail):
+                    reason = f"Activity-Quelle ist technisch blockiert/unsicher und wird gezielt per KI-Fallback geprüft: {detail}"
+                    verification = add_ai_verification_candidate(
+                        content_type="activity",
+                        source_system="offers_json",
+                        content_id=content_id,
+                        title=title,
+                        source_url=source_url,
+                        reason=reason,
+                        current_data=current_activity_data,
+                        source_fingerprint=source_fp,
+                        content_fingerprint=content_fp,
+                        priority=60,
+                        today=today,
+                    )
+                    if verification.get("cache_hit") != "yes":
+                        issues.append(issue(
+                            "warning",
+                            "activity",
+                            "offers_json",
+                            content_id,
+                            title,
+                            "activity_ai_verification_candidate",
+                            "Activity-Quelle kann durch den technischen Audit nicht belastbar geprüft werden.",
+                            "Strukturierten KI-Faktencheck innerhalb des Budgetlimits ausführen. Keine Activity-Daten automatisch überschreiben.",
+                            source_url=source_url,
+                            evidence_status="source_blocked_or_unreadable",
+                            evidence_summary=detail,
+                            verification_key=verification.get("verification_key", ""),
+                            verification_status=verification.get("verification_status", ""),
+                            verified_by=verification.get("verified_by", ""),
+                            last_verified_at=verification.get("last_verified_at", ""),
+                            verified_until=verification.get("verified_until", ""),
+                            source_fingerprint=source_fp,
+                            content_fingerprint=content_fp,
+                            next_check_at=verification.get("next_check_at", ""),
+                            ai_candidate_priority=verification.get("ai_candidate_priority", ""),
+                            ai_candidate_reason=verification.get("ai_candidate_reason", ""),
+                            public_url=public_url,
+                        ))
+                else:
+                    issues.append(issue(
+                        "review_needed",
+                        "activity",
+                        "offers_json",
+                        content_id,
+                        title,
+                        "activity_source_url_broken",
+                        f"Activity-Quelle antwortet kritisch: {detail}",
+                        "Quelle manuell prüfen; Activity nicht automatisch löschen.",
+                        source_url=source_url,
+                        public_url=public_url,
+                    ))
             elif status == "warning" and not is_transient_network_warning(detail):
-                issues.append(issue(
-                    "warning",
-                    "activity",
-                    "offers_json",
-                    content_id,
-                    title,
-                    "activity_source_url_unstable",
-                    f"Activity-Quelle konnte nicht sicher geprüft werden: {detail}",
-                    "Bei Wiederholung manuell prüfen.",
+                reason = f"Activity-Quelle ist fuer den technischen Audit nicht sicher lesbar: {detail}"
+                verification = add_ai_verification_candidate(
+                    content_type="activity",
+                    source_system="offers_json",
+                    content_id=content_id,
+                    title=title,
                     source_url=source_url,
-                    public_url=public_url,
-                ))
+                    reason=reason,
+                    current_data=current_activity_data,
+                    source_fingerprint=source_fp,
+                    content_fingerprint=content_fp,
+                    priority=55,
+                    today=today,
+                )
+                if verification.get("cache_hit") != "yes":
+                    issues.append(issue(
+                        "warning",
+                        "activity",
+                        "offers_json",
+                        content_id,
+                        title,
+                        "activity_ai_verification_candidate",
+                        "Activity-Quelle konnte technisch nicht sicher geprüft werden.",
+                        "Strukturierten KI-Faktencheck innerhalb des Budgetlimits ausführen oder priorisiert zurückstellen.",
+                        source_url=source_url,
+                        evidence_status="source_unstable_or_unreadable",
+                        evidence_summary=detail,
+                        verification_key=verification.get("verification_key", ""),
+                        verification_status=verification.get("verification_status", ""),
+                        verified_by=verification.get("verified_by", ""),
+                        last_verified_at=verification.get("last_verified_at", ""),
+                        verified_until=verification.get("verified_until", ""),
+                        source_fingerprint=source_fp,
+                        content_fingerprint=content_fp,
+                        next_check_at=verification.get("next_check_at", ""),
+                        ai_candidate_priority=verification.get("ai_candidate_priority", ""),
+                        ai_candidate_reason=verification.get("ai_candidate_reason", ""),
+                        public_url=public_url,
+                    ))
             elif status == "redirect" and not is_benign_redirect(source_url, detail):
                 issues.append(issue(
                     "warning",
@@ -1982,18 +2504,22 @@ def summarize(issues: List[Issue]) -> Dict[str, Any]:
     by_process_category: Dict[str, int] = {}
     by_correction_owner: Dict[str, int] = {}
     by_workbench_group: Dict[str, int] = {}
+    by_verification_status: Dict[str, int] = {}
     for item in issues:
         counts[item.severity] = counts.get(item.severity, 0) + 1
         by_type[item.content_type] = by_type.get(item.content_type, 0) + 1
         by_process_category[item.process_category] = by_process_category.get(item.process_category, 0) + 1
         by_correction_owner[item.correction_owner] = by_correction_owner.get(item.correction_owner, 0) + 1
         by_workbench_group[item.workbench_group] = by_workbench_group.get(item.workbench_group, 0) + 1
+        if item.verification_status:
+            by_verification_status[item.verification_status] = by_verification_status.get(item.verification_status, 0) + 1
     return {
         "counts": counts,
         "by_type": by_type,
         "by_process_category": by_process_category,
         "by_correction_owner": by_correction_owner,
         "by_workbench_group": by_workbench_group,
+        "by_verification_status": by_verification_status,
         "total": len(issues),
     }
 
@@ -2019,6 +2545,7 @@ def write_json_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> 
     payload = {
         "meta": meta,
         "summary": summarize(issues),
+        "verification_summary": dict(VERIFICATION_STATS),
         "observations_summary": summarize_observations(OBSERVATIONS),
         "issues": [asdict(item) for item in issues],
         "observations": [asdict(item) for item in OBSERVATIONS],
@@ -2052,6 +2579,14 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
         "",
         *[f"- {key}: {value}" for key, value in sorted(summary.get("by_correction_owner", {}).items())],
         "",
+        "## Verification fallback / cache",
+        "",
+        f"- Cache entries loaded: {VERIFICATION_STATS.get('cache_entries_loaded', 0)}",
+        f"- Cache hits: {VERIFICATION_STATS.get('cache_hits', 0)}",
+        f"- AI candidates total: {VERIFICATION_STATS.get('ai_candidates_total', 0)}",
+        f"- AI candidates selected: {VERIFICATION_STATS.get('ai_candidates_selected', 0)}",
+        f"- Deferred by budget: {VERIFICATION_STATS.get('ai_candidates_deferred_by_budget', 0)}",
+        "",
         "## Evidence observations",
         "",
         f"- Total observations: {observation_summary.get('total', 0)}",
@@ -2059,8 +2594,8 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
         "",
         "## Issues",
         "",
-        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL | Visual Key | Visual Motif | Visual Asset | Evidence | Field status |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL | Visual Key | Visual Motif | Visual Asset | Evidence | Verification | Priority | Field status |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for item in sorted(issues, key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.workbench_group, x.content_type, x.date, x.title)):
         def cell(value: str) -> str:
@@ -2081,6 +2616,8 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
                 cell(item.suggested_visual_motif),
                 cell(item.visual_asset_status),
                 cell(item.evidence_status),
+                cell(item.verification_status),
+                cell(item.ai_candidate_priority),
                 cell(item.evidence_field_statuses),
             ]) + " |"
         )
@@ -2098,6 +2635,9 @@ def main() -> None:
     parser.add_argument("--activity-visual-pool", default="data/activity_visual_pool.json")
     parser.add_argument("--output-json", default="data/content-quality-report.json")
     parser.add_argument("--output-md", default="data/content-quality-report.md")
+    parser.add_argument("--verification-cache-json", default="data/content-verification-cache.json")
+    parser.add_argument("--ai-candidates-json", default="data/content-ai-verification-candidates.json")
+    parser.add_argument("--ai-max-candidates", type=int, default=AI_VERIFICATION_DEFAULT_MAX_CANDIDATES)
     parser.add_argument("--base-url", default="https://bocholt-erleben.de")
     parser.add_argument("--horizon-days", type=int, default=14)
     parser.add_argument("--network", action="store_true")
@@ -2105,6 +2645,11 @@ def main() -> None:
     args = parser.parse_args()
 
     today = date.today()
+
+    global VERIFICATION_CACHE
+    VERIFICATION_CACHE = load_verification_cache(ROOT / args.verification_cache_json)
+    VERIFICATION_STATS["cache_entries_loaded"] = len(VERIFICATION_CACHE)
+
     event_pools = load_visual_pools(ROOT / args.event_visual_pool)
     activity_pools = load_visual_pools(ROOT / args.activity_visual_pool)
     source_suggestions = load_source_suggestions()
@@ -2171,14 +2716,25 @@ def main() -> None:
         "db_events_loaded": len(db_event_rows),
         "base_url": args.base_url,
         "source_suggestions_loaded": len(source_suggestions),
+        "verification_cache_entries_loaded": len(VERIFICATION_CACHE),
+        "ai_max_candidates": max(0, args.ai_max_candidates),
     }
+
+    candidates = selected_ai_candidates(args.ai_max_candidates)
+    meta["ai_candidates_total"] = VERIFICATION_STATS.get("ai_candidates_total", 0)
+    meta["ai_candidates_selected"] = VERIFICATION_STATS.get("ai_candidates_selected", 0)
+    meta["ai_candidates_deferred_by_budget"] = VERIFICATION_STATS.get("ai_candidates_deferred_by_budget", 0)
+    meta["verification_cache_hits"] = VERIFICATION_STATS.get("cache_hits", 0)
 
     write_json_report(ROOT / args.output_json, issues, meta)
     write_markdown_report(ROOT / args.output_md, issues, meta)
+    write_ai_candidates_report(ROOT / args.ai_candidates_json, candidates, meta)
 
     summary = summarize(issues)
     print("✅ Content Quality Audit written")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
+    print("=== Verification fallback / cache ===")
+    print(json.dumps(dict(VERIFICATION_STATS), ensure_ascii=False, indent=2))
 
     if args.fail_on_critical and summary["counts"].get("critical", 0):
         print("❌ Content Quality Guard found critical issues.", file=sys.stderr)
