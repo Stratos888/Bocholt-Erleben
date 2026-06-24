@@ -691,8 +691,10 @@ Umfang:
           return { items: [], total: 0, error: payload?.message || "content_audit_load_failed" };
         }
 
-        const items = Array.isArray(payload.data?.items) ? payload.data.items : [];
-        const packageItems = Array.isArray(payload.data?.package_items) ? payload.data.package_items : items;
+        /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_PACKAGE_ARRAY_ISOLATION_V1 | Zweck: verhindert, dass die aktuelle Detailkarte durch queue.shift() aus den Arbeitspaketen verschwindet; Umfang: defensive Kopien der API-Arrays, keine Datenänderung === */
+        const items = Array.isArray(payload.data?.items) ? payload.data.items.slice() : [];
+        const packageItems = Array.isArray(payload.data?.package_items) ? payload.data.package_items.slice() : items.slice();
+        /* === END BLOCK: INBOX_CONTENT_AUDIT_PACKAGE_ARRAY_ISOLATION_V1 === */
         return {
           items,
           packageItems,
@@ -1705,13 +1707,7 @@ Umfang:
       const code = trimValue(item.issue_code);
       const source = trimValue(item.source_system);
 
-      if (category === "repo_data_patch_candidate" || group.includes("repo-datenpatch")) return "repo_data_patch";
-      if (category === "source_review_candidate" || group.includes("quellenprüfung")) return "source_check";
-      if (category === "fact_check_candidate" || group.includes("faktencheck")) return "fact_check";
-      if (category === "source_retry_observation" || group.includes("retry")) return "retry_observation";
-      if (category === "visual_fit_candidate" || group.includes("visual-fit")) return "visual_fit";
-      if (category === "activity_review_candidate" || group.includes("activity-prüfung")) return "activity_check";
-
+      /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_WORK_ROUTE_HARDENING_V1 | Zweck: ordnet Arbeitspakete anhand eindeutiger Issue-Codes stabil ein, auch wenn alte Sheet-/API-Gruppenwerte noch vorhanden sind; Umfang: reine UI-/Exportlogik, keine Status- oder Datenänderung === */
       const visualMarkers = ["visual", "image", "bild", "motif"];
       if (visualMarkers.some((marker) => code.includes(marker))) return "visual_fit";
 
@@ -1722,6 +1718,14 @@ Umfang:
 
       const directRepoCodes = ["activity_required_field_missing", "activity_duplicate_id", "activities_json_invalid"];
       if (source === "offers_json" && directRepoCodes.includes(code)) return "repo_data_patch";
+      /* === END BLOCK: INBOX_CONTENT_AUDIT_WORK_ROUTE_HARDENING_V1 === */
+
+      if (category === "repo_data_patch_candidate" || group.includes("repo-datenpatch")) return "repo_data_patch";
+      if (category === "source_review_candidate" || group.includes("quellenprüfung")) return "source_check";
+      if (category === "fact_check_candidate" || group.includes("faktencheck")) return "fact_check";
+      if (category === "source_retry_observation" || group.includes("retry")) return "retry_observation";
+      if (category === "visual_fit_candidate" || group.includes("visual-fit")) return "visual_fit";
+      if (category === "activity_review_candidate" || group.includes("activity-prüfung")) return "activity_check";
 
       if (category === "repo_patch_candidate" || owner === "repo_patch" || group.includes("repo-patch")) return "repo_data_patch";
       return "other";
