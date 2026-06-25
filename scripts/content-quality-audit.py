@@ -101,6 +101,10 @@ VERIFICATION_STATS: Dict[str, int] = {
 AI_VERIFICATION_CANDIDATES: List[Dict[str, Any]] = []
 
 
+def log_checkpoint(message: str) -> None:
+    print(f"[content-quality] {datetime.now().isoformat(timespec='seconds')} {message}", flush=True)
+
+
 def url_host(value: str) -> str:
     return (urlparse(norm(value)).netloc or "").lower().removeprefix("www.")
 
@@ -1571,8 +1575,12 @@ def audit_event_rows(
     visual_occurrences: list[Dict[str, str]] = []
 
     horizon_end = today + timedelta(days=horizon_days)
+    total_rows = len(rows)
+    log_checkpoint(f"event audit start: source_system={source_system}, rows={total_rows}, scope={scope}, network={network}")
 
-    for row in rows:
+    for index, row in enumerate(rows, start=1):
+        if index == 1 or index % 10 == 0 or index == total_rows:
+            log_checkpoint(f"event audit progress: source_system={source_system}, row={index}/{total_rows}, issues={len(issues)}")
         content_id = norm(row.get("id") or row.get("event_id") or row.get("submission_id"))
         title = norm(row.get("title"))
         date_value = norm(row.get("date") or row.get("start_date"))
@@ -2184,6 +2192,7 @@ def audit_event_rows(
                 ))
 
     issues.extend(audit_event_visual_fit_candidates(visual_occurrences, source_system, base_url))
+    log_checkpoint(f"event audit done: source_system={source_system}, rows={total_rows}, issues={len(issues)}")
     return issues
 
 
@@ -2212,8 +2221,12 @@ def audit_activities(
     issues: List[Issue] = []
     seen_ids: set[str] = set()
     public_url = f"{base_url.rstrip('/')}/aktivitaeten/" if base_url else ""
+    total_offers = len(offers)
+    log_checkpoint(f"activity audit start: rows={total_offers}, network={network}")
 
-    for offer in offers:
+    for index, offer in enumerate(offers, start=1):
+        if index == 1 or index % 10 == 0 or index == total_offers:
+            log_checkpoint(f"activity audit progress: row={index}/{total_offers}, issues={len(issues)}")
         if not isinstance(offer, dict):
             continue
 
@@ -2544,6 +2557,7 @@ def audit_activities(
             # Activity-Oeffnungszeiten/Kosten/Saison duerfen nicht durch eine zu grobe Textprobe verrauscht werden.
 
 
+    log_checkpoint(f"activity audit done: rows={total_offers}, issues={len(issues)}")
     return issues
 
 
@@ -2694,17 +2708,22 @@ def main() -> None:
     args = parser.parse_args()
 
     today = date.today()
+    log_checkpoint(f"audit start: scope={args.scope}, network={args.network}, base_url={args.base_url}")
 
     global VERIFICATION_CACHE
+    log_checkpoint(f"load verification cache: {args.verification_cache_json}")
     VERIFICATION_CACHE = load_verification_cache(ROOT / args.verification_cache_json)
     VERIFICATION_STATS["cache_entries_loaded"] = len(VERIFICATION_CACHE)
+    log_checkpoint(f"verification cache loaded: entries={len(VERIFICATION_CACHE)}")
 
     event_pools = load_visual_pools(ROOT / args.event_visual_pool)
     activity_pools = load_visual_pools(ROOT / args.activity_visual_pool)
     source_suggestions = load_source_suggestions()
+    log_checkpoint(f"supporting data loaded: event_pools={len(event_pools)}, activity_pools={len(activity_pools)}, source_suggestions={len(source_suggestions)}")
 
     event_rows, event_source = load_events(ROOT / args.events_tsv, ROOT / args.events_json)
     db_event_rows = load_db_events(ROOT / args.db_events_json)
+    log_checkpoint(f"content rows loaded: sheet_events={len(event_rows)} ({event_source}), db_events={len(db_event_rows)}")
 
     issues: List[Issue] = []
     if not event_rows:
@@ -2769,15 +2788,19 @@ def main() -> None:
         "ai_max_candidates": max(0, args.ai_max_candidates),
     }
 
+    log_checkpoint(f"audit issue collection done: issues={len(issues)}")
     candidates = selected_ai_candidates(args.ai_max_candidates)
+    log_checkpoint(f"ai candidates selected: total={VERIFICATION_STATS.get('ai_candidates_total', 0)}, selected={len(candidates)}, limit={max(0, args.ai_max_candidates)}")
     meta["ai_candidates_total"] = VERIFICATION_STATS.get("ai_candidates_total", 0)
     meta["ai_candidates_selected"] = VERIFICATION_STATS.get("ai_candidates_selected", 0)
     meta["ai_candidates_deferred_by_budget"] = VERIFICATION_STATS.get("ai_candidates_deferred_by_budget", 0)
     meta["verification_cache_hits"] = VERIFICATION_STATS.get("cache_hits", 0)
 
+    log_checkpoint("write reports start")
     write_json_report(ROOT / args.output_json, issues, meta)
     write_markdown_report(ROOT / args.output_md, issues, meta)
     write_ai_candidates_report(ROOT / args.ai_candidates_json, candidates, meta)
+    log_checkpoint(f"write reports done: json={args.output_json}, md={args.output_md}, ai_candidates={args.ai_candidates_json}")
 
     summary = summarize(issues)
     print("✅ Content Quality Audit written")
