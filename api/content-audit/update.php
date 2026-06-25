@@ -160,6 +160,8 @@ function cau_update_event_fields(string $contentId, array $updates): array
         'ticket_url',
         'description',
         'visual_key',
+        'visual_motif',
+        'image_visual_motif',
     ];
 
     $updatedRanges = [];

@@ -80,6 +80,7 @@ jobs:
           TAB_EVENTS: Events
           TAB_INBOX: Inbox
           TAB_ARCHIVE: Inbox_Archive
+          TAB_CONTENT_SEARCH_FEEDBACK: Content_Search_Feedback
 
           MAX_NEW_CANDIDATES: "24"
           SEARCH_WINDOW_DAYS: "210"

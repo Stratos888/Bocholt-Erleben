@@ -1343,6 +1343,9 @@ Umfang:
         ["Zeitdetails", scheduleDetails],
         ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
         ["Kategorie", trimValue(it.kategorie_suggestion)],
+        ["Visual Key", trimValue(it.visual_key)],
+        ["Visual Motif", trimValue(it.visual_motif)],
+        ["Visual Asset", trimValue(it.visual_asset_status)],
         ["Eingereicht am", submittedAt],
         ["Prüfhinweis", curationNote],
         ["Dubletten-/Importhinweis", dedupeHint]
@@ -1723,6 +1726,14 @@ Umfang:
               <label for="auditEventLocation">Ort / Location</label>
               <input id="auditEventLocation" type="text" value="${escapeHtml(eventFieldValue(item, "location"))}" autocomplete="off" />
             </div>
+            <div class="auditField">
+              <label for="auditEventVisualKey">Visual Key</label>
+              <input id="auditEventVisualKey" type="text" value="${escapeHtml(eventFieldValue(item, "visual_key") || item.suggested_visual_key || "")}" autocomplete="off" />
+            </div>
+            <div class="auditField">
+              <label for="auditEventVisualMotif">Visual Motif</label>
+              <input id="auditEventVisualMotif" type="text" value="${escapeHtml(eventFieldValue(item, "visual_motif") || eventFieldValue(item, "image_visual_motif") || item.suggested_visual_motif || "")}" autocomplete="off" />
+            </div>
             <div class="auditField auditField--wide">
               <label for="auditEventSourceUrl">Offizielle Quelle</label>
               <input id="auditEventSourceUrl" type="url" value="${escapeHtml(sourceValue)}" inputmode="url" autocomplete="off" />
@@ -1739,7 +1750,9 @@ Umfang:
         date: value("auditEventDate"),
         time: value("auditEventTime"),
         city: value("auditEventCity"),
-        location: value("auditEventLocation")
+        location: value("auditEventLocation"),
+        visual_key: value("auditEventVisualKey"),
+        visual_motif: value("auditEventVisualMotif")
       };
 
       const endDate = value("auditEventEndDate");

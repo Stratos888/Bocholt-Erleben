@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import argparse
 import csv
+from collections import Counter
 import hashlib
 import html
 import json
+import os
 import re
 import socket
 import ssl
@@ -2603,20 +2605,422 @@ def summarize_observations(observations: List[Observation]) -> Dict[str, Any]:
     }
 
 
-def write_json_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> None:
+
+# === BEGIN BLOCK: CONTENT_SEARCH_FEEDBACK_BUILDER_FINAL | Zweck: verdichtet Audit-Findings zu begrenzten maschinenlesbaren Lernsignalen fuer den naechsten KI-Suchlauf; Umfang: JSON-/Sheet-Artefakt ohne fachliche Auto-Aenderung und ohne Regel-Bloat ===
+SEARCH_FEEDBACK_MAX_RULES = int(os.environ.get("SEARCH_FEEDBACK_MAX_RULES", "48"))
+SEARCH_FEEDBACK_SIGNAL_TTL_DAYS = int(os.environ.get("SEARCH_FEEDBACK_SIGNAL_TTL_DAYS", "365"))
+VISUAL_FEEDBACK_MAX_ITEMS = int(os.environ.get("VISUAL_FEEDBACK_MAX_ITEMS", "160"))
+
+
+def search_feedback_expiry_date(meta: Dict[str, Any]) -> str:
+    generated = norm(meta.get("generated_at"))
+    base = datetime.now()
+    if generated:
+        try:
+            base = datetime.fromisoformat(generated.replace("Z", "+00:00")).replace(tzinfo=None)
+        except Exception:
+            base = datetime.now()
+    return (base + timedelta(days=SEARCH_FEEDBACK_SIGNAL_TTL_DAYS)).date().isoformat()
+
+
+SEARCH_FEEDBACK_RULES: Dict[str, Dict[str, Any]] = {
+    "event_source_has_time_but_dataset_missing_time": {
+        "feedback_class": "time_missing_from_source",
+        "field": "time",
+        "priority": 95,
+        "prompt_rule": "Wenn die Quelle konkrete Uhrzeiten nennt, darf time nicht leer bleiben. Prüfe Eventzeit explizit und setze time nur als einzelne Startzeit HH:MM; Zeitspannen oder uneinheitliche Mehrtageszeiten bleiben leer und werden in notes erklärt.",
+    },
+    "event_ticket_portal_as_primary_source": {
+        "feedback_class": "ticket_portal_primary_source",
+        "field": "source_url",
+        "priority": 90,
+        "prompt_rule": "Nutze Ticketportale nicht als primaere source_url. Suche zuerst nach offizieller Event-, Veranstalter-, Stadt- oder Venue-Detailseite; Ticketportale nur in notes erwähnen, wenn keine bessere Quelle existiert und der Kandidat sonst regelkonform ist.",
+    },
+    "event_source_facts_not_confirmed": {
+        "feedback_class": "event_core_facts_not_confirmed",
+        "field": "core_facts",
+        "priority": 85,
+        "prompt_rule": "Nimm Events nur auf, wenn Titel, Datum, Ort und soweit vorhanden Uhrzeit aus derselben belastbaren Instanzquelle bestätigt sind. Bei teilweiser Bestätigung nicht als FINAL ausgeben.",
+    },
+    "event_ai_verification_candidate": {
+        "feedback_class": "event_source_unreadable_or_uncertain",
+        "field": "source_url",
+        "priority": 70,
+        "prompt_rule": "Bei schwer lesbaren oder blockierten Quellen zusätzliche offizielle Gegenquelle suchen. Wenn Kernfakten nicht belastbar bestätigt werden können, Kandidat nicht ausgeben oder source_candidates nur als Merker führen.",
+    },
+    "activity_ai_verification_candidate": {
+        "feedback_class": "activity_source_unreadable_or_uncertain",
+        "field": "activity_source",
+        "priority": 55,
+        "prompt_rule": "Activity-Quellen, die technisch schwer lesbar sind, nicht als Eventkandidaten missverstehen. Nur als Activity-/Quellenhinweis berücksichtigen, nicht in die Event-Inbox ausgeben.",
+    },
+    "activity_source_facts_not_confirmed": {
+        "feedback_class": "activity_facts_uncertain",
+        "field": "activity_facts",
+        "priority": 50,
+        "prompt_rule": "Activity-Öffnungs-, Saison- und Nutzungsdaten nicht aus Eventseiten ableiten. Bei unsicherer Activity-Quelle keine Eventkandidaten erzeugen.",
+    },
+    "event_visual_specific_motif_gap": {
+        "feedback_class": "visual_specific_motif_context",
+        "field": "visual_motif",
+        "priority": 44,
+        "prompt_rule": "Konkrete Motivbegriffe aus der Quelle in title, description oder notes erhalten. Spezifische Eventtypen wie Fechten, Darts, Stoffmarkt, Autorenlesung oder Open-Air nicht zu generischen Sport-/Kultur-/Festivaltexten verwaschen.",
+    },
+    "event_visual_motif_missing_specific": {
+        "feedback_class": "visual_specific_motif_context",
+        "field": "visual_motif",
+        "priority": 42,
+        "prompt_rule": "Wenn die Quelle ein konkretes Motiv nennt, dieses Motiv im Kandidaten klar benennen, damit die lokale Visual-Motif-Regel es deterministisch erkennen kann. Keine künstlich allgemeinen Beschreibungen ausgeben.",
+    },
+    "event_visual_key_missing_needs_decision": {
+        "feedback_class": "visual_uncertain_context",
+        "field": "visual_key",
+        "priority": 38,
+        "prompt_rule": "Bei visuell schwer einordenbaren Events keine scheinbare Sicherheit erzeugen. Event nur dann als FINAL ausgeben, wenn die Event-Fakten stark sind; visuelle Unsicherheit neutral in notes beschreiben.",
+    },
+    "event_visual_key_missing_ready_candidate": {
+        "feedback_class": "visual_context_preservation",
+        "field": "visual_key",
+        "priority": 36,
+        "prompt_rule": "Visual-Fit-Luecken sind kein Grund, starke Events zu verstecken. Wichtig ist, Eventtyp, Programmform und konkrete Motivbegriffe quellengetreu zu erhalten, damit lokale Regeln/Fallbacks korrekt greifen.",
+    },
+}
+
+SEARCH_FEEDBACK_DEFAULT_RULES: list[Dict[str, Any]] = [
+    {
+        "feedback_class": "rejected_unclear_date_time_place",
+        "field": "date_time_location",
+        "priority": 80,
+        "prompt_rule": "Ablehnungen wegen unklarer Terminangaben bedeuten: Datum, Uhrzeit und Ort müssen aus der konkreten Instanzquelle belegt sein; sonst nicht als FINAL ausgeben.",
+    },
+    {
+        "feedback_class": "rejected_no_concrete_single_event",
+        "field": "event_scope",
+        "priority": 75,
+        "prompt_rule": "Ablehnungen wegen 'kein konkreter Einzeltermin' bedeuten: keine Dauerangebote, Kursübersichten, allgemeinen Informationsseiten oder bloßen Öffnungszeiten als Event ausgeben.",
+    },
+    {
+        "feedback_class": "rejected_source_insufficient",
+        "field": "source_quality",
+        "priority": 75,
+        "prompt_rule": "Ablehnungen wegen unzureichender Quelle bedeuten: Quelle muss event-spezifisch, öffentlich lesbar und kanonisch genug sein; schwache oder unklare Quellen nicht als FINAL nutzen.",
+    },
+]
+
+
+def search_feedback_config_for_issue(item: Issue) -> Dict[str, Any] | None:
+    code = norm(item.issue_code)
+    if code in SEARCH_FEEDBACK_RULES:
+        return SEARCH_FEEDBACK_RULES[code]
+    if code.startswith("event_visual_") or "visual" in code or "motif" in code:
+        # Visual-Fit-Signale werden nur dann an den KI-Suchprompt gespiegelt,
+        # wenn sie die Such-/Extraktionsqualitaet betreffen. Asset-Gaps,
+        # Pool-Vertraege und reine Bildproduktion duerfen den Suchlauf nicht
+        # zu falscher Selektion oder Bildautomatisierung verleiten.
+        return None
+    if code in {"event_source_url_broken", "event_source_url_redirect", "event_source_url_missing", "event_source_url_invalid"}:
+        return {
+            "feedback_class": "event_source_quality_problem",
+            "field": "source_url",
+            "priority": 65,
+            "prompt_rule": "Quellen mit Broken-Link, Redirect, fehlender oder ungültiger URL nicht erneut als starke Eventquelle verwenden. Erst eine kanonische, erreichbare Detailquelle suchen.",
+        }
+    return None
+
+
+def source_host_for_feedback(source_url: str) -> str:
+    return url_host(source_url) or "unknown"
+
+
+def feedback_example(item: Issue) -> Dict[str, str]:
+    return {
+        "title": item.title,
+        "date": item.date,
+        "issue_code": item.issue_code,
+        "source_url": item.source_url,
+        "suggested_url": item.suggested_url,
+        "evidence_status": item.evidence_status,
+        "evidence_summary": item.evidence_summary[:240],
+    }
+
+
+def add_limited_unique(values: List[str], value: str, limit: int) -> None:
+    clean = norm(value)
+    if clean and clean not in values and len(values) < limit:
+        values.append(clean)
+
+
+def build_search_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> Dict[str, Any]:
+    # Feedback darf nicht pro Domain/Fall als neue Prompt-Regel wuchern.
+    # Gruppierung daher auf Fehlerklasse + Issue + Contenttyp + Feld + Regeltext;
+    # Hosts, Quellen und Beispiele bleiben nur Diagnosewerte innerhalb dieser einen Regel.
+    grouped: Dict[tuple[str, str, str, str, str], Dict[str, Any]] = {}
+    total_signals = 0
+
+    for item in issues:
+        if item.severity not in {"critical", "review_needed", "warning"}:
+            continue
+        config = search_feedback_config_for_issue(item)
+        if not config:
+            continue
+        total_signals += 1
+        feedback_class = norm(config.get("feedback_class"))
+        issue_code = norm(item.issue_code)
+        field = norm(config.get("field")) or norm(item.evidence_missing_fields) or "general"
+        host = source_host_for_feedback(item.source_url)
+        prompt_rule = norm(config.get("prompt_rule"))
+        key = (feedback_class, issue_code, item.content_type, field, prompt_rule)
+        current = grouped.setdefault(key, {
+            "feedback_class": feedback_class,
+            "issue_code": issue_code,
+            "content_type": item.content_type,
+            "source_system": [],
+            "source_host": [],
+            "field": field,
+            "count": 0,
+            "priority": int(config.get("priority") or 50),
+            "status": "active",
+            "prompt_rule": prompt_rule,
+            "last_seen_at": norm(meta.get("generated_at", ""))[:10],
+            "expires_at": search_feedback_expiry_date(meta),
+            "examples_policy": "examples_are_diagnostics_not_prompt_rules",
+            "example_titles": [],
+            "example_urls": [],
+            "examples": [],
+        })
+        current["count"] += 1
+        add_limited_unique(current["source_system"], item.source_system, 6)
+        add_limited_unique(current["source_host"], host, 8)
+        if item.title and item.title not in current["example_titles"] and len(current["example_titles"]) < 6:
+            current["example_titles"].append(item.title)
+        if item.source_url and item.source_url not in current["example_urls"] and len(current["example_urls"]) < 4:
+            current["example_urls"].append(item.source_url)
+        if len(current["examples"]) < 4:
+            current["examples"].append(feedback_example(item))
+
+    rules = sorted(grouped.values(), key=lambda row: (-int(row.get("priority") or 0), -int(row.get("count") or 0), row.get("feedback_class", "")))
+
+    # Default-Regeln sind als kontrollierte Prozess-Leitplanken enthalten, auch wenn im aktuellen Audit keine Archiv-/Ablehnungsdaten geladen wurden.
+    for default_rule in SEARCH_FEEDBACK_DEFAULT_RULES:
+        if not any(rule.get("feedback_class") == default_rule["feedback_class"] for rule in rules):
+            rules.append({
+                "feedback_class": default_rule["feedback_class"],
+                "issue_code": "inbox_rejection_reason_default",
+                "content_type": "event",
+                "source_system": "inbox_archive",
+                "source_host": "all",
+                "field": default_rule["field"],
+                "count": 0,
+                "priority": default_rule["priority"],
+                "status": "default_context",
+                "prompt_rule": default_rule["prompt_rule"],
+                "last_seen_at": norm(meta.get("generated_at", ""))[:10],
+                "expires_at": "",
+                "examples_policy": "default_context_no_examples",
+                "example_titles": [],
+                "example_urls": [],
+                "examples": [],
+            })
+
+    class_counts = Counter(rule["feedback_class"] for rule in rules if rule.get("status") == "active")
+    issue_code_counts = Counter(rule["issue_code"] for rule in rules if rule.get("status") == "active")
+
+    return {
+        "meta": {
+            "generated_at": meta.get("generated_at", datetime.now().isoformat(timespec="seconds")),
+            "source": "content-quality-audit",
+            "scope": meta.get("scope", ""),
+            "network_checks": bool(meta.get("network_checks")),
+            "total_feedback_signals": total_signals,
+            "active_rule_count": sum(1 for rule in rules if rule.get("status") == "active"),
+            "default_rule_count": sum(1 for rule in rules if rule.get("status") == "default_context"),
+            "contract": "search_prompt_context_only_no_auto_write_no_rulebook_mutation",
+            "rule_bloat_guard": "typed_grouped_class_capped_with_ttl",
+            "max_rules": SEARCH_FEEDBACK_MAX_RULES,
+            "signal_ttl_days": SEARCH_FEEDBACK_SIGNAL_TTL_DAYS,
+        },
+        "summary": {
+            "by_feedback_class": dict(class_counts),
+            "by_issue_code": dict(issue_code_counts),
+        },
+        "rules": rules[:SEARCH_FEEDBACK_MAX_RULES],
+    }
+
+
+# === BEGIN BLOCK: CONTENT_VISUAL_FEEDBACK_ROUTER_V1 | Zweck: trennt Visual-Fit-Feedback in Suchprompt-, Regel- und Asset-Gap-Signale; Umfang: maschinenlesbarer Zusatzreport ohne fachliche Auto-Aenderung ===
+VISUAL_RULE_REVIEW_CODES = {
+    "event_visual_key_missing_ready_candidate",
+    "event_visual_key_missing_needs_decision",
+    "event_visual_motif_missing_specific",
+    "event_visual_motif_unknown",
+    "event_visual_specific_motif_gap",
+}
+VISUAL_ASSET_GAP_CODES = {
+    "event_visual_key_missing_asset_gap",
+    "event_visual_motif_without_ready_asset",
+}
+VISUAL_POOL_CONTRACT_CODES = {
+    "event_visual_key_unknown",
+    "event_visual_key_without_safe_image",
+}
+VISUAL_DIVERSITY_CODES = {
+    "event_visual_reuse_cluster",
+}
+VISUAL_SEARCH_RELEVANT_CODES = set(SEARCH_FEEDBACK_RULES.keys()) & {
+    "event_visual_specific_motif_gap",
+    "event_visual_motif_missing_specific",
+    "event_visual_key_missing_needs_decision",
+    "event_visual_key_missing_ready_candidate",
+}
+
+
+def is_visual_issue(item: Issue) -> bool:
+    code = norm(item.issue_code)
+    return code.startswith("event_visual_") or "visual" in code or "motif" in code or item.workbench_group == "Visual-Fit"
+
+
+def visual_feedback_route_for_issue(item: Issue) -> str:
+    code = norm(item.issue_code)
+    if code in VISUAL_ASSET_GAP_CODES:
+        return "asset_gap"
+    if code in VISUAL_POOL_CONTRACT_CODES:
+        return "pool_contract"
+    if code in VISUAL_DIVERSITY_CODES:
+        return "diversity_review"
+    if code in VISUAL_RULE_REVIEW_CODES:
+        return "rule_review"
+    return "visual_review"
+
+
+def visual_feedback_item(item: Issue, route: str, meta: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "route": route,
+        "issue_code": item.issue_code,
+        "severity": item.severity,
+        "content_type": item.content_type,
+        "source_system": item.source_system,
+        "content_id": item.content_id,
+        "title": item.title,
+        "date": item.date,
+        "source_url": item.source_url,
+        "suggested_visual_key": item.suggested_visual_key,
+        "suggested_visual_motif": item.suggested_visual_motif,
+        "suggested_visual_motif_role": item.suggested_visual_motif_role,
+        "visual_asset_status": item.visual_asset_status,
+        "evidence_status": item.evidence_status,
+        "evidence_summary": item.evidence_summary[:360],
+        "recommended_action": item.recommended_action,
+        "search_feedback_relevant": item.issue_code in VISUAL_SEARCH_RELEVANT_CODES,
+        "generated_at": norm(meta.get("generated_at", "")),
+    }
+
+
+def build_visual_asset_gap_rows(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    grouped: Dict[tuple[str, str], Dict[str, Any]] = {}
+    for item in items:
+        if item.get("route") != "asset_gap":
+            continue
+        key = norm(item.get("suggested_visual_key")) or "<unknown_key>"
+        motif = norm(item.get("suggested_visual_motif")) or "<unknown_motif>"
+        group_key = (key, motif)
+        current = grouped.setdefault(group_key, {
+            "visual_key": key,
+            "visual_motif": motif,
+            "count": 0,
+            "priority": "medium",
+            "recommended_action": "Kein automatischer Bildmodell-Aufruf. Gap sammeln, priorisieren und spaeter bewusst als Bildproduktionspaket behandeln.",
+            "example_titles": [],
+            "example_urls": [],
+            "issue_codes": [],
+        })
+        current["count"] += 1
+        if norm(item.get("severity")) in {"critical", "review_needed"}:
+            current["priority"] = "high"
+        add_limited_unique(current["example_titles"], norm(item.get("title")), 6)
+        add_limited_unique(current["example_urls"], norm(item.get("source_url")), 4)
+        add_limited_unique(current["issue_codes"], norm(item.get("issue_code")), 5)
+
+    order = {"high": 0, "medium": 1, "low": 2}
+    return sorted(grouped.values(), key=lambda row: (order.get(row.get("priority", "medium"), 9), row.get("visual_key", ""), row.get("visual_motif", "")))
+
+
+def build_visual_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> Dict[str, Any]:
+    visual_items: List[Dict[str, Any]] = []
+    for item in issues:
+        if item.severity not in {"critical", "review_needed", "warning"}:
+            continue
+        if not is_visual_issue(item):
+            continue
+        route = visual_feedback_route_for_issue(item)
+        visual_items.append(visual_feedback_item(item, route, meta))
+
+    visual_items = visual_items[:VISUAL_FEEDBACK_MAX_ITEMS]
+    route_counts = Counter(norm(item.get("route")) for item in visual_items)
+    search_relevant = [item for item in visual_items if item.get("search_feedback_relevant")]
+    rule_feedback = [item for item in visual_items if item.get("route") in {"rule_review", "pool_contract"}]
+    asset_gaps = build_visual_asset_gap_rows(visual_items)
+
+    return {
+        "meta": {
+            "generated_at": meta.get("generated_at", datetime.now().isoformat(timespec="seconds")),
+            "source": "content-quality-audit",
+            "scope": meta.get("scope", ""),
+            "contract": "visual_feedback_routed_no_image_generation_no_auto_ready_no_rulebook_mutation",
+            "max_items": VISUAL_FEEDBACK_MAX_ITEMS,
+        },
+        "summary": {
+            "total_visual_signals": len(visual_items),
+            "route_counts": dict(route_counts),
+            "search_relevant_count": len(search_relevant),
+            "rule_feedback_count": len(rule_feedback),
+            "asset_gap_count": len(asset_gaps),
+        },
+        "search_relevant": search_relevant,
+        "rule_feedback": rule_feedback,
+        "asset_gaps": asset_gaps,
+        "items": visual_items,
+    }
+
+
+def write_search_feedback_report(path: Path, feedback: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(feedback, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def write_visual_feedback_report(path: Path, feedback: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(feedback, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+# === END BLOCK: CONTENT_VISUAL_FEEDBACK_ROUTER_V1 ===
+# === END BLOCK: CONTENT_SEARCH_FEEDBACK_BUILDER_FINAL ===
+
+def write_json_report(
+    path: Path,
+    issues: List[Issue],
+    meta: Dict[str, Any],
+    search_feedback: Dict[str, Any] | None = None,
+    visual_feedback: Dict[str, Any] | None = None,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "meta": meta,
         "summary": summarize(issues),
         "verification_summary": dict(VERIFICATION_STATS),
         "observations_summary": summarize_observations(OBSERVATIONS),
+        "search_feedback_summary": (search_feedback or {}).get("summary", {}),
+        "visual_feedback_summary": (visual_feedback or {}).get("summary", {}),
         "issues": [asdict(item) for item in issues],
         "observations": [asdict(item) for item in OBSERVATIONS],
     }
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> None:
+def write_markdown_report(
+    path: Path,
+    issues: List[Issue],
+    meta: Dict[str, Any],
+    search_feedback: Dict[str, Any] | None = None,
+    visual_feedback: Dict[str, Any] | None = None,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     summary = summarize(issues)
     observation_summary = summarize_observations(OBSERVATIONS)
@@ -2649,6 +3053,21 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
         f"- AI candidates total: {VERIFICATION_STATS.get('ai_candidates_total', 0)}",
         f"- AI candidates selected: {VERIFICATION_STATS.get('ai_candidates_selected', 0)}",
         f"- Deferred by budget: {VERIFICATION_STATS.get('ai_candidates_deferred_by_budget', 0)}",
+        "",
+        "## Search feedback",
+        "",
+        f"- Active feedback rules: {(search_feedback or {}).get('meta', {}).get('active_rule_count', 0)}",
+        f"- Default context rules: {(search_feedback or {}).get('meta', {}).get('default_rule_count', 0)}",
+        f"- Feedback signals: {(search_feedback or {}).get('meta', {}).get('total_feedback_signals', 0)}",
+        *[f"- {key}: {value}" for key, value in sorted(((search_feedback or {}).get('summary', {}).get('by_feedback_class', {}) or {}).items())],
+        "",
+        "## Visual feedback routing",
+        "",
+        f"- Visual signals: {((visual_feedback or {}).get('summary', {}) or {}).get('total_visual_signals', 0)}",
+        f"- Search-relevant visual signals: {((visual_feedback or {}).get('summary', {}) or {}).get('search_relevant_count', 0)}",
+        f"- Visual rule feedback: {((visual_feedback or {}).get('summary', {}) or {}).get('rule_feedback_count', 0)}",
+        f"- Visual asset gaps: {((visual_feedback or {}).get('summary', {}) or {}).get('asset_gap_count', 0)}",
+        *[f"- {key}: {value}" for key, value in sorted((((visual_feedback or {}).get('summary', {}) or {}).get('route_counts', {}) or {}).items())],
         "",
         "## Evidence observations",
         "",
@@ -2700,6 +3119,8 @@ def main() -> None:
     parser.add_argument("--output-md", default="data/content-quality-report.md")
     parser.add_argument("--verification-cache-json", default="data/content-verification-cache.json")
     parser.add_argument("--ai-candidates-json", default="data/content-ai-verification-candidates.json")
+    parser.add_argument("--search-feedback-json", default="data/content-search-feedback.json")
+    parser.add_argument("--visual-feedback-json", default="data/content-visual-feedback.json")
     parser.add_argument("--ai-max-candidates", type=int, default=AI_VERIFICATION_DEFAULT_MAX_CANDIDATES)
     parser.add_argument("--base-url", default="https://bocholt-erleben.de")
     parser.add_argument("--horizon-days", type=int, default=14)
@@ -2796,11 +3217,24 @@ def main() -> None:
     meta["ai_candidates_deferred_by_budget"] = VERIFICATION_STATS.get("ai_candidates_deferred_by_budget", 0)
     meta["verification_cache_hits"] = VERIFICATION_STATS.get("cache_hits", 0)
 
+    log_checkpoint("build search feedback start")
+    search_feedback = build_search_feedback_payload(issues, meta)
+    meta["search_feedback_rules_active"] = search_feedback.get("meta", {}).get("active_rule_count", 0)
+    meta["search_feedback_signals"] = search_feedback.get("meta", {}).get("total_feedback_signals", 0)
+
+    log_checkpoint("build visual feedback start")
+    visual_feedback = build_visual_feedback_payload(issues, meta)
+    meta["visual_feedback_signals"] = visual_feedback.get("summary", {}).get("total_visual_signals", 0)
+    meta["visual_feedback_search_relevant"] = visual_feedback.get("summary", {}).get("search_relevant_count", 0)
+    meta["visual_feedback_asset_gaps"] = visual_feedback.get("summary", {}).get("asset_gap_count", 0)
+
     log_checkpoint("write reports start")
-    write_json_report(ROOT / args.output_json, issues, meta)
-    write_markdown_report(ROOT / args.output_md, issues, meta)
+    write_json_report(ROOT / args.output_json, issues, meta, search_feedback, visual_feedback)
+    write_markdown_report(ROOT / args.output_md, issues, meta, search_feedback, visual_feedback)
     write_ai_candidates_report(ROOT / args.ai_candidates_json, candidates, meta)
-    log_checkpoint(f"write reports done: json={args.output_json}, md={args.output_md}, ai_candidates={args.ai_candidates_json}")
+    write_search_feedback_report(ROOT / args.search_feedback_json, search_feedback)
+    write_visual_feedback_report(ROOT / args.visual_feedback_json, visual_feedback)
+    log_checkpoint(f"write reports done: json={args.output_json}, md={args.output_md}, ai_candidates={args.ai_candidates_json}, search_feedback={args.search_feedback_json}, visual_feedback={args.visual_feedback_json}")
 
     summary = summarize(issues)
     print("✅ Content Quality Audit written")

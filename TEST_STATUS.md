@@ -32,6 +32,35 @@ Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter ble
 - Bei Widerspruch gilt: `MASTER.md` für strategische Steuerung, `ROADMAP.md` für aktuelle Taktik, `ENGINEERING.md` für Arbeitsregeln.
 <!-- === END BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_22 === -->
 
+
+<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_SEARCH_FEEDBACK_LOOP_FINAL_STATIC_2026_06_25 | Zweck: dokumentiert lokale/statische Validierung des finalen KI-Suchlauf-Feedback-Loop-Prozesspatches; Umfang: kein Live-Proof, keine Eventdatenfixes === -->
+## Content Search Feedback Loop – finaler Prozesspatch vorbereitet, Live-Beweis offen (2026-06-25)
+
+Status: lokal/statisch bestanden; Live-Beweis nach Upload/Deployment noch offen.
+
+### Lokal geprüfter Umfang
+
+- `scripts/content-quality-audit.py` erzeugt zusätzlich ein strukturiertes, gedeckeltes `content-search-feedback.json` mit TTL-/Bloat-Guard-Metadaten.
+- Der Content-Audit-Workflow schreibt daraus einen Sheet-Handoff-Tab `Content_Search_Feedback` bzw. `Content_Search_Feedback_Staging`.
+- `scripts/weekly-ki-websearch-to-manual-inbox.py` liest diesen Feedback-Tab optional, fällt bei fehlendem Tab auf das JSON-Artefakt zurück und ergänzt echte Inbox-/Archiv-Ablehnungen als typisierte Feedbackklassen.
+- Der Suchprompt erhält keinen Roh-Anhang aller Einzelfälle, sondern nur einen begrenzten `CONTENT_SEARCH_FEEDBACK`-Block mit priorisierten Klassenregeln.
+- Die Weekly-Diagnose protokolliert Anzahl, Klassen, Quellen und Kurzfassung der angewendeten Feedbackregeln.
+
+### Lokal bestandene Checks
+
+- Python-Syntaxcheck für `scripts/content-quality-audit.py` bestanden.
+- Python-Syntaxcheck für `scripts/weekly-ki-websearch-to-manual-inbox.py` bestanden.
+- YAML-Parsing für `content-quality-audit.yml`, `weekly-ki-websearch-to-manual-inbox.yml` und `manual-ki-intake.yml` bestanden.
+- Content-Audit-Testlauf ohne Live-Sheet-/Secret-Zugriff erzeugte ein gültiges Feedback-JSON mit Default-Kontextregeln und Bloat-Guard-Metadaten.
+- Synthetischer Ablehnungs-/Ticketportal-Test erzeugte verdichtete Feedbackregeln aus `Content_Search_Feedback`, `Inbox_Archive` und noch nicht archivierten `verworfen`-Inbox-Zeilen.
+
+### Noch nicht als Live-Proof behauptet
+
+- GitHub-Auditlauf muss nach Deployment den Sheet-Tab `Content_Search_Feedback(_Staging)` tatsächlich schreiben.
+- Der nächste Weekly-KI-Suchlauf muss im Log `search_feedback_rules_applied` und die Feedback-Klassen ausweisen.
+- Ob wiederkehrende Fehlerklassen praktisch abnehmen, ist erst nach mehreren realen Läufen bewertbar.
+<!-- === END BLOCK: TEST_STATUS_CONTENT_SEARCH_FEEDBACK_LOOP_FINAL_STATIC_2026_06_25 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_MAIN_KI_SEARCH_INBOX_VISUAL_KEY_PROOF_2026_06_25 | Zweck: dokumentiert den bestandenen Main-Beweis fuer Weekly-KI-Suchlauf, Manual-Inbox-Intake, Visual-Key-Handoff, Apps-Script-Approve-Fix und Live-Bildausspielung; Umfang: GitHub-Workflowlogs, Sheet-/PWA-Proof, Grenzen und Folgeworkpack === -->
 ## Main-KI-Suchlauf / Manual Inbox / Visual-Key-Handoff – bestanden (2026-06-25)
 
@@ -159,7 +188,7 @@ Letzter belegter Audit-Stand nach KI-Faktencheck-/Prüfcache-V1:
 
 Offene Folgebeweise:
 
-- KI-Suchlauf Feedback Loop / Self-Improving Search V1 entwerfen und testen, damit Audit-/Inbox-Fehler automatisch als Suchlauf-Lernsignale nutzbar werden.
+- KI-Suchlauf Feedback Loop / Self-Improving Search entwerfen und testen, damit Audit-/Inbox-Fehler automatisch als Suchlauf-Lernsignale nutzbar werden.
 - Visual-Fit-Paket fachlich bewerten und daraus konkrete Folgeaktionen ableiten.
 - Repo-Datenpatch-Paket als bewussten Sammelpatch vorbereiten und testen.
 - Quellencheck-/Faktencheck-Fälle nach Cache-/KI-Fallbacklogik fachlich prüfen.
@@ -237,7 +266,7 @@ Kein enger Timeout wurde ergänzt, weil ein vorher scheinbar hängender Lauf sp�
 
 ### Folgeworkpack
 
-Nächster sinnvoller Workpack: KI-Suchlauf Feedback Loop / Self-Improving Search V1.
+Nächster sinnvoller Workpack: KI-Suchlauf Feedback Loop / Self-Improving Search.
 
 Ziel: Audit-Findings, Inbox-Ablehnungsgründe, Korrekturgründe und KI-Faktencheck-Ergebnisse werden nicht manuell alle paar Wochen in Suchregeln übertragen, sondern strukturiert als Feedback für den nächsten KI-Suchlauf genutzt.
 <!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_AI_CACHE_TARGET_2026_06_24 === -->
