@@ -74,6 +74,14 @@ WARN_ON_PENDING_INBOX = os.environ.get(
     os.environ.get("FAIL_ON_PENDING_INBOX", "true"),
 ).lower() in {"1", "true", "yes"}
 FAIL_ON_PENDING_MANUAL = os.environ.get("FAIL_ON_PENDING_MANUAL", "false").lower() in {"1", "true", "yes"}
+
+# === BEGIN BLOCK: SELF_IMPROVING_SEARCH_FEEDBACK_LIMITS_FINAL | Zweck: verhindert Prompt-/Regel-Bloat im KI-Suchlauf; Umfang: harte Caps fuer Feedback-Pool, Prompt-Kontext und Inbox-Ablehnungsverlauf ===
+MAX_SEARCH_FEEDBACK_POOL_RULES = int(os.environ.get("MAX_SEARCH_FEEDBACK_POOL_RULES", "48"))
+MAX_PROMPT_SEARCH_FEEDBACK_RULES = int(os.environ.get("MAX_PROMPT_SEARCH_FEEDBACK_RULES", "18"))
+INBOX_REJECTION_FEEDBACK_DAYS = int(os.environ.get("INBOX_REJECTION_FEEDBACK_DAYS", "365"))
+MAX_FEEDBACK_RULE_TEXT_CHARS = int(os.environ.get("MAX_FEEDBACK_RULE_TEXT_CHARS", "420"))
+MAX_FEEDBACK_EXAMPLE_TEXT_CHARS = int(os.environ.get("MAX_FEEDBACK_EXAMPLE_TEXT_CHARS", "220"))
+# === END BLOCK: SELF_IMPROVING_SEARCH_FEEDBACK_LIMITS_FINAL ===
 # === END BLOCK: WEEKLY_PRODUCTION_CONFIG_APPEND_READY_V5 ===
 
 ALLOWED_CATEGORIES = {
@@ -409,7 +417,27 @@ def has_pending_inbox_rows(records: List[RefRecord]) -> bool:
 
 
 
-# === BEGIN BLOCK: CONTENT_SEARCH_FEEDBACK_CONTEXT_V1 | Zweck: liest strukturierte Audit-/Inbox-Lernsignale fuer den Weekly-KI-Suchlauf; Umfang: Prompt-Kontext, keine automatische Datenmutation ===
+# === BEGIN BLOCK: SELF_IMPROVING_SEARCH_FEEDBACK_CONTEXT_FINAL | Zweck: verdichtet Audit-Feedback und Inbox-Ablehnungen zu begrenztem Lernkontext fuer den Weekly-KI-Suchlauf; Umfang: Prompt-Kontext, harte Caps, Decay, keine automatische Datenmutation ===
+def feedback_join(value: Any, limit: int = MAX_FEEDBACK_EXAMPLE_TEXT_CHARS) -> str:
+    if isinstance(value, list):
+        text = "; ".join(clean_output_text(item) for item in value if clean_output_text(item))
+    else:
+        text = clean_output_text(value)
+    return text[:limit]
+
+
+def read_tsv_dicts(path: Path) -> list[dict[str, str]]:
+    if not path.exists() or not path.read_text(encoding="utf-8").strip():
+        return []
+    try:
+        with path.open("r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f, delimiter="\t")
+            return [dict(row) for row in reader if any(norm(v) for v in row.values())]
+    except Exception as exc:
+        info(f"TSV nicht lesbar: {path} ({exc})")
+        return []
+
+
 def load_json_search_feedback(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
@@ -423,20 +451,269 @@ def load_json_search_feedback(path: Path) -> list[dict[str, Any]]:
 
 
 def load_tsv_search_feedback(path: Path) -> list[dict[str, Any]]:
-    if not path.exists() or not path.read_text(encoding="utf-8").strip():
-        return []
-    try:
-        with path.open("r", encoding="utf-8", newline="") as f:
-            reader = csv.DictReader(f, delimiter="\t")
-            return [dict(row) for row in reader if any(norm(v) for v in row.values())]
-    except Exception as exc:
-        info(f"Content-Search-Feedback-TSV unlesbar: {path} ({exc})")
-        return []
+    return [dict(row) for row in read_tsv_dicts(path)]
 
 
-def normalize_search_feedback_rule(item: dict[str, Any]) -> dict[str, str] | None:
+INBOX_REJECTION_FEEDBACK_CLASSES: dict[str, dict[str, Any]] = {
+    "rejected_duplicate_existing": {
+        "field": "dedupe",
+        "priority": 78,
+        "prompt_rule": "Wenn ein Kandidat einem bestehenden, offenen, archivierten oder im aktuellen Lauf erkannten Event gleicht, nicht erneut ausgeben. Dedupe nach Titel, Datum, Ort und source_url konsequent anwenden.",
+    },
+    "rejected_unclear_date_time_place": {
+        "field": "date_time_location",
+        "priority": 90,
+        "prompt_rule": "Datum, Uhrzeit und Ort müssen aus der konkreten Instanzquelle belastbar sein. Bei unklaren Terminangaben, unsicherer Ortsgranularitaet oder zweifelhafter URL nicht als FINAL ausgeben.",
+    },
+    "rejected_not_public": {
+        "field": "public_access",
+        "priority": 84,
+        "prompt_rule": "Nur oeffentlich besuchbare Veranstaltungen ausgeben. Interne, geschlossene, ausgebuchte, reine Gruppen-/Kurs- oder nicht klar zugaengliche Termine nicht als FINAL ausgeben.",
+    },
+    "rejected_no_concrete_single_event": {
+        "field": "event_scope",
+        "priority": 88,
+        "prompt_rule": "Keine Dauerangebote, Oeffnungszeiten, Kursuebersichten, allgemeinen Infoseiten, Betreuungswochen oder losen Reihen als Event ausgeben. Nur konkrete Einzeltermine oder klar zusammenhaengende Mehrtagesevents.",
+    },
+    "rejected_source_insufficient": {
+        "field": "source_quality",
+        "priority": 86,
+        "prompt_rule": "Quelle muss event-spezifisch, oeffentlich lesbar und kanonisch genug sein. Bei schwacher, unklarer oder nicht instanzpassender Quelle zuerst bessere offizielle Detailquelle suchen; sonst nicht ausgeben.",
+    },
+    "rejected_not_local_enough": {
+        "field": "location_scope",
+        "priority": 82,
+        "prompt_rule": "Keine Kandidaten ausgeben, die raeumlich nicht klar zu Bocholt und dem definierten Nahraum passen. Randgebiet nur bei starkem Eventcharakter und sicherer Naehe.",
+    },
+    "rejected_editorial_fit": {
+        "field": "editorial_fit",
+        "priority": 76,
+        "prompt_rule": "Nicht nur formal korrekte Termine ausgeben. Kandidaten muessen redaktionell stark genug, lokal relevant und fuer normale Nutzer der Kuratierungs-PWA nuetzlich sein.",
+    },
+    "rejected_advertising_or_commercial": {
+        "field": "commercial_fit",
+        "priority": 82,
+        "prompt_rule": "Eintraege, die primaer Werbung, Verkauf, Dienstleistung, Anbieterpromotion oder monetarisierungsrelevante Venue-Promo sind, nicht als redaktionellen Event-Kandidaten ausgeben.",
+    },
+    "rejected_activity_scope_mismatch": {
+        "field": "activity_event_boundary",
+        "priority": 74,
+        "prompt_rule": "Aktivitaeten, Dauerorte und Aktivitaetspraesenzen nicht mit Event-Einzelterminen vermischen. Activity-Signale duerfen nicht als Event-Backfill in die Event-Inbox wandern.",
+    },
+    "rejected_other_review_signal": {
+        "field": "manual_review_quality",
+        "priority": 52,
+        "prompt_rule": "Manuelle Ablehnungen als Qualitaetssignal verstehen: aehnliche Kandidaten nur ausgeben, wenn Quelle, Termin, Oeffentlichkeit, Lokalitaet und redaktioneller Nutzen eindeutig besser belegt sind.",
+    },
+}
+
+
+BUILTIN_DEFAULT_SEARCH_FEEDBACK_RULES: list[dict[str, Any]] = [
+    {
+        "feedback_class": "rejected_unclear_date_time_place",
+        "issue_code": "inbox_rejection_reason_default",
+        "content_type": "event",
+        "source_system": "inbox_rejection_defaults",
+        "source_host": "all",
+        "field": "date_time_location",
+        "count": 0,
+        "priority": 80,
+        "status": "default_context",
+        "prompt_rule": INBOX_REJECTION_FEEDBACK_CLASSES["rejected_unclear_date_time_place"]["prompt_rule"],
+    },
+    {
+        "feedback_class": "rejected_no_concrete_single_event",
+        "issue_code": "inbox_rejection_reason_default",
+        "content_type": "event",
+        "source_system": "inbox_rejection_defaults",
+        "source_host": "all",
+        "field": "event_scope",
+        "count": 0,
+        "priority": 75,
+        "status": "default_context",
+        "prompt_rule": INBOX_REJECTION_FEEDBACK_CLASSES["rejected_no_concrete_single_event"]["prompt_rule"],
+    },
+    {
+        "feedback_class": "rejected_source_insufficient",
+        "issue_code": "inbox_rejection_reason_default",
+        "content_type": "event",
+        "source_system": "inbox_rejection_defaults",
+        "source_host": "all",
+        "field": "source_quality",
+        "count": 0,
+        "priority": 75,
+        "status": "default_context",
+        "prompt_rule": INBOX_REJECTION_FEEDBACK_CLASSES["rejected_source_insufficient"]["prompt_rule"],
+    },
+]
+
+
+def parse_feedback_date(value: Any) -> date | None:
+    raw = norm(value)
+    if not raw:
+        return None
+    for candidate in [raw[:10], raw.replace("/", "-")[:10]]:
+        parsed = parse_iso_date(candidate)
+        if parsed:
+            return parsed
+    for fmt in ("%d.%m.%Y", "%d.%m.%y"):
+        try:
+            return datetime.strptime(raw[:10], fmt).date()
+        except Exception:
+            pass
+    return None
+
+
+def is_feedback_rule_expired(item: dict[str, Any], today: date) -> bool:
+    status = norm(item.get("status") or "active")
+    if status == "default_context":
+        return False
+    expires_at = parse_feedback_date(item.get("expires_at"))
+    if expires_at and expires_at < today:
+        return True
+    last_seen_at = parse_feedback_date(item.get("last_seen_at") or item.get("generated_at"))
+    if last_seen_at and (today - last_seen_at).days > INBOX_REJECTION_FEEDBACK_DAYS:
+        try:
+            count = int(float(norm(item.get("count") or "0")))
+        except Exception:
+            count = 0
+        return count <= 1
+    return False
+
+
+def classify_inbox_rejection(row: dict[str, str]) -> tuple[str, dict[str, Any]] | None:
+    status = norm_key(row.get("status", ""))
+    if status not in {"verworfen", "rejected", "abgelehnt"}:
+        return None
+
+    reason = " ".join(
+        norm(row.get(key, ""))
+        for key in [
+            "ablehnungsgrund",
+            "Ablehnungsgrund",
+            "rejection_reason",
+            "reject_reason",
+            "reason",
+            "notes",
+            "notes_text",
+            "review_notes",
+            "review_note",
+        ]
+        if norm(row.get(key, ""))
+    )
+    reason_key = norm_key(reason)
+
+    if not reason_key:
+        feedback_class = "rejected_other_review_signal"
+    elif any(token in reason_key for token in ["doppelt", "dublette", "bereits vorhanden", "bereits ausreichend", "abgedeckt"]):
+        feedback_class = "rejected_duplicate_existing"
+    elif any(token in reason_key for token in ["terminangaben", "datum", "uhrzeit", "ort", "link", "unklar", "nicht belastbar"]):
+        feedback_class = "rejected_unclear_date_time_place"
+    elif any(token in reason_key for token in ["nicht öffentlich", "nicht oeffentlich", "nicht klar zugänglich", "nicht klar zugaenglich", "geschlossen", "intern"]):
+        feedback_class = "rejected_not_public"
+    elif any(token in reason_key for token in ["dauerangebot", "öffnungszeit", "oeffnungszeit", "kursübersicht", "kursuebersicht", "allgemeine information", "kein konkreter einzeltermin", "betreuungswoche"]):
+        feedback_class = "rejected_no_concrete_single_event"
+    elif any(token in reason_key for token in ["quelle", "angaben reichen", "verlässliche veröffentlichung", "verlaessliche veroeffentlichung", "nicht ausreichend", "zu schwach"]):
+        feedback_class = "rejected_source_insufficient"
+    elif any(token in reason_key for token in ["nicht lokal", "räumlich", "raeumlich", "umgebung", "zu weit"]):
+        feedback_class = "rejected_not_local_enough"
+    elif any(token in reason_key for token in ["werbung", "dienstleistung", "verkauf", "anbieter", "promotion", "kommerziell"]):
+        feedback_class = "rejected_advertising_or_commercial"
+    elif any(token in reason_key for token in ["einzeltermin statt aktivität", "einzeltermin statt aktivitaet", "keine eigene aktivitätskarte", "keine eigene aktivitaetskarte"]):
+        feedback_class = "rejected_activity_scope_mismatch"
+    elif any(token in reason_key for token in ["redaktionell", "nicht passend", "fokus", "nicht eigenständig", "nicht eigenstaendig"]):
+        feedback_class = "rejected_editorial_fit"
+    else:
+        feedback_class = "rejected_other_review_signal"
+
+    config = INBOX_REJECTION_FEEDBACK_CLASSES[feedback_class]
+    source_url = canonical_url(row.get("source_url", "")) or canonical_url(row.get("url", ""))
+    host = source_domain(source_url) if source_url else "all"
+    if host.startswith("www."):
+        host = host[4:]
+
+    # Allgemeine Ablehnungsgruende werden bewusst nicht pro Host aufgefaechert, damit der Prompt nicht mit Einzelfallquellen waechst.
+    host_scope = host if feedback_class in {"rejected_source_insufficient", "rejected_advertising_or_commercial"} else "all"
+    content_type = norm(row.get("content_type") or row.get("submission_kind") or row.get("type") or "event")
+    if content_type not in {"event", "activity"}:
+        content_type = "event"
+
+    seen_at = (
+        parse_feedback_date(row.get("updated_at"))
+        or parse_feedback_date(row.get("rejected_at"))
+        or parse_feedback_date(row.get("created_at"))
+    )
+    if seen_at and (date.today() - seen_at).days > INBOX_REJECTION_FEEDBACK_DAYS:
+        return None
+
+    return feedback_class, {
+        "feedback_class": feedback_class,
+        "issue_code": "inbox_rejection_reason",
+        "content_type": content_type,
+        "source_system": "inbox_rejection_history",
+        "source_host": host_scope,
+        "field": config["field"],
+        "count": 1,
+        "priority": int(config["priority"]),
+        "status": "active",
+        "prompt_rule": config["prompt_rule"],
+        "example_titles": [norm(row.get("title", ""))] if norm(row.get("title", "")) else [],
+        "example_urls": [source_url] if source_url else [],
+        "last_seen_at": seen_at.isoformat() if seen_at else "",
+        "source": "inbox_rejection_history",
+    }
+
+
+def read_inbox_rejection_feedback_rules() -> list[dict[str, Any]]:
+    rows = read_tsv_dicts(TMP_ARCHIVE_TSV_PATH) + read_tsv_dicts(TMP_INBOX_TSV_PATH)
+    grouped: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+
+    for row in rows:
+        classified = classify_inbox_rejection(row)
+        if not classified:
+            continue
+        _feedback_class, rule = classified
+        key = (
+            norm(rule.get("feedback_class")),
+            norm(rule.get("content_type")),
+            norm(rule.get("source_host")),
+            norm(rule.get("field")),
+        )
+        if key not in grouped:
+            grouped[key] = dict(rule)
+            continue
+
+        current = grouped[key]
+        current["count"] = int(current.get("count") or 0) + 1
+        current["priority"] = max(int(current.get("priority") or 0), int(rule.get("priority") or 0))
+        titles = current.setdefault("example_titles", [])
+        for title in rule.get("example_titles", []):
+            if title and title not in titles and len(titles) < 6:
+                titles.append(title)
+        urls = current.setdefault("example_urls", [])
+        for url in rule.get("example_urls", []):
+            if url and url not in urls and len(urls) < 4:
+                urls.append(url)
+        if rule.get("last_seen_at") and (not current.get("last_seen_at") or rule["last_seen_at"] > current["last_seen_at"]):
+            current["last_seen_at"] = rule["last_seen_at"]
+
+    for rule in grouped.values():
+        # Wiederholte reale Ablehnungen duerfen etwas nach oben, aber nie unbegrenzt eskalieren.
+        try:
+            count = int(rule.get("count") or 0)
+        except Exception:
+            count = 0
+        rule["priority"] = min(98, int(rule.get("priority") or 0) + min(10, max(0, count - 1)))
+
+    return list(grouped.values())
+
+
+def normalize_search_feedback_rule(item: dict[str, Any], source: str = "unknown") -> dict[str, str] | None:
+    if is_feedback_rule_expired(item, date.today()):
+        return None
+
     feedback_class = norm(item.get("feedback_class"))
-    prompt_rule = clean_output_text(item.get("prompt_rule"))
+    prompt_rule = clean_output_text(item.get("prompt_rule"))[:MAX_FEEDBACK_RULE_TEXT_CHARS]
     status = norm(item.get("status") or "active")
     if not feedback_class or not prompt_rule:
         return None
@@ -456,39 +733,85 @@ def normalize_search_feedback_rule(item: dict[str, Any]) -> dict[str, str] | Non
         "issue_code": norm(item.get("issue_code")),
         "content_type": norm(item.get("content_type")),
         "source_system": norm(item.get("source_system")),
-        "source_host": norm(item.get("source_host")),
+        "source_host": norm(item.get("source_host")) or "all",
         "field": norm(item.get("field")),
         "priority": str(priority_int),
         "count": str(count_int),
         "status": status,
         "prompt_rule": prompt_rule,
-        "example_titles": clean_output_text(item.get("example_titles")),
-        "example_urls": clean_output_text(item.get("example_urls")),
+        "example_titles": feedback_join(item.get("example_titles")),
+        "example_urls": feedback_join(item.get("example_urls")),
+        "last_seen_at": norm(item.get("last_seen_at")),
+        "source": norm(item.get("source")) or source,
     }
 
 
-def read_search_feedback_rules(limit: int = 18) -> list[dict[str, str]]:
-    raw_rules = load_tsv_search_feedback(TMP_CONTENT_SEARCH_FEEDBACK_TSV_PATH)
-    source = "sheet"
-    if not raw_rules:
-        raw_rules = load_json_search_feedback(CONTENT_SEARCH_FEEDBACK_JSON_PATH)
-        source = "repo_json"
+def merge_feedback_rules(raw_rules: list[dict[str, Any]]) -> list[dict[str, str]]:
+    merged: dict[tuple[str, str, str, str, str], dict[str, str]] = {}
+    order: list[tuple[str, str, str, str, str]] = []
 
-    normalized: list[dict[str, str]] = []
-    seen = set()
     for item in raw_rules:
-        rule = normalize_search_feedback_rule(item)
+        source = norm(item.get("source")) or norm(item.get("source_system")) or "unknown"
+        rule = normalize_search_feedback_rule(item, source)
         if not rule:
             continue
-        key = (rule["feedback_class"], rule["issue_code"], rule["source_host"], rule["field"], rule["prompt_rule"])
-        if key in seen:
+        key = (
+            rule["feedback_class"],
+            rule["content_type"],
+            rule["source_host"],
+            rule["field"],
+            rule["prompt_rule"],
+        )
+        if key not in merged:
+            merged[key] = rule
+            order.append(key)
             continue
-        seen.add(key)
-        rule["source"] = source
-        normalized.append(rule)
+        current = merged[key]
+        current["count"] = str(int(current.get("count") or 0) + int(rule.get("count") or 0))
+        current["priority"] = str(max(int(current.get("priority") or 0), int(rule.get("priority") or 0)))
+        if rule.get("example_titles") and rule["example_titles"] not in current.get("example_titles", ""):
+            current["example_titles"] = feedback_join([current.get("example_titles", ""), rule["example_titles"]])
+        if rule.get("source") and rule["source"] not in current.get("source", ""):
+            current["source"] = feedback_join([current.get("source", ""), rule["source"]], 120)
 
-    normalized.sort(key=lambda row: (-int(row.get("priority") or 0), -int(row.get("count") or 0), row.get("feedback_class", "")))
-    return normalized[:limit]
+    out = [merged[key] for key in order]
+    # Built-in Defaults nur ergänzen, wenn keine aktive/Default-Regel derselben Klasse existiert.
+    existing_classes = {rule.get("feedback_class") for rule in out}
+    for item in BUILTIN_DEFAULT_SEARCH_FEEDBACK_RULES:
+        if item["feedback_class"] not in existing_classes:
+            normalized = normalize_search_feedback_rule(item, "builtin_default")
+            if normalized:
+                out.append(normalized)
+                existing_classes.add(item["feedback_class"])
+
+    out.sort(
+        key=lambda row: (
+            row.get("status") != "active",
+            -int(row.get("priority") or 0),
+            -int(row.get("count") or 0),
+            row.get("feedback_class", ""),
+        )
+    )
+    return out[:MAX_SEARCH_FEEDBACK_POOL_RULES]
+
+
+def read_search_feedback_rules(limit: int = MAX_PROMPT_SEARCH_FEEDBACK_RULES) -> list[dict[str, str]]:
+    raw_rules: list[dict[str, Any]] = []
+
+    sheet_rules = load_tsv_search_feedback(TMP_CONTENT_SEARCH_FEEDBACK_TSV_PATH)
+    for item in sheet_rules:
+        item.setdefault("source", "content_search_feedback_sheet")
+    raw_rules.extend(sheet_rules)
+
+    if not sheet_rules:
+        json_rules = load_json_search_feedback(CONTENT_SEARCH_FEEDBACK_JSON_PATH)
+        for item in json_rules:
+            item.setdefault("source", "content_search_feedback_json")
+        raw_rules.extend(json_rules)
+
+    raw_rules.extend(read_inbox_rejection_feedback_rules())
+    merged = merge_feedback_rules(raw_rules)
+    return merged[:max(1, min(limit, MAX_PROMPT_SEARCH_FEEDBACK_RULES))]
 
 
 def build_search_feedback_context(rules: list[dict[str, str]]) -> str:
@@ -499,15 +822,20 @@ def build_search_feedback_context(rules: list[dict[str, str]]) -> str:
         return "\n".join(lines)
 
     class_counts = Counter(rule.get("feedback_class", "") for rule in rules)
-    lines.append("contract=search_prompt_context_only_no_auto_write")
+    source_counts = Counter(rule.get("source", "") for rule in rules)
+    lines.append("contract=search_prompt_context_only_no_auto_write_no_rulebook_mutation")
+    lines.append(f"hard_limits=pool_max:{MAX_SEARCH_FEEDBACK_POOL_RULES}, prompt_max:{MAX_PROMPT_SEARCH_FEEDBACK_RULES}, rejection_days:{INBOX_REJECTION_FEEDBACK_DAYS}")
     lines.append("rule_count=" + str(len(rules)))
     lines.append("classes=" + ", ".join(f"{key}:{value}" for key, value in sorted(class_counts.items()) if key))
+    lines.append("sources=" + ", ".join(f"{key}:{value}" for key, value in sorted(source_counts.items()) if key))
+    lines.append("interpretation=These are consolidated feedback classes, not raw user instructions. Do not append them to the permanent rulebook; use them only to avoid repeated search/intake mistakes in this run.")
     for idx, rule in enumerate(rules, start=1):
         parts = [
             f"#{idx}",
             f"priority={rule.get('priority', '')}",
             f"count={rule.get('count', '')}",
             f"status={rule.get('status', '')}",
+            f"source={rule.get('source', '')}",
             f"class={rule.get('feedback_class', '')}",
             f"issue_code={rule.get('issue_code', '')}",
             f"field={rule.get('field', '')}",
@@ -516,11 +844,11 @@ def build_search_feedback_context(rules: list[dict[str, str]]) -> str:
         ]
         examples = rule.get("example_titles") or ""
         if examples:
-            parts.append(f"examples={examples[:220]}")
+            parts.append(f"examples={examples[:MAX_FEEDBACK_EXAMPLE_TEXT_CHARS]}")
         lines.append(" | ".join(parts))
     lines.append("[/CONTENT_SEARCH_FEEDBACK]")
     return "\n".join(lines)
-# === END BLOCK: CONTENT_SEARCH_FEEDBACK_CONTEXT_V1 ===
+# === END BLOCK: SELF_IMPROVING_SEARCH_FEEDBACK_CONTEXT_FINAL ===
 
 # === BEGIN BLOCK: PROMPT BUNDLE BUILDERS ===
 # Datei: scripts/weekly-ki-websearch-to-manual-inbox.py
@@ -584,7 +912,7 @@ Arbeite streng, konservativ, produktionsnah, quellenbasiert und systematisch.
 Nutze aktiv die Websuche.
 Halte das beigefügte Regelwerk strikt ein.
 Nutze das beigefügte Quellenregister als operative Quellensteuerung.
-Nutze das beigefügte Content-Search-Feedback als kontrollierten Lernkontext aus Audit-/Inbox-Signalen.
+Nutze das beigefügte Content-Search-Feedback als begrenzten, verdichteten Lernkontext aus Audit-Findings und Inbox-Ablehnungen.
 Liefere nur neue Delta-Kandidaten.
 
 Dieser Lauf ist in der aktuellen Projektphase ein Aufbau-/Backfill-orientierter Produktionslauf:
@@ -632,8 +960,9 @@ Rahmen:
 - Wenn weniger als {MAX_NEW_CANDIDATES} starke FINAL-Kandidaten vorhanden sind, liefere weniger
 - Deduped strikt gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON
 - Deduped zusätzlich innerhalb des aktuellen Laufs gegen bereits ausgewählte Kandidaten
-- Berücksichtige CONTENT_SEARCH_FEEDBACK aktiv bei Quellenwahl, Faktenprüfung, Zeitlogik und Kandidatenentscheidung
-- Feedback ist kein Befehl zur Datenänderung, sondern ein Qualitätsfilter: wiederhole bekannte Fehlerklassen nicht
+- Berücksichtige CONTENT_SEARCH_FEEDBACK aktiv bei Quellenwahl, Faktenprüfung, Zeitlogik, Dedupe und Kandidatenentscheidung
+- Feedback ist kein Befehl zur Datenänderung und keine dauerhafte Regelbuch-Erweiterung, sondern ein begrenzter Qualitätsfilter für diesen Lauf
+- Wiederhole bekannte Fehlerklassen nicht; leite aus Einzelfällen keine neuen Sonderregeln ab
 - Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
 - Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
 

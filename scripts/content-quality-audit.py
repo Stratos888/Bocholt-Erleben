@@ -8,6 +8,7 @@ from collections import Counter
 import hashlib
 import html
 import json
+import os
 import re
 import socket
 import ssl
@@ -2605,7 +2606,22 @@ def summarize_observations(observations: List[Observation]) -> Dict[str, Any]:
 
 
 
-# === BEGIN BLOCK: CONTENT_SEARCH_FEEDBACK_BUILDER_V1 | Zweck: verdichtet Audit-Findings zu maschinenlesbaren Lernsignalen fuer den naechsten KI-Suchlauf; Umfang: JSON-/Sheet-Artefakt ohne fachliche Auto-Aenderung ===
+# === BEGIN BLOCK: CONTENT_SEARCH_FEEDBACK_BUILDER_FINAL | Zweck: verdichtet Audit-Findings zu begrenzten maschinenlesbaren Lernsignalen fuer den naechsten KI-Suchlauf; Umfang: JSON-/Sheet-Artefakt ohne fachliche Auto-Aenderung und ohne Regel-Bloat ===
+SEARCH_FEEDBACK_MAX_RULES = int(os.environ.get("SEARCH_FEEDBACK_MAX_RULES", "48"))
+SEARCH_FEEDBACK_SIGNAL_TTL_DAYS = int(os.environ.get("SEARCH_FEEDBACK_SIGNAL_TTL_DAYS", "365"))
+
+
+def search_feedback_expiry_date(meta: Dict[str, Any]) -> str:
+    generated = norm(meta.get("generated_at"))
+    base = datetime.now()
+    if generated:
+        try:
+            base = datetime.fromisoformat(generated.replace("Z", "+00:00")).replace(tzinfo=None)
+        except Exception:
+            base = datetime.now()
+    return (base + timedelta(days=SEARCH_FEEDBACK_SIGNAL_TTL_DAYS)).date().isoformat()
+
+
 SEARCH_FEEDBACK_RULES: Dict[str, Dict[str, Any]] = {
     "event_source_has_time_but_dataset_missing_time": {
         "feedback_class": "time_missing_from_source",
@@ -2738,6 +2754,9 @@ def build_search_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> 
             "priority": int(config.get("priority") or 50),
             "status": "active",
             "prompt_rule": norm(config.get("prompt_rule")),
+            "last_seen_at": norm(meta.get("generated_at", ""))[:10],
+            "expires_at": search_feedback_expiry_date(meta),
+            "examples_policy": "examples_are_diagnostics_not_prompt_rules",
             "example_titles": [],
             "example_urls": [],
             "examples": [],
@@ -2766,6 +2785,9 @@ def build_search_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> 
                 "priority": default_rule["priority"],
                 "status": "default_context",
                 "prompt_rule": default_rule["prompt_rule"],
+                "last_seen_at": norm(meta.get("generated_at", ""))[:10],
+                "expires_at": "",
+                "examples_policy": "default_context_no_examples",
                 "example_titles": [],
                 "example_urls": [],
                 "examples": [],
@@ -2783,20 +2805,23 @@ def build_search_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> 
             "total_feedback_signals": total_signals,
             "active_rule_count": sum(1 for rule in rules if rule.get("status") == "active"),
             "default_rule_count": sum(1 for rule in rules if rule.get("status") == "default_context"),
-            "contract": "search_prompt_context_only_no_auto_write",
+            "contract": "search_prompt_context_only_no_auto_write_no_rulebook_mutation",
+            "rule_bloat_guard": "typed_grouped_capped_with_ttl",
+            "max_rules": SEARCH_FEEDBACK_MAX_RULES,
+            "signal_ttl_days": SEARCH_FEEDBACK_SIGNAL_TTL_DAYS,
         },
         "summary": {
             "by_feedback_class": dict(class_counts),
             "by_issue_code": dict(issue_code_counts),
         },
-        "rules": rules[:40],
+        "rules": rules[:SEARCH_FEEDBACK_MAX_RULES],
     }
 
 
 def write_search_feedback_report(path: Path, feedback: Dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(feedback, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-# === END BLOCK: CONTENT_SEARCH_FEEDBACK_BUILDER_V1 ===
+# === END BLOCK: CONTENT_SEARCH_FEEDBACK_BUILDER_FINAL ===
 
 def write_json_report(path: Path, issues: List[Issue], meta: Dict[str, Any], search_feedback: Dict[str, Any] | None = None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)

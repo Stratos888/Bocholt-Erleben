@@ -73,12 +73,13 @@ Aktueller strategischer Zielzustand:
 - Keine KI- oder Website-Textauswertung darf fachliche Inhalte blind überschreiben. Semantische Änderungen brauchen eine explizite geprüfte Aktion.
 - Eine 0%-Fehlerquote wird nicht behauptet. Der Qualitätsstandard lautet: definierte Event-/Activity-Kerndaten regelmäßig prüfen, sichere Fälle automatisch abräumen, keine bekannten ungeprüften kritischen Fehler online lassen und nur echte Restaufgaben zur Bewertung vorlegen.
 
-Nächster strategischer Ausbau:
+Aktueller strategischer Ausbau: KI-Suchlauf Feedback Loop / Self-Improving Search
 
-- Die Content-Prüfung soll Lernsignale für den KI-Suchlauf erzeugen, damit wiederkehrende Fehler nicht nur korrigiert, sondern die Such-/Prompt-/Quellenlogik verbessert wird.
-- Bereits vorhandene Inbox-Ablehnungsgründe, Korrekturgründe, Audit-Findings und KI-Faktencheck-Ergebnisse sollen nicht manuell alle paar Wochen ausgewertet werden müssen, sondern strukturiert in einen Feedback-Loop für den nächsten Suchlauf eingehen.
-- V1-Prozessarchitektur: Content-Audit verdichtet typisierte Findings in `content-search-feedback.json` und schreibt daraus den Sheet-Tab `Content_Search_Feedback(_Staging)`; der Weekly-KI-Suchlauf liest diese Feedback-Schicht als Prompt-/Quellenkontext und protokolliert die angewendeten Regeln.
-- Ziel ist keine unkontrolliert selbsttrainierende KI, sondern ein kontrollierter, belegbarer Prozess: Fehlerklassifikation -> Feedback-Artefakt -> Suchlauf-Regel/Prompt-Kontext -> Messung, ob dieselbe Fehlerklasse seltener wiederkommt.
+- Die Content-Prüfung erzeugt Lernsignale für den KI-Suchlauf, damit wiederkehrende Fehler nicht nur korrigiert, sondern die Such-/Prompt-/Quellenlogik verbessert wird.
+- Inbox-Ablehnungsgründe, Audit-Findings, KI-Faktencheck-Ergebnisse und Cache-/Bestätigungssignale werden nicht manuell in Suchregeln umgeschrieben, sondern strukturiert typisiert und begrenzt an den nächsten Suchlauf übergeben.
+- Finale Prozessarchitektur: Content-Audit verdichtet typisierte Findings in `content-search-feedback.json` und schreibt daraus `Content_Search_Feedback(_Staging)`; der Weekly-KI-Suchlauf kombiniert diesen Tab mit realer Inbox-/Archiv-Ablehnungshistorie und baut daraus einen gedeckelten `CONTENT_SEARCH_FEEDBACK`-Promptkontext.
+- Regel-Bloat ist technisch begrenzt: Feedback wird nach Fehlerklassen gruppiert, duplizierte Einzelfälle werden gezählt statt angehängt, alte Einzelablehnungen laufen aus, und der Suchprompt erhält nur die priorisierten Top-Regeln.
+- Ziel ist keine unkontrolliert selbsttrainierende KI, sondern ein kontrollierter, belegbarer Prozess: Fehlerklassifikation -> Feedback-Artefakt/Ablehnungshistorie -> begrenzter Suchlauf-Kontext -> Diagnose -> Messung, ob dieselbe Fehlerklasse seltener wiederkommt.
 
 Separater strategischer Punkt:
 
@@ -157,7 +158,7 @@ Bewusst geparkt:
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.
-- Current next workpack: deploy and prove the Content Quality Feedback Loop / Self-Improving Search V1 process patch.
+- Current next workpack: deploy and prove the final Content Quality Feedback Loop / Self-Improving Search process patch on staging, then decide main promotion.
 - The feedback-loop workpack connects typed audit findings, Inbox/rejection-reason defaults and KI-facts outcomes back into the KI search workflow without requiring the user to manually maintain search rules every few weeks.
 - Content Quality Guard V2 and the AI verification cache are no longer basic-introduction workpacks; further changes need a concrete finding from current reports or from the feedback-loop design.
 - Manual-KI-Intake / Visual-Key-Handoff and Activity-Premium-Visuals remain separate workstreams and must only be reopened when the current Content-Quality/Visual-Fit package produces a concrete need.

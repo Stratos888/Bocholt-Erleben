@@ -74,7 +74,7 @@ Dieser Workpack ist die redaktionelle Eingabeschicht für spätere Automatisieru
 ---
 
 <!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_FEEDBACK_LOOP_2026_06_25 | Zweck: definiert den naechsten Workpack nach abgeschlossenem KI-Faktencheck-Cache; Umfang: Audit-/Inbox-Feedback, Ablehnungsgruende, KI-Suchlauf-Regeln, Messbarkeit, keine blinde Selbstmutation === -->
-## Content-Prüfung – nächster Workpack: KI-Suchlauf Feedback Loop / Self-Improving Search V1 (2026-06-25)
+## Content-Prüfung – KI-Suchlauf Feedback Loop / Self-Improving Search finaler Staging-Prozess (2026-06-25)
 
 Dieser Block ist der nächste aktive Content-Quality-Workpack nach dem belegten KI-Faktencheck-Fallback mit Prüfcache. Er überschreibt ältere Formulierungen, nach denen zuerst noch der Cache-Grundprozess zu implementieren wäre.
 
@@ -95,7 +95,7 @@ Ziel ist daher ein kontrollierter Feedback-Prozess:
 5. Der nächste KI-Suchlauf nutzt dieses Feedback als Kontext für Quellenwahl, Prompt-Regeln und Plausibilitätsprüfungen.
 6. Reports zeigen, welches Feedback angewendet wurde und ob wiederkehrende Fehlerklassen abnehmen.
 
-### Fehlerklassen für V1
+### Fehlerklassen
 
 Mindestens strukturiert unterscheiden:
 
@@ -119,13 +119,13 @@ Der Workpack soll voraussichtlich ein oder mehrere maschinenlesbare Artefakte er
 - Fehlerklassen-Zählung nach Lauf, Quelle und Feld.
 - Liste wiederholter Fehler, die trotz Feedback erneut auftreten.
 
-Die Analyse der aktuellen Owner-Flows legt für V1 diese Datei-/Tab-Struktur fest:
+Die Analyse der aktuellen Owner-Flows legt diese finale Datei-/Tab-Struktur fest:
 
 - Audit-Owner: `scripts/content-quality-audit.py` erzeugt `data/content-search-feedback.json` als runtime-/reportfähiges Artefakt.
 - Sheet-Handoff: `.github/workflows/content-quality-audit.yml` schreibt daraus `Content_Search_Feedback` auf `main` und `Content_Search_Feedback_Staging` auf `staging`.
-- Suchlauf-Owner: `scripts/weekly-ki-websearch-to-manual-inbox.py` exportiert den Feedback-Tab optional, fällt bei fehlendem Tab auf `data/content-search-feedback.json` zurück und baut daraus `CONTENT_SEARCH_FEEDBACK` für den Prompt.
-- Diagnose: `weekly_event_diagnostics.json` enthält Anzahl, Klassen und Kurzfassung der im Suchlauf angewendeten Feedbackregeln.
-- Automationsgrenze: Feedback ändert keine fachlichen Events/Activities/DB-Daten und schreibt keine Suchregeln dauerhaft selbst um.
+- Suchlauf-Owner: `scripts/weekly-ki-websearch-to-manual-inbox.py` exportiert den Feedback-Tab optional, fällt bei fehlendem Tab auf `data/content-search-feedback.json` zurück, liest zusätzlich echte Inbox-/Archiv-Ablehnungen und baut daraus einen gruppierten, gedeckelten `CONTENT_SEARCH_FEEDBACK`-Promptblock.
+- Diagnose: `weekly_event_diagnostics.json` enthält Anzahl, Klassen, Quellen und Kurzfassung der im Suchlauf angewendeten Feedbackregeln.
+- Automationsgrenze: Feedback ändert keine fachlichen Events/Activities/DB-Daten, schreibt keine Suchregeln dauerhaft selbst um und wird nur als laufbezogener Qualitätsfilter genutzt.
 
 ### Regeln und Grenzen
 
@@ -133,15 +133,16 @@ Die Analyse der aktuellen Owner-Flows legt für V1 diese Datei-/Tab-Struktur fes
 - Kein automatisches Überschreiben von Event-/Activity-Daten nur wegen eines Feedback-Signals.
 - Feedback darf Such-/Prompt-Kontext und Prüfprioritäten verbessern, aber fachliche Änderungen bleiben bestätigungspflichtig.
 - Kein pauschaler Vollscan per KI; Budget-, Kandidaten- und Cache-Logik bleiben bestehen.
-- Ablehnungsgründe aus der Inbox sind wertvolle Trainingssignale, aber erst nach Typisierung/Normalisierung belastbar.
+- Ablehnungsgründe aus der Inbox werden nicht roh in den Prompt übernommen, sondern auf feste Feedbackklassen normalisiert.
+- Regel-Bloat ist technisch begrenzt: maximaler Feedback-Pool, maximaler Prompt-Block, Gruppierung nach Fehlerklasse/Feld/Quelle, Duplikatzählung statt Listenwachstum und Decay für alte Einzelablehnungen.
 - Der Nutzer soll keine wöchentliche manuelle Regelpflege übernehmen müssen.
 
-### Akzeptanzkriterien für V1
+### Akzeptanzkriterien
 
-- Audit-/Inbox-/KI-Faktencheck-Signale werden in einem strukturierten Feedback-Artefakt gesammelt.
+- Audit-/KI-Faktencheck-Signale werden in einem strukturierten Feedback-Artefakt gesammelt; Inbox-Ablehnungen werden zusätzlich aus Inbox/Archiv-Historie typisiert.
 - Der KI-Suchlauf kann dieses Artefakt lesen und in Prompt-/Quellenlogik sichtbar berücksichtigen.
 - Der Audit-Report zeigt, welche Feedbackklassen erzeugt wurden; der Weekly-Diagnosereport zeigt, welche Feedbackregeln angewendet wurden.
-- Wiederholte Fehlerklassen werden erkennbar gezählt.
+- Wiederholte Fehlerklassen werden erkennbar gezählt, ohne dass Einzelfälle unbegrenzt als neue Promptregeln anwachsen.
 - Mindestens eine konkrete Fehlerklasse, z. B. Zeitangaben oder Ticketportal-Primärquellen, wird als Proof durchgängig vom Audit-Finding bis zum KI-Suchlauf-Feedback verfolgt.
 
 ### Nicht-Ziel in diesem Workpack
@@ -203,7 +204,7 @@ Staging-Proof mit `Farm & Country Fair`:
 
 ### Folgeworkpack
 
-Der nächste Ausbau ist `Content-Prüfung – KI-Suchlauf Feedback Loop / Self-Improving Search V1`.
+Der nächste Ausbau ist `Content-Prüfung – KI-Suchlauf Feedback Loop / Self-Improving Search`.
 <!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_AI_VERIFICATION_CACHE_2026_06_24 === -->
 
 ---
@@ -288,7 +289,7 @@ Visual-Fit:
 
 ### Nächste Reihenfolge
 
-1. KI-Suchlauf Feedback Loop / Self-Improving Search V1 analysieren und als Prozesspatch vorbereiten:
+1. KI-Suchlauf Feedback Loop / Self-Improving Search analysieren und als Prozesspatch vorbereiten:
    - Audit-Findings, Inbox-Entscheidungen, Ablehnungsgründe und KI-Faktencheck-Ergebnisse als Lernsignale sammeln.
    - Fehlerklassen normalisieren.
    - Feedback-Artefakt für den nächsten KI-Suchlauf erzeugen.
