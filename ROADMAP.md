@@ -119,7 +119,13 @@ Der Workpack soll voraussichtlich ein oder mehrere maschinenlesbare Artefakte er
 - Fehlerklassen-Zählung nach Lauf, Quelle und Feld.
 - Liste wiederholter Fehler, die trotz Feedback erneut auftreten.
 
-Die genaue Datei-/Tab-Struktur wird erst nach Analyse der aktuellen KI-Suchlauf- und Inbox-Artefakte festgelegt.
+Die Analyse der aktuellen Owner-Flows legt für V1 diese Datei-/Tab-Struktur fest:
+
+- Audit-Owner: `scripts/content-quality-audit.py` erzeugt `data/content-search-feedback.json` als runtime-/reportfähiges Artefakt.
+- Sheet-Handoff: `.github/workflows/content-quality-audit.yml` schreibt daraus `Content_Search_Feedback` auf `main` und `Content_Search_Feedback_Staging` auf `staging`.
+- Suchlauf-Owner: `scripts/weekly-ki-websearch-to-manual-inbox.py` exportiert den Feedback-Tab optional, fällt bei fehlendem Tab auf `data/content-search-feedback.json` zurück und baut daraus `CONTENT_SEARCH_FEEDBACK` für den Prompt.
+- Diagnose: `weekly_event_diagnostics.json` enthält Anzahl, Klassen und Kurzfassung der im Suchlauf angewendeten Feedbackregeln.
+- Automationsgrenze: Feedback ändert keine fachlichen Events/Activities/DB-Daten und schreibt keine Suchregeln dauerhaft selbst um.
 
 ### Regeln und Grenzen
 
@@ -134,7 +140,7 @@ Die genaue Datei-/Tab-Struktur wird erst nach Analyse der aktuellen KI-Suchlauf-
 
 - Audit-/Inbox-/KI-Faktencheck-Signale werden in einem strukturierten Feedback-Artefakt gesammelt.
 - Der KI-Suchlauf kann dieses Artefakt lesen und in Prompt-/Quellenlogik sichtbar berücksichtigen.
-- Der Report zeigt, welche Feedbackregeln angewendet wurden.
+- Der Audit-Report zeigt, welche Feedbackklassen erzeugt wurden; der Weekly-Diagnosereport zeigt, welche Feedbackregeln angewendet wurden.
 - Wiederholte Fehlerklassen werden erkennbar gezählt.
 - Mindestens eine konkrete Fehlerklasse, z. B. Zeitangaben oder Ticketportal-Primärquellen, wird als Proof durchgängig vom Audit-Finding bis zum KI-Suchlauf-Feedback verfolgt.
 

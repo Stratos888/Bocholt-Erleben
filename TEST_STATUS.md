@@ -32,6 +32,34 @@ Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter ble
 - Bei Widerspruch gilt: `MASTER.md` für strategische Steuerung, `ROADMAP.md` für aktuelle Taktik, `ENGINEERING.md` für Arbeitsregeln.
 <!-- === END BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_22 === -->
 
+
+<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_SEARCH_FEEDBACK_LOOP_V1_STATIC_2026_06_25 | Zweck: dokumentiert lokale/statische Validierung des KI-Suchlauf-Feedback-Loop-Prozesspatches; Umfang: kein Live-Proof, keine Eventdatenfixes === -->
+## Content Search Feedback Loop V1 – Prozesspatch vorbereitet, Live-Beweis offen (2026-06-25)
+
+Status: lokal/statisch bestanden; Live-Beweis nach Upload/Deployment noch offen.
+
+### Lokal geprüfter Umfang
+
+- `scripts/content-quality-audit.py` erzeugt zusätzlich ein strukturiertes `content-search-feedback.json`.
+- Der Content-Audit-Workflow schreibt daraus einen Sheet-Handoff-Tab `Content_Search_Feedback` bzw. `Content_Search_Feedback_Staging`.
+- `scripts/weekly-ki-websearch-to-manual-inbox.py` liest diesen Feedback-Tab optional, fällt bei fehlendem Tab auf das JSON-Artefakt zurück und baut daraus einen `CONTENT_SEARCH_FEEDBACK`-Promptblock.
+- Die Weekly-Diagnose protokolliert Anzahl, Klassen und Kurzfassung der angewendeten Feedbackregeln.
+
+### Lokal bestandene Checks
+
+- Python-Syntaxcheck für `scripts/content-quality-audit.py` bestanden.
+- Python-Syntaxcheck für `scripts/weekly-ki-websearch-to-manual-inbox.py` bestanden.
+- YAML-Parsing für `content-quality-audit.yml`, `weekly-ki-websearch-to-manual-inbox.yml` und `manual-ki-intake.yml` bestanden.
+- Content-Audit-Testlauf ohne Live-Sheet-/Secret-Zugriff erzeugte ein gültiges Feedback-JSON mit Default-Kontextregeln.
+- Synthetischer Ticketportal-Test erzeugte aktive Feedbackklassen `ticket_portal_primary_source` und `visual_key_missing_or_no_ready_asset`.
+
+### Noch nicht als Live-Proof behauptet
+
+- GitHub-Auditlauf muss nach Deployment den Sheet-Tab `Content_Search_Feedback(_Staging)` tatsächlich schreiben.
+- Der nächste Weekly-KI-Suchlauf muss im Log `search_feedback_rules_applied` und die Feedback-Klassen ausweisen.
+- Ob wiederkehrende Fehlerklassen praktisch abnehmen, ist erst nach mehreren realen Läufen bewertbar.
+<!-- === END BLOCK: TEST_STATUS_CONTENT_SEARCH_FEEDBACK_LOOP_V1_STATIC_2026_06_25 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_MAIN_KI_SEARCH_INBOX_VISUAL_KEY_PROOF_2026_06_25 | Zweck: dokumentiert den bestandenen Main-Beweis fuer Weekly-KI-Suchlauf, Manual-Inbox-Intake, Visual-Key-Handoff, Apps-Script-Approve-Fix und Live-Bildausspielung; Umfang: GitHub-Workflowlogs, Sheet-/PWA-Proof, Grenzen und Folgeworkpack === -->
 ## Main-KI-Suchlauf / Manual Inbox / Visual-Key-Handoff – bestanden (2026-06-25)
 

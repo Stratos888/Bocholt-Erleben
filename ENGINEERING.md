@@ -108,6 +108,8 @@ Never stack a new patch on unrelated uncommitted WIP.
 - AI verification must use a cache/validity model. A fresh `confirmed` result with unchanged `source_fingerprint` and `content_fingerprint` must suppress repeat KI checks until `verified_until` or `next_check_at` requires it.
 - Manual proof tests or reviewed confirmations must use `Content_Verification_Acceptance` on `main` and `Content_Verification_Acceptance_Staging` on `staging`; do not ask the user to edit generated `Content_Audit` rows or technical fingerprints directly.
 - Content-search feedback must be derived from typed audit findings, Inbox decisions, rejection reasons and KI verification outcomes. Do not rely on the user manually rewriting KI search rules every few weeks.
+- `data/content-search-feedback.json` is a generated audit/report artifact, not a hand-maintained editorial data source. The workflow handoff is the Sheet tab `Content_Search_Feedback` on live/main and `Content_Search_Feedback_Staging` on staging.
+- The Weekly-KI-Suchlauf may read `Content_Search_Feedback` as prompt/source/validation context and may log applied feedback classes in diagnostics. It must not treat feedback as permission to write canonical content or permanently self-mutate the rulebook.
 - Feedback-loop automation may improve search prompts, source preferences and validation priorities, but it must not silently mutate canonical Event, Activity or DB data.
 - KI checks must be budgeted and prioritized by risk, for example near-term Events, blocked official sources, source/ticket conflicts, or stale Activity opening data.
 - Audit workflows may write audit rows, summaries, verification metadata and review recommendations, but must not silently overwrite editorial source rows.

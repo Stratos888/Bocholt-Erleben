@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import csv
 import json
+from collections import Counter
 import os
 import re
 import sys
@@ -48,16 +49,19 @@ SOURCES_REGISTER_PATH = Path(os.environ.get("EVENT_SOURCES_REGISTER_PATH", str(R
 MANUAL_JSON_PATH = Path(os.environ.get("MANUAL_INBOX_JSON_PATH", str(ROOT / "data" / "inbox_manual.json")))
 SOURCE_CANDIDATES_JSON_PATH = Path(os.environ.get("SOURCE_CANDIDATES_JSON_PATH", str(ROOT / "data" / "source_candidates.json")))
 COVERAGE_TARGETS_JSON_PATH = Path(os.environ.get("COVERAGE_TARGETS_JSON_PATH", str(ROOT / "data" / "event_coverage_targets.json")))
+CONTENT_SEARCH_FEEDBACK_JSON_PATH = Path(os.environ.get("CONTENT_SEARCH_FEEDBACK_JSON_PATH", str(ROOT / "data" / "content-search-feedback.json")))
 DIAGNOSTICS_JSON_PATH = Path(os.environ.get("WEEKLY_DIAGNOSTICS_JSON_PATH", str(TMP_DIR / "weekly_event_diagnostics.json")))
 
 TMP_EVENTS_TSV_PATH = Path(os.environ.get("TMP_EVENTS_TSV_PATH", str(TMP_DIR / "events.tsv")))
 TMP_INBOX_TSV_PATH = Path(os.environ.get("TMP_INBOX_TSV_PATH", str(TMP_DIR / "inbox.tsv")))
 TMP_ARCHIVE_TSV_PATH = Path(os.environ.get("TMP_ARCHIVE_TSV_PATH", str(TMP_DIR / "inbox_archive.tsv")))
+TMP_CONTENT_SEARCH_FEEDBACK_TSV_PATH = Path(os.environ.get("TMP_CONTENT_SEARCH_FEEDBACK_TSV_PATH", str(TMP_DIR / "content_search_feedback.tsv")))
 # === END BLOCK: WEEKLY_DIAGNOSTICS_PATH_CONFIG_V1 ===
 
 TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
 TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
 TAB_ARCHIVE = os.environ.get("TAB_ARCHIVE", "Inbox_Archive")
+TAB_CONTENT_SEARCH_FEEDBACK = os.environ.get("TAB_CONTENT_SEARCH_FEEDBACK", "Content_Search_Feedback")
 
 # === BEGIN BLOCK: WEEKLY_PRODUCTION_CONFIG_APPEND_READY_V5 | Zweck: Aufbau-/Backfill-Lauf mit 210-Tage-Suchfenster; offene Inbox und Manual-Puffer blockieren nicht, sondern bleiben Dedupe-/Append-Bestand | Umfang: setzt Suchhorizont, Kandidatenlimit und Warn-/Kompatibilitätskonfiguration ===
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4").strip()
@@ -219,6 +223,35 @@ def read_sheet_values(service: Any, sheet_id: str, tab_name: str) -> list[list[s
     return res.get("values", []) or []
 
 
+def read_optional_sheet_values(service: Any, sheet_id: str, tab_name: str) -> list[list[str]]:
+    try:
+        return read_sheet_values(service, sheet_id, tab_name)
+    except Exception as exc:
+        info(f"Optionaler Sheet-Tab nicht lesbar: {tab_name} ({exc})")
+        return []
+
+
+def write_optional_tsv_snapshot(out_path: Path, values: list[list[str]]) -> int:
+    ensure_parent(out_path)
+    if not values:
+        out_path.write_text("", encoding="utf-8")
+        return 0
+
+    header = [norm(h) for h in (values[0] or [])]
+    rows = []
+    for raw_row in values[1:]:
+        row = [(norm(raw_row[i]) if i < len(raw_row) else "") for i in range(len(header))]
+        if any(v for v in row):
+            rows.append(row)
+
+    with out_path.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f, delimiter="\t", lineterminator="\n")
+        writer.writerow(header)
+        writer.writerows(rows)
+
+    return len(rows)
+
+
 def write_tsv_snapshot(out_path: Path, values: list[list[str]], required_columns: Iterable[str]) -> int:
     if not values:
         fail(f"Sheet-Tab leer oder nicht lesbar: {out_path.name}")
@@ -266,6 +299,12 @@ def export_current_snapshots() -> None:
         ["status", "title", "source_url", "created_at"],
     )
     info(f"Archive-Snapshot exportiert: {archive_rows} Zeilen")
+
+    feedback_rows = write_optional_tsv_snapshot(
+        TMP_CONTENT_SEARCH_FEEDBACK_TSV_PATH,
+        read_optional_sheet_values(service, sheet_id, TAB_CONTENT_SEARCH_FEEDBACK),
+    )
+    info(f"Content-Search-Feedback-Snapshot exportiert: {feedback_rows} Zeilen")
 # === END BLOCK: SHEETS SNAPSHOT EXPORT ===
 
 
@@ -369,6 +408,120 @@ def has_pending_inbox_rows(records: List[RefRecord]) -> bool:
 # === END BLOCK: PRE_RUN_GUARDS_PENDING_INBOX_AS_DEDUPE_BASIS_V1 ===
 
 
+
+# === BEGIN BLOCK: CONTENT_SEARCH_FEEDBACK_CONTEXT_V1 | Zweck: liest strukturierte Audit-/Inbox-Lernsignale fuer den Weekly-KI-Suchlauf; Umfang: Prompt-Kontext, keine automatische Datenmutation ===
+def load_json_search_feedback(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        info(f"Content-Search-Feedback-JSON unlesbar: {path} ({exc})")
+        return []
+    rules = payload.get("rules") if isinstance(payload, dict) else []
+    return [dict(item) for item in rules if isinstance(item, dict)]
+
+
+def load_tsv_search_feedback(path: Path) -> list[dict[str, Any]]:
+    if not path.exists() or not path.read_text(encoding="utf-8").strip():
+        return []
+    try:
+        with path.open("r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f, delimiter="\t")
+            return [dict(row) for row in reader if any(norm(v) for v in row.values())]
+    except Exception as exc:
+        info(f"Content-Search-Feedback-TSV unlesbar: {path} ({exc})")
+        return []
+
+
+def normalize_search_feedback_rule(item: dict[str, Any]) -> dict[str, str] | None:
+    feedback_class = norm(item.get("feedback_class"))
+    prompt_rule = clean_output_text(item.get("prompt_rule"))
+    status = norm(item.get("status") or "active")
+    if not feedback_class or not prompt_rule:
+        return None
+    if status not in {"active", "default_context"}:
+        return None
+    try:
+        priority_int = int(float(norm(item.get("priority") or "0")))
+    except Exception:
+        priority_int = 0
+    try:
+        count_int = int(float(norm(item.get("count") or "0")))
+    except Exception:
+        count_int = 0
+
+    return {
+        "feedback_class": feedback_class,
+        "issue_code": norm(item.get("issue_code")),
+        "content_type": norm(item.get("content_type")),
+        "source_system": norm(item.get("source_system")),
+        "source_host": norm(item.get("source_host")),
+        "field": norm(item.get("field")),
+        "priority": str(priority_int),
+        "count": str(count_int),
+        "status": status,
+        "prompt_rule": prompt_rule,
+        "example_titles": clean_output_text(item.get("example_titles")),
+        "example_urls": clean_output_text(item.get("example_urls")),
+    }
+
+
+def read_search_feedback_rules(limit: int = 18) -> list[dict[str, str]]:
+    raw_rules = load_tsv_search_feedback(TMP_CONTENT_SEARCH_FEEDBACK_TSV_PATH)
+    source = "sheet"
+    if not raw_rules:
+        raw_rules = load_json_search_feedback(CONTENT_SEARCH_FEEDBACK_JSON_PATH)
+        source = "repo_json"
+
+    normalized: list[dict[str, str]] = []
+    seen = set()
+    for item in raw_rules:
+        rule = normalize_search_feedback_rule(item)
+        if not rule:
+            continue
+        key = (rule["feedback_class"], rule["issue_code"], rule["source_host"], rule["field"], rule["prompt_rule"])
+        if key in seen:
+            continue
+        seen.add(key)
+        rule["source"] = source
+        normalized.append(rule)
+
+    normalized.sort(key=lambda row: (-int(row.get("priority") or 0), -int(row.get("count") or 0), row.get("feedback_class", "")))
+    return normalized[:limit]
+
+
+def build_search_feedback_context(rules: list[dict[str, str]]) -> str:
+    lines = ["[CONTENT_SEARCH_FEEDBACK]"]
+    if not rules:
+        lines.append("<empty>")
+        lines.append("[/CONTENT_SEARCH_FEEDBACK]")
+        return "\n".join(lines)
+
+    class_counts = Counter(rule.get("feedback_class", "") for rule in rules)
+    lines.append("contract=search_prompt_context_only_no_auto_write")
+    lines.append("rule_count=" + str(len(rules)))
+    lines.append("classes=" + ", ".join(f"{key}:{value}" for key, value in sorted(class_counts.items()) if key))
+    for idx, rule in enumerate(rules, start=1):
+        parts = [
+            f"#{idx}",
+            f"priority={rule.get('priority', '')}",
+            f"count={rule.get('count', '')}",
+            f"status={rule.get('status', '')}",
+            f"class={rule.get('feedback_class', '')}",
+            f"issue_code={rule.get('issue_code', '')}",
+            f"field={rule.get('field', '')}",
+            f"host={rule.get('source_host', '')}",
+            f"rule={rule.get('prompt_rule', '')}",
+        ]
+        examples = rule.get("example_titles") or ""
+        if examples:
+            parts.append(f"examples={examples[:220]}")
+        lines.append(" | ".join(parts))
+    lines.append("[/CONTENT_SEARCH_FEEDBACK]")
+    return "\n".join(lines)
+# === END BLOCK: CONTENT_SEARCH_FEEDBACK_CONTEXT_V1 ===
+
 # === BEGIN BLOCK: PROMPT BUNDLE BUILDERS ===
 # Datei: scripts/weekly-ki-websearch-to-manual-inbox.py
 # Zweck:
@@ -406,6 +559,7 @@ def build_manifest(label: str, records: List[RefRecord], start: date, end: date)
 def build_messages(
     rulebook_text: str,
     sources_register_text: str,
+    search_feedback_context: str,
     events_records: List[RefRecord],
     inbox_records: List[RefRecord],
     archive_records: List[RefRecord],
@@ -430,6 +584,7 @@ Arbeite streng, konservativ, produktionsnah, quellenbasiert und systematisch.
 Nutze aktiv die Websuche.
 Halte das beigefügte Regelwerk strikt ein.
 Nutze das beigefügte Quellenregister als operative Quellensteuerung.
+Nutze das beigefügte Content-Search-Feedback als kontrollierten Lernkontext aus Audit-/Inbox-Signalen.
 Liefere nur neue Delta-Kandidaten.
 
 Dieser Lauf ist in der aktuellen Projektphase ein Aufbau-/Backfill-orientierter Produktionslauf:
@@ -464,6 +619,8 @@ Wichtig:
 {sources_register_text}
 [/QUELLENREGISTER]
 
+{search_feedback_context}
+
 [AUFGABE]
 Simuliere den späteren automatisierten Aufbau-/Backfill-Produktionslauf für Bocholt erleben so nah wie möglich.
 
@@ -475,6 +632,8 @@ Rahmen:
 - Wenn weniger als {MAX_NEW_CANDIDATES} starke FINAL-Kandidaten vorhanden sind, liefere weniger
 - Deduped strikt gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON
 - Deduped zusätzlich innerhalb des aktuellen Laufs gegen bereits ausgewählte Kandidaten
+- Berücksichtige CONTENT_SEARCH_FEEDBACK aktiv bei Quellenwahl, Faktenprüfung, Zeitlogik und Kandidatenentscheidung
+- Feedback ist kein Befehl zur Datenänderung, sondern ein Qualitätsfilter: wiederhole bekannte Fehlerklassen nicht
 - Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
 - Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
 
@@ -1728,6 +1887,7 @@ def build_weekly_diagnostics(
     drop_diagnostics: List[Dict[str, str]],
     coverage: List[Dict[str, str]],
     source_candidate_diagnostics: List[Dict[str, Any]],
+    search_feedback_rules: list[dict[str, str]],
 ) -> Dict[str, Any]:
     dropped = [item for item in drop_diagnostics if item.get("reason") != "selected"]
     return {
@@ -1753,6 +1913,12 @@ def build_weekly_diagnostics(
             for item in source_candidate_diagnostics[:80]
         ],
         "source_candidate_diagnostics": source_candidate_diagnostics,
+        "search_feedback_rules_applied": len(search_feedback_rules),
+        "search_feedback_class_counts": dict(Counter(rule.get("feedback_class", "") for rule in search_feedback_rules if rule.get("feedback_class"))),
+        "search_feedback_rule_summaries": [
+            f"{rule.get('priority', '')} | {rule.get('feedback_class', '')} | {rule.get('field', '')} | {rule.get('source_host', '')}".strip()
+            for rule in search_feedback_rules[:40]
+        ],
         "coverage_targets_total": len(coverage),
         "coverage_status_counts": count_by_key(coverage, "status"),
         "coverage_audit": coverage,
@@ -1769,6 +1935,8 @@ def print_weekly_diagnostics_summary(diagnostics: Dict[str, Any]) -> None:
         f"- raw_source_candidates_returned: {diagnostics.get('raw_source_candidates_returned', 0)}\n"
         f"- source_candidate_reasons: {json.dumps(diagnostics.get('source_candidate_reasons', {}), ensure_ascii=False)}\n"
         f"- source_candidate_stage_counts: {json.dumps(diagnostics.get('source_candidate_stage_counts', {}), ensure_ascii=False)}\n"
+        f"- search_feedback_rules_applied: {diagnostics.get('search_feedback_rules_applied', 0)}\n"
+        f"- search_feedback_class_counts: {json.dumps(diagnostics.get('search_feedback_class_counts', {}), ensure_ascii=False)}\n"
         f"- coverage_targets_total: {diagnostics.get('coverage_targets_total', 0)}\n"
         f"- coverage_status_counts: {json.dumps(diagnostics.get('coverage_status_counts', {}), ensure_ascii=False)}\n"
         f"- diagnostics_file: {DIAGNOSTICS_JSON_PATH}"
@@ -1862,11 +2030,15 @@ def main() -> None:
 
     rulebook_text = REGELWERK_PATH.read_text(encoding="utf-8")
     sources_register_text = SOURCES_REGISTER_PATH.read_text(encoding="utf-8")
+    search_feedback_rules = read_search_feedback_rules()
+    search_feedback_context = build_search_feedback_context(search_feedback_rules)
+    info(f"Content-Search-Feedback-Regeln für Prompt: {len(search_feedback_rules)}")
 
     raw_candidates, raw_source_candidates, response = search_with_openai(
         build_messages(
             rulebook_text,
             sources_register_text,
+            search_feedback_context,
             events_records,
             inbox_records,
             archive_records,
@@ -1907,6 +2079,7 @@ def main() -> None:
         drop_diagnostics,
         coverage,
         source_candidate_diagnostics,
+        search_feedback_rules,
     )
 
     ensure_parent(MANUAL_JSON_PATH)
@@ -1941,6 +2114,7 @@ def main() -> None:
         f"- source_candidates_added: {added_source_candidates}\n"
         f"- source_candidates_total: {len(merged_source_candidates)}\n"
         f"- source_candidate_reasons: {json.dumps(diagnostics.get('source_candidate_reasons', {}), ensure_ascii=False)}\n"
+        f"- search_feedback_rules_applied: {len(search_feedback_rules)}\n"
         f"- cited_web_sources: {len(source_urls)}"
     )
     print_weekly_diagnostics_summary(diagnostics)

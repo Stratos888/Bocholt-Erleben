@@ -77,6 +77,7 @@ Nächster strategischer Ausbau:
 
 - Die Content-Prüfung soll Lernsignale für den KI-Suchlauf erzeugen, damit wiederkehrende Fehler nicht nur korrigiert, sondern die Such-/Prompt-/Quellenlogik verbessert wird.
 - Bereits vorhandene Inbox-Ablehnungsgründe, Korrekturgründe, Audit-Findings und KI-Faktencheck-Ergebnisse sollen nicht manuell alle paar Wochen ausgewertet werden müssen, sondern strukturiert in einen Feedback-Loop für den nächsten Suchlauf eingehen.
+- V1-Prozessarchitektur: Content-Audit verdichtet typisierte Findings in `content-search-feedback.json` und schreibt daraus den Sheet-Tab `Content_Search_Feedback(_Staging)`; der Weekly-KI-Suchlauf liest diese Feedback-Schicht als Prompt-/Quellenkontext und protokolliert die angewendeten Regeln.
 - Ziel ist keine unkontrolliert selbsttrainierende KI, sondern ein kontrollierter, belegbarer Prozess: Fehlerklassifikation -> Feedback-Artefakt -> Suchlauf-Regel/Prompt-Kontext -> Messung, ob dieselbe Fehlerklasse seltener wiederkommt.
 
 Separater strategischer Punkt:
@@ -156,8 +157,8 @@ Bewusst geparkt:
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.
-- Current next workpack: document the completed Content Quality AI verification fallback/cache proof, then design the Content Quality Feedback Loop / Self-Improving Search V1.
-- The feedback-loop workpack must connect audit findings, Inbox decisions, rejection reasons and KI-facts outcomes back into the KI search workflow without requiring the user to manually maintain search rules every few weeks.
+- Current next workpack: deploy and prove the Content Quality Feedback Loop / Self-Improving Search V1 process patch.
+- The feedback-loop workpack connects typed audit findings, Inbox/rejection-reason defaults and KI-facts outcomes back into the KI search workflow without requiring the user to manually maintain search rules every few weeks.
 - Content Quality Guard V2 and the AI verification cache are no longer basic-introduction workpacks; further changes need a concrete finding from current reports or from the feedback-loop design.
 - Manual-KI-Intake / Visual-Key-Handoff and Activity-Premium-Visuals remain separate workstreams and must only be reopened when the current Content-Quality/Visual-Fit package produces a concrete need.
 - Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.

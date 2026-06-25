@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from collections import Counter
 import hashlib
 import html
 import json
@@ -2603,20 +2604,215 @@ def summarize_observations(observations: List[Observation]) -> Dict[str, Any]:
     }
 
 
-def write_json_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> None:
+
+# === BEGIN BLOCK: CONTENT_SEARCH_FEEDBACK_BUILDER_V1 | Zweck: verdichtet Audit-Findings zu maschinenlesbaren Lernsignalen fuer den naechsten KI-Suchlauf; Umfang: JSON-/Sheet-Artefakt ohne fachliche Auto-Aenderung ===
+SEARCH_FEEDBACK_RULES: Dict[str, Dict[str, Any]] = {
+    "event_source_has_time_but_dataset_missing_time": {
+        "feedback_class": "time_missing_from_source",
+        "field": "time",
+        "priority": 95,
+        "prompt_rule": "Wenn die Quelle konkrete Uhrzeiten nennt, darf time nicht leer bleiben. Prüfe Eventzeit explizit und setze time nur als einzelne Startzeit HH:MM; Zeitspannen oder uneinheitliche Mehrtageszeiten bleiben leer und werden in notes erklärt.",
+    },
+    "event_ticket_portal_as_primary_source": {
+        "feedback_class": "ticket_portal_primary_source",
+        "field": "source_url",
+        "priority": 90,
+        "prompt_rule": "Nutze Ticketportale nicht als primaere source_url. Suche zuerst nach offizieller Event-, Veranstalter-, Stadt- oder Venue-Detailseite; Ticketportale nur in notes erwähnen, wenn keine bessere Quelle existiert und der Kandidat sonst regelkonform ist.",
+    },
+    "event_source_facts_not_confirmed": {
+        "feedback_class": "event_core_facts_not_confirmed",
+        "field": "core_facts",
+        "priority": 85,
+        "prompt_rule": "Nimm Events nur auf, wenn Titel, Datum, Ort und soweit vorhanden Uhrzeit aus derselben belastbaren Instanzquelle bestätigt sind. Bei teilweiser Bestätigung nicht als FINAL ausgeben.",
+    },
+    "event_ai_verification_candidate": {
+        "feedback_class": "event_source_unreadable_or_uncertain",
+        "field": "source_url",
+        "priority": 70,
+        "prompt_rule": "Bei schwer lesbaren oder blockierten Quellen zusätzliche offizielle Gegenquelle suchen. Wenn Kernfakten nicht belastbar bestätigt werden können, Kandidat nicht ausgeben oder source_candidates nur als Merker führen.",
+    },
+    "activity_ai_verification_candidate": {
+        "feedback_class": "activity_source_unreadable_or_uncertain",
+        "field": "activity_source",
+        "priority": 55,
+        "prompt_rule": "Activity-Quellen, die technisch schwer lesbar sind, nicht als Eventkandidaten missverstehen. Nur als Activity-/Quellenhinweis berücksichtigen, nicht in die Event-Inbox ausgeben.",
+    },
+    "activity_source_facts_not_confirmed": {
+        "feedback_class": "activity_facts_uncertain",
+        "field": "activity_facts",
+        "priority": 50,
+        "prompt_rule": "Activity-Öffnungs-, Saison- und Nutzungsdaten nicht aus Eventseiten ableiten. Bei unsicherer Activity-Quelle keine Eventkandidaten erzeugen.",
+    },
+    "event_visual_key_mismatch": {
+        "feedback_class": "visual_key_mismatch",
+        "field": "visual_key",
+        "priority": 45,
+        "prompt_rule": "visual_key und visual_motif bewusst aus Eventtyp und konkretem Motiv ableiten. Bei Sport, Messe, Kultur und Reihenformaten nicht nur Kategorie übernehmen, sondern Titel und Quelle gegen Motiv-Fit prüfen.",
+    },
+    "event_visual_key_missing_ready_candidate": {
+        "feedback_class": "visual_key_missing_or_no_ready_asset",
+        "field": "visual_key",
+        "priority": 40,
+        "prompt_rule": "Wenn kein sicher passender visual_key/visual_motif ableitbar ist, Kandidat nicht künstlich generisch machen. Unsicherheit in notes markieren und keinen falschen Sport-/Festival-Fallback erzwingen.",
+    },
+}
+
+SEARCH_FEEDBACK_DEFAULT_RULES: list[Dict[str, Any]] = [
+    {
+        "feedback_class": "rejected_unclear_date_time_place",
+        "field": "date_time_location",
+        "priority": 80,
+        "prompt_rule": "Ablehnungen wegen unklarer Terminangaben bedeuten: Datum, Uhrzeit und Ort müssen aus der konkreten Instanzquelle belegt sein; sonst nicht als FINAL ausgeben.",
+    },
+    {
+        "feedback_class": "rejected_no_concrete_single_event",
+        "field": "event_scope",
+        "priority": 75,
+        "prompt_rule": "Ablehnungen wegen 'kein konkreter Einzeltermin' bedeuten: keine Dauerangebote, Kursübersichten, allgemeinen Informationsseiten oder bloßen Öffnungszeiten als Event ausgeben.",
+    },
+    {
+        "feedback_class": "rejected_source_insufficient",
+        "field": "source_quality",
+        "priority": 75,
+        "prompt_rule": "Ablehnungen wegen unzureichender Quelle bedeuten: Quelle muss event-spezifisch, öffentlich lesbar und kanonisch genug sein; schwache oder unklare Quellen nicht als FINAL nutzen.",
+    },
+]
+
+
+def search_feedback_config_for_issue(item: Issue) -> Dict[str, Any] | None:
+    code = norm(item.issue_code)
+    if code in SEARCH_FEEDBACK_RULES:
+        return SEARCH_FEEDBACK_RULES[code]
+    if code.startswith("event_visual_") or "visual" in code or "motif" in code:
+        return SEARCH_FEEDBACK_RULES.get("event_visual_key_mismatch")
+    if code in {"event_source_url_broken", "event_source_url_redirect", "event_source_url_missing", "event_source_url_invalid"}:
+        return {
+            "feedback_class": "event_source_quality_problem",
+            "field": "source_url",
+            "priority": 65,
+            "prompt_rule": "Quellen mit Broken-Link, Redirect, fehlender oder ungültiger URL nicht erneut als starke Eventquelle verwenden. Erst eine kanonische, erreichbare Detailquelle suchen.",
+        }
+    return None
+
+
+def source_host_for_feedback(source_url: str) -> str:
+    return url_host(source_url) or "unknown"
+
+
+def feedback_example(item: Issue) -> Dict[str, str]:
+    return {
+        "title": item.title,
+        "date": item.date,
+        "issue_code": item.issue_code,
+        "source_url": item.source_url,
+        "suggested_url": item.suggested_url,
+        "evidence_status": item.evidence_status,
+        "evidence_summary": item.evidence_summary[:240],
+    }
+
+
+def build_search_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> Dict[str, Any]:
+    grouped: Dict[tuple[str, str, str, str, str, str], Dict[str, Any]] = {}
+    total_signals = 0
+
+    for item in issues:
+        if item.severity not in {"critical", "review_needed", "warning"}:
+            continue
+        config = search_feedback_config_for_issue(item)
+        if not config:
+            continue
+        total_signals += 1
+        feedback_class = norm(config.get("feedback_class"))
+        issue_code = norm(item.issue_code)
+        field = norm(config.get("field")) or norm(item.evidence_missing_fields) or "general"
+        host = source_host_for_feedback(item.source_url)
+        key = (feedback_class, issue_code, item.content_type, item.source_system, host, field)
+        current = grouped.setdefault(key, {
+            "feedback_class": feedback_class,
+            "issue_code": issue_code,
+            "content_type": item.content_type,
+            "source_system": item.source_system,
+            "source_host": host,
+            "field": field,
+            "count": 0,
+            "priority": int(config.get("priority") or 50),
+            "status": "active",
+            "prompt_rule": norm(config.get("prompt_rule")),
+            "example_titles": [],
+            "example_urls": [],
+            "examples": [],
+        })
+        current["count"] += 1
+        if item.title and item.title not in current["example_titles"] and len(current["example_titles"]) < 6:
+            current["example_titles"].append(item.title)
+        if item.source_url and item.source_url not in current["example_urls"] and len(current["example_urls"]) < 4:
+            current["example_urls"].append(item.source_url)
+        if len(current["examples"]) < 4:
+            current["examples"].append(feedback_example(item))
+
+    rules = sorted(grouped.values(), key=lambda row: (-int(row.get("priority") or 0), -int(row.get("count") or 0), row.get("feedback_class", "")))
+
+    # Default-Regeln sind als kontrollierte Prozess-Leitplanken enthalten, auch wenn im aktuellen Audit keine Archiv-/Ablehnungsdaten geladen wurden.
+    for default_rule in SEARCH_FEEDBACK_DEFAULT_RULES:
+        if not any(rule.get("feedback_class") == default_rule["feedback_class"] for rule in rules):
+            rules.append({
+                "feedback_class": default_rule["feedback_class"],
+                "issue_code": "inbox_rejection_reason_default",
+                "content_type": "event",
+                "source_system": "inbox_archive",
+                "source_host": "all",
+                "field": default_rule["field"],
+                "count": 0,
+                "priority": default_rule["priority"],
+                "status": "default_context",
+                "prompt_rule": default_rule["prompt_rule"],
+                "example_titles": [],
+                "example_urls": [],
+                "examples": [],
+            })
+
+    class_counts = Counter(rule["feedback_class"] for rule in rules if rule.get("status") == "active")
+    issue_code_counts = Counter(rule["issue_code"] for rule in rules if rule.get("status") == "active")
+
+    return {
+        "meta": {
+            "generated_at": meta.get("generated_at", datetime.now().isoformat(timespec="seconds")),
+            "source": "content-quality-audit",
+            "scope": meta.get("scope", ""),
+            "network_checks": bool(meta.get("network_checks")),
+            "total_feedback_signals": total_signals,
+            "active_rule_count": sum(1 for rule in rules if rule.get("status") == "active"),
+            "default_rule_count": sum(1 for rule in rules if rule.get("status") == "default_context"),
+            "contract": "search_prompt_context_only_no_auto_write",
+        },
+        "summary": {
+            "by_feedback_class": dict(class_counts),
+            "by_issue_code": dict(issue_code_counts),
+        },
+        "rules": rules[:40],
+    }
+
+
+def write_search_feedback_report(path: Path, feedback: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(feedback, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+# === END BLOCK: CONTENT_SEARCH_FEEDBACK_BUILDER_V1 ===
+
+def write_json_report(path: Path, issues: List[Issue], meta: Dict[str, Any], search_feedback: Dict[str, Any] | None = None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "meta": meta,
         "summary": summarize(issues),
         "verification_summary": dict(VERIFICATION_STATS),
         "observations_summary": summarize_observations(OBSERVATIONS),
+        "search_feedback_summary": (search_feedback or {}).get("summary", {}),
         "issues": [asdict(item) for item in issues],
         "observations": [asdict(item) for item in OBSERVATIONS],
     }
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any]) -> None:
+def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any], search_feedback: Dict[str, Any] | None = None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     summary = summarize(issues)
     observation_summary = summarize_observations(OBSERVATIONS)
@@ -2649,6 +2845,13 @@ def write_markdown_report(path: Path, issues: List[Issue], meta: Dict[str, Any])
         f"- AI candidates total: {VERIFICATION_STATS.get('ai_candidates_total', 0)}",
         f"- AI candidates selected: {VERIFICATION_STATS.get('ai_candidates_selected', 0)}",
         f"- Deferred by budget: {VERIFICATION_STATS.get('ai_candidates_deferred_by_budget', 0)}",
+        "",
+        "## Search feedback",
+        "",
+        f"- Active feedback rules: {(search_feedback or {}).get('meta', {}).get('active_rule_count', 0)}",
+        f"- Default context rules: {(search_feedback or {}).get('meta', {}).get('default_rule_count', 0)}",
+        f"- Feedback signals: {(search_feedback or {}).get('meta', {}).get('total_feedback_signals', 0)}",
+        *[f"- {key}: {value}" for key, value in sorted(((search_feedback or {}).get('summary', {}).get('by_feedback_class', {}) or {}).items())],
         "",
         "## Evidence observations",
         "",
@@ -2700,6 +2903,7 @@ def main() -> None:
     parser.add_argument("--output-md", default="data/content-quality-report.md")
     parser.add_argument("--verification-cache-json", default="data/content-verification-cache.json")
     parser.add_argument("--ai-candidates-json", default="data/content-ai-verification-candidates.json")
+    parser.add_argument("--search-feedback-json", default="data/content-search-feedback.json")
     parser.add_argument("--ai-max-candidates", type=int, default=AI_VERIFICATION_DEFAULT_MAX_CANDIDATES)
     parser.add_argument("--base-url", default="https://bocholt-erleben.de")
     parser.add_argument("--horizon-days", type=int, default=14)
@@ -2796,11 +3000,17 @@ def main() -> None:
     meta["ai_candidates_deferred_by_budget"] = VERIFICATION_STATS.get("ai_candidates_deferred_by_budget", 0)
     meta["verification_cache_hits"] = VERIFICATION_STATS.get("cache_hits", 0)
 
+    log_checkpoint("build search feedback start")
+    search_feedback = build_search_feedback_payload(issues, meta)
+    meta["search_feedback_rules_active"] = search_feedback.get("meta", {}).get("active_rule_count", 0)
+    meta["search_feedback_signals"] = search_feedback.get("meta", {}).get("total_feedback_signals", 0)
+
     log_checkpoint("write reports start")
-    write_json_report(ROOT / args.output_json, issues, meta)
-    write_markdown_report(ROOT / args.output_md, issues, meta)
+    write_json_report(ROOT / args.output_json, issues, meta, search_feedback)
+    write_markdown_report(ROOT / args.output_md, issues, meta, search_feedback)
     write_ai_candidates_report(ROOT / args.ai_candidates_json, candidates, meta)
-    log_checkpoint(f"write reports done: json={args.output_json}, md={args.output_md}, ai_candidates={args.ai_candidates_json}")
+    write_search_feedback_report(ROOT / args.search_feedback_json, search_feedback)
+    log_checkpoint(f"write reports done: json={args.output_json}, md={args.output_md}, ai_candidates={args.ai_candidates_json}, search_feedback={args.search_feedback_json}")
 
     summary = summarize(issues)
     print("✅ Content Quality Audit written")
