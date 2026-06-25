@@ -106,6 +106,9 @@ Never stack a new patch on unrelated uncommitted WIP.
 - HTTP 429, bot protection, blocked pages, repeated timeouts or weak fact confirmation are not automatically user tasks. They should become typed `ai_verification_candidate` / retry candidates before they are escalated to the Inbox.
 - AI verification must be a targeted fallback, not a replacement for the audit. Do not send all content through AI by default.
 - AI verification must use a cache/validity model. A fresh `confirmed` result with unchanged `source_fingerprint` and `content_fingerprint` must suppress repeat KI checks until `verified_until` or `next_check_at` requires it.
+- Manual proof tests or reviewed confirmations must use `Content_Verification_Acceptance` on `main` and `Content_Verification_Acceptance_Staging` on `staging`; do not ask the user to edit generated `Content_Audit` rows or technical fingerprints directly.
+- Content-search feedback must be derived from typed audit findings, Inbox decisions, rejection reasons and KI verification outcomes. Do not rely on the user manually rewriting KI search rules every few weeks.
+- Feedback-loop automation may improve search prompts, source preferences and validation priorities, but it must not silently mutate canonical Event, Activity or DB data.
 - KI checks must be budgeted and prioritized by risk, for example near-term Events, blocked official sources, source/ticket conflicts, or stale Activity opening data.
 - Audit workflows may write audit rows, summaries, verification metadata and review recommendations, but must not silently overwrite editorial source rows.
 - Deterministic auto-handling is allowed only for safe technical cases, for example expired Events being excluded by the build/runtime feed, benign redirects being suppressed as tasks, or duplicate stale findings being kept out of the active queue.

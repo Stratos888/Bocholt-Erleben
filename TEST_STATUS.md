@@ -20,7 +20,7 @@ Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter ble
 
 ### Offene oder bewusst geparkte Beweise
 
-- KI-/Inbox-/Visual-Key-Handoff nach dem nächsten automatischen `main`-Suchlauf prüfen; Kontrolltermin: Dienstag, 2026-06-23, 11:00 Uhr.
+- KI-/Inbox-/Visual-Key-Handoff bleibt bei konkretem Suchlauf-Symptom zu prüfen; der frühere Kontrolltermin 2026-06-23 ist historisch erledigt bzw. nicht mehr aktueller Blocker.
 - 28-/30-Tage-Reporting-Datenlauf abwarten, bevor Akquise-/Feedbackberichte als belastbar gelten.
 - Activity-Visual-Restschuld (`fallback`, `needs_review`) ist bewusst späterer Qualitätsworkpack.
 - Echte Zahlungs-/Webhook-/Stripe-Livefälle bleiben nur dann erneut zu testen, wenn ein konkreter Zahlungsflow geändert wurde oder ein neues Symptom auftritt.
@@ -34,16 +34,17 @@ Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter ble
 <!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_INDEX_2026_06_24 | Zweck: macht den aktuellen Content-Pruefprozess-Stand im Test-Index sichtbar; Umfang: Audit-Report, Inbox-Pakete, Visual-Fit-V2, offene Folgebeweise === -->
 ## Aktueller Test-Index Zusatz – Content-Prüfung V2 (2026-06-24)
 
-Status: Prozess-V2 auf Staging geprüft; Grundprozess bestanden, offene Arbeitspakete bleiben fachlich zu bearbeiten.
+Status: Prozess-V2 plus KI-Faktencheck-/Prüfcache-V1 auf Staging geprüft; Grundprozess bestanden, offene Arbeitspakete bleiben fachlich bzw. als Feedback-Loop-Ausbau zu bearbeiten.
 
 Bestandene Beweise:
 
 - Content Quality Audit läuft nach Deploy und erzeugt `content-quality-report-full`.
 - Der Report enthält Prozesskategorien, Correction Owner, Workbench-Gruppen und Automation Policy.
-- Die Workbench `/inbox/` zeigt Arbeitspakete getrennt an:
+- Die Workbench `/inbox/` bzw. der Audit-Report zeigt Arbeitspakete getrennt an:
   - Repo-Datenpatch.
   - Quellencheck.
   - Faktencheck.
+  - KI-Faktencheck.
   - Beobachten / Retry.
   - Visual-Fit.
 - Repo-Datenpatch-Paket enthält die drei echten Activity-Datenlücken und nicht mehr Redirect-/Retry-Fälle.
@@ -52,17 +53,18 @@ Bestandene Beweise:
 - Faktencheck V1 und Visual-Fit V2 sind im Report aktiv.
 - Visual-Fit V2 liefert konkrete Vorschläge für `visual_key`, `visual_motif`, Motivrolle und Asset-Status.
 
-Letzter belegter Audit-Stand:
+Letzter belegter Audit-Stand nach KI-Faktencheck-/Prüfcache-V1:
 
 - Critical: 0.
-- Review needed: 5.
-- Warnings: 16.
+- Review needed: 4.
+- Warnings: 19.
 - Automatisch erledigt: 118.
-- Arbeitspakete: Repo-Datenpatch 3, Sheet-/Quellenkorrektur 1, Quellenprüfung 2, Faktencheck 3, Visual-Fit 12, Automatisch erledigt 118.
+- Arbeitspakete: Repo-Datenpatch 3, Sheet-/Quellenkorrektur 1, Quellenprüfung 1, Faktencheck 4, KI-Faktencheck 3, Visual-Fit 11, Automatisch erledigt 118.
+- Verification-Fallback: Cache entries loaded 1, Cache hits 1, AI candidates selected 3, Deferred by budget 0.
 
 Offene Folgebeweise:
 
-- KI-Faktencheck-Fallback mit Prüfcache implementieren und testen: blockierte/unsichere Quellen dürfen nicht direkt als Nutzeraufgaben oder pauschale KI-Kosten enden.
+- KI-Suchlauf Feedback Loop / Self-Improving Search V1 entwerfen und testen, damit Audit-/Inbox-Fehler automatisch als Suchlauf-Lernsignale nutzbar werden.
 - Visual-Fit-Paket fachlich bewerten und daraus konkrete Folgeaktionen ableiten.
 - Repo-Datenpatch-Paket als bewussten Sammelpatch vorbereiten und testen.
 - Quellencheck-/Faktencheck-Fälle nach Cache-/KI-Fallbacklogik fachlich prüfen.
@@ -71,34 +73,78 @@ Offene Folgebeweise:
 
 
 
-<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_AI_CACHE_TARGET_2026_06_24 | Zweck: dokumentiert den naechsten noch nicht implementierten Beweis fuer KI-Faktencheck-Fallback und Pruefcache; Umfang: Ziel, Nicht-Beweis, Akzeptanzkriterien === -->
-## Content Quality – KI-Faktencheck-Fallback / Prüfcache Zielbeweis offen (2026-06-24)
+<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_AI_CACHE_TARGET_2026_06_24 | Zweck: dokumentiert den bestandenen Beweis fuer KI-Faktencheck-Fallback, Pruefcache, Acceptance-Schicht und Runtime-Logging; Umfang: Staging-Artefakte, Farm-Country-Fair-Proof, Grenzen, Folgeworkpack === -->
+## Content Quality – KI-Faktencheck-Fallback / Prüfcache bestanden (2026-06-25)
 
-Status: Zielzustand dokumentiert, noch nicht implementiert und noch nicht getestet.
+Status: bestanden als V1-Prozess auf Staging.
 
-Auslöser:
+### Geprüfter Umfang
 
-- Die feldgenauere Faktenprüfung hat gezeigt, dass direkte HTTP-/GitHub-Zugriffe auf offizielle Quellen nicht immer zuverlässig sind, z. B. durch `429`, Bot-Schutz oder schwer lesbare Seiten.
-- Solche Fälle dürfen nicht automatisch zu Nutzeraufgaben werden.
-- Gleichzeitig darf nicht jede Woche der gesamte Contentbestand teuer per KI geprüft werden.
+- Content Quality Audit mit Scope `full`.
+- `ai_verification_candidate` für unsichere/blockierte Quellen.
+- Budgetlimit für KI-Kandidaten.
+- `content-ai-verification-candidates.json` als strukturiertes KI-Fallback-Artefakt.
+- `Content_Verification_Cache_Staging` als Prüfcache.
+- `Content_Verification_Acceptance_Staging` als robuste Acceptance-Schicht.
+- Cache-Writeback aus Acceptance-Zeile.
+- Cache-Hit im Folgelauf.
+- Zeitlücken-Hinweis `source_has_time_but_dataset_missing_time`.
+- Checkpoint-Logs im Workflow-/Python-Lauf.
 
-Zu beweisender Zielzustand:
+### Letzter belegter Reportstand
 
-- Audit-Skript bleibt die billige erste Prüfschicht.
-- Unsichere/blockierte Fälle werden als `ai_verification_candidate` markiert und priorisiert.
-- KI-Faktencheck läuft nur für priorisierte Kandidaten innerhalb eines Budget-/Mengenlimits.
-- Bestätigte KI-Ergebnisse setzen einen Prüfstatus mit `last_verified_at`, `verified_until`, `verified_by`, `verification_status`, `source_fingerprint`, `content_fingerprint` und `next_check_at`.
-- Frisch bestätigte, unveränderte Inhalte werden nicht erneut teuer geprüft.
-- Nur Konflikte, fehlende belastbare Quellen, bessere Quellenvorschläge oder unsichere KI-Ergebnisse erscheinen in der Content-Inbox.
-- KI-Ergebnisse überschreiben keine fachlichen Daten automatisch.
+Artifact: `content-quality-report-full` vom Staging-Lauf 2026-06-25.
 
-Nicht als bestanden betrachten, bis ein echter Staging-Report zeigt:
+- `Critical`: 0.
+- `Review needed`: 4.
+- `Warning`: 19.
+- `Auto fixed`: 118.
+- `Cache entries loaded`: 1.
+- `Cache hits`: 1.
+- `AI candidates total`: 3.
+- `AI candidates selected`: 3.
+- `Deferred by budget`: 0.
 
-- Anzahl der Script-geprüften Fälle.
-- Anzahl der cache-bestätigt übersprungenen Fälle.
-- Anzahl der KI-Kandidaten.
-- Anzahl der tatsächlich eskalierten Inbox-Fälle.
-- Nachweis, dass mindestens ein blockierter/unsicherer Fall nicht direkt als Nutzeraufgabe, sondern korrekt als KI-Fallback-/Retry-Kandidat behandelt wurde.
+Aktuelle KI-Faktencheck-Kandidaten im belegten Lauf:
+
+- `Pokémon-Tag`.
+- `Das schönste Ei der Welt`.
+- `Witte Venn Ahaus-Alstätte entdecken`.
+
+### Farm-&-Country-Fair-Proof
+
+- Manuell geprüfter Testfall: `Farm & Country Fair`, `verification_key=0c54bf13073014fd79f9b8d7`.
+- Offizielle Quelle bestätigte Titel, Datum 26.–28.06.2026, Uhrzeiten und Adresse.
+- Acceptance-Zeile wurde im Writeback-Lauf gelesen und in den Prüfcache übernommen.
+- Folgelauf meldete `Cache entries loaded: 1` und `Cache hits: 1`.
+- `Farm & Country Fair` erschien danach nicht mehr in `content-ai-verification-candidates.json`.
+- Der Fall blieb nur noch für unabhängige Hinweise sichtbar, z. B. Visual-Fit oder Zeitlücke.
+
+### Runtime-Logging-Proof
+
+Der Audit-Schritt ist jetzt beobachtbar. Im GitHub-Log erscheinen Checkpoints wie:
+
+- `=== Content Quality Audit: start ===`.
+- `verification cache loaded: entries=1`.
+- `supporting data loaded`.
+- `event audit start`.
+- `event audit progress: row=...`.
+
+Kein enger Timeout wurde ergänzt, weil ein vorher scheinbar hängender Lauf später erfolgreich weiterlief.
+
+### Grenzen
+
+- Der Beweis gilt für die definierte Event-/Activity-Content-Prüfmatrix, nicht für jeden Text der gesamten Website.
+- Es wird keine 100%-Fehlerfreiheit behauptet.
+- Der Prozess garantiert nicht, dass jeder theoretisch mögliche externe Datenfehler erkannt wird.
+- Belegt ist: erkannte oder nicht sicher bestätigbare Fälle werden typisiert, gecacht oder als Arbeitspaket sichtbar gemacht.
+- KI-/Audit-Ergebnisse überschreiben keine fachlichen Daten automatisch.
+
+### Folgeworkpack
+
+Nächster sinnvoller Workpack: KI-Suchlauf Feedback Loop / Self-Improving Search V1.
+
+Ziel: Audit-Findings, Inbox-Ablehnungsgründe, Korrekturgründe und KI-Faktencheck-Ergebnisse werden nicht manuell alle paar Wochen in Suchregeln übertragen, sondern strukturiert als Feedback für den nächsten KI-Suchlauf genutzt.
 <!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_AI_CACHE_TARGET_2026_06_24 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_PROOF_2026_06_24 | Zweck: dokumentiert den bestandenen Staging-Prozessbeweis fuer Content Quality Guard V2; Umfang: Reportzahlen, Paketlogik, Inbox-Screenshots, Grenzen === -->
