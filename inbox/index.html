@@ -46,7 +46,6 @@ Umfang:
     .brand { display:grid; gap:4px; min-width:0; }
     .title { font-weight: 900; line-height: 1.05; font-size: 24px; letter-spacing:-.02em; }
     .inboxEyebrow { display:flex; align-items:center; gap:7px; flex-wrap:wrap; font-size:12px; font-weight:800; letter-spacing:.035em; text-transform:uppercase; opacity:.72; }
-    .inboxSubtitle { max-width: 42rem; color: rgba(20,35,28,.72); font-size:13.5px; line-height:1.32; }
     .inboxSystemMenu { position:relative; flex:0 0 auto; }
     .inboxSystemMenu summary { list-style:none; cursor:pointer; }
     .inboxSystemMenu summary::-webkit-details-marker { display:none; }
@@ -55,10 +54,10 @@ Umfang:
     .inboxToolbar .btn { width:100%; text-align:left; }
     /* === BEGIN BLOCK: INBOX_CONTENT_VERIFICATION_WORKBENCH_CSS_V1 | Zweck: fuehrt Audit-Faelle als klare Content-Pruefaufgaben mit Anweisung, Checkliste und Korrekturfeldern; Umfang: Mode-Switch und Verification-Karten-Ergaenzungen === */
     .reviewModeSwitch { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; margin: 12px 0 0; }
-    .reviewModeSwitch .btn { display:grid; gap:3px; align-content:start; min-height:58px; padding: 10px 11px; font-size: 13px; text-align:left; }
-    .reviewModeSwitch .is-active { border-color: rgba(38,118,62,.42); background: rgba(38,118,62,.075); font-weight: 800; }
+    .reviewModeSwitch .btn { display:flex; align-items:center; min-height:46px; padding: 10px 12px; font-size: 13.5px; text-align:left; }
+    .reviewModeSwitch .is-active { border-color: rgba(38,118,62,.42); background: rgba(38,118,62,.075); font-weight: 850; }
     .reviewModeLabel { display:block; font-size:13.5px; font-weight:850; line-height:1.18; }
-    .reviewModeHelp { display:block; font-size:12px; font-weight:600; line-height:1.25; opacity:.68; }
+    .reviewModeCount { font-weight:800; opacity:.7; }
     .auditIssueBox { display:grid; gap:7px; margin:0; padding:11px 12px; border-radius:14px; border:1px solid rgba(155,112,0,.28); background:rgba(155,112,0,.055); font-size:14px; line-height:1.35; }
     .auditIssueBox--critical { border-color:rgba(160,0,0,.35); background:rgba(160,0,0,.065); }
     .auditIssueBox--review_needed { border-color:rgba(155,112,0,.32); background:rgba(155,112,0,.065); }
@@ -81,11 +80,9 @@ Umfang:
     .auditBundleActions { display:flex; gap:8px; flex-wrap:wrap; margin-top:2px; }
     .auditBundleActions .btn { padding:7px 10px; font-size:13px; }
     /* === END BLOCK: INBOX_REPO_PATCH_BUNDLE_CSS_V1 === */
-    .reviewQuickGuide { display:grid; gap:7px; padding:11px 12px; border-radius:14px; border:1px solid rgba(38,118,62,.18); background:rgba(38,118,62,.045); font-size:13.5px; line-height:1.33; }
-    .reviewQuickGuide strong { font-weight:850; }
     .reviewMiniSteps { display:flex; flex-wrap:wrap; gap:6px; margin:0; padding:0; list-style:none; }
     .reviewMiniSteps li { display:inline-flex; align-items:center; gap:5px; padding:5px 8px; border-radius:999px; background:rgba(255,255,255,.68); border:1px solid rgba(0,0,0,.08); font-size:12.5px; font-weight:720; }
-    .reviewVisualBox { display:grid; gap:7px; padding:10px 11px; border-radius:14px; border:1px solid rgba(42,95,150,.18); background:rgba(42,95,150,.045); }
+    .reviewVisualBox { display:grid; gap:6px; padding:0; border:0; background:transparent; }
     .reviewVisualBox__title { font-size:12px; font-weight:850; letter-spacing:.045em; text-transform:uppercase; opacity:.72; }
     .reviewVisualBox__hint { font-size:12.5px; line-height:1.32; opacity:.76; }
     .reviewFieldPills { display:flex; flex-wrap:wrap; gap:6px; }
@@ -101,7 +98,7 @@ Umfang:
     .auditDecisionCard__label { font-size:12px; font-weight:850; letter-spacing:.04em; text-transform:uppercase; opacity:.68; }
     .auditChecklist { list-style:none; padding:0; grid-template-columns: repeat(2, minmax(0,1fr)); }
     .auditChecklist li { padding:7px 9px; border-radius:12px; background:rgba(0,0,0,.035); font-size:13px; line-height:1.25; }
-    .auditChecklist li::before { content:"Prüfen: "; font-weight:820; opacity:.68; }
+    .auditChecklist li::before { content:""; }
     .auditPackageDisclosure { border-top: 1px solid rgba(0,0,0,.09); padding-top:9px; }
     .auditPackageDisclosure summary { cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px; font-weight:850; letter-spacing:.045em; text-transform:uppercase; opacity:.76; }
     .auditPackageDisclosure summary::-webkit-details-marker { display:none; }
@@ -110,6 +107,8 @@ Umfang:
     .auditPackageDisclosureBody { display:grid; gap:9px; margin-top:8px; }
     .auditLinkGrid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
     .auditLinkGrid .btn { width:100%; }
+    .reviewDebugOnly { display:none; }
+    body.is-debug .reviewDebugOnly { display:block; }
     @media (max-width: 560px) {
       .top { align-items:flex-start; }
       .title { font-size:22px; }
@@ -123,6 +122,7 @@ Umfang:
     .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.16); font-size: 12px; }
     .muted { opacity: .72; }
     .status { margin-top: 8px; font-size: 13px; }
+    .status:empty { display:none; }
 
     .btn { padding: 9px 11px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; font: inherit; }
     .btn:disabled { opacity: .42; cursor: not-allowed; }
@@ -201,7 +201,6 @@ Umfang:
           <span id="lockState" class="pill muted">gesperrt</span>
         </div>
         <div class="title">Inbox</div>
-        <div class="inboxSubtitle">Neue Inhalte prüfen. Bestehende Inhalte korrigieren. Jede Karte zeigt genau die nächste Entscheidung.</div>
       </div>
       <details class="inboxSystemMenu">
         <summary class="btn" aria-label="Systemaktionen öffnen">System</summary>
@@ -219,13 +218,11 @@ Umfang:
 
     <!-- === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_SWITCH_V1 | Zweck: macht Content-Pruefung in derselben privaten Inbox bearbeitbar, aber getrennt von neuen Event-Kandidaten; Umfang: zwei Mode-Buttons === -->
     <div class="reviewModeSwitch" aria-label="Review-Bereich">
-      <button id="modeCurationBtn" class="btn is-active" type="button">
-        <span class="reviewModeLabel">Neue Events</span>
-        <span class="reviewModeHelp">Kandidaten freigeben oder ablehnen</span>
+      <button id="modeCurationBtn" class="btn is-active" type="button" title="Neue Event-Kandidaten prüfen, freigeben oder ablehnen.">
+        <span class="reviewModeLabel">Neue Events <span id="modeCurationCount" class="reviewModeCount">(–)</span></span>
       </button>
-      <button id="modeAuditBtn" class="btn" type="button">
-        <span class="reviewModeLabel">Content-Prüfung</span>
-        <span class="reviewModeHelp">Bestehende Inhalte prüfen oder korrigieren</span>
+      <button id="modeAuditBtn" class="btn" type="button" title="Bestehende Events und Aktivitäten prüfen oder korrigieren.">
+        <span class="reviewModeLabel">Content-Prüfung <span id="modeAuditCount" class="reviewModeCount">(–)</span></span>
       </button>
     </div>
     <!-- === END BLOCK: INBOX_CONTENT_AUDIT_MODE_SWITCH_V1 === -->
@@ -281,7 +278,11 @@ Umfang:
     /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_STATE_V1 | Zweck: haelt Kuratierung und Content-Pruefung als getrennte Queues in einer UI; Umfang: DOM-Referenzen und Mode-State === */
     const elModeCurationBtn = document.getElementById("modeCurationBtn");
     const elModeAuditBtn = document.getElementById("modeAuditBtn");
+    const elModeCurationCount = document.getElementById("modeCurationCount");
+    const elModeAuditCount = document.getElementById("modeAuditCount");
     let activeReviewMode = "curation";
+    let curationTabCount = null;
+    let contentAuditTabCount = null;
     /* === END BLOCK: INBOX_CONTENT_AUDIT_MODE_STATE_V1 === */
     
     let queue = [];
@@ -295,6 +296,7 @@ Umfang:
     // Token nur im RAM (keine Storage APIs)
     let sessionToken = "";
     let reviewApiPassword = "";
+    if (new URLSearchParams(window.location.search).has("debug")) document.body.classList.add("is-debug");
 
     // === BEGIN BLOCK: REVIEW PAGE BUTTON BINDINGS V2 ===
     // Zweck:
@@ -326,9 +328,39 @@ Umfang:
     /* === END BLOCK: INBOX_PUSH_BUTTON_BINDING_V1 === */
 
     /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_BINDINGS_V1 | Zweck: wechselt zwischen Event-Kuratierung und Content-Pruefung ohne Vermischung der Queues; Umfang: Mode-Button-Listener === */
+    function formatTabCount(value) {
+      return Number.isFinite(value) ? `(${value})` : "(–)";
+    }
+
     function refreshReviewModeButtons() {
       if (elModeCurationBtn) elModeCurationBtn.classList.toggle("is-active", activeReviewMode === "curation");
       if (elModeAuditBtn) elModeAuditBtn.classList.toggle("is-active", activeReviewMode === "content_audit");
+      if (elModeCurationCount) elModeCurationCount.textContent = formatTabCount(curationTabCount);
+      if (elModeAuditCount) elModeAuditCount.textContent = formatTabCount(contentAuditTabCount);
+    }
+
+    async function refreshInactiveTabCount() {
+      try {
+        if (activeReviewMode === "curation" && contentAuditTabCount === null) {
+          const auditResult = await fetchContentAuditReviewItems();
+          contentAuditTabCount = Array.isArray(auditResult.items) ? auditResult.items.length : 0;
+          refreshReviewModeButtons();
+          return;
+        }
+
+        if (activeReviewMode === "content_audit" && curationTabCount === null) {
+          const [res, submissionsResult] = await Promise.all([
+            jsonp(API_URL, { action: "listReview" }),
+            fetchSubmissionReviewItems()
+          ]);
+          const sheetCount = res && res.ok && Array.isArray(res.items) ? res.items.length : 0;
+          const submissionCount = Array.isArray(submissionsResult.items) ? submissionsResult.items.length : 0;
+          curationTabCount = sheetCount + submissionCount;
+          refreshReviewModeButtons();
+        }
+      } catch (_error) {
+        refreshReviewModeButtons();
+      }
     }
 
     async function switchReviewMode(mode) {
@@ -410,7 +442,7 @@ Umfang:
       current = null;
       totalLoaded = 0;
       contentAuditPackagePool = [];
-      setStatus("Inbox gesperrt. Passwort eingeben, um Review-Fälle zu laden.");
+      setStatus("");
       elLeft.textContent = "";
       elRight.textContent = "";
       refreshLock();
@@ -784,7 +816,7 @@ Umfang:
         return;
       }
 
-      setStatus("Lade …");
+      setStatus("");
       elOne.innerHTML = "";
       queue = [];
       current = null;
@@ -800,21 +832,16 @@ Umfang:
           contentAuditHistory = [];
 
           refreshLock();
+          contentAuditTabCount = queue.length;
+          refreshReviewModeButtons();
           if (auditResult.error) {
             setStatus("Content-Prüfung nicht geladen: " + auditResult.error);
-          } else if (queue.length > 0) {
-            const generated = auditResult.generatedAt ? ` · Stand: ${auditResult.generatedAt}` : "";
-            const packageTotal = Number(auditResult.packageTotal || contentAuditPackagePool.length || queue.length || 0);
-            const packageHint = packageTotal > queue.length ? ` · ${packageTotal} Fälle in Arbeitspaketen` : "";
-            setStatus(`Content-Prüfung: ${queue.length} direkt zu entscheiden${packageHint}${generated}`);
-          } else if (contentAuditPackagePool.length > 0) {
-            const generated = auditResult.generatedAt ? ` · Stand: ${auditResult.generatedAt}` : "";
-            setStatus(`Content-Prüfung: keine direkten Entscheidungen · ${contentAuditPackagePool.length} Fälle in Arbeitspaketen${generated}`);
           } else {
-            setStatus("Content-Prüfung: nichts offen.");
+            setStatus("");
           }
 
           showNext(totalLoaded);
+          refreshInactiveTabCount();
           return;
         }
         /* === END BLOCK: INBOX_CONTENT_AUDIT_LOAD_BRANCH_V1 === */
@@ -847,18 +874,17 @@ Umfang:
         totalLoaded = Number(res.total || sheetItems.length || 0) + Number(submissionsResult.total || submissionItems.length || 0);
 
         refreshLock();
+        curationTabCount = queue.length;
+        refreshReviewModeButtons();
         if (!queue.length && submissionsResult.error) {
-          setStatus("Neue Events: nichts offen. DB-Einreichungen nicht geladen: " + submissionsResult.error);
-        } else if (waitingPaymentSubmissionItems.length > 0 && queue.length === waitingPaymentSubmissionItems.length) {
-          setStatus(`Neue Events: ${waitingPaymentSubmissionItems.length} wartet auf Zahlung. Keine direkte Entscheidung offen.`);
-        } else if (waitingPaymentSubmissionItems.length > 0) {
-          setStatus(`Neue Events: aktive Fälle zuerst · ${waitingPaymentSubmissionItems.length} wartet auf Zahlung.`);
+          setStatus("Neue Events nicht vollständig geladen: " + submissionsResult.error);
         } else {
-          setStatus(queue.length ? "Neue Events: direkt prüfen und entscheiden." : "Neue Events: nichts offen.");
+          setStatus("");
         }
         /* === END BLOCK: REVIEW_QUEUE_ORDER_WITH_WAITING_PAYMENTS_V1 === */
 
         showNext(totalLoaded);
+        refreshInactiveTabCount();
       } catch (e) {
         console.error(e);
         setStatus("Fehler beim Laden (Netz/JSONP): " + (e && e.message ? e.message : e));
@@ -1301,25 +1327,13 @@ Umfang:
         ["Bildstatus", trimValue(item.visual_asset_status)]
       ].filter(([, value]) => value);
 
-      if (!rows.length) {
-        return `
-          <section class="reviewSection" aria-label="Bildzuordnung">
-            <div class="reviewVisualBox">
-              <div class="reviewVisualBox__title">Bildzuordnung</div>
-              <div class="reviewVisualBox__hint">Kein Visual Key gesetzt. Beim Übernehmen später in der Content-Prüfung oder im Sheet nachziehen, falls das Event ein eigenes Motiv braucht.</div>
-            </div>
-          </section>
-        `;
-      }
+      if (!rows.length) return "";
 
       return `
         <section class="reviewSection" aria-label="Bildzuordnung">
-          <div class="reviewVisualBox">
-            <div class="reviewVisualBox__title">Bildzuordnung</div>
-            <div class="reviewFieldPills">
-              ${rows.map(([label, value]) => `<span class="reviewFieldPill"><strong>${escapeHtml(label)}:</strong> <span class="reviewCode">${escapeHtml(value)}</span></span>`).join("")}
-            </div>
-            <div class="reviewVisualBox__hint">Kurz prüfen: Passt der Bildtyp wirklich zum konkreten Event? Falsche Motive später nicht blind übernehmen.</div>
+          <div class="reviewSectionTitle">Bildzuordnung</div>
+          <div class="reviewFieldPills">
+            ${rows.map(([label, value]) => `<span class="reviewFieldPill"><strong>${escapeHtml(label)}:</strong> <span class="reviewCode">${escapeHtml(value)}</span></span>`).join("")}
           </div>
         </section>
       `;
@@ -1486,9 +1500,6 @@ Umfang:
         ? [placeLine, timeLine || scheduleDetails]
         : [dateRangeLine, timeLine, placeLine]
       ).filter(Boolean).join(" · ");
-      const curationKindLabel = curationReviewKindLabel(it);
-      const curationDecisionLine = curationReviewDecisionLine(it, reviewState);
-      const curationStepsHtml = buildReviewMiniSteps(curationReviewSteps(it, reviewState));
       const visualBoxHtml = renderCurationVisualBox(it);
       const flowDetailsHtml = flowRowsHtml ? `
           <details class="reviewDisclosure reviewDisclosure--flow">
@@ -1510,13 +1521,6 @@ Umfang:
             ${metaLine ? `<div class="reviewMetaLine">${escapeHtml(metaLine)}</div>` : ``}
           </header>
 
-          <section class="reviewSection" aria-label="Was du hier siehst">
-            <div class="reviewQuickGuide">
-              <div><strong>Du siehst:</strong> ${escapeHtml(curationKindLabel)}</div>
-              <div><strong>Nächste Entscheidung:</strong> ${escapeHtml(curationDecisionLine)}</div>
-              ${curationStepsHtml}
-            </div>
-          </section>
 
           <section class="reviewSection reviewSection--data" aria-label="Event- und Aktivitätsdaten">
             <div class="reviewSectionTitle">${isActivityPresence ? "Wichtigste Aktivitätsdaten" : "Wichtigste Eventdaten"}</div>
@@ -1551,7 +1555,6 @@ Umfang:
 
           <section class="reviewSection reviewSection--actions" aria-label="Review-Aktionen">
             <div class="reviewActionGroupTitle">Entscheidung</div>
-            <p class="reviewActionIntro">Öffne zuerst die passende Quelle. Ablehnungsgrund nur wählen, wenn du den Fall wirklich verwirfst.</p>
             <div class="rejectBox">
               <label class="rejectLabel" for="rejectReason">Ablehnungsgrund bei Verwerfen</label>
               <select id="rejectReason" class="rejectSelect">
@@ -1562,11 +1565,11 @@ Umfang:
             <div id="reviewCardNotice" class="reviewNotice" hidden role="status" aria-live="polite"></div>
 
             <div class="actions actions--compact">
-              <button id="btnOk" class="btn btn-good actionPrimary" type="button">${escapeHtml(reviewState.approveLabel)}</button>
-              <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>${escapeHtml(primaryLinkLabel)}</button>
-              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quelle öffnen</button>
-              <button id="btnLater" class="btn" type="button">In dieser Sitzung später</button>
-              <button id="btnNo" class="btn btn-bad" type="button">${escapeHtml(reviewState.rejectLabel)}</button>
+              <button id="btnOk" class="btn btn-good actionPrimary" type="button" title="Diesen Fall übernehmen oder zur nächsten Stufe freigeben.">${escapeHtml(reviewState.approveLabel)}</button>
+              <button id="btnOpenEvent" class="btn sourceBtn" type="button" title="Öffnet den Link des Events oder der Einreichung in einem neuen Tab." ${openEventDisabled ? "disabled" : ""}>${escapeHtml(primaryLinkLabel)}</button>
+              <button id="btnOpenSource" class="btn sourceBtn" type="button" title="Öffnet die Originalquelle zur Prüfung." ${openSourceDisabled ? "disabled" : ""}>Quelle öffnen</button>
+              <button id="btnLater" class="btn" type="button" title="Schiebt diesen Fall nur in der aktuellen Sitzung nach hinten. Es wird nichts gespeichert.">Später</button>
+              <button id="btnNo" class="btn btn-bad" type="button" title="Verwirft den Fall mit dem ausgewählten Ablehnungsgrund.">${escapeHtml(reviewState.rejectLabel)}</button>
             </div>
           </section>
 
@@ -1813,13 +1816,12 @@ Umfang:
       if (!status && !summary && !checked && !missing && !fieldStatuses) return "";
       return `
         <section class="reviewSection" aria-label="Faktenprobe">
-          <div class="reviewSectionTitle">Automatische Faktenprobe</div>
+          <div class="reviewSectionTitle">Quellencheck</div>
           <div class="auditStateNote">
             ${status ? `<div><strong>Status:</strong> ${escapeHtml(formatEvidenceStatus(status))}</div>` : ``}
             ${summary ? `<div>${escapeHtml(summary)}</div>` : ``}
-            ${checked ? `<div><strong>Automatisch geprüft:</strong> ${escapeHtml(checked)}</div>` : ``}
-            ${missing ? `<div><strong>Nicht automatisch bestätigt:</strong> ${escapeHtml(missing)}</div>` : ``}
-            ${fieldStatuses ? `<div><strong>Feldstatus:</strong> ${escapeHtml(fieldStatuses)}</div>` : ``}
+            ${checked ? `<div><strong>Geprüft:</strong> ${escapeHtml(checked)}</div>` : ``}
+            ${missing ? `<div><strong>Noch offen:</strong> ${escapeHtml(missing)}</div>` : ``}
           </div>
         </section>
       `;
@@ -1839,7 +1841,6 @@ Umfang:
             ${motif ? `<div><strong>Motiv:</strong> <span class="reviewCode">${escapeHtml(motif)}</span></div>` : ``}
             ${role ? `<div><strong>Motiv-Rolle:</strong> ${escapeHtml(role)}</div>` : ``}
             ${assetStatus ? `<div><strong>Bildstatus:</strong> ${escapeHtml(assetStatus)}</div>` : ``}
-            <div>Vorschlag prüfen. Kein Bild blind ersetzen.</div>
           </div>
         </section>
       `;
@@ -1853,7 +1854,6 @@ Umfang:
       return `
         <section class="reviewSection" aria-label="Eventdaten korrigieren">
           <div class="reviewSectionTitle">Eventdaten korrigieren</div>
-          <div class="auditActionHint">Nur ändern, wenn die Quelle die Abweichung bestätigt. Speichern schreibt direkt in die Eventdaten.</div>
           <div class="auditFormGrid">
             <div class="auditField auditField--wide">
               <label for="auditEventTitle">Titel</label>
@@ -2142,32 +2142,18 @@ Umfang:
             </div>
           </details>
       ` : "";
-      const auditKind = isActivity ? "Activity" : "Event";
-      const auditStepsHtml = buildReviewMiniSteps(isActivity
-        ? ["Quelle öffnen", "Daten prüfen", "Patch oder Abschluss"]
-        : ["Quelle öffnen", "Felder vergleichen", "speichern oder abschließen"]
-      );
 
       elOne.innerHTML = `
         <article class="card reviewCard">
           <header class="reviewCardHead">
             <div class="reviewBadgeRow">
               <span class="originBadge">Content-Prüfung</span>
-              ${it.workbench_group ? `<span class="reviewChip">${escapeHtml(it.workbench_group)}</span>` : ``}
               <span class="reviewChip reviewChip--waiting">${escapeHtml(severityLabel)}</span>
-              <span class="reviewChip">${escapeHtml(statusLabel)}</span>
             </div>
             <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
             <div class="reviewMetaLine">${escapeHtml([formatGermanDate(it.date), trimValue(it.content_type), trimValue(it.issue_code)].filter(Boolean).join(" · "))}</div>
           </header>
 
-          <section class="reviewSection" aria-label="Was du hier siehst">
-            <div class="reviewQuickGuide">
-              <div><strong>Du siehst:</strong> Content-Fall für ${escapeHtml(auditKind)}</div>
-              <div><strong>Status:</strong> ${escapeHtml(severityLabel)} · ${escapeHtml(statusLabel)}</div>
-              ${auditStepsHtml}
-            </div>
-          </section>
 
           <section class="reviewSection" aria-label="Prüfbefund">
             <div class="reviewSectionTitle">Befund</div>
@@ -2177,20 +2163,6 @@ Umfang:
             </div>
           </section>
 
-          <section class="reviewSection" aria-label="Konkrete Aktion">
-            <div class="reviewSectionTitle">Jetzt zu tun</div>
-            <div class="auditDecisionCard">
-              <div class="auditDecisionCard__title">${escapeHtml(guide.actionTitle)}</div>
-              <div class="auditDecisionCard__line">
-                <span class="auditDecisionCard__label">Aktion</span>
-                <span>${escapeHtml(guide.action)}</span>
-              </div>
-              <div class="auditDecisionCard__line">
-                <span class="auditDecisionCard__label">Warum</span>
-                <span>${escapeHtml(guide.why)}</span>
-              </div>
-            </div>
-          </section>
 
           <section class="reviewSection" aria-label="Prüfliste">
             <div class="reviewSectionTitle">Kurz prüfen</div>
@@ -2198,15 +2170,12 @@ Umfang:
           </section>
 
           <section class="reviewSection" aria-label="Links">
-            <div class="reviewSectionTitle">Öffnen</div>
+            <div class="reviewSectionTitle">Quelle prüfen</div>
             <div class="auditLinkGrid">
-              <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${it.public_url ? "" : "disabled"}>Website-Eintrag öffnen</button>
-              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${it.source_url ? "" : "disabled"}>Quelle öffnen</button>
+              <button id="btnOpenEvent" class="btn sourceBtn" type="button" title="Öffnet den aktuellen Website-Eintrag." ${it.public_url ? "" : "disabled"}>Website öffnen</button>
+              <button id="btnOpenSource" class="btn sourceBtn" type="button" title="Öffnet die Originalquelle zur Prüfung." ${it.source_url ? "" : "disabled"}>Quelle öffnen</button>
             </div>
-            <div class="urlBox">
-              ${it.public_url ? `<div class="urlLine"><strong>Website:</strong> ${escapeHtml(it.public_url)}</div>` : ``}
-              ${it.source_url ? `<div class="urlLine"><strong>Quelle:</strong> ${escapeHtml(it.source_url)}</div>` : ``}
-            </div>
+
           </section>
 
           ${renderSourceSuggestion(it)}
@@ -2217,36 +2186,30 @@ Umfang:
 
           ${renderEventCorrectionForm(it, suggestedUrl)}
 
-          ${isActivity ? `
-            <section class="reviewSection" aria-label="Activity-Hinweis">
-              <div class="reviewSectionTitle">Activity-Korrektur</div>
-              <div class="auditStateNote">Activity-Daten liegen im Repo. Die Inbox überschreibt sie nicht direkt. Bei Änderungen: „Patch nötig“ markieren.</div>
-            </section>
-          ` : ``}
 
-          ${workPackagesSectionHtml}
-
-          <details class="reviewDisclosure">
-            <summary>Technische Prüfdaten</summary>
-            <div class="reviewDisclosureBody reviewGrid">
-              ${auditRowsHtml}
-            </div>
-          </details>
+          <div class="reviewDebugOnly">
+            ${workPackagesSectionHtml}
+            <details class="reviewDisclosure">
+              <summary>Technische Prüfdaten</summary>
+              <div class="reviewDisclosureBody reviewGrid">
+                ${auditRowsHtml}
+              </div>
+            </details>
+          </div>
 
           <div id="reviewCardNotice" class="reviewNotice" hidden role="status" aria-live="polite"></div>
 
           <section class="reviewSection reviewSection--actions" aria-label="Content-Prüfaktionen">
-            <div class="reviewActionGroupTitle">Abschluss</div>
-            <p class="reviewActionIntro">Diese Buttons ändern den Status. Vorheriger/Nächster blättert nur und speichert nichts.</p>
+            <div class="reviewActionGroupTitle">Aktion</div>
             <div class="actions actions--compact">
-              <button id="btnAuditPrevious" class="btn" type="button" ${contentAuditHistory.length ? "" : "disabled"}>Vorheriger Fall</button>
-              <button id="btnAuditNext" class="btn" type="button" ${queue.length ? "" : "disabled"}>Nächster Fall</button>
+              <button id="btnAuditPrevious" class="btn" type="button" title="Zur vorherigen Karte wechseln. Speichert nichts." ${contentAuditHistory.length ? "" : "disabled"}>Zurück</button>
+              <button id="btnAuditNext" class="btn" type="button" title="Zur nächsten Karte wechseln. Speichert nichts." ${queue.length ? "" : "disabled"}>Weiter</button>
             </div>
             <div class="actions actions--compact">
-              ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button">Korrektur speichern</button>` : ``}
-              <button id="btnAuditVerified" class="btn btn-good" type="button">Als geprüft abschließen</button>
-              ${isActivity ? `<button id="btnAuditPatchNeeded" class="btn btn-bad" type="button">Patch nötig</button>` : ``}
-              <button id="btnAuditSnooze" class="btn" type="button">7 Tage parken</button>
+              ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button" title="Speichert die sichtbaren Korrekturfelder direkt in den Eventdaten.">Korrektur speichern</button>` : ``}
+              <button id="btnAuditVerified" class="btn btn-good" type="button" title="Markiert den Fall als geprüft, wenn keine Änderung nötig ist.">Als geprüft abschließen</button>
+              ${isActivity ? `<button id="btnAuditPatchNeeded" class="btn btn-bad" type="button" title="Markiert diesen Activity-Fall für einen bewussten Repo-Patch.">Patch nötig</button>` : ``}
+              <button id="btnAuditSnooze" class="btn" type="button" title="Blendet den Fall 7 Tage aus und prüft ihn danach erneut.">7 Tage parken</button>
             </div>
           </section>
         </article>
@@ -2318,6 +2281,8 @@ Umfang:
         };
         setStatus(labels[action] || "Content-Fall aktualisiert.");
         showNext(totalLoaded);
+        contentAuditTabCount = contentAuditSessionCount();
+        refreshReviewModeButtons();
       } catch (error) {
         console.error(error);
         renderContentAuditCurrent(totalLoaded);
