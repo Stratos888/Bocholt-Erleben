@@ -18,6 +18,61 @@ Kanonische Rollen:
 
 ---
 
+<!-- === BEGIN BLOCK: ROADMAP_INBOX_VISUAL_KEY_REVIEW_UI_2026_06_25 | Zweck: definiert den naechsten kleinen Workpack nach bestandenem Main-KI-Suchlauf-Handoff; Umfang: Visual-Key-Anzeige, Dropdown-Korrektur, Lernsignal, keine neue Bildproduktion === -->
+## Inbox Review – Visual Key sichtbar und änderbar machen (nächster Workpack)
+
+Status: nächster empfohlener UI-/Prozess-Workpack nach bestandenem Main-Beweis für KI-Suchlauf, Manual Inbox, Visual-Key-Handoff und Live-Bildausspielung.
+
+### Ziel in einem Satz
+
+Die Inbox-PWA soll den von der KI vorgeschlagenen `visual_key` vor der Veröffentlichung sichtbar machen und redaktionell änderbar speichern, damit falsche Bildtypen vor Livegang korrigiert und später als Lernsignal genutzt werden können.
+
+### Auslöser
+
+Im Main-Proof wurde der Fall `Bocholter Gesundheitstage` sichtbar:
+
+- KI-/Fallback-Logik führte zunächst zu `indoor_sport_competition`.
+- Live erschien dadurch ein Darts-/Sporthallenbild.
+- Fachlich korrekt war `business_messe_info`.
+- Nach manueller Korrektur in `Events.visual_key` und Deploy wurde das Bild korrekt ausgetauscht.
+- Der technische Handoff ist nach Apps-Script-Fix bestanden; die Review-UI ist aber noch blind gegenüber dem Bildtyp.
+
+### Zielzustand V1
+
+In der Inbox-Karte für neue Events gibt es einen kompakten Bildtyp-Block:
+
+- Aktueller `visual_key` sichtbar.
+- Dropdown mit den erlaubten Keys aus `event_visual_pool.json`.
+- Änderung wird vor `Übernehmen` im Sheet gespeichert oder beim Übernehmen mitgegeben.
+- Der finale Wert landet nach `Übernehmen` in `Events.visual_key`.
+- Optional: ursprünglicher KI-Vorschlag bleibt als separates Feld/Notiz auswertbar, damit spätere Suchlauf-Regeln lernen können.
+
+### Akzeptanzkriterien
+
+- Eine KI-Inbox-Zeile mit `visual_key` zeigt den Key in der PWA sichtbar an.
+- Der Nutzer kann den Key vor dem Übernehmen ändern.
+- Es gibt keine freien Tippfehlerwerte; Auswahl ist auf bekannte Pool-Keys begrenzt.
+- Nach `Übernehmen` steht der geänderte Wert in `Events.visual_key`.
+- `Deploy jetzt` veröffentlicht danach das passende Bild.
+- Der bestehende Apps-Script-Approve-Fix bleibt kompatibel.
+
+### Nicht-Ziel
+
+- Kein neues Event-Visual-System.
+- Keine neue Bildproduktion.
+- Keine Abschaffung der menschlichen Inbox-Prüfung.
+- Kein blindes automatisches Überschreiben von Eventdaten.
+- Kein vollständiger Self-Improving-Search-Feedback-Loop; dieser bleibt ein separater Content-Quality-Workpack.
+
+### Verhältnis zum Feedback-Loop
+
+Dieser Workpack ist die redaktionelle Eingabeschicht für spätere Automatisierung:
+
+`KI-Vorschlag -> redaktionell geänderter finaler visual_key -> strukturiertes Lernsignal -> bessere Suchlauf-/Mapping-Regeln`.
+<!-- === END BLOCK: ROADMAP_INBOX_VISUAL_KEY_REVIEW_UI_2026_06_25 === -->
+
+---
+
 <!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_FEEDBACK_LOOP_2026_06_25 | Zweck: definiert den naechsten Workpack nach abgeschlossenem KI-Faktencheck-Cache; Umfang: Audit-/Inbox-Feedback, Ablehnungsgruende, KI-Suchlauf-Regeln, Messbarkeit, keine blinde Selbstmutation === -->
 ## Content-Prüfung – nächster Workpack: KI-Suchlauf Feedback Loop / Self-Improving Search V1 (2026-06-25)
 

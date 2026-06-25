@@ -10,6 +10,7 @@ Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter ble
 ### Aktuell bestandene Hauptbeweise
 
 - Main-Merge und Live-Smoke bestanden; öffentliche Kernbereiche laden ohne bekannten Blocker.
+- KI-Suchlauf → Manual Inbox → Visual-Key-Handoff → Events-/Live-Bildausspielung ist auf `main` mit dem aktuellen Prüflauf bestanden.
 - Event-Visual-Motif-Fit ist für den aktuellen Sheet-Stand abgeschlossen; keine offenen Produktions-/Review-Gaps.
 - `/angebote/` ist Legacy-Redirect; kanonische Aktivitätenroute ist `/aktivitaeten/`.
 - Aktivitätspräsenz-Funnel ist unter `/aktivitaeten/sichtbar-werden/...` kanonisch; alte `/angebote/sichtbar-werden/...`-Routen sind nur Redirects.
@@ -20,7 +21,7 @@ Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter ble
 
 ### Offene oder bewusst geparkte Beweise
 
-- KI-/Inbox-/Visual-Key-Handoff bleibt bei konkretem Suchlauf-Symptom zu prüfen; der frühere Kontrolltermin 2026-06-23 ist historisch erledigt bzw. nicht mehr aktueller Blocker.
+- Inbox-Review-UI soll den `visual_key` künftig sichtbar und vor dem Übernehmen änderbar machen; der zugrunde liegende Handoff ist bereits bestanden.
 - 28-/30-Tage-Reporting-Datenlauf abwarten, bevor Akquise-/Feedbackberichte als belastbar gelten.
 - Activity-Visual-Restschuld (`fallback`, `needs_review`) ist bewusst späterer Qualitätsworkpack.
 - Echte Zahlungs-/Webhook-/Stripe-Livefälle bleiben nur dann erneut zu testen, wenn ein konkreter Zahlungsflow geändert wurde oder ein neues Symptom auftritt.
@@ -30,6 +31,100 @@ Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter ble
 - Alte Erwähnungen von `/angebote/...` in früheren Testblöcken sind historische Nachweise, nicht aktuelle Informationsarchitektur.
 - Bei Widerspruch gilt: `MASTER.md` für strategische Steuerung, `ROADMAP.md` für aktuelle Taktik, `ENGINEERING.md` für Arbeitsregeln.
 <!-- === END BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_22 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_MAIN_KI_SEARCH_INBOX_VISUAL_KEY_PROOF_2026_06_25 | Zweck: dokumentiert den bestandenen Main-Beweis fuer Weekly-KI-Suchlauf, Manual-Inbox-Intake, Visual-Key-Handoff, Apps-Script-Approve-Fix und Live-Bildausspielung; Umfang: GitHub-Workflowlogs, Sheet-/PWA-Proof, Grenzen und Folgeworkpack === -->
+## Main-KI-Suchlauf / Manual Inbox / Visual-Key-Handoff – bestanden (2026-06-25)
+
+Status: bestanden für den aktuellen Main-/Live-Prozess mit menschlicher Inbox-Prüfung.
+
+### Geprüfter Umfang
+
+Geprüft wurde der nach dem Main-Merge offene Kontrollpunkt:
+
+`Weekly KI Websearch -> Manual Inbox -> Manual KI Event Intake -> Inbox-Review -> Events -> Deploy -> Live-Bildausspielung`.
+
+### Belegte Workflow-Ergebnisse
+
+`Weekly KI Websearch -> Manual Inbox #17` auf `main`:
+
+- Workflow grün.
+- Events-Snapshot: 176 Zeilen.
+- Inbox-Snapshot vor Lauf: 0 Zeilen.
+- Roh-Kandidaten: 3.
+- Produktiv ausgewählt: 2.
+- Verworfen: 1 mit Grund `out_of_window` (`600 Jahre Werth - Festwoche`).
+- In `data/inbox_manual.json` geschrieben: 2.
+- Neue Source-Candidates: 0.
+- Coverage-Ziele: 27.
+- Coverage-Status: `IN_EVENTS` 21, `IN_INBOX_ARCHIVE` 2, `MISSING_FROM_RAW` 3, `PAST_TARGET` 1.
+
+`Manual KI Event Intake` als Folgelauf:
+
+- Workflow grün.
+- `visual_key`-Dropdown im Google-Sheet-Tab `Inbox` gesetzt: 34 Optionen.
+- `Append OK: appended=2 skipped=0`.
+- `data/inbox_manual.json` wurde danach zurückgesetzt.
+- Deploy wurde durch den Intake-Workflow angestoßen.
+
+Import-/Review-Pfad:
+
+- Die zwei Kandidaten waren in der Inbox sichtbar und konnten redaktionell übernommen werden:
+  - `Bocholter Gesundheitstage`.
+  - `Nacht der Ausbildung 2026 mit Isselburg`.
+- Der GitHub-Workflow `Inbox -> Events (Import) #147` meldete `Import-Kandidaten (status=übernehmen): 0`, weil die PWA-/Apps-Script-Review bereits direkt nach `Events` importiert hatte. Das ist kein Fehler dieses Beweises, sondern beschreibt den tatsächlich genutzten Live-Review-Pfad.
+
+### Gefundener und behobener Prozessfehler
+
+Beim Test wurde ein echter Handoff-Fehler im externen Google Apps Script gefunden:
+
+- `approve_()` importierte die Inbox-Zeile direkt nach `Events`, übernahm aber `visual_key` nicht in `eventMap`.
+- Folge: `Events.visual_key` blieb leer und der Build musste den Bildtyp wieder automatisch ableiten.
+- Sichtbares Symptom: `Bocholter Gesundheitstage` fiel wegen Kategorie `Sport & Bewegung` auf `indoor_sport_competition` zurück und zeigte ein unpassendes Darts-/Sporthallenbild.
+
+Der externe Apps-Script-Code wurde korrigiert:
+
+- `approve_()` setzt jetzt `visual_key: valueOrEmpty_(inboxMap.visual_key)`.
+- Zusätzlich werden gemeinsame Zusatzspalten aus Inbox nach Events übernommen, ohne bewusst gemappte Felder zu überschreiben.
+- Die bestehende Web-App-Bereitstellung wurde auf eine neue Version gehoben; die API-URL blieb unverändert.
+
+Beweis nach Fix:
+
+- Testfall `TEST Visual Key Import Proof` wurde in der Inbox-PWA angezeigt.
+- Nach Klick auf `Übernehmen` erschien der Fall im Google-Sheet-Tab `Events`.
+- `Events.visual_key` war dort korrekt mit `business_messe_info` befüllt.
+
+### Live-Bildausspielung
+
+- `Bocholter Gesundheitstage` wurde in `Events.visual_key` auf `business_messe_info` korrigiert und erneut deployt.
+- Das vorherige Darts-/Sporthallenbild wurde live durch ein passenderes Beratungs-/Info-Motiv ersetzt.
+- `Nacht der Ausbildung 2026 mit Isselburg` nutzt ebenfalls `business_messe_info` und zeigt ein passendes Vortrag-/Infoveranstaltungsbild.
+
+### Bewertung gegen den ursprünglichen Kontrollpunkt
+
+Bestanden:
+
+1. Weekly-KI-Suchlauf läuft auf `main` und erzeugt Kandidaten.
+2. Manual-KI-Intake schreibt Kandidaten in den Google-Sheet-Tab `Inbox`.
+3. `Inbox.visual_key` wird mit KI-Vorschlag befüllt und das Dropdown mit 34 erlaubten Keys gesetzt.
+4. Der tatsächlich genutzte PWA-/Apps-Script-Übernehmen-Pfad schreibt `visual_key` nach dem Fix nach `Events.visual_key`.
+5. `Events.visual_key` steuert nach Deploy die Live-Bildausspielung.
+6. Der konkrete Fehlfall `Gesundheitstage -> Dartsbild` ist live korrigiert.
+
+Damit gilt der Main-Kontrollpunkt `KI-Suchlauf / Inbox / visual_key / Events-Build / Live-Bildausspielung prüfen` als abgeschlossen.
+
+### Grenzen und Folgeworkpack
+
+Nicht Teil dieses Beweises:
+
+- Die Inbox-PWA zeigt den `visual_key` noch nicht redaktionell sichtbar/änderbar an. Das ist der nächste sinnvolle UI-Workpack.
+- Der externe Google-Apps-Script-Code liegt nicht im Repo und muss bei künftigen Änderungen separat beachtet werden.
+- Vollautomatische Bildtyp-Perfektion ist nicht bewiesen; der aktuelle Zielprozess bleibt KI-Vorschlag plus menschliche Inbox-Prüfung.
+- Die automatische Ableitung sollte zusätzlich gehärtet werden, z. B. `Gesundheitstage` / `Gesundheitsprogramm` nicht auf Sport-Wettkampf-Motive fallen lassen.
+
+Nächster empfohlener Workpack:
+
+`Inbox-Review-UI: visual_key anzeigen, per Dropdown änderbar machen und den ursprünglichen KI-Vorschlag als Lernsignal erhalten.`
+<!-- === END BLOCK: TEST_STATUS_MAIN_KI_SEARCH_INBOX_VISUAL_KEY_PROOF_2026_06_25 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_INDEX_2026_06_24 | Zweck: macht den aktuellen Content-Pruefprozess-Stand im Test-Index sichtbar; Umfang: Audit-Report, Inbox-Pakete, Visual-Fit-V2, offene Folgebeweise === -->
 ## Aktueller Test-Index Zusatz – Content-Prüfung V2 (2026-06-24)
@@ -3281,15 +3376,19 @@ Konsequenz:
 - Der vollständige Live-Beweis gegen Google Sheets ist erst nach Merge bzw. Run auf `main` möglich.
 - Ein fehlgeschlagener Versuch, den Workflow per `gh workflow run manual-ki-intake.yml --ref staging` zu starten, ist kein fachlicher Fehler des Visual-Key-Handoffs; `staging` ist hierfür bewusst nicht der Zielpfad.
 
-### Offener Main-Beweis
+### Main-Beweis nachträglich erledigt
 
-Nach Merge bzw. Ausführung auf `main` ist noch live zu prüfen:
+Der ursprünglich offene Main-Beweis wurde am 2026-06-25 im Block `TEST_STATUS_MAIN_KI_SEARCH_INBOX_VISUAL_KEY_PROOF_2026_06_25` bestanden.
+
+Geprüft und bestanden:
 
 1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
 2. Das Dropdown für `Inbox.visual_key` erscheint mit den erlaubten Keys aus `event_visual_pool.json`.
-3. Ein redaktionell geänderter `visual_key` wird beim Übernehmen nach `Events.visual_key` erhalten.
-4. Der spätere Build übernimmt `Events.visual_key` nach `events.json`.
-5. Deployte Event-Cards erhalten dadurch automatisch ein passendes Eventbild aus dem Visual-Pool.
+3. Der PWA-/Apps-Script-Übernehmen-Pfad übernimmt `visual_key` nach einem externen Apps-Script-Fix nach `Events.visual_key`.
+4. Der spätere Deploy übernimmt `Events.visual_key` in die Live-Bildausspielung.
+5. Deployte Event-Cards erhalten dadurch ein Bild aus dem passenden Event-Visual-Pool.
+
+Folge: Der alte Staging-Grenzblock bleibt historischer Implementierungsnachweis; der aktuelle Status ist nicht mehr offen.
 <!-- === END BLOCK: TEST_STATUS_MANUAL_KI_INTAKE_STAGING_LIMIT_2026_06_09 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_VISUAL_AUDIT_WARNINGS_CLEANUP_2026_06_09 | Zweck: dokumentiert Bereinigung der Visual-Audit-Warnungen; Umfang: Event-Alt-Texte, Audit-Owner-Check, Activity-JPG-Einordnung === -->
