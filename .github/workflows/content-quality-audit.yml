@@ -1,0 +1,937 @@
+# === BEGIN BLOCK: CONTENT QUALITY AUDIT WORKFLOW V1 ===
+# Zweck:
+# - Prueft redaktionelle Sheet-Events, oeffentliche DB-Events und Activities regelmaessig.
+# - Schreibt den Bericht in den Google-Sheet-Tab Content_Audit.
+# - Aendert keine fachlichen Inhalte automatisch.
+# === END BLOCK: CONTENT QUALITY AUDIT WORKFLOW V1 ===
+
+name: Content Quality Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "Audit-Scope"
+        required: false
+        default: "full"
+        type: choice
+        options:
+          - daily
+          - full
+  push:
+    branches:
+      - staging
+    paths:
+      - ".github/workflows/content-quality-audit.yml"
+      - "scripts/content-quality-audit.py"
+      - "data/content_source_suggestions.json"
+      - "data/**"
+      - "api/events/public.php"
+  schedule:
+    # Taeglich: zeitnahe Events + Quellen-/Link-Auffaelligkeiten.
+    - cron: "35 5 * * *"
+    # Woechentlich Montag: voller Activity-/Event-Bestand.
+    - cron: "55 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  content_quality_audit:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      # === BEGIN BLOCK: CONTENT_QUALITY_CHECKOUT_AND_PYTHON_V1 | Zweck: Baseline fuer Audit-Script bereitstellen; Umfang: Checkout + Python + Google Sheets Dependencies ===
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Google Sheets dependencies
+        shell: bash
+        run: |
+          set -e
+          python -m pip install --upgrade pip
+          pip install google-api-python-client google-auth
+      # === END BLOCK: CONTENT_QUALITY_CHECKOUT_AND_PYTHON_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_RESOLVE_SCOPE_AND_TARGET_V1 | Zweck: trennt daily/full und live/staging Sheet-/Runtime-Ziele; Umfang: setzt Audit-ENV fuer Folge-Schritte ===
+      - name: Resolve audit scope and target
+        shell: bash
+        env:
+          INPUT_SCOPE: ${{ github.event.inputs.scope }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+          LIVE_SHEET_ID: ${{ secrets.LIVE_SHEET_ID }}
+          LEGACY_SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: |
+          set -e
+
+          BE_SHEET_ID="${LIVE_SHEET_ID:-${LEGACY_SHEET_ID:-}}"
+          if [ -z "$BE_SHEET_ID" ]; then
+            echo "❌ LIVE_SHEET_ID oder SHEET_ID fehlt."
+            exit 1
+          fi
+
+          if [ -n "${INPUT_SCOPE:-}" ]; then
+            AUDIT_SCOPE="$INPUT_SCOPE"
+          elif [ "${EVENT_NAME:-}" = "push" ]; then
+            AUDIT_SCOPE="full"
+          elif [ "${EVENT_SCHEDULE:-}" = "55 5 * * 1" ]; then
+            AUDIT_SCOPE="full"
+          else
+            AUDIT_SCOPE="daily"
+          fi
+
+          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
+            APP_BASE_URL="https://staging.bocholt-erleben.de"
+            CONTENT_AUDIT_TAB="Content_Audit_Staging"
+            CONTENT_VERIFICATION_CACHE_TAB="Content_Verification_Cache_Staging"
+            CONTENT_VERIFICATION_ACCEPTANCE_TAB="Content_Verification_Acceptance_Staging"
+          else
+            APP_BASE_URL="https://bocholt-erleben.de"
+            CONTENT_AUDIT_TAB="Content_Audit"
+            CONTENT_VERIFICATION_CACHE_TAB="Content_Verification_Cache"
+            CONTENT_VERIFICATION_ACCEPTANCE_TAB="Content_Verification_Acceptance"
+          fi
+
+          echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
+          echo "AUDIT_SCOPE=$AUDIT_SCOPE" >> "$GITHUB_ENV"
+          echo "APP_BASE_URL=$APP_BASE_URL" >> "$GITHUB_ENV"
+          echo "CONTENT_AUDIT_TAB=$CONTENT_AUDIT_TAB" >> "$GITHUB_ENV"
+          echo "CONTENT_VERIFICATION_CACHE_TAB=$CONTENT_VERIFICATION_CACHE_TAB" >> "$GITHUB_ENV"
+          echo "CONTENT_VERIFICATION_ACCEPTANCE_TAB=$CONTENT_VERIFICATION_ACCEPTANCE_TAB" >> "$GITHUB_ENV"
+
+          echo "Audit scope: $AUDIT_SCOPE"
+          echo "Audit runtime: $APP_BASE_URL"
+          echo "Audit sheet tab: $CONTENT_AUDIT_TAB"
+          echo "Verification cache tab: $CONTENT_VERIFICATION_CACHE_TAB"
+          echo "Verification acceptance tab: $CONTENT_VERIFICATION_ACCEPTANCE_TAB"
+      # === END BLOCK: CONTENT_QUALITY_RESOLVE_SCOPE_AND_TARGET_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_EXPORT_EVENTS_SHEET_V1 | Zweck: liest die kanonischen redaktionellen Events direkt aus dem Google Sheet; Umfang: exportiert Events!A:ZZ nach data/events.tsv ===
+      - name: Export Events tab for audit
+        timeout-minutes: 6
+        shell: bash
+        env:
+          SHEET_ID: ${{ env.BE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -e
+          python - <<'PY'
+          import csv, json, os, socket, ssl, sys, time
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
+          from googleapiclient.errors import HttpError
+
+          def fail(msg):
+              print(f"❌ {msg}", file=sys.stderr)
+              sys.exit(1)
+
+          sheet_id = os.environ.get("SHEET_ID", "").strip()
+          sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+          if not sheet_id:
+              fail("ENV SHEET_ID fehlt.")
+          if not sa_json:
+              fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
+
+          try:
+              sa_info = json.loads(sa_json)
+          except Exception:
+              fail("GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.")
+
+          socket.setdefaulttimeout(90)
+          scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+          creds = service_account.Credentials.from_service_account_info(sa_info, scopes=scopes)
+          service = build("sheets", "v4", credentials=creds, cache_discovery=False)
+
+          def fetch_values(range_name, label, attempts=4):
+              last_exc = None
+              for attempt in range(1, attempts + 1):
+                  try:
+                      print(f"↻ {label}: Versuch {attempt}/{attempts}")
+                      res = service.spreadsheets().values().get(
+                          spreadsheetId=sheet_id,
+                          range=range_name,
+                          majorDimension="ROWS",
+                      ).execute(num_retries=4)
+                      return res.get("values", []) or []
+                  except HttpError as exc:
+                      status = getattr(exc.resp, "status", None)
+                      retryable = status in (408, 429, 500, 502, 503, 504)
+                      last_exc = exc
+                      if (not retryable) or attempt >= attempts:
+                          raise
+                      time.sleep(attempt * 5)
+                  except (TimeoutError, socket.timeout, ssl.SSLError, OSError) as exc:
+                      last_exc = exc
+                      if attempt >= attempts:
+                          raise
+                      time.sleep(attempt * 5)
+              raise last_exc or RuntimeError(f"{label}: unbekannter Exportfehler")
+
+          values = fetch_values("Events!A:ZZ", "Events-Tab")
+          if not values:
+              fail("Events-Tab ist leer oder nicht lesbar.")
+
+          header = [str(h).strip() for h in (values[0] or [])]
+          required = ["id", "title", "date", "city", "location", "kategorie"]
+          missing = [col for col in required if col not in header]
+          if missing:
+              fail(f"Events-Header unvollständig. Fehlende Spalten: {missing}. Header={header}")
+
+          rows = []
+          for raw in values[1:]:
+              row = [(raw[i].strip() if i < len(raw) and raw[i] is not None else "") for i in range(len(header))]
+              if any(row):
+                  rows.append(row)
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/events.tsv", "w", encoding="utf-8", newline="") as handle:
+              writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
+              writer.writerow(header)
+              writer.writerows(rows)
+
+          print(f"✅ Export OK: {len(rows)} Events-Zeilen nach data/events.tsv")
+          PY
+          test -s data/events.tsv
+      # === END BLOCK: CONTENT_QUALITY_EXPORT_EVENTS_SHEET_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_FETCH_PUBLIC_DB_EVENTS_V1 | Zweck: erfasst genehmigte DB-/Veranstalter-Events aus dem oeffentlichen Runtime-Feed; Umfang: best-effort API Snapshot fuer Audit ===
+      - name: Fetch public DB events for audit
+        shell: bash
+        run: |
+          set -e
+          mkdir -p data
+          if curl -fsSL --max-time 20 "${APP_BASE_URL}/api/events/public.php" -o data/public-db-events.json; then
+            echo "✅ Public DB events snapshot fetched."
+          else
+            echo '{"status":"unavailable","events":[]}' > data/public-db-events.json
+            echo "⚠️ Public DB events snapshot unavailable; audit continues with Sheet/Activities."
+          fi
+      # === END BLOCK: CONTENT_QUALITY_FETCH_PUBLIC_DB_EVENTS_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_EXPORT_VERIFICATION_CACHE_V1 | Zweck: liest den persistenten KI-Pruefcache aus Google Sheets; Umfang: exportiert Content_Verification_Cache nach data/content-verification-cache.json, ohne fachliche Daten zu ändern ===
+      - name: Export verification cache
+        timeout-minutes: 4
+        shell: bash
+        env:
+          SHEET_ID: ${{ env.BE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -e
+          python - <<'PY'
+          import json, os, sys
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
+          from googleapiclient.errors import HttpError
+
+          def norm(value):
+              return str(value or '').strip()
+
+          def write_empty(reason):
+              os.makedirs('data', exist_ok=True)
+              with open('data/content-verification-cache.json', 'w', encoding='utf-8') as handle:
+                  json.dump({'items': [], 'meta': {'status': 'empty', 'reason': reason}}, handle, ensure_ascii=False, indent=2)
+                  handle.write('\n')
+              print(f'ℹ️ Verification cache empty: {reason}')
+
+          sheet_id = os.environ.get('SHEET_ID', '').strip()
+          tab_name = os.environ.get('CONTENT_VERIFICATION_CACHE_TAB', 'Content_Verification_Cache').strip() or 'Content_Verification_Cache'
+          sa_json = os.environ.get('GOOGLE_SERVICE_ACCOUNT_JSON', '').strip()
+          if not sheet_id or not sa_json:
+              write_empty('missing_sheet_or_service_account')
+              sys.exit(0)
+
+          creds = service_account.Credentials.from_service_account_info(
+              json.loads(sa_json),
+              scopes=['https://www.googleapis.com/auth/spreadsheets.readonly'],
+          )
+          service = build('sheets', 'v4', credentials=creds, cache_discovery=False)
+          try:
+              values = service.spreadsheets().values().get(
+                  spreadsheetId=sheet_id,
+                  range=f'{tab_name}!A:Z',
+                  majorDimension='ROWS',
+              ).execute(num_retries=3).get('values', []) or []
+          except HttpError as exc:
+              if getattr(exc.resp, 'status', None) == 400:
+                  write_empty('cache_tab_missing')
+                  sys.exit(0)
+              raise
+
+          if len(values) < 2:
+              write_empty('cache_tab_without_rows')
+              sys.exit(0)
+
+          header = [norm(name) for name in values[0]]
+          items = []
+          for raw in values[1:]:
+              row = {header[i]: norm(raw[i]) if i < len(raw) else '' for i in range(len(header)) if header[i]}
+              if any(row.values()):
+                  items.append(row)
+
+          os.makedirs('data', exist_ok=True)
+          with open('data/content-verification-cache.json', 'w', encoding='utf-8') as handle:
+              json.dump({'items': items, 'meta': {'status': 'ok', 'tab': tab_name}}, handle, ensure_ascii=False, indent=2)
+              handle.write('\n')
+          print(f'✅ Verification cache exported from {tab_name}: {len(items)} rows')
+          PY
+          test -s data/content-verification-cache.json
+      # === END BLOCK: CONTENT_QUALITY_EXPORT_VERIFICATION_CACHE_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_RUN_AUDIT_V1 | Zweck: fuehrt den eigentlichen Guard gegen Sheet-, DB- und Activity-Quellen aus; Umfang: Report in JSON/Markdown ohne fachliche Auto-Aenderung ===
+      - name: Run Content Quality Audit
+        shell: bash
+        run: |
+          set -e
+          echo "=== Content Quality Audit: start ==="
+          echo "scope=${AUDIT_SCOPE}"
+          echo "base_url=${APP_BASE_URL}"
+          echo "cache_json=data/content-verification-cache.json"
+          echo "ai_max_candidates=${AI_VERIFICATION_MAX_CANDIDATES:-12}"
+          echo "python=$(python --version)"
+          echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          python -u scripts/content-quality-audit.py \
+            --scope "$AUDIT_SCOPE" \
+            --network \
+            --base-url "$APP_BASE_URL" \
+            --verification-cache-json data/content-verification-cache.json \
+            --ai-candidates-json data/content-ai-verification-candidates.json \
+            --ai-max-candidates "${AI_VERIFICATION_MAX_CANDIDATES:-12}" \
+            --output-json data/content-quality-report.json \
+            --output-md data/content-quality-report.md
+
+          echo "=== Content Quality Audit: report files ==="
+          ls -lh data/content-quality-report.json data/content-quality-report.md data/content-ai-verification-candidates.json
+          echo "finished_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          echo "=== Content quality summary ==="
+          python - <<'PY'
+          import json
+          report = json.load(open('data/content-quality-report.json', encoding='utf-8'))
+          print(json.dumps(report['summary'], ensure_ascii=False, indent=2), flush=True)
+          PY
+      # === END BLOCK: CONTENT_QUALITY_RUN_AUDIT_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V2 | Zweck: schreibt offene Content-Verification-Faelle in Content_Audit/Content_Audit_Staging und erhaelt Review-Status bis zum naechsten Prueftermin; Umfang: ersetzt Tab-Inhalt, schreibt keine fachlichen Daten zurueck ===
+      - name: Write Content_Audit sheet tab
+        shell: bash
+        env:
+          SHEET_ID: ${{ env.BE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -e
+          python - <<'PY'
+          import json, os, sys
+          from datetime import date, datetime
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
+          from googleapiclient.errors import HttpError
+
+          def fail(msg):
+              print(f"❌ {msg}", file=sys.stderr)
+              sys.exit(1)
+
+          def norm(value):
+              return str(value or "").strip()
+
+          def parse_date(value):
+              raw = norm(value)[:10]
+              try:
+                  return datetime.strptime(raw, "%Y-%m-%d").date()
+              except Exception:
+                  return None
+
+          sheet_id = os.environ.get("SHEET_ID", "").strip()
+          tab_name = os.environ.get("CONTENT_AUDIT_TAB", "Content_Audit").strip() or "Content_Audit"
+          sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+          if not sheet_id:
+              fail("ENV SHEET_ID fehlt.")
+          if not sa_json:
+              fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
+
+          report = json.load(open("data/content-quality-report.json", encoding="utf-8"))
+          issues = report.get("issues") or []
+          sheet_issues = [item for item in issues if item.get("severity") in {"critical", "review_needed", "warning"}]
+          meta = report.get("meta") or {}
+          summary = report.get("summary") or {}
+
+          scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+          creds = service_account.Credentials.from_service_account_info(json.loads(sa_json), scopes=scopes)
+          service = build("sheets", "v4", credentials=creds, cache_discovery=False)
+
+          spreadsheet = service.spreadsheets().get(spreadsheetId=sheet_id).execute()
+          sheets = spreadsheet.get("sheets", [])
+          existing = {s.get("properties", {}).get("title"): s.get("properties", {}).get("sheetId") for s in sheets}
+
+          if tab_name not in existing:
+              service.spreadsheets().batchUpdate(
+                  spreadsheetId=sheet_id,
+                  body={"requests": [{"addSheet": {"properties": {"title": tab_name}}}]},
+              ).execute()
+              print(f"✅ Sheet tab angelegt: {tab_name}")
+
+          header = [
+              "severity",
+              "status",
+              "content_type",
+              "source_system",
+              "process_category",
+              "correction_owner",
+              "workbench_group",
+              "automation_policy",
+              "content_id",
+              "title",
+              "date",
+              "issue_code",
+              "issue_text",
+              "recommended_action",
+              "source_url",
+              "suggested_url",
+              "suggested_url_label",
+              "suggestion_reason",
+              "suggested_visual_key",
+              "suggested_visual_motif",
+              "suggested_visual_motif_role",
+              "visual_asset_status",
+              "evidence_status",
+              "evidence_summary",
+              "evidence_checked_fields",
+              "evidence_missing_fields",
+              "evidence_field_statuses",
+              "verification_key",
+              "verification_status",
+              "verified_by",
+              "last_verified_at",
+              "verified_until",
+              "verification_reason",
+              "better_source_url",
+              "field_findings_json",
+              "source_fingerprint",
+              "content_fingerprint",
+              "next_check_at",
+              "ai_candidate_priority",
+              "ai_candidate_reason",
+              "public_url",
+              "first_seen_at",
+              "last_seen_at",
+              "occurrence_count",
+              "auto_fix_allowed",
+              "auto_fix_done",
+              "review_note",
+              "verified_at",
+              "next_review_at",
+              "action_state",
+          ]
+
+          generated_at = meta.get("generated_at", "")
+          generated_day = parse_date(generated_at) or date.today()
+
+          previous_by_key = {}
+          try:
+              previous = service.spreadsheets().values().get(
+                  spreadsheetId=sheet_id,
+                  range=f"{tab_name}!A:AZ",
+                  majorDimension="ROWS",
+              ).execute().get("values", []) or []
+          except HttpError:
+              previous = []
+
+          previous_rows = []
+          if len(previous) >= 3:
+              prev_header = [norm(name) for name in previous[2]]
+              prev_index = {name: idx for idx, name in enumerate(prev_header) if name}
+
+              def prev_value(row, name):
+                  idx = prev_index.get(name)
+                  if idx is None or idx >= len(row):
+                      return ""
+                  return norm(row[idx])
+
+              for row in previous[3:]:
+                  previous_row = {name: prev_value(row, name) for name in prev_header if name}
+                  if any(previous_row.values()):
+                      previous_rows.append(previous_row)
+
+                  key = "|".join([
+                      prev_value(row, "content_type"),
+                      prev_value(row, "source_system"),
+                      prev_value(row, "content_id"),
+                      prev_value(row, "issue_code"),
+                      prev_value(row, "source_url"),
+                  ])
+                  if key.strip("|"):
+                      previous_by_key[key] = {
+                          "status": prev_value(row, "status") or "open",
+                          "first_seen_at": prev_value(row, "first_seen_at") or generated_at,
+                          "occurrence_count": prev_value(row, "occurrence_count") or "1",
+                          "review_note": prev_value(row, "review_note"),
+                          "verified_at": prev_value(row, "verified_at"),
+                          "next_review_at": prev_value(row, "next_review_at"),
+                          "action_state": prev_value(row, "action_state"),
+                          "verification_key": prev_value(row, "verification_key"),
+                          "verification_status": prev_value(row, "verification_status"),
+                          "verified_by": prev_value(row, "verified_by"),
+                          "last_verified_at": prev_value(row, "last_verified_at"),
+                          "verified_until": prev_value(row, "verified_until"),
+                          "verification_reason": prev_value(row, "verification_reason"),
+                          "better_source_url": prev_value(row, "better_source_url"),
+                          "field_findings_json": prev_value(row, "field_findings_json"),
+                          "source_fingerprint": prev_value(row, "source_fingerprint"),
+                          "content_fingerprint": prev_value(row, "content_fingerprint"),
+                          "next_check_at": prev_value(row, "next_check_at"),
+                      }
+
+          rows = [
+              ["generated_at", generated_at, "scope", meta.get("scope", ""), "network_checks", str(meta.get("network_checks", "")), "summary", json.dumps(summary, ensure_ascii=False)],
+              [],
+              header,
+          ]
+
+          open_statuses = {"", "open"}
+          deferred_statuses = {"checked", "verified", "corrected", "snoozed"}
+          persistent_statuses = {"patch_needed", "source_unavailable", "blocked"}
+
+          def cached_previous_value(previous_item, name, current_value=""):
+              value = previous_item.get(name, "") if isinstance(previous_item, dict) else ""
+              return value if value else current_value
+
+          for item in sheet_issues:
+              key = "|".join([
+                  item.get("content_type", ""),
+                  item.get("source_system", ""),
+                  item.get("content_id", ""),
+                  item.get("issue_code", ""),
+                  item.get("source_url", ""),
+              ])
+              previous_item = previous_by_key.get(key, {})
+              first_seen_at = previous_item.get("first_seen_at") or generated_at
+              try:
+                  occurrence_count = str(int(previous_item.get("occurrence_count") or "0") + 1) if previous_item else "1"
+              except ValueError:
+                  occurrence_count = "1"
+
+              previous_status = previous_item.get("status", "open")
+              previous_next = previous_item.get("next_review_at", "")
+              previous_next_day = parse_date(previous_next)
+
+              status = item.get("status", "open") or "open"
+              review_note = previous_item.get("review_note", "")
+              verified_at = previous_item.get("verified_at", "")
+              next_review_at = previous_item.get("next_review_at", "")
+              action_state = previous_item.get("action_state", "")
+
+              if previous_status in persistent_statuses:
+                  status = previous_status
+              elif previous_status in deferred_statuses and previous_next_day and previous_next_day > generated_day:
+                  status = previous_status
+              elif previous_status in deferred_statuses and previous_next_day and previous_next_day <= generated_day:
+                  status = "open"
+                  action_state = "review_due_again"
+              elif previous_status not in open_statuses and previous_status not in deferred_statuses:
+                  status = previous_status
+
+              verification_status = item.get("verification_status", "")
+              verified_by = item.get("verified_by", "")
+              last_verified_at = item.get("last_verified_at", "")
+              verified_until = item.get("verified_until", "")
+              verification_reason = item.get("verification_reason", "")
+              better_source_url = item.get("better_source_url", "")
+              field_findings_json = item.get("field_findings_json", "")
+              source_fingerprint = item.get("source_fingerprint", "")
+              content_fingerprint = item.get("content_fingerprint", "")
+              next_check_at = item.get("next_check_at", "")
+
+              if previous_item.get("verification_status"):
+                  verification_status = cached_previous_value(previous_item, "verification_status", verification_status)
+                  verified_by = cached_previous_value(previous_item, "verified_by", verified_by)
+                  last_verified_at = cached_previous_value(previous_item, "last_verified_at", last_verified_at)
+                  verified_until = cached_previous_value(previous_item, "verified_until", verified_until)
+                  verification_reason = cached_previous_value(previous_item, "verification_reason", verification_reason)
+                  better_source_url = cached_previous_value(previous_item, "better_source_url", better_source_url)
+                  field_findings_json = cached_previous_value(previous_item, "field_findings_json", field_findings_json)
+                  source_fingerprint = cached_previous_value(previous_item, "source_fingerprint", source_fingerprint)
+                  content_fingerprint = cached_previous_value(previous_item, "content_fingerprint", content_fingerprint)
+                  next_check_at = cached_previous_value(previous_item, "next_check_at", next_check_at)
+
+              rows.append([
+                  item.get("severity", ""),
+                  status,
+                  item.get("content_type", ""),
+                  item.get("source_system", ""),
+                  item.get("process_category", ""),
+                  item.get("correction_owner", ""),
+                  item.get("workbench_group", ""),
+                  item.get("automation_policy", ""),
+                  item.get("content_id", ""),
+                  item.get("title", ""),
+                  item.get("date", ""),
+                  item.get("issue_code", ""),
+                  item.get("issue_text", ""),
+                  item.get("recommended_action", ""),
+                  item.get("source_url", ""),
+                  item.get("suggested_url", ""),
+                  item.get("suggested_url_label", ""),
+                  item.get("suggestion_reason", ""),
+                  item.get("suggested_visual_key", ""),
+                  item.get("suggested_visual_motif", ""),
+                  item.get("suggested_visual_motif_role", ""),
+                  item.get("visual_asset_status", ""),
+                  item.get("evidence_status", ""),
+                  item.get("evidence_summary", ""),
+                  item.get("evidence_checked_fields", ""),
+                  item.get("evidence_missing_fields", ""),
+                  item.get("evidence_field_statuses", ""),
+                  item.get("verification_key", ""),
+                  verification_status,
+                  verified_by,
+                  last_verified_at,
+                  verified_until,
+                  verification_reason,
+                  better_source_url,
+                  field_findings_json,
+                  source_fingerprint,
+                  content_fingerprint,
+                  next_check_at,
+                  item.get("ai_candidate_priority", ""),
+                  item.get("ai_candidate_reason", ""),
+                  item.get("public_url", ""),
+                  first_seen_at,
+                  generated_at,
+                  occurrence_count,
+                  item.get("auto_fix_allowed", ""),
+                  item.get("auto_fix_done", ""),
+                  review_note,
+                  verified_at,
+                  next_review_at,
+                  action_state,
+              ])
+
+          service.spreadsheets().values().clear(
+              spreadsheetId=sheet_id,
+              range=f"{tab_name}!A:AZ",
+              body={},
+          ).execute()
+          service.spreadsheets().values().update(
+              spreadsheetId=sheet_id,
+              range=f"{tab_name}!A1",
+              valueInputOption="RAW",
+              body={"values": rows},
+          ).execute()
+
+          cache_tab = os.environ.get("CONTENT_VERIFICATION_CACHE_TAB", "Content_Verification_Cache").strip() or "Content_Verification_Cache"
+          spreadsheet = service.spreadsheets().get(spreadsheetId=sheet_id).execute()
+          sheets = spreadsheet.get("sheets", [])
+          existing = {s.get("properties", {}).get("title"): s.get("properties", {}).get("sheetId") for s in sheets}
+          cache_header = [[
+              "verification_key",
+              "content_type",
+              "source_system",
+              "content_id",
+              "title",
+              "source_url",
+              "verification_status",
+              "verified_by",
+              "last_verified_at",
+              "verified_until",
+              "verification_reason",
+              "source_fingerprint",
+              "content_fingerprint",
+              "next_check_at",
+              "better_source_url",
+              "field_findings_json",
+          ]]
+          acceptance_tab = os.environ.get("CONTENT_VERIFICATION_ACCEPTANCE_TAB", "Content_Verification_Acceptance").strip() or "Content_Verification_Acceptance"
+          acceptance_header = [[
+              "verification_key",
+              "verification_status",
+              "verified_by",
+              "last_verified_at",
+              "verified_until",
+              "verification_reason",
+              "better_source_url",
+              "field_findings_json",
+              "source_fingerprint",
+              "content_fingerprint",
+              "content_type",
+              "source_system",
+              "content_id",
+              "title",
+              "source_url",
+              "action_state",
+              "processed_at",
+          ]]
+          if cache_tab not in existing:
+              service.spreadsheets().batchUpdate(
+                  spreadsheetId=sheet_id,
+                  body={"requests": [{"addSheet": {"properties": {"title": cache_tab}}}]},
+              ).execute()
+              service.spreadsheets().values().update(
+                  spreadsheetId=sheet_id,
+                  range=f"{cache_tab}!A1",
+                  valueInputOption="RAW",
+                  body={"values": cache_header},
+              ).execute()
+              print(f"✅ Verification cache tab angelegt: {cache_tab}")
+          else:
+              current_header = service.spreadsheets().values().get(
+                  spreadsheetId=sheet_id,
+                  range=f"{cache_tab}!A1:P1",
+                  majorDimension="ROWS",
+              ).execute().get("values", []) or []
+              if not current_header or not any(current_header[0]):
+                  service.spreadsheets().values().update(
+                      spreadsheetId=sheet_id,
+                      range=f"{cache_tab}!A1",
+                      valueInputOption="RAW",
+                      body={"values": cache_header},
+                  ).execute()
+                  print(f"✅ Verification cache header gesetzt: {cache_tab}")
+
+          if acceptance_tab not in existing:
+              service.spreadsheets().batchUpdate(
+                  spreadsheetId=sheet_id,
+                  body={"requests": [{"addSheet": {"properties": {"title": acceptance_tab}}}]},
+              ).execute()
+              service.spreadsheets().values().update(
+                  spreadsheetId=sheet_id,
+                  range=f"{acceptance_tab}!A1",
+                  valueInputOption="RAW",
+                  body={"values": acceptance_header},
+              ).execute()
+              print(f"✅ Verification acceptance tab angelegt: {acceptance_tab}")
+          else:
+              current_acceptance_header = service.spreadsheets().values().get(
+                  spreadsheetId=sheet_id,
+                  range=f"{acceptance_tab}!A1:Q1",
+                  majorDimension="ROWS",
+              ).execute().get("values", []) or []
+              if not current_acceptance_header or not any(current_acceptance_header[0]):
+                  service.spreadsheets().values().update(
+                      spreadsheetId=sheet_id,
+                      range=f"{acceptance_tab}!A1",
+                      valueInputOption="RAW",
+                      body={"values": acceptance_header},
+                  ).execute()
+                  print(f"✅ Verification acceptance header gesetzt: {acceptance_tab}")
+
+          # === BEGIN BLOCK: CONTENT_QUALITY_VERIFICATION_CACHE_WRITEBACK_V2 | Zweck: uebernimmt bestaetigte KI-/manuelle Faktenchecks aus separater Acceptance-Schicht oder vorherigem Content_Audit in den persistenten Pruefcache; Umfang: confirmed-only Cache-Merge ohne fachliche Datenaenderung ===
+          def build_cache_item_from_audit_row(row):
+              if norm(row.get("process_category")) != "ai_verification_candidate":
+                  return None, "not_ai_verification_candidate"
+              if norm(row.get("verification_status")).lower() != "confirmed":
+                  return None, "not_confirmed"
+
+              key = norm(row.get("verification_key"))
+              source_fingerprint = norm(row.get("source_fingerprint"))
+              content_fingerprint = norm(row.get("content_fingerprint"))
+              verified_until_raw = norm(row.get("verified_until") or row.get("next_review_at") or row.get("next_check_at"))
+              verified_until_day = parse_date(verified_until_raw)
+              if not key:
+                  return None, "missing_verification_key"
+              if not source_fingerprint or not content_fingerprint:
+                  return None, "missing_fingerprint"
+              if verified_until_day is None:
+                  return None, "missing_or_invalid_verified_until"
+              if verified_until_day < generated_day:
+                  return None, "verified_until_expired"
+
+              last_verified_at = norm(row.get("last_verified_at") or row.get("verified_at") or generated_at)
+              next_check_at = norm(row.get("next_check_at") or verified_until_day.isoformat())
+              verification_reason = norm(
+                  row.get("verification_reason")
+                  or row.get("review_note")
+                  or "Im Content_Audit als confirmed akzeptiert."
+              )
+
+              return {
+                  "verification_key": key,
+                  "content_type": norm(row.get("content_type")),
+                  "source_system": norm(row.get("source_system")),
+                  "content_id": norm(row.get("content_id")),
+                  "title": norm(row.get("title")),
+                  "source_url": norm(row.get("source_url")),
+                  "verification_status": "confirmed",
+                  "verified_by": norm(row.get("verified_by") or "user"),
+                  "last_verified_at": last_verified_at,
+                  "verified_until": verified_until_day.isoformat(),
+                  "verification_reason": verification_reason,
+                  "source_fingerprint": source_fingerprint,
+                  "content_fingerprint": content_fingerprint,
+                  "next_check_at": next_check_at,
+                  "better_source_url": norm(row.get("better_source_url") or row.get("suggested_url")),
+                  "field_findings_json": norm(row.get("field_findings_json")),
+              }, "accepted"
+
+          context_by_verification_key = {}
+          for item in sheet_issues:
+              key = norm(item.get("verification_key"))
+              if key:
+                  context_by_verification_key[key] = {str(k): norm(v) for k, v in item.items()}
+          for previous_row in previous_rows:
+              key = norm(previous_row.get("verification_key"))
+              if key and key not in context_by_verification_key:
+                  context_by_verification_key[key] = previous_row
+
+          def read_acceptance_rows():
+              try:
+                  values = service.spreadsheets().values().get(
+                      spreadsheetId=sheet_id,
+                      range=f"{acceptance_tab}!A:Z",
+                      majorDimension="ROWS",
+                  ).execute().get("values", []) or []
+              except HttpError:
+                  return []
+              if len(values) < 2:
+                  return []
+              row_header = [norm(name) for name in values[0]]
+              out = []
+              for raw in values[1:]:
+                  row = {
+                      row_header[i]: norm(raw[i]) if i < len(raw) else ""
+                      for i in range(len(row_header))
+                      if row_header[i]
+                  }
+                  if any(row.values()):
+                      out.append(row)
+              return out
+
+          def merge_acceptance_context(row):
+              key = norm(row.get("verification_key"))
+              merged = dict(context_by_verification_key.get(key, {})) if key else {}
+              for name, value in row.items():
+                  if norm(value):
+                      merged[name] = norm(value)
+              if key and not norm(merged.get("verification_key")):
+                  merged["verification_key"] = key
+              if key and not norm(merged.get("process_category")):
+                  merged["process_category"] = "ai_verification_candidate"
+              return merged
+
+          acceptance_rows = read_acceptance_rows()
+          accepted_cache_by_key = {}
+          accepted_source_by_key = {}
+          cache_skip_counts = {}
+
+          for previous_row in previous_rows:
+              cache_item, cache_reason = build_cache_item_from_audit_row(previous_row)
+              if cache_item:
+                  key = cache_item["verification_key"]
+                  accepted_cache_by_key[key] = cache_item
+                  accepted_source_by_key[key] = "previous_audit"
+              else:
+                  cache_skip_counts[cache_reason] = cache_skip_counts.get(cache_reason, 0) + 1
+
+          for acceptance_row in acceptance_rows:
+              merged_row = merge_acceptance_context(acceptance_row)
+              cache_item, cache_reason = build_cache_item_from_audit_row(merged_row)
+              if cache_item:
+                  key = cache_item["verification_key"]
+                  accepted_cache_by_key[key] = cache_item
+                  accepted_source_by_key[key] = "acceptance_tab"
+              else:
+                  cache_key = f"acceptance_{cache_reason}"
+                  cache_skip_counts[cache_key] = cache_skip_counts.get(cache_key, 0) + 1
+
+          accepted_cache_items = list(accepted_cache_by_key.values())
+
+          cache_header_values = cache_header[0]
+          existing_cache_by_key = {}
+          try:
+              cache_values = service.spreadsheets().values().get(
+                  spreadsheetId=sheet_id,
+                  range=f"{cache_tab}!A:Z",
+                  majorDimension="ROWS",
+              ).execute().get("values", []) or []
+          except HttpError:
+              cache_values = []
+
+          if len(cache_values) >= 2:
+              existing_cache_header = [norm(name) for name in cache_values[0]]
+              for raw in cache_values[1:]:
+                  cache_row = {
+                      existing_cache_header[i]: norm(raw[i]) if i < len(raw) else ""
+                      for i in range(len(existing_cache_header))
+                      if existing_cache_header[i]
+                  }
+                  key = norm(cache_row.get("verification_key"))
+                  if key:
+                      existing_cache_by_key[key] = cache_row
+
+          existing_cache_rows_before_merge = len(existing_cache_by_key)
+          for item in accepted_cache_items:
+              existing_cache_by_key[item["verification_key"]] = item
+
+          if accepted_cache_items:
+              merged_cache_rows = []
+              for item in sorted(
+                  existing_cache_by_key.values(),
+                  key=lambda row: (norm(row.get("content_type")), norm(row.get("title")), norm(row.get("content_id"))),
+              ):
+                  merged_cache_rows.append([norm(item.get(name)) for name in cache_header_values])
+
+              service.spreadsheets().values().clear(
+                  spreadsheetId=sheet_id,
+                  range=f"{cache_tab}!A:Z",
+                  body={},
+              ).execute()
+              service.spreadsheets().values().update(
+                  spreadsheetId=sheet_id,
+                  range=f"{cache_tab}!A1",
+                  valueInputOption="RAW",
+                  body={"values": [cache_header_values] + merged_cache_rows},
+              ).execute()
+              cache_writeback_status = "written"
+          else:
+              cache_writeback_status = "no_confirmed_rows"
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/content-verification-cache-writeback.json", "w", encoding="utf-8") as handle:
+              json.dump({
+                  "status": cache_writeback_status,
+                  "tab": cache_tab,
+                  "accepted_count": len(accepted_cache_items),
+                  "acceptance_rows_read": len(acceptance_rows),
+                  "accepted_sources": accepted_source_by_key,
+                  "existing_cache_rows_before_merge": existing_cache_rows_before_merge,
+                  "cache_rows_after_merge": len(existing_cache_by_key),
+                  "skip_counts": cache_skip_counts,
+                  "accepted": [
+                      {
+                          "verification_key": item.get("verification_key", ""),
+                          "content_id": item.get("content_id", ""),
+                          "title": item.get("title", ""),
+                          "verified_until": item.get("verified_until", ""),
+                          "source": accepted_source_by_key.get(item.get("verification_key", ""), ""),
+                      }
+                      for item in accepted_cache_items
+                  ],
+              }, handle, ensure_ascii=False, indent=2)
+              handle.write("\n")
+
+          print(f"✅ Verification cache writeback: {cache_writeback_status}, accepted={len(accepted_cache_items)}")
+          # === END BLOCK: CONTENT_QUALITY_VERIFICATION_CACHE_WRITEBACK_V2 ===
+
+          print(f"✅ Content Audit written to {tab_name}: {len(sheet_issues)} issues")
+          PY
+      # === END BLOCK: CONTENT_QUALITY_WRITE_SHEET_TAB_V2 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 | Zweck: macht Reports im Workflow nachvollziehbar; Umfang: Artefakt-Upload ohne Repo-Commit ===
+      - name: Upload audit reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-quality-report-${{ env.AUDIT_SCOPE }}
+          path: |
+            data/content-quality-report.json
+            data/content-quality-report.md
+            data/content-ai-verification-candidates.json
+            data/content-verification-cache.json
+            data/content-verification-cache-writeback.json
+      # === END BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 ===

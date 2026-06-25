@@ -89,6 +89,36 @@ Never stack a new patch on unrelated uncommitted WIP.
 - Production KI workflows run on `main` only and must target the live Inbox/push path.
 - `Inbox → Events` import is production-only and must not run on `staging`.
 
+### Content Quality Guard rule
+
+- Regular content quality checks must follow the actual source ownership:
+  1. Google Sheet tab `Events` for editorial events.
+  2. Public DB/API feed `/api/events/public.php` for approved organizer events.
+  3. `data/offers.json` for Activities.
+- Audit results are written to `Content_Audit` on live/main and `Content_Audit_Staging` on staging.
+- The private `/inbox/` is the human workbench: event candidates and content-quality findings must remain separate queues, but use the same review UI.
+- The audit is action-only for the user-facing workbench:
+  - every run checks the relevant source set again,
+  - safe technical findings are auto-handled or silently observed,
+  - correct/benign results do not become review tasks,
+  - only findings that cannot be solved safely by the audit itself appear as open work.
+- Harmless canonical redirects, language-path redirects and one-off transient network timeouts are not user tasks, but must be rechecked by cheap technical checks on the next run.
+- HTTP 429, bot protection, blocked pages, repeated timeouts or weak fact confirmation are not automatically user tasks. They should become typed `ai_verification_candidate` / retry candidates before they are escalated to the Inbox.
+- AI verification must be a targeted fallback, not a replacement for the audit. Do not send all content through AI by default.
+- AI verification must use a cache/validity model. A fresh `confirmed` result with unchanged `source_fingerprint` and `content_fingerprint` must suppress repeat KI checks until `verified_until` or `next_check_at` requires it.
+- Manual proof tests or reviewed confirmations must use `Content_Verification_Acceptance` on `main` and `Content_Verification_Acceptance_Staging` on `staging`; do not ask the user to edit generated `Content_Audit` rows or technical fingerprints directly.
+- Content-search feedback must be derived from typed audit findings, Inbox decisions, rejection reasons and KI verification outcomes. Do not rely on the user manually rewriting KI search rules every few weeks.
+- Feedback-loop automation may improve search prompts, source preferences and validation priorities, but it must not silently mutate canonical Event, Activity or DB data.
+- KI checks must be budgeted and prioritized by risk, for example near-term Events, blocked official sources, source/ticket conflicts, or stale Activity opening data.
+- Audit workflows may write audit rows, summaries, verification metadata and review recommendations, but must not silently overwrite editorial source rows.
+- Deterministic auto-handling is allowed only for safe technical cases, for example expired Events being excluded by the build/runtime feed, benign redirects being suppressed as tasks, or duplicate stale findings being kept out of the active queue.
+- Semantically uncertain findings, such as changed times, cancellations, moved locations, unreachable sources, problematic redirects, ticket portals as primary Event source or stale Activity availability, must become `review_needed`, `warning` or a typed correction candidate, not a blind data mutation.
+- The user should not be instructed to edit Google Sheets directly. For Sheet-owned Events, `/inbox/` → Content-Prüfung is the intended correction surface; an explicit reviewed action may write back to the canonical Google Sheet `Events` tab.
+- Approved organizer events are DB/API-owned; their correction path must stay in the review/admin/DB workflow and must not be routed through the editorial Sheet.
+- Activities remain repo-/JSON-owned in V1. Activity corrections must be collected as visible repo patch candidates unless a future owner contract explicitly moves them into a Sheet-/DB-backed source.
+- KI facts-check results must be stored as structured states such as `confirmed`, `conflict`, `better_source_found`, `not_found` or `uncertain`. Free-text KI output alone is not sufficient for automated routing.
+- Event visual-key and concrete image-fit correctness is a separate quality domain. It may be surfaced by the Content Guard as `visual_fit_candidate`, but rule/motif changes, image production and pool updates must be handled through the Visual Workflow and not mixed into generic link/date/opening-status fixes.
+
 ---
 
 ## 2. PROOF BEFORE PATCH
@@ -115,6 +145,43 @@ Rules:
 - Do not treat old routes, leftover files, or repo presence alone as canonical product truth.
 - Do not redefine product rules from `Produktvertrag.md` inside `MASTER.md`, UI copy, or ad-hoc chat reasoning.
 - If a contradiction is found, resolve it at the canonical source first.
+
+
+---
+
+## 3A. DOCUMENTATION GOVERNANCE
+
+Documentation is part of project control. It must be current-first and role-clean so future ChatGPT work does not reactivate obsolete tasks.
+
+### Canonical document roles
+
+- `MASTER.md` = short strategic control, current focus, frozen areas, permanent product direction.
+- `ROADMAP.md` = current tactical backlog, active/geparkte/wartende workpacks, next proofs.
+- `ENGINEERING.md` = hard working rules, patch modes, audits, fallback workflows.
+- `TEST_STATUS.md` = proof archive and current test index, not product definition.
+- `Produktvertrag.md` = product model, prices, tariffs, funnel/product logic.
+
+### Current-first rule
+
+- Active steering information belongs at the top of `MASTER.md`, `ROADMAP.md` or the index of `TEST_STATUS.md`.
+- Long history must not be appended to `MASTER.md` as active context.
+- `ROADMAP.md` must not become an undifferentiated archive; old blocks may remain only when the current top block clearly overrides them.
+- `TEST_STATUS.md` may stay long, but must keep a current index near the top.
+- Historical route names, old screenshots and old test paths in `TEST_STATUS.md` are evidence, not current architecture.
+
+### Documentation patch rule
+
+- A Doku patch must state which owner document it changes and why.
+- Prefer small current-state/index updates over mass rewriting old history.
+- If an old block is obsolete but still useful as evidence, leave it in `TEST_STATUS.md`; do not copy it into `MASTER.md` or the active ROADMAP section.
+- If a contradiction is found, fix the canonical source first and only then adjust secondary references.
+- Do not add broad future plans unless they become an active, geparkt or wartend workpack.
+
+### Archive rule
+
+- Use archive movement only for clearly obsolete large documentation clusters.
+- Do not create `docs/archive/` churn just to make a small current-state correction.
+- Archive moves, deletions or file splits are their own workpack and should not be mixed with UI, feature or visual patches.
 
 ---
 
@@ -263,11 +330,12 @@ Patch the owning file first.
 
 Ownership:
 
-- `css/style.css` = public CSS entrypoint / import order only
-- `css/base.css` = tokens, foundation, app-wide primitives
-- `css/pages.css` = content/static page styling
+- `css/style.css` = public CSS entrypoint / import order only; no selectors, no visual fixes
+- `css/base.css` = tokens, reset, foundation, app-wide primitives
+- `css/pages.css` = public content pages, static pages, funnel pages and legal pages
 - `css/components.css` = reusable UI components and component states
-- `css/home.css` = home, hero, feed, search-row layout
+- `css/home.css` = historical Discovery/Event/Activity shell owner; frozen against new large UI blocks
+- `css/today.css` = Today/Home-specific surface and recommendation layout
 - `css/overlays.css` = detailpanel, sheets, modals, overlay locks
 
 Rules:
@@ -276,6 +344,10 @@ Rules:
 - Layout fixes belong in the owning layout file, not in component files.
 - Overlay mechanics belong in `css/overlays.css`.
 - Cross-file fixes are allowed only if root cause proves they are necessary.
+- `css/home.css` must not be used as the default dumping ground for new visual patches.
+- New large CSS blocks require an owner decision first: existing owner, new owner file, or conscious extraction from an old owner.
+- If an existing owner block is touched, prefer replacing/consolidating that owner block over appending a later override block.
+- CSS governance is enforced by `tools/audit-css-governance.py`; do not bypass it to ship cosmetic patches.
 
 ---
 
@@ -329,8 +401,11 @@ Asset/versioning rules:
 
 - `css/style.css` is the public CSS entrypoint and must not be deleted.
 - `css/style.css` owns CSS import order only.
+- `css/style.css` must remain import-only; real selectors belong in owner files.
+- Public HTML files must load `/css/style.css` as the single CSS entrypoint.
+- Source-level CSS cache keys must stay consistent and are checked by `tools/audit-css-governance.py`.
 - Do not patch `css/style.css` for normal visual changes unless the import order or actual CSS entrypoint changes.
-- Do not manually bump asset query versions in multiple HTML files for normal CSS/JS edits.
+- Do not manually bump asset query versions in multiple HTML files for normal CSS/JS edits, except in an intentional CSS-governance/cache-key normalization patch.
 - The deploy workflow replaces existing `?v=...` asset references with the generated `BUILD_ID`.
 - Only touch asset references manually when a new asset is introduced, an asset is renamed, or a script/link tag is missing completely.
 
@@ -543,6 +618,21 @@ Fallback-Einschränkungen:
 - Bevorzugt werden konkrete Block-Ersetzungen mit eindeutigem BEGIN-/END-Marker oder vollständige kleine Dateiänderungen.
 - Nach manueller Änderung muss der Nutzer im GitHub-Diff prüfen, ob ausschließlich die beabsichtigten Dateien und Blöcke geändert wurden.
 - Wenn ein sicherer Git-Patch-Check nicht möglich ist, muss der Patch kleiner und deterministischer sein als im normalen Codespaces-Workflow.
+
+### ZIP-first Webupload-Fallback
+
+Wenn Codespaces nicht verfügbar ist und der Nutzer ein aktuelles Projekt-ZIP liefert, ist der bevorzugte Fallback für kleine bis mittlere Patches:
+
+1. Nutzer liefert eine aktuelle ZIP des Zielbranches.
+2. ChatGPT prüft die Baseline lokal gegen den Zielzustand.
+3. ChatGPT erstellt ein Patch-ZIP in echter Repo-Root-Struktur.
+4. Das Patch-ZIP enthält ausschließlich Dateien/Ordner, die ins Repo übernommen werden sollen.
+5. Keine Wrapper-/Hilfsdateien im Patch-ZIP: keine `README.txt`, keine `MANIFEST.json`, kein `UPLOAD_TO_REPO_ROOT`.
+6. Nutzer entpackt das Patch-ZIP und lädt den entpackten Inhalt per GitHub Drag & Drop auf den Zielbranch hoch.
+7. Nutzer wartet den Deploy ab und liefert danach eine neue ZIP zur finalen Prüfung.
+8. ChatGPT prüft den neuen ZIP-Stand gegen Zielzustand, Checks und mögliche Restverweise.
+
+Dieser Fallback ist bevorzugt für Doku-, HTML-, CSS-, statische JS-, kleine PHP- und kleine Tool-/Audit-Patches. Nicht bevorzugt ist er für große Refactorings, viele Löschungen, Dateiumbenennungen, komplexe Merge-Konflikte oder Asset-Massenänderungen.
 <!-- === END BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 === -->
 
 ## Eventdaten-Quelle: Sheet-first

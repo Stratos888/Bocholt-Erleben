@@ -231,6 +231,176 @@ function be_require_review_access(): void
 }
 /* === END BLOCK: BACKEND_REVIEW_ACCESS_GUARD_V1 === */
 
+
+/* === BEGIN BLOCK: BACKEND_GOOGLE_SHEETS_API_HELPERS_V1 | Zweck: erlaubt geschuetzten internen API-Endpunkten den Zugriff auf das kanonische Google Sheet ohne Composer-Abhaengigkeit; Umfang: Service-Account-JWT, Values-GET und Values-UPDATE === */
+function be_google_config(): array
+{
+    $config = be_get_config();
+    $google = $config['google'] ?? null;
+
+    if (!is_array($google)) {
+        throw new RuntimeException('Google config is missing.');
+    }
+
+    $sheetId = trim((string)($google['sheet_id'] ?? ''));
+    $serviceAccountJson = trim((string)($google['service_account_json'] ?? ''));
+
+    if ($sheetId === '' || $serviceAccountJson === '') {
+        throw new RuntimeException('Google config is incomplete.');
+    }
+
+    $serviceAccount = json_decode($serviceAccountJson, true);
+    if (!is_array($serviceAccount)) {
+        throw new RuntimeException('Google service account JSON is invalid.');
+    }
+
+    if (trim((string)($serviceAccount['client_email'] ?? '')) === '' || trim((string)($serviceAccount['private_key'] ?? '')) === '') {
+        throw new RuntimeException('Google service account credentials are incomplete.');
+    }
+
+    return [
+        'sheet_id' => $sheetId,
+        'service_account' => $serviceAccount,
+    ];
+}
+
+function be_google_base64url(string $value): string
+{
+    return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
+}
+
+function be_google_access_token(array $scopes): string
+{
+    static $cached = [];
+
+    $scope = implode(' ', $scopes);
+    $now = time();
+    if (isset($cached[$scope]) && is_array($cached[$scope]) && (int)($cached[$scope]['expires_at'] ?? 0) > ($now + 60)) {
+        return (string)$cached[$scope]['token'];
+    }
+
+    $google = be_google_config();
+    $account = $google['service_account'];
+
+    $header = be_google_base64url(json_encode(['alg' => 'RS256', 'typ' => 'JWT'], JSON_THROW_ON_ERROR));
+    $claim = be_google_base64url(json_encode([
+        'iss' => (string)$account['client_email'],
+        'scope' => $scope,
+        'aud' => 'https://oauth2.googleapis.com/token',
+        'iat' => $now,
+        'exp' => $now + 3600,
+    ], JSON_THROW_ON_ERROR));
+
+    $unsigned = $header . '.' . $claim;
+    $privateKey = (string)$account['private_key'];
+    $signature = '';
+    if (!openssl_sign($unsigned, $signature, $privateKey, OPENSSL_ALGO_SHA256)) {
+        throw new RuntimeException('Google JWT signature failed.');
+    }
+
+    $jwt = $unsigned . '.' . be_google_base64url($signature);
+    $body = http_build_query([
+        'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        'assertion' => $jwt,
+    ]);
+
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: application/x-www-form-urlencoded\r\nAccept: application/json\r\n",
+            'content' => $body,
+            'timeout' => 20,
+            'ignore_errors' => true,
+        ],
+    ]);
+
+    $raw = file_get_contents('https://oauth2.googleapis.com/token', false, $context);
+    $payload = is_string($raw) && $raw !== '' ? json_decode($raw, true) : null;
+    if (!is_array($payload) || trim((string)($payload['access_token'] ?? '')) === '') {
+        throw new RuntimeException('Google token request failed.');
+    }
+
+    $token = (string)$payload['access_token'];
+    $cached[$scope] = [
+        'token' => $token,
+        'expires_at' => $now + (int)($payload['expires_in'] ?? 3600),
+    ];
+
+    return $token;
+}
+
+function be_google_sheets_request(string $method, string $url, ?array $body = null): array
+{
+    $token = be_google_access_token(['https://www.googleapis.com/auth/spreadsheets']);
+    $headers = "Authorization: Bearer {$token}\r\nAccept: application/json\r\n";
+    $content = '';
+
+    if ($body !== null) {
+        $content = json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        $headers .= "Content-Type: application/json; charset=utf-8\r\n";
+    }
+
+    $context = stream_context_create([
+        'http' => [
+            'method' => $method,
+            'header' => $headers,
+            'content' => $content,
+            'timeout' => 30,
+            'ignore_errors' => true,
+        ],
+    ]);
+
+    $raw = file_get_contents($url, false, $context);
+    $payload = is_string($raw) && $raw !== '' ? json_decode($raw, true) : null;
+
+    $statusCode = 0;
+    if (isset($http_response_header) && is_array($http_response_header) && isset($http_response_header[0])) {
+        if (preg_match('/\s(\d{3})\s/', (string)$http_response_header[0], $match)) {
+            $statusCode = (int)$match[1];
+        }
+    }
+
+    if ($statusCode < 200 || $statusCode >= 300 || !is_array($payload)) {
+        throw new RuntimeException('Google Sheets request failed.');
+    }
+
+    return $payload;
+}
+
+function be_google_sheets_values_get(string $range): array
+{
+    $google = be_google_config();
+    $url = sprintf(
+        'https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s?majorDimension=ROWS',
+        rawurlencode($google['sheet_id']),
+        rawurlencode($range)
+    );
+
+    return be_google_sheets_request('GET', $url);
+}
+
+function be_google_sheets_values_update(string $range, array $values): array
+{
+    $google = be_google_config();
+    $url = sprintf(
+        'https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s?valueInputOption=RAW',
+        rawurlencode($google['sheet_id']),
+        rawurlencode($range)
+    );
+
+    return be_google_sheets_request('PUT', $url, [
+        'range' => $range,
+        'majorDimension' => 'ROWS',
+        'values' => $values,
+    ]);
+}
+
+function be_content_audit_tab_name(): string
+{
+    return be_app_env_value() === 'staging' ? 'Content_Audit_Staging' : 'Content_Audit';
+}
+/* === END BLOCK: BACKEND_GOOGLE_SHEETS_API_HELPERS_V1 === */
+
 function be_mail_encode_header(string $value): string
 {
     $clean = trim(preg_replace('/[\r\n]+/', ' ', $value) ?? '');

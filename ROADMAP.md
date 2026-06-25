@@ -18,74 +18,391 @@ Kanonische Rollen:
 
 ---
 
-<!-- === BEGIN BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_19 | Zweck: konsolidiert den aktuellen taktischen Fokus nach Main-Merge und Live-Smoke; Umfang: naechster Beweis, Freeze-Grenzen und nachgelagerte Prozesshaertung === -->
-## Aktuelle taktische Priorität – Stand 2026-06-19
+<!-- === BEGIN BLOCK: ROADMAP_INBOX_VISUAL_KEY_REVIEW_UI_2026_06_25 | Zweck: definiert den naechsten kleinen Workpack nach bestandenem Main-KI-Suchlauf-Handoff; Umfang: Visual-Key-Anzeige, Dropdown-Korrektur, Lernsignal, keine neue Bildproduktion === -->
+## Inbox Review – Visual Key sichtbar und änderbar machen (nächster Workpack)
 
-Dieser Block überschreibt ältere "nächster Workpack"-Formulierungen weiter unten, wenn sie dem aktuellen Stand widersprechen.
+Status: nächster empfohlener UI-/Prozess-Workpack nach bestandenem Main-Beweis für KI-Suchlauf, Manual Inbox, Visual-Key-Handoff und Live-Bildausspielung.
 
-### Abgeschlossen seit letztem Prioritätsblock
+### Ziel in einem Satz
 
-- `staging` wurde erfolgreich nach `main` gemerged.
-- Der Live-Bereich wurde manuell geprüft und wirkt stabil.
-- Der Desktop-Alignment-Fehler der drei Today-Cards wurde nach dem Merge behoben.
-- Event-Visual-Motif-Fit ist für den aktuellen Sheet-Stand abgeschlossen:
-  - keine offenen `gap_to_produce`-Motive
-  - keine offenen `candidate_to_integrate`-Motive
-  - keine offenen `review_rules`-Motive
-  - leerer Gap-Backlog für den geprüften Stand
+Die Inbox-PWA soll den von der KI vorgeschlagenen `visual_key` vor der Veröffentlichung sichtbar machen und redaktionell änderbar speichern, damit falsche Bildtypen vor Livegang korrigiert und später als Lernsignal genutzt werden können.
 
-### Nächster operativer Punkt
+### Auslöser
 
-Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main` bewerten.
+Im Main-Proof wurde der Fall `Bocholter Gesundheitstage` sichtbar:
 
-Geplanter Kontrollzeitpunkt:
+- KI-/Fallback-Logik führte zunächst zu `indoor_sport_competition`.
+- Live erschien dadurch ein Darts-/Sporthallenbild.
+- Fachlich korrekt war `business_messe_info`.
+- Nach manueller Korrektur in `Events.visual_key` und Deploy wurde das Bild korrekt ausgetauscht.
+- Der technische Handoff ist nach Apps-Script-Fix bestanden; die Review-UI ist aber noch blind gegenüber dem Bildtyp.
 
-- Dienstag, 2026-06-23, 11:00 Uhr.
+### Zielzustand V1
 
-Zu prüfen:
+In der Inbox-Karte für neue Events gibt es einen kompakten Bildtyp-Block:
 
-1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
-2. Das Dropdown für `Inbox.visual_key` enthält die erlaubten Keys aus `data/event_visual_pool.json`.
-3. Ein redaktionell geänderter `visual_key` bleibt beim Übernehmen erhalten.
-4. `Events.visual_key` wird korrekt geschrieben.
-5. Der spätere Build übernimmt den Key in die deployten Eventdaten.
-6. Event-Cards erhalten dadurch automatisch passende Bilder aus dem Event-Visual-Pool.
+- Aktueller `visual_key` sichtbar.
+- Dropdown mit den erlaubten Keys aus `event_visual_pool.json`.
+- Änderung wird vor `Übernehmen` im Sheet gespeichert oder beim Übernehmen mitgegeben.
+- Der finale Wert landet nach `Übernehmen` in `Events.visual_key`.
+- Optional: ursprünglicher KI-Vorschlag bleibt als separates Feld/Notiz auswertbar, damit spätere Suchlauf-Regeln lernen können.
 
-Wichtig: Eine Chat-Simulation oder ein `staging`-Workflow-Lauf ersetzt diesen Beweis nicht. Der vollständige Beweis muss auf `main` gegen die echte Google-Sheet-Kette erfolgen.
+### Akzeptanzkriterien
 
-### Aktuell gefreezt oder nicht erneut breit öffnen
+- Eine KI-Inbox-Zeile mit `visual_key` zeigt den Key in der PWA sichtbar an.
+- Der Nutzer kann den Key vor dem Übernehmen ändern.
+- Es gibt keine freien Tippfehlerwerte; Auswahl ist auf bekannte Pool-Keys begrenzt.
+- Nach `Übernehmen` steht der geänderte Wert in `Events.visual_key`.
+- `Deploy jetzt` veröffentlicht danach das passende Bild.
+- Der bestehende Apps-Script-Approve-Fix bleibt kompatibel.
 
-- Kein neuer breiter UI-/Feature-Workpack bis nach dem KI-/Inbox-Handoff-Beweis.
-- Event-Visual-Produktion nur bei neuem Sheet-Bedarf, neuem Gap-Backlog oder bewusster strategischer Poolentscheidung.
-- Event-Visual-Duplicate-Cleanup nur bei konkretem sichtbaren Symptom oder neuem Eventdatenstand öffnen.
-- Event-Card Normal State Polish bleibt gefreezt.
-- Event-Detailpanel bleibt gefreezt.
-- Activity-Öffnungsstatus-Massenpflege bleibt abgeschlossen; nur gezielte Sonderfälle.
+### Nicht-Ziel
 
-### Getrennter Folge-Workstream
+- Kein neues Event-Visual-System.
+- Keine neue Bildproduktion.
+- Keine Abschaffung der menschlichen Inbox-Prüfung.
+- Kein blindes automatisches Überschreiben von Eventdaten.
+- Kein vollständiger Self-Improving-Search-Feedback-Loop; dieser bleibt ein separater Content-Quality-Workpack.
 
-Activity-Premium-Visuals bleiben ein eigener Qualitäts-Workstream:
+### Verhältnis zum Feedback-Loop
 
-- ein exklusives Premium-Hauptbild pro Activity
-- keine Wiederverwendung aus dem Event-Visual-Pool
-- zuerst gezielte Bildrecherche/-bewertung
-- danach nur geprüfte, rechtlich saubere und qualitativ bessere Kandidaten integrieren
+Dieser Workpack ist die redaktionelle Eingabeschicht für spätere Automatisierung:
 
-### Nachgelagerter Prozessverbesserungs-Punkt
+`KI-Vorschlag -> redaktionell geänderter finaler visual_key -> strukturiertes Lernsignal -> bessere Suchlauf-/Mapping-Regeln`.
+<!-- === END BLOCK: ROADMAP_INBOX_VISUAL_KEY_REVIEW_UI_2026_06_25 === -->
 
-KI-/Inbox-Prozess erst nach dem Main-Handoff-Beweis konsolidieren.
+---
 
-Ziel:
-- `data/inbox_manual.json` nicht mehr als persistenten Repo-Puffer für temporäre Event-Kandidaten verwenden.
-- KI-/Manual-Kandidaten direkt oder über ein temporäres GitHub-Run-Artefakt in die Google-Sheet-Inbox überführen.
-- Import-/Cleanup-Rhythmus vereinheitlichen: wöchentlich passend zur KI-Suche plus manuell auslösbar bei Bedarf.
-- Prüfen, ob `duplikat` als finaler Inbox-Status im Cleanup mit archiviert werden soll.
+<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_FEEDBACK_LOOP_2026_06_25 | Zweck: definiert den naechsten Workpack nach abgeschlossenem KI-Faktencheck-Cache; Umfang: Audit-/Inbox-Feedback, Ablehnungsgruende, KI-Suchlauf-Regeln, Messbarkeit, keine blinde Selbstmutation === -->
+## Content-Prüfung – nächster Workpack: KI-Suchlauf Feedback Loop / Self-Improving Search V1 (2026-06-25)
 
-Bewertung:
-- Kein aktueller Blocker für Main/Live.
-- Separater Prozess-Härtungsworkpack nach dem echten KI-/Inbox-Handoff-Beweis.
+Dieser Block ist der nächste aktive Content-Quality-Workpack nach dem belegten KI-Faktencheck-Fallback mit Prüfcache. Er überschreibt ältere Formulierungen, nach denen zuerst noch der Cache-Grundprozess zu implementieren wäre.
 
-<!-- === END BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_19 === -->
+### Ziel in einem Satz
+
+Die Content-Prüfung soll Fehler nicht nur sichtbar machen, sondern strukturierte Lernsignale für den nächsten KI-Suchlauf erzeugen, damit wiederkehrende Fehler bei Event- und Activity-Daten seltener entstehen.
+
+### Warum dieser Workpack nötig ist
+
+Aktuell sammelt die Inbox bereits Nutzerentscheidungen, Ablehnungsgründe und Korrektursignale. Ohne weiteren Ausbau müsste der Nutzer diese Listen regelmäßig manuell auswerten und daraus Such-/Prompt-Regeln ableiten. Das ist nicht praktikabel.
+
+Ziel ist daher ein kontrollierter Feedback-Prozess:
+
+1. Content Quality Audit erkennt Datenfehler, Unsicherheiten, Quellenprobleme und Zeitlücken.
+2. `/inbox/` sammelt Entscheidungen, Ablehnungsgründe und Korrekturgründe.
+3. KI-Faktencheck liefert strukturierte Ergebnisse wie `confirmed`, `conflict`, `better_source_found`, `not_found` oder `uncertain`.
+4. Ein Feedback-Artefakt fasst diese Signale nach Fehlerklasse, Quelle, Eventtyp und Feld zusammen.
+5. Der nächste KI-Suchlauf nutzt dieses Feedback als Kontext für Quellenwahl, Prompt-Regeln und Plausibilitätsprüfungen.
+6. Reports zeigen, welches Feedback angewendet wurde und ob wiederkehrende Fehlerklassen abnehmen.
+
+### Fehlerklassen für V1
+
+Mindestens strukturiert unterscheiden:
+
+- Datum falsch erkannt oder altes Jahr übernommen.
+- Start-/Enddatum verwechselt oder Enddatum fehlt.
+- Uhrzeit übersehen, obwohl Quelle konkrete Zeiten nennt.
+- Uhrzeit falsch interpretiert, z. B. Öffnungszeit statt Eventzeit.
+- Ort/Adresse falsch oder zu grob übernommen.
+- Ticketportal statt offizieller Event-/Veranstalterquelle genutzt.
+- Quelle nicht erreichbar, Bot-Schutz, `429`, `503`, Redirect oder schwer lesbare Seite.
+- Event verwechselt, ähnliche Titel vermischt oder falscher Termin derselben Reihe genutzt.
+- Activity-Öffnungszeiten, Saisonhinweise oder Nutzungsempfehlungen veraltet/unsicher.
+- Visual-Key-/Motiv-Fit falsch oder zu generisch, sofern dies aus der getrennten Visual-Fit-Prüfung als Suchfeedback relevant wird.
+
+### Zielartefakte
+
+Der Workpack soll voraussichtlich ein oder mehrere maschinenlesbare Artefakte erzeugen, z. B.:
+
+- `content-search-feedback.json` als komprimierter Lernkontext für den KI-Suchlauf.
+- Feedback-Zusammenfassung im Content-Audit-Report.
+- Fehlerklassen-Zählung nach Lauf, Quelle und Feld.
+- Liste wiederholter Fehler, die trotz Feedback erneut auftreten.
+
+Die genaue Datei-/Tab-Struktur wird erst nach Analyse der aktuellen KI-Suchlauf- und Inbox-Artefakte festgelegt.
+
+### Regeln und Grenzen
+
+- Keine unkontrollierte Selbstmutation der KI-Regeln.
+- Kein automatisches Überschreiben von Event-/Activity-Daten nur wegen eines Feedback-Signals.
+- Feedback darf Such-/Prompt-Kontext und Prüfprioritäten verbessern, aber fachliche Änderungen bleiben bestätigungspflichtig.
+- Kein pauschaler Vollscan per KI; Budget-, Kandidaten- und Cache-Logik bleiben bestehen.
+- Ablehnungsgründe aus der Inbox sind wertvolle Trainingssignale, aber erst nach Typisierung/Normalisierung belastbar.
+- Der Nutzer soll keine wöchentliche manuelle Regelpflege übernehmen müssen.
+
+### Akzeptanzkriterien für V1
+
+- Audit-/Inbox-/KI-Faktencheck-Signale werden in einem strukturierten Feedback-Artefakt gesammelt.
+- Der KI-Suchlauf kann dieses Artefakt lesen und in Prompt-/Quellenlogik sichtbar berücksichtigen.
+- Der Report zeigt, welche Feedbackregeln angewendet wurden.
+- Wiederholte Fehlerklassen werden erkennbar gezählt.
+- Mindestens eine konkrete Fehlerklasse, z. B. Zeitangaben oder Ticketportal-Primärquellen, wird als Proof durchgängig vom Audit-Finding bis zum KI-Suchlauf-Feedback verfolgt.
+
+### Nicht-Ziel in diesem Workpack
+
+- Kein UI-Polish der Inbox.
+- Kein Daten-Cleanup nur zum Schließen aktueller Audit-Fälle.
+- Kein neues visuelles Bildsystem.
+- Kein Training eines eigenen Modells.
+- Keine automatische Live-Änderung aus Feedback ohne Review-/Owner-Pfad.
+<!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_FEEDBACK_LOOP_2026_06_25 === -->
+
+---
+
+<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_AI_VERIFICATION_CACHE_2026_06_24 | Zweck: dokumentiert den abgeschlossenen KI-Faktencheck-Fallback mit Pruefcache; Umfang: Events, Activities, blockierte Quellen, verified_until, Budget-/Prioritaetslogik, Acceptance-Tab, Cache-Hit === -->
+## Content-Prüfung – KI-Faktencheck-Fallback mit Prüfcache abgeschlossen (2026-06-25)
+
+Status: als V1-Prozess auf Staging live belegt.
+
+### Ziel des Workpacks
+
+Der Workpack sollte verhindern, dass blockierte, schwer lesbare oder fachlich unsichere Quellen direkt als Nutzeraufgabe erscheinen oder jede Woche pauschal teuer per KI geprüft werden.
+
+Ziel-Hybridprozess:
+
+1. Das billige Audit-Skript prüft technische und eindeutig maschinelle Regeln.
+2. Nur blockierte, schwer lesbare oder fachlich unsichere Fälle werden `ai_verification_candidate`.
+3. KI-Faktencheck-Kandidaten werden strukturiert und budgetiert ausgegeben.
+4. Ein Prüfcache verhindert Wiederholungsprüfungen, solange Inhalt und Quelle unverändert und `verified_until` gültig ist.
+5. In `/inbox/` landen nur Konflikte, fehlende belastbare Quellen, vorgeschlagene Änderungen oder echte Nutzerentscheidungen.
+
+### Belegt umgesetzt
+
+- Audit erzeugt `ai_verification_candidate` für unsichere/blockierte Quellen.
+- Report zeigt Cache-Zahlen, KI-Kandidaten, Budgetauswahl und zurückgestellte Kandidaten.
+- `content-ai-verification-candidates.json` wird als strukturiertes KI-Fallback-Artefakt erzeugt.
+- `Content_Verification_Cache(_Staging)` wird exportiert und befüllt.
+- `Content_Verification_Acceptance(_Staging)` dient als robuste Acceptance-Schicht, damit technische Audit-Zeilen nicht manuell bearbeitet werden müssen.
+- Bestätigte Acceptance-Zeilen werden in den Prüfcache übernommen.
+- Ein bestätigter unveränderter Fall erzeugt im Folgelauf einen Cache-Hit und verschwindet aus den KI-Kandidaten.
+- `source_has_time_but_dataset_missing_time` macht sichtbar, wenn eine Quelle konkrete Uhrzeiten nennt, der Datensatz aber keine Uhrzeit enthält.
+- Workflow-/Script-Logs sind durch Checkpoint-Ausgaben beobachtbar; kein enger Timeout wurde ergänzt.
+
+### Konkreter Proof
+
+Staging-Proof mit `Farm & Country Fair`:
+
+- Acceptance-Zeile für `verification_key=0c54bf13073014fd79f9b8d7` wurde gelesen.
+- Cache-Writeback schrieb einen Cache-Eintrag.
+- Folgelauf lud `Cache entries loaded: 1` und meldete `Cache hits: 1`.
+- `Farm & Country Fair` erschien danach nicht mehr als KI-Faktencheck-Kandidat.
+- Der Fall bleibt weiterhin für andere unabhängige Hinweise sichtbar, z. B. Visual-Fit oder Zeitlücken, falls diese nicht Teil des bestätigten KI-Faktenchecks sind.
+
+### Grenzen
+
+- Das ist keine 100%-Garantie für die gesamte Website.
+- Abgesichert ist der definierte V1-Prozess für Event-/Activity-Kerndaten und die aktuell modellierten Prüfregeln.
+- KI-/Audit-Ergebnisse überschreiben keine fachlichen Daten automatisch.
+- Die Pflege echter Korrekturen bleibt owner- und reviewpflichtig.
+
+### Folgeworkpack
+
+Der nächste Ausbau ist `Content-Prüfung – KI-Suchlauf Feedback Loop / Self-Improving Search V1`.
+<!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_AI_VERIFICATION_CACHE_2026_06_24 === -->
+
+---
+
+<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_PROCESS_V2_STATUS_2026_06_24 | Zweck: dokumentiert den aktuellen Zielabgleich nach Content-Facts-/Visual-Fit-Prozesspatches; Umfang: Status, erreichte Prozessfaehigkeiten, offene Workpacks, naechste Reihenfolge === -->
+## Content-Prüfung – aktueller Zielabgleich nach Prozess V2 (2026-06-24)
+
+Dieser Block ist die aktuelle taktische Steuerung für die Content-Prüfung. Er konkretisiert den Zielzustand aus `ROADMAP_CONTENT_QUALITY_TARGET_STATE_2026_06_23` und überschreibt ältere offene Content-Quality-To-dos, soweit sie durch den Prozess-V2-Stand erledigt sind.
+
+### Aktueller Reifegrad
+
+Stand: Prozess-V2 plus KI-Faktencheck-/Prüfcache-V1 sind als technische Prozessbasis belegt. Offene Arbeitspakete sind jetzt fachliche Paketbearbeitung, Visual-Fit-Auswertung und der KI-Suchlauf-Feedback-Loop.
+
+Belegt durch den letzten Staging-Audit-Report nach KI-Faktencheck-/Prüfcache-V1:
+
+- `critical`: 0.
+- `review_needed`: 4.
+- `warning`: 19.
+- `auto_fixed` / automatisch erledigt: 118.
+- Arbeitspakete: Repo-Datenpatch 3, Sheet-/Quellenkorrektur 1, Quellenprüfung 1, Faktencheck 4, KI-Faktencheck 3, Visual-Fit 11, Automatisch erledigt 118.
+- Verification-Fallback: Cache entries loaded 1, Cache hits 1, AI candidates selected 3, Deferred by budget 0.
+
+### Was jetzt erreicht ist
+
+- Der Audit unterscheidet nicht mehr nur Fehler/kein Fehler, sondern Prozesskategorien und Korrektur-Owner:
+  - `auto_resolved` / `audit_script`.
+  - `repo_data_patch_candidate` / `repo_patch`.
+  - `sheet_update_candidate` / `content_inbox_to_sheet`.
+  - `source_review_candidate` / `content_inbox_source_check`.
+  - `fact_check_candidate` / `content_inbox_fact_check`.
+  - `visual_fit_candidate` / `visual_workflow`.
+- `/inbox/` bündelt die Content-Prüfung in Arbeitspakete statt in eine pauschale Einzelfallliste.
+- Sheet-/Quellenkorrekturen laufen konzeptionell über die Content-Inbox, nicht über direkte Nutzerarbeit im Google Sheet.
+- Repo-owned Activities werden nicht unsichtbar in der Inbox überschrieben, sondern als Repo-Datenpatch-Kandidaten gesammelt.
+- Quellencheck, Faktencheck, KI-Faktencheck, Retry/Beobachten und Visual-Fit sind getrennte Pakete und werden nicht mehr mit normalen Datenpatches vermischt.
+- Für Ticketportal-Fälle kann der Audit eine empfohlene offizielle Quelle aus `data/content_source_suggestions.json` in die Inbox bringen; Speichern bleibt eine bewusste Aktion.
+- Faktenprobe V1 prüft bei geeigneten Eventquellen automatisch, ob Titel, Datum, Uhrzeit und Ort ausreichend in der Quelle bestätigt werden.
+- Visual-Fit V2 erzeugt für fehlende Event-Visual-Zuordnungen konkrete Vorschläge für `visual_key`, `visual_motif`, Motivrolle und Asset-Status.
+
+### Aktuelle offene Arbeitspakete aus dem letzten Audit
+
+Repo-Datenpatch:
+
+- `Bürgerpark Rhede` – `visual_key` fehlt.
+- `Suderwicker Märchenspielplatz` – `visual_key` fehlt.
+- `Waldlehrpfad am Vossenpand` – `visual_key` fehlt.
+
+Sheet-/Quellenkorrektur:
+
+- `Borken Open Air - ABBA Gold The Concert Show` – Ticketportal ist als Primärquelle hinterlegt; empfohlene offizielle Quelle ist vorbereitet.
+
+Quellenprüfung:
+
+- `Unterduikmuseum Aalten` – Redirect muss fachlich geprüft werden.
+
+Faktencheck / Zeitlücken:
+
+- `Borkener Darts Trophy` – Quelle nennt Uhrzeit, Datensatz enthält keine Uhrzeit.
+- `Musikschulfest der Musikschule Isselburg` – Quelle nennt Uhrzeit, Datensatz enthält keine Uhrzeit.
+- `Bocholter Gesundheitstage` – Quelle nennt Uhrzeit, Datensatz enthält keine Uhrzeit.
+- `Playfountain - Bocholter Wasserspaß` – Quelle nennt Uhrzeit, Datensatz enthält keine Uhrzeit.
+
+KI-Faktencheck:
+
+- `Pokémon-Tag` – Kernfakten nicht automatisch ausreichend bestätigt.
+- `Das schönste Ei der Welt` – Kernfakten nicht automatisch ausreichend bestätigt.
+- `Witte Venn Ahaus-Alstätte entdecken` – Activity-Quelle technisch nicht sicher lesbar.
+
+Visual-Fit:
+
+- 11 Fälle, darunter konkrete `visual_key`-/`visual_motif`-Vorschläge. `Farm & Country Fair` ist hier noch sichtbar, aber nicht mehr als KI-Faktencheck-Kandidat.
+- Visual-Fit-Fälle sind keine normalen Datenfehler, sondern gehören in den separaten Bild-/Motiv-Workflow.
+
+### Was noch fehlt
+
+- KI-Suchlauf-Feedback-Loop entwerfen, damit Audit-/Inbox-Fehler nicht manuell in Suchregeln übersetzt werden müssen.
+- Visual-Fit-Fälle fachlich bewerten: Welche Vorschläge können übernommen werden, welche brauchen neue Bilder, welche brauchen Regelverfeinerung?
+- Aus dem Repo-Datenpatch-Paket einen bewussten Sammelpatch erzeugen.
+- Quellencheck- und Faktencheck-Pakete fachlich prüfen und erst danach ggf. Sheet-/Repo-Korrekturen ableiten.
+- Repo-Patch-Paket/Export später automatischer machen; aktuell ist die Paketkopie für ChatGPT-Patchvorbereitung ausreichend.
+- UI/UX der Content-Inbox bleibt bewusst ganz am Schluss.
+
+### Nächste Reihenfolge
+
+1. KI-Suchlauf Feedback Loop / Self-Improving Search V1 analysieren und als Prozesspatch vorbereiten:
+   - Audit-Findings, Inbox-Entscheidungen, Ablehnungsgründe und KI-Faktencheck-Ergebnisse als Lernsignale sammeln.
+   - Fehlerklassen normalisieren.
+   - Feedback-Artefakt für den nächsten KI-Suchlauf erzeugen.
+   - Anwendung und Wirkung im Report messbar machen.
+2. Danach Visual-Fit-Paket fachlich auswerten und in Gruppen aufteilen:
+   - direkt übernehmbarer Visual-Key-/Motif-Vorschlag.
+   - neue Bildproduktion / Asset-Gap.
+   - Regelverfeinerung nötig.
+   - echte Nutzer-Bildentscheidung nötig.
+3. Danach Repo-Datenpatch-Paket für die drei Activity-`visual_key`-Lücken vorbereiten.
+4. Danach Quellencheck-/Faktencheck-Pakete mit Cache-/KI-Fallbacklogik prüfen.
+5. Danach erst UI/UX-Polish der Content-Inbox.
+
+### Harte Grenzen
+
+- Keine fachlichen Daten automatisch überschreiben.
+- Keine Daten-Cleanup-Patches nur zum optischen Schließen des Reports.
+- Keine neue SEO-/Content-Ausweitung vor Abschluss der offenen Content-Prüfpakete.
+- Keine Bildproduktion ohne konkreten Visual-Gap oder bestätigten Visual-Fit-Bedarf.
+<!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_PROCESS_V2_STATUS_2026_06_24 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_TARGET_STATE_2026_06_23 | Zweck: haelt den Zielzustand des automatischen Content-Pruefprozesses und die aktuelle Standortbestimmung fest; Umfang: Events, Activities, Anbieter-Events, Korrekturwege, Visual-Fit-Abgrenzung === -->
+## Aktuelle taktische Priorität – Content-Prüfung Zielzustand (2026-06-23)
+
+Dieser Block überschreibt ältere Content-Quality-/Inbox-Formulierungen weiter unten, wenn sie dem aktuellen Zielzustand widersprechen.
+
+### Ziel in einem Satz
+
+Der Content-Prüfprozess prüft regelmäßig alle relevanten Inhalte automatisch, löst sichere technische Fälle selbst oder protokolliert sie still, und zeigt in `/inbox/` nur Fälle, bei denen wirklich etwas zu entscheiden, freizugeben oder gesammelt zu korrigieren ist.
+
+### Was regelmäßig geprüft werden soll
+
+Events:
+
+- Titel, Datum, Startzeit, Endzeit, Ort, Adresse und Quelle.
+- Ticketportal vs. offizielle Event-/Veranstalterquelle.
+- Absage, Verschiebung oder widersprüchliche Angaben, soweit maschinell erkennbar.
+- Dubletten, Serienlogik und abgelaufene Sichtbarkeit.
+- `visual_key` / `visual_motif` als Übergabe an den separaten Visual-Fit-Prüfblock.
+
+Activities:
+
+- Titel, Ort, Adresse/Maps, Beschreibung und Quelle.
+- Öffnungszeiten, Saisonzeiten, Feiertagslogik, Kostenhinweise und `checked_at`.
+- Redirects, Erreichbarkeit, fehlende Pflichtfelder und Bild-/Visual-Key-Grundstatus.
+
+Anbieter-/DB-Events:
+
+- Öffentliche Sichtbarkeit, Pflichtfelder, Quellen, Zahlungs-/Review-Status und technische API-Ausspielung.
+- Korrekturweg bleibt DB-/Admin-/Review-geführt, nicht Google-Sheet-geführt.
+
+### Was in der Content-Prüfung erscheinen soll
+
+Anzeigen:
+
+- Quelle kaputt, unklar, zu generisch oder Ticketportal als Primärquelle.
+- Datum, Uhrzeit, Ort oder Adresse fehlen bzw. widersprechen der Quelle.
+- Activity-Öffnungszeiten, Saison-/Feiertagslogik oder Kosten sind zu alt oder nicht belastbar.
+- Pflichtfeld fehlt, `visual_key` fehlt oder ist unbekannt.
+- Dubletten, Serienproblem, Absage/Verschiebung oder anderer echter Reviewbedarf.
+- Bild-/Motiv-Fit ist unsicher und kann nicht automatisch entschieden werden.
+
+Nicht anzeigen:
+
+- korrekt geprüfte Inhalte ohne Befund.
+- harmlose Canonical-, Slash- oder Sprachpfad-Redirects.
+- einzelne temporäre Timeouts ohne weiteren Befund.
+- abgelaufene Events, die korrekt aus dem öffentlichen Feed fallen.
+- pauschale Vollprüfungen ohne konkrete Auffälligkeit.
+
+### Wie korrigiert werden soll
+
+- Der Nutzer soll nicht direkt im Google Sheet arbeiten müssen.
+- Sheet-Events werden aus `/inbox/` → Content-Prüfung kontrolliert ins Google Sheet `Events` zurückgeschrieben.
+- Anbieter-/DB-Events werden aus der Inbox bzw. Admin-/Reviewlogik in der DB korrigiert.
+- Activities bleiben in V1 repo-/JSON-owned: Die Content-Prüfung sammelt Patch-Kandidaten; ChatGPT erstellt daraus später Sammelpatches. Ein späterer PR-/Patchpaket-Workflow ist möglich.
+- Fachliche Daten dürfen nicht blind durch KI-Textauswertung überschrieben werden. Semantische Änderungen brauchen eine explizite geprüfte Aktion.
+
+### Separater Visual-Fit-Workstream
+
+Bildprüfung ist ein eigener Qualitätsblock:
+
+- KI-Suche muss passende `visual_key`/`visual_motif`-Werte wählen.
+- Wenn kein passendes Motiv existiert, entsteht ein Gap statt einer falschen Bildzuordnung.
+- Geprüft werden müssen Bild-Motiv-Fit, zu generische Bilder, irreführende Bilder und zu häufige Wiederholung gleicher Bilder im gleichen Kontext.
+- Bildproduktion, Visual-Key-Verfeinerung und Pool-Updates laufen über den Visual Workflow, nicht als Nebenwirkung der Daten-/Quellenprüfung.
+
+### Standortbestimmung aktuell
+
+Erreicht:
+
+- Content-Quality-Grundsystem existiert: Workflow, Script, Audit-Report, Audit-Sheet-Tabs und `/inbox/`-Arbeitsbereich.
+- Lärm wurde deutlich reduziert: korrekte bzw. harmlose Fälle sollen nicht mehr als normale Aufgaben auftauchen.
+- Sichere technische Auto-Behandlung ist begonnen, z. B. abgelaufene Events im Report als `auto_fixed`.
+- Der Audit schreibt Empfehlungen, aber ändert fachliche Quellen nicht blind.
+
+Noch offen:
+
+- Report und Workbench müssen stärker nach Arbeitstyp sortieren: automatisch erledigt, nur beobachtet, Sheet-Korrektur, DB-/Review-Fall, Repo-Patch-Kandidat, Visual-Fit-Kandidat, echte Nutzerentscheidung.
+- Die Inbox muss zur zentralen Korrekturoberfläche werden; Google Sheet darf nicht die Nutzerarbeitsfläche sein.
+- Vollständige Datenwahrheit gegen Quellen ist noch nicht ausreichend bewiesen, vor allem Datum/Uhrzeit/Ort/Öffnungszeiten/Kosten.
+- Visual-Key-/Bild-Fit ist noch kein systematischer Prüfprozess.
+
+### Nächster sinnvoller Workpack
+
+Prozess-Patch, keine Datenkorrektur:
+
+1. Audit-Report um klarere Prozesskategorien erweitern.
+2. `/inbox/` Content-Prüfung nach echten Arbeitstypen sortieren.
+3. Sheet-/DB-/Repo-Korrekturwege in der UI und im Report sauber trennen.
+4. Visual-Fit-Fälle als eigenen Kandidatentyp vorbereiten, aber nicht mit Datenwahrheitskorrekturen vermischen.
+5. Keine konkreten Activity-/Event-Datenfixes in diesem Workpack.
+
+### Nicht als nächstes starten
+
+- Keine direkten Daten-Cleanup-Patches nur zum Schließen aktueller Audit-Fälle.
+- Keine SEO-/Content-Ausweitung vor belastbarem Content-Prüfprozess.
+- Keine pauschale manuelle Vollprüfung aller Inhalte in der Inbox.
+- Keine neue Event-Visual-Produktion ohne konkreten Visual-Gap.
+<!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_TARGET_STATE_2026_06_23 === -->
 
 <!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_GAPS_CLOSED_2026_06_18 | Zweck: schliesst den aktiven Event-Visual-Motiv-Fit-Produktionsblock fuer aktuellen Sheet-Stand; Umfang: Reststatus und naechste Arbeit nur bei neuem Bedarf === -->
 ## Event Visual Motif-Fit – aktuelle Sheet-Gaps geschlossen (2026-06-18)
@@ -386,21 +703,22 @@ Akzeptanzkriterien:
 
 ## P0.5 — Inhaltsqualität, Prüfläufe und kontrolliertes Self-Healing
 
-<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_SELF_HEALING_V1_2026_05_31 | Zweck: nimmt regelmäßige Live-Content-Prüfung, Warnlogik und sichere automatische Korrekturen als späteren Workstream auf; Umfang: Events aus Google Sheet/DB, Activities aus offers.json, Audit-Reports, Auto-Fix-Grenzen === -->
+<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_SELF_HEALING_V1_2026_05_31 | Zweck: nimmt regelmäßige Live-Content-Prüfung, Warnlogik und sichere automatische Korrekturen als aktiven Workstream auf; Umfang: Events aus Google Sheet/DB, Activities aus offers.json, Audit-Reports, Google-Sheet-Reviewtab, Auto-Fix-Grenzen === -->
 
-Status 2026-05-31:
+Status 2026-06-22:
 
-- Der generierte Event-Feed `data/events.json` wurde aus dem Repository entfernt.
-- Fachliche Event-Quelle bleibt das Google Sheet; zugelassene Veranstalter-Einreichungen kommen zusätzlich aus der DB/API.
-- `data/events.json` bleibt nur ein generiertes Deploy-/Runtime-Artefakt, weil Frontend, SEO-Schema und Service Worker den Feed zur Laufzeit laden.
-- Dadurch ist die bisherige Repo-Verwirrung durch stale Event-JSON reduziert.
-- Der nächste Qualitätsbedarf liegt nicht bei weiterer Discovery allein, sondern bei regelmäßiger Prüfung bereits live sichtbarer Inhalte.
+- Der generierte Event-Feed `data/events.json` wurde aus dem Repository entfernt bzw. ist nur noch Deploy-/Runtime-Artefakt.
+- Fachliche Event-Quelle bleibt das Google Sheet, Tab `Events`.
+- Zugelassene Veranstalter-Einreichungen kommen zusätzlich aus der DB/API über `/api/events/public.php`.
+- Activities bleiben aktuell Repo-/JSON-geführt über `data/offers.json`.
+- Der nächste Qualitätsbedarf liegt vor weiterem SEO-/Content-Wachstum bei regelmäßiger Prüfung bereits live sichtbarer Inhalte.
 
 Ziel:
 
 - Live sichtbare Events und Aktivitäten werden regelmäßig auf technische und fachliche Auffälligkeiten geprüft.
-- Der Prüflauf unterscheidet klar zwischen sicher automatisch korrigierbaren Fällen und Fällen, die eine Warnung bzw. redaktionelle Prüfung brauchen.
+- Der Prüflauf unterscheidet klar zwischen sicher automatisch abgefangenen Fällen und Fällen, die eine Warnung bzw. redaktionelle Prüfung brauchen.
 - Automatische Korrekturen dürfen nur erfolgen, wenn die Änderung deterministisch belegbar und regressionsarm ist.
+- Unsichere KI-/Website-Textinterpretationen dürfen fachliche Inhalte nicht blind überschreiben.
 
 Warum:
 
@@ -409,39 +727,43 @@ Warum:
 - Manuelle Vollkontrolle aller Live-Inhalte ist langfristig nicht realistisch.
 - Blinde Auto-Korrekturen wären aber riskanter als ein fehlender Prüflauf.
 
-Scope für den späteren Workstream:
+Scope des dauerhaften Workstreams:
 
-- Events aus dem live generierten Sheet-Feed.
+- Redaktionelle Events aus dem Google-Sheet-Tab `Events`.
 - Genehmigte öffentliche DB-Events aus `/api/events/public.php`.
 - Aktivitäten aus `data/offers.json`.
 - Quellen-URLs, Event-URLs, Website-Links, Maps-Ziele und Bild-URLs.
-- Prüfbericht für interne Nutzung.
-- Optional später: Audit-Status im internen Dashboard.
+- Ergebnis als JSON-/Markdown-Report im Workflow und als Google-Sheet-Tab:
+  - `Content_Audit` auf live/main.
+  - `Content_Audit_Staging` auf staging.
+- Optional später: Darstellung im internen Dashboard, sofern der Sheet-Tab nicht mehr ausreicht.
 
-Nicht im Scope der ersten Umsetzung:
+Harte Grenzen:
 
 - Kein automatisches Umschreiben freier Beschreibungstexte.
 - Kein automatisches Löschen von Events nur wegen temporär nicht erreichbarer Quelle.
 - Kein blindes Überschreiben des Google Sheets durch unsichere KI-Auswertung.
-- Kein Anbieterbericht oder öffentliche Qualitätsanzeige.
+- Kein automatisches Ändern von Activity-Daten in `data/offers.json`; dafür bleibt ein sichtbarer Repo-Patch nötig.
+- Kein Anbieterbericht oder öffentliche Qualitätsanzeige aus ungeprüften Audit-Befunden.
 
 Empfohlener Prüfrhythmus:
 
 - Events, leichtgewichtig: täglich, Fokus auf die nächsten 14 Tage.
 - Events, tiefer Quellencheck: wöchentlich für den relevanten Zukunftsbestand.
+- DB-/Veranstalter-Events: täglich über `/api/events/public.php`.
 - Aktivitäten, technischer Check: wöchentlich.
-- Aktivitäten, tiefer Plausibilitäts-/Quellencheck: monatlich.
+- Aktivitäten, tiefer Plausibilitäts-/Quellencheck: monatlich bzw. über `checked_at`-Alterung.
 
-Sichere Auto-Fix-Kandidaten ohne KI:
+Sichere Auto-Fix-/Auto-Abfang-Kandidaten ohne KI:
 
 - abgelaufene Events nicht mehr ausspielen bzw. beim Feed-Build ausschließen.
-- kaputte Bild-URLs durch vorhandene Fallback-Logik abfangen.
+- kaputte Bild-URLs durch vorhandene Fallback-Logik abfangen, sofern Fallback vorhanden ist.
 - fehlende Pflichtfelder blockieren oder in Review markieren.
 - harte Duplikate nach stabiler ID oder eindeutigem Schlüssel unterdrücken.
 - permanente Redirects protokollieren und später kontrolliert übernehmen.
-- strukturierte Quelldaten übernehmen, wenn JSON-LD, ICS oder API-Daten eindeutig demselben Event zugeordnet werden können.
+- strukturierte Quelldaten übernehmen, wenn JSON-LD, ICS oder API-Daten eindeutig demselben Event zugeordnet werden können; bis dahin nur Review-Empfehlung.
 
-Nicht sicher ohne KI oder spezialisierten Quellenparser:
+Nicht sicher ohne spezialisierte Quellenparser oder redaktionelle Prüfung:
 
 - geänderte Uhrzeiten aus freiem Website-Text erkennen.
 - verschobene oder abgesagte Events sicher interpretieren.
@@ -452,40 +774,32 @@ Nicht sicher ohne KI oder spezialisierten Quellenparser:
 Benachrichtigungs- und Reaktionslogik:
 
 - `auto_fixed`: keine Sofortwarnung; Aufnahme in Tages-/Wochenprotokoll.
-- `warning`: im internen Dashboard oder Audit-Report sichtbar machen.
-- `review_needed`: interne Warnung erzeugen; nicht automatisch öffentlich ändern.
-- `critical`: Push/E-Mail oder deutlich sichtbarer interner Hinweis.
+- `warning`: im `Content_Audit`-Tab oder Audit-Report sichtbar machen.
+- `review_needed`: interne Review-Arbeit erzeugen; nicht automatisch öffentlich ändern.
+- `critical`: deutlich sichtbarer interner Hinweis im Audit-Tab; Deploy bleibt durch bestehende technische Gates geschützt.
 - `source_unreachable`: protokollieren; erst nach Wiederholung oder besonderer Kritikalität eskalieren.
 
-Mögliche technische Bausteine:
+Technische Bausteine:
 
-- neuer Workflow `content-quality-audit.yml`.
-- neues Script `scripts/content-quality-audit.py` für harte technische Checks.
-- später optional `scripts/content-source-audit.py` für Quellenvergleich.
-- Ergebnisdatei oder Sheet-Tab `Content_Audit`.
-- Google-Sheets-Schreibrechte nur für einen eng begrenzten späteren Auto-Fix-Workflow, nicht für den normalen Deploy.
+- Workflow `.github/workflows/content-quality-audit.yml`.
+- Script `scripts/content-quality-audit.py` für harte technische Checks, Quellen-/Linkprüfungen und Review-Klassifizierung.
+- Workflow-Reports `data/content-quality-report.json` und `data/content-quality-report.md` als nicht committete Workflow-Artefakte.
+- Google-Sheet-Zieltab `Content_Audit` / `Content_Audit_Staging`.
+- Google-Sheets-Schreibrechte nur für Audit-Zeilen, nicht für fachliche Datenmutation in `Events`, `Inbox` oder Activity-Quellen.
 
-Akzeptanzkriterien für Phase 1:
+Akzeptanzkriterien:
 
 - Der Audit läuft unabhängig vom normalen Deploy.
-- Der Audit prüft den echten Live-/Runtime-Bestand, nicht eine stale Repo-Kopie.
+- Der Audit prüft den echten Sheet-/Runtime-/Repo-Bestand, nicht eine stale Event-JSON-Kopie.
 - Der Audit erzeugt einen verständlichen Bericht mit Severity, betroffener Quelle und empfohlener Aktion.
 - Harte technische Fehler sind klar von fachlichen Unsicherheiten getrennt.
 - Kein unsicherer Befund verändert automatisch öffentliche Inhalte.
-
-Akzeptanzkriterien für spätere Auto-Fix-Phase:
-
-- Jede Auto-Korrektur ist nachvollziehbar protokolliert.
-- Auto-Fixes sind auf deterministische Fälle begrenzt.
-- Für Google-Sheet-Änderungen gibt es Schreibschutzlogik, Audit-Log und möglichst eine Rücknahmeoption.
-- KI darf nur als Assistenz für semantische Prüfung eingesetzt werden, nicht als alleiniger Grund für blindes Überschreiben.
-- Bei widersprüchlichen Quellen gewinnt nicht automatisch die externe Quelle; der Fall geht in Review.
+- Jede deterministische Auto-Abfanglogik ist nachvollziehbar protokolliert.
 
 Prioritätseinordnung:
 
-- Nicht vor den aktuell laufenden Messwert-/Akquise-Wartepunkten erzwingen.
-- Sinnvoller Anschluss nach stabiler Nutzwertmessung und bevor größere Content-Mengen weiter ausgebaut werden.
-- Phase 1 kann klein und technisch beginnen, ohne die Produktoberfläche zu verändern.
+- Dieser Workstream kommt vor SEO-Themenseiten, größerem Activity-Ausbau und Anbieter-Akquise.
+- Ziel ist nicht mehr Content um jeden Preis, sondern belastbarer, regelmäßig kontrollierter Content als Wachstumsbasis.
 
 <!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_SELF_HEALING_V1_2026_05_31 === -->
 
@@ -1633,3 +1947,27 @@ Nächster Schritt:
 - `staging → main` nur dann, wenn `staging` insgesamt releasefähig ist und keine anderen unfertigen Änderungen enthält.
 - Nach Main-Deploy reicht ein kurzer Live-Smoke auf `/events/`.
 <!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_CLOSED_2026_06_18 === -->
+<!-- === BEGIN BLOCK: ROADMAP_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 | Zweck: markiert Reporting-Hardening als technisch live bewiesen und grenzt den weiteren organischen Datenlauf fuer Akquise ab; Umfang: Status, naechste Wartepunkte, keine neue Codearbeit === -->
+## Reporting-/Tracking-Hardening – technisch live bewiesen (2026-06-19)
+
+Status:
+- Technischer Workpack abgeschlossen.
+- Live-Beweis nach Main-Merge bestanden.
+
+Belegt:
+- `impact_summary` im Anbieterportal wird serverseitig befüllt.
+- Die neue Aktivitäts-Funnel-Route `/aktivitaeten/sichtbar-werden/` wird live als `organizer_cta_click` gezählt.
+- Today-Desktop-Klicks reichen vorhandene Reporting-Ziele an das Nutzwerttracking weiter.
+- Dashboard-Nachweis am 2026-06-19:
+  - `Nutzwert-Klicks` stieg von 75 auf 76.
+  - `Veranstalter-CTA` stieg von 3 auf 4.
+
+Bewertung:
+- Keine weitere technische Reporting-Härtung aus diesem Prüfstand nötig.
+- Testklicks bleiben reine Funktionsbeweise und dürfen nicht als Akquise-Erfolgsdaten verwendet werden.
+- Für Verkaufs-/Akquise-Aussagen zählt erst ein längerer organischer Datenlauf.
+
+Nächster sinnvoller Wartepunkt:
+- Nach einem vollständigen 28-Tage-/30-Tage-Zeitraum prüfen, ob genug organische Website-, Route-/Maps-, Detail- und CTA-Signale für einen ersten belastbaren Feedbackbericht vorliegen.
+- Bis dahin keine neuen Reporting-Features bauen, sondern Datenqualität beobachten.
+<!-- === END BLOCK: ROADMAP_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 === -->

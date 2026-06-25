@@ -22,7 +22,7 @@ Umfang:
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Inbox Review</title>
-<link rel="stylesheet" href="/css/style.css?v=1" />
+<link rel="stylesheet" href="/css/style.css?v=2026-06-22-css-governance-v1" />
   <style>
     /* === BEGIN BLOCK: FINAL REVIEW UI CSS (minimal, readable) ===
        Zweck:
@@ -46,6 +46,34 @@ Umfang:
     .brand { display:flex; align-items:baseline; gap:10px; padding-top: 8px; }
     .title { font-weight: 800; line-height: 1.1; }
     .inboxToolbar { display:flex; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
+    /* === BEGIN BLOCK: INBOX_CONTENT_VERIFICATION_WORKBENCH_CSS_V1 | Zweck: fuehrt Audit-Faelle als klare Content-Pruefaufgaben mit Anweisung, Checkliste und Korrekturfeldern; Umfang: Mode-Switch und Verification-Karten-Ergaenzungen === */
+    .reviewModeSwitch { display:flex; gap:7px; flex-wrap:wrap; margin: 9px 0 0; }
+    .reviewModeSwitch .btn { padding: 7px 10px; font-size: 13px; }
+    .reviewModeSwitch .is-active { border-color: rgba(38,118,62,.42); background: rgba(38,118,62,.075); font-weight: 800; }
+    .auditIssueBox { display:grid; gap:7px; margin:0; padding:11px 12px; border-radius:14px; border:1px solid rgba(155,112,0,.28); background:rgba(155,112,0,.055); font-size:14px; line-height:1.35; }
+    .auditIssueBox--critical { border-color:rgba(160,0,0,.35); background:rgba(160,0,0,.065); }
+    .auditIssueBox--review_needed { border-color:rgba(155,112,0,.32); background:rgba(155,112,0,.065); }
+    .auditIssueBox--warning { border-color:rgba(42,95,150,.25); background:rgba(42,95,150,.055); }
+    .auditInstructionBox { display:grid; gap:8px; margin:0; padding:12px; border-radius:14px; border:1px solid rgba(38,118,62,.22); background:rgba(38,118,62,.055); font-size:14px; line-height:1.38; }
+    .auditInstructionBox strong { display:block; margin-bottom:2px; }
+    .auditChecklist { margin: 0; padding-left: 20px; display:grid; gap:5px; font-size:13.5px; line-height:1.32; }
+    .auditFormGrid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+    .auditField { display:grid; gap:4px; }
+    .auditField--wide { grid-column: 1 / -1; }
+    .auditField label { font-size:12px; font-weight:760; opacity:.78; }
+    .auditField input,
+    .auditField textarea { width:100%; box-sizing:border-box; padding:9px 10px; border-radius:12px; border:1px solid rgba(0,0,0,.18); font:inherit; background:transparent; }
+    .auditField textarea { min-height:76px; resize:vertical; }
+    .auditActionHint { font-size:12.5px; line-height:1.35; opacity:.76; }
+    .auditStateNote { border-radius:12px; padding:9px 10px; background:rgba(0,0,0,.035); font-size:13px; line-height:1.35; }
+    /* === BEGIN BLOCK: INBOX_REPO_PATCH_BUNDLE_CSS_V1 | Zweck: macht Repo-Patch-Kandidaten als Sammelpaket sichtbar und kopierbar, ohne Daten zu ändern; Umfang: nur Content-Prüfung-Bündelanzeige === */
+    .auditBundleBox { display:grid; gap:8px; margin:0; padding:11px 12px; border-radius:14px; border:1px solid rgba(38,118,62,.22); background:rgba(38,118,62,.04); font-size:13.5px; line-height:1.35; }
+    .auditBundleList { margin:0; padding-left:18px; display:grid; gap:4px; }
+    .auditBundleActions { display:flex; gap:8px; flex-wrap:wrap; margin-top:2px; }
+    .auditBundleActions .btn { padding:7px 10px; font-size:13px; }
+    /* === END BLOCK: INBOX_REPO_PATCH_BUNDLE_CSS_V1 === */
+    @media (max-width: 560px) { .auditFormGrid { grid-template-columns:1fr; } }
+    /* === END BLOCK: INBOX_CONTENT_VERIFICATION_WORKBENCH_CSS_V1 === */
     .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.16); font-size: 12px; }
     .muted { opacity: .72; }
     .status { margin-top: 8px; font-size: 13px; }
@@ -136,6 +164,13 @@ Umfang:
 
     <div id="statusLine" class="status muted"></div>
 
+    <!-- === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_SWITCH_V1 | Zweck: macht Content-Pruefung in derselben privaten Inbox bearbeitbar, aber getrennt von neuen Event-Kandidaten; Umfang: zwei Mode-Buttons === -->
+    <div class="reviewModeSwitch" aria-label="Review-Bereich">
+      <button id="modeCurationBtn" class="btn is-active" type="button">Neue Events</button>
+      <button id="modeAuditBtn" class="btn" type="button">Content-Prüfung</button>
+    </div>
+    <!-- === END BLOCK: INBOX_CONTENT_AUDIT_MODE_SWITCH_V1 === -->
+
     <section id="one"></section>
 
     <div class="footer">
@@ -164,6 +199,10 @@ Umfang:
     // - Nur Endpoint-Konstanten für inbox/index.html
     const API_URL  = "https://script.google.com/macros/s/AKfycbxU3MYnINbhk-1XFehzGRYeto3f4BH9fyL6RmMlQPwmTt_wciHoESRo27nx1-KSIAos/exec";
     const SUBMISSIONS_REVIEW_API_URL = "/api/submissions/review-list.php";
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_ENDPOINTS_V1 | Zweck: laedt und bearbeitet Content-Quality-Faelle aus Content_Audit/Content_Audit_Staging ueber geschuetzte Backend-Endpunkte; Umfang: Endpoint-Konstanten === */
+    const CONTENT_AUDIT_LIST_API_URL = "/api/content-audit/list.php";
+    const CONTENT_AUDIT_UPDATE_API_URL = "/api/content-audit/update.php";
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_ENDPOINTS_V1 === */
 
     /* === BEGIN BLOCK: INBOX_PUSH_ENDPOINTS_V1 | Zweck: interne Browser-Push-Registrierung nur für diese private Inbox-Seite; Umfang: Push-Endpunkt-Konstanten === */
     const PUSH_CONFIG_API_URL = "/api/push/config.php";
@@ -180,10 +219,19 @@ Umfang:
     const elRight = document.getElementById("progressRight");
     const elPushBtn = document.getElementById("pushBtn");
     const elLocalPushTestBtn = document.getElementById("localPushTestBtn");
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_STATE_V1 | Zweck: haelt Kuratierung und Content-Pruefung als getrennte Queues in einer UI; Umfang: DOM-Referenzen und Mode-State === */
+    const elModeCurationBtn = document.getElementById("modeCurationBtn");
+    const elModeAuditBtn = document.getElementById("modeAuditBtn");
+    let activeReviewMode = "curation";
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_MODE_STATE_V1 === */
     
     let queue = [];
     let current = null;
     let totalLoaded = 0;
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_NAV_STATE_V1 | Zweck: erlaubt Vor-/Weiter-Navigation in Content-Prueffaellen ohne Statusaenderung; Umfang: nur Sitzungszustand fuer die Content-Pruefung === */
+    let contentAuditHistory = [];
+    let contentAuditPackagePool = [];
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_NAV_STATE_V1 === */
 
     // Token nur im RAM (keine Storage APIs)
     let sessionToken = "";
@@ -217,6 +265,31 @@ Umfang:
       });
     }
     /* === END BLOCK: INBOX_PUSH_BUTTON_BINDING_V1 === */
+
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_BINDINGS_V1 | Zweck: wechselt zwischen Event-Kuratierung und Content-Pruefung ohne Vermischung der Queues; Umfang: Mode-Button-Listener === */
+    function refreshReviewModeButtons() {
+      if (elModeCurationBtn) elModeCurationBtn.classList.toggle("is-active", activeReviewMode === "curation");
+      if (elModeAuditBtn) elModeAuditBtn.classList.toggle("is-active", activeReviewMode === "content_audit");
+    }
+
+    async function switchReviewMode(mode) {
+      activeReviewMode = mode === "content_audit" ? "content_audit" : "curation";
+      refreshReviewModeButtons();
+      const ok = await ensureUnlocked();
+      if (!ok) {
+        renderLockedState();
+        return;
+      }
+      await loadAndShow();
+    }
+
+    if (elModeCurationBtn) {
+      elModeCurationBtn.addEventListener("click", () => switchReviewMode("curation"));
+    }
+    if (elModeAuditBtn) {
+      elModeAuditBtn.addEventListener("click", () => switchReviewMode("content_audit"));
+    }
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_MODE_BINDINGS_V1 === */
         /* === BEGIN BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BINDING_V1 | Zweck: testet lokale Notification-Anzeige auf genau diesem Gerät ohne Server-Push; Umfang: zusätzlicher Diagnose-Button === */
     if (elLocalPushTestBtn) {
       elLocalPushTestBtn.addEventListener("click", async () => {
@@ -277,6 +350,7 @@ Umfang:
       queue = [];
       current = null;
       totalLoaded = 0;
+      contentAuditPackagePool = [];
       setStatus("Kuratier-Inbox gesperrt. Bitte neu laden und Passwort eingeben.");
       elLeft.textContent = "";
       elRight.textContent = "";
@@ -553,6 +627,89 @@ Umfang:
       }
     }
 
+    /* === BEGIN BLOCK: INBOX_CONTENT_VERIFICATION_FETCH_V2 | Zweck: laedt offene Content-Verification-Faelle aus dem geschuetzten Backend statt aus dem normalen Event-Kandidaten-Feed; Umfang: Fetch- und Helper-Funktionen === */
+    function isContentAuditItem(item) {
+      return String(item && item.review_source || "") === "content_audit";
+    }
+
+    function formatContentAuditSeverity(value) {
+      const key = trimValue(value);
+      const labels = {
+        critical: "kritisch",
+        review_needed: "Prüfung nötig",
+        warning: "Hinweis"
+      };
+      return labels[key] || key || "Content-Prüfung";
+    }
+
+    function formatContentAuditStatus(value) {
+      const key = trimValue(value) || "open";
+      const labels = {
+        open: "offen",
+        patch_needed: "Patch nötig",
+        source_unavailable: "Quelle unklar",
+        blocked: "blockiert",
+        snoozed: "zurückgestellt",
+        verified: "geprüft",
+        corrected: "korrigiert"
+      };
+      return labels[key] || key;
+    }
+
+    function isContentAuditEventItem(item) {
+      return trimValue(item.content_type) === "event" && trimValue(item.source_system) === "sheet_events";
+    }
+
+    function isContentAuditActivityItem(item) {
+      return trimValue(item.content_type) === "activity" && trimValue(item.source_system) === "offers_json";
+    }
+
+    function isContentAuditEventSourceUrlIssue(item) {
+      const issueCode = trimValue(item.issue_code);
+      return isContentAuditEventItem(item)
+        && ["event_source_url_broken", "event_source_url_redirect", "event_source_url_unstable", "event_ticket_url_manual_check"].includes(issueCode);
+    }
+
+    async function fetchContentAuditReviewItems() {
+      if (!reviewApiPassword) {
+        return { items: [], total: 0, error: "content_audit_locked" };
+      }
+
+      try {
+        const response = await fetch(CONTENT_AUDIT_LIST_API_URL, {
+          method: "GET",
+          credentials: "same-origin",
+          headers: {
+            Accept: "application/json",
+            "X-BE-Review-Password": reviewApiPassword
+          },
+          cache: "no-store"
+        });
+
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload || payload.status !== "ok") {
+          return { items: [], total: 0, error: payload?.message || "content_audit_load_failed" };
+        }
+
+        /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_PACKAGE_ARRAY_ISOLATION_V1 | Zweck: verhindert, dass die aktuelle Detailkarte durch queue.shift() aus den Arbeitspaketen verschwindet; Umfang: defensive Kopien der API-Arrays, keine Datenänderung === */
+        const items = Array.isArray(payload.data?.items) ? payload.data.items.slice() : [];
+        const packageItems = Array.isArray(payload.data?.package_items) ? payload.data.package_items.slice() : items.slice();
+        /* === END BLOCK: INBOX_CONTENT_AUDIT_PACKAGE_ARRAY_ISOLATION_V1 === */
+        return {
+          items,
+          packageItems,
+          total: Number(payload.data?.total || items.length || 0),
+          packageTotal: Number(payload.data?.package_total || packageItems.length || 0),
+          tabName: trimValue(payload.data?.tab_name),
+          generatedAt: trimValue(payload.data?.generated_at),
+          error: ""
+        };
+      } catch (_error) {
+        return { items: [], total: 0, error: "content_audit_network_failed" };
+      }
+    }
+    /* === END BLOCK: INBOX_CONTENT_VERIFICATION_FETCH_V2 === */
+
     function normalizeSheetReviewItem(item) {
       return {
         ...item,
@@ -575,6 +732,34 @@ Umfang:
       totalLoaded = 0;
 
       try {
+        /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_LOAD_BRANCH_V1 | Zweck: laedt Content-Pruefung als eigene Queue, damit Audit-Faelle nicht mit neuen Event-Kandidaten vermischt werden; Umfang: frueher Branch in loadAndShow === */
+        if (activeReviewMode === "content_audit") {
+          const auditResult = await fetchContentAuditReviewItems();
+          queue = Array.isArray(auditResult.items) ? auditResult.items : [];
+          contentAuditPackagePool = Array.isArray(auditResult.packageItems) ? auditResult.packageItems : queue;
+          totalLoaded = Number(auditResult.total || queue.length || 0);
+          contentAuditHistory = [];
+
+          refreshLock();
+          if (auditResult.error) {
+            setStatus("Content-Prüfung konnte nicht geladen werden: " + auditResult.error);
+          } else if (queue.length > 0) {
+            const generated = auditResult.generatedAt ? ` · Stand: ${auditResult.generatedAt}` : "";
+            const packageTotal = Number(auditResult.packageTotal || contentAuditPackagePool.length || queue.length || 0);
+            const packageHint = packageTotal > queue.length ? ` · ${packageTotal} Fälle in Arbeitspaketen` : "";
+            setStatus(`Content-Prüfung: ${queue.length} zentrale Fälle${packageHint}${generated}`);
+          } else if (contentAuditPackagePool.length > 0) {
+            const generated = auditResult.generatedAt ? ` · Stand: ${auditResult.generatedAt}` : "";
+            setStatus(`Content-Prüfung: keine zentralen Fälle · ${contentAuditPackagePool.length} Fälle nur in Arbeitspaketen${generated}`);
+          } else {
+            setStatus("Content-Prüfung: keine offenen Fälle.");
+          }
+
+          showNext(totalLoaded);
+          return;
+        }
+        /* === END BLOCK: INBOX_CONTENT_AUDIT_LOAD_BRANCH_V1 === */
+
         const [res, submissionsResult] = await Promise.all([
           jsonp(API_URL, { action: "listReview" }),
           fetchSubmissionReviewItems()
@@ -629,6 +814,27 @@ Umfang:
       current = queue.shift() || null;
       renderCurrent(totalCount);
     }
+    /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_NAVIGATION_V1 | Zweck: blaettert in Content-Prueffaellen vor/zurueck, ohne einen Fall zu bestaetigen, zurueckzustellen oder sonst zu veraendern; Umfang: reine UI-Navigation innerhalb der geladenen Queue === */
+    function showNextContentAuditItem() {
+      if (!isContentAuditItem(current) || !queue.length) return;
+      contentAuditHistory.push(current);
+      current = queue.shift() || null;
+      setStatus("Nur weitergeblättert – kein Status wurde geändert.");
+      renderCurrent(totalLoaded);
+    }
+
+    function showPreviousContentAuditItem() {
+      if (!isContentAuditItem(current) || !contentAuditHistory.length) return;
+      if (current) queue.unshift(current);
+      current = contentAuditHistory.pop() || null;
+      setStatus("Nur zurückgeblättert – kein Status wurde geändert.");
+      renderCurrent(totalLoaded);
+    }
+
+    function contentAuditSessionCount() {
+      return contentAuditHistory.length + queue.length + (current ? 1 : 0);
+    }
+    /* === END BLOCK: INBOX_CONTENT_AUDIT_NAVIGATION_V1 === */
     /* === BEGIN BLOCK: REVIEW_DEFER_CURRENT_ITEM_V1 | Zweck: verschiebt den aktuell angezeigten Fall ans Ende der aktuellen Inbox-Sitzung, ohne DB- oder Sheet-Status zu ändern; Umfang: reine UI-Navigation === */
     function deferCurrentItem() {
       if (!current) return;
@@ -999,9 +1205,13 @@ Umfang:
     function renderCurrent(totalCount) {
       refreshLock();
 
-      const remaining = queue.length + (current ? 1 : 0);
+      /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_PROGRESS_NAV_AWARE_V1 | Zweck: zeigt bei Content-Pruefung alle geladenen offenen Faelle weiter korrekt an, auch wenn der Nutzer nur vor/zurueck blaettert; Umfang: ersetzt Progress-Berechnung === */
+      const remaining = isContentAuditItem(current)
+        ? contentAuditSessionCount()
+        : queue.length + (current ? 1 : 0);
       elLeft.textContent = remaining ? `${remaining} übrig` : `0 übrig`;
       elRight.textContent = totalCount ? `Inbox: ${totalCount}` : "";
+      /* === END BLOCK: INBOX_CONTENT_AUDIT_PROGRESS_NAV_AWARE_V1 === */
 
       if (!current) {
         elOne.innerHTML = `
@@ -1012,6 +1222,13 @@ Umfang:
         `;
         return;
       }
+
+      /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_RENDER_BRANCH_V1 | Zweck: rendert Content-Quality-Faelle als eigene Arbeitskarte statt sie durch die Event-Kandidaten-Logik zu schicken; Umfang: frueher Render-Branch === */
+      if (isContentAuditItem(current)) {
+        renderContentAuditCurrent(totalCount);
+        return;
+      }
+      /* === END BLOCK: INBOX_CONTENT_AUDIT_RENDER_BRANCH_V1 === */
 
       // === BEGIN BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
       // Zweck:
@@ -1231,6 +1448,688 @@ Umfang:
       document.getElementById("btnNo").addEventListener("click", () => approveReject("verworfen"));
       // === END BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
     }
+
+    /* === BEGIN BLOCK: INBOX_CONTENT_VERIFICATION_RENDER_AND_ACTIONS_V2 | Zweck: macht Content-Quality-Faelle als klare Pruefaufgaben mit Checkliste, Korrekturfeldern und eindeutigen Statusaktionen bearbeitbar; Umfang: eigener Render- und Write-Pfad fuer review_source=content_audit === */
+    function buildContentAuditRows(item) {
+      return [
+        ["Arbeitsbereich", trimValue(item.workbench_group)],
+        ["Prozesskategorie", trimValue(item.process_category)],
+        ["Korrekturweg", trimValue(item.correction_owner)],
+        ["Automatik-Regel", trimValue(item.automation_policy)],
+        ["Queue-Rolle", trimValue(item.queue_role)],
+        ["Faktenprobe", trimValue(item.evidence_status)],
+        ["Visual-Key-Vorschlag", trimValue(item.suggested_visual_key)],
+        ["Visual-Motiv-Vorschlag", trimValue(item.suggested_visual_motif)],
+        ["Visual-Motiv-Rolle", trimValue(item.suggested_visual_motif_role)],
+        ["Visual-Asset-Status", trimValue(item.visual_asset_status)],
+        ["Faktenprobe Kurzbefund", trimValue(item.evidence_summary)],
+        ["Geprüfte Felder", trimValue(item.evidence_checked_fields)],
+        ["Nicht bestätigt", trimValue(item.evidence_missing_fields)],
+        ["Feldstatus", trimValue(item.evidence_field_statuses)],
+        ["Typ", trimValue(item.content_type)],
+        ["Quelle", trimValue(item.source_system)],
+        ["ID", trimValue(item.content_id)],
+        ["Datum", formatGermanDate(item.date)],
+        ["Issue-Code", trimValue(item.issue_code)],
+        ["Status", formatContentAuditStatus(item.status)],
+        ["Erstmals gesehen", formatGermanDateTime(item.first_seen_at)],
+        ["Zuletzt gesehen", formatGermanDateTime(item.last_seen_at)],
+        ["Anzahl", trimValue(item.occurrence_count)],
+        ["Nächste Prüfung", formatGermanDate(item.next_review_at)],
+        ["Tab", trimValue(item.sheet_tab)]
+      ].filter(([, value]) => trimValue(value));
+    }
+
+    function contentAuditGuide(item) {
+      const code = trimValue(item.issue_code);
+      const type = trimValue(item.content_type);
+      const source = trimValue(item.source_system);
+      const guides = {
+        event_full_verification_due: {
+          actionTitle: "Event vollständig gegen die Quelle prüfen",
+          why: "Datum, Uhrzeit, Ort oder Absage können sich ändern. Dieser Check macht den Event-Datensatz bewusst verifiziert.",
+          action: "Öffne die Quelle. Vergleiche Titel, Datum, Start-/Endzeit, Ort/Adresse, Ticketlink, Status/Absage, Beschreibung, Kategorie/Tags und Bild. Wenn alles stimmt: „Vollständig geprüft“ klicken. Wenn etwas abweicht: Felder unten korrigieren und speichern.",
+          checklist: ["Titel stimmt", "Datum stimmt", "Startzeit und Endzeit stimmen", "Ort/Adresse stimmt", "Quelle/Ticketlink funktioniert", "keine Absage oder Verschiebung erkennbar", "Beschreibung/Kategorie/Tags passen", "Bild/Motiv passt"],
+          nextReviewDays: 7
+        },
+        event_source_url_broken: {
+          actionTitle: "Kaputte Eventquelle beheben",
+          why: "Eine kaputte Quelle schwächt Vertrauen und verhindert Nachprüfung.",
+          action: "Öffne die Quelle. Suche die korrekte Eventseite. Wenn du eine neue URL findest, unten eintragen und speichern. Wenn die Quelle nur temporär nicht erreichbar ist: 7 Tage zurückstellen.",
+          checklist: ["Quelle im Browser öffnen", "neue korrekte Eventquelle suchen", "URL im Events-Sheet speichern oder Fall zurückstellen"],
+          nextReviewDays: 7
+        },
+        event_source_url_redirect: {
+          actionTitle: "Weiterleitung bewusst übernehmen oder bestätigen",
+          why: "Redirects können harmlos sein, aber auch auf eine allgemeinere oder falsche Seite führen.",
+          action: "Öffne die Quelle. Wenn die Zielseite fachlich korrekt ist, die finale URL unten speichern. Wenn die Weiterleitung bewusst akzeptiert werden soll, vollständig geprüft markieren.",
+          checklist: ["Quelle öffnen", "finale Zielseite fachlich prüfen", "finale URL speichern oder bewusst bestätigen"],
+          nextReviewDays: 14
+        },
+        event_source_url_unstable: {
+          actionTitle: "Unsichere Eventquelle manuell prüfen",
+          why: "Der Bot konnte die Quelle nicht sicher bewerten. Für Nutzer kann sie trotzdem funktionieren.",
+          action: "Quelle im Browser öffnen. Wenn sie funktioniert und der Inhalt stimmt: vollständig geprüft. Wenn sie falsch ist: URL korrigieren. Wenn sie temporär nicht erreichbar ist: 7 Tage zurückstellen.",
+          checklist: ["Quelle im Browser testen", "Eventdaten vergleichen", "bestätigen, korrigieren oder zurückstellen"],
+          nextReviewDays: 7
+        },
+        event_ticket_url_manual_check: {
+          actionTitle: "Ticketportal manuell prüfen",
+          why: "Ticketportale wie Reservix blockieren Bot-Prüfungen oft. Das ist nicht automatisch ein Fehler.",
+          action: "Ticketlink im Browser öffnen. Wenn der Ticket-/Buchungslink für Nutzer sinnvoll funktioniert, vollständig geprüft klicken. Wenn eigentlich eine redaktionelle Quelle fehlt, passende Quelle/URL unten korrigieren.",
+          checklist: ["Ticketlink im Browser öffnen", "prüfen, ob Nutzer sinnvoll buchen/Informationen sehen", "Ticketlink bestätigen oder bessere Quelle speichern"],
+          nextReviewDays: 14
+        },
+        event_ticket_portal_as_primary_source: {
+          actionTitle: "Offizielle Eventquelle statt Ticketportal setzen",
+          why: "Ticketportale sind Buchungslinks. Die primäre Quelle soll die offizielle Event- oder Veranstalterseite sein, damit Datum, Ort und Status belastbar nachprüfbar bleiben.",
+          action: "Wenn eine empfohlene offizielle Quelle angezeigt wird, diese öffnen, gegen Datum/Uhrzeit/Ort vergleichen und erst danach unten speichern. Falls kein Vorschlag vorhanden ist: Fall zurückstellen oder Quelle recherchieren lassen. Das Ticketportal nicht blind als Hauptquelle bestätigen.",
+          checklist: ["Ticketportal öffnen und Event identifizieren", "empfohlene offizielle Quelle öffnen, falls vorhanden", "Datum/Uhrzeit/Ort vergleichen", "offizielle Quelle in der Content-Prüfung speichern oder Fall zurückstellen"],
+          nextReviewDays: 14
+        },
+        event_time_format_unusual: {
+          actionTitle: "Eventzeit prüfen und korrigieren",
+          why: "Ungewöhnliche Zeitformate können auf falsche oder schwer lesbare Angaben hinweisen.",
+          action: "Quelle öffnen, Start-/Endzeit vergleichen und unten im Feld „Uhrzeit“ im Format HH:MM oder HH:MM–HH:MM speichern.",
+          checklist: ["Startzeit prüfen", "Endzeit prüfen", "Uhrzeit im Sheet korrigieren"],
+          nextReviewDays: 7
+        },
+        activity_full_verification_due: {
+          actionTitle: "Activity vollständig gegen die Quelle prüfen",
+          why: "Öffnungszeiten, Saison, Preise oder Nutzbarkeit können sich ändern. Diese Activity gilt erst nach vollständigem Check als qualitätsgesichert.",
+          action: "Quelle öffnen. Prüfe Ort, Maps, Öffnungszeiten, Saison/Feiertage, Kosten, Beschreibung, Tags/Merkmale, Bild und Bildnachweis. Wenn alles stimmt: vollständig geprüft. Wenn etwas geändert werden muss: Patch nötig markieren.",
+          checklist: ["Ort/Maps stimmt", "Öffnungszeiten stimmen", "Saison/Feiertage geprüft", "Kosten/Eintritt geprüft", "Beschreibung stimmt", "Tags/Merkmale passen", "Bild und Bildnachweis passen"],
+          nextReviewDays: 30
+        },
+        activity_required_field_missing: {
+          actionTitle: "Activity-Datensatz per Repo-Patch korrigieren",
+          why: "Activities liegen in data/offers.json und dürfen nicht unsichtbar über die Inbox überschrieben werden.",
+          action: "Quelle öffnen, fehlendes Feld fachlich bestimmen und „Patch nötig markieren“ klicken. Danach erstellen wir einen bewussten Repo-Patch.",
+          checklist: ["Quelle öffnen", "fehlenden Wert bestimmen", "Patch nötig markieren"],
+          nextReviewDays: 30
+        },
+        activity_image_needs_review: {
+          actionTitle: "Activity-Bild bewusst prüfen",
+          why: "Bilder mit needs_review sind noch nicht final freigegeben.",
+          action: "Öffentliche Seite und Quelle öffnen. Wenn Bild passt, später per Repo-Patch freigeben. Wenn es nicht passt, Ersatzbild/Patch vorbereiten.",
+          checklist: ["Bild in Card-Kontext ansehen", "Motiv-Fit prüfen", "Bildnachweis prüfen", "Patch nötig markieren"],
+          nextReviewDays: 30
+        },
+        activity_source_url_redirect: {
+          actionTitle: "Activity-Redirect prüfen",
+          why: "Eine weitergeleitete Quelle kann korrekt sein, sollte aber bewusst in data/offers.json nachgezogen werden.",
+          action: "Quelle öffnen, finale Zielseite prüfen und bei korrekter Zielseite Patch nötig markieren, damit die URL später im Repo aktualisiert wird.",
+          checklist: ["Quelle öffnen", "finale Zielseite prüfen", "Patch nötig markieren oder vollständig bestätigen"],
+          nextReviewDays: 30
+        },
+        activity_check_too_old: {
+          actionTitle: "Activity-Öffnungszeiten erneut prüfen",
+          why: "Der letzte fachliche Check ist zu alt; Öffnungszeiten/Saison können sich geändert haben.",
+          action: "Quelle öffnen, Öffnungszeiten und Saisonangaben vergleichen. Wenn alles stimmt: vollständig geprüft. Bei Änderung: Patch nötig markieren.",
+          checklist: ["Öffnungszeiten prüfen", "Saison/Feiertage prüfen", "Kosten prüfen", "Patch nötig oder vollständig geprüft"],
+          nextReviewDays: 30
+        },
+        event_visual_key_missing_ready_candidate: {
+          actionTitle: "Visual-Key-Vorschlag prüfen",
+          why: "Für das Event fehlt ein visual_key, aber der Audit kann einen passenden Key und ein vorhandenes Motiv vorschlagen.",
+          action: "Im Visual-Fit-Paket prüfen, ob visual_key und visual_motif fachlich passen. Erst danach gesammelt in Sheet/Workflow übernehmen.",
+          checklist: ["Eventtitel prüfen", "visual_key-Vorschlag prüfen", "visual_motif-Vorschlag prüfen", "Bildmotiv im Pool prüfen", "später gesammelt übernehmen oder ablehnen"],
+          nextReviewDays: 30
+        },
+        event_visual_key_missing_asset_gap: {
+          actionTitle: "Visual-Gap statt falschem Bild",
+          why: "Für das Event fehlt ein visual_key und der vorgeschlagene Motivbedarf hat kein fertiges Asset.",
+          action: "Im Visual-Fit-Workflow entscheiden: neues Bildmotiv produzieren, Key/Motiv verfeinern oder bewusst Fallback nutzen.",
+          checklist: ["Eventmotiv bestimmen", "fehlendes Asset prüfen", "Bildproduktion oder Key-Verfeinerung planen", "nicht blind Fallback setzen"],
+          nextReviewDays: 30
+        },
+        event_visual_key_missing_needs_decision: {
+          actionTitle: "Visual-Zuordnung manuell entscheiden",
+          why: "Der Audit kann keinen eindeutig sicheren Visual-Fit ableiten.",
+          action: "Im Visual-Fit-Workflow manuell bewerten, ob bestehende Keys reichen oder ein neuer Motivbedarf entsteht.",
+          checklist: ["Eventkontext prüfen", "Key-Vorschlag prüfen", "Motiv-/Assetstatus prüfen", "Entscheidung dokumentieren"],
+          nextReviewDays: 30
+        },
+        event_visual_motif_missing_specific: {
+          actionTitle: "Spezifisches Visual-Motiv prüfen",
+          why: "Der visual_key ist vorhanden, aber ohne visual_motif kann die Website ein zu generisches Bild verwenden.",
+          action: "Im Visual-Fit-Paket prüfen, ob das vorgeschlagene visual_motif übernommen werden soll oder ob ein neutraler Fallback bewusst reicht.",
+          checklist: ["visual_key prüfen", "visual_motif-Vorschlag prüfen", "Pool-Bild prüfen", "später gesammelt übernehmen oder ablehnen"],
+          nextReviewDays: 30
+        },
+        event_visual_motif_unknown: {
+          actionTitle: "Unbekanntes Visual-Motiv prüfen",
+          why: "Das gesetzte visual_motif passt nicht zum aktuellen Motiv-Regelwerk.",
+          action: "Motiv im Sheet korrigieren oder Regelwerk bewusst erweitern. Nicht automatisch überschreiben.",
+          checklist: ["gesetztes visual_motif prüfen", "Regelwerk prüfen", "Korrektur oder Erweiterung vorbereiten"],
+          nextReviewDays: 30
+        },
+        event_visual_motif_without_ready_asset: {
+          actionTitle: "Visual-Motiv ohne fertiges Bild",
+          why: "Das Motiv ist fachlich erkennbar, aber es gibt noch kein fertiges ready-Bild im Pool.",
+          action: "Visual-Gap in den Bildproduktionsworkflow übernehmen oder bewusst anderes Motiv wählen.",
+          checklist: ["Motivbedarf prüfen", "Assetstatus prüfen", "Bildproduktion planen", "kein falsches Bild erzwingen"],
+          nextReviewDays: 30
+        }
+      };
+
+      return guides[code] || {
+        actionTitle: type === "activity" ? "Activity-Fall fachlich prüfen" : "Event-Fall fachlich prüfen",
+        why: "Der Guard hat einen Qualitätsfall gefunden, der nicht blind automatisch korrigiert wird.",
+        action: trimValue(item.recommended_action) || "Quelle öffnen, Angaben prüfen und den passenden Abschluss-Button verwenden.",
+        checklist: source === "offers_json" ? ["Quelle öffnen", "Angaben vergleichen", "Patch nötig markieren oder vollständig geprüft"] : ["Quelle öffnen", "Angaben vergleichen", "über Content-Prüfung korrigieren oder vollständig geprüft"],
+        nextReviewDays: type === "activity" ? 30 : 7
+      };
+    }
+
+    function eventFieldValue(item, name) {
+      const fields = item && item.event_fields && typeof item.event_fields === "object" ? item.event_fields : {};
+      return trimValue(fields[name]);
+    }
+
+    function renderAuditChecklist(items) {
+      return `<ul class="auditChecklist">${items.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>`;
+    }
+
+    function renderSourceSuggestion(item) {
+      const suggestedUrl = trimValue(item.suggested_url);
+      if (!suggestedUrl) return "";
+      const label = trimValue(item.suggested_url_label) || "Empfohlene offizielle Quelle";
+      const reason = trimValue(item.suggestion_reason);
+      return `
+        <section class="reviewSection" aria-label="Empfohlene Quelle">
+          <div class="reviewSectionTitle">Empfohlene Quelle</div>
+          <div class="auditStateNote auditStateNote--suggestedSource">
+            <strong>${escapeHtml(label)}</strong><br />
+            <span>${escapeHtml(suggestedUrl)}</span>
+            ${reason ? `<br /><span>${escapeHtml(reason)}</span>` : ``}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderEvidenceSummary(item) {
+      const status = trimValue(item.evidence_status);
+      const summary = trimValue(item.evidence_summary);
+      const checked = trimValue(item.evidence_checked_fields);
+      const missing = trimValue(item.evidence_missing_fields);
+      const fieldStatuses = trimValue(item.evidence_field_statuses);
+      if (!status && !summary && !checked && !missing && !fieldStatuses) return "";
+      return `
+        <section class="reviewSection" aria-label="Faktenprobe">
+          <div class="reviewSectionTitle">Faktenprobe</div>
+          <div class="auditStateNote">
+            ${status ? `<div><strong>Status:</strong> ${escapeHtml(status)}</div>` : ``}
+            ${summary ? `<div>${escapeHtml(summary)}</div>` : ``}
+            ${checked ? `<div><strong>Automatisch geprüft:</strong> ${escapeHtml(checked)}</div>` : ``}
+            ${missing ? `<div><strong>Nicht automatisch bestätigt:</strong> ${escapeHtml(missing)}</div>` : ``}
+            ${fieldStatuses ? `<div><strong>Feldstatus:</strong> ${escapeHtml(fieldStatuses)}</div>` : ``}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderVisualFitSuggestion(item) {
+      const key = trimValue(item.suggested_visual_key);
+      const motif = trimValue(item.suggested_visual_motif);
+      const role = trimValue(item.suggested_visual_motif_role);
+      const assetStatus = trimValue(item.visual_asset_status);
+      if (!key && !motif && !role && !assetStatus) return "";
+      return `
+        <section class="reviewSection" aria-label="Visual-Fit-Vorschlag">
+          <div class="reviewSectionTitle">Visual-Fit-Vorschlag</div>
+          <div class="auditStateNote">
+            ${key ? `<div><strong>visual_key:</strong> ${escapeHtml(key)}</div>` : ``}
+            ${motif ? `<div><strong>visual_motif:</strong> ${escapeHtml(motif)}</div>` : ``}
+            ${role ? `<div><strong>Motiv-Rolle:</strong> ${escapeHtml(role)}</div>` : ``}
+            ${assetStatus ? `<div><strong>Asset-Status:</strong> ${escapeHtml(assetStatus)}</div>` : ``}
+            <div>Nur Vorschlag für den Visual-Fit-Workflow. Nicht automatisch speichern oder Bild blind ersetzen.</div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderEventCorrectionForm(item, suggestedUrl) {
+      if (!isContentAuditEventItem(item)) return "";
+      const issueCode = trimValue(item.issue_code);
+      const currentSourceValue = eventFieldValue(item, "source_url") || eventFieldValue(item, "url") || eventFieldValue(item, "event_url") || trimValue(item.source_url);
+      const sourceValue = suggestedUrl || (issueCode === "event_ticket_portal_as_primary_source" ? "" : currentSourceValue);
+      return `
+        <section class="reviewSection" aria-label="Eventdaten korrigieren">
+          <div class="reviewSectionTitle">Eventdaten über Content-Prüfung korrigieren</div>
+          <div class="auditActionHint">Nur ändern, wenn du die Abweichung in der Quelle gesehen hast. Gespeichert wird im Hintergrund in die kanonische Eventquelle; du musst nicht direkt im Sheet arbeiten.</div>
+          <div class="auditFormGrid">
+            <div class="auditField auditField--wide">
+              <label for="auditEventTitle">Titel</label>
+              <input id="auditEventTitle" type="text" value="${escapeHtml(eventFieldValue(item, "title") || item.title)}" autocomplete="off" />
+            </div>
+            <div class="auditField">
+              <label for="auditEventDate">Startdatum YYYY-MM-DD</label>
+              <input id="auditEventDate" type="text" value="${escapeHtml(eventFieldValue(item, "date") || item.date)}" inputmode="numeric" autocomplete="off" />
+            </div>
+            <div class="auditField">
+              <label for="auditEventEndDate">Enddatum YYYY-MM-DD</label>
+              <input id="auditEventEndDate" type="text" value="${escapeHtml(eventFieldValue(item, "endDate") || eventFieldValue(item, "end_date"))}" inputmode="numeric" autocomplete="off" />
+            </div>
+            <div class="auditField">
+              <label for="auditEventTime">Uhrzeit</label>
+              <input id="auditEventTime" type="text" value="${escapeHtml(eventFieldValue(item, "time"))}" autocomplete="off" />
+            </div>
+            <div class="auditField">
+              <label for="auditEventCity">Stadt</label>
+              <input id="auditEventCity" type="text" value="${escapeHtml(eventFieldValue(item, "city"))}" autocomplete="off" />
+            </div>
+            <div class="auditField auditField--wide">
+              <label for="auditEventLocation">Ort / Location</label>
+              <input id="auditEventLocation" type="text" value="${escapeHtml(eventFieldValue(item, "location"))}" autocomplete="off" />
+            </div>
+            <div class="auditField auditField--wide">
+              <label for="auditEventSourceUrl">Offizielle Quelle</label>
+              <input id="auditEventSourceUrl" type="url" value="${escapeHtml(sourceValue)}" inputmode="url" autocomplete="off" />
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function collectEventUpdateFields() {
+      const value = (id) => trimValue(document.getElementById(id)?.value);
+      const updates = {
+        title: value("auditEventTitle"),
+        date: value("auditEventDate"),
+        time: value("auditEventTime"),
+        city: value("auditEventCity"),
+        location: value("auditEventLocation")
+      };
+
+      const endDate = value("auditEventEndDate");
+      if (endDate) {
+        updates.endDate = endDate;
+        updates.end_date = endDate;
+      }
+
+      const sourceUrl = value("auditEventSourceUrl");
+      if (sourceUrl) {
+        updates.source_url = sourceUrl;
+        updates.url = sourceUrl;
+        updates.event_url = sourceUrl;
+      }
+
+      Object.keys(updates).forEach((key) => {
+        if (!updates[key]) delete updates[key];
+      });
+      return updates;
+    }
+
+    /* === BEGIN BLOCK: INBOX_CONTENT_WORK_PACKAGE_EXPORT_V2 | Zweck: trennt Content-Prueffaelle in saubere Arbeitspakete (Repo-Datenpatch, Quellencheck, Retry/Beobachten, Visual-Fit), damit keine fachlich unterschiedlichen Faelle blind zusammen gepatcht werden; Umfang: reine UI-/Exportlogik, keine Status- oder Datenänderung === */
+    function contentAuditAllLoadedItems() {
+      const base = contentAuditPackagePool.length
+        ? contentAuditPackagePool
+        : [...contentAuditHistory, ...(current ? [current] : []), ...queue];
+      return base.filter(isContentAuditItem);
+    }
+
+    function contentAuditWorkRoute(item) {
+      const category = trimValue(item.process_category);
+      const owner = trimValue(item.correction_owner);
+      const group = trimValue(item.workbench_group).toLowerCase();
+      const code = trimValue(item.issue_code);
+      const source = trimValue(item.source_system);
+
+      /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_WORK_ROUTE_HARDENING_V1 | Zweck: ordnet Arbeitspakete anhand eindeutiger Issue-Codes stabil ein, auch wenn alte Sheet-/API-Gruppenwerte noch vorhanden sind; Umfang: reine UI-/Exportlogik, keine Status- oder Datenänderung === */
+      const visualMarkers = ["visual", "image", "bild", "motif"];
+      if (visualMarkers.some((marker) => code.includes(marker))) return "visual_fit";
+
+      if (code === "activity_source_url_unstable" || code === "event_source_url_unstable") return "retry_observation";
+      if (code.includes("source_url_redirect") || code.includes("source_url_broken") || code.includes("source_missing") || code.includes("source_url_invalid")) return "source_check";
+      if (code.includes("facts_not_confirmed") || code.includes("fact_evidence")) return "fact_check";
+      if (code.includes("checked_at") || code.includes("check_too_old") || code.includes("check_aging")) return "activity_check";
+
+      const directRepoCodes = ["activity_required_field_missing", "activity_duplicate_id", "activities_json_invalid"];
+      if (source === "offers_json" && directRepoCodes.includes(code)) return "repo_data_patch";
+      /* === END BLOCK: INBOX_CONTENT_AUDIT_WORK_ROUTE_HARDENING_V1 === */
+
+      if (category === "repo_data_patch_candidate" || group.includes("repo-datenpatch")) return "repo_data_patch";
+      if (category === "source_review_candidate" || group.includes("quellenprüfung")) return "source_check";
+      if (category === "fact_check_candidate" || group.includes("faktencheck")) return "fact_check";
+      if (category === "source_retry_observation" || group.includes("retry")) return "retry_observation";
+      if (category === "visual_fit_candidate" || group.includes("visual-fit")) return "visual_fit";
+      if (category === "activity_review_candidate" || group.includes("activity-prüfung")) return "activity_check";
+
+      if (category === "repo_patch_candidate" || owner === "repo_patch" || group.includes("repo-patch")) return "repo_data_patch";
+      return "other";
+    }
+
+    const contentAuditWorkPackages = {
+      repo_data_patch: {
+        title: "Repo-Datenpatch-Paket",
+        label: "Repo-Datenpatch",
+        copyLabel: "Repo-Datenpatch kopieren",
+        description: "Direkt patchbare Datenlücken aus dem Repo. Diese Fälle können später gebündelt als bewusster Repo-Patch vorbereitet werden.",
+        instruction: "Bitte nur diese direkten Repo-Datenfälle patchen. Quellen-/Retry-/Visual-Fit-Fälle nicht in denselben Patch mischen. Keine Daten blind überschreiben."
+      },
+      source_check: {
+        title: "Quellencheck-Paket",
+        label: "Quellencheck",
+        copyLabel: "Quellencheck kopieren",
+        description: "Quellenfälle, bei denen zuerst fachlich geprüft werden muss, ob die Zielseite stimmt oder eine bessere Quelle nötig ist. Erst danach entsteht ggf. ein Repo- oder Sheet-Fix.",
+        instruction: "Bitte diese Quellenfälle zuerst fachlich prüfen. Nur wenn die Zielquelle belastbar besser ist, danach einen getrennten Korrekturpatch oder Inbox-Speicherfall vorbereiten."
+      },
+      fact_check: {
+        title: "Faktencheck-Paket",
+        label: "Faktencheck",
+        copyLabel: "Faktencheck kopieren",
+        description: "Fälle, bei denen die Quelle technisch erreichbar ist, aber Datum, Uhrzeit, Ort oder Titel nicht ausreichend automatisch bestätigt wurden. Das ist eine Prüfstichprobe, noch keine Korrektur.",
+        instruction: "Bitte diese Faktenfälle gegen die Quelle prüfen. Nur wenn die Quelle wirklich widerspricht, danach eine Sheet-/Inbox-Korrektur vorbereiten. Schwache automatische Texttreffer nicht blind als Fehler behandeln."
+      },
+      activity_check: {
+        title: "Activity-Prüfpaket",
+        label: "Activity-Prüfung",
+        copyLabel: "Activity-Prüfung kopieren",
+        description: "Activity-Fälle, bei denen Öffnungszeiten, checked_at, Saison oder fachliche Angaben geprüft werden müssen. Erst danach wird entschieden, ob ein Repo-Patch nötig ist.",
+        instruction: "Bitte diese Activity-Fälle fachlich gegen die Quelle prüfen und erst danach einen Repo-Patch vorbereiten."
+      },
+      retry_observation: {
+        title: "Beobachten-/Retry-Paket",
+        label: "Beobachten / Retry",
+        copyLabel: "Retry-Fälle kopieren",
+        description: "Technisch wackelige Einzelfälle. Nicht sofort patchen. Beim nächsten Audit erneut prüfen und erst bei Wiederholung eskalieren.",
+        instruction: "Bitte diese Fälle nicht sofort patchen. Erst bei wiederholtem Auftreten oder echtem Quellenfehler in Quellencheck/Patch überführen."
+      },
+      visual_fit: {
+        title: "Visual-Fit-Paket",
+        label: "Visual-Fit",
+        copyLabel: "Visual-Fit-Fälle kopieren",
+        description: "Bild-/visual_key-/visual_motif-/Motiv-Fälle. Diese gehören in den separaten Visual-Fit-Workflow, nicht in normale Daten- oder Quellenpatches.",
+        instruction: "Bitte diese Fälle im separaten Visual-Fit-Workflow bewerten. Kein Bild blind ersetzen und keine visual_keys/visual_motifs ohne Motivprüfung setzen."
+      }
+    };
+
+    function contentAuditPackageItems(route) {
+      const seen = new Set();
+      return contentAuditAllLoadedItems().filter((item) => {
+        if (contentAuditWorkRoute(item) !== route) return false;
+        const key = [trimValue(item.content_type), trimValue(item.content_id), trimValue(item.issue_code)].join("::");
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function buildContentAuditPackagePayload(route, items) {
+      const config = contentAuditWorkPackages[route] || contentAuditWorkPackages.repo_data_patch;
+      return {
+        type: "bocholt_content_quality_work_package",
+        route,
+        label: config.label,
+        generated_at: new Date().toISOString(),
+        source: "inbox_content_pruefung",
+        instruction: config.instruction,
+        candidates: items.map((item) => ({
+          content_type: trimValue(item.content_type),
+          source_system: trimValue(item.source_system),
+          content_id: trimValue(item.content_id),
+          title: trimValue(item.title),
+          issue_code: trimValue(item.issue_code),
+          issue_text: trimValue(item.issue_text),
+          recommended_action: trimValue(item.recommended_action),
+          source_url: trimValue(item.source_url),
+          suggested_url: trimValue(item.suggested_url),
+          suggested_visual_key: trimValue(item.suggested_visual_key),
+          suggested_visual_motif: trimValue(item.suggested_visual_motif),
+          suggested_visual_motif_role: trimValue(item.suggested_visual_motif_role),
+          visual_asset_status: trimValue(item.visual_asset_status),
+          public_url: trimValue(item.public_url),
+          process_category: trimValue(item.process_category),
+          correction_owner: trimValue(item.correction_owner),
+          workbench_group: trimValue(item.workbench_group),
+          automation_policy: trimValue(item.automation_policy),
+          queue_role: trimValue(item.queue_role),
+          evidence_status: trimValue(item.evidence_status),
+          evidence_summary: trimValue(item.evidence_summary),
+          evidence_checked_fields: trimValue(item.evidence_checked_fields),
+          evidence_missing_fields: trimValue(item.evidence_missing_fields),
+          evidence_field_statuses: trimValue(item.evidence_field_statuses)
+        }))
+      };
+    }
+
+    function renderContentAuditPackage(route) {
+      const config = contentAuditWorkPackages[route];
+      if (!config) return "";
+      const items = contentAuditPackageItems(route);
+      if (!items.length) return "";
+      const maxVisible = 6;
+      const listItems = items.slice(0, maxVisible).map((item) => `
+        <li><strong>${escapeHtml(item.title || item.content_id || "ohne Titel")}</strong> · ${escapeHtml(item.issue_code || "ohne Issue-Code")}</li>
+      `).join("");
+      const more = items.length > maxVisible ? `<li>… ${escapeHtml(String(items.length - maxVisible))} weitere</li>` : "";
+      return `
+        <section class="reviewSection" aria-label="${escapeHtml(config.title)}">
+          <div class="reviewSectionTitle">${escapeHtml(config.title)}</div>
+          <div class="auditBundleBox">
+            <div><strong>${escapeHtml(String(items.length))} ${escapeHtml(config.label)}-Fall${items.length === 1 ? "" : "e"}</strong> in der geladenen Content-Prüfung.</div>
+            <div>${escapeHtml(config.description)}</div>
+            <ul class="auditBundleList">${listItems}${more}</ul>
+            <div class="auditBundleActions">
+              <button class="btn" type="button" data-audit-bundle-copy="${escapeHtml(route)}">${escapeHtml(config.copyLabel)}</button>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderContentAuditWorkPackages() {
+      const currentRoute = contentAuditWorkRoute(current || {});
+      const routes = [currentRoute, "repo_data_patch", "source_check", "fact_check", "activity_check", "retry_observation", "visual_fit"]
+        .filter((route, index, arr) => route && route !== "other" && arr.indexOf(route) === index);
+      return routes.map(renderContentAuditPackage).join("");
+    }
+
+    async function copyContentAuditPackageToClipboard(route) {
+      const items = contentAuditPackageItems(route);
+      const payload = JSON.stringify(buildContentAuditPackagePayload(route, items), null, 2);
+      const config = contentAuditWorkPackages[route] || contentAuditWorkPackages.repo_data_patch;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(payload);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = payload;
+          textarea.setAttribute("readonly", "readonly");
+          textarea.style.position = "fixed";
+          textarea.style.left = "-9999px";
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textarea);
+        }
+        setStatus(`${items.length} ${config.label}-Fall${items.length === 1 ? "" : "e"} kopiert. Keine Daten wurden geändert.`);
+      } catch (error) {
+        console.error(error);
+        setStatus("Arbeitspaket konnte nicht kopiert werden. Bitte technische Prüfdaten manuell sichern.");
+      }
+    }
+    /* === END BLOCK: INBOX_CONTENT_WORK_PACKAGE_EXPORT_V2 === */
+
+    function renderContentAuditCurrent(totalCount) {
+      const it = current;
+      const severity = trimValue(it.severity);
+      const severityLabel = formatContentAuditSeverity(severity);
+      const statusLabel = formatContentAuditStatus(it.status);
+      const guide = contentAuditGuide(it);
+      const canEditEvent = isContentAuditEventItem(it);
+      const isActivity = isContentAuditActivityItem(it);
+      const suggestedUrl = trimValue(it.suggested_url);
+      const auditRowsHtml = buildContentAuditRows(it).map(([label, value]) => `
+        <div class="reviewRow">
+          <div class="reviewLabel">${escapeHtml(label)}</div>
+          <div class="reviewValue">${escapeHtml(value)}</div>
+        </div>
+      `).join("");
+
+      elOne.innerHTML = `
+        <article class="card reviewCard">
+          <header class="reviewCardHead">
+            <div class="reviewBadgeRow">
+              <span class="originBadge">Content-Prüfung</span>
+              ${it.workbench_group ? `<span class="reviewChip">${escapeHtml(it.workbench_group)}</span>` : ``}
+              <span class="reviewChip reviewChip--waiting">${escapeHtml(severityLabel)}</span>
+              <span class="reviewChip">${escapeHtml(statusLabel)}</span>
+            </div>
+            <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
+            <div class="reviewMetaLine">${escapeHtml([formatGermanDate(it.date), trimValue(it.content_type), trimValue(it.issue_code)].filter(Boolean).join(" · "))}</div>
+          </header>
+
+          ${renderContentAuditWorkPackages()}
+
+          <section class="reviewSection" aria-label="Konkrete Aktion">
+            <div class="reviewSectionTitle">Jetzt zu tun</div>
+            <div class="auditInstructionBox">
+              <div><strong>${escapeHtml(guide.actionTitle)}</strong>${escapeHtml(guide.action)}</div>
+              <div><strong>Warum:</strong> ${escapeHtml(guide.why)}</div>
+            </div>
+          </section>
+
+          <section class="reviewSection" aria-label="Prüfliste">
+            <div class="reviewSectionTitle">Prüfliste</div>
+            ${renderAuditChecklist(guide.checklist)}
+          </section>
+
+          <section class="reviewSection" aria-label="Prüfbefund">
+            <div class="reviewSectionTitle">Prüfbefund</div>
+            <div class="auditIssueBox auditIssueBox--${escapeHtml(severity)}">
+              <strong>${escapeHtml(it.issue_text || "Content-Fall prüfen")}</strong>
+              <span>${escapeHtml(it.recommended_action || "Bitte fachlich prüfen.")}</span>
+            </div>
+          </section>
+
+          <section class="reviewSection" aria-label="Links">
+            <div class="reviewSectionTitle">Links</div>
+            <div class="urlBox">
+              ${it.public_url ? `<div class="urlLine"><strong>Eintrag auf Website:</strong> ${escapeHtml(it.public_url)}</div>` : ``}
+              ${it.source_url ? `<div class="urlLine"><strong>Quelle/Ticketlink:</strong> ${escapeHtml(it.source_url)}</div>` : ``}
+            </div>
+            <div class="auditActionHint">Erst Quelle öffnen und fachlich vergleichen. Danach unten entweder korrigieren, vollständig geprüft markieren, zurückstellen oder Patch nötig markieren.</div>
+          </section>
+
+          ${renderSourceSuggestion(it)}
+
+          ${renderEvidenceSummary(it)}
+
+          ${renderVisualFitSuggestion(it)}
+
+          ${renderEventCorrectionForm(it, suggestedUrl)}
+
+          ${isActivity ? `
+            <section class="reviewSection" aria-label="Activity-Hinweis">
+              <div class="reviewSectionTitle">Activity-Korrektur</div>
+              <div class="auditStateNote">Diese Activity kommt aus <strong>data/offers.json</strong>. Die Inbox überschreibt sie nicht direkt. Wenn Öffnungszeiten, Bild, Tags, visual_key oder Quelle geändert werden müssen, markiere den Fall als „Patch nötig“.</div>
+            </section>
+          ` : ``}
+
+          <details class="reviewDisclosure">
+            <summary>Technische Prüfdaten</summary>
+            <div class="reviewDisclosureBody reviewGrid">
+              ${auditRowsHtml}
+            </div>
+          </details>
+
+          <div id="reviewCardNotice" class="reviewNotice" hidden role="status" aria-live="polite"></div>
+
+          <section class="reviewSection reviewSection--actions" aria-label="Content-Prüfaktionen">
+            <div class="auditActionHint"><strong>Navigation:</strong> „Vorheriger Fall“ und „Nächster Fall“ ändern nichts. Nutze sie nur zum Blättern. Statusänderungen passieren nur über die Abschlussbuttons.</div>
+            <div class="actions actions--compact">
+              <button id="btnAuditPrevious" class="btn" type="button" ${contentAuditHistory.length ? "" : "disabled"}>← Vorheriger Fall</button>
+              <button id="btnAuditNext" class="btn" type="button" ${queue.length ? "" : "disabled"}>Nächster Fall →</button>
+            </div>
+            <div class="auditActionHint"><strong>Abschluss:</strong> Klicke hier erst, wenn du den aktuellen Fall wirklich entschieden hast.</div>
+            <div class="actions actions--compact">
+              ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button">Eventdaten speichern</button>` : ``}
+              <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${it.public_url ? "" : "disabled"}>Eintrag öffnen</button>
+              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${it.source_url ? "" : "disabled"}>Quelle/Ticketlink öffnen</button>
+              <button id="btnAuditVerified" class="btn btn-good" type="button">Vollständig geprüft</button>
+              ${isActivity ? `<button id="btnAuditPatchNeeded" class="btn btn-bad" type="button">Patch nötig markieren</button>` : ``}
+              <button id="btnAuditSnooze" class="btn" type="button">7 Tage zurückstellen</button>
+            </div>
+          </section>
+        </article>
+      `;
+
+      document.getElementById("btnAuditPrevious").addEventListener("click", showPreviousContentAuditItem);
+      document.getElementById("btnAuditNext").addEventListener("click", showNextContentAuditItem);
+      document.getElementById("btnOpenEvent").addEventListener("click", () => {
+        const url = trimValue(it.public_url);
+        if (url) window.open(url, "_blank", "noopener,noreferrer");
+      });
+      document.getElementById("btnOpenSource").addEventListener("click", () => {
+        const url = trimValue(it.source_url);
+        if (url) window.open(url, "_blank", "noopener,noreferrer");
+      });
+      document.querySelectorAll("[data-audit-bundle-copy]").forEach((button) => {
+        button.addEventListener("click", () => copyContentAuditPackageToClipboard(trimValue(button.getAttribute("data-audit-bundle-copy"))));
+      });
+      document.getElementById("btnAuditVerified").addEventListener("click", () => writeContentAuditAction(it, "verify_full", {
+        next_review_days: guide.nextReviewDays || (isActivity ? 30 : 7),
+        review_note: "Über interne Inbox vollständig fachlich geprüft."
+      }));
+      document.getElementById("btnAuditSnooze").addEventListener("click", () => writeContentAuditAction(it, "snooze", {
+        next_review_days: 7,
+        review_note: "Über interne Inbox 7 Tage zurückgestellt."
+      }));
+
+      const patchButton = document.getElementById("btnAuditPatchNeeded");
+      if (patchButton) {
+        patchButton.addEventListener("click", () => writeContentAuditAction(it, "mark_patch_needed", {
+          review_note: "Repo-Patch nötig: Activity-Datensatz/Visuals/Öffnungszeiten fachlich korrigieren."
+        }));
+      }
+
+      const saveFieldsButton = document.getElementById("btnAuditSaveFields");
+      if (saveFieldsButton) {
+        saveFieldsButton.addEventListener("click", () => writeContentAuditAction(it, "update_event_fields", {
+          event_updates: collectEventUpdateFields(),
+          next_review_days: guide.nextReviewDays || 7,
+          review_note: "Eventdaten über interne Inbox korrigiert und fachlich geprüft."
+        }));
+      }
+    }
+
+    async function writeContentAuditAction(it, action, extra = {}) {
+      const ok = await ensureUnlocked();
+      if (!ok) return;
+
+      ["btnAuditSaveFields", "btnAuditVerified", "btnAuditSnooze", "btnAuditPatchNeeded", "btnAuditPrevious", "btnAuditNext", "btnOpenEvent", "btnOpenSource"].forEach((id) => {
+        const button = document.getElementById(id);
+        if (button) button.disabled = true;
+      });
+
+      try {
+        const payload = {
+          action,
+          row_number: Number(it.row_number || 0),
+          content_id: trimValue(it.content_id),
+          issue_code: trimValue(it.issue_code),
+          ...extra
+        };
+
+        await postJson(CONTENT_AUDIT_UPDATE_API_URL, payload);
+        const labels = {
+          update_event_fields: "Eventdaten korrigiert.",
+          verify_full: "Content-Fall vollständig geprüft.",
+          snooze: "Content-Fall 7 Tage zurückgestellt.",
+          mark_patch_needed: "Content-Fall als Patch nötig markiert."
+        };
+        setStatus(labels[action] || "Content-Fall aktualisiert.");
+        showNext(totalLoaded);
+      } catch (error) {
+        console.error(error);
+        renderContentAuditCurrent(totalLoaded);
+        setReviewCardNotice("Content-Fall konnte nicht aktualisiert werden: " + (error?.message || error), "error");
+        setStatus("");
+      }
+    }
+    /* === END BLOCK: INBOX_CONTENT_VERIFICATION_RENDER_AND_ACTIONS_V2 === */
 
     async function approveReject(status) {
       if (!current) return;
@@ -1594,6 +2493,7 @@ Umfang:
     // Umfang:
     // - Ersetzt Init-Block
     (async function init() {
+      refreshReviewModeButtons();
       refreshLock();
 
       try {

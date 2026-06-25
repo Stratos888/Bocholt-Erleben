@@ -2,6 +2,315 @@
 
 # TEST STATUS — BOCHOLT ERLEBEN
 
+<!-- === BEGIN BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_22 | Zweck: macht das lange Testprotokoll fuer Folgechats current-first lesbar; Umfang: aktuelle Hauptbeweise, offene/geparkte Beweise, Umgang mit historischen Alt-Routen === -->
+## Aktueller Test-Index für Folgechats
+
+Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter bleiben als Beweisarchiv erhalten, sind aber nicht automatisch aktuelle Aufgaben.
+
+### Aktuell bestandene Hauptbeweise
+
+- Main-Merge und Live-Smoke bestanden; öffentliche Kernbereiche laden ohne bekannten Blocker.
+- KI-Suchlauf → Manual Inbox → Visual-Key-Handoff → Events-/Live-Bildausspielung ist auf `main` mit dem aktuellen Prüflauf bestanden.
+- Event-Visual-Motif-Fit ist für den aktuellen Sheet-Stand abgeschlossen; keine offenen Produktions-/Review-Gaps.
+- `/angebote/` ist Legacy-Redirect; kanonische Aktivitätenroute ist `/aktivitaeten/`.
+- Aktivitätspräsenz-Funnel ist unter `/aktivitaeten/sichtbar-werden/...` kanonisch; alte `/angebote/sichtbar-werden/...`-Routen sind nur Redirects.
+- Public-Shell/Footer-Konsistenz ist auf öffentlichen Neben-/Funnel-Seiten eingebracht und geprüft.
+- Reporting-/Tracking-Hardening ist live bewiesen: Anbieter-/CTA-Klick auf `/aktivitaeten/sichtbar-werden/` wurde im Dashboard gezählt.
+- CSS-Governance ist eingeführt; CSS-Audit, `style.css`-Entry-Point und ZIP-first-Fallback sind geprüft.
+- Aktivitätspräsenz-Funnel und Stripe-Rücksprunglogik sind statisch gegen die neue Route geprüft.
+
+### Offene oder bewusst geparkte Beweise
+
+- Inbox-Review-UI soll den `visual_key` künftig sichtbar und vor dem Übernehmen änderbar machen; der zugrunde liegende Handoff ist bereits bestanden.
+- 28-/30-Tage-Reporting-Datenlauf abwarten, bevor Akquise-/Feedbackberichte als belastbar gelten.
+- Activity-Visual-Restschuld (`fallback`, `needs_review`) ist bewusst späterer Qualitätsworkpack.
+- Echte Zahlungs-/Webhook-/Stripe-Livefälle bleiben nur dann erneut zu testen, wenn ein konkreter Zahlungsflow geändert wurde oder ein neues Symptom auftritt.
+
+### Hinweis zu historischen Blöcken
+
+- Alte Erwähnungen von `/angebote/...` in früheren Testblöcken sind historische Nachweise, nicht aktuelle Informationsarchitektur.
+- Bei Widerspruch gilt: `MASTER.md` für strategische Steuerung, `ROADMAP.md` für aktuelle Taktik, `ENGINEERING.md` für Arbeitsregeln.
+<!-- === END BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_22 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_MAIN_KI_SEARCH_INBOX_VISUAL_KEY_PROOF_2026_06_25 | Zweck: dokumentiert den bestandenen Main-Beweis fuer Weekly-KI-Suchlauf, Manual-Inbox-Intake, Visual-Key-Handoff, Apps-Script-Approve-Fix und Live-Bildausspielung; Umfang: GitHub-Workflowlogs, Sheet-/PWA-Proof, Grenzen und Folgeworkpack === -->
+## Main-KI-Suchlauf / Manual Inbox / Visual-Key-Handoff – bestanden (2026-06-25)
+
+Status: bestanden für den aktuellen Main-/Live-Prozess mit menschlicher Inbox-Prüfung.
+
+### Geprüfter Umfang
+
+Geprüft wurde der nach dem Main-Merge offene Kontrollpunkt:
+
+`Weekly KI Websearch -> Manual Inbox -> Manual KI Event Intake -> Inbox-Review -> Events -> Deploy -> Live-Bildausspielung`.
+
+### Belegte Workflow-Ergebnisse
+
+`Weekly KI Websearch -> Manual Inbox #17` auf `main`:
+
+- Workflow grün.
+- Events-Snapshot: 176 Zeilen.
+- Inbox-Snapshot vor Lauf: 0 Zeilen.
+- Roh-Kandidaten: 3.
+- Produktiv ausgewählt: 2.
+- Verworfen: 1 mit Grund `out_of_window` (`600 Jahre Werth - Festwoche`).
+- In `data/inbox_manual.json` geschrieben: 2.
+- Neue Source-Candidates: 0.
+- Coverage-Ziele: 27.
+- Coverage-Status: `IN_EVENTS` 21, `IN_INBOX_ARCHIVE` 2, `MISSING_FROM_RAW` 3, `PAST_TARGET` 1.
+
+`Manual KI Event Intake` als Folgelauf:
+
+- Workflow grün.
+- `visual_key`-Dropdown im Google-Sheet-Tab `Inbox` gesetzt: 34 Optionen.
+- `Append OK: appended=2 skipped=0`.
+- `data/inbox_manual.json` wurde danach zurückgesetzt.
+- Deploy wurde durch den Intake-Workflow angestoßen.
+
+Import-/Review-Pfad:
+
+- Die zwei Kandidaten waren in der Inbox sichtbar und konnten redaktionell übernommen werden:
+  - `Bocholter Gesundheitstage`.
+  - `Nacht der Ausbildung 2026 mit Isselburg`.
+- Der GitHub-Workflow `Inbox -> Events (Import) #147` meldete `Import-Kandidaten (status=übernehmen): 0`, weil die PWA-/Apps-Script-Review bereits direkt nach `Events` importiert hatte. Das ist kein Fehler dieses Beweises, sondern beschreibt den tatsächlich genutzten Live-Review-Pfad.
+
+### Gefundener und behobener Prozessfehler
+
+Beim Test wurde ein echter Handoff-Fehler im externen Google Apps Script gefunden:
+
+- `approve_()` importierte die Inbox-Zeile direkt nach `Events`, übernahm aber `visual_key` nicht in `eventMap`.
+- Folge: `Events.visual_key` blieb leer und der Build musste den Bildtyp wieder automatisch ableiten.
+- Sichtbares Symptom: `Bocholter Gesundheitstage` fiel wegen Kategorie `Sport & Bewegung` auf `indoor_sport_competition` zurück und zeigte ein unpassendes Darts-/Sporthallenbild.
+
+Der externe Apps-Script-Code wurde korrigiert:
+
+- `approve_()` setzt jetzt `visual_key: valueOrEmpty_(inboxMap.visual_key)`.
+- Zusätzlich werden gemeinsame Zusatzspalten aus Inbox nach Events übernommen, ohne bewusst gemappte Felder zu überschreiben.
+- Die bestehende Web-App-Bereitstellung wurde auf eine neue Version gehoben; die API-URL blieb unverändert.
+
+Beweis nach Fix:
+
+- Testfall `TEST Visual Key Import Proof` wurde in der Inbox-PWA angezeigt.
+- Nach Klick auf `Übernehmen` erschien der Fall im Google-Sheet-Tab `Events`.
+- `Events.visual_key` war dort korrekt mit `business_messe_info` befüllt.
+
+### Live-Bildausspielung
+
+- `Bocholter Gesundheitstage` wurde in `Events.visual_key` auf `business_messe_info` korrigiert und erneut deployt.
+- Das vorherige Darts-/Sporthallenbild wurde live durch ein passenderes Beratungs-/Info-Motiv ersetzt.
+- `Nacht der Ausbildung 2026 mit Isselburg` nutzt ebenfalls `business_messe_info` und zeigt ein passendes Vortrag-/Infoveranstaltungsbild.
+
+### Bewertung gegen den ursprünglichen Kontrollpunkt
+
+Bestanden:
+
+1. Weekly-KI-Suchlauf läuft auf `main` und erzeugt Kandidaten.
+2. Manual-KI-Intake schreibt Kandidaten in den Google-Sheet-Tab `Inbox`.
+3. `Inbox.visual_key` wird mit KI-Vorschlag befüllt und das Dropdown mit 34 erlaubten Keys gesetzt.
+4. Der tatsächlich genutzte PWA-/Apps-Script-Übernehmen-Pfad schreibt `visual_key` nach dem Fix nach `Events.visual_key`.
+5. `Events.visual_key` steuert nach Deploy die Live-Bildausspielung.
+6. Der konkrete Fehlfall `Gesundheitstage -> Dartsbild` ist live korrigiert.
+
+Damit gilt der Main-Kontrollpunkt `KI-Suchlauf / Inbox / visual_key / Events-Build / Live-Bildausspielung prüfen` als abgeschlossen.
+
+### Grenzen und Folgeworkpack
+
+Nicht Teil dieses Beweises:
+
+- Die Inbox-PWA zeigt den `visual_key` noch nicht redaktionell sichtbar/änderbar an. Das ist der nächste sinnvolle UI-Workpack.
+- Der externe Google-Apps-Script-Code liegt nicht im Repo und muss bei künftigen Änderungen separat beachtet werden.
+- Vollautomatische Bildtyp-Perfektion ist nicht bewiesen; der aktuelle Zielprozess bleibt KI-Vorschlag plus menschliche Inbox-Prüfung.
+- Die automatische Ableitung sollte zusätzlich gehärtet werden, z. B. `Gesundheitstage` / `Gesundheitsprogramm` nicht auf Sport-Wettkampf-Motive fallen lassen.
+
+Nächster empfohlener Workpack:
+
+`Inbox-Review-UI: visual_key anzeigen, per Dropdown änderbar machen und den ursprünglichen KI-Vorschlag als Lernsignal erhalten.`
+<!-- === END BLOCK: TEST_STATUS_MAIN_KI_SEARCH_INBOX_VISUAL_KEY_PROOF_2026_06_25 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_INDEX_2026_06_24 | Zweck: macht den aktuellen Content-Pruefprozess-Stand im Test-Index sichtbar; Umfang: Audit-Report, Inbox-Pakete, Visual-Fit-V2, offene Folgebeweise === -->
+## Aktueller Test-Index Zusatz – Content-Prüfung V2 (2026-06-24)
+
+Status: Prozess-V2 plus KI-Faktencheck-/Prüfcache-V1 auf Staging geprüft; Grundprozess bestanden, offene Arbeitspakete bleiben fachlich bzw. als Feedback-Loop-Ausbau zu bearbeiten.
+
+Bestandene Beweise:
+
+- Content Quality Audit läuft nach Deploy und erzeugt `content-quality-report-full`.
+- Der Report enthält Prozesskategorien, Correction Owner, Workbench-Gruppen und Automation Policy.
+- Die Workbench `/inbox/` bzw. der Audit-Report zeigt Arbeitspakete getrennt an:
+  - Repo-Datenpatch.
+  - Quellencheck.
+  - Faktencheck.
+  - KI-Faktencheck.
+  - Beobachten / Retry.
+  - Visual-Fit.
+- Repo-Datenpatch-Paket enthält die drei echten Activity-Datenlücken und nicht mehr Redirect-/Retry-Fälle.
+- Sheet-/Quellenkorrektur ist über die Content-Inbox vorbereitet; Borken Open Air zeigt eine empfohlene offizielle Quelle und befüllt das Quellenfeld mit dieser URL, ohne automatisch zu speichern.
+- Quellencheck und Retry werden nicht mehr mit Repo-Datenpatches vermischt.
+- Faktencheck V1 und Visual-Fit V2 sind im Report aktiv.
+- Visual-Fit V2 liefert konkrete Vorschläge für `visual_key`, `visual_motif`, Motivrolle und Asset-Status.
+
+Letzter belegter Audit-Stand nach KI-Faktencheck-/Prüfcache-V1:
+
+- Critical: 0.
+- Review needed: 4.
+- Warnings: 19.
+- Automatisch erledigt: 118.
+- Arbeitspakete: Repo-Datenpatch 3, Sheet-/Quellenkorrektur 1, Quellenprüfung 1, Faktencheck 4, KI-Faktencheck 3, Visual-Fit 11, Automatisch erledigt 118.
+- Verification-Fallback: Cache entries loaded 1, Cache hits 1, AI candidates selected 3, Deferred by budget 0.
+
+Offene Folgebeweise:
+
+- KI-Suchlauf Feedback Loop / Self-Improving Search V1 entwerfen und testen, damit Audit-/Inbox-Fehler automatisch als Suchlauf-Lernsignale nutzbar werden.
+- Visual-Fit-Paket fachlich bewerten und daraus konkrete Folgeaktionen ableiten.
+- Repo-Datenpatch-Paket als bewussten Sammelpatch vorbereiten und testen.
+- Quellencheck-/Faktencheck-Fälle nach Cache-/KI-Fallbacklogik fachlich prüfen.
+- UI/UX der Content-Inbox erst am Ende polieren.
+<!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_INDEX_2026_06_24 === -->
+
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_AI_CACHE_TARGET_2026_06_24 | Zweck: dokumentiert den bestandenen Beweis fuer KI-Faktencheck-Fallback, Pruefcache, Acceptance-Schicht und Runtime-Logging; Umfang: Staging-Artefakte, Farm-Country-Fair-Proof, Grenzen, Folgeworkpack === -->
+## Content Quality – KI-Faktencheck-Fallback / Prüfcache bestanden (2026-06-25)
+
+Status: bestanden als V1-Prozess auf Staging.
+
+### Geprüfter Umfang
+
+- Content Quality Audit mit Scope `full`.
+- `ai_verification_candidate` für unsichere/blockierte Quellen.
+- Budgetlimit für KI-Kandidaten.
+- `content-ai-verification-candidates.json` als strukturiertes KI-Fallback-Artefakt.
+- `Content_Verification_Cache_Staging` als Prüfcache.
+- `Content_Verification_Acceptance_Staging` als robuste Acceptance-Schicht.
+- Cache-Writeback aus Acceptance-Zeile.
+- Cache-Hit im Folgelauf.
+- Zeitlücken-Hinweis `source_has_time_but_dataset_missing_time`.
+- Checkpoint-Logs im Workflow-/Python-Lauf.
+
+### Letzter belegter Reportstand
+
+Artifact: `content-quality-report-full` vom Staging-Lauf 2026-06-25.
+
+- `Critical`: 0.
+- `Review needed`: 4.
+- `Warning`: 19.
+- `Auto fixed`: 118.
+- `Cache entries loaded`: 1.
+- `Cache hits`: 1.
+- `AI candidates total`: 3.
+- `AI candidates selected`: 3.
+- `Deferred by budget`: 0.
+
+Aktuelle KI-Faktencheck-Kandidaten im belegten Lauf:
+
+- `Pokémon-Tag`.
+- `Das schönste Ei der Welt`.
+- `Witte Venn Ahaus-Alstätte entdecken`.
+
+### Farm-&-Country-Fair-Proof
+
+- Manuell geprüfter Testfall: `Farm & Country Fair`, `verification_key=0c54bf13073014fd79f9b8d7`.
+- Offizielle Quelle bestätigte Titel, Datum 26.–28.06.2026, Uhrzeiten und Adresse.
+- Acceptance-Zeile wurde im Writeback-Lauf gelesen und in den Prüfcache übernommen.
+- Folgelauf meldete `Cache entries loaded: 1` und `Cache hits: 1`.
+- `Farm & Country Fair` erschien danach nicht mehr in `content-ai-verification-candidates.json`.
+- Der Fall blieb nur noch für unabhängige Hinweise sichtbar, z. B. Visual-Fit oder Zeitlücke.
+
+### Runtime-Logging-Proof
+
+Der Audit-Schritt ist jetzt beobachtbar. Im GitHub-Log erscheinen Checkpoints wie:
+
+- `=== Content Quality Audit: start ===`.
+- `verification cache loaded: entries=1`.
+- `supporting data loaded`.
+- `event audit start`.
+- `event audit progress: row=...`.
+
+Kein enger Timeout wurde ergänzt, weil ein vorher scheinbar hängender Lauf später erfolgreich weiterlief.
+
+### Grenzen
+
+- Der Beweis gilt für die definierte Event-/Activity-Content-Prüfmatrix, nicht für jeden Text der gesamten Website.
+- Es wird keine 100%-Fehlerfreiheit behauptet.
+- Der Prozess garantiert nicht, dass jeder theoretisch mögliche externe Datenfehler erkannt wird.
+- Belegt ist: erkannte oder nicht sicher bestätigbare Fälle werden typisiert, gecacht oder als Arbeitspaket sichtbar gemacht.
+- KI-/Audit-Ergebnisse überschreiben keine fachlichen Daten automatisch.
+
+### Folgeworkpack
+
+Nächster sinnvoller Workpack: KI-Suchlauf Feedback Loop / Self-Improving Search V1.
+
+Ziel: Audit-Findings, Inbox-Ablehnungsgründe, Korrekturgründe und KI-Faktencheck-Ergebnisse werden nicht manuell alle paar Wochen in Suchregeln übertragen, sondern strukturiert als Feedback für den nächsten KI-Suchlauf genutzt.
+<!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_AI_CACHE_TARGET_2026_06_24 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_PROOF_2026_06_24 | Zweck: dokumentiert den bestandenen Staging-Prozessbeweis fuer Content Quality Guard V2; Umfang: Reportzahlen, Paketlogik, Inbox-Screenshots, Grenzen === -->
+## Content Quality Guard V2 – Prozessbeweis bestanden (2026-06-24)
+
+Status: bestanden als Prozessgrundlage; fachliche Paketbearbeitung offen.
+
+### Geprüfter Umfang
+
+- Automatischer Content-Audit nach Deploy.
+- Audit-Report `content-quality-report-full`.
+- `/inbox/` Content-Prüfung.
+- Sheet-/Quellenkorrektur-Fall `Borken Open Air - ABBA Gold The Concert Show`.
+- Repo-Datenpatch-Paket am Beispiel `Bürgerpark Rhede`.
+- Pakettrennung für Quellencheck, Faktencheck und Visual-Fit.
+
+### Report-Beweis
+
+Letzter geprüfter Staging-Report:
+
+- `critical`: 0.
+- `review_needed`: 5.
+- `warning`: 16.
+- `auto_fixed` / automatisch erledigt: 118.
+- `by_workbench_group`:
+  - Automatisch erledigt: 118.
+  - Visual-Fit: 12.
+  - Repo-Datenpatch: 3.
+  - Faktencheck: 3.
+  - Quellenprüfung: 2.
+  - Sheet-/Quellenkorrektur: 1.
+
+### Bestandene Detailbeweise
+
+- Borken Open Air:
+  - Ticketportal als Primärquelle wird erkannt.
+  - Empfohlene offizielle Quelle wird angezeigt.
+  - Feld `Offizielle Quelle` wird mit der empfohlenen Quelle vorbefüllt.
+  - Es erfolgt keine automatische Speicherung.
+- Repo-Datenpatch-Paket:
+  - Enthält `Bürgerpark Rhede`, `Suderwicker Märchenspielplatz`, `Waldlehrpfad am Vossenpand`.
+  - Enthält nicht mehr `Unterduikmuseum Aalten` oder `Witte Venn`.
+- Quellencheck:
+  - `Unterduikmuseum Aalten` wird als Quellencheck geführt, nicht als Repo-Datenpatch.
+- Retry/Beobachten:
+  - technisch wackelige Quellen werden nicht als direkter Patchkandidat behandelt.
+- Faktencheck:
+  - `Farm & Country Fair`, `Pokémon-Tag`, `Playfountain - Bocholter Wasserspaß` werden als Prüfstichprobe geführt, nicht als bestätigte Korrektur.
+- Visual-Fit:
+  - Visual-Fit-Fälle werden separat vom normalen Content-/Datenpatch-Prozess geführt.
+  - Der Report enthält vorgeschlagene `visual_key`-/`visual_motif`-Werte und Asset-Status.
+
+### Ergebnisbewertung
+
+- Der Content-Prüfprozess ist als automatische Vorprüfung und Paketierungslogik belastbar.
+- Zielerreichung: ca. 90 %.
+- Der Prozess ist noch kein Ersatz für fachliche Entscheidungen bei Quellenwiderspruch, Öffnungszeiten-/Kostenunsicherheit oder Bild-Motiv-Bewertung.
+
+### Nicht Bestandteil dieses Abschlusses
+
+- Kein Daten-Cleanup.
+- Kein automatisches Setzen von `visual_key` oder `visual_motif`.
+- Kein automatisches Überschreiben von Sheet-, DB- oder Repo-Inhalten.
+- Kein UI/UX-Polish.
+
+### Nächster Testfokus
+
+- Visual-Fit-Paket fachlich bewerten.
+- Danach erst konkrete Sammelpatches oder Sheet-/Quellenkorrekturen aus den geprüften Paketen ableiten.
+<!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_PROCESS_V2_PROOF_2026_06_24 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_MAIN_MERGE_LIVE_SMOKE_2026_06_19 | Zweck: dokumentiert erfolgreichen Main-Merge, Live-Smoke und nachgezogenen Today-Card-Alignment-Fix; Umfang: Abschlussanker vor KI-Suchlauf-Handoff-Test === -->
 ## Main-Merge / Live-Smoke – bestanden (2026-06-19)
 
@@ -3067,15 +3376,19 @@ Konsequenz:
 - Der vollständige Live-Beweis gegen Google Sheets ist erst nach Merge bzw. Run auf `main` möglich.
 - Ein fehlgeschlagener Versuch, den Workflow per `gh workflow run manual-ki-intake.yml --ref staging` zu starten, ist kein fachlicher Fehler des Visual-Key-Handoffs; `staging` ist hierfür bewusst nicht der Zielpfad.
 
-### Offener Main-Beweis
+### Main-Beweis nachträglich erledigt
 
-Nach Merge bzw. Ausführung auf `main` ist noch live zu prüfen:
+Der ursprünglich offene Main-Beweis wurde am 2026-06-25 im Block `TEST_STATUS_MAIN_KI_SEARCH_INBOX_VISUAL_KEY_PROOF_2026_06_25` bestanden.
+
+Geprüft und bestanden:
 
 1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
 2. Das Dropdown für `Inbox.visual_key` erscheint mit den erlaubten Keys aus `event_visual_pool.json`.
-3. Ein redaktionell geänderter `visual_key` wird beim Übernehmen nach `Events.visual_key` erhalten.
-4. Der spätere Build übernimmt `Events.visual_key` nach `events.json`.
-5. Deployte Event-Cards erhalten dadurch automatisch ein passendes Eventbild aus dem Visual-Pool.
+3. Der PWA-/Apps-Script-Übernehmen-Pfad übernimmt `visual_key` nach einem externen Apps-Script-Fix nach `Events.visual_key`.
+4. Der spätere Deploy übernimmt `Events.visual_key` in die Live-Bildausspielung.
+5. Deployte Event-Cards erhalten dadurch ein Bild aus dem passenden Event-Visual-Pool.
+
+Folge: Der alte Staging-Grenzblock bleibt historischer Implementierungsnachweis; der aktuelle Status ist nicht mehr offen.
 <!-- === END BLOCK: TEST_STATUS_MANUAL_KI_INTAKE_STAGING_LIMIT_2026_06_09 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_VISUAL_AUDIT_WARNINGS_CLEANUP_2026_06_09 | Zweck: dokumentiert Bereinigung der Visual-Audit-Warnungen; Umfang: Event-Alt-Texte, Audit-Owner-Check, Activity-JPG-Einordnung === -->
@@ -3660,3 +3973,40 @@ Abschlussbewertung:
 Main-Freigabe:
 - Dieser Arbeitsblock kann Richtung `main`, sofern `staging` keine anderen unfertigen Änderungen enthält.
 <!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_FINAL_CLOSURE_2026_06_18 === -->
+<!-- === BEGIN BLOCK: TEST_STATUS_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 | Zweck: dokumentiert den Live-Beweis nach Reporting-Hardening, Aktivitaeten-Funnel-Migration und Main-Merge; Umfang: Anbieter-CTA, Nutzwert-Klicks, Dashboard-Nachweis, Abgrenzung Testklicks === -->
+## Reporting-/Tracking-Hardening – Live-Beweis nach Main-Merge (2026-06-19)
+
+Status: bestanden.
+
+Kontext:
+- Der Staging-Stand mit Aktivitäts-Funnel-Migration, Footer-Konsistenz und Reporting-Hardening wurde nach `main` gemerged und ist live.
+- Geprüft wurde die echte Live-Kette über UI-Klick und internes SEO-/Mehrwert-Dashboard.
+
+Belegter Live-Test:
+- Vor dem Test im Dashboard:
+  - `Nutzwert-Klicks`: 75
+  - `Veranstalter-CTA`: 3
+  - Eigenes Tracking war ausgeschlossen.
+- Live geöffnet:
+  - `/aktivitaeten/sichtbar-werden/`
+- Nach dem Test im Dashboard:
+  - `Nutzwert-Klicks`: 76
+  - `Veranstalter-CTA`: 4
+  - Eigenes Tracking war während des Nachweises aktiv.
+
+Bewertung:
+- Die neue Route `/aktivitaeten/sichtbar-werden/` wird live als Anbieter-/Veranstalter-CTA erfasst.
+- Der Klick landet messbar im internen Nutzwert-/Mehrwert-Dashboard.
+- Der Reporting-Hardening-Workpack ist technisch abgeschlossen.
+- Der Test ist ein Funktionsbeweis, kein Akquise-Erfolgsbeleg.
+
+Wichtige Abgrenzung:
+- Eigene Testklicks dürfen nicht als organische Nutzersignale oder Anbietermehrwert verkauft werden.
+- Nach dem Beweistest sollte eigenes Tracking wieder ausgeschlossen werden.
+- Für echte Akquise-Aussagen bleibt ein längerer organischer Datenlauf nötig.
+
+Offen nach diesem Nachweis:
+- 28-Tage-/30-Tage-Auswertung organischer Nutzwertsignale.
+- Spätere Bewertung, ob ein screenshot- oder mailfähiger Feedbackbericht belastbar ist.
+- Keine weitere technische Reporting-Härtung aus diesem Befund nötig.
+<!-- === END BLOCK: TEST_STATUS_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 === -->

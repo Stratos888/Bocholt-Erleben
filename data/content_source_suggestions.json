@@ -1,0 +1,11 @@
+{
+  "schema": "content_source_suggestions_v1",
+  "purpose": "Curated official-source suggestions for Content Quality Audit cases. These are suggestions only; they do not change Event, Activity or Sheet data without explicit inbox confirmation.",
+  "events": {
+    "borken-open-air-abba-gold-the-concert-show-2026-07-17": {
+      "suggested_url": "https://www.borken.de/de/aktuelles/meldungen/1217430.php",
+      "label": "Stadt Borken: Sommer-Highlights auf dem Borkener Marktplatz",
+      "reason": "Offizielle Stadt-Borken-Seite statt Ticketportal; bestaetigt Borken Open Air / ABBA GOLD am 17.07.2026 auf dem Marktplatz. Vor dem Speichern in der Inbox noch gegen die vorhandenen Eventdaten vergleichen."
+    }
+  }
+}

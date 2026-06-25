@@ -352,6 +352,14 @@ jobs:
           head -n 60 data/inbox.json || true
       # === END BLOCK: BUILD EVENTS + INBOX FEEDS (TSV -> JSON, fail-fast where needed) ===
 
+      # === BEGIN BLOCK: DEPLOY_CSS_GOVERNANCE_AUDIT_V1 | Zweck: stoppt Deploys, wenn CSS-Entry, Cache-Buster oder Owner-Grenzen verletzt werden; Umfang: ergänzt nur den fail-fast Audit-Step vor Build-Version/Deploy-Artefakt ===
+      - name: Audit CSS governance
+        shell: bash
+        run: |
+          set -e
+          python3 tools/audit-css-governance.py
+      # === END BLOCK: DEPLOY_CSS_GOVERNANCE_AUDIT_V1 ===
+
       - name: Compute build version
         shell: bash
         run: |
@@ -823,7 +831,7 @@ jobs:
           print(f"=== search-metrics.json status: {result['status']} ===")
           PY
 
-          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_STRIPE_PRICE_ACTIVITY_BASIC APP_STRIPE_PRICE_ACTIVITY_PLUS APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_REVIEW_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL APP_PUSH_VAPID_PUBLIC_KEY APP_PUSH_VAPID_PRIVATE_KEY_PEM APP_PUSH_SECRET
+          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_STRIPE_PRICE_ACTIVITY_BASIC APP_STRIPE_PRICE_ACTIVITY_PLUS APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_REVIEW_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL APP_PUSH_VAPID_PUBLIC_KEY APP_PUSH_VAPID_PRIVATE_KEY_PEM APP_PUSH_SECRET BE_SHEET_ID GOOGLE_SERVICE_ACCOUNT_JSON
           # === END BLOCK: SEARCH_METRICS_EXPORT_AND_CONFIG_ENV_V2 ===
 
           python - <<'PY'
@@ -873,6 +881,12 @@ jobs:
               "review": {
                   "password": os.environ["APP_REVIEW_PASSWORD"],
               },
+              # === BEGIN BLOCK: PRIVATE_CONFIG_GOOGLE_SHEET_PAYLOAD_V1 | Zweck: stellt geschuetzten internen APIs Zugriff auf das kanonische Google Sheet bereit; Umfang: ergaenzt Sheet-ID und Service-Account nur in api/_config.php des Deploy-Artefakts ===
+              "google": {
+                  "sheet_id": os.environ.get("BE_SHEET_ID", ""),
+                  "service_account_json": os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", ""),
+              },
+              # === END BLOCK: PRIVATE_CONFIG_GOOGLE_SHEET_PAYLOAD_V1 ===
               # === BEGIN BLOCK: PRIVATE_CONFIG_INBOX_PUSH_PAYLOAD_V1 | Zweck: optionale Web-Push-Konfiguration für interne Inbox-Hinweise; Umfang: ergänzt push-Konfiguration ohne Pflicht-Secrets ===
               "push": {
                   "enabled": bool(os.environ.get("APP_PUSH_VAPID_PUBLIC_KEY", "").strip() and os.environ.get("APP_PUSH_VAPID_PRIVATE_KEY_PEM", "").strip()),

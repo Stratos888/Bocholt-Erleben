@@ -38,39 +38,63 @@ The following workpack is intentionally on hold:
 
 ## CURRENT FOCUS
 
-<!-- === BEGIN BLOCK: MASTER_POST_MAIN_MERGE_2026_06_19 | Zweck: setzt den aktuellen Projektsteuerungsstand nach Main-Merge und Live-Smoke; Umfang: naechster operativer Beweis und bewusste Nicht-Ziele === -->
-### Nach Main-Merge: KI-/Inbox-Visual-Key-Handoff beweisen
+<!-- === BEGIN BLOCK: MASTER_CURRENT_CONTROL_2026_06_25 | Zweck: konsolidiert strategischen Steuerungsstand fuer nachhaltige Content-Sicherung; Umfang: Content-Quality-V1, KI-Faktencheck-Cache, naechster Feedback-Loop-Workpack, keine Growth-Arbeiten vor Stabilisierung === -->
+### Aktueller Steuerungsstand: Content-Sicherung vor weiterem Wachstum
 
-Stand: 2026-06-19.
+Stand: 2026-06-25.
 
-Aktueller Zustand:
+Aktuell abgeschlossen und nicht erneut öffnen ohne konkretes Symptom:
 
-- `staging` wurde erfolgreich nach `main` gemerged.
-- Der Live-Bereich wurde manuell geprüft und wirkt stabil.
-- Der Desktop-Alignment-Fehler der drei Today-Cards wurde nach dem Main-Merge behoben und live kontrolliert.
-- Der Event-Visual-Motif-Fit-Block ist für den aktuellen Sheet-Stand abgeschlossen; es gibt keine offenen `gap_to_produce`-, `candidate_to_integrate`- oder `review_rules`-Motive.
+- `/angebote/` ist nur noch Legacy-Redirect auf `/aktivitaeten/`; die Aktivitätspräsenz läuft kanonisch unter `/aktivitaeten/sichtbar-werden/...`.
+- Öffentliche Neben-/Funnel-Seiten nutzen den zentralen Footer/Shell-Abschluss.
+- Reporting-/Tracking-Hardening ist technisch abgeschlossen und live bewiesen.
+- CSS-Governance ist eingeführt.
+- Event-Visual-Motif-Fit ist für den bisherigen Sheet-Stand technisch abgeschlossen.
+- Content-Quality-Grundsystem existiert: Workflow, Script, Google-Sheet-Audittab und `/inbox/`-Arbeitsbereich.
+- Content Quality Guard V2 ist auf Staging als Prozessgrundlage belegt: Audit-Report mit Prozesskategorien, Arbeitspaketen und Correction Ownern; `/inbox/` zeigt Repo-Datenpatch, Quellencheck, Faktencheck, Beobachten/Retry und Visual-Fit getrennt.
+- Content Quality AI Verification Fallback mit Prüfcache ist live belegt: `ai_verification_candidate`, Budgetlimit, strukturiertes Kandidaten-Artefakt, Acceptance-Tab, Cache-Writeback, Cache-Hit und bessere Runtime-Logs funktionieren.
 
-Nächster operativer Beweis:
+Aktueller strategischer Zielzustand:
 
-- Den nächsten automatischen KI-Suchlauf auf `main` bzw. den nächsten tatsächlichen Manual-KI-Intake-Lauf prüfen.
-- Geplanter Kontrollzeitpunkt: Dienstag, 2026-06-23, 11:00 Uhr.
+- Der Content Quality Guard ist ein automatischer Prüf- und Vorentscheidungsprozess, nicht eine wöchentliche manuelle Vollprüfung.
+- Jedes regelmäßige Audit prüft die relevanten Event- und Activity-Daten erneut:
+  1. Google-Sheet `Events` für redaktionelle Events.
+  2. DB/API für freigegebene Veranstalter-Events.
+  3. `data/offers.json` für Activities.
+- Sichere technische Fälle werden automatisch behandelt oder still protokolliert, zum Beispiel abgelaufene ausgeblendete Events, harmlose Canonical-/Sprach-Redirects oder einzelne temporäre Netzwerkaussetzer.
+- In der Content-Prüfung erscheinen nur Fälle, bei denen wirklich etwas zu tun ist und die weder durch das Prüfskript noch durch einen frischen KI-Faktencheck sicher geklärt werden können.
+- Für Quellen, die das GitHub-/HTTP-Prüfskript blockieren, schwer lesbar sind oder Fakten nicht eindeutig maschinell bestätigen, gilt der Hybridmodus: billiges Audit-Skript zuerst, gezielter KI-Faktencheck nur als Fallback.
+- KI-Faktenchecks werden gecacht: Wenn Quelle und Inhalt unverändert sind und `verified_until` noch gilt, wird nicht jede Woche erneut teuer geprüft.
+- Die private `/inbox/` ist die Arbeitsoberfläche für Content-Prüfung und Korrektur. Der Nutzer soll nicht direkt in technischen Google-Sheet-Spalten arbeiten müssen.
+- Source Ownership bleibt erhalten:
+  - Sheet-Events werden aus der Content-Prüfung heraus kontrolliert ins Google Sheet `Events` zurückgeschrieben.
+  - Anbieter-/DB-Events werden über Review-/Adminlogik bzw. DB-Owner korrigiert.
+  - Activities bleiben repo-/JSON-owned und werden in V1 als Patch-Kandidaten gesammelt; später kann daraus ein PR-/Patchpaket-Workflow werden.
+- Keine KI- oder Website-Textauswertung darf fachliche Inhalte blind überschreiben. Semantische Änderungen brauchen eine explizite geprüfte Aktion.
+- Eine 0%-Fehlerquote wird nicht behauptet. Der Qualitätsstandard lautet: definierte Event-/Activity-Kerndaten regelmäßig prüfen, sichere Fälle automatisch abräumen, keine bekannten ungeprüften kritischen Fehler online lassen und nur echte Restaufgaben zur Bewertung vorlegen.
 
-Zu prüfen:
+Nächster strategischer Ausbau:
 
-1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
-2. Das Dropdown für `Inbox.visual_key` enthält die erlaubten Keys aus `data/event_visual_pool.json`.
-3. Ein redaktionell geänderter `visual_key` bleibt beim Übernehmen erhalten.
-4. `Events.visual_key` wird korrekt geschrieben.
-5. Der spätere Build übernimmt den Key in die deployten Eventdaten.
-6. Event-Cards erhalten dadurch automatisch passende Bilder aus dem Event-Visual-Pool.
+- Die Content-Prüfung soll Lernsignale für den KI-Suchlauf erzeugen, damit wiederkehrende Fehler nicht nur korrigiert, sondern die Such-/Prompt-/Quellenlogik verbessert wird.
+- Bereits vorhandene Inbox-Ablehnungsgründe, Korrekturgründe, Audit-Findings und KI-Faktencheck-Ergebnisse sollen nicht manuell alle paar Wochen ausgewertet werden müssen, sondern strukturiert in einen Feedback-Loop für den nächsten Suchlauf eingehen.
+- Ziel ist keine unkontrolliert selbsttrainierende KI, sondern ein kontrollierter, belegbarer Prozess: Fehlerklassifikation -> Feedback-Artefakt -> Suchlauf-Regel/Prompt-Kontext -> Messung, ob dieselbe Fehlerklasse seltener wiederkommt.
 
-Bis zu diesem Beweis nicht starten:
+Separater strategischer Punkt:
 
-- kein neuer breiter UI-/Feature-Workpack,
-- kein erneuter Event-Visual-Produktionslauf ohne neuen Sheet-Bedarf,
-- keine pauschale Activity-Öffnungsstatus-Massenpflege,
-- keine Prozesshärtung des KI-/Inbox-Flows vor dem echten Main-Beweis.
-<!-- === END BLOCK: MASTER_POST_MAIN_MERGE_2026_06_19 === -->
+- KI-Visual-Key-/Bild-Fit-Qualität wird als eigener Workstream geführt.
+- Die Event-Suche muss passende `visual_key`/`visual_motif`-Zuordnungen liefern oder fehlende/unsichere Bildpassung als Gap ausgeben.
+- Geprüft werden muss nicht nur, ob ein Bild existiert, sondern ob das konkrete Bild bzw. Motiv zum Event passt und nicht zu oft im gleichen Kontext wiederholt wird.
+- Dieser Punkt wird nicht mit der Datenwahrheitsprüfung vermischt.
+
+Bewusst geparkt:
+
+- Weiterer SEO-/Content-Ausbau.
+- Anbieter-Akquise mit Qualitätsversprechen.
+- Neue Event-Visual-Produktion ohne konkreten Gap.
+- Pauschale manuelle Vollprüfung aller Inhalte in der Inbox.
+- Pauschaler KI-Prüflauf über alle Inhalte ohne Kandidatenfilter, Cache und Budgetgrenze.
+- Manuelle periodische KI-Regelpflege aus Ablehnungslisten ohne Automations-/Feedback-Mechanik.
+<!-- === END BLOCK: MASTER_CURRENT_CONTROL_2026_06_25 === -->
 
 ---
 
@@ -132,31 +156,10 @@ Bis zu diesem Beweis nicht starten:
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.
-- First operational proof after the successful Main merge and Live smoke: evaluate the next automatic `main` search run for Manual-KI-Intake / Visual-Key-Handoff.
-- Do not treat a `staging` workflow attempt or chat simulation as the final proof; the real Google-Sheet chain must be verified on `main`.
-- Activity-Premium-Visuals continue as a separate workstream and must not reopen the frozen Event-Visual-Duplicate-Cleanup without a concrete symptom.
+- Current next workpack: document the completed Content Quality AI verification fallback/cache proof, then design the Content Quality Feedback Loop / Self-Improving Search V1.
+- The feedback-loop workpack must connect audit findings, Inbox decisions, rejection reasons and KI-facts outcomes back into the KI search workflow without requiring the user to manually maintain search rules every few weeks.
+- Content Quality Guard V2 and the AI verification cache are no longer basic-introduction workpacks; further changes need a concrete finding from current reports or from the feedback-loop design.
+- Manual-KI-Intake / Visual-Key-Handoff and Activity-Premium-Visuals remain separate workstreams and must only be reopened when the current Content-Quality/Visual-Fit package produces a concrete need.
 - Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.
 
 <!-- === END CANONICAL MASTER FILE === -->
-
-<!-- === BEGIN BLOCK: MASTER_CURRENT_PROJECT_CONTINUATION_2026_06_09 | Zweck: ersetzt veralteten Today-Home-Fortsetzungspunkt durch aktuellen Steuerungsstand; Umfang: KI-Intake, Event-Visual-Freeze, Activity-Visuals, Activity-Opening === -->
-## Aktueller Fortsetzungspunkt – KI-Intake Main-Beweis und getrennte Premium-Visual-Workstreams
-
-Stand: 2026-06-09, `staging` ZIP-Snapshot.
-
-Aktuell verbindlich:
-
-- Der nächste operative Pipeline-Beweis ist der Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main`.
-- Auf `staging` ist die echte Google-Sheet-Kette bewusst nicht vollständig prüfbar, weil der Workflow per Branch-Guard geschützt ist.
-- Nach dem Suchlauf ist zu prüfen, ob `Inbox.visual_key`, Dropdown, redaktionelle Key-Änderung, `Events.visual_key`, Build und Eventbild-Ausspielung zusammen funktionieren.
-- Event-Visual-Duplicate-Cleanup ist vorerst gefreezt; Folgearbeit dort nur bei konkretem sichtbaren Symptom oder bewusstem neuen Eventdatenstand.
-- Activity-Premium-Visuals sind ein eigener Qualitäts-Workstream mit exklusiven Bildern pro Activity und dürfen nicht mit Event-Visuals vermischt werden.
-- Activity-Opening-Status ist grundsätzlich umgesetzt; Folgearbeit nur noch gezielt an Saisonlogik, Detailtexten und Sonderfällen.
-
-Nicht als nächstes starten:
-
-- kein weiterer breiter Event-Card-Polish ohne konkretes Symptom
-- keine erneute pauschale Activity-Öffnungszeiten-Massenpflege
-- keine KI-Chat-Simulation als Ersatz für den späteren `main`-Beweis
-- keine Vermischung von Roadmap-Konsolidierung, Bildproduktion und App-Logik in einem Patch
-<!-- === END BLOCK: MASTER_CURRENT_PROJECT_CONTINUATION_2026_06_09 === -->

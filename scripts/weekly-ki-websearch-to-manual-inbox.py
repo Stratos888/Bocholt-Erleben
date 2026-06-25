@@ -29,6 +29,7 @@ from googleapiclient.discovery import build
 from openai import OpenAI
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+from event_visual_motifs import infer_event_visual_fit
 
 
 # === BEGIN BLOCK: CONFIG ===
@@ -700,6 +701,8 @@ Jeder Eintrag in candidates MUSS exakt diese Felder enthalten:
 - source_name
 - source_url
 - notes
+- visual_key
+- visual_motif
 
 Wenn ein Wert nicht vorhanden ist, setze ihn als leeren String "".
 Lasse niemals ein Pflichtfeld weg.
@@ -949,6 +952,7 @@ CANDIDATE_OUTPUT_FIELDS = [
     "source_url",
     "notes",
     "visual_key",
+    "visual_motif",
 ]
 
 
@@ -1061,12 +1065,21 @@ def normalize_candidate(item: Dict[str, Any]) -> Dict[str, str]:
     if not out.get("notes"):
         out["notes"] = "manual chat search v3"
 
-    out["visual_key"] = normalize_event_visual_key(out.get("visual_key", "")) or infer_event_visual_key(
+    fit = infer_event_visual_fit(
+        title=out.get("title", ""),
+        description=out.get("description", ""),
+        category=out.get("kategorie_suggestion", ""),
+        location=out.get("location", ""),
+        visual_key=out.get("visual_key", ""),
+        visual_motif=out.get("visual_motif", ""),
+    )
+    out["visual_key"] = normalize_event_visual_key(out.get("visual_key", "")) or fit.get("visual_key", "") or infer_event_visual_key(
         title=out.get("title", ""),
         description=out.get("description", ""),
         category=out.get("kategorie_suggestion", ""),
         location=out.get("location", ""),
     )
+    out["visual_motif"] = fit.get("visual_motif", "")
 
     return {field: out.get(field, "") for field in CANDIDATE_OUTPUT_FIELDS}
 
