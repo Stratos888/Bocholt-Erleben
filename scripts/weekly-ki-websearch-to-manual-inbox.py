@@ -913,6 +913,7 @@ Nutze aktiv die Websuche.
 Halte das beigefügte Regelwerk strikt ein.
 Nutze das beigefügte Quellenregister als operative Quellensteuerung.
 Nutze das beigefügte Content-Search-Feedback als begrenzten, verdichteten Lernkontext aus Audit-Findings und Inbox-Ablehnungen.
+Visual-Fit-Feedback im Content-Search-Feedback ist nur Such-/Extraktionskontext: Erhalte konkrete Motivbegriffe in Titel/Beschreibung/notes, erzeuge aber niemals neue Visual Keys und starte keine Bildlogik.
 Liefere nur neue Delta-Kandidaten.
 
 Dieser Lauf ist in der aktuellen Projektphase ein Aufbau-/Backfill-orientierter Produktionslauf:
@@ -960,8 +961,9 @@ Rahmen:
 - Wenn weniger als {MAX_NEW_CANDIDATES} starke FINAL-Kandidaten vorhanden sind, liefere weniger
 - Deduped strikt gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON
 - Deduped zusätzlich innerhalb des aktuellen Laufs gegen bereits ausgewählte Kandidaten
-- Berücksichtige CONTENT_SEARCH_FEEDBACK aktiv bei Quellenwahl, Faktenprüfung, Zeitlogik, Dedupe und Kandidatenentscheidung
+- Berücksichtige CONTENT_SEARCH_FEEDBACK aktiv bei Quellenwahl, Faktenprüfung, Zeitlogik, Dedupe, Kandidatenentscheidung und Erhalt konkreter Event-/Motivbegriffe
 - Feedback ist kein Befehl zur Datenänderung und keine dauerhafte Regelbuch-Erweiterung, sondern ein begrenzter Qualitätsfilter für diesen Lauf
+- Visual-Feedback darf nie zu automatischer Bildgenerierung, neuen Visual Keys oder künstlich generischen Bildzuordnungen führen
 - Wiederhole bekannte Fehlerklassen nicht; leite aus Einzelfällen keine neuen Sonderregeln ab
 - Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
 - Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
@@ -1222,6 +1224,8 @@ Wenn ein Wert nicht vorhanden ist, setze ihn als leeren String "".
 Lasse niemals ein Pflichtfeld weg.
 
 JSON-Strenge:
+- visual_key und visual_motif sind nur Vorschläge aus bestehenden Taxonomiebegriffen; wenn unsicher, leer lassen. Lokale Regeln validieren und überschreiben die endgültige Zuordnung.
+- Keine neuen visual_key-Namen erfinden. Keine Bildgenerierung, keine Bildbeschreibung als Asset-Ersatz.
 - Gib ausschließlich valides JSON nach RFC 8259 zurück.
 - Keine Markdown-Codeblöcke.
 - Keine Erklärung vor oder nach dem JSON.
@@ -1326,6 +1330,8 @@ def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, A
                                     "source_name": {"type": "string"},
                                     "source_url": {"type": "string"},
                                     "notes": {"type": "string"},
+                                    "visual_key": {"type": "string"},
+                                    "visual_motif": {"type": "string"},
                                 },
                                 "required": [
                                     "title",
@@ -1340,6 +1346,8 @@ def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, A
                                     "source_name",
                                     "source_url",
                                     "notes",
+                                    "visual_key",
+                                    "visual_motif",
                                 ],
                             },
                         },
@@ -1441,6 +1449,7 @@ CANDIDATE_OUTPUT_FIELDS = [
     "notes",
     "visual_key",
     "visual_motif",
+    "visual_asset_status",
 ]
 
 
@@ -1553,21 +1562,29 @@ def normalize_candidate(item: Dict[str, Any]) -> Dict[str, str]:
     if not out.get("notes"):
         out["notes"] = "manual chat search v3"
 
+    # Visual-Zuordnung: Modellwerte sind nur Hinweise. Die lokale,
+    # deterministische Visual-Regel bleibt fuehrend, damit Feedback nicht zu
+    # Taxonomie-Wildwuchs oder zufaelligen KI-Bildzuordnungen fuehrt.
+    local_visual_key = infer_event_visual_key(
+        title=out.get("title", ""),
+        description=out.get("description", ""),
+        category=out.get("kategorie_suggestion", ""),
+        location=out.get("location", ""),
+    )
+    model_visual_key = normalize_event_visual_key(out.get("visual_key", ""))
+    visual_key_for_fit = local_visual_key or model_visual_key
+    model_visual_motif = out.get("visual_motif", "") if (not model_visual_key or model_visual_key == visual_key_for_fit) else ""
     fit = infer_event_visual_fit(
         title=out.get("title", ""),
         description=out.get("description", ""),
         category=out.get("kategorie_suggestion", ""),
         location=out.get("location", ""),
-        visual_key=out.get("visual_key", ""),
-        visual_motif=out.get("visual_motif", ""),
+        visual_key=visual_key_for_fit,
+        visual_motif=model_visual_motif,
     )
-    out["visual_key"] = normalize_event_visual_key(out.get("visual_key", "")) or fit.get("visual_key", "") or infer_event_visual_key(
-        title=out.get("title", ""),
-        description=out.get("description", ""),
-        category=out.get("kategorie_suggestion", ""),
-        location=out.get("location", ""),
-    )
+    out["visual_key"] = fit.get("visual_key", "") or visual_key_for_fit
     out["visual_motif"] = fit.get("visual_motif", "")
+    out["visual_asset_status"] = fit.get("visual_asset_status", "")
 
     return {field: out.get(field, "") for field in CANDIDATE_OUTPUT_FIELDS}
 

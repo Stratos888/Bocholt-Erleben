@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+from event_visual_motifs import infer_event_visual_fit
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -63,6 +64,8 @@ class InboxItem:
     matched_event_id: str
     notes: str
     visual_key: str
+    visual_motif: str
+    visual_asset_status: str
     created_at: str
 # === END BLOCK: INBOX ITEM DATACLASS (incl. row_number for writeback) ===
 
@@ -212,6 +215,22 @@ def main() -> None:
         except Exception:
             rn = idx
 
+        local_visual_key = infer_event_visual_key(
+            title=data.get("title", ""),
+            description=data.get("description", ""),
+            category=data.get("kategorie_suggestion", ""),
+            location=data.get("location", ""),
+        )
+        model_visual_key = normalize_event_visual_key(data.get("visual_key", ""))
+        fit = infer_event_visual_fit(
+            title=data.get("title", ""),
+            description=data.get("description", ""),
+            category=data.get("kategorie_suggestion", ""),
+            location=data.get("location", ""),
+            visual_key=local_visual_key or model_visual_key,
+            visual_motif=data.get("visual_motif", ""),
+        )
+
         items.append(
             InboxItem(
                 row_number=rn,
@@ -231,12 +250,9 @@ def main() -> None:
                 match_score=data.get("match_score", ""),
                 matched_event_id=data.get("matched_event_id", ""),
                 notes=data.get("notes", ""),
-                visual_key=normalize_event_visual_key(data.get("visual_key", "")) or infer_event_visual_key(
-                    title=data.get("title", ""),
-                    description=data.get("description", ""),
-                    category=data.get("kategorie_suggestion", ""),
-                    location=data.get("location", ""),
-                ),
+                visual_key=fit.get("visual_key", ""),
+                visual_motif=fit.get("visual_motif", ""),
+                visual_asset_status=fit.get("visual_asset_status", ""),
                 created_at=data.get("created_at", ""),
             )
         )
@@ -296,6 +312,10 @@ def main() -> None:
             obj["notes"] = it.notes
         if it.visual_key:
             obj["visual_key"] = it.visual_key
+        if it.visual_motif:
+            obj["visual_motif"] = it.visual_motif
+        if it.visual_asset_status:
+            obj["visual_asset_status"] = it.visual_asset_status
 
         out.append(obj)
 
