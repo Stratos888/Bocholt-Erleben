@@ -84,6 +84,7 @@ jobs:
           sys.path.insert(0, str(ROOT / "scripts"))
 
           from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+          from event_visual_motifs import infer_event_visual_fit
           # === END BLOCK: MANUAL_INTAKE_VISUAL_KEY_HELPER_IMPORT_V1 ===
           MANUAL_JSON_PATH = ROOT / "data" / "inbox_manual.json"
 
@@ -106,6 +107,11 @@ jobs:
               "notes",
               "visual_key",
               "created_at",
+          ]
+
+          OPTIONAL_VISUAL_INBOX_COLUMNS = [
+              "visual_motif",
+              "visual_asset_status",
           ]
 
           REQUIRED_JSON_KEYS = [
@@ -209,6 +215,10 @@ jobs:
           missing_columns = [col for col in INBOX_COLUMNS if col not in header]
           if missing_columns:
               fail(f"Inbox-Header unvollständig. Fehlende Spalten: {missing_columns}")
+
+          missing_optional_visual_columns = [col for col in OPTIONAL_VISUAL_INBOX_COLUMNS if col not in header]
+          if missing_optional_visual_columns:
+              info(f"Optionale Visual-Review-Spalten fehlen noch und werden daher nicht befüllt: {missing_optional_visual_columns}")
 
           # === BEGIN BLOCK: MANUAL_INTAKE_VISUAL_KEY_DROPDOWN_V1 | Zweck: macht KI-Bildzuordnung in der Inbox sichtbar, auswählbar und fehlerarm editierbar; Umfang: setzt Google-Sheets-Dropdown aus data/event_visual_pool.json für Inbox.visual_key ===
           pool_path = ROOT / "data" / "event_visual_pool.json"
@@ -319,12 +329,26 @@ jobs:
               normalized["url"] = canonical_url(normalized.get("url", ""))
               normalized["source_url"] = canonical_url(normalized.get("source_url", "")) or normalized["url"]
               # === BEGIN BLOCK: MANUAL_INTAKE_VISUAL_KEY_HANDOFF_V1 | Zweck: garantiert Visual-Key beim Append in die Sheet-Inbox; Umfang: normalisiert vorhandenen Key oder inferiert deterministisch aus Eventdaten ===
-              normalized["visual_key"] = normalize_event_visual_key(normalized.get("visual_key", "")) or infer_event_visual_key(
+              local_visual_key = infer_event_visual_key(
                   title=normalized.get("title", ""),
                   description=normalized.get("description", ""),
                   category=normalized.get("kategorie_suggestion", ""),
                   location=normalized.get("location", ""),
               )
+              model_visual_key = normalize_event_visual_key(normalized.get("visual_key", ""))
+              visual_key_for_fit = local_visual_key or model_visual_key
+              fit = infer_event_visual_fit(
+                  title=normalized.get("title", ""),
+                  description=normalized.get("description", ""),
+                  category=normalized.get("kategorie_suggestion", ""),
+                  location=normalized.get("location", ""),
+                  visual_key=visual_key_for_fit,
+                  visual_motif=normalized.get("visual_motif", ""),
+                  pool_payload=pool_data,
+              )
+              normalized["visual_key"] = fit.get("visual_key", "") or visual_key_for_fit
+              normalized["visual_motif"] = fit.get("visual_motif", "")
+              normalized["visual_asset_status"] = fit.get("visual_asset_status", "")
               # === END BLOCK: MANUAL_INTAKE_VISUAL_KEY_HANDOFF_V1 ===
               # === END BLOCK: MANUAL_INTAKE_NORMALIZE_STATUS_CREATED_AT_V1 ===
 

@@ -94,12 +94,14 @@ jobs:
             CONTENT_VERIFICATION_CACHE_TAB="Content_Verification_Cache_Staging"
             CONTENT_VERIFICATION_ACCEPTANCE_TAB="Content_Verification_Acceptance_Staging"
             CONTENT_SEARCH_FEEDBACK_TAB="Content_Search_Feedback_Staging"
+            CONTENT_VISUAL_FEEDBACK_TAB="Content_Visual_Feedback_Staging"
           else
             APP_BASE_URL="https://bocholt-erleben.de"
             CONTENT_AUDIT_TAB="Content_Audit"
             CONTENT_VERIFICATION_CACHE_TAB="Content_Verification_Cache"
             CONTENT_VERIFICATION_ACCEPTANCE_TAB="Content_Verification_Acceptance"
             CONTENT_SEARCH_FEEDBACK_TAB="Content_Search_Feedback"
+            CONTENT_VISUAL_FEEDBACK_TAB="Content_Visual_Feedback"
           fi
 
           echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
@@ -109,6 +111,7 @@ jobs:
           echo "CONTENT_VERIFICATION_CACHE_TAB=$CONTENT_VERIFICATION_CACHE_TAB" >> "$GITHUB_ENV"
           echo "CONTENT_VERIFICATION_ACCEPTANCE_TAB=$CONTENT_VERIFICATION_ACCEPTANCE_TAB" >> "$GITHUB_ENV"
           echo "CONTENT_SEARCH_FEEDBACK_TAB=$CONTENT_SEARCH_FEEDBACK_TAB" >> "$GITHUB_ENV"
+          echo "CONTENT_VISUAL_FEEDBACK_TAB=$CONTENT_VISUAL_FEEDBACK_TAB" >> "$GITHUB_ENV"
 
           echo "Audit scope: $AUDIT_SCOPE"
           echo "Audit runtime: $APP_BASE_URL"
@@ -116,6 +119,7 @@ jobs:
           echo "Verification cache tab: $CONTENT_VERIFICATION_CACHE_TAB"
           echo "Verification acceptance tab: $CONTENT_VERIFICATION_ACCEPTANCE_TAB"
           echo "Search feedback tab: $CONTENT_SEARCH_FEEDBACK_TAB"
+          echo "Visual feedback tab: $CONTENT_VISUAL_FEEDBACK_TAB"
       # === END BLOCK: CONTENT_QUALITY_RESOLVE_SCOPE_AND_TARGET_V1 ===
 
       # === BEGIN BLOCK: CONTENT_QUALITY_EXPORT_EVENTS_SHEET_V1 | Zweck: liest die kanonischen redaktionellen Events direkt aus dem Google Sheet; Umfang: exportiert Events!A:ZZ nach data/events.tsv ===
@@ -309,12 +313,13 @@ jobs:
             --verification-cache-json data/content-verification-cache.json \
             --ai-candidates-json data/content-ai-verification-candidates.json \
             --search-feedback-json data/content-search-feedback.json \
+            --visual-feedback-json data/content-visual-feedback.json \
             --ai-max-candidates "${AI_VERIFICATION_MAX_CANDIDATES:-12}" \
             --output-json data/content-quality-report.json \
             --output-md data/content-quality-report.md
 
           echo "=== Content Quality Audit: report files ==="
-          ls -lh data/content-quality-report.json data/content-quality-report.md data/content-ai-verification-candidates.json data/content-search-feedback.json
+          ls -lh data/content-quality-report.json data/content-quality-report.md data/content-ai-verification-candidates.json data/content-search-feedback.json data/content-visual-feedback.json
           echo "finished_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
           echo "=== Content quality summary ==="
@@ -1034,6 +1039,141 @@ jobs:
           PY
       # === END BLOCK: CONTENT_SEARCH_FEEDBACK_SHEET_WRITE_V1 ===
 
+      # === BEGIN BLOCK: CONTENT_VISUAL_FEEDBACK_SHEET_WRITE_V1 | Zweck: schreibt geroutete Visual-Fit-Lernsignale in einen eigenen Sheet-Tab ohne Bildgenerierung; Umfang: Feedback-/Gap-Kontext fuer Review und spaetere Bildproduktion ===
+      - name: Write Content_Visual_Feedback sheet tab
+        shell: bash
+        env:
+          SHEET_ID: ${{ env.BE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -e
+          python - <<'PY'
+          import json, os, sys
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
+
+          def fail(msg):
+              print(f"❌ {msg}", file=sys.stderr)
+              sys.exit(1)
+
+          def norm(value):
+              if isinstance(value, list):
+                  return "; ".join(str(v or "").strip() for v in value if str(v or "").strip())
+              return str(value or "").strip()
+
+          sheet_id = os.environ.get("SHEET_ID", "").strip()
+          tab_name = os.environ.get("CONTENT_VISUAL_FEEDBACK_TAB", "Content_Visual_Feedback").strip() or "Content_Visual_Feedback"
+          sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+          if not sheet_id:
+              fail("ENV SHEET_ID fehlt.")
+          if not sa_json:
+              fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
+
+          with open("data/content-visual-feedback.json", encoding="utf-8") as handle:
+              payload = json.load(handle)
+
+          meta = payload.get("meta") or {}
+          items = payload.get("items") or []
+          gaps = payload.get("asset_gaps") or []
+          header = [
+              "generated_at",
+              "record_type",
+              "route",
+              "issue_code",
+              "severity",
+              "content_type",
+              "source_system",
+              "content_id",
+              "title",
+              "date",
+              "source_url",
+              "suggested_visual_key",
+              "suggested_visual_motif",
+              "suggested_visual_motif_role",
+              "visual_asset_status",
+              "search_feedback_relevant",
+              "count",
+              "priority",
+              "recommended_action",
+              "evidence_summary",
+          ]
+          rows = [header]
+          for item in items:
+              rows.append([
+                  norm(meta.get("generated_at")),
+                  "visual_signal",
+                  norm(item.get("route")),
+                  norm(item.get("issue_code")),
+                  norm(item.get("severity")),
+                  norm(item.get("content_type")),
+                  norm(item.get("source_system")),
+                  norm(item.get("content_id")),
+                  norm(item.get("title")),
+                  norm(item.get("date")),
+                  norm(item.get("source_url")),
+                  norm(item.get("suggested_visual_key")),
+                  norm(item.get("suggested_visual_motif")),
+                  norm(item.get("suggested_visual_motif_role")),
+                  norm(item.get("visual_asset_status")),
+                  str(bool(item.get("search_feedback_relevant"))).lower(),
+                  "",
+                  "",
+                  norm(item.get("recommended_action")),
+                  norm(item.get("evidence_summary")),
+              ])
+          for gap in gaps:
+              rows.append([
+                  norm(meta.get("generated_at")),
+                  "asset_gap",
+                  "asset_gap",
+                  norm(gap.get("issue_codes")),
+                  "warning",
+                  "event",
+                  "content_visual_feedback",
+                  "",
+                  norm(gap.get("example_titles")),
+                  "",
+                  norm(gap.get("example_urls")),
+                  norm(gap.get("visual_key")),
+                  norm(gap.get("visual_motif")),
+                  "",
+                  "needs_asset",
+                  "false",
+                  norm(gap.get("count")),
+                  norm(gap.get("priority")),
+                  norm(gap.get("recommended_action")),
+                  "Aggregierter Visual-Asset-Gap aus Content Quality Audit.",
+              ])
+
+          creds = service_account.Credentials.from_service_account_info(
+              json.loads(sa_json),
+              scopes=["https://www.googleapis.com/auth/spreadsheets"],
+          )
+          service = build("sheets", "v4", credentials=creds, cache_discovery=False)
+          spreadsheet = service.spreadsheets().get(spreadsheetId=sheet_id).execute()
+          existing = {s.get("properties", {}).get("title") for s in spreadsheet.get("sheets", [])}
+          if tab_name not in existing:
+              service.spreadsheets().batchUpdate(
+                  spreadsheetId=sheet_id,
+                  body={"requests": [{"addSheet": {"properties": {"title": tab_name}}}]},
+              ).execute()
+              print(f"✅ Visual feedback tab angelegt: {tab_name}")
+
+          service.spreadsheets().values().clear(
+              spreadsheetId=sheet_id,
+              range=f"{tab_name}!A:T",
+              body={},
+          ).execute()
+          service.spreadsheets().values().update(
+              spreadsheetId=sheet_id,
+              range=f"{tab_name}!A1",
+              valueInputOption="RAW",
+              body={"values": rows},
+          ).execute()
+          print(f"✅ Content visual feedback written to {tab_name}: {len(rows) - 1} rows")
+          PY
+      # === END BLOCK: CONTENT_VISUAL_FEEDBACK_SHEET_WRITE_V1 ===
+
       # === BEGIN BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 | Zweck: macht Reports im Workflow nachvollziehbar; Umfang: Artefakt-Upload ohne Repo-Commit ===
       - name: Upload audit reports
         uses: actions/upload-artifact@v4
@@ -1044,6 +1184,7 @@ jobs:
             data/content-quality-report.md
             data/content-ai-verification-candidates.json
             data/content-search-feedback.json
+            data/content-visual-feedback.json
             data/content-verification-cache.json
             data/content-verification-cache-writeback.json
       # === END BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 ===
