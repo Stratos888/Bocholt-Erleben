@@ -28,10 +28,10 @@ on:
       - "data/**"
       - "api/events/public.php"
   schedule:
-    # Taeglich: zeitnahe Events + Quellen-/Link-Auffaelligkeiten.
-    - cron: "35 5 * * *"
-    # Woechentlich Montag: voller Activity-/Event-Bestand.
-    - cron: "55 5 * * 1"
+    # Taeglich vor dem Dienstag-KI-Suchlauf: zeitnahe Events + Quellen-/Link-Auffaelligkeiten.
+    - cron: "35 4 * * *"
+    # Woechentlich Mittwoch nach dem Dienstag-KI-Suchlauf: voller Activity-/Event-Bestand.
+    - cron: "55 5 * * 3"
 
 permissions:
   contents: read
@@ -82,7 +82,7 @@ jobs:
             AUDIT_SCOPE="$INPUT_SCOPE"
           elif [ "${EVENT_NAME:-}" = "push" ]; then
             AUDIT_SCOPE="full"
-          elif [ "${EVENT_SCHEDULE:-}" = "55 5 * * 1" ]; then
+          elif [ "${EVENT_SCHEDULE:-}" = "55 5 * * 3" ]; then
             AUDIT_SCOPE="full"
           else
             AUDIT_SCOPE="daily"
