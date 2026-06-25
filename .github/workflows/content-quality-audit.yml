@@ -39,6 +39,8 @@ permissions:
 jobs:
   content_quality_audit:
     runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: "1"
 
     steps:
       # === BEGIN BLOCK: CONTENT_QUALITY_CHECKOUT_AND_PYTHON_V1 | Zweck: Baseline fuer Audit-Script bereitstellen; Umfang: Checkout + Python + Google Sheets Dependencies ===
@@ -288,7 +290,15 @@ jobs:
         shell: bash
         run: |
           set -e
-          python scripts/content-quality-audit.py \
+          echo "=== Content Quality Audit: start ==="
+          echo "scope=${AUDIT_SCOPE}"
+          echo "base_url=${APP_BASE_URL}"
+          echo "cache_json=data/content-verification-cache.json"
+          echo "ai_max_candidates=${AI_VERIFICATION_MAX_CANDIDATES:-12}"
+          echo "python=$(python --version)"
+          echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          python -u scripts/content-quality-audit.py \
             --scope "$AUDIT_SCOPE" \
             --network \
             --base-url "$APP_BASE_URL" \
@@ -298,11 +308,15 @@ jobs:
             --output-json data/content-quality-report.json \
             --output-md data/content-quality-report.md
 
+          echo "=== Content Quality Audit: report files ==="
+          ls -lh data/content-quality-report.json data/content-quality-report.md data/content-ai-verification-candidates.json
+          echo "finished_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
           echo "=== Content quality summary ==="
           python - <<'PY'
           import json
           report = json.load(open('data/content-quality-report.json', encoding='utf-8'))
-          print(json.dumps(report['summary'], ensure_ascii=False, indent=2))
+          print(json.dumps(report['summary'], ensure_ascii=False, indent=2), flush=True)
           PY
       # === END BLOCK: CONTENT_QUALITY_RUN_AUDIT_V1 ===
 
