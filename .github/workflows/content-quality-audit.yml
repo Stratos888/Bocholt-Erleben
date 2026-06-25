@@ -978,6 +978,9 @@ jobs:
               "prompt_rule",
               "example_titles",
               "example_urls",
+              "last_seen_at",
+              "expires_at",
+              "examples_policy",
               "source",
           ]
           rows = [header]
@@ -996,6 +999,9 @@ jobs:
                   norm(item.get("prompt_rule")),
                   norm(item.get("example_titles")),
                   norm(item.get("example_urls")),
+                  norm(item.get("last_seen_at")),
+                  norm(item.get("expires_at")),
+                  norm(item.get("examples_policy")),
                   "content_quality_audit",
               ])
 
@@ -1015,7 +1021,7 @@ jobs:
 
           service.spreadsheets().values().clear(
               spreadsheetId=sheet_id,
-              range=f"{tab_name}!A:N",
+              range=f"{tab_name}!A:Q",
               body={},
           ).execute()
           service.spreadsheets().values().update(
