@@ -41,15 +41,24 @@ Umfang:
     === END BLOCK: REVIEW UI LAYOUT WITH COMPLETE EVENT DATA V1 === */
 
     /* === BEGIN BLOCK: REVIEW_INBOX_WORKBENCH_UI_V2 | Zweck: macht die Inbox zur kompakten Review-Arbeitskarte mit klarer Priorisierung von Daten, Flow und Aktionen; Umfang: zentrale Inbox-UI-Styles === */
-    .wrap { max-width: 760px; margin: 0 auto; padding: 12px; }
-    .top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-    .brand { display:flex; align-items:baseline; gap:10px; padding-top: 8px; }
-    .title { font-weight: 800; line-height: 1.1; }
-    .inboxToolbar { display:flex; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
+    .wrap { max-width: 780px; margin: 0 auto; padding: 12px; }
+    .top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .brand { display:grid; gap:4px; min-width:0; }
+    .title { font-weight: 900; line-height: 1.05; font-size: 24px; letter-spacing:-.02em; }
+    .inboxEyebrow { display:flex; align-items:center; gap:7px; flex-wrap:wrap; font-size:12px; font-weight:800; letter-spacing:.035em; text-transform:uppercase; opacity:.72; }
+    .inboxSubtitle { max-width: 42rem; color: rgba(20,35,28,.72); font-size:13.5px; line-height:1.32; }
+    .inboxSystemMenu { position:relative; flex:0 0 auto; }
+    .inboxSystemMenu summary { list-style:none; cursor:pointer; }
+    .inboxSystemMenu summary::-webkit-details-marker { display:none; }
+    .inboxSystemMenu[open] summary { border-color: rgba(38,118,62,.34); background: rgba(38,118,62,.06); }
+    .inboxToolbar { position:absolute; right:0; top:calc(100% + 6px); z-index:20; min-width: 190px; display:grid; gap:7px; padding:9px; border-radius:14px; border:1px solid rgba(0,0,0,.12); background:#fff; box-shadow:0 16px 34px rgba(31,41,51,.14); }
+    .inboxToolbar .btn { width:100%; text-align:left; }
     /* === BEGIN BLOCK: INBOX_CONTENT_VERIFICATION_WORKBENCH_CSS_V1 | Zweck: fuehrt Audit-Faelle als klare Content-Pruefaufgaben mit Anweisung, Checkliste und Korrekturfeldern; Umfang: Mode-Switch und Verification-Karten-Ergaenzungen === */
-    .reviewModeSwitch { display:flex; gap:7px; flex-wrap:wrap; margin: 9px 0 0; }
-    .reviewModeSwitch .btn { padding: 7px 10px; font-size: 13px; }
+    .reviewModeSwitch { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; margin: 12px 0 0; }
+    .reviewModeSwitch .btn { display:grid; gap:3px; align-content:start; min-height:58px; padding: 10px 11px; font-size: 13px; text-align:left; }
     .reviewModeSwitch .is-active { border-color: rgba(38,118,62,.42); background: rgba(38,118,62,.075); font-weight: 800; }
+    .reviewModeLabel { display:block; font-size:13.5px; font-weight:850; line-height:1.18; }
+    .reviewModeHelp { display:block; font-size:12px; font-weight:600; line-height:1.25; opacity:.68; }
     .auditIssueBox { display:grid; gap:7px; margin:0; padding:11px 12px; border-radius:14px; border:1px solid rgba(155,112,0,.28); background:rgba(155,112,0,.055); font-size:14px; line-height:1.35; }
     .auditIssueBox--critical { border-color:rgba(160,0,0,.35); background:rgba(160,0,0,.065); }
     .auditIssueBox--review_needed { border-color:rgba(155,112,0,.32); background:rgba(155,112,0,.065); }
@@ -72,7 +81,44 @@ Umfang:
     .auditBundleActions { display:flex; gap:8px; flex-wrap:wrap; margin-top:2px; }
     .auditBundleActions .btn { padding:7px 10px; font-size:13px; }
     /* === END BLOCK: INBOX_REPO_PATCH_BUNDLE_CSS_V1 === */
-    @media (max-width: 560px) { .auditFormGrid { grid-template-columns:1fr; } }
+    .reviewQuickGuide { display:grid; gap:7px; padding:11px 12px; border-radius:14px; border:1px solid rgba(38,118,62,.18); background:rgba(38,118,62,.045); font-size:13.5px; line-height:1.33; }
+    .reviewQuickGuide strong { font-weight:850; }
+    .reviewMiniSteps { display:flex; flex-wrap:wrap; gap:6px; margin:0; padding:0; list-style:none; }
+    .reviewMiniSteps li { display:inline-flex; align-items:center; gap:5px; padding:5px 8px; border-radius:999px; background:rgba(255,255,255,.68); border:1px solid rgba(0,0,0,.08); font-size:12.5px; font-weight:720; }
+    .reviewVisualBox { display:grid; gap:7px; padding:10px 11px; border-radius:14px; border:1px solid rgba(42,95,150,.18); background:rgba(42,95,150,.045); }
+    .reviewVisualBox__title { font-size:12px; font-weight:850; letter-spacing:.045em; text-transform:uppercase; opacity:.72; }
+    .reviewVisualBox__hint { font-size:12.5px; line-height:1.32; opacity:.76; }
+    .reviewFieldPills { display:flex; flex-wrap:wrap; gap:6px; }
+    .reviewFieldPill { display:inline-flex; align-items:center; gap:5px; padding:5px 8px; border-radius:999px; border:1px solid rgba(0,0,0,.10); background:rgba(255,255,255,.72); font-size:12.5px; line-height:1.15; }
+    .reviewFieldPill strong { font-weight:850; }
+    .reviewCode { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.95em; }
+    .reviewActionIntro { margin:0 0 8px; font-size:12.8px; line-height:1.34; opacity:.78; }
+    .reviewActionGroupTitle { margin:0 0 6px; font-size:12px; font-weight:850; letter-spacing:.045em; text-transform:uppercase; opacity:.72; }
+    .reviewNoData { color:rgba(20,35,28,.58); font-style:italic; }
+    .auditDecisionCard { display:grid; gap:8px; padding:12px; border-radius:15px; border:1px solid rgba(38,118,62,.20); background:rgba(38,118,62,.05); font-size:13.5px; line-height:1.34; }
+    .auditDecisionCard__title { font-weight:900; font-size:15px; line-height:1.22; }
+    .auditDecisionCard__line { display:grid; gap:3px; }
+    .auditDecisionCard__label { font-size:12px; font-weight:850; letter-spacing:.04em; text-transform:uppercase; opacity:.68; }
+    .auditChecklist { list-style:none; padding:0; grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .auditChecklist li { padding:7px 9px; border-radius:12px; background:rgba(0,0,0,.035); font-size:13px; line-height:1.25; }
+    .auditChecklist li::before { content:"Prüfen: "; font-weight:820; opacity:.68; }
+    .auditPackageDisclosure { border-top: 1px solid rgba(0,0,0,.09); padding-top:9px; }
+    .auditPackageDisclosure summary { cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px; font-weight:850; letter-spacing:.045em; text-transform:uppercase; opacity:.76; }
+    .auditPackageDisclosure summary::-webkit-details-marker { display:none; }
+    .auditPackageDisclosure summary::after { content:"›"; transform:rotate(90deg); font-size:18px; line-height:1; opacity:.7; }
+    .auditPackageDisclosure[open] summary::after { transform:rotate(-90deg); }
+    .auditPackageDisclosureBody { display:grid; gap:9px; margin-top:8px; }
+    .auditLinkGrid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+    .auditLinkGrid .btn { width:100%; }
+    @media (max-width: 560px) {
+      .top { align-items:flex-start; }
+      .title { font-size:22px; }
+      .reviewModeSwitch { grid-template-columns:1fr; }
+      .auditFormGrid,
+      .auditLinkGrid { grid-template-columns:1fr; }
+      .auditChecklist { grid-template-columns:1fr; }
+      .inboxToolbar { right:0; }
+    }
     /* === END BLOCK: INBOX_CONTENT_VERIFICATION_WORKBENCH_CSS_V1 === */
     .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.16); font-size: 12px; }
     .muted { opacity: .72; }
@@ -150,24 +196,37 @@ Umfang:
   <main class="wrap">
     <div class="top">
       <div class="brand">
-        <div class="title">Inbox Review</div>
-        <span id="lockState" class="pill muted">gesperrt</span>
+        <div class="inboxEyebrow">
+          <span>Private Arbeitsansicht</span>
+          <span id="lockState" class="pill muted">gesperrt</span>
+        </div>
+        <div class="title">Inbox</div>
+        <div class="inboxSubtitle">Neue Inhalte prüfen. Bestehende Inhalte korrigieren. Jede Karte zeigt genau die nächste Entscheidung.</div>
       </div>
-      <div class="inboxToolbar">
-        <!-- === BEGIN BLOCK: INBOX_COMPACT_TOOLBAR_V1 | Zweck: reduziert den Inbox-Header und blendet die lokale Diagnose-Testmeldung aus; Umfang: sichtbare Toolbar-Buttons === -->
-        <button id="pushBtn" class="btn" type="button">Push aktivieren</button>
-        <button id="deployBtn" class="btn" type="button">Deploy jetzt</button>
-        <button id="reloadBtn" class="btn" type="button" aria-label="Reload">↻</button>
-        <!-- === END BLOCK: INBOX_COMPACT_TOOLBAR_V1 === -->
-      </div>
+      <details class="inboxSystemMenu">
+        <summary class="btn" aria-label="Systemaktionen öffnen">System</summary>
+        <div class="inboxToolbar">
+          <!-- === BEGIN BLOCK: INBOX_COMPACT_TOOLBAR_V2 | Zweck: hält technische Aktionen erreichbar, aber aus dem Review-Hauptfluss heraus; Umfang: sichtbare Toolbar-Buttons === -->
+          <button id="pushBtn" class="btn" type="button">Push aktivieren</button>
+          <button id="deployBtn" class="btn" type="button">Deploy starten</button>
+          <button id="reloadBtn" class="btn" type="button">Neu laden</button>
+          <!-- === END BLOCK: INBOX_COMPACT_TOOLBAR_V2 === -->
+        </div>
+      </details>
     </div>
 
     <div id="statusLine" class="status muted"></div>
 
     <!-- === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_SWITCH_V1 | Zweck: macht Content-Pruefung in derselben privaten Inbox bearbeitbar, aber getrennt von neuen Event-Kandidaten; Umfang: zwei Mode-Buttons === -->
     <div class="reviewModeSwitch" aria-label="Review-Bereich">
-      <button id="modeCurationBtn" class="btn is-active" type="button">Neue Events</button>
-      <button id="modeAuditBtn" class="btn" type="button">Content-Prüfung</button>
+      <button id="modeCurationBtn" class="btn is-active" type="button">
+        <span class="reviewModeLabel">Neue Events</span>
+        <span class="reviewModeHelp">Kandidaten freigeben oder ablehnen</span>
+      </button>
+      <button id="modeAuditBtn" class="btn" type="button">
+        <span class="reviewModeLabel">Content-Prüfung</span>
+        <span class="reviewModeHelp">Bestehende Inhalte prüfen oder korrigieren</span>
+      </button>
     </div>
     <!-- === END BLOCK: INBOX_CONTENT_AUDIT_MODE_SWITCH_V1 === -->
 
@@ -351,15 +410,15 @@ Umfang:
       current = null;
       totalLoaded = 0;
       contentAuditPackagePool = [];
-      setStatus("Kuratier-Inbox gesperrt. Bitte neu laden und Passwort eingeben.");
+      setStatus("Inbox gesperrt. Passwort eingeben, um Review-Fälle zu laden.");
       elLeft.textContent = "";
       elRight.textContent = "";
       refreshLock();
       elOne.innerHTML = `
         <article class="card">
           <h1>Gesperrt</h1>
-          <p class="muted">Die Kuratier-Inbox wird erst nach erfolgreicher Passwortabfrage geladen.</p>
-          <button class="btn" type="button" onclick="window.location.reload()">Neu laden und entsperren</button>
+          <p class="muted">Neue Events und Content-Prüfungen bleiben verborgen, bis die Sitzung entsperrt ist.</p>
+          <button class="btn" type="button" onclick="window.location.reload()">Entsperren</button>
         </article>
       `;
     }
@@ -742,17 +801,17 @@ Umfang:
 
           refreshLock();
           if (auditResult.error) {
-            setStatus("Content-Prüfung konnte nicht geladen werden: " + auditResult.error);
+            setStatus("Content-Prüfung nicht geladen: " + auditResult.error);
           } else if (queue.length > 0) {
             const generated = auditResult.generatedAt ? ` · Stand: ${auditResult.generatedAt}` : "";
             const packageTotal = Number(auditResult.packageTotal || contentAuditPackagePool.length || queue.length || 0);
             const packageHint = packageTotal > queue.length ? ` · ${packageTotal} Fälle in Arbeitspaketen` : "";
-            setStatus(`Content-Prüfung: ${queue.length} zentrale Fälle${packageHint}${generated}`);
+            setStatus(`Content-Prüfung: ${queue.length} direkt zu entscheiden${packageHint}${generated}`);
           } else if (contentAuditPackagePool.length > 0) {
             const generated = auditResult.generatedAt ? ` · Stand: ${auditResult.generatedAt}` : "";
-            setStatus(`Content-Prüfung: keine zentralen Fälle · ${contentAuditPackagePool.length} Fälle nur in Arbeitspaketen${generated}`);
+            setStatus(`Content-Prüfung: keine direkten Entscheidungen · ${contentAuditPackagePool.length} Fälle in Arbeitspaketen${generated}`);
           } else {
-            setStatus("Content-Prüfung: keine offenen Fälle.");
+            setStatus("Content-Prüfung: nichts offen.");
           }
 
           showNext(totalLoaded);
@@ -789,13 +848,13 @@ Umfang:
 
         refreshLock();
         if (!queue.length && submissionsResult.error) {
-          setStatus("Keine review-items. DB-Review konnte nicht geladen werden: " + submissionsResult.error);
+          setStatus("Neue Events: nichts offen. DB-Einreichungen nicht geladen: " + submissionsResult.error);
         } else if (waitingPaymentSubmissionItems.length > 0 && queue.length === waitingPaymentSubmissionItems.length) {
-          setStatus(`${waitingPaymentSubmissionItems.length} Einreichung(en) warten auf Zahlung. Keine weiteren aktiven Review-Fälle.`);
+          setStatus(`Neue Events: ${waitingPaymentSubmissionItems.length} wartet auf Zahlung. Keine direkte Entscheidung offen.`);
         } else if (waitingPaymentSubmissionItems.length > 0) {
-          setStatus(`${waitingPaymentSubmissionItems.length} Einreichung(en) warten auf Zahlung und wurden ans Ende sortiert.`);
+          setStatus(`Neue Events: aktive Fälle zuerst · ${waitingPaymentSubmissionItems.length} wartet auf Zahlung.`);
         } else {
-          setStatus(queue.length ? "" : "Keine review-items.");
+          setStatus(queue.length ? "Neue Events: direkt prüfen und entscheiden." : "Neue Events: nichts offen.");
         }
         /* === END BLOCK: REVIEW_QUEUE_ORDER_WITH_WAITING_PAYMENTS_V1 === */
 
@@ -841,7 +900,7 @@ Umfang:
 
       queue.push(current);
       current = null;
-      setStatus("Fall ans Ende der aktuellen Ansicht verschoben.");
+      setStatus("Für diese Sitzung nach hinten geschoben. Es wurde nichts gespeichert.");
       showNext(totalLoaded);
     }
     /* === END BLOCK: REVIEW_DEFER_CURRENT_ITEM_V1 === */
@@ -1013,8 +1072,8 @@ Umfang:
         return {
           label: "KI-/Sheet-Fall",
           actionMode: "sheet",
-          approveLabel: "✅ Übernehmen",
-          rejectLabel: "❌ Verwerfen"
+          approveLabel: "Übernehmen",
+          rejectLabel: "Verwerfen"
         };
       }
 
@@ -1202,6 +1261,71 @@ Umfang:
     }
     /* === END BLOCK: REVIEW_ACTIVITY_IMAGE_DISPLAY_V1 === */
 
+    /* === BEGIN BLOCK: INBOX_PREMIUM_DECISION_HELPERS_V1 | Zweck: macht jede Inbox-Karte mit kurzen Orientierungstexten, Prüfschritten und sichtbarer Bildzuordnung selbsterklärend; Umfang: reine Anzeigehelfer ohne API-Änderung === */
+    function buildReviewMiniSteps(items) {
+      const cleanItems = (Array.isArray(items) ? items : []).map(trimValue).filter(Boolean);
+      if (!cleanItems.length) return "";
+      return `<ul class="reviewMiniSteps">${cleanItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+    }
+
+    function curationReviewKindLabel(item) {
+      if (isActivityPresenceItem(item)) return "Aktivitätspräsenz vom Anbieter";
+      if (String(item.review_source || "") === "submission_db") return "Event-Einreichung vom Anbieter";
+      return "KI-/Sheet-Kandidat";
+    }
+
+    function curationReviewDecisionLine(item, reviewState) {
+      if (isActivityPresenceItem(item)) {
+        return "Prüfe, ob Ort, Zugänglichkeit, Öffnungszeiten und Bildangaben belastbar sind.";
+      }
+      if (String(item.review_source || "") === "submission_db") {
+        if (reviewState.actionMode === "release_payment") return "Vorprüfung: Wenn die Angaben passen, Zahlungslink freigeben.";
+        if (reviewState.actionMode === "publish") return "Finalprüfung: Nach Zahlung nur veröffentlichen, wenn die Daten passen.";
+        return "Einreichung prüfen und passend entscheiden.";
+      }
+      return "Nur übernehmen, wenn Termin, Ort, Quelle und Bildzuordnung plausibel sind.";
+    }
+
+    function curationReviewSteps(item, reviewState) {
+      if (isActivityPresenceItem(item)) return ["Ort prüfen", "Öffnungszeiten prüfen", "Bildmaterial prüfen", "entscheiden"];
+      if (String(item.review_source || "") === "submission_db" && reviewState.actionMode === "release_payment") return ["Angaben prüfen", "Zahlung freigeben", "später veröffentlichen"];
+      if (String(item.review_source || "") === "submission_db" && reviewState.actionMode === "publish") return ["Quelle prüfen", "Zahlung bestätigt", "veröffentlichen"];
+      return ["Quelle öffnen", "Dubletten prüfen", "Bildtyp prüfen", "entscheiden"];
+    }
+
+    function renderCurationVisualBox(item) {
+      if (isActivityPresenceItem(item)) return "";
+      const rows = [
+        ["Bildtyp", trimValue(item.visual_key)],
+        ["Motiv", trimValue(item.visual_motif)],
+        ["Bildstatus", trimValue(item.visual_asset_status)]
+      ].filter(([, value]) => value);
+
+      if (!rows.length) {
+        return `
+          <section class="reviewSection" aria-label="Bildzuordnung">
+            <div class="reviewVisualBox">
+              <div class="reviewVisualBox__title">Bildzuordnung</div>
+              <div class="reviewVisualBox__hint">Kein Visual Key gesetzt. Beim Übernehmen später in der Content-Prüfung oder im Sheet nachziehen, falls das Event ein eigenes Motiv braucht.</div>
+            </div>
+          </section>
+        `;
+      }
+
+      return `
+        <section class="reviewSection" aria-label="Bildzuordnung">
+          <div class="reviewVisualBox">
+            <div class="reviewVisualBox__title">Bildzuordnung</div>
+            <div class="reviewFieldPills">
+              ${rows.map(([label, value]) => `<span class="reviewFieldPill"><strong>${escapeHtml(label)}:</strong> <span class="reviewCode">${escapeHtml(value)}</span></span>`).join("")}
+            </div>
+            <div class="reviewVisualBox__hint">Kurz prüfen: Passt der Bildtyp wirklich zum konkreten Event? Falsche Motive später nicht blind übernehmen.</div>
+          </div>
+        </section>
+      `;
+    }
+    /* === END BLOCK: INBOX_PREMIUM_DECISION_HELPERS_V1 === */
+
     function renderCurrent(totalCount) {
       refreshLock();
 
@@ -1216,8 +1340,8 @@ Umfang:
       if (!current) {
         elOne.innerHTML = `
           <div class="card">
-            <h1>Fertig 🎉</h1>
-            <div class="muted">↻ zum Neuladen.</div>
+            <h1>Fertig</h1>
+            <div class="muted">Keine offenen Karten in diesem Bereich. Über „System“ kannst du neu laden.</div>
           </div>
         `;
         return;
@@ -1343,9 +1467,6 @@ Umfang:
         ["Zeitdetails", scheduleDetails],
         ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
         ["Kategorie", trimValue(it.kategorie_suggestion)],
-        ["Visual Key", trimValue(it.visual_key)],
-        ["Visual Motif", trimValue(it.visual_motif)],
-        ["Visual Asset", trimValue(it.visual_asset_status)],
         ["Eingereicht am", submittedAt],
         ["Prüfhinweis", curationNote],
         ["Dubletten-/Importhinweis", dedupeHint]
@@ -1365,6 +1486,18 @@ Umfang:
         ? [placeLine, timeLine || scheduleDetails]
         : [dateRangeLine, timeLine, placeLine]
       ).filter(Boolean).join(" · ");
+      const curationKindLabel = curationReviewKindLabel(it);
+      const curationDecisionLine = curationReviewDecisionLine(it, reviewState);
+      const curationStepsHtml = buildReviewMiniSteps(curationReviewSteps(it, reviewState));
+      const visualBoxHtml = renderCurationVisualBox(it);
+      const flowDetailsHtml = flowRowsHtml ? `
+          <details class="reviewDisclosure reviewDisclosure--flow">
+            <summary>Status / Zahlung</summary>
+            <div class="reviewDisclosureBody reviewGrid">
+              ${flowRowsHtml}
+            </div>
+          </details>
+      ` : "";
 
       elOne.innerHTML = `
         <article class="card reviewCard">
@@ -1377,15 +1510,25 @@ Umfang:
             ${metaLine ? `<div class="reviewMetaLine">${escapeHtml(metaLine)}</div>` : ``}
           </header>
 
+          <section class="reviewSection" aria-label="Was du hier siehst">
+            <div class="reviewQuickGuide">
+              <div><strong>Du siehst:</strong> ${escapeHtml(curationKindLabel)}</div>
+              <div><strong>Nächste Entscheidung:</strong> ${escapeHtml(curationDecisionLine)}</div>
+              ${curationStepsHtml}
+            </div>
+          </section>
+
           <section class="reviewSection reviewSection--data" aria-label="Event- und Aktivitätsdaten">
-            <div class="reviewSectionTitle">${isActivityPresence ? "Wichtige Aktivitätsdaten" : "Wichtige Eventdaten"}</div>
+            <div class="reviewSectionTitle">${isActivityPresence ? "Wichtigste Aktivitätsdaten" : "Wichtigste Eventdaten"}</div>
             <div class="reviewPrimaryGrid">
               ${primaryRowsHtml}
             </div>
           </section>
 
+          ${visualBoxHtml}
+
           <section class="reviewSection reviewSection--description" aria-label="Beschreibung und Links">
-            <div class="reviewSectionTitle">Beschreibung / Links</div>
+            <div class="reviewSectionTitle">Beschreibung und Links</div>
             <p class="desc">${escapeHtml(desc || "(kein Text vorhanden)")}</p>
             <div class="urlBox">
               ${eventUrl ? `<div class="urlLine"><strong>${escapeHtml(primaryLinkLabel.replace(" öffnen", ""))}:</strong> ${escapeHtml(eventUrl)}</div>` : ``}
@@ -1395,16 +1538,11 @@ Umfang:
 
           ${reviewRiskHtml}
 
-          <details class="reviewDisclosure reviewDisclosure--flow">
-            <summary>Flow / Zahlung</summary>
-            <div class="reviewDisclosureBody reviewGrid">
-              ${flowRowsHtml}
-            </div>
-          </details>
+          ${flowDetailsHtml}
 
           ${secondaryRowsHtml ? `
             <details class="reviewDisclosure reviewDisclosure--secondary">
-              <summary>Weitere Prüfdaten</summary>
+              <summary>Zusatzdaten</summary>
               <div class="reviewDisclosureBody reviewGrid">
                 ${secondaryRowsHtml}
               </div>
@@ -1412,8 +1550,10 @@ Umfang:
           ` : ``}
 
           <section class="reviewSection reviewSection--actions" aria-label="Review-Aktionen">
+            <div class="reviewActionGroupTitle">Entscheidung</div>
+            <p class="reviewActionIntro">Öffne zuerst die passende Quelle. Ablehnungsgrund nur wählen, wenn du den Fall wirklich verwirfst.</p>
             <div class="rejectBox">
-              <label class="rejectLabel" for="rejectReason">Ablehnungsgrund</label>
+              <label class="rejectLabel" for="rejectReason">Ablehnungsgrund bei Verwerfen</label>
               <select id="rejectReason" class="rejectSelect">
                 ${rejectOptionsHtml}
               </select>
@@ -1424,8 +1564,8 @@ Umfang:
             <div class="actions actions--compact">
               <button id="btnOk" class="btn btn-good actionPrimary" type="button">${escapeHtml(reviewState.approveLabel)}</button>
               <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>${escapeHtml(primaryLinkLabel)}</button>
-              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quelle</button>
-              <button id="btnLater" class="btn" type="button">Später</button>
+              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quelle öffnen</button>
+              <button id="btnLater" class="btn" type="button">In dieser Sitzung später</button>
               <button id="btnNo" class="btn btn-bad" type="button">${escapeHtml(reviewState.rejectLabel)}</button>
             </div>
           </section>
@@ -1651,6 +1791,19 @@ Umfang:
       `;
     }
 
+    function formatEvidenceStatus(value) {
+      const key = trimValue(value);
+      const labels = {
+        confirmed: "bestätigt",
+        partially_confirmed: "teilweise bestätigt",
+        not_confirmed: "nicht bestätigt",
+        unavailable: "nicht erreichbar",
+        manual_check_needed: "manuell prüfen",
+        unknown: "unklar"
+      };
+      return labels[key] || key;
+    }
+
     function renderEvidenceSummary(item) {
       const status = trimValue(item.evidence_status);
       const summary = trimValue(item.evidence_summary);
@@ -1660,9 +1813,9 @@ Umfang:
       if (!status && !summary && !checked && !missing && !fieldStatuses) return "";
       return `
         <section class="reviewSection" aria-label="Faktenprobe">
-          <div class="reviewSectionTitle">Faktenprobe</div>
+          <div class="reviewSectionTitle">Automatische Faktenprobe</div>
           <div class="auditStateNote">
-            ${status ? `<div><strong>Status:</strong> ${escapeHtml(status)}</div>` : ``}
+            ${status ? `<div><strong>Status:</strong> ${escapeHtml(formatEvidenceStatus(status))}</div>` : ``}
             ${summary ? `<div>${escapeHtml(summary)}</div>` : ``}
             ${checked ? `<div><strong>Automatisch geprüft:</strong> ${escapeHtml(checked)}</div>` : ``}
             ${missing ? `<div><strong>Nicht automatisch bestätigt:</strong> ${escapeHtml(missing)}</div>` : ``}
@@ -1680,13 +1833,13 @@ Umfang:
       if (!key && !motif && !role && !assetStatus) return "";
       return `
         <section class="reviewSection" aria-label="Visual-Fit-Vorschlag">
-          <div class="reviewSectionTitle">Visual-Fit-Vorschlag</div>
+          <div class="reviewSectionTitle">Bildvorschlag</div>
           <div class="auditStateNote">
-            ${key ? `<div><strong>visual_key:</strong> ${escapeHtml(key)}</div>` : ``}
-            ${motif ? `<div><strong>visual_motif:</strong> ${escapeHtml(motif)}</div>` : ``}
+            ${key ? `<div><strong>Bildtyp:</strong> <span class="reviewCode">${escapeHtml(key)}</span></div>` : ``}
+            ${motif ? `<div><strong>Motiv:</strong> <span class="reviewCode">${escapeHtml(motif)}</span></div>` : ``}
             ${role ? `<div><strong>Motiv-Rolle:</strong> ${escapeHtml(role)}</div>` : ``}
-            ${assetStatus ? `<div><strong>Asset-Status:</strong> ${escapeHtml(assetStatus)}</div>` : ``}
-            <div>Nur Vorschlag für den Visual-Fit-Workflow. Nicht automatisch speichern oder Bild blind ersetzen.</div>
+            ${assetStatus ? `<div><strong>Bildstatus:</strong> ${escapeHtml(assetStatus)}</div>` : ``}
+            <div>Vorschlag prüfen. Kein Bild blind ersetzen.</div>
           </div>
         </section>
       `;
@@ -1699,19 +1852,19 @@ Umfang:
       const sourceValue = suggestedUrl || (issueCode === "event_ticket_portal_as_primary_source" ? "" : currentSourceValue);
       return `
         <section class="reviewSection" aria-label="Eventdaten korrigieren">
-          <div class="reviewSectionTitle">Eventdaten über Content-Prüfung korrigieren</div>
-          <div class="auditActionHint">Nur ändern, wenn du die Abweichung in der Quelle gesehen hast. Gespeichert wird im Hintergrund in die kanonische Eventquelle; du musst nicht direkt im Sheet arbeiten.</div>
+          <div class="reviewSectionTitle">Eventdaten korrigieren</div>
+          <div class="auditActionHint">Nur ändern, wenn die Quelle die Abweichung bestätigt. Speichern schreibt direkt in die Eventdaten.</div>
           <div class="auditFormGrid">
             <div class="auditField auditField--wide">
               <label for="auditEventTitle">Titel</label>
               <input id="auditEventTitle" type="text" value="${escapeHtml(eventFieldValue(item, "title") || item.title)}" autocomplete="off" />
             </div>
             <div class="auditField">
-              <label for="auditEventDate">Startdatum YYYY-MM-DD</label>
+              <label for="auditEventDate">Startdatum</label>
               <input id="auditEventDate" type="text" value="${escapeHtml(eventFieldValue(item, "date") || item.date)}" inputmode="numeric" autocomplete="off" />
             </div>
             <div class="auditField">
-              <label for="auditEventEndDate">Enddatum YYYY-MM-DD</label>
+              <label for="auditEventEndDate">Enddatum</label>
               <input id="auditEventEndDate" type="text" value="${escapeHtml(eventFieldValue(item, "endDate") || eventFieldValue(item, "end_date"))}" inputmode="numeric" autocomplete="off" />
             </div>
             <div class="auditField">
@@ -1727,11 +1880,11 @@ Umfang:
               <input id="auditEventLocation" type="text" value="${escapeHtml(eventFieldValue(item, "location"))}" autocomplete="off" />
             </div>
             <div class="auditField">
-              <label for="auditEventVisualKey">Visual Key</label>
+              <label for="auditEventVisualKey">Bildtyp / visual_key</label>
               <input id="auditEventVisualKey" type="text" value="${escapeHtml(eventFieldValue(item, "visual_key") || item.suggested_visual_key || "")}" autocomplete="off" />
             </div>
             <div class="auditField">
-              <label for="auditEventVisualMotif">Visual Motif</label>
+              <label for="auditEventVisualMotif">Motiv / visual_motif</label>
               <input id="auditEventVisualMotif" type="text" value="${escapeHtml(eventFieldValue(item, "visual_motif") || eventFieldValue(item, "image_visual_motif") || item.suggested_visual_motif || "")}" autocomplete="off" />
             </div>
             <div class="auditField auditField--wide">
@@ -1980,6 +2133,20 @@ Umfang:
           <div class="reviewValue">${escapeHtml(value)}</div>
         </div>
       `).join("");
+      const workPackagesHtml = renderContentAuditWorkPackages();
+      const workPackagesSectionHtml = workPackagesHtml ? `
+          <details class="auditPackageDisclosure">
+            <summary>Arbeitspakete</summary>
+            <div class="auditPackageDisclosureBody">
+              ${workPackagesHtml}
+            </div>
+          </details>
+      ` : "";
+      const auditKind = isActivity ? "Activity" : "Event";
+      const auditStepsHtml = buildReviewMiniSteps(isActivity
+        ? ["Quelle öffnen", "Daten prüfen", "Patch oder Abschluss"]
+        : ["Quelle öffnen", "Felder vergleichen", "speichern oder abschließen"]
+      );
 
       elOne.innerHTML = `
         <article class="card reviewCard">
@@ -1994,36 +2161,52 @@ Umfang:
             <div class="reviewMetaLine">${escapeHtml([formatGermanDate(it.date), trimValue(it.content_type), trimValue(it.issue_code)].filter(Boolean).join(" · "))}</div>
           </header>
 
-          ${renderContentAuditWorkPackages()}
-
-          <section class="reviewSection" aria-label="Konkrete Aktion">
-            <div class="reviewSectionTitle">Jetzt zu tun</div>
-            <div class="auditInstructionBox">
-              <div><strong>${escapeHtml(guide.actionTitle)}</strong>${escapeHtml(guide.action)}</div>
-              <div><strong>Warum:</strong> ${escapeHtml(guide.why)}</div>
+          <section class="reviewSection" aria-label="Was du hier siehst">
+            <div class="reviewQuickGuide">
+              <div><strong>Du siehst:</strong> Content-Fall für ${escapeHtml(auditKind)}</div>
+              <div><strong>Status:</strong> ${escapeHtml(severityLabel)} · ${escapeHtml(statusLabel)}</div>
+              ${auditStepsHtml}
             </div>
           </section>
 
-          <section class="reviewSection" aria-label="Prüfliste">
-            <div class="reviewSectionTitle">Prüfliste</div>
-            ${renderAuditChecklist(guide.checklist)}
-          </section>
-
           <section class="reviewSection" aria-label="Prüfbefund">
-            <div class="reviewSectionTitle">Prüfbefund</div>
+            <div class="reviewSectionTitle">Befund</div>
             <div class="auditIssueBox auditIssueBox--${escapeHtml(severity)}">
               <strong>${escapeHtml(it.issue_text || "Content-Fall prüfen")}</strong>
               <span>${escapeHtml(it.recommended_action || "Bitte fachlich prüfen.")}</span>
             </div>
           </section>
 
-          <section class="reviewSection" aria-label="Links">
-            <div class="reviewSectionTitle">Links</div>
-            <div class="urlBox">
-              ${it.public_url ? `<div class="urlLine"><strong>Eintrag auf Website:</strong> ${escapeHtml(it.public_url)}</div>` : ``}
-              ${it.source_url ? `<div class="urlLine"><strong>Quelle/Ticketlink:</strong> ${escapeHtml(it.source_url)}</div>` : ``}
+          <section class="reviewSection" aria-label="Konkrete Aktion">
+            <div class="reviewSectionTitle">Jetzt zu tun</div>
+            <div class="auditDecisionCard">
+              <div class="auditDecisionCard__title">${escapeHtml(guide.actionTitle)}</div>
+              <div class="auditDecisionCard__line">
+                <span class="auditDecisionCard__label">Aktion</span>
+                <span>${escapeHtml(guide.action)}</span>
+              </div>
+              <div class="auditDecisionCard__line">
+                <span class="auditDecisionCard__label">Warum</span>
+                <span>${escapeHtml(guide.why)}</span>
+              </div>
             </div>
-            <div class="auditActionHint">Erst Quelle öffnen und fachlich vergleichen. Danach unten entweder korrigieren, vollständig geprüft markieren, zurückstellen oder Patch nötig markieren.</div>
+          </section>
+
+          <section class="reviewSection" aria-label="Prüfliste">
+            <div class="reviewSectionTitle">Kurz prüfen</div>
+            ${renderAuditChecklist(guide.checklist)}
+          </section>
+
+          <section class="reviewSection" aria-label="Links">
+            <div class="reviewSectionTitle">Öffnen</div>
+            <div class="auditLinkGrid">
+              <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${it.public_url ? "" : "disabled"}>Website-Eintrag öffnen</button>
+              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${it.source_url ? "" : "disabled"}>Quelle öffnen</button>
+            </div>
+            <div class="urlBox">
+              ${it.public_url ? `<div class="urlLine"><strong>Website:</strong> ${escapeHtml(it.public_url)}</div>` : ``}
+              ${it.source_url ? `<div class="urlLine"><strong>Quelle:</strong> ${escapeHtml(it.source_url)}</div>` : ``}
+            </div>
           </section>
 
           ${renderSourceSuggestion(it)}
@@ -2037,9 +2220,11 @@ Umfang:
           ${isActivity ? `
             <section class="reviewSection" aria-label="Activity-Hinweis">
               <div class="reviewSectionTitle">Activity-Korrektur</div>
-              <div class="auditStateNote">Diese Activity kommt aus <strong>data/offers.json</strong>. Die Inbox überschreibt sie nicht direkt. Wenn Öffnungszeiten, Bild, Tags, visual_key oder Quelle geändert werden müssen, markiere den Fall als „Patch nötig“.</div>
+              <div class="auditStateNote">Activity-Daten liegen im Repo. Die Inbox überschreibt sie nicht direkt. Bei Änderungen: „Patch nötig“ markieren.</div>
             </section>
           ` : ``}
+
+          ${workPackagesSectionHtml}
 
           <details class="reviewDisclosure">
             <summary>Technische Prüfdaten</summary>
@@ -2051,19 +2236,17 @@ Umfang:
           <div id="reviewCardNotice" class="reviewNotice" hidden role="status" aria-live="polite"></div>
 
           <section class="reviewSection reviewSection--actions" aria-label="Content-Prüfaktionen">
-            <div class="auditActionHint"><strong>Navigation:</strong> „Vorheriger Fall“ und „Nächster Fall“ ändern nichts. Nutze sie nur zum Blättern. Statusänderungen passieren nur über die Abschlussbuttons.</div>
+            <div class="reviewActionGroupTitle">Abschluss</div>
+            <p class="reviewActionIntro">Diese Buttons ändern den Status. Vorheriger/Nächster blättert nur und speichert nichts.</p>
             <div class="actions actions--compact">
-              <button id="btnAuditPrevious" class="btn" type="button" ${contentAuditHistory.length ? "" : "disabled"}>← Vorheriger Fall</button>
-              <button id="btnAuditNext" class="btn" type="button" ${queue.length ? "" : "disabled"}>Nächster Fall →</button>
+              <button id="btnAuditPrevious" class="btn" type="button" ${contentAuditHistory.length ? "" : "disabled"}>Vorheriger Fall</button>
+              <button id="btnAuditNext" class="btn" type="button" ${queue.length ? "" : "disabled"}>Nächster Fall</button>
             </div>
-            <div class="auditActionHint"><strong>Abschluss:</strong> Klicke hier erst, wenn du den aktuellen Fall wirklich entschieden hast.</div>
             <div class="actions actions--compact">
-              ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button">Eventdaten speichern</button>` : ``}
-              <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${it.public_url ? "" : "disabled"}>Eintrag öffnen</button>
-              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${it.source_url ? "" : "disabled"}>Quelle/Ticketlink öffnen</button>
-              <button id="btnAuditVerified" class="btn btn-good" type="button">Vollständig geprüft</button>
-              ${isActivity ? `<button id="btnAuditPatchNeeded" class="btn btn-bad" type="button">Patch nötig markieren</button>` : ``}
-              <button id="btnAuditSnooze" class="btn" type="button">7 Tage zurückstellen</button>
+              ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button">Korrektur speichern</button>` : ``}
+              <button id="btnAuditVerified" class="btn btn-good" type="button">Als geprüft abschließen</button>
+              ${isActivity ? `<button id="btnAuditPatchNeeded" class="btn btn-bad" type="button">Patch nötig</button>` : ``}
+              <button id="btnAuditSnooze" class="btn" type="button">7 Tage parken</button>
             </div>
           </section>
         </article>

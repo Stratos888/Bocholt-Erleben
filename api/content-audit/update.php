@@ -209,10 +209,16 @@ try {
     $nextReviewAt = cau_next_review_date($nextReviewDays);
 
     if ($action === 'mark_checked' || $action === 'verify_full') {
-        cau_mark_audit_row($tabName, $rowNumber, 'verified', $note !== '' ? $note : 'Über interne Inbox vollständig geprüft.', [
+        $doneNote = $note !== '' ? $note : 'Über interne Inbox vollständig geprüft.';
+        cau_mark_audit_row($tabName, $rowNumber, 'verified', $doneNote, [
             'verified_at' => $now,
             'next_review_at' => $nextReviewAt,
             'action_state' => 'verified_until_next_review',
+            'verification_status' => 'confirmed',
+            'verified_by' => 'manual_inbox',
+            'last_verified_at' => $now,
+            'verified_until' => $nextReviewAt,
+            'verification_reason' => $doneNote,
         ]);
         be_json_response(200, [
             'status' => 'ok',
@@ -225,9 +231,13 @@ try {
     }
 
     if ($action === 'snooze') {
-        cau_mark_audit_row($tabName, $rowNumber, 'snoozed', $note !== '' ? $note : 'Für spätere Prüfung zurückgestellt.', [
+        $doneNote = $note !== '' ? $note : 'Für spätere Prüfung zurückgestellt.';
+        cau_mark_audit_row($tabName, $rowNumber, 'snoozed', $doneNote, [
             'next_review_at' => $nextReviewAt,
             'action_state' => 'snoozed',
+            'verification_status' => 'deferred',
+            'verification_reason' => $doneNote,
+            'next_check_at' => $nextReviewAt,
         ]);
         be_json_response(200, [
             'status' => 'ok',
@@ -260,6 +270,12 @@ try {
             'verified_at' => $now,
             'next_review_at' => $nextReviewAt,
             'action_state' => 'event_sheet_corrected',
+            'verification_status' => 'corrected',
+            'verified_by' => 'manual_inbox',
+            'last_verified_at' => $now,
+            'verified_until' => $nextReviewAt,
+            'verification_reason' => $doneNote,
+            'better_source_url' => $newUrl,
         ]);
 
         be_json_response(200, [
@@ -282,11 +298,21 @@ try {
 
         $updatedRanges = cau_update_event_fields($contentId, $eventUpdates);
         $doneNote = $note !== '' ? $note : 'Event-Felder über interne Inbox korrigiert und geprüft.';
-        cau_mark_audit_row($tabName, $rowNumber, 'corrected', $doneNote, [
+        $sourceForAudit = trim((string)($eventUpdates['source_url'] ?? $eventUpdates['url'] ?? $eventUpdates['event_url'] ?? ''));
+        $auditUpdates = [
             'verified_at' => $now,
             'next_review_at' => $nextReviewAt,
             'action_state' => 'event_sheet_corrected',
-        ]);
+            'verification_status' => 'corrected',
+            'verified_by' => 'manual_inbox',
+            'last_verified_at' => $now,
+            'verified_until' => $nextReviewAt,
+            'verification_reason' => $doneNote,
+        ];
+        if ($sourceForAudit !== '') {
+            $auditUpdates['better_source_url'] = $sourceForAudit;
+        }
+        cau_mark_audit_row($tabName, $rowNumber, 'corrected', $doneNote, $auditUpdates);
 
         be_json_response(200, [
             'status' => 'ok',
