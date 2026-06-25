@@ -2727,8 +2727,17 @@ def feedback_example(item: Issue) -> Dict[str, str]:
     }
 
 
+def add_limited_unique(values: List[str], value: str, limit: int) -> None:
+    clean = norm(value)
+    if clean and clean not in values and len(values) < limit:
+        values.append(clean)
+
+
 def build_search_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> Dict[str, Any]:
-    grouped: Dict[tuple[str, str, str, str, str, str], Dict[str, Any]] = {}
+    # Feedback darf nicht pro Domain/Fall als neue Prompt-Regel wuchern.
+    # Gruppierung daher auf Fehlerklasse + Issue + Contenttyp + Feld + Regeltext;
+    # Hosts, Quellen und Beispiele bleiben nur Diagnosewerte innerhalb dieser einen Regel.
+    grouped: Dict[tuple[str, str, str, str, str], Dict[str, Any]] = {}
     total_signals = 0
 
     for item in issues:
@@ -2742,18 +2751,19 @@ def build_search_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> 
         issue_code = norm(item.issue_code)
         field = norm(config.get("field")) or norm(item.evidence_missing_fields) or "general"
         host = source_host_for_feedback(item.source_url)
-        key = (feedback_class, issue_code, item.content_type, item.source_system, host, field)
+        prompt_rule = norm(config.get("prompt_rule"))
+        key = (feedback_class, issue_code, item.content_type, field, prompt_rule)
         current = grouped.setdefault(key, {
             "feedback_class": feedback_class,
             "issue_code": issue_code,
             "content_type": item.content_type,
-            "source_system": item.source_system,
-            "source_host": host,
+            "source_system": [],
+            "source_host": [],
             "field": field,
             "count": 0,
             "priority": int(config.get("priority") or 50),
             "status": "active",
-            "prompt_rule": norm(config.get("prompt_rule")),
+            "prompt_rule": prompt_rule,
             "last_seen_at": norm(meta.get("generated_at", ""))[:10],
             "expires_at": search_feedback_expiry_date(meta),
             "examples_policy": "examples_are_diagnostics_not_prompt_rules",
@@ -2762,6 +2772,8 @@ def build_search_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> 
             "examples": [],
         })
         current["count"] += 1
+        add_limited_unique(current["source_system"], item.source_system, 6)
+        add_limited_unique(current["source_host"], host, 8)
         if item.title and item.title not in current["example_titles"] and len(current["example_titles"]) < 6:
             current["example_titles"].append(item.title)
         if item.source_url and item.source_url not in current["example_urls"] and len(current["example_urls"]) < 4:
@@ -2806,7 +2818,7 @@ def build_search_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> 
             "active_rule_count": sum(1 for rule in rules if rule.get("status") == "active"),
             "default_rule_count": sum(1 for rule in rules if rule.get("status") == "default_context"),
             "contract": "search_prompt_context_only_no_auto_write_no_rulebook_mutation",
-            "rule_bloat_guard": "typed_grouped_capped_with_ttl",
+            "rule_bloat_guard": "typed_grouped_class_capped_with_ttl",
             "max_rules": SEARCH_FEEDBACK_MAX_RULES,
             "signal_ttl_days": SEARCH_FEEDBACK_SIGNAL_TTL_DAYS,
         },
