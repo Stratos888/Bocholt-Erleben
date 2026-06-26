@@ -116,3 +116,41 @@ Der erste echte Guard-Lauf zeigte zwei wichtige Härtungspunkte:
 - Zwemwater-Seiten können positive, Warn- und Negativformulierungen gleichzeitig als Legende/Hilfetext enthalten. Gemischte ungescopedte Seitensignale werden künftig konservativ `unknown`, statt vorschnell `blocked` zu setzen. Nur klar gescopte Statusformulierungen wie `Zwemplek status:goed` oder `Actuele situatie: in orde` dürfen zu `ok` führen.
 
 Damit bleibt der Guard weiter report-only und schreibt keine Produktdaten.
+
+## Guard V1.2 – lokale Badeeignung getrennt von Wasserstatus
+
+Der Aasee-Befund zeigt: Gute Messwerte und kein Badeverbot reichen nicht automatisch fuer eine aktive Badeempfehlung.
+
+V1.2 trennt deshalb drei Ebenen:
+
+| Ebene | Bedeutung |
+|---|---|
+| `water_state` | offizielle Wasserqualitaet / Badeverbot / Messwerte |
+| `local_suitability_state` | lokale praktische Badeeignung, z. B. Schlamm, Geruch, Algen, gesperrte Badebucht, gruenes Flaggen-/Freigabesignal |
+| `state` | finaler Guard-Status fuer Empfehlungsschutz |
+
+Produktregel ab V1.2:
+
+> Ein Bade-Highlight darf spaeter nur dann technisch als Kandidat fuer `ok` gelten, wenn `water_state = ok` **und** `local_suitability_state = ok` sind.
+
+Konsequenzen:
+
+- `water_state = ok` allein fuehrt nicht mehr zu einem finalen `ok`.
+- Lokale Negativsignale aus serioeser lokaler Presse oder offizieller Quelle fuehren mindestens zu `watch`.
+- `watch` blockiert weiterhin jede automatische Bade-Highlight-Ausspielung.
+- Lokale Presse kann eine Empfehlung unterdruecken, beweist aber kein offizielles Badeverbot.
+- Positive lokale Freigaben sollen bevorzugt aus offiziellen Stadt-/Kreis-/Betreiberquellen kommen, z. B. gruene Flagge, Badestelle freigegeben, Badebucht geoeffnet.
+
+Aktuell ergänzt fuer Aasee:
+
+- offizielle Stadt-Bocholt-Aasee-Seite als lokale Freigabe-/Warnquelle,
+- lokales BBV-Negativsignal zu Schlamm/Geruch als zeitlich begrenzter Empfehlungssuppressor bis `2026-07-15`.
+
+Der Guard bleibt report-only:
+
+- kein Writeback nach `data/offers.json`,
+- keine direkte Änderung an Activity-Highlights,
+- keine UI-Aktivierung,
+- keine automatische Inbox-Aktion.
+
+Erst nach Sichtung von 1–2 V1.2-Artefakten wird entschieden, ob und wie lokale Badeeignung in einen spaeteren Content-/Statusprozess uebernommen wird.
