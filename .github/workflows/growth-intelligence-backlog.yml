@@ -1,0 +1,80 @@
+# === BEGIN FILE: .github/workflows/growth-intelligence-backlog.yml | Zweck: erzeugt woechentlich deduplizierte Growth-/Acquisition-Backlog-Punkte aus GSC/GA4 ohne KI-Suchlauf-Kopplung; Umfang: kompletter Workflow ===
+name: Growth Intelligence Backlog
+
+on:
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: "Analysezeitraum in Tagen"
+        required: false
+        default: "30"
+  schedule:
+    # Woechentlich Montagmorgen: nach einer vollen Vorwoche neue Growth-/Acquisition-Hinweise sammeln.
+    - cron: "20 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  growth_intelligence_backlog:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Google API dependencies
+        shell: bash
+        run: |
+          set -e
+          python -m pip install --upgrade pip
+          pip install google-api-python-client google-auth
+
+      - name: Resolve Growth runtime
+        shell: bash
+        env:
+          INPUT_LOOKBACK_DAYS: ${{ github.event.inputs.lookback_days }}
+          LIVE_SHEET_ID: ${{ secrets.LIVE_SHEET_ID }}
+          LEGACY_SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: |
+          set -e
+          BE_SHEET_ID="${LIVE_SHEET_ID:-${LEGACY_SHEET_ID:-}}"
+          if [ -z "$BE_SHEET_ID" ]; then
+            echo "❌ LIVE_SHEET_ID oder SHEET_ID fehlt."
+            exit 1
+          fi
+
+          LOOKBACK_DAYS="${INPUT_LOOKBACK_DAYS:-30}"
+          if ! echo "$LOOKBACK_DAYS" | grep -Eq '^[0-9]+$'; then
+            LOOKBACK_DAYS="30"
+          fi
+
+          echo "GROWTH_BACKLOG_TAB=Growth_Backlog" >> "$GITHUB_ENV"
+          echo "GROWTH_REPORT_TAB=Growth_Intelligence_Report" >> "$GITHUB_ENV"
+
+          echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
+          echo "GROWTH_LOOKBACK_DAYS=$LOOKBACK_DAYS" >> "$GITHUB_ENV"
+          echo "Growth lookback days: $LOOKBACK_DAYS"
+
+      - name: Update Growth Backlog
+        timeout-minutes: 10
+        shell: bash
+        env:
+          BE_SHEET_ID: ${{ env.BE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GROWTH_LOOKBACK_DAYS: ${{ env.GROWTH_LOOKBACK_DAYS }}
+          GROWTH_BACKLOG_TAB: ${{ env.GROWTH_BACKLOG_TAB }}
+          GROWTH_REPORT_TAB: ${{ env.GROWTH_REPORT_TAB }}
+        run: |
+          set -e
+          python scripts/growth-intelligence-backlog.py
+# === END FILE: .github/workflows/growth-intelligence-backlog.yml ===
