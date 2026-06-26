@@ -1168,7 +1168,34 @@
           "Wochenende",
           "Wasser"
         ]
-      }
+      },
+      "seasonal_highlights": [
+        {
+          "id": "wasserburg-anholt-landscape-park-season",
+          "type": "park_season",
+          "activation_mode": "stable_seasonal",
+          "label": "Landschaftspark-Saison",
+          "short_label": "Landschaftspark",
+          "detail_label": "Saison für den Landschaftspark",
+          "starts": "04-01",
+          "ends": "10-31",
+          "peak_starts": "05-01",
+          "peak_ends": "09-30",
+          "confidence": "verified_stable",
+          "source_label": "Wasserburg Anholt / Öffnungszeiten",
+          "source_url": "https://www.wasserburg-anholt.de/index.php/de/oeffnungszeiten-preise",
+          "checked_at": "2026-06-26",
+          "valid_until": "2027-04-01",
+          "home_boost": 10,
+          "activity_sort_boost": 6,
+          "visibility": [
+            "home",
+            "activity_card",
+            "activity_detail"
+          ],
+          "public_note": "Der historische Landschaftspark ist in der Sommersaison länger geöffnet. Tickets, Hausführungen und Tageshinweise vor Besuch prüfen."
+        }
+      ]
     },
     {
       "id": "anholter-schweiz-erleben",
@@ -1262,7 +1289,34 @@
           "Wasser",
           "Tiere"
         ]
-      }
+      },
+      "seasonal_highlights": [
+        {
+          "id": "anholter-schweiz-sommeroeffnung",
+          "type": "park_season",
+          "activation_mode": "stable_seasonal",
+          "label": "Wildpark-Sommersaison",
+          "short_label": "Wildpark-Saison",
+          "detail_label": "Saison mit langen Wildpark-Öffnungszeiten",
+          "starts": "03-01",
+          "ends": "10-24",
+          "peak_starts": "04-01",
+          "peak_ends": "09-30",
+          "confidence": "verified_stable",
+          "source_label": "Biotopwildpark Anholter Schweiz / Öffnungszeiten",
+          "source_url": "https://www.wildpark-nrw.de/",
+          "checked_at": "2026-06-26",
+          "valid_until": "2027-03-01",
+          "home_boost": 10,
+          "activity_sort_boost": 6,
+          "visibility": [
+            "home",
+            "activity_card",
+            "activity_detail"
+          ],
+          "public_note": "In der Sommersaison ist der Wildpark täglich mit langen Einlasszeiten geöffnet; konkrete Zeiten und Tageshinweise vor Besuch prüfen."
+        }
+      ]
     },
     {
       "id": "villa-mondriaan-winterswijk-erleben",
@@ -3122,7 +3176,57 @@
           "Spielplatz",
           "Baden"
         ]
-      }
+      },
+      "seasonal_highlights": [
+        {
+          "id": "proebstingsee-bathing-status",
+          "type": "bathing_water",
+          "activation_mode": "condition_sensitive",
+          "label": "Badestelle aktuell freigegeben",
+          "short_label": "Baden freigegeben",
+          "detail_label": "Badehinweis",
+          "starts": "05-15",
+          "ends": "09-15",
+          "requires_current_status": true,
+          "current_status_max_age_days": 7,
+          "confidence": "verified_condition_sensitive",
+          "source_label": "Badegewässer NRW / Pröbstingsee",
+          "source_url": "https://db.badegewaesser.nrw.de/badegewaesser-nrw/50",
+          "checked_at": "2026-06-26",
+          "valid_until": "2027-03-01",
+          "home_boost": 0,
+          "activity_sort_boost": 0,
+          "visibility": [
+            "activity_detail"
+          ],
+          "public_note": "Nur mit frischer positiver Badewasser-/Betreiberstatusquelle als Bade-Highlight ausspielen.",
+          "source_policy": {
+            "positive_requires": [
+              "official_city",
+              "official_authority",
+              "official_bathing_water_status",
+              "official_operator"
+            ],
+            "negative_allows": [
+              "official_city",
+              "official_authority",
+              "official_bathing_water_status",
+              "official_operator",
+              "local_press"
+            ]
+          },
+          "current_status": {
+            "state": "unknown",
+            "label": "Status vor Empfehlung prüfen",
+            "source_type": "",
+            "source_url": "",
+            "checked_at": "",
+            "valid_until": "",
+            "reason": "Noch keine frische positive Statusquelle im Repo hinterlegt.",
+            "public_note": "Vor einer Badeempfehlung muss der aktuelle Badewasserstatus geprüft werden."
+          }
+        }
+      ]
     },
     {
       "id": "borkener-tuerme-tour",
@@ -4052,7 +4156,57 @@
           "Wasser",
           "Baden"
         ]
-      }
+      },
+      "seasonal_highlights": [
+        {
+          "id": "auesee-bathing-status",
+          "type": "bathing_water",
+          "activation_mode": "condition_sensitive",
+          "label": "Badestelle aktuell freigegeben",
+          "short_label": "Baden freigegeben",
+          "detail_label": "Badehinweis",
+          "starts": "05-15",
+          "ends": "09-15",
+          "requires_current_status": true,
+          "current_status_max_age_days": 7,
+          "confidence": "verified_condition_sensitive",
+          "source_label": "Badegewässer NRW / Auesee Rettungsinsel",
+          "source_url": "https://db.badegewaesser.nrw.de/badegewaesser-nrw/22",
+          "checked_at": "2026-06-26",
+          "valid_until": "2027-03-01",
+          "home_boost": 0,
+          "activity_sort_boost": 0,
+          "visibility": [
+            "activity_detail"
+          ],
+          "public_note": "Nur mit frischer positiver Badewasser-/Betreiberstatusquelle als Bade-Highlight ausspielen; Auesee hat mehrere Badestellen/Statusquellen.",
+          "source_policy": {
+            "positive_requires": [
+              "official_city",
+              "official_authority",
+              "official_bathing_water_status",
+              "official_operator"
+            ],
+            "negative_allows": [
+              "official_city",
+              "official_authority",
+              "official_bathing_water_status",
+              "official_operator",
+              "local_press"
+            ]
+          },
+          "current_status": {
+            "state": "unknown",
+            "label": "Status vor Empfehlung prüfen",
+            "source_type": "",
+            "source_url": "",
+            "checked_at": "",
+            "valid_until": "",
+            "reason": "Noch keine frische positive Statusquelle im Repo hinterlegt.",
+            "public_note": "Vor einer Badeempfehlung muss der aktuelle Badewasserstatus geprüft werden."
+          }
+        }
+      ]
     },
     {
       "id": "schwarzes-wasser-wesel-entdecken",

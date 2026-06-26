@@ -16,7 +16,7 @@ Seasonal Activity Highlights sind eine geprüfte Zusatzschicht für Aktivitäten
 
 | Modus | Zweck | Ausspielung |
 |---|---|---|
-| `stable_seasonal` | stabile, belegte Saisonphänomene | aktiv, wenn Zeitraum und Quellenprüfung gültig sind |
+| `stable_seasonal` | stabile, belegte Saisonphänomene oder belastbare Saison-/Öffnungsfenster | aktiv, wenn Zeitraum und Quellenprüfung gültig sind |
 | `condition_sensitive` | kurzfristig kippende Zustände | nur aktiv mit `current_status.state=ok` und frischer offizieller/Betreiber-Quelle |
 | `event_only` | konkrete Termine/Aktionen | nie als Activity-Highlight ausspielen |
 | `candidate_only` | plausible, aber nicht belastbare Idee | nie öffentlich ausspielen |
@@ -39,7 +39,7 @@ Seasonal Activity Highlights sind eine geprüfte Zusatzschicht für Aktivitäten
 | Activity-Card | aktives Highlight erscheint als kurzer Chip |
 | Detailpanel | aktives Highlight oder Statushinweis wird kompakt erklärt |
 
-## Aktueller Datenstand V1
+## Datenstand nach Content Batch 01
 
 Aktive/stabile Highlights:
 
@@ -47,11 +47,26 @@ Aktive/stabile Highlights:
 - Korenburgerveen: Wollgras-/Moorzeit
 - Quellengrundpark Weseke: Apothekergarten-Saison
 - Witte Venn: Heideblüte-Zeit
+- Wasserburg Anholt: Landschaftspark-Saison
+- Anholter Schweiz: Wildpark-Sommersaison mit langen Öffnungszeiten
 
 Zustandsabhängige, aktuell nicht öffentlich als Bade-Highlight ausgespielte Kandidaten:
 
 - Aasee: `blocked`, solange keine frische positive Freigabe vorliegt
 - Hilgelo: `unknown`, bis eine frische positive Badewasser-/Betreiberstatusquelle gepflegt ist
+- Pröbstingsee: `unknown`, bis eine frische positive Badewasser-/Betreiberstatusquelle gepflegt ist
+- Auesee Wesel: `unknown`, bis eine frische positive Badewasser-/Betreiberstatusquelle gepflegt ist
+
+## Content Batch 01 Scope
+
+Content Batch 01 ergänzt nur sichere Datensätze:
+
+- keine Blüten-/Tierannahmen ohne konkrete Quelle
+- keine konkreten Aktionen als Activity-Highlight
+- keine Badeempfehlung ohne aktuelle positive Statusquelle
+- keine Live-News-Abfrage im Browser
+
+Ergänzt wurden zwei stabile Saison-/Öffnungsfenster und zwei weitere zustandsabhängige Badegewässer-Kandidaten. Die Badegewässer-Kandidaten werden bewusst nicht aktiv ausgespielt, solange der tägliche Status-Guard keine frische positive Quelle im Repo hinterlegt hat.
 
 ## Prüfung
 
