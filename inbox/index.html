@@ -942,6 +942,19 @@ Umfang:
       return String(value || "").trim();
     }
 
+    function comparableUrl(value) {
+      const raw = trimValue(value);
+      if (!raw) return "";
+      try {
+        const url = new URL(raw, window.location.origin);
+        url.hash = "";
+        const path = url.pathname.replace(/\/+$/, "") || "/";
+        return `${url.protocol}//${url.host}${path}${url.search}`.toLowerCase();
+      } catch (_error) {
+        return raw.replace(/\/+$/, "").toLowerCase();
+      }
+    }
+
     function formatGermanDate(value) {
       const raw = trimValue(value);
       if (!raw) return "";
@@ -1943,6 +1956,9 @@ Umfang:
       const source = trimValue(item.source_system);
 
       /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_WORK_ROUTE_HARDENING_V1 | Zweck: ordnet Arbeitspakete anhand eindeutiger Issue-Codes stabil ein, auch wenn alte Sheet-/API-Gruppenwerte noch vorhanden sind; Umfang: reine UI-/Exportlogik, keine Status- oder Datenänderung === */
+      const visualBacklogCodes = ["activity_visual_premium_gap", "activity_visual_key_auto_patch_candidate", "activity_visual_asset_missing"];
+      if (visualBacklogCodes.includes(code)) return "visual_fit";
+
       const visualMarkers = ["visual", "image", "bild", "motif"];
       if (visualMarkers.some((marker) => code.includes(marker))) return "visual_fit";
 
@@ -2127,6 +2143,9 @@ Umfang:
       const canEditEvent = isContentAuditEventItem(it);
       const isActivity = isContentAuditActivityItem(it);
       const suggestedUrl = trimValue(it.suggested_url);
+      const publicUrl = trimValue(it.public_url);
+      const sourceUrl = trimValue(it.source_url);
+      const showPublicLink = publicUrl && comparableUrl(publicUrl) !== comparableUrl(sourceUrl);
       const auditRowsHtml = buildContentAuditRows(it).map(([label, value]) => `
         <div class="reviewRow">
           <div class="reviewLabel">${escapeHtml(label)}</div>
@@ -2172,8 +2191,8 @@ Umfang:
           <section class="reviewSection" aria-label="Links">
             <div class="reviewSectionTitle">Quelle prüfen</div>
             <div class="auditLinkGrid">
-              <button id="btnOpenEvent" class="btn sourceBtn" type="button" title="Öffnet den aktuellen Website-Eintrag." ${it.public_url ? "" : "disabled"}>Website öffnen</button>
-              <button id="btnOpenSource" class="btn sourceBtn" type="button" title="Öffnet die Originalquelle zur Prüfung." ${it.source_url ? "" : "disabled"}>Quelle öffnen</button>
+              ${showPublicLink ? `<button id="btnOpenEvent" class="btn sourceBtn" type="button" title="Öffnet den aktuellen öffentlichen Eintrag in der App.">Eintrag öffnen</button>` : ``}
+              <button id="btnOpenSource" class="btn sourceBtn" type="button" title="Öffnet die Originalquelle, anhand der du den Befund prüfst." ${sourceUrl ? "" : "disabled"}>Quelle prüfen</button>
             </div>
 
           </section>
@@ -2217,10 +2236,13 @@ Umfang:
 
       document.getElementById("btnAuditPrevious").addEventListener("click", showPreviousContentAuditItem);
       document.getElementById("btnAuditNext").addEventListener("click", showNextContentAuditItem);
-      document.getElementById("btnOpenEvent").addEventListener("click", () => {
-        const url = trimValue(it.public_url);
-        if (url) window.open(url, "_blank", "noopener,noreferrer");
-      });
+      const openEventButton = document.getElementById("btnOpenEvent");
+      if (openEventButton) {
+        openEventButton.addEventListener("click", () => {
+          const url = trimValue(it.public_url);
+          if (url) window.open(url, "_blank", "noopener,noreferrer");
+        });
+      }
       document.getElementById("btnOpenSource").addEventListener("click", () => {
         const url = trimValue(it.source_url);
         if (url) window.open(url, "_blank", "noopener,noreferrer");

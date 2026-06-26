@@ -74,7 +74,7 @@ SEVERITY_RANK = {
 }
 
 EVENT_REQUIRED_FIELDS = ["id", "title", "date", "city", "location", "kategorie"]
-ACTIVITY_REQUIRED_FIELDS = ["id", "title", "location", "description", "url", "visual_key", "opening_status"]
+ACTIVITY_REQUIRED_FIELDS = ["id", "title", "location", "description", "url", "opening_status"]
 SAFE_IMAGE_STATUSES = {"ready", "usable", "fallback"}
 TICKET_PORTAL_HOSTS = (
     "reservix.de",
@@ -307,6 +307,26 @@ def infer_process_metadata(
             "correction_owner": "content_inbox_fact_check",
             "workbench_group": "Faktencheck",
             "automation_policy": "human_review_before_write",
+        }
+
+    activity_visual_backlog_codes = {
+        "activity_visual_key_auto_patch_candidate",
+        "activity_visual_premium_gap",
+        "activity_visual_asset_missing",
+    }
+    if code in activity_visual_backlog_codes:
+        if code == "activity_visual_key_auto_patch_candidate":
+            return {
+                "process_category": "visual_auto_patch_candidate",
+                "correction_owner": "repo_patch_automation",
+                "workbench_group": "Visual-Backlog",
+                "automation_policy": "auto_patch_candidate_no_manual_inbox",
+            }
+        return {
+            "process_category": "visual_backlog_observation",
+            "correction_owner": "visual_workflow",
+            "workbench_group": "Visual-Backlog",
+            "automation_policy": "backlog_only_no_content_inbox",
         }
 
     visual_markers = (
@@ -918,6 +938,43 @@ def pool_has_safe_image(pool: Dict[str, Any]) -> bool:
     if not isinstance(images, list):
         return False
     return any(isinstance(img, dict) and norm(img.get("status")) in SAFE_IMAGE_STATUSES for img in images)
+
+
+def slugify_visual_key(value: str) -> str:
+    raw = norm(value).lower()
+    replacements = {
+        "ä": "ae",
+        "ö": "oe",
+        "ü": "ue",
+        "ß": "ss",
+    }
+    for source, target in replacements.items():
+        raw = raw.replace(source, target)
+    raw = re.sub(r"[^a-z0-9]+", "_", raw).strip("_")
+    return re.sub(r"_+", "_", raw)
+
+
+def activity_pool_key_for_offer_id(offer_id: str, activity_visual_pools: Dict[str, Dict[str, Any]]) -> str:
+    wanted = norm(offer_id)
+    if not wanted:
+        return ""
+    for key, pool in activity_visual_pools.items():
+        offer_ids = pool.get("primary_offer_ids") if isinstance(pool, dict) else []
+        if isinstance(offer_ids, list) and wanted in {norm(item) for item in offer_ids}:
+            return norm(key)
+    return ""
+
+
+def activity_direct_image_status(offer: Dict[str, Any]) -> str:
+    image = norm(offer.get("image"))
+    quality = norm(offer.get("image_quality"))
+    if not image:
+        return "no_direct_image"
+    if quality in {"ready", "usable", "fallback"}:
+        return f"direct_image_{quality}"
+    if quality:
+        return f"direct_image_{quality}"
+    return "direct_image_present"
 
 
 def check_url(url: str) -> Tuple[str, str]:
@@ -2261,6 +2318,50 @@ def audit_activities(
                     public_url=public_url,
                 ))
 
+        if not visual_key:
+            matched_pool_key = activity_pool_key_for_offer_id(content_id, activity_visual_pools)
+            suggested_activity_key = matched_pool_key or slugify_visual_key(content_id or title)
+            matched_pool = activity_visual_pools.get(matched_pool_key) if matched_pool_key else None
+            image_status = activity_direct_image_status(offer)
+            if matched_pool is not None and pool_has_safe_image(matched_pool):
+                issues.append(issue(
+                    "warning",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_visual_key_auto_patch_candidate",
+                    f"Bildtyp fehlt; vorhandener Activity-Visual-Pool passt: {matched_pool_key}",
+                    f"Automatischer Repo-Patch-Kandidat: visual_key={matched_pool_key} ergänzen. Nicht als manuelle Content-Aktion anzeigen.",
+                    source_url=source_url,
+                    suggested_visual_key=matched_pool_key,
+                    visual_asset_status="ready_pool_available",
+                    evidence_status="auto_patch_candidate",
+                    evidence_summary="Activity hat keinen visual_key, aber ein passender Activity-Visual-Pool mit sicherem Bild ist über primary_offer_ids eindeutig zuordenbar.",
+                    evidence_checked_fields="offer.id, activity_visual_pool.primary_offer_ids, activity_visual_pool.images.status",
+                    evidence_missing_fields="visual_key",
+                    public_url=public_url,
+                ))
+            else:
+                issues.append(issue(
+                    "warning",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_visual_premium_gap",
+                    "Premium-Bildpool fehlt: Activity hat keinen visual_key.",
+                    "Nicht in der Content-Inbox bearbeiten. Visual-Gap bündeln: Premium-Bild/Pool für diese Activity erzeugen oder beschaffen; vorhandenes Direktbild bleibt bis dahin Übergang.",
+                    source_url=source_url,
+                    suggested_visual_key=suggested_activity_key,
+                    visual_asset_status=image_status if matched_pool is None else "pool_without_safe_image",
+                    evidence_status="visual_backlog",
+                    evidence_summary=f"Activity ohne visual_key. Vorschlag für künftigen Pool-Key: {suggested_activity_key}. Direktbild-Status: {image_status}.",
+                    evidence_checked_fields="offer.id, offer.image, offer.image_quality, activity_visual_pool",
+                    evidence_missing_fields="visual_key, activity_visual_pool",
+                    public_url=public_url,
+                ))
+
         if content_id in seen_ids:
             issues.append(issue(
                 "critical",
@@ -2858,10 +2959,13 @@ VISUAL_RULE_REVIEW_CODES = {
 VISUAL_ASSET_GAP_CODES = {
     "event_visual_key_missing_asset_gap",
     "event_visual_motif_without_ready_asset",
+    "activity_visual_premium_gap",
+    "activity_visual_asset_missing",
 }
 VISUAL_POOL_CONTRACT_CODES = {
     "event_visual_key_unknown",
     "event_visual_key_without_safe_image",
+    "activity_visual_key_auto_patch_candidate",
 }
 VISUAL_DIVERSITY_CODES = {
     "event_visual_reuse_cluster",
@@ -2916,14 +3020,17 @@ def visual_feedback_item(item: Issue, route: str, meta: Dict[str, Any]) -> Dict[
 
 
 def build_visual_asset_gap_rows(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    grouped: Dict[tuple[str, str], Dict[str, Any]] = {}
+    grouped: Dict[tuple[str, str, str], Dict[str, Any]] = {}
     for item in items:
         if item.get("route") != "asset_gap":
             continue
+        content_type = norm(item.get("content_type")) or "content"
         key = norm(item.get("suggested_visual_key")) or "<unknown_key>"
-        motif = norm(item.get("suggested_visual_motif")) or "<unknown_motif>"
-        group_key = (key, motif)
+        motif = norm(item.get("suggested_visual_motif"))
+        group_key = (content_type, key, motif)
         current = grouped.setdefault(group_key, {
+            "content_type": content_type,
+            "source_system": "content_visual_feedback",
             "visual_key": key,
             "visual_motif": motif,
             "count": 0,
@@ -2931,17 +3038,23 @@ def build_visual_asset_gap_rows(items: List[Dict[str, Any]]) -> List[Dict[str, A
             "recommended_action": "Kein automatischer Bildmodell-Aufruf. Gap sammeln, priorisieren und spaeter bewusst als Bildproduktionspaket behandeln.",
             "example_titles": [],
             "example_urls": [],
+            "content_ids": [],
             "issue_codes": [],
         })
         current["count"] += 1
+        issue_code = norm(item.get("issue_code"))
         if norm(item.get("severity")) in {"critical", "review_needed"}:
             current["priority"] = "high"
+        if issue_code == "activity_visual_premium_gap" and current["priority"] != "high":
+            current["priority"] = "medium"
+            current["recommended_action"] = "Activity-Visual-Gap sammeln: Premium-Bild/Pool fuer diese Aktivitaeten erzeugen oder beschaffen; vorhandene Direktbilder bleiben bis dahin Uebergang. Keine einzelne Content-Inbox-Aktion."
         add_limited_unique(current["example_titles"], norm(item.get("title")), 6)
         add_limited_unique(current["example_urls"], norm(item.get("source_url")), 4)
-        add_limited_unique(current["issue_codes"], norm(item.get("issue_code")), 5)
+        add_limited_unique(current["content_ids"], norm(item.get("content_id")), 12)
+        add_limited_unique(current["issue_codes"], issue_code, 5)
 
     order = {"high": 0, "medium": 1, "low": 2}
-    return sorted(grouped.values(), key=lambda row: (order.get(row.get("priority", "medium"), 9), row.get("visual_key", ""), row.get("visual_motif", "")))
+    return sorted(grouped.values(), key=lambda row: (order.get(row.get("priority", "medium"), 9), row.get("content_type", ""), row.get("visual_key", ""), row.get("visual_motif", "")))
 
 
 def build_visual_feedback_payload(issues: List[Issue], meta: Dict[str, Any]) -> Dict[str, Any]:
