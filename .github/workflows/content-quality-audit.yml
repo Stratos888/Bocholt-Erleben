@@ -369,7 +369,14 @@ jobs:
 
           report = json.load(open("data/content-quality-report.json", encoding="utf-8"))
           issues = report.get("issues") or []
-          sheet_issues = [item for item in issues if item.get("severity") in {"critical", "review_needed", "warning"}]
+          hidden_content_audit_categories = {"visual_backlog_observation", "visual_auto_patch_candidate"}
+          hidden_content_audit_policies = {"backlog_only_no_content_inbox", "auto_patch_candidate_no_manual_inbox"}
+          sheet_issues = [
+              item for item in issues
+              if item.get("severity") in {"critical", "review_needed", "warning"}
+              and item.get("process_category") not in hidden_content_audit_categories
+              and item.get("automation_policy") not in hidden_content_audit_policies
+          ]
           meta = report.get("meta") or {}
           summary = report.get("summary") or {}
 
@@ -1128,9 +1135,9 @@ jobs:
                   "asset_gap",
                   norm(gap.get("issue_codes")),
                   "warning",
-                  "event",
-                  "content_visual_feedback",
-                  "",
+                  norm(gap.get("content_type") or "event"),
+                  norm(gap.get("source_system") or "content_visual_feedback"),
+                  norm(gap.get("content_ids")),
                   norm(gap.get("example_titles")),
                   "",
                   norm(gap.get("example_urls")),
