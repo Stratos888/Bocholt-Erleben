@@ -1,0 +1,108 @@
+# Bathing Water Guard V1
+
+Status: report-only proof workflow.
+
+## Ziel
+
+Der Guard prueft offizielle Badegewaesserquellen fuer die zustandsabhaengigen Activity-Highlights:
+
+- Aasee Bocholt
+- Hilgelo Winterswijk
+- Proebstingsee Borken
+- Auesee Wesel
+
+Ziel ist ein tagesaktueller Schutz gegen falsche Badeempfehlungen. Der Guard erzeugt zunaechst nur ein Artefakt und schreibt keine Produktdaten.
+
+## Nicht-Ziel
+
+Dieser Workpack aktiviert keine Bade-Highlights automatisch.
+
+Nicht enthalten:
+
+- kein Writeback nach `data/offers.json`
+- keine direkte Aenderung an `current_status`
+- keine UI-Aktivierung
+- kein automatisches `ok` im Frontend
+- keine Integration in die normale Content-Inbox
+
+## Quellen
+
+| Gruppe | Quelle |
+|---|---|
+| Aasee Bocholt | NRW-Badegewaesserdatenbank, DataTables-Messwert-Endpunkt |
+| Proebstingsee Borken | NRW-Badegewaesserdatenbank, DataTables-Messwert-Endpunkt |
+| Auesee Wesel | NRW-Badegewaesserdatenbank, Rettungsinsel + Treibsand |
+| Hilgelo Winterswijk | Zwemwater-Seite fuer `id=1750` |
+
+Die NRW-Endpunkte wurden im Source-Discovery-V2-Proof ueber Browser-/XHR-Analyse gefunden. V1 nutzt diese Endpunkte direkt und wertet aktuelle Messwerttabellen aus.
+
+## Statuslogik
+
+| Status | Bedeutung |
+|---|---|
+| `ok` | Quelle ist erreichbar, in Saison, frischer positiver Status, kein Sperrsignal |
+| `watch` | Quelle ist erreichbar, aber mit Warnsignal oder bald veraltendem Messwert |
+| `blocked` | offizielles Badeverbot, negatives Schwimmadvies oder technisches Blocksignal |
+| `unknown` | Quelle nicht eindeutig, nicht erreichbar, zu alt oder nicht positiv belegbar |
+| `out_of_season` | konfiguriertes Badefenster nicht aktiv |
+
+Wichtig:
+
+- `blocked` schlaegt alle anderen Status.
+- `unknown` aktiviert nichts.
+- `watch` aktiviert nichts.
+- Bei mehreren Quellen fuer eine Activity-Gruppe wird nur dann `ok` gesetzt, wenn alle konfigurierten Quellen positiv sind.
+- Der Guard ist konservativ: Im Zweifel bleibt der Status `unknown`.
+
+## Frischefenster
+
+Default:
+
+- `warn_measurement_age_days = 35`
+- `max_measurement_age_days = 45`
+
+Ein NRW-Messwert kann nur dann zu `ok` fuehren, wenn er innerhalb des maximalen Frischefensters liegt.
+
+## Artefakte
+
+Der Workflow erzeugt:
+
+- `bathing-water-status-guard.json`
+- `bathing-water-status-guard.md`
+
+Diese Artefakte sind die Grundlage fuer eine manuelle Bewertung.
+
+## Workflow
+
+Datei:
+
+```text
+.github/workflows/bathing-water-guard-v1.yml
+```
+
+Trigger:
+
+- manuell ueber `workflow_dispatch`, sobald der Workflow auf einem Branch liegt, auf dem GitHub den Button anbietet
+- taeglich in der Badesaison per Cron
+- bei Push auf Script/Workflow/Doku
+
+Hinweis:
+
+GitHub zeigt den manuellen Run-Button je nach Repository-Konfiguration oft erst, wenn der Workflow auf dem Default-Branch liegt. Auf `staging` laeuft der Proof trotzdem bei Push.
+
+## Entscheidung nach 1 bis 2 Laeufen
+
+Erst nach Sichtung der Artefakte entscheiden:
+
+| Ergebnis | Konsequenz |
+|---|---|
+| Statusquellen stabil, eindeutig, plausibel | spaeteren Writeback-/Inbox-Designschritt planen |
+| viele `unknown` trotz abrufbarer Quellen | manuelle Statuspflege beibehalten |
+| Widersprueche oder fragile Parser | kein produktiver Guard |
+| klare Blocksignale | Bade-Highlights weiter blockiert lassen |
+
+## Produktregel
+
+Bis zu einem separat freigegebenen Writeback-Workpack gilt:
+
+> Bade-/Wasser-Highlights bleiben unsichtbar, solange keine frische positive Statusquelle fachlich bestaetigt und gepflegt wurde.
