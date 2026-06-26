@@ -316,6 +316,7 @@
       mapsTarget: asString(obj.location || obj.ort),
       image: asString(obj.image),
       visualKey: asString(obj.visual_key || obj.image_visual_key),
+      visualMotif: asString(obj.visual_motif || obj.image_visual_motif),
       date: asString(obj.date || obj.datum),
       endDate: asString(obj.endDate),
       time: asString(obj.time || obj.uhrzeit || obj.startzeit),

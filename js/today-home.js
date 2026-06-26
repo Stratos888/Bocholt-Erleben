@@ -386,11 +386,25 @@
   ]);
 
   function eventVisualKey(item) {
-    return asString(item?.visualKey || item?.visual_key || item?.image_visual_key);
+    return asString(
+      item?.visualKey ||
+      item?.visual_key ||
+      item?.image_visual_key ||
+      item?.raw?.visual_key ||
+      item?.raw?.image_visual_key ||
+      ""
+    );
   }
 
   function eventVisualMotif(item) {
-    return asString(item?.visualMotif || item?.visual_motif || item?.image_visual_motif);
+    return asString(
+      item?.visualMotif ||
+      item?.visual_motif ||
+      item?.image_visual_motif ||
+      item?.raw?.visual_motif ||
+      item?.raw?.image_visual_motif ||
+      ""
+    );
   }
 
   function isFallbackEventVisual(visual) {
@@ -451,6 +465,28 @@
       if (visual) return visual;
     }
 
+    if (item?.type === "event") {
+      const visualKey = eventVisualKey(item);
+      const visualMotif = eventVisualMotif(item);
+      const pool = visualKey ? state.eventVisualPools[visualKey] : null;
+      const candidatePool = eventVisualCandidatePool(pool, visualMotif);
+
+      const pooledVisual = selectVisualFromPool(
+        candidatePool,
+        [
+          asString(item.id),
+          asString(item.date),
+          asString(item.endDate),
+          asString(item.title),
+          visualKey,
+          visualMotif
+        ].join("|"),
+        usedImages
+      );
+
+      if (pooledVisual) return pooledVisual;
+    }
+
     const ownImage = normalizeUrl(item?.image);
     if (ownImage) {
       if (usedImages) usedImages.add(ownImage);
@@ -460,27 +496,7 @@
       });
     }
 
-    if (item?.type !== "event") {
-      return null;
-    }
-
-    const visualKey = eventVisualKey(item);
-    const visualMotif = eventVisualMotif(item);
-    const pool = visualKey ? state.eventVisualPools[visualKey] : null;
-    const candidatePool = eventVisualCandidatePool(pool, visualMotif);
-
-    return selectVisualFromPool(
-      candidatePool,
-      [
-        asString(item.id),
-        asString(item.date),
-        asString(item.endDate),
-        asString(item.title),
-        visualKey,
-        visualMotif
-      ].join("|"),
-      usedImages
-    );
+    return null;
   }
 
   function resolveItemImage(item, usedImages) {
