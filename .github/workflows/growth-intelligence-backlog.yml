@@ -45,7 +45,7 @@ jobs:
         run: |
           set -e
           python -m pip install --upgrade pip
-          pip install google-api-python-client google-auth
+          pip install google-api-python-client google-auth pymysql
 
       - name: Resolve Growth runtime
         shell: bash
@@ -78,6 +78,17 @@ jobs:
           GROWTH_LOOKBACK_DAYS: ${{ env.GROWTH_LOOKBACK_DAYS }}
           GROWTH_BACKLOG_TAB: ${{ env.GROWTH_BACKLOG_TAB }}
           GROWTH_REPORT_TAB: ${{ env.GROWTH_REPORT_TAB }}
+          BE_ENVIRONMENT: ${{ github.ref_name }}
+          LIVE_DB_HOST: ${{ secrets.LIVE_DB_HOST }}
+          LIVE_DB_NAME: ${{ secrets.LIVE_DB_NAME }}
+          LIVE_DB_USER: ${{ secrets.LIVE_DB_USER }}
+          LIVE_DB_PASSWORD: ${{ secrets.LIVE_DB_PASSWORD }}
+          LIVE_DB_PORT: ${{ secrets.LIVE_DB_PORT }}
+          STAGING_DB_HOST: ${{ secrets.STAGING_DB_HOST }}
+          STAGING_DB_NAME: ${{ secrets.STAGING_DB_NAME }}
+          STAGING_DB_USER: ${{ secrets.STAGING_DB_USER }}
+          STAGING_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+          STAGING_DB_PORT: ${{ secrets.STAGING_DB_PORT }}
         run: |
           set -e
           export GSC_SITE_URL="${GSC_SITE_URL:-${SEARCH_METRICS_GOOGLE_SITE_URL:-}}"

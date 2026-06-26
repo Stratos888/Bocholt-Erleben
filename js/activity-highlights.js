@@ -6,6 +6,7 @@
   const HIDDEN_MODES = new Set(["event_only", "candidate_only"]);
   const STATUS_VALUES = new Set(["ok", "watch", "blocked", "unknown"]);
   const DEFAULT_CONDITION_MAX_AGE_DAYS = 7;
+  let statusOverridesByKey = Object.freeze({});
 
   function asString(value) {
     return value == null ? "" : String(value).trim();
@@ -17,6 +18,103 @@
 
   function readObject(value) {
     return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  }
+
+  function normalizeStatusOverride(value) {
+    const source = readObject(value);
+    const state = asString(source.state || "unknown").toLowerCase();
+    const normalizedState = STATUS_VALUES.has(state) ? state : "unknown";
+
+    return {
+      state: normalizedState,
+      label: asString(source.label),
+      source_type: asString(source.source_type || source.sourceType),
+      sourceType: asString(source.source_type || source.sourceType),
+      guard_source: asString(source.guard_source || source.guardSource),
+      guardSource: asString(source.guard_source || source.guardSource),
+      source_url: asString(source.source_url || source.sourceUrl),
+      sourceUrl: asString(source.source_url || source.sourceUrl),
+      checked_at: asString(source.checked_at || source.checkedAt),
+      checkedAt: asString(source.checked_at || source.checkedAt),
+      valid_until: asString(source.valid_until || source.validUntil),
+      validUntil: asString(source.valid_until || source.validUntil),
+      reason: asString(source.reason),
+      public_note: asString(source.public_note || source.publicNote),
+      publicNote: asString(source.public_note || source.publicNote),
+      confidence: asString(source.confidence),
+      water_state: asString(source.water_state || source.waterState).toLowerCase(),
+      waterState: asString(source.water_state || source.waterState).toLowerCase(),
+      local_suitability_state: asString(source.local_suitability_state || source.localSuitabilityState).toLowerCase(),
+      localSuitabilityState: asString(source.local_suitability_state || source.localSuitabilityState).toLowerCase(),
+      latest_sample_date: asString(source.latest_sample_date || source.latestSampleDate),
+      latestSampleDate: asString(source.latest_sample_date || source.latestSampleDate),
+      latest_sample_age_days: Number(source.latest_sample_age_days ?? source.latestSampleAgeDays ?? NaN),
+      group_id: asString(source.group_id || source.groupId),
+      groupId: asString(source.group_id || source.groupId)
+    };
+  }
+
+  function setStatusOverrides(payload) {
+    const source = readObject(payload);
+    const items = readObject(source.items);
+    const out = Object.create(null);
+
+    Object.entries(items).forEach(([rawKey, rawValue]) => {
+      const key = asString(rawKey).toLowerCase();
+      if (!key) return;
+      const status = normalizeStatusOverride(rawValue);
+      out[key] = status;
+
+      const value = readObject(rawValue);
+      const activityId = asString(value.activity_id || value.activityId).toLowerCase();
+      const highlightId = asString(value.highlight_id || value.highlightId).toLowerCase();
+      if (activityId && highlightId) out[`${activityId}:${highlightId}`] = status;
+    });
+
+    statusOverridesByKey = Object.freeze(out);
+    return statusOverridesByKey;
+  }
+
+  async function loadStatusOverrides(url = "/data/bathing_water_status.json") {
+    if (typeof fetch !== "function") return null;
+
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) {
+        if (response.status !== 404) {
+          console.warn(`[ActivityHighlights] ${url} load failed: ${response.status} ${response.statusText}`);
+        }
+        return null;
+      }
+
+      const payload = await response.json();
+      setStatusOverrides(payload);
+      return payload;
+    } catch (error) {
+      console.warn("[ActivityHighlights] Bathing water status overrides unavailable.", error);
+      return null;
+    }
+  }
+
+  function findStatusOverride(offer, highlight) {
+    const offerId = asString(offer?.id).toLowerCase();
+    const highlightId = asString(highlight?.id).toLowerCase();
+    if (!offerId || !highlightId) return null;
+
+    return statusOverridesByKey[`${offerId}:${highlightId}`] || statusOverridesByKey[highlightId] || null;
+  }
+
+  function applyStatusOverride(offer, highlight) {
+    const override = findStatusOverride(offer, highlight);
+    if (!override) return highlight;
+
+    const baseStatus = readObject(highlight.current_status || highlight.currentStatus);
+    const mergedStatus = { ...baseStatus, ...override };
+    return {
+      ...highlight,
+      current_status: mergedStatus,
+      currentStatus: mergedStatus
+    };
   }
 
   function normalizeDate(value) {
@@ -113,12 +211,17 @@
       ? policy.positive_requires.map((entry) => asString(entry).toLowerCase()).filter(Boolean)
       : [];
 
+    if (sourceType === "guard_verified" && asString(status.guard_source || status.guardSource) === "bathing_water_guard_v2") {
+      return asString(status.water_state || status.waterState).toLowerCase() === "ok"
+        && asString(status.local_suitability_state || status.localSuitabilityState).toLowerCase() === "ok";
+    }
+
     if (!allowed.length) return true;
     return allowed.includes(sourceType);
   }
 
-  function normalizeHighlight(highlight) {
-    const obj = readObject(highlight);
+  function normalizeHighlight(highlight, offer = null) {
+    const obj = applyStatusOverride(offer, readObject(highlight));
     const activationMode = asString(obj.activation_mode || obj.activationMode || "stable_seasonal").toLowerCase();
 
     return {
@@ -150,7 +253,8 @@
   }
 
   function getHighlights(offer) {
-    return asArray(offer?.seasonal_highlights || offer?.seasonalHighlights).map(normalizeHighlight);
+    return asArray(offer?.seasonal_highlights || offer?.seasonalHighlights)
+      .map((highlight) => normalizeHighlight(highlight, offer));
   }
 
   function isInSeason(highlight, now) {
@@ -266,26 +370,51 @@
     const status = readObject(candidate.current_status || candidate.currentStatus);
     const state = statusState(candidate);
     const publicNote = asString(status.public_note || status.publicNote || candidate.status_public_note || candidate.statusPublicNote);
+    const sourceType = asString(status.source_type || status.sourceType).toLowerCase();
+    const isBathingWater = asString(candidate.type).toLowerCase() === "bathing_water";
 
     if (state === "blocked") {
       return {
-        title: asString(status.label) || "Statushinweis",
-        label: "Aktuell nicht als Highlight empfohlen",
+        title: isBathingWater ? "Badehinweis" : asString(status.label) || "Statushinweis",
+        label: isBathingWater ? "Baden aktuell nicht empfohlen" : "Aktuell nicht als Highlight empfohlen",
         note: publicNote || asString(status.reason) || "Aktuell liegt kein positives Statussignal für dieses zustandsabhängige Highlight vor.",
-        state
+        sourceType,
+        sourceUrl: asString(status.source_url || status.sourceUrl),
+        state,
+        type: candidate.type
       };
     }
 
     if (state === "watch" || state === "unknown") {
       return {
-        title: "Statushinweis",
-        label: "Aktuellen Status prüfen",
+        title: isBathingWater ? "Badehinweis" : "Statushinweis",
+        label: isBathingWater ? "Badehinweis prüfen" : "Aktuellen Status prüfen",
         note: publicNote || "Für dieses zustandsabhängige Highlight liegt aktuell keine frische positive Freigabe vor.",
-        state
+        sourceType,
+        sourceUrl: asString(status.source_url || status.sourceUrl),
+        state,
+        type: candidate.type
       };
     }
 
     return null;
+  }
+
+  function getConditionStatusCardLabel(offer, context = {}) {
+    const statusNote = getConditionStatusNote(offer, context);
+    if (!statusNote) return "";
+
+    const state = asString(statusNote.state).toLowerCase();
+    const type = asString(statusNote.type).toLowerCase();
+
+    if (state === "unknown") return "";
+
+    if (type === "bathing_water") {
+      if (state === "blocked") return "Baden aktuell nicht empfohlen";
+      if (state === "watch") return "Badehinweis prüfen";
+    }
+
+    return asString(statusNote.label);
   }
 
   function getSearchTerms(offer, context = {}) {
@@ -306,6 +435,10 @@
   }
 
   window.BEActivityHighlights = {
+    setStatusOverrides,
+    setBathingWaterStatusData: setStatusOverrides,
+    loadStatusOverrides,
+    loadBathingWaterStatusData: loadStatusOverrides,
     getHighlights,
     getActiveHighlights,
     getPrimaryActiveHighlight,
@@ -315,6 +448,7 @@
     getScoreAdjustment,
     getDetailBlock,
     getConditionStatusNote,
+    getConditionStatusCardLabel,
     getSearchTerms,
     isActiveHighlight,
     isInSeason,

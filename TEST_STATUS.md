@@ -4213,3 +4213,43 @@ Offen nach diesem Nachweis:
 - Spätere Bewertung, ob ein screenshot- oder mailfähiger Feedbackbericht belastbar ist.
 - Keine weitere technische Reporting-Härtung aus diesem Befund nötig.
 <!-- === END BLOCK: TEST_STATUS_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_BATHING_WATER_GUARD_V2_SAFE_WRITEBACK_2026_06_26 | Zweck: dokumentiert den Wechsel vom Report-only-Proof zum sicheren Live-Statusdatei-Writeback fuer Badegewaesser; Umfang: Architektur, UI-Wirkung, Guard-Ergebnis, offene Grenzen === -->
+## Badegewässer Guard V2 – Safe Writeback vorbereitet (2026-06-26)
+
+Status: bereit für Staging-Deploy und Guard-/UI-Smoke.
+
+Kontext:
+- Guard V1/V1.1/V1.2 haben Quellenzugriff, Zukunftszeilen-Handling, Zwemwater-Konservativlogik und lokale Badeeignung geprüft.
+- Der reine Report-only-Modus schützt zwar fachlich, ändert aber die Live-Seite nicht automatisch.
+- V2 führt deshalb eine getrennte generierte Statusdatei ein.
+
+Technische Zielarchitektur:
+- `data/offers.json` bleibt redaktioneller Activity-/Highlight-Stammdatenbestand.
+- `data/bathing_water_status.json` ist die automatisch generierte Badegewässer-Statusdatei.
+- `scripts/check-bathing-water-status.py --write-data data/bathing_water_status.json` schreibt nur diese Statusdatei.
+- Der Workflow `Bathing Water Guard V2` committet die Statusdatei nur bei echtem Diff.
+- Das Frontend lädt `offers.json` plus `bathing_water_status.json`; die Statusdatei überschreibt nur `current_status` für bekannte Badegewässer-Highlights.
+- Wenn die Statusdatei fehlt oder fehlerhaft ist, bleibt der konservative Fallback aus `offers.json` aktiv.
+
+Sicherheitsregeln:
+- Kein automatischer Writeback nach `data/offers.json`.
+- `ok` darf nur aktivierend wirken, wenn der Guard `water_state=ok` und `local_suitability_state=ok` liefert.
+- `watch`, `blocked` und `unknown` verhindern weiterhin Bade-Highlight, Bade-Boost und `Jetzt besonders`-Treffer.
+- Negative lokale Hinweise werden als knapper Statuschip auf der Aktivitätenseite und als kompakter Hinweis im Detailpanel sichtbar, nicht als prominente Home-Warnung.
+
+Initialer Status aus dem geprüften Guard-Lauf vom 2026-06-26:
+- Aasee Bocholt: `watch` wegen lokaler Schlamm-/Geruch-/Ablagerungs-Hinweise trotz unauffälliger Wasserwerte.
+- Hilgelo: `unknown` wegen gemischter, nicht sicher gescopter Zwemwater-Statussignale.
+- Pröbstingsee Borken: `watch` wegen Messwertalter oberhalb Watch-Schwelle.
+- Auesee Wesel: `watch`, weil Wasserwerte ok sind, aber positive lokale Badeeignung nicht belegt ist.
+
+Erwartete Live-Wirkung:
+- Home zeigt keine Badeempfehlung.
+- Aasee zeigt auf der Aktivitätenkarte `Badehinweis prüfen`.
+- Aasee-Detailpanel erklärt die lokale Eignungswarnung.
+- `Jetzt besonders` enthält keine Badegewässer als positive Highlights, solange kein finaler Guard-Status `ok` vorliegt.
+
+Offene Grenze:
+- Neue Badegewässer-Aktivitäten müssen künftig bewusst im Guard ergänzt werden. Der Activity-Highlight-Audit warnt, wenn ein Badegewässer-Highlight keinen Eintrag in `data/bathing_water_status.json` hat.
+<!-- === END BLOCK: TEST_STATUS_BATHING_WATER_GUARD_V2_SAFE_WRITEBACK_2026_06_26 === -->

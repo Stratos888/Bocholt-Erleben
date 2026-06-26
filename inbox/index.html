@@ -235,7 +235,8 @@ Umfang:
     .backlogItem summary::-webkit-details-marker { display:none; }
     .backlogLine { display:flex; align-items:center; gap:6px; min-width:0; }
     .backlogTitle { font-weight:880; line-height:1.22; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .backlogReason { font-size:12.8px; line-height:1.28; opacity:.74; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .backlogReason { font-size:12.8px; line-height:1.28; opacity:.74; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+    .backlogItem[open] > summary .backlogReason { display:none; }
     .backlogDetail { display:grid; gap:9px; padding:0 11px 11px; border-top:1px solid rgba(31,41,51,.08); }
     .backlogBlock { display:grid; gap:3px; font-size:13.2px; line-height:1.35; }
     .backlogBlock strong { font-size:11.5px; letter-spacing:.045em; text-transform:uppercase; opacity:.66; }
@@ -1837,7 +1838,16 @@ Umfang:
     }
 
     function getBacklogDescription(item) {
-      return trimValue(item.description || item.why_relevant || item.short_reason || item.recommended_action || item.expected_benefit);
+      const manual = trimValue(item.description);
+      if (manual) return manual;
+      const parts = [
+        trimValue(item.why_relevant),
+        trimValue(item.recommended_action),
+        trimValue(item.expected_benefit),
+        trimValue(item.acquisition_note)
+      ].filter(Boolean);
+      if (parts.length) return parts.join("\n\n");
+      return trimValue(item.short_reason);
     }
 
     function renderBacklogEditForm(item) {

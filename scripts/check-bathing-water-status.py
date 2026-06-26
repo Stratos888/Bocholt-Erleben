@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Report-only bathing-water status guard for Bocholt erleben.
+"""Bathing-water status guard for Bocholt erleben.
 
-This script reads official bathing-water sources found by the V2 source discovery
-workpack and produces JSON/Markdown artifacts. It intentionally does not write to
-`data/offers.json` and does not activate any public highlight.
+The guard reads official bathing-water sources found by the V2 source discovery
+workpack and produces JSON/Markdown report artifacts. In V2 it can also write a
+small generated frontend status file. It never edits `data/offers.json`;
+redactional activity data and time-sensitive bathing status stay separated.
 
 Status policy is conservative:
 - `blocked` beats all other states.
 - `ok` is only emitted for current, parseable, positive source data.
-- ambiguous, stale or unavailable source data becomes `unknown`.
+- ambiguous, stale or unavailable source data becomes `unknown` or `watch`.
+- public bathing highlights require both positive water status and positive local
+  suitability; positive lab values alone are not enough.
 """
 
 from __future__ import annotations
@@ -27,7 +30,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-SCRIPT_VERSION = "BATHING_WATER_GUARD_V1_REPORT_ONLY"
+SCRIPT_VERSION = "BATHING_WATER_GUARD_V2_SAFE_WRITEBACK"
 USER_AGENT = "BocholtErlebenBathingWaterGuard/1.0 (+https://bocholt-erleben.de)"
 REQUEST_TIMEOUT_SECONDS = 25
 
@@ -69,10 +72,100 @@ WATCH_ZWEMWATER_PHRASES = [
 ]
 POSITIVE_ZWEMWATER_PHRASES = [
     "actuele situatie: in orde",
+    "actuele situatie:in orde",
     "actuele situatie in orde",
     "zwemplek status: goed",
+    "zwemplek status:goed",
     "zwemplek status goed",
+    "zwemplek status: in orde",
+    "zwemplek status:in orde",
+    "zwemplek status in orde",
     "de waterkwaliteit is goed",
+]
+
+STRICT_NEGATIVE_ZWEMWATER_PHRASES = [
+    "actuele situatie: negatief zwemadvies",
+    "actuele situatie:negatief zwemadvies",
+    "actuele situatie negatief zwemadvies",
+    "zwemplek status: negatief zwemadvies",
+    "zwemplek status:negatief zwemadvies",
+    "zwemplek status negatief zwemadvies",
+    "actuele situatie: zwemmen wordt afgeraden",
+    "actuele situatie:zwemmen wordt afgeraden",
+    "zwemplek status: zwemmen wordt afgeraden",
+    "zwemplek status:zwemmen wordt afgeraden",
+]
+STRICT_WATCH_ZWEMWATER_PHRASES = [
+    "actuele situatie: waarschuwing",
+    "actuele situatie:waarschuwing",
+    "zwemplek status: waarschuwing",
+    "zwemplek status:waarschuwing",
+    "actuele situatie: waterkwaliteit wordt onderzocht",
+    "actuele situatie:waterkwaliteit wordt onderzocht",
+    "zwemplek status: waterkwaliteit wordt onderzocht",
+    "zwemplek status:waterkwaliteit wordt onderzocht",
+]
+STRICT_POSITIVE_ZWEMWATER_PHRASES = [
+    "actuele situatie: in orde",
+    "actuele situatie:in orde",
+    "actuele situatie in orde",
+    "zwemplek status: goed",
+    "zwemplek status:goed",
+    "zwemplek status goed",
+    "zwemplek status: in orde",
+    "zwemplek status:in orde",
+    "zwemplek status in orde",
+]
+
+# V1.2 separates microbiological/legal water status from practical local
+# suitability. Good lab values and no official ban are necessary, but not enough
+# for an active public bathing recommendation.
+LOCAL_BLOCK_PHRASES = [
+    "badeverbot",
+    "badebucht geschlossen",
+    "badestelle geschlossen",
+    "badebereich geschlossen",
+    "gesperrt",
+    "blaualgen",
+    "cyanobakterien",
+    "microcystin",
+    "einsinkgefahr",
+    "nicht ins wasser",
+    "baden verboten",
+    "vom baden wird abgeraten",
+]
+
+LOCAL_WATCH_PHRASES = [
+    "schlamm",
+    "schlammig",
+    "geruch",
+    "stinkt",
+    "ablagerung",
+    "ablagerungen",
+    "algen",
+    "trübung",
+    "truebung",
+    "sichttiefe",
+    "keine badegäste",
+    "keine badegaeste",
+    "badegäste bleiben aus",
+    "badegaeste bleiben aus",
+    "badegäste abgeschreckt",
+    "badegaeste abgeschreckt",
+]
+
+LOCAL_POSITIVE_PHRASES = [
+    "grüne flagge",
+    "gruene flagge",
+    "badestelle freigegeben",
+    "badebucht geöffnet",
+    "badebucht geoeffnet",
+    "baden möglich",
+    "baden moeglich",
+    "wassersport möglich",
+    "wassersport moeglich",
+    "schwimmen möglich",
+    "schwimmen moeglich",
 ]
 
 STATE_ORDER = {"blocked": 3, "watch": 2, "unknown": 1, "ok": 0, "out_of_season": -1}
@@ -87,16 +180,22 @@ class SourceConfig:
     url: str
     nrw_id: Optional[int] = None
     zwemwater_id: Optional[int] = None
+    dimension: str = "water_quality"
+    source_role: str = "official_status"
+    valid_until: Optional[str] = None
+    max_age_days: Optional[int] = None
 
 
 @dataclass(frozen=True)
 class GroupConfig:
     group_id: str
     activity_ids: List[str]
+    highlight_id: str
     title: str
     season_start: str
     season_end: str
     sources: List[SourceConfig]
+    local_sources: List[SourceConfig] = field(default_factory=list)
 
 
 @dataclass
@@ -105,6 +204,8 @@ class SourceResult:
     title: str
     type: str
     authority_type: str
+    dimension: str
+    source_role: str
     state: str
     confidence: str
     checked_at: str
@@ -123,6 +224,7 @@ GROUPS: List[GroupConfig] = [
     GroupConfig(
         group_id="aasee-bocholt",
         activity_ids=["aasee-erleben"],
+        highlight_id="aasee-bathing-status",
         title="Aasee Bocholt",
         season_start="06-01",
         season_end="09-15",
@@ -136,10 +238,33 @@ GROUPS: List[GroupConfig] = [
                 nrw_id=48,
             )
         ],
+        local_sources=[
+            SourceConfig(
+                id="aasee-bocholt-official-aasee-page",
+                type="local_suitability_page",
+                title="Stadt Bocholt - Aasee",
+                authority_type="official_city",
+                url="https://www.bocholt.de/aasee",
+                dimension="local_suitability",
+                source_role="official_positive_or_negative",
+                max_age_days=45,
+            ),
+            SourceConfig(
+                id="aasee-bocholt-local-press-sludge-signal",
+                type="local_suitability_page",
+                title="Lokales Negativsignal - Aasee Schlamm/Geruch",
+                authority_type="local_press_negative_signal",
+                url="https://www.bbv-net.de/bocholt/bocholter-aasee-schlamm-geruch-stinkt-keine-badegaeste-seezustand-probleme-w1212295-6000574615/",
+                dimension="local_suitability",
+                source_role="negative_signal_only",
+                valid_until="2026-07-15",
+            ),
+        ],
     ),
     GroupConfig(
         group_id="hilgelo-winterswijk",
         activity_ids=["hilgelo-erleben"],
+        highlight_id="hilgelo-bathing-status",
         title="'t Hilgelo Winterswijk",
         season_start="05-01",
         season_end="10-01",
@@ -157,6 +282,7 @@ GROUPS: List[GroupConfig] = [
     GroupConfig(
         group_id="proebstingsee-borken",
         activity_ids=["proebstingsee-borken-erleben"],
+        highlight_id="proebstingsee-bathing-status",
         title="Pröbstingsee Borken",
         season_start="05-15",
         season_end="09-15",
@@ -174,6 +300,7 @@ GROUPS: List[GroupConfig] = [
     GroupConfig(
         group_id="auesee-wesel",
         activity_ids=["auesee-wesel-erleben"],
+        highlight_id="auesee-bathing-status",
         title="Auesee Wesel",
         season_start="05-15",
         season_end="09-15",
@@ -394,6 +521,8 @@ def check_nrw_source(source: SourceConfig, today: dt.date, max_age_days: int, wa
             title=source.title,
             type=source.type,
             authority_type=source.authority_type,
+            dimension=source.dimension,
+            source_role=source.source_role,
             state="unknown",
             confidence="fetch_failed",
             checked_at=checked_at,
@@ -410,6 +539,8 @@ def check_nrw_source(source: SourceConfig, today: dt.date, max_age_days: int, wa
             title=source.title,
             type=source.type,
             authority_type=source.authority_type,
+            dimension=source.dimension,
+            source_role=source.source_role,
             state="unknown",
             confidence="parse_failed",
             checked_at=checked_at,
@@ -426,6 +557,8 @@ def check_nrw_source(source: SourceConfig, today: dt.date, max_age_days: int, wa
             title=source.title,
             type=source.type,
             authority_type=source.authority_type,
+            dimension=source.dimension,
+            source_role=source.source_role,
             state="unknown",
             confidence="no_current_year_samples",
             checked_at=checked_at,
@@ -434,23 +567,46 @@ def check_nrw_source(source: SourceConfig, today: dt.date, max_age_days: int, wa
             reason="No dated current-year sample row found in NRW endpoint.",
             raw_signals={"endpoint_url": url, "http_status": status, "content_type": content_type},
         )
-    dated.sort(key=lambda item: item["sample_date"])
-    latest = dated[-1]
+    warnings: List[str] = []
+    future_dated = [
+        item for item in dated
+        if dt.date.fromisoformat(str(item["sample_date"])) > today
+    ]
+    dated_non_future = [
+        item for item in dated
+        if dt.date.fromisoformat(str(item["sample_date"])) <= today
+    ]
+    if future_dated:
+        warnings.append(f"{len(future_dated)} future sample rows ignored")
+    if not dated_non_future:
+        return SourceResult(
+            source_id=source.id,
+            title=source.title,
+            type=source.type,
+            authority_type=source.authority_type,
+            dimension=source.dimension,
+            source_role=source.source_role,
+            state="unknown",
+            confidence="no_non_future_sample",
+            checked_at=checked_at,
+            source_url=source.url,
+            rows_seen=len(rows),
+            reason="Only future-dated NRW sample rows were found; no current status can be derived.",
+            warnings=warnings,
+            raw_signals={"endpoint_url": url, "http_status": status, "content_type": content_type},
+        )
+    dated_non_future.sort(key=lambda item: item["sample_date"])
+    latest = dated_non_future[-1]
     latest_date = dt.date.fromisoformat(str(latest["sample_date"]))
     age_days = (today - latest_date).days
-    warnings: List[str] = []
     state_from_values = str(latest.get("state_from_values") or "unknown")
     state = state_from_values
     confidence = "official_current_sample"
-    reason = "Latest NRW sample is recent enough and no blocking signal was parsed."
-    if age_days < 0:
-        state = "unknown"
-        confidence = "future_sample_date"
-        reason = "Latest sample date is in the future relative to guard date."
-    elif age_days > max_age_days:
+    reason = "Latest NRW non-future sample is recent enough and no blocking signal was parsed."
+    if age_days > max_age_days:
         state = "unknown"
         confidence = "stale_sample"
-        reason = f"Latest NRW sample is older than {max_age_days} days."
+        reason = f"Latest NRW non-future sample is older than {max_age_days} days."
     elif age_days > warn_age_days and state == "ok":
         state = "watch"
         confidence = "sample_near_stale"
@@ -468,6 +624,8 @@ def check_nrw_source(source: SourceConfig, today: dt.date, max_age_days: int, wa
         title=source.title,
         type=source.type,
         authority_type=source.authority_type,
+        dimension=source.dimension,
+        source_role=source.source_role,
         state=state,
         confidence=confidence,
         checked_at=checked_at,
@@ -492,6 +650,8 @@ def check_zwemwater_source(source: SourceConfig, today: dt.date) -> SourceResult
             title=source.title,
             type=source.type,
             authority_type=source.authority_type,
+            dimension=source.dimension,
+            source_role=source.source_role,
             state="unknown",
             confidence="fetch_failed",
             checked_at=checked_at,
@@ -503,26 +663,56 @@ def check_zwemwater_source(source: SourceConfig, today: dt.date) -> SourceResult
     found_negative = [phrase for phrase in NEGATIVE_ZWEMWATER_PHRASES if phrase in plain]
     found_watch = [phrase for phrase in WATCH_ZWEMWATER_PHRASES if phrase in plain]
     found_positive = [phrase for phrase in POSITIVE_ZWEMWATER_PHRASES if phrase in plain]
+    strict_negative = [phrase for phrase in STRICT_NEGATIVE_ZWEMWATER_PHRASES if phrase in plain]
+    strict_watch = [phrase for phrase in STRICT_WATCH_ZWEMWATER_PHRASES if phrase in plain]
+    strict_positive = [phrase for phrase in STRICT_POSITIVE_ZWEMWATER_PHRASES if phrase in plain]
+
     state = "unknown"
     confidence = "no_specific_status_signal"
     reason = "No sufficiently specific Zwemwater status phrase was parsed."
-    if found_negative:
+
+    # Zwemwater pages can contain complete status legends or advice text for all
+    # possible states. Page-wide phrase matches are therefore not enough for a
+    # public status decision when positive and negative/watch terms coexist.
+    if strict_negative:
         state = "blocked"
-        confidence = "official_negative_status_phrase"
-        reason = "Zwemwater page contains a negative swimming advice/status phrase."
+        confidence = "official_scoped_negative_status_phrase"
+        reason = "Zwemwater page contains a scoped negative current-status phrase."
+    elif strict_watch:
+        state = "watch"
+        confidence = "official_scoped_watch_status_phrase"
+        reason = "Zwemwater page contains a scoped watch-level current-status phrase."
+    elif strict_positive:
+        state = "ok"
+        confidence = "official_scoped_positive_status_phrase"
+        reason = "Zwemwater page contains a scoped positive current-status phrase."
+    elif found_positive and (found_negative or found_watch):
+        state = "unknown"
+        confidence = "mixed_unscoped_status_phrases"
+        reason = (
+            "Zwemwater page contains mixed positive and negative/watch phrases outside "
+            "a scoped current-status context; no status decision is safe."
+        )
+    elif found_negative:
+        state = "blocked"
+        confidence = "unscoped_negative_status_phrase"
+        reason = "Zwemwater page contains a negative phrase and no positive phrase was parsed."
     elif found_watch:
         state = "watch"
-        confidence = "official_watch_status_phrase"
-        reason = "Zwemwater page contains a watch-level warning phrase."
+        confidence = "unscoped_watch_status_phrase"
+        reason = "Zwemwater page contains a watch phrase and no positive phrase was parsed."
     elif found_positive:
         state = "ok"
-        confidence = "official_positive_status_phrase"
-        reason = "Zwemwater page contains a positive current status phrase."
+        confidence = "unscoped_positive_status_phrase"
+        reason = "Zwemwater page contains a positive phrase and no negative/watch phrase was parsed."
+
     return SourceResult(
         source_id=source.id,
         title=source.title,
         type=source.type,
         authority_type=source.authority_type,
+        dimension=source.dimension,
+        source_role=source.source_role,
         state=state,
         confidence=confidence,
         checked_at=checked_at,
@@ -535,6 +725,131 @@ def check_zwemwater_source(source: SourceConfig, today: dt.date) -> SourceResult
             "negative_phrases": found_negative,
             "watch_phrases": found_watch,
             "positive_phrases": found_positive,
+            "strict_negative_phrases": strict_negative,
+            "strict_watch_phrases": strict_watch,
+            "strict_positive_phrases": strict_positive,
+        },
+    )
+
+
+def parse_iso_date_optional(value: Optional[str]) -> Optional[dt.date]:
+    if not value:
+        return None
+    try:
+        return dt.date.fromisoformat(value)
+    except ValueError:
+        return None
+
+
+def find_local_signals(plain: str) -> Dict[str, List[str]]:
+    return {
+        "block_phrases": [phrase for phrase in LOCAL_BLOCK_PHRASES if phrase in plain],
+        "watch_phrases": [phrase for phrase in LOCAL_WATCH_PHRASES if phrase in plain],
+        "positive_phrases": [phrase for phrase in LOCAL_POSITIVE_PHRASES if phrase in plain],
+    }
+
+
+def check_local_suitability_source(source: SourceConfig, today: dt.date) -> SourceResult:
+    checked_at = today_utc_iso()
+    valid_until = parse_iso_date_optional(source.valid_until)
+    if valid_until and today > valid_until:
+        return SourceResult(
+            source_id=source.id,
+            title=source.title,
+            type=source.type,
+            authority_type=source.authority_type,
+            dimension=source.dimension,
+            source_role=source.source_role,
+            state="unknown",
+            confidence="local_signal_expired",
+            checked_at=checked_at,
+            source_url=source.url,
+            reason=f"Configured local suitability signal expired on {valid_until.isoformat()}.",
+            raw_signals={"valid_until": source.valid_until},
+        )
+    try:
+        status, content_type, text = request_url(source.url, accept="text/html,*/*")
+    except Exception as exc:  # noqa: BLE001
+        return SourceResult(
+            source_id=source.id,
+            title=source.title,
+            type=source.type,
+            authority_type=source.authority_type,
+            dimension=source.dimension,
+            source_role=source.source_role,
+            state="unknown",
+            confidence="fetch_failed",
+            checked_at=checked_at,
+            source_url=source.url,
+            reason="Local suitability page could not be fetched.",
+            errors=[str(exc)],
+            raw_signals={"valid_until": source.valid_until},
+        )
+    plain = norm_text(text)
+    signals = find_local_signals(plain)
+    block_phrases = signals["block_phrases"]
+    watch_phrases = signals["watch_phrases"]
+    positive_phrases = signals["positive_phrases"]
+    state = "unknown"
+    confidence = "no_local_suitability_signal"
+    reason = "No local suitability signal was parsed."
+
+    # Local press is strong enough to suppress a public recommendation, but not
+    # to prove an official legal bathing ban. Therefore negative press signals
+    # become `watch`, not `blocked`, unless an explicit official/ban phrase is
+    # present on an official source. `watch` still prevents public highlights.
+    if source.source_role == "negative_signal_only":
+        if block_phrases or watch_phrases:
+            state = "watch"
+            confidence = "local_negative_signal"
+            reason = "Local negative suitability signal parsed; do not actively recommend bathing."
+        else:
+            state = "unknown"
+            confidence = "negative_signal_source_without_match"
+            reason = "Negative-signal source fetched, but configured watch/block phrases were not parsed."
+    elif source.source_role in {"official_positive_or_negative", "operator_positive_or_negative"}:
+        if block_phrases:
+            state = "blocked"
+            confidence = "official_local_block_signal"
+            reason = "Official/operator source contains a local block signal."
+        elif watch_phrases:
+            state = "watch"
+            confidence = "official_local_watch_signal"
+            reason = "Official/operator source contains a local watch signal."
+        elif positive_phrases:
+            state = "ok"
+            confidence = "official_local_positive_signal"
+            reason = "Official/operator source contains a positive local suitability signal."
+        else:
+            state = "unknown"
+            confidence = "official_source_without_status_phrase"
+            reason = "Official/operator source fetched, but no local suitability phrase was parsed."
+    else:
+        state = "unknown"
+        confidence = "unsupported_local_source_role"
+        reason = f"Unsupported local source role: {source.source_role}."
+
+    return SourceResult(
+        source_id=source.id,
+        title=source.title,
+        type=source.type,
+        authority_type=source.authority_type,
+        dimension=source.dimension,
+        source_role=source.source_role,
+        state=state,
+        confidence=confidence,
+        checked_at=checked_at,
+        source_url=source.url,
+        rows_seen=1,
+        reason=reason,
+        warnings=[],
+        raw_signals={
+            "http_status": status,
+            "content_type": content_type,
+            "valid_until": source.valid_until,
+            "block_phrases": block_phrases,
+            "watch_phrases": watch_phrases,
+            "positive_phrases": positive_phrases,
         },
     )
 
@@ -544,24 +859,51 @@ def check_source(source: SourceConfig, today: dt.date, max_age_days: int, warn_a
         return check_nrw_source(source, today, max_age_days, warn_age_days)
     if source.type == "zwemwater_page":
         return check_zwemwater_source(source, today)
+    if source.type == "local_suitability_page":
+        return check_local_suitability_source(source, today)
     raise ValueError(f"Unsupported source type: {source.type}")
 
 
-def aggregate_group_state(source_results: List[SourceResult], active_season: bool) -> Tuple[str, str, str]:
+def aggregate_dimension_state(
+    source_results: List[SourceResult],
+    active_season: bool,
+    *,
+    dimension_label: str,
+) -> Tuple[str, str, str]:
     if not active_season:
         return "out_of_season", "season_inactive", "Configured swimming season is not active."
     if not source_results:
-        return "unknown", "no_sources", "No source result exists."
+        return "unknown", "no_sources", f"No {dimension_label} source result exists."
     states = [result.state for result in source_results]
     if "blocked" in states:
-        return "blocked", "blocked_source", "At least one official source produced a blocking signal."
+        return "blocked", "blocked_source", f"At least one {dimension_label} source produced a blocking signal."
     if "watch" in states:
-        return "watch", "watch_source", "At least one official source produced a watch-level signal."
+        return "watch", "watch_source", f"At least one {dimension_label} source produced a watch-level signal."
     if all(state == "ok" for state in states):
-        return "ok", "all_sources_ok", "All configured official sources are currently positive."
+        return "ok", "all_sources_ok", f"All configured {dimension_label} sources are currently positive."
     if any(state == "ok" for state in states):
-        return "watch", "partial_ok", "At least one source is ok, but not all configured sources are positive."
-    return "unknown", "no_positive_source", "No configured source produced a fresh positive status."
+        return "watch", "partial_ok", f"At least one {dimension_label} source is ok, but not all configured sources are positive."
+    return "unknown", "no_positive_source", f"No configured {dimension_label} source produced a fresh positive status."
+
+
+def aggregate_final_state(water_state: str, local_state: str, active_season: bool) -> Tuple[str, str, str]:
+    if not active_season:
+        return "out_of_season", "season_inactive", "Configured swimming season is not active."
+    if water_state == "blocked":
+        return "blocked", "water_blocked", "Water-quality/legal source blocks bathing."
+    if local_state == "blocked":
+        return "blocked", "local_blocked", "Local suitability source blocks an active bathing recommendation."
+    if local_state == "watch":
+        return "watch", "local_watch", "Local suitability warning suppresses an active bathing recommendation."
+    if water_state == "watch":
+        return "watch", "water_watch", "Water-quality source is only watch-level."
+    if water_state == "unknown":
+        return "unknown", "water_unknown", "Water-quality status is unknown or stale."
+    if water_state == "ok" and local_state == "ok":
+        return "ok", "water_and_local_ok", "Water status and local suitability are both positive."
+    if water_state == "ok" and local_state == "unknown":
+        return "watch", "local_not_proven", "Water status is positive, but local suitability is not positively proven."
+    return "unknown", "not_fully_positive", "Final status is not fully positive."
 
 
 def result_to_dict(result: SourceResult) -> Dict[str, Any]:
@@ -570,6 +912,8 @@ def result_to_dict(result: SourceResult) -> Dict[str, Any]:
         "title": result.title,
         "type": result.type,
         "authority_type": result.authority_type,
+        "dimension": result.dimension,
+        "source_role": result.source_role,
         "state": result.state,
         "confidence": result.confidence,
         "checked_at": result.checked_at,
@@ -585,28 +929,176 @@ def result_to_dict(result: SourceResult) -> Dict[str, Any]:
     }
 
 
+
+
+def add_days_iso(day: dt.date, days: int) -> str:
+    return (day + dt.timedelta(days=days)).isoformat()
+
+
+def pick_status_source(group: Dict[str, Any]) -> Dict[str, Any]:
+    sources = group.get("sources") if isinstance(group.get("sources"), list) else []
+    state = str(group.get("state") or "unknown")
+    preferred_states = ["blocked", "watch"] if state in {"blocked", "watch"} else ["ok"]
+    for wanted in preferred_states:
+        for source in sources:
+            if isinstance(source, dict) and source.get("state") == wanted:
+                return source
+    for source in sources:
+        if isinstance(source, dict):
+            return source
+    return {}
+
+
+def status_label(state: str) -> str:
+    if state == "blocked":
+        return "Baden aktuell nicht empfohlen"
+    if state == "watch":
+        return "Badehinweis prüfen"
+    if state == "ok":
+        return "Badestelle freigegeben"
+    return "Status vor Empfehlung prüfen"
+
+
+def public_note_for_group(group: Dict[str, Any]) -> str:
+    state = str(group.get("state") or "unknown")
+    confidence = str(group.get("confidence") or "")
+    water_state = str(group.get("water_state") or "unknown")
+    local_state = str(group.get("local_suitability_state") or "unknown")
+
+    if state == "blocked":
+        if confidence == "water_blocked":
+            return "Für diese Badestelle liegt aktuell ein Badeverbot, ein Sperrsignal oder ein kritisches Wasserqualitäts-Signal vor."
+        return "Für diese Badestelle liegt aktuell ein lokales Sperr- oder Warnsignal vor."
+    if state == "watch":
+        if confidence == "local_watch":
+            return (
+                "Die Wasserwerte sind aktuell unauffällig, es gibt aber lokale Hinweise auf Schlamm, "
+                "Geruch oder Ablagerungen. Deshalb wird Baden hier aktuell nicht als Tipp empfohlen."
+            )
+        if confidence == "water_watch":
+            return "Der letzte automatisch ausgelesene Messwert ist nicht frisch genug für eine aktive Badeempfehlung."
+        if confidence == "local_not_proven" or (water_state == "ok" and local_state == "unknown"):
+            return (
+                "Die Wasserwerte sind aktuell unauffällig, aber eine positive lokale Badeeignung ist "
+                "nicht belegt. Deshalb wird Baden hier aktuell nicht als Tipp empfohlen."
+            )
+        return "Der aktuelle Badegewässerstatus ist nur auf Watch-Level. Deshalb wird Baden hier nicht aktiv empfohlen."
+    if state == "ok":
+        return "Wasserstatus und lokale Badeeignung sind aktuell positiv geprüft."
+    if state == "out_of_season":
+        return "Die konfigurierte Badesaison ist aktuell nicht aktiv."
+    return "Der aktuelle Badegewässerstatus konnte nicht eindeutig geprüft werden. Deshalb gibt es keine Badeempfehlung."
+
+
+def build_public_status_data(report: Dict[str, Any]) -> Dict[str, Any]:
+    guard_date_text = str(report.get("guard_date") or "")
+    try:
+        guard_date = dt.date.fromisoformat(guard_date_text)
+    except ValueError:
+        guard_date = dt.datetime.now(dt.timezone.utc).date()
+
+    group_configs = {group.group_id: group for group in GROUPS}
+    items: Dict[str, Dict[str, Any]] = {}
+
+    for group in report.get("groups", []):
+        if not isinstance(group, dict):
+            continue
+        config = group_configs.get(str(group.get("group_id") or ""))
+        if not config:
+            continue
+        source = pick_status_source(group)
+        final_state = str(group.get("state") or "unknown")
+        status = {
+            "state": final_state,
+            "label": status_label(final_state),
+            "source_type": "guard_verified",
+            "guard_source": "bathing_water_guard_v2",
+            "source_url": str(source.get("source_url") or ""),
+            "source_urls": [str(item.get("source_url") or "") for item in group.get("sources", []) if isinstance(item, dict) and item.get("source_url")],
+            "checked_at": guard_date.isoformat(),
+            "valid_until": add_days_iso(guard_date, 2),
+            "reason": str(group.get("reason") or ""),
+            "public_note": public_note_for_group(group),
+            "confidence": str(group.get("confidence") or ""),
+            "water_state": str(group.get("water_state") or "unknown"),
+            "water_confidence": str(group.get("water_confidence") or ""),
+            "local_suitability_state": str(group.get("local_suitability_state") or "unknown"),
+            "local_suitability_confidence": str(group.get("local_suitability_confidence") or ""),
+            "latest_sample_date": None,
+            "latest_sample_age_days": None,
+            "group_id": config.group_id,
+            "activity_ids": config.activity_ids,
+            "highlight_id": config.highlight_id,
+        }
+        for water_source in group.get("water_sources", []):
+            if not isinstance(water_source, dict):
+                continue
+            if water_source.get("latest_sample_date"):
+                status["latest_sample_date"] = water_source.get("latest_sample_date")
+                status["latest_sample_age_days"] = water_source.get("latest_sample_age_days")
+                break
+        for activity_id in config.activity_ids:
+            key = f"{activity_id}:{config.highlight_id}"
+            items[key] = {"activity_id": activity_id, "highlight_id": config.highlight_id, **status}
+
+    return {
+        "generated_at": report.get("generated_at"),
+        "source": "bathing-water-guard-v2",
+        "script_version": report.get("script_version"),
+        "guard_date": report.get("guard_date"),
+        "policy": {
+            "mode": "safe_writeback_status_file",
+            "status_file": "data/bathing_water_status.json",
+            "does_not_edit": "data/offers.json",
+            "ok_requires": "water_state=ok and local_suitability_state=ok",
+            "fallback": "Frontend falls back to conservative data/offers.json status if this file is missing or invalid.",
+        },
+        "summary": report.get("summary", {}),
+        "items": items,
+    }
+
 def build_report(today: dt.date, max_age_days: int, warn_age_days: int) -> Dict[str, Any]:
     generated_at = today_utc_iso()
     groups_output: List[Dict[str, Any]] = []
     all_source_results: List[SourceResult] = []
     for group in GROUPS:
         active_season = in_season(today, group.season_start, group.season_end)
-        source_results = [check_source(source, today, max_age_days, warn_age_days) for source in group.sources]
+        water_results = [check_source(source, today, max_age_days, warn_age_days) for source in group.sources]
+        # Local suitability is intentionally separate from lab/legal water status.
+        # It can suppress an active recommendation even if water values are `ok`.
+        local_results = [check_source(source, today, max_age_days, warn_age_days) for source in group.local_sources]
+        source_results = water_results + local_results
         all_source_results.extend(source_results)
-        group_state, group_confidence, group_reason = aggregate_group_state(source_results, active_season)
+        water_state, water_confidence, water_reason = aggregate_dimension_state(
+            water_results, active_season, dimension_label="water-quality"
+        )
+        local_state, local_confidence, local_reason = aggregate_dimension_state(
+            local_results, active_season, dimension_label="local-suitability"
+        )
+        group_state, group_confidence, group_reason = aggregate_final_state(water_state, local_state, active_season)
         groups_output.append(
             {
                 "group_id": group.group_id,
                 "activity_ids": group.activity_ids,
+                "highlight_id": group.highlight_id,
                 "title": group.title,
                 "state": group_state,
                 "confidence": group_confidence,
                 "reason": group_reason,
+                "water_state": water_state,
+                "water_confidence": water_confidence,
+                "water_reason": water_reason,
+                "local_suitability_state": local_state,
+                "local_suitability_confidence": local_confidence,
+                "local_suitability_reason": local_reason,
                 "in_season": active_season,
                 "season_start": group.season_start,
                 "season_end": group.season_end,
                 "source_ids": [source.id for source in group.sources],
+                "local_source_ids": [source.id for source in group.local_sources],
                 "sources": [result_to_dict(result) for result in source_results],
+                "water_sources": [result_to_dict(result) for result in water_results],
+                "local_suitability_sources": [result_to_dict(result) for result in local_results],
             }
         )
         # Be polite to external sources and avoid a burst of requests.
@@ -619,21 +1111,22 @@ def build_report(today: dt.date, max_age_days: int, warn_age_days: int) -> Dict[
     return {
         "generated_at": generated_at,
         "script_version": SCRIPT_VERSION,
-        "scope": "bathing_water_guard_v1_report_only_no_product_writeback",
+        "scope": "bathing_water_guard_v2_safe_writeback_status_file",
         "guard_date": today.isoformat(),
         "policy": {
             "max_measurement_age_days": max_age_days,
             "warn_measurement_age_days": warn_age_days,
             "state_order": STATE_ORDER,
-            "important": "This report never writes public activity highlight status. Positive results require a separate review before product writeback.",
+            "important": "The report can write data/bathing_water_status.json when --write-data is used. It never edits data/offers.json. A public bathing recommendation requires both positive water status and positive local suitability; positive lab values alone are not enough.",
         },
         "summary": {
             "groups_total": len(groups_output),
             "state_counts": counts,
             "operationally_positive_groups": operationally_positive,
             "guarded_or_blocked_groups": guarded_or_blocked,
+            "ready_for_status_file_writeback": True,
             "ready_for_product_writeback": False,
-            "recommendation": "review_report_before_any_writeback",
+            "recommendation": "write_generated_status_file_only",
         },
         "groups": groups_output,
     }
@@ -641,7 +1134,7 @@ def build_report(today: dt.date, max_age_days: int, warn_age_days: int) -> Dict[
 
 def render_markdown(report: Dict[str, Any]) -> str:
     lines: List[str] = []
-    lines.append("# Bathing Water Guard V1 Report")
+    lines.append("# Bathing Water Guard V2 Report")
     lines.append("")
     lines.append(f"Generated: `{report['generated_at']}`")
     lines.append(f"Guard date: `{report['guard_date']}`")
@@ -655,24 +1148,25 @@ def render_markdown(report: Dict[str, Any]) -> str:
     lines.append(f"- Ready for product writeback: `{str(summary['ready_for_product_writeback']).lower()}`")
     lines.append(f"- Recommendation: `{summary['recommendation']}`")
     lines.append("")
-    lines.append("> Report-only: this artifact does not update `data/offers.json` and does not activate public bathing highlights.")
+    lines.append("> Safe writeback: this artifact may update `data/bathing_water_status.json`, but it does not edit `data/offers.json`.")
     lines.append("")
     lines.append("## Activity groups")
     lines.append("")
-    lines.append("| Group | State | Confidence | In season | Reason | Latest samples |")
-    lines.append("|---|---|---|---:|---|---|")
+    lines.append("| Group | Final | Water | Local suitability | In season | Reason | Latest samples |")
+    lines.append("|---|---|---|---|---:|---|---|")
     for group in report["groups"]:
         latest_samples = []
-        for source in group["sources"]:
+        for source in group["water_sources"]:
             if source.get("latest_sample_date"):
                 latest_samples.append(f"{source['source_id']}: {source['latest_sample_date']} ({source.get('latest_sample_age_days')}d)")
             else:
                 latest_samples.append(f"{source['source_id']}: n/a")
         lines.append(
-            "| {group_id} | `{state}` | `{confidence}` | {in_season} | {reason} | {samples} |".format(
+            "| {group_id} | `{state}` | `{water_state}` | `{local_state}` | {in_season} | {reason} | {samples} |".format(
                 group_id=group["group_id"],
                 state=group["state"],
-                confidence=group["confidence"],
+                water_state=group.get("water_state"),
+                local_state=group.get("local_suitability_state"),
                 in_season="yes" if group["in_season"] else "no",
                 reason=str(group["reason"]).replace("|", "\\|"),
                 samples="<br>".join(latest_samples).replace("|", "\\|"),
@@ -687,6 +1181,8 @@ def render_markdown(report: Dict[str, Any]) -> str:
         for source in group["sources"]:
             lines.append(f"#### {source['title']} (`{source['source_id']}`)")
             lines.append("")
+            lines.append(f"- Dimension: `{source.get('dimension')}`")
+            lines.append(f"- Source role: `{source.get('source_role')}`")
             lines.append(f"- State: `{source['state']}`")
             lines.append(f"- Confidence: `{source['confidence']}`")
             lines.append(f"- Reason: {source['reason']}")
@@ -701,6 +1197,13 @@ def render_markdown(report: Dict[str, Any]) -> str:
                 lines.append(f"- Badeverbot parsed: `{sample.get('badeverbot')}`")
                 if sample.get("signals"):
                     lines.append(f"- Signals: `{', '.join(sample.get('signals') or [])}`")
+            raw_signals = source.get("raw_signals") or {}
+            if raw_signals.get("block_phrases"):
+                lines.append(f"- Local block phrases: `{', '.join(raw_signals.get('block_phrases') or [])}`")
+            if raw_signals.get("watch_phrases"):
+                lines.append(f"- Local watch phrases: `{', '.join(raw_signals.get('watch_phrases') or [])}`")
+            if raw_signals.get("positive_phrases"):
+                lines.append(f"- Local positive phrases: `{', '.join(raw_signals.get('positive_phrases') or [])}`")
             if source.get("warnings"):
                 lines.append(f"- Warnings: `{', '.join(source['warnings'])}`")
             if source.get("errors"):
@@ -714,12 +1217,13 @@ def ensure_parent(path: Path) -> None:
 
 
 def main(argv: Optional[List[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="Report-only bathing-water status guard.")
+    parser = argparse.ArgumentParser(description="Bathing-water status guard with optional safe status-file writeback.")
     parser.add_argument("--today", help="Guard date as YYYY-MM-DD; defaults to current UTC date.")
     parser.add_argument("--max-measurement-age-days", type=int, default=45)
     parser.add_argument("--warn-measurement-age-days", type=int, default=35)
     parser.add_argument("--out-json", default="bathing-water-status-guard.json")
     parser.add_argument("--out-md", default="bathing-water-status-guard.md")
+    parser.add_argument("--write-data", default="", help="Optional path for generated frontend status data, e.g. data/bathing_water_status.json.")
     args = parser.parse_args(argv)
     today = parse_today(args.today)
     if args.warn_measurement_age_days > args.max_measurement_age_days:
@@ -731,6 +1235,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     ensure_parent(out_md)
     out_json.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     out_md.write_text(render_markdown(report), encoding="utf-8")
+    if args.write_data:
+        data_path = Path(args.write_data)
+        ensure_parent(data_path)
+        data_path.write_text(json.dumps(build_public_status_data(report), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report["summary"], ensure_ascii=False, indent=2))
     return 0
 

@@ -143,8 +143,14 @@ def audit_highlight(offer: dict[str, Any], highlight: dict[str, Any], today: dat
         status_checked_at = parse_iso_date(status.get("checked_at"))
         if state == "ok":
             source_type = norm(status.get("source_type")).lower()
-            if source_type not in OFFICIAL_POSITIVE_SOURCE_TYPES:
-                add_error(errors, offer_id, highlight_id, f"positive Freigabe braucht offizielle Quelle, source_type={source_type!r}")
+            guard_ok = (
+                source_type == "guard_verified"
+                and norm(status.get("guard_source")).lower() == "bathing_water_guard_v2"
+                and norm(status.get("water_state")).lower() == "ok"
+                and norm(status.get("local_suitability_state")).lower() == "ok"
+            )
+            if source_type not in OFFICIAL_POSITIVE_SOURCE_TYPES and not guard_ok:
+                add_error(errors, offer_id, highlight_id, f"positive Freigabe braucht offizielle Quelle oder Guard-Freigabe, source_type={source_type!r}")
             if not norm(status.get("source_url")):
                 add_error(errors, offer_id, highlight_id, "positive Freigabe braucht current_status.source_url")
             if not status_checked_at or not status_valid_until or status_valid_until < today:
@@ -173,6 +179,7 @@ def audit_highlight(offer: dict[str, Any], highlight: dict[str, Any], today: dat
 def main() -> int:
     parser = argparse.ArgumentParser(description="Audit seasonal activity highlights")
     parser.add_argument("--offers-json", default="data/offers.json")
+    parser.add_argument("--bathing-status-json", default="data/bathing_water_status.json")
     parser.add_argument("--scope", choices=["deploy-gate", "daily", "full"], default="deploy-gate")
     parser.add_argument("--today", default="")
     args = parser.parse_args()
@@ -191,6 +198,20 @@ def main() -> int:
 
     errors: list[str] = []
     warnings: list[str] = []
+
+    status_items: dict[str, Any] = {}
+    status_path = ROOT / args.bathing_status_json
+    if status_path.exists():
+        try:
+            status_payload = json.loads(status_path.read_text(encoding="utf-8"))
+            loaded_items = status_payload.get("items") if isinstance(status_payload, dict) else {}
+            if isinstance(loaded_items, dict):
+                status_items = {norm(key).lower(): value for key, value in loaded_items.items()}
+            else:
+                errors.append(f"{args.bathing_status_json}: items ist kein Objekt")
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{args.bathing_status_json}: konnte nicht gelesen/geparst werden: {exc}")
+
     totals = {
         "offers": len(offers),
         "seasonal_highlights": 0,
@@ -201,6 +222,8 @@ def main() -> int:
         "blocked": 0,
         "unknown": 0,
     }
+
+    bathing_highlight_keys: set[str] = set()
 
     for offer in offers:
         if not isinstance(offer, dict):
@@ -213,12 +236,43 @@ def main() -> int:
             if not isinstance(highlight, dict):
                 errors.append(f"{norm(offer.get('id'))}: seasonal_highlights enthaelt keinen Objekt-Eintrag")
                 continue
+            highlight_for_audit = highlight
+            if norm(highlight.get("type")).lower() == "bathing_water":
+                bathing_key = f"{norm(offer.get('id')).lower()}:{norm(highlight.get('id')).lower()}"
+                bathing_highlight_keys.add(bathing_key)
+                override = status_items.get(bathing_key)
+                if isinstance(override, dict):
+                    override_valid_until = parse_iso_date(override.get("valid_until"))
+                    if override_valid_until is None or override_valid_until >= today:
+                        current_status = highlight.get("current_status") if isinstance(highlight.get("current_status"), dict) else {}
+                        highlight_for_audit = {**highlight, "current_status": {**current_status, **override}}
             totals["seasonal_highlights"] += 1
-            item_errors, item_warnings, stats = audit_highlight(offer, highlight, today, scope=args.scope)
+            item_errors, item_warnings, stats = audit_highlight(offer, highlight_for_audit, today, scope=args.scope)
             errors.extend(item_errors)
             warnings.extend(item_warnings)
             for key, value in stats.items():
                 totals[key] = totals.get(key, 0) + value
+
+    if status_path.exists() and status_items:
+        status_keys = set(status_items.keys())
+        for required_key in sorted(bathing_highlight_keys):
+            if required_key not in status_keys:
+                warnings.append(f"{required_key}: Badegewässer-Highlight hat keinen Eintrag in {args.bathing_status_json}")
+        for key, value in status_items.items():
+            item_key = norm(key).lower()
+            if not isinstance(value, dict):
+                errors.append(f"{args.bathing_status_json}/{item_key}: Eintrag ist kein Objekt")
+                continue
+            state = norm(value.get("state") or "unknown").lower()
+            if state not in STATUS_VALUES:
+                errors.append(f"{args.bathing_status_json}/{item_key}: state ungueltig: {state!r}")
+            if state == "ok":
+                if norm(value.get("source_type")).lower() != "guard_verified":
+                    errors.append(f"{args.bathing_status_json}/{item_key}: ok braucht source_type=guard_verified")
+                if norm(value.get("water_state")).lower() != "ok" or norm(value.get("local_suitability_state")).lower() != "ok":
+                    errors.append(f"{args.bathing_status_json}/{item_key}: ok braucht water_state=ok und local_suitability_state=ok")
+                if not parse_iso_date(value.get("checked_at")) or not parse_iso_date(value.get("valid_until")):
+                    errors.append(f"{args.bathing_status_json}/{item_key}: ok braucht checked_at und valid_until")
 
     if errors:
         print("ACTIVITY_HIGHLIGHTS_AUDIT_FAILED", file=sys.stderr)

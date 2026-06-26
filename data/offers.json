@@ -148,14 +148,14 @@
             ]
           },
           "current_status": {
-            "state": "blocked",
-            "label": "Aktuell kein Bade-Highlight",
+            "state": "watch",
+            "label": "Badehinweis prüfen",
             "source_type": "local_press",
             "source_url": "https://www.bbv-net.de/bocholt/bocholter-aasee-schlamm-geruch-stinkt-keine-badegaeste-seezustand-probleme-w1212295-6000574615/",
             "checked_at": "2026-06-26",
-            "valid_until": "2026-07-10",
-            "reason": "Aktuelle lokale Medienlage spricht gegen eine Badeempfehlung; saisonales Grundfenster reicht nicht als Freigabe.",
-            "public_note": "Der Aasee bleibt als Freizeitort nutzbar, wird aktuell aber nicht als Bade-Highlight empfohlen."
+            "valid_until": "2026-07-15",
+            "reason": "Wasserwerte und Badeverbot reichen nicht als Empfehlung: aktueller lokaler Hinweis auf Schlamm, Geruch und Ablagerungen spricht gegen eine aktive Badeempfehlung.",
+            "public_note": "Die Wasserwerte sind unauffällig, es gibt aber aktuelle lokale Hinweise auf Schlamm, Geruch oder Ablagerungen. Deshalb wird Baden hier aktuell nicht als Tipp empfohlen."
           }
         }
       ]
