@@ -193,3 +193,37 @@ Abgrenzung:
 - Bei fehlender oder fehlerhafter Statusdatei fällt das Frontend auf die konservativen Statuswerte aus `offers.json` zurück.
 
 Der Workflow heißt weiterhin technisch `.github/workflows/bathing-water-guard-v1.yml`, trägt aber den Anzeigenamen `Bathing Water Guard V2`, damit bestehende Dateipfade nicht unnötig verschoben werden.
+
+
+## Guard V2 – Staging-Validierung vom 2026-06-26
+
+Die Safe-Writeback-Kette wurde auf `staging` validiert:
+
+1. `Bathing Water Guard V2` lief grün.
+2. Der Guard erzeugte `data/bathing_water_status.json` mit `script_version=BATHING_WATER_GUARD_V2_SAFE_WRITEBACK`.
+3. Der Workflow erkannte einen echten Diff und schrieb den Commit `Aktualisiere Badegewaesser-Status` auf `staging`.
+4. Der anschließende Deploy war grün.
+5. Das Frontend las die Statusdatei und spielte keine falsche Badeempfehlung aus.
+6. Aasee zeigte einen Badehinweis und war nicht im Filter `Jetzt besonders`.
+
+Validierter Guard-Status:
+
+| Gruppe | Status | Wirkung |
+|---|---|---|
+| Aasee Bocholt | `blocked` | keine Badeempfehlung; lokales Warn-/Sperrsignal sichtbar |
+| Hilgelo | `unknown` | keine Badeempfehlung |
+| Pröbstingsee Borken | `watch` | keine Badeempfehlung; Messwertalter beachten |
+| Auesee Wesel | `watch` | keine Badeempfehlung; lokale Badeeignung nicht positiv belegt |
+
+Damit ist auf `staging` belegt:
+
+```text
+Guard V2 -> Statusdatei -> Commit -> Deploy -> Frontend-Override -> sichere UI
+```
+
+Weiterhin gilt:
+
+- kein automatischer Writeback nach `data/offers.json`,
+- `ready_for_product_writeback=false`,
+- keine positive Badeempfehlung ohne finalen Guard-Status `ok`,
+- täglicher produktiver Schedule erst nach Merge auf `main` final prüfen.
