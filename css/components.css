@@ -1451,6 +1451,11 @@
   content: none;
   display: none;
 }
+
+.page--activities .activity-card-quiet__item--status{
+  background: color-mix(in srgb, #f7e5b2 48%, white 52%);
+  color: color-mix(in srgb, #5f4210 80%, var(--color-text-primary, #1f2933) 20%);
+}
 /* === END BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE_V3 === */
 
 /* === BEGIN BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V3 | Zweck: finalisiert die Bottom Tab Bar visuell zu einer flacheren, strafferen Mobile-Shell mit breit integriertem Active-Indicator und ausgewogener Präsenz beider Tabs | Umfang: kompletter visueller Owner der Bottom Tab Bar inkl. Root, Items, Active-Indicator, Focus und Desktop-Off === */
@@ -2011,6 +2016,12 @@ body.has-bottom-tabbar{
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,0.88),
       0 4px 10px rgba(12,24,16,0.035);
+  }
+
+  .page--activities .activity-card-fact--status{
+    background: color-mix(in srgb, #f7e5b2 46%, rgba(244,247,242,0.96) 54%);
+    border-color: color-mix(in srgb, #7a5a13 24%, rgba(18,34,26,0.065) 76%);
+    color: color-mix(in srgb, #5f4210 82%, var(--color-text-primary, #1f2933) 18%);
   }
   /* === END BLOCK: ACTIVITIES_CARD_MATCH_FACT_CSS_V1 === */
 

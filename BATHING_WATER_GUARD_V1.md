@@ -154,3 +154,13 @@ Der Guard bleibt report-only:
 - keine automatische Inbox-Aktion.
 
 Erst nach Sichtung von 1–2 V1.2-Artefakten wird entschieden, ob und wie lokale Badeeignung in einen spaeteren Content-/Statusprozess uebernommen wird.
+
+## UI-Policy fuer lokale Badehinweise
+
+V1.2 trennt weiterhin Report-Guard und Produktdaten. Wenn ein lokaler Hinweis fachlich in `data/offers.json` gepflegt wird, gilt fuer die UI:
+
+- Home zeigt keine negative grosse Warnung. Der Bade-/Wasser-Boost wird nur unterdrueckt.
+- Activity-Cards duerfen bei konkretem `watch`/`blocked` einen knappen Statuschip zeigen, z. B. `Badehinweis pruefen`.
+- `unknown` erzeugt keinen Card-Chip, um die Aktivitaetenliste nicht mit unklaren Hinweisen zu ueberfrachten.
+- Das Detailpanel erklaert die Ursache kompakt, z. B. Wasserwerte unauffaellig, aber lokaler Schlamm-/Geruchshinweis aktiv.
+- Ein negativer lokaler Hinweis laeuft ueber `valid_until` ab oder wird durch eine staerkere positive lokale Quelle ersetzt. Das blosse Fehlen neuer Negativmeldungen ist keine Entwarnung.

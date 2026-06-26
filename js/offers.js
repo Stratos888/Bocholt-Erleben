@@ -484,6 +484,10 @@ function getCategoryPresentation(category) {
     if (!highlight) return "";
     return highlight.shortLabel ? `Jetzt: ${highlight.shortLabel}` : highlight.label;
   }
+
+  function getConditionStatusCardLabel(offer) {
+    return toSingleLine(window.BEActivityHighlights?.getConditionStatusCardLabel?.(offer, { now: new Date(), surface: "activity" }));
+  }
   /* === END BLOCK: ACTIVITY_HIGHLIGHT_CARD_HELPERS_V1 === */
 
   function getMeaningfulTagItems(offer) {
@@ -528,11 +532,13 @@ function getCategoryPresentation(category) {
       ? offer.activeMatchLabels.map((entry) => toSingleLine(entry)).filter(Boolean)
       : [];
 
+    const statusLabel = getConditionStatusCardLabel(offer);
+
     if (activeMatches.length) {
       const merged = [];
       const seen = new Set();
 
-      [getActiveHighlightLabel(offer), ...activeMatches, ...getRankedTagItems(offer, 3)].forEach((entry) => {
+      [getActiveHighlightLabel(offer), statusLabel, ...activeMatches, ...getRankedTagItems(offer, 3)].forEach((entry) => {
         const value = toSingleLine(entry);
         const key = normalizeComparable(value);
         if (!value || seen.has(key)) return;
@@ -546,8 +552,8 @@ function getCategoryPresentation(category) {
 
     const highlightLabel = getActiveHighlightLabel(offer);
     const primaryTags = getRankedTagItems(offer, 2);
-    if (highlightLabel) {
-      return [highlightLabel, ...primaryTags].slice(0, 3).join(" · ");
+    if (highlightLabel || statusLabel) {
+      return [highlightLabel, statusLabel, ...primaryTags].filter(Boolean).slice(0, 3).join(" · ");
     }
 
     if (primaryTags.length) return primaryTags.join(" · ");
@@ -566,6 +572,7 @@ function getCategoryPresentation(category) {
       : [];
 
     const activeHighlightLabel = getActiveHighlightLabel(offer);
+    const statusLabel = getConditionStatusCardLabel(offer);
     const primaryTags = getRankedTagItems(offer, 3);
     const curatedFacts = Array.isArray(offer?.cardFacts)
       ? offer.cardFacts.map((entry) => toSingleLine(entry)).filter(Boolean)
@@ -579,7 +586,7 @@ function getCategoryPresentation(category) {
       const merged = [];
       const seen = new Set();
 
-      [activeHighlightLabel, ...activeMatches, ...primaryTags, ...curatedFacts, ...fallbackFacts].forEach((entry) => {
+      [activeHighlightLabel, statusLabel, ...activeMatches, ...primaryTags, ...curatedFacts, ...fallbackFacts].forEach((entry) => {
         const value = toSingleLine(entry);
         const key = normalizeComparable(value);
         if (!value || seen.has(key)) return;
@@ -591,8 +598,8 @@ function getCategoryPresentation(category) {
       return merged.slice(0, 3);
     }
 
-    if (activeHighlightLabel) {
-      return [activeHighlightLabel, ...primaryTags, ...curatedFacts, ...fallbackFacts]
+    if (activeHighlightLabel || statusLabel) {
+      return [activeHighlightLabel, statusLabel, ...primaryTags, ...curatedFacts, ...fallbackFacts]
         .map((entry) => toSingleLine(entry))
         .filter(Boolean)
         .filter((entry, index, list) => list.findIndex((item) => normalizeComparable(item) === normalizeComparable(entry)) === index)
@@ -626,7 +633,8 @@ function getCategoryPresentation(category) {
     pickSupportingLabel,
     getRankedTagItems,
     getActiveHighlight,
-    getActiveHighlightLabel
+    getActiveHighlightLabel,
+    getConditionStatusCardLabel
   };
 })();
 
@@ -667,6 +675,7 @@ const OfferCards = (() => {
         .filter(Boolean)
     );
     const seasonalLabel = String(OfferVisuals.getActiveHighlightLabel?.(offer) || "").replace(/\s+/g, " ").trim();
+    const statusLabel = String(OfferVisuals.getConditionStatusCardLabel?.(offer) || "").replace(/\s+/g, " ").trim();
 
     return `
       <div class="activity-card-facts" aria-label="${activeMatches.size ? "Passende Merkmale" : "Wichtige Merkmale"}">
@@ -674,10 +683,12 @@ const OfferCards = (() => {
           const label = String(item || "").replace(/\s+/g, " ").trim();
           const isMatch = activeMatches.has(label);
           const isSeasonal = seasonalLabel && label === seasonalLabel;
+          const isStatus = statusLabel && label === statusLabel;
           const className = [
             "activity-card-fact",
             isMatch ? "activity-card-fact--match" : "",
-            isSeasonal ? "activity-card-fact--seasonal" : ""
+            isSeasonal ? "activity-card-fact--seasonal" : "",
+            isStatus ? "activity-card-fact--status" : ""
           ].filter(Boolean).join(" ");
 
           return `<span class="${className}">${OfferVisuals.escapeHtml(label)}</span>`;
@@ -697,9 +708,15 @@ const OfferCards = (() => {
 
     if (!items.length) return "";
 
+    const statusLabel = String(OfferVisuals.getConditionStatusCardLabel?.(offer) || "").replace(/\s+/g, " ").trim();
+
     return `
       <div class="activity-card-quiet" aria-label="Warum diese Aktivität passt">
-        ${items.map((item) => `<span class="activity-card-quiet__item">${OfferVisuals.escapeHtml(item)}</span>`).join("")}
+        ${items.map((item) => {
+          const isStatus = statusLabel && item === statusLabel;
+          const className = `activity-card-quiet__item${isStatus ? " activity-card-quiet__item--status" : ""}`;
+          return `<span class="${className}">${OfferVisuals.escapeHtml(item)}</span>`;
+        }).join("")}
       </div>
     `.trim();
   }

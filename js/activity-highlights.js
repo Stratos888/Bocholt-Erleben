@@ -266,26 +266,51 @@
     const status = readObject(candidate.current_status || candidate.currentStatus);
     const state = statusState(candidate);
     const publicNote = asString(status.public_note || status.publicNote || candidate.status_public_note || candidate.statusPublicNote);
+    const sourceType = asString(status.source_type || status.sourceType).toLowerCase();
+    const isBathingWater = asString(candidate.type).toLowerCase() === "bathing_water";
 
     if (state === "blocked") {
       return {
-        title: asString(status.label) || "Statushinweis",
-        label: "Aktuell nicht als Highlight empfohlen",
+        title: isBathingWater ? "Badehinweis" : asString(status.label) || "Statushinweis",
+        label: isBathingWater ? "Baden aktuell nicht empfohlen" : "Aktuell nicht als Highlight empfohlen",
         note: publicNote || asString(status.reason) || "Aktuell liegt kein positives Statussignal für dieses zustandsabhängige Highlight vor.",
-        state
+        sourceType,
+        sourceUrl: asString(status.source_url || status.sourceUrl),
+        state,
+        type: candidate.type
       };
     }
 
     if (state === "watch" || state === "unknown") {
       return {
-        title: "Statushinweis",
-        label: "Aktuellen Status prüfen",
+        title: isBathingWater ? "Badehinweis" : "Statushinweis",
+        label: isBathingWater ? "Badehinweis prüfen" : "Aktuellen Status prüfen",
         note: publicNote || "Für dieses zustandsabhängige Highlight liegt aktuell keine frische positive Freigabe vor.",
-        state
+        sourceType,
+        sourceUrl: asString(status.source_url || status.sourceUrl),
+        state,
+        type: candidate.type
       };
     }
 
     return null;
+  }
+
+  function getConditionStatusCardLabel(offer, context = {}) {
+    const statusNote = getConditionStatusNote(offer, context);
+    if (!statusNote) return "";
+
+    const state = asString(statusNote.state).toLowerCase();
+    const type = asString(statusNote.type).toLowerCase();
+
+    if (state === "unknown") return "";
+
+    if (type === "bathing_water") {
+      if (state === "blocked") return "Baden aktuell nicht empfohlen";
+      if (state === "watch") return "Badehinweis prüfen";
+    }
+
+    return asString(statusNote.label);
   }
 
   function getSearchTerms(offer, context = {}) {
@@ -315,6 +340,7 @@
     getScoreAdjustment,
     getDetailBlock,
     getConditionStatusNote,
+    getConditionStatusCardLabel,
     getSearchTerms,
     isActiveHighlight,
     isInSeason,
