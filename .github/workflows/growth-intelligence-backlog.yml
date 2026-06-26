@@ -2,6 +2,13 @@
 name: Growth Intelligence Backlog
 
 on:
+  push:
+    branches: ["main", "staging"]
+    paths:
+      - ".github/workflows/growth-intelligence-backlog.yml"
+      - "scripts/growth-intelligence-backlog.py"
+      - "docs/GROWTH_INTELLIGENCE_BACKLOG.md"
+
   workflow_dispatch:
     inputs:
       lookback_days:
@@ -17,6 +24,9 @@ permissions:
 
 jobs:
   growth_intelligence_backlog:
+    # Push ist absichtlich nur ein Sichtbarkeits-/Registrierungs-Trigger, damit GitHub den neuen Workflow
+    # wie die bestehenden Workflows im Actions-Menue anzeigt. Echte Backlog-Erzeugung nur manuell oder geplant.
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     runs-on: ubuntu-latest
     env:
       PYTHONUNBUFFERED: "1"
@@ -69,12 +79,14 @@ jobs:
         env:
           BE_SHEET_ID: ${{ env.BE_SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL || secrets.SEARCH_METRICS_GOOGLE_SITE_URL }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+          SEARCH_METRICS_GOOGLE_SITE_URL: ${{ secrets.SEARCH_METRICS_GOOGLE_SITE_URL }}
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
           GROWTH_LOOKBACK_DAYS: ${{ env.GROWTH_LOOKBACK_DAYS }}
           GROWTH_BACKLOG_TAB: ${{ env.GROWTH_BACKLOG_TAB }}
           GROWTH_REPORT_TAB: ${{ env.GROWTH_REPORT_TAB }}
         run: |
           set -e
+          export GSC_SITE_URL="${GSC_SITE_URL:-${SEARCH_METRICS_GOOGLE_SITE_URL:-}}"
           python scripts/growth-intelligence-backlog.py
 # === END FILE: .github/workflows/growth-intelligence-backlog.yml ===
