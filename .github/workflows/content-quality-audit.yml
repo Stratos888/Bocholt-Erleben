@@ -24,6 +24,9 @@ on:
     paths:
       - ".github/workflows/content-quality-audit.yml"
       - "scripts/content-quality-audit.py"
+      - "aktivitaeten/index.html"
+      - "js/activity-highlights.js"
+      - "scripts/audit-activity-highlights.py"
       - "data/content_source_suggestions.json"
       - "data/**"
       - "api/events/public.php"
