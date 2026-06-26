@@ -1,3 +1,177 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_SEASONAL_ACTIVITY_HIGHLIGHTS_V1_DONE_2026_06_26 | Zweck: dokumentiert Abschluss des Workpacks Seasonal Activity Highlights V1 inklusive Content Batch 01, Bade-/Status-Gate und Home-Rotationshaertung; Umfang: Staging-Deploy, fachlicher Smoke, Datenstand, bewusste Grenzen und Folge-Proof statt unbewiesener Automatisierung === -->
+## Seasonal Activity Highlights V1 + Content Batch 01 – abgeschlossen (2026-06-26)
+
+Status: auf Staging eingebracht, deployed und fachlich per Smoke-Test bestaetigt.
+
+### Umgesetzter Zielzustand
+
+- Saisonale Activity-Highlights sind als gepruefte Zusatzschicht in `data/offers.json` modelliert.
+- Home nutzt aktive Highlights kuratierend, aber nicht mehr dauerhaft dominierend.
+- Die Aktivitaetenseite zeigt aktive Highlights ueber:
+  - Card-Pill `Jetzt: ...`,
+  - Filter `Jetzt besonders`,
+  - Detailpanel-Block `Jetzt besonders`.
+- Zustandsabhaengige Bade-/Wasser-Highlights werden nur mit frischer positiver Statusquelle ausgespielt.
+- Negative oder unbekannte Statuslage blockiert Bade-Highlights auch dann, wenn das saisonale Grundfenster passt.
+- Konkrete Aktionen, Fuehrungen und Termine bleiben Events und werden nicht als Activity-Highlight gepflegt.
+- Weiche Annahmen wie `Park = Bluete`, `Sommer = Baden` oder `Naturgebiet = Tiere sichtbar` werden nicht ausgespielt.
+
+### Aktueller Datenstand
+
+- Activities gesamt: 44.
+- Saisonale Highlight-Datensaetze: 10.
+- Stabile saisonale Highlights: 6.
+- Zustandsabhaengige Bade-/Status-Highlights: 4.
+- Aktive Bade-Highlights ohne frische positive Statusquelle: 0.
+
+Aktiv stabile Highlights je Saisonfenster:
+
+- `zwillbrocker-venn-flamingos-entdecken` – Flamingo-Zeit.
+- `korenburgerveen-entdecken` – Moor-/Wollgraszeit.
+- `quellengrundpark-weseke-entdecken` – Apothekergarten-Saison.
+- `witte-venn-ahaus-alstaette-entdecken` – Heidebluete-Zeit.
+- `wasserburg-anholt-erleben` – Landschaftspark-Saison.
+- `anholter-schweiz-erleben` – Wildpark-Saison.
+
+Bewusst nicht aktiv als Bade-Highlight ausgespielt:
+
+- `aasee-erleben` – aktueller Status `blocked`.
+- `hilgelo-erleben` – aktueller Status `unknown`.
+- `proebstingsee-borken-erleben` – aktueller Status `unknown`.
+- `auesee-wesel-erleben` – aktueller Status `unknown`.
+
+### Gepruefter Staging-Smoke
+
+Bestanden:
+
+- GitHub Actions / Deploy nach den Seasonal-Highlight-Patches gruen.
+- Kurzzeitiger STRATO-/Smoke-Timeout wurde per Rerun ohne Codeaenderung geloest.
+- Staging laedt wieder auf Mobile und Desktop.
+- Home laedt ohne kaputte Cards.
+- Aktivitaetenseite laedt und zeigt `Jetzt besonders (5)` im aktuellen Saisonkontext.
+- Cards zeigen `Jetzt: ...` nur bei aktivem, erlaubtem Highlight-Zeitfenster.
+- Aasee, Hilgelo, Proebstingsee und Auesee zeigen keine Bade-Highlight-Pill.
+- Zwillbrocker Venn, Quellengrundpark Weseke, Wasserburg Anholt, Anholter Schweiz und Korenburgerveen zeigen im aktuellen Zeitraum passende `Jetzt`-Pills.
+- Detailpanel zeigt bei stabilen Highlights einen kompakten Block `Jetzt besonders` mit vorsichtiger Sprache.
+- Home-Rotationshaertung verhindert, dass saisonale Highlights dauerhaft die komplette Empfehlungsliste dominieren.
+
+### Validierung
+
+Bestanden im Patch-/Deploy-Kontext:
+
+- JS-Syntaxchecks fuer die betroffenen Frontend-Dateien.
+- Python-Compile-Checks fuer Content-/Highlight-Audit-Skripte.
+- `data/offers.json` JSON-valid.
+- `python3 scripts/audit-activity-highlights.py --scope full` bestanden.
+- Audit-Datenstand nach Content Batch 01:
+  - `seasonal_highlights=10`
+  - `stable=6`
+  - `condition_sensitive=4`
+  - `condition_currently_playable=0`
+  - `blocked=1`
+  - `unknown=3`
+
+### Bewusste Grenzen
+
+- Die eingebaute Logik ist ein Sicherheits-/Ausspiel-Gate, kein bereits bewiesener automatischer Badegewaesser-Statusabruf.
+- Die Content-Pruefung erkennt fehlende, alte oder unklare Statusdaten und verhindert dadurch falsche Ausspielung.
+- Die Content-Pruefung recherchiert derzeit noch nicht belastbar automatisch externe Badegewaesserquellen und setzt daraus nicht selbststaendig `ok`, `watch`, `blocked` oder `unknown`.
+- Bade-/Wasser-Highlights bleiben ohne frische positive Statusquelle unsichtbar.
+- Frontend fragt keine Live-News ab; ausgespielt werden nur gepruefte Repo-/Contentdaten.
+
+### Abschlussbewertung
+
+Das Workpack `Seasonal Activity Highlights V1` ist fuer den aktuellen Staging-Stand abgeschlossen.
+
+Abgeschlossen sind:
+
+- Systemlogik fuer saisonale Activity-Highlights.
+- Status-/Blockerlogik fuer zustandsabhaengige Highlights.
+- Aktivitaetenseiten-Filter und Card-/Detailpanel-Ausweisung.
+- Content Batch 01 mit konservativ geprueften Zusatzhighlights.
+- Home-Rotationshaertung gegen monotone saisonale Toplisten.
+
+### Keine aktiven Folgepflichten aus diesem Workpack
+
+- Kein geplanter Massen-`Content Batch 02` als naechster Pflichtschritt.
+- Weitere saisonale Highlights nur bei neuem konkretem Quellenfund oder bewusstem spaeterem Rechercheauftrag.
+- Zusaetzliche Highlights nur mit belastbarer Quelle und klarer Aktivierungslogik.
+
+### Optionaler naechster Pruefpunkt: Badegewaesser Status Proof
+
+Bevor Bade-/Wasser-Highlights automatisch aktiviert werden, soll zuerst ein separater Proof klaeren, ob offizielle Statusquellen fuer die relevanten Badestellen robust auslesbar sind:
+
+- `aasee-erleben`
+- `hilgelo-erleben`
+- `proebstingsee-borken-erleben`
+- `auesee-wesel-erleben`
+
+Ziel des Proofs:
+
+- offizielle Statusquelle abrufen,
+- Status eindeutig auf `ok`, `watch`, `blocked` oder `unknown` mappen,
+- Aktualitaet bzw. Pruefstand erkennen,
+- Fehler- und Unsicherheitsfaelle konservativ auf `unknown` oder `blocked` fallen lassen,
+- erst danach entscheiden, ob ein taeglicher Badegewaesser-Status-Guard technisch operationalisiert wird.
+
+Bis dieser Proof bestanden ist, bleibt die aktuelle sichere Regel verbindlich:
+
+- Keine Badeempfehlung ohne frische positive Statusquelle.
+- `unknown`, `watch` und `blocked` erzeugen keinen Chip, keinen Boost und keinen `Jetzt besonders`-Treffer.
+<!-- === END BLOCK: TEST_STATUS_SEASONAL_ACTIVITY_HIGHLIGHTS_V1_DONE_2026_06_26 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_INBOX_CONTENT_AUTOMATION_ROUTING_FREEZE_2026_06_26 | Zweck: dokumentiert den eingefrorenen Staging-Stand fuer Content-Automation-Routing und mobile Inbox-Nutzung; Umfang: Prozessentscheid, Validierung, offene Live-Nutzungsbeobachtung === -->
+## Inbox / Content-Automation-Routing – Mobile-Arbeitsstand eingefroren (2026-06-26)
+
+Status: Staging-Deployment gruen; UI-/Prozessstand wird vorerst eingefroren und im Alltag mobil genutzt.
+
+### Eingefrorener Zielzustand
+
+- Die private `/inbox/` bleibt die zentrale Arbeitsansicht fuer:
+  1. neue Event-Kandidaten,
+  2. echte manuelle Content-Prueffaelle.
+- Die Inbox ist mobile-first zu bewerten, weil sie primaer am Smartphone genutzt wird.
+- Die normale Content-Pruefung soll keine technische Vollfehlerliste sein, sondern eine Ausnahme-Queue:
+  - nur Faelle anzeigen, bei denen der Nutzer wirklich entscheiden, bestaetigen oder korrigieren muss,
+  - keine reinen Visual-/Premium-Backlog-Hinweise als manuelle Sofortaktion anzeigen.
+- Activity-Faelle wie `visual_key fehlt`, bei denen die Activity sonst nutzbar ist und nur ein Premium-Visual-Pool bzw. neues Bild fehlt, werden als Visual-Backlog aggregiert statt in der normalen Content-Inbox angezeigt.
+- Beispielentscheid: `Buergerpark Rhede` soll nicht als normale Content-Aktion erscheinen, sondern in `Content_Visual_Feedback(_Staging)` bzw. im Visual-Backlog gesammelt werden.
+- Ticketportal-als-Primärquelle-Faelle bleiben echte Content-Prueffaelle, wenn eine offizielle Quelle vorgeschlagen wurde:
+  - Ticketportal oeffnen nur zur Identifikation,
+  - offizielle Quelle pruefen,
+  - bei Uebereinstimmung offizielle Quelle uebernehmen,
+  - Ticketportal nur bewusst behalten, wenn keine bessere Quelle nutzbar ist.
+
+### UI-Stand
+
+- Tabs zeigen Counts direkt: `Neue Events (x)` und `Content-Pruefung (x)`.
+- Erklaerende Zwischenbloecke wurden entfernt.
+- Content-Karten wurden fuer Mobile verdichtet:
+  - weniger sichtbarer Fliesstext,
+  - technische Issue-Codes nicht prominent,
+  - Quellencheck gekuerzt,
+  - Eventdaten-Korrekturfelder bei Quellenfaellen eingeklappt,
+  - Hauptaktion steht vor Navigation.
+- Technische Pruefdaten/Arbeitspakete bleiben nicht Teil der normalen Arbeitsansicht; Debug-/Diagnosezugriff bleibt separat.
+
+### Geprueft
+
+- Deployment nach Content-Automation-Routing und UI-Polish war gruen.
+- Nach Routing-Patch sank die sichtbare Content-Pruefung von vorherigen Visual-Key-Pflichtfeldfaellen auf echte manuelle Faelle.
+- Ticketportal-Fall `Borken Open Air - ABBA Gold The Concert Show` wurde in der Inbox als echter manueller Quellenfall sichtbar und UI-seitig auf `Offizielle Quelle uebernehmen` gefuehrt.
+- Mobile-Screenshots zeigten noch zu viel vertikale Hoehe; daraufhin wurde der mobile Kompaktstand als aktueller Arbeitsstand erstellt.
+
+### Noch beobachten, nicht sofort neu umbauen
+
+- Der Nutzer arbeitet jetzt zunaechst mit diesem Stand.
+- Weitere UI-Aenderungen erst nach realer mobiler Nutzung und konkreten Screenshots/Faellen.
+- Besonders beobachten:
+  - ob `Offizielle Quelle uebernehmen` Faelle sauber verschwinden,
+  - ob Counts nach Aktionen stabil sinken,
+  - ob reine Visual-Gaps dauerhaft aus der normalen Content-Pruefung herausbleiben,
+  - ob `Content_Visual_Feedback(_Staging)` die Visual-/Bildbedarfe ausreichend aggregiert.
+<!-- === END BLOCK: TEST_STATUS_INBOX_CONTENT_AUTOMATION_ROUTING_FREEZE_2026_06_26 === -->
+
 <!-- === BEGIN FILE: TEST_STATUS.md | Zweck: kanonisches Test- und Freigabeprotokoll für geprüfte Funktionen im Projekt „Bocholt erleben“; Umfang: Staging-/Live-Teststände, bestandene Smoke-Tests, offene Regressionen === -->
 
 # TEST STATUS — BOCHOLT ERLEBEN

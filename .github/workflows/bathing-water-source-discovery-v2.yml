@@ -1,0 +1,85 @@
+# === BEGIN FILE: .github/workflows/bathing-water-source-discovery-v2.yml | Zweck: tiefer Discovery-Proof fuer aktuelle Badegewaesser-Statusquellen; Umfang: kein Deploy, kein Daten-/Sheet-Writeback ===
+name: Bathing Water Source Discovery V2
+
+on:
+  workflow_dispatch:
+    inputs:
+      min_usable_activity_groups:
+        description: "Minimum usable activity groups before designing a guard workflow"
+        required: false
+        default: "3"
+      skip_browser:
+        description: "Skip Playwright browser discovery and run static discovery only"
+        required: false
+        default: "false"
+  push:
+    branches:
+      - staging
+    paths:
+      - ".github/workflows/bathing-water-source-discovery-v2.yml"
+      - "scripts/discover-bathing-water-sources-v2.py"
+      - "BATHING_WATER_SOURCE_DISCOVERY_V2.md"
+
+permissions:
+  contents: read
+
+jobs:
+  source_discovery_v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install browser tooling
+        if: ${{ github.event.inputs.skip_browser != 'true' }}
+        shell: bash
+        run: |
+          set -e
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Run source discovery V2
+        shell: bash
+        env:
+          MIN_USABLE_ACTIVITY_GROUPS: ${{ github.event.inputs.min_usable_activity_groups || '3' }}
+          SKIP_BROWSER: ${{ github.event.inputs.skip_browser || 'false' }}
+        run: |
+          set -e
+          extra_args=""
+          if [ "${SKIP_BROWSER}" = "true" ]; then
+            extra_args="--skip-browser"
+          fi
+          python scripts/discover-bathing-water-sources-v2.py \
+            --min-usable-activity-groups "${MIN_USABLE_ACTIVITY_GROUPS}" \
+            --output tmp/bathing-water-source-discovery-v2.json \
+            --markdown tmp/bathing-water-source-discovery-v2.md \
+            ${extra_args}
+
+      - name: Add proof summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f tmp/bathing-water-source-discovery-v2.md ]; then
+            cat tmp/bathing-water-source-discovery-v2.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Bathing water source discovery V2 did not produce a summary." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload discovery artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bathing-water-source-discovery-v2
+          path: |
+            tmp/bathing-water-source-discovery-v2.json
+            tmp/bathing-water-source-discovery-v2.md
+          if-no-files-found: warn
+# === END FILE: .github/workflows/bathing-water-source-discovery-v2.yml ===

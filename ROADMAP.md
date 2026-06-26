@@ -1,3 +1,51 @@
+<!-- === BEGIN BLOCK: ROADMAP_INBOX_CONTENT_AUTOMATION_ROUTING_FREEZE_2026_06_26 | Zweck: setzt den aktuellen Inbox-/Content-Quality-Fortsetzungspunkt nach Mobile-Kompaktfreeze; Umfang: naechste Arbeit erst nach echter Nutzung, keine sofortige neue UI-Runde === -->
+## Inbox / Content-Pruefung – Mobile-Kompaktstand eingefroren, echte Nutzung abwarten (2026-06-26)
+
+Status: aktueller Arbeitsstand eingefroren.
+
+### Aktuelle Prozessentscheidung
+
+Die Content-Pruefung wird als automatisierter Kreislauf gefuehrt:
+
+`Audit -> Vorentscheidung/Routing -> nur echte Ausnahmefaelle in Inbox -> strukturierte Rueckmeldung -> bessere KI-Suche und weniger Wiederholfehler`.
+
+Die Inbox soll nicht alle Warnungen anzeigen. Sie soll nur Faelle zeigen, in denen der Nutzer wirklich gebraucht wird.
+
+### Routing-Regeln fuer den eingefrorenen Stand
+
+- Neue Event-Kandidaten bleiben in `Neue Events`.
+- Echte Quellen-/Fakten-/Korrekturentscheidungen bleiben in `Content-Pruefung`.
+- Reine Activity-Visual-Gaps werden nicht als normale Content-Aktion behandelt, sondern aggregiert in den Visual-Backlog bzw. `Content_Visual_Feedback(_Staging)` gegeben.
+- Beispiel: `Buergerpark Rhede` mit fehlendem `visual_key`, aber nutzbarer Activity und vorhandener Quelle/Bildbasis, ist kein manueller Sofortfall.
+- Ticketportal als primaere Eventquelle ist ein manueller Fall, wenn eine offizielle Quelle vorgeschlagen wird; Normalaktion ist `Offizielle Quelle uebernehmen`.
+
+### UX-Regel
+
+Mobile ist die fuehrende Nutzungsrealitaet fuer die Inbox.
+
+Daher gilt fuer weitere Inbox-Arbeiten:
+
+- keine langen Erklaertexte,
+- keine technischen Pflichtlisten im normalen Flow,
+- keine gleichrangigen Spezialaktionen, wenn es eine klare Hauptaktion gibt,
+- Counts direkt in den Tabs,
+- Hilfe nur kurz, kontextuell und moeglichst ueber Label/Title/Status,
+- technische Details nur fuer Debug/Diagnose.
+
+### Naechster Schritt
+
+Kein weiterer Umbau sofort.
+
+Erst nach realer Nutzung sammeln:
+
+1. Screenshot eines verbleibenden unklaren Content-Falls,
+2. erwartete Aktion aus Nutzersicht,
+3. tatsaechlich angebotene Aktionen,
+4. ob der Fall automatisch, Backlog oder manuell sein sollte.
+
+Dann gezielt nachschaerfen.
+<!-- === END BLOCK: ROADMAP_INBOX_CONTENT_AUTOMATION_ROUTING_FREEZE_2026_06_26 === -->
+
 # ROADMAP — BOCHOLT ERLEBEN
 
 <!-- === BEGIN CANONICAL ROADMAP FILE: Tactical prioritized backlog only === -->

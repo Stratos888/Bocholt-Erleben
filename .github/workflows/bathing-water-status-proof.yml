@@ -1,0 +1,66 @@
+# === BEGIN FILE: .github/workflows/bathing-water-status-proof.yml | Zweck: prueft externe Badegewaesser-Statusquellen als Machbarkeits-Proof; Umfang: kein Deploy, keine Daten-/Sheet-Schreibzugriffe ===
+name: Bathing Water Status Proof
+
+on:
+  workflow_dispatch:
+    inputs:
+      min_usable_activity_groups:
+        description: "Minimum usable activity groups before operationalization is recommended"
+        required: false
+        default: "3"
+  push:
+    branches:
+      - staging
+    paths:
+      - ".github/workflows/bathing-water-status-proof.yml"
+      - "scripts/check-bathing-water-status-proof.py"
+      - "BATHING_WATER_STATUS_PROOF.md"
+
+permissions:
+  contents: read
+
+jobs:
+  bathing_water_status_proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run bathing water status proof
+        shell: bash
+        env:
+          MIN_USABLE_ACTIVITY_GROUPS: ${{ github.event.inputs.min_usable_activity_groups || '3' }}
+        run: |
+          set -e
+          python scripts/check-bathing-water-status-proof.py \
+            --min-usable-activity-groups "${MIN_USABLE_ACTIVITY_GROUPS}" \
+            --output tmp/bathing-water-status-proof.json \
+            --markdown tmp/bathing-water-status-proof.md
+
+      - name: Add proof summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f tmp/bathing-water-status-proof.md ]; then
+            cat tmp/bathing-water-status-proof.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Bathing water status proof did not produce a summary." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bathing-water-status-proof
+          path: |
+            tmp/bathing-water-status-proof.json
+            tmp/bathing-water-status-proof.md
+          if-no-files-found: warn
+# === END FILE: .github/workflows/bathing-water-status-proof.yml ===
