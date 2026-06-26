@@ -1,4 +1,4 @@
-<!-- === BEGIN BLOCK: TEST_STATUS_SEASONAL_ACTIVITY_HIGHLIGHTS_V1_DONE_2026_06_26 | Zweck: dokumentiert Abschluss des Workpacks Seasonal Activity Highlights V1 inklusive Content Batch 01, Bade-/Status-Gate und Home-Rotationshaertung; Umfang: Staging-Deploy, fachlicher Smoke, Datenstand und bewusste Folgeregeln === -->
+<!-- === BEGIN BLOCK: TEST_STATUS_SEASONAL_ACTIVITY_HIGHLIGHTS_V1_DONE_2026_06_26 | Zweck: dokumentiert Abschluss des Workpacks Seasonal Activity Highlights V1 inklusive Content Batch 01, Bade-/Status-Gate und Home-Rotationshaertung; Umfang: Staging-Deploy, fachlicher Smoke, Datenstand, bewusste Grenzen und Folge-Proof statt unbewiesener Automatisierung === -->
 ## Seasonal Activity Highlights V1 + Content Batch 01 – abgeschlossen (2026-06-26)
 
 Status: auf Staging eingebracht, deployed und fachlich per Smoke-Test bestaetigt.
@@ -71,13 +71,12 @@ Bestanden im Patch-/Deploy-Kontext:
   - `blocked=1`
   - `unknown=3`
 
-### Bewusste Produkt- und Prozessregeln
+### Bewusste Grenzen
 
-- Ein Saisonfenster allein reicht nicht fuer Badeempfehlungen.
-- Bade-/Wasser-Highlights brauchen aktuelle positive Statusdaten aus offizieller oder vergleichbar belastbarer Quelle.
-- Presse-/News-Hinweise koennen als Negativsignal blockieren, aber nicht allein positiv freigeben.
-- `blocked` und `unknown` schlagen immer das Saisonfenster.
-- Content-Pruefung soll zustandsabhaengige Highlights wie Badeseen taeglich bzw. saisonal eng pruefen, aber nur echte Handlungsfaelle in die Inbox bringen.
+- Die eingebaute Logik ist ein Sicherheits-/Ausspiel-Gate, kein bereits bewiesener automatischer Badegewaesser-Statusabruf.
+- Die Content-Pruefung erkennt fehlende, alte oder unklare Statusdaten und verhindert dadurch falsche Ausspielung.
+- Die Content-Pruefung recherchiert derzeit noch nicht belastbar automatisch externe Badegewaesserquellen und setzt daraus nicht selbststaendig `ok`, `watch`, `blocked` oder `unknown`.
+- Bade-/Wasser-Highlights bleiben ohne frische positive Statusquelle unsichtbar.
 - Frontend fragt keine Live-News ab; ausgespielt werden nur gepruefte Repo-/Contentdaten.
 
 ### Abschlussbewertung
@@ -92,11 +91,33 @@ Abgeschlossen sind:
 - Content Batch 01 mit konservativ geprueften Zusatzhighlights.
 - Home-Rotationshaertung gegen monotone saisonale Toplisten.
 
-Weitere Arbeit nur als separater Folgeworkpack:
+### Keine aktiven Folgepflichten aus diesem Workpack
 
-- Content Batch 02 nach erneuter quellenbasierter Recherche.
-- Operationalisierung/Automatisierung des taeglichen Badegewaesser-Status-Guards.
-- Zusätzliche Highlights nur mit belastbarer Quelle und klarer Aktivierungslogik.
+- Kein geplanter Massen-`Content Batch 02` als naechster Pflichtschritt.
+- Weitere saisonale Highlights nur bei neuem konkretem Quellenfund oder bewusstem spaeterem Rechercheauftrag.
+- Zusaetzliche Highlights nur mit belastbarer Quelle und klarer Aktivierungslogik.
+
+### Optionaler naechster Pruefpunkt: Badegewaesser Status Proof
+
+Bevor Bade-/Wasser-Highlights automatisch aktiviert werden, soll zuerst ein separater Proof klaeren, ob offizielle Statusquellen fuer die relevanten Badestellen robust auslesbar sind:
+
+- `aasee-erleben`
+- `hilgelo-erleben`
+- `proebstingsee-borken-erleben`
+- `auesee-wesel-erleben`
+
+Ziel des Proofs:
+
+- offizielle Statusquelle abrufen,
+- Status eindeutig auf `ok`, `watch`, `blocked` oder `unknown` mappen,
+- Aktualitaet bzw. Pruefstand erkennen,
+- Fehler- und Unsicherheitsfaelle konservativ auf `unknown` oder `blocked` fallen lassen,
+- erst danach entscheiden, ob ein taeglicher Badegewaesser-Status-Guard technisch operationalisiert wird.
+
+Bis dieser Proof bestanden ist, bleibt die aktuelle sichere Regel verbindlich:
+
+- Keine Badeempfehlung ohne frische positive Statusquelle.
+- `unknown`, `watch` und `blocked` erzeugen keinen Chip, keinen Boost und keinen `Jetzt besonders`-Treffer.
 <!-- === END BLOCK: TEST_STATUS_SEASONAL_ACTIVITY_HIGHLIGHTS_V1_DONE_2026_06_26 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_INBOX_CONTENT_AUTOMATION_ROUTING_FREEZE_2026_06_26 | Zweck: dokumentiert den eingefrorenen Staging-Stand fuer Content-Automation-Routing und mobile Inbox-Nutzung; Umfang: Prozessentscheid, Validierung, offene Live-Nutzungsbeobachtung === -->
