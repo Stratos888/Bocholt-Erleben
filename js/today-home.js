@@ -386,25 +386,11 @@
   ]);
 
   function eventVisualKey(item) {
-    return asString(
-      item?.visualKey ||
-      item?.visual_key ||
-      item?.image_visual_key ||
-      item?.raw?.visual_key ||
-      item?.raw?.image_visual_key ||
-      ""
-    );
+    return asString(item?.visualKey || item?.visual_key || item?.image_visual_key);
   }
 
   function eventVisualMotif(item) {
-    return asString(
-      item?.visualMotif ||
-      item?.visual_motif ||
-      item?.image_visual_motif ||
-      item?.raw?.visual_motif ||
-      item?.raw?.image_visual_motif ||
-      ""
-    );
+    return asString(item?.visualMotif || item?.visual_motif || item?.image_visual_motif);
   }
 
   function isFallbackEventVisual(visual) {
@@ -465,28 +451,6 @@
       if (visual) return visual;
     }
 
-    if (item?.type === "event") {
-      const visualKey = eventVisualKey(item);
-      const visualMotif = eventVisualMotif(item);
-      const pool = visualKey ? state.eventVisualPools[visualKey] : null;
-      const candidatePool = eventVisualCandidatePool(pool, visualMotif);
-
-      const pooledVisual = selectVisualFromPool(
-        candidatePool,
-        [
-          asString(item.id),
-          asString(item.date),
-          asString(item.endDate),
-          asString(item.title),
-          visualKey,
-          visualMotif
-        ].join("|"),
-        usedImages
-      );
-
-      if (pooledVisual) return pooledVisual;
-    }
-
     const ownImage = normalizeUrl(item?.image);
     if (ownImage) {
       if (usedImages) usedImages.add(ownImage);
@@ -496,7 +460,27 @@
       });
     }
 
-    return null;
+    if (item?.type !== "event") {
+      return null;
+    }
+
+    const visualKey = eventVisualKey(item);
+    const visualMotif = eventVisualMotif(item);
+    const pool = visualKey ? state.eventVisualPools[visualKey] : null;
+    const candidatePool = eventVisualCandidatePool(pool, visualMotif);
+
+    return selectVisualFromPool(
+      candidatePool,
+      [
+        asString(item.id),
+        asString(item.date),
+        asString(item.endDate),
+        asString(item.title),
+        visualKey,
+        visualMotif
+      ].join("|"),
+      usedImages
+    );
   }
 
   function resolveItemImage(item, usedImages) {
@@ -838,41 +822,86 @@
     return "sonstige";
   }
 
-  /* === BEGIN BLOCK: TODAY_ACTIVITY_SEASONAL_HIGHLIGHT_CURATION_V1 | Zweck: laesst belegte saisonale Highlights die Activity-Spur sichtbar beeinflussen, ohne Region/Vielfalt komplett zu uebersteuern === */
-  function hasActiveActivityHighlight(item) {
+  /* === BEGIN BLOCK: TODAY_ACTIVITY_SEASONAL_HIGHLIGHT_CURATION_V2 | Zweck: haertet Home-Curation gegen monotone Seasonal-Highlight-Listen; Umfang: taegliche Rotation, maximal 2 Seasonal-Activities bzw. 1 bei Event-Mix, mindestens ein normaler Activity-Tipp wenn verfuegbar === */
+  function hasActiveActivityHighlight(item, context = {}) {
     if (item?.type !== "activity") return false;
-    return !!window.BEActivityHighlights?.getPrimaryActiveHighlight?.(item.raw || item, { now: new Date(), surface: "home" });
+
+    const now = context?.now instanceof Date ? context.now : new Date();
+    return !!window.BEActivityHighlights?.getPrimaryActiveHighlight?.(item.raw || item, {
+      now,
+      surface: "home"
+    });
   }
 
-  function compareActivityCandidates(a, b) {
-    const highlightDiff = Number(hasActiveActivityHighlight(b)) - Number(hasActiveActivityHighlight(a));
-    if (highlightDiff) return highlightDiff;
+  function dailyActivityRotationRank(item, context = {}) {
+    const key = rotationKey(context?.now || new Date());
+    return stableHash(`${key}:today-home-activity:${itemKey(item)}`) % 1000;
+  }
 
+  function compareActivityCandidates(a, b, context = {}) {
+    const aHighlight = hasActiveActivityHighlight(a, context);
+    const bHighlight = hasActiveActivityHighlight(b, context);
     const scoreDiff = todayScore(b) - todayScore(a);
-    if (Math.abs(scoreDiff) >= 10) return scoreDiff;
+
+    if (Math.abs(scoreDiff) >= 18) return scoreDiff;
+
+    if (aHighlight === bHighlight) {
+      const rotationDiff = dailyActivityRotationRank(a, context) - dailyActivityRotationRank(b, context);
+      if (rotationDiff) return rotationDiff;
+    }
+
+    if (Math.abs(scoreDiff) >= 8) return scoreDiff;
 
     const regionDiff = activityRegionRank(a) - activityRegionRank(b);
     if (regionDiff) return regionDiff;
 
     return compareTodayItems(a, b);
   }
-  /* === END BLOCK: TODAY_ACTIVITY_SEASONAL_HIGHLIGHT_CURATION_V1 === */
 
-  function selectDiverseActivities(items, limit) {
+  function seasonalHomeLimit(limit, hasNonHighlightCandidate) {
+    if (!hasNonHighlightCandidate) return limit;
+    return limit <= 2 ? 1 : 2;
+  }
+  /* === END BLOCK: TODAY_ACTIVITY_SEASONAL_HIGHLIGHT_CURATION_V2 === */
+
+  function selectDiverseActivities(items, limit, context = {}) {
     const candidates = Array.isArray(items) ? items : [];
     const selected = [];
     const selectedKeys = new Set();
     const usedRegions = new Set();
     const usedThemes = new Set();
+    const hasNonHighlightCandidate = candidates.some((item) => !hasActiveActivityHighlight(item, context));
+    const maxSeasonalHighlights = seasonalHomeLimit(limit, hasNonHighlightCandidate);
+    let selectedSeasonalHighlights = 0;
+    let selectedNonHighlights = 0;
 
     const tryAdd = (item) => {
       const key = itemKey(item);
       if (!item || selectedKeys.has(key) || selected.length >= limit) return false;
 
+      const isSeasonalHighlight = hasActiveActivityHighlight(item, context);
+      if (isSeasonalHighlight && selectedSeasonalHighlights >= maxSeasonalHighlights) return false;
+
+      if (
+        isSeasonalHighlight &&
+        hasNonHighlightCandidate &&
+        selectedNonHighlights === 0 &&
+        selected.length >= limit - 1
+      ) {
+        return false;
+      }
+
       selected.push(item);
       selectedKeys.add(key);
       usedRegions.add(activityRegionBucket(item));
       usedThemes.add(activityThemeBucket(item));
+
+      if (isSeasonalHighlight) {
+        selectedSeasonalHighlights += 1;
+      } else {
+        selectedNonHighlights += 1;
+      }
+
       return true;
     };
 
@@ -889,6 +918,14 @@
       });
     });
 
+    if (selected.length < limit) {
+      candidates.forEach((item) => {
+        if (selected.length < limit) {
+          tryAdd(item);
+        }
+      });
+    }
+
     return selected;
   }
 
@@ -900,14 +937,14 @@
     const activityLane = addDailyRotation(
       cleaned.filter((item) => item.type !== "event" && hasAllowedActivityVisual(item)).slice(0, 32),
       context
-    ).sort(compareActivityCandidates);
+    ).sort((a, b) => compareActivityCandidates(a, b, context));
 
     const eventLane = addDailyRotation(
       cleaned.filter((item) => isTodayEventCandidate(item, now) && todayScore(item) > 0),
       context
     ).sort(compareEventCandidates);
 
-    const selectedActivities = selectDiverseActivities(activityLane, eventLane.length ? 2 : 3);
+    const selectedActivities = selectDiverseActivities(activityLane, eventLane.length ? 2 : 3, context);
     const selectedEvent = eventLane[0] || null;
     const selected = selectedEvent
       ? [...selectedActivities, selectedEvent]
