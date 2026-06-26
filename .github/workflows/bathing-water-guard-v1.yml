@@ -1,4 +1,4 @@
-name: Bathing Water Guard V1
+name: Bathing Water Guard V2
 
 on:
   workflow_dispatch:
@@ -16,31 +16,37 @@ on:
         required: false
         default: ""
   schedule:
-    # Daily during the usual bathing season. The script itself remains conservative
-    # and never writes product data.
+    # Daily during the usual bathing season. On the default branch this writes a
+    # generated frontend status file, but never edits redactional offers.json.
     - cron: "17 5 * 5-9 *"
   push:
     paths:
       - "scripts/check-bathing-water-status.py"
       - ".github/workflows/bathing-water-guard-v1.yml"
       - "BATHING_WATER_GUARD_V1.md"
+      - "ACTIVITY_SEASONAL_HIGHLIGHTS.md"
+      - "js/activity-highlights.js"
+      - "js/offers-main.js"
+      - "js/today-home.js"
 
 permissions:
-  contents: read
+  contents: write
 
 defaults:
   run:
     shell: bash
 
 jobs:
-  guard-report:
-    name: Build report-only bathing water guard artifact
+  guard-status:
+    name: Build bathing water status and safe frontend writeback
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -50,14 +56,15 @@ jobs:
       - name: Compile guard script
         run: python3 -m py_compile scripts/check-bathing-water-status.py
 
-      - name: Run bathing water guard V1
+      - name: Run bathing water guard V2
         run: |
-          mkdir -p artifacts/bathing-water-guard-v1
+          mkdir -p artifacts/bathing-water-guard-v2
           args=(
             --max-measurement-age-days "${{ github.event.inputs.max_measurement_age_days || '45' }}"
             --warn-measurement-age-days "${{ github.event.inputs.warn_measurement_age_days || '35' }}"
-            --out-json artifacts/bathing-water-guard-v1/bathing-water-status-guard.json
-            --out-md artifacts/bathing-water-guard-v1/bathing-water-status-guard.md
+            --out-json artifacts/bathing-water-guard-v2/bathing-water-status-guard.json
+            --out-md artifacts/bathing-water-guard-v2/bathing-water-status-guard.md
+            --write-data data/bathing_water_status.json
           )
           if [ -n "${{ github.event.inputs.guard_date || '' }}" ]; then
             args+=(--today "${{ github.event.inputs.guard_date }}")
@@ -67,6 +74,21 @@ jobs:
       - name: Upload guard artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bathing-water-guard-v1
-          path: artifacts/bathing-water-guard-v1/
+          name: bathing-water-guard-v2
+          path: artifacts/bathing-water-guard-v2/
           if-no-files-found: error
+
+      - name: Commit generated frontend status file when changed
+        if: github.event_name != 'pull_request'
+        run: |
+          set -e
+          if git diff --quiet -- data/bathing_water_status.json; then
+            echo "No bathing-water status data change."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/bathing_water_status.json
+          git commit -m "Aktualisiere Badegewaesser-Status"
+          git push
