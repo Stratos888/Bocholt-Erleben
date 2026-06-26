@@ -12,6 +12,7 @@ const OffersApp = {
   filteredOffers: [],
   searchTerm: "",
   activeFilters: {
+    seasonal: new Set(),
     situation: new Set(),
     proximity: new Set(),
     activity_type: new Set(),
@@ -20,10 +21,15 @@ const OffersApp = {
   },
 
   /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V1 | Zweck: definiert eine einheitliche Nutzerlogik: jeder weitere Filter verengt die Treffer; Ort/Nähe blockiert dabei parallele Alternativen, damit Schnellfilter nicht wie OR-Wechsel wirken; Umfang: Filterreihenfolge, Exklusivgruppen und Filtergruppen-Konfiguration === */
-  filterGroupOrder: ["proximity", "situation", "activity_type", "features", "effort"],
+  filterGroupOrder: ["seasonal", "proximity", "situation", "activity_type", "features", "effort"],
   exclusiveFilterGroups: new Set(["proximity"]),
 
   filterGroups: Object.freeze({
+    seasonal: Object.freeze({
+      label: "Jetzt",
+      mode: "all",
+      options: Object.freeze(["Jetzt besonders"])
+    }),
     proximity: Object.freeze({
       label: "Ort / Nähe",
       mode: "all",
@@ -298,6 +304,9 @@ const OffersApp = {
       mode: String(obj.mode || "").trim(),
       price: String(obj.price || "").trim(),
       season: String(obj.season || "").trim(),
+      seasonal_highlights: Array.isArray(obj.seasonal_highlights)
+        ? obj.seasonal_highlights
+        : [],
       opening_status: obj.opening_status && typeof obj.opening_status === "object"
         ? obj.opening_status
         : null,
@@ -319,6 +328,7 @@ const OffersApp = {
       offer.mode,
       offer.price,
       offer.season,
+      ...(window.BEActivityHighlights?.getSearchTerms?.(offer) || []),
       ...offer.tags,
       ...offer.filter_tags,
       ...offer.audience,
@@ -551,6 +561,13 @@ const OffersApp = {
   matchesFilterGroup(offer, group, activeValues = this.getActiveValues(group)) {
     if (!activeValues.length) return true;
 
+    if (group === "seasonal") {
+      return activeValues.every((value) => {
+        if (value !== "Jetzt besonders") return false;
+        return window.BEActivityHighlights?.hasActiveHighlight?.(offer) === true;
+      });
+    }
+
     const available = new Set(this.getOfferFilterValues(offer, group));
     return activeValues.every((value) => available.has(value));
   },
@@ -604,9 +621,18 @@ const OffersApp = {
   rankOffer(offer) {
     let score = 0;
 
+    score += window.BEActivityHighlights?.getScoreAdjustment?.(offer, { mode: "activity" }) || 0;
+
     this.filterGroupOrder.forEach((group) => {
       const activeValues = this.getActiveValues(group);
       if (!activeValues.length) return;
+
+      if (group === "seasonal") {
+        if (window.BEActivityHighlights?.hasActiveHighlight?.(offer)) {
+          score += 18;
+        }
+        return;
+      }
 
       const values = new Set(this.getOfferFilterValues(offer, group));
       activeValues.forEach((value) => {
@@ -628,6 +654,7 @@ const OffersApp = {
 
     const visibleValueCount = [
       ...(offer.tags || []),
+      ...(offer.seasonal_highlights || []),
       ...(offer.cardFacts || []),
       ...this.filterGroupOrder.flatMap((group) => this.getOfferFilterValues(offer, group))
     ].filter(Boolean).length;
@@ -647,6 +674,11 @@ const OffersApp = {
 
   /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_LABELS_ENTERPRISE_V1 | Zweck: übersetzt aktive Filterwerte in verständliche Card-Merkmale, damit Ergebnis-Cards ihre Passung für Nutzer nachvollziehbar erklären; Umfang: ersetzt nur getActiveMatchLabels() und ergänzt lokalen Label-Mapper === */
   getCardMatchLabel(offer, group, value) {
+    if (group === "seasonal" && value === "Jetzt besonders") {
+      const highlight = window.BEActivityHighlights?.getPrimaryHighlight?.(offer);
+      return highlight?.shortLabel ? `Jetzt: ${highlight.shortLabel}` : "Jetzt besonders";
+    }
+
     const normalizedTags = new Set(this.normalizeArray(offer?.tags));
     const normalizedFacts = new Set(this.normalizeArray(offer?.cardFacts));
 
@@ -681,7 +713,7 @@ const OffersApp = {
   },
 
   getActiveMatchLabels(offer) {
-    const orderedGroups = ["situation", "features", "proximity", "activity_type", "effort"];
+    const orderedGroups = ["seasonal", "situation", "features", "proximity", "activity_type", "effort"];
     const labels = [];
     const seen = new Set();
 
@@ -704,8 +736,11 @@ const OffersApp = {
   /* === END BLOCK: ACTIVITIES_CARD_MATCH_LABELS_ENTERPRISE_V1 === */
 
   withRenderedMatchContext(offer) {
+    const activeHighlight = window.BEActivityHighlights?.getPrimaryHighlight?.(offer) || null;
+
     return {
       ...offer,
+      activeHighlight,
       activeMatchLabels: this.getActiveMatchLabels(offer)
     };
   },
@@ -754,6 +789,11 @@ const OffersApp = {
       const isExclusiveBlocked = this.isBlockedByActiveExclusiveGroup(group, value);
       const count = this.countProjectedMatches(group, value);
       const disabled = !isActive && (isExclusiveBlocked || count === 0);
+      if (group === "seasonal") {
+        button.hidden = !isActive && count === 0;
+      } else {
+        button.hidden = false;
+      }
       const countLabel = count === 1 ? "1 Aktivität" : `${count} Aktivitäten`;
 
       button.textContent = isActive ? baseLabel : `${baseLabel} (${count})`;

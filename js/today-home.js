@@ -726,8 +726,12 @@
     return Array.isArray(candidatePool) && candidatePool.length > 0;
   }
 
+  /* === BEGIN BLOCK: TODAY_ACTIVITY_VISUAL_POOL_QUALITY_GATE_V2 | Zweck: blockiert Activities mit altem needs_review-Bild nicht mehr, wenn fuer dieselbe Activity ein ready Premium-Visual im Pool existiert; Umfang: ersetzt nur hasAllowedActivityVisual() === */
   function hasAllowedActivityVisual(item) {
     if (item?.type !== "activity") return true;
+
+    const pool = activityVisualPool(item);
+    if (Array.isArray(pool) && pool.length) return true;
 
     const quality = asString(
       item?.imageQuality ||
@@ -738,6 +742,7 @@
 
     return quality !== "needs_review" && quality !== "blocked";
   }
+  /* === END BLOCK: TODAY_ACTIVITY_VISUAL_POOL_QUALITY_GATE_V2 === */
 
   function isTopTipEligible(item, context) {
     return window.OpeningStatus?.isTopTipEligible?.(item, context) !== false;

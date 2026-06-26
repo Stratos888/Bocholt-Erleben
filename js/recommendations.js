@@ -343,6 +343,7 @@
       availability: asString(obj.opening_status?.type || recommendation.availability) || "unknown",
       openingStatus: readObject(obj.opening_status),
       openingHours: readObject(obj.opening_hours),
+      seasonalHighlights: asArray(obj.seasonal_highlights || obj.seasonalHighlights),
       situationTags,
       audienceTags: [],
       interestTags,
@@ -403,6 +404,11 @@
     }
 
     if (item.type === "activity") {
+      const highlight = window.BEActivityHighlights?.getPrimaryHighlight?.(item.raw || item, { now: context.now });
+      if (highlight?.shortLabel) {
+        labels.push(`Jetzt: ${highlight.shortLabel}`);
+      }
+
       asArray(window.OpeningStatus?.buildRecommendationAvailabilityLabels?.(item, context)).forEach((label) => {
         labels.push(label);
       });
@@ -510,6 +516,11 @@
       if (item.availability === "opening_hours_check") score -= 3;
       if (hasAny(item.timeProfile, "short_spontaneous")) score += 7;
       if (context.mode === "weekend" && hasAny(item.timeProfile, "weekend")) score += 14;
+
+      score += window.BEActivityHighlights?.getScoreAdjustment?.(item.raw || item, {
+        now: context.now,
+        mode: "home"
+      }) || 0;
 
       score += window.OpeningStatus?.nonBusinessDayScoreAdjustment?.(item, context) || 0;
     }

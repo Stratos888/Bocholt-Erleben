@@ -108,7 +108,26 @@
           "Spielplatz",
           "Baden"
         ]
-      }
+      },
+      "seasonal_highlights": [
+        {
+          "id": "aasee-badesaison",
+          "type": "water",
+          "label": "Jetzt Badezeit",
+          "short_label": "Badezeit",
+          "starts": "06-01",
+          "ends": "09-30",
+          "peak_starts": "06-15",
+          "peak_ends": "08-31",
+          "confidence": "official_source",
+          "source_url": "https://www.bocholt.de/aasee",
+          "checked_at": "2026-06-25",
+          "valid_until": "2027-06-01",
+          "home_boost": 22,
+          "activity_sort_boost": 9,
+          "public_note": "Saisonale Badestelle am Aasee. Wasserqualität und Hinweise vor Ort prüfen."
+        }
+      ]
     },
     {
       "id": "burloer-venn-entdecken",
@@ -288,7 +307,26 @@
           "Spielplatz",
           "Baden"
         ]
-      }
+      },
+      "seasonal_highlights": [
+        {
+          "id": "hilgelo-zwemseizoen",
+          "type": "water",
+          "label": "Jetzt Badesee-Zeit",
+          "short_label": "Badesee-Zeit",
+          "starts": "05-01",
+          "ends": "09-30",
+          "peak_starts": "06-15",
+          "peak_ends": "08-31",
+          "confidence": "official_source",
+          "source_url": "https://www.leisurelands.nl/nl/ontdek-recreatiegebieden-leisurelands/achterhoek/hilgelo/activiteiten-op-hilgelo/naar-het-strand-op-hilgelo/zwemmen-op-hilgelo",
+          "checked_at": "2026-06-25",
+          "valid_until": "2027-05-01",
+          "home_boost": 20,
+          "activity_sort_boost": 8,
+          "public_note": "Offizielle Badestelle; die Wasserqualität wird im Zwemseizoen regelmäßig kontrolliert."
+        }
+      ]
     },
     {
       "id": "textilwerk-bocholt-erleben",
@@ -1498,7 +1536,26 @@
           "Wochenende",
           "Tiere"
         ]
-      }
+      },
+      "seasonal_highlights": [
+        {
+          "id": "zwillbrocker-venn-flamingozeit",
+          "type": "wildlife",
+          "label": "Jetzt gute Flamingo-Zeit",
+          "short_label": "Flamingo-Zeit",
+          "starts": "03-01",
+          "ends": "08-31",
+          "peak_starts": "04-01",
+          "peak_ends": "07-31",
+          "confidence": "verified_stable",
+          "source_url": "https://www.muensterland.com/tourismus/themen/radfahren-muensterland/radrouten-muensterland/flamingoroute/",
+          "checked_at": "2026-06-25",
+          "valid_until": "2027-03-01",
+          "home_boost": 24,
+          "activity_sort_boost": 10,
+          "public_note": "Gute Zeit für Flamingo-Beobachtung; Fernglas mitnehmen und aus Distanz beobachten."
+        }
+      ]
     },
     {
       "id": "korenburgerveen-entdecken",
@@ -1579,7 +1636,26 @@
           "Natur",
           "Wochenende"
         ]
-      }
+      },
+      "seasonal_highlights": [
+        {
+          "id": "korenburgerveen-wollgras-veenpluis",
+          "type": "nature",
+          "label": "Wollgras & Moorzeit",
+          "short_label": "Moorzeit",
+          "starts": "04-01",
+          "ends": "08-31",
+          "peak_starts": "05-01",
+          "peak_ends": "07-31",
+          "confidence": "verified_stable",
+          "source_url": "https://www.natuurmonumenten.nl/natuurgebieden/korenburgerveen",
+          "checked_at": "2026-06-25",
+          "valid_until": "2027-04-01",
+          "home_boost": 16,
+          "activity_sort_boost": 7,
+          "public_note": "Im Frühjahr und Sommer ist das Moor mit Wollgras und Veenpluis besonders interessant."
+        }
+      ]
     },
     {
       "id": "wooldse-veen-entdecken",
@@ -3416,7 +3492,26 @@
           "Wochenende",
           "Wasser"
         ]
-      }
+      },
+      "seasonal_highlights": [
+        {
+          "id": "quellengrundpark-apothekergarten-saison",
+          "type": "nature_culture",
+          "label": "Apothekergarten-Saison",
+          "short_label": "Apothekergarten",
+          "starts": "05-01",
+          "ends": "10-31",
+          "peak_starts": "05-15",
+          "peak_ends": "09-30",
+          "confidence": "verified_stable",
+          "source_url": "https://naturparke-rheinland.lvr.de/de/barrierefreie_angebote/hohe_mark___westmuensterland/borken_weseke_apothekergarten.html",
+          "checked_at": "2026-06-25",
+          "valid_until": "2027-05-01",
+          "home_boost": 14,
+          "activity_sort_boost": 6,
+          "public_note": "Der Quellengrundpark mit Apothekergarten ist in der warmen Jahreszeit besonders interessant."
+        }
+      ]
     },
     {
       "id": "die-berge-hombornquelle-entdecken",
@@ -4044,7 +4139,26 @@
           "Wochenende",
           "Wasser"
         ]
-      }
+      },
+      "seasonal_highlights": [
+        {
+          "id": "witte-venn-heidebluete",
+          "type": "nature",
+          "label": "Heideblüte-Zeit",
+          "short_label": "Heideblüte",
+          "starts": "08-01",
+          "ends": "09-30",
+          "peak_starts": "08-15",
+          "peak_ends": "09-15",
+          "confidence": "verified_stable",
+          "source_url": "https://www.muensterland.com/tourismus/themen/erlebnis-region-muensterland/naturerlebnis/witte-venn/",
+          "checked_at": "2026-06-25",
+          "valid_until": "2027-08-01",
+          "home_boost": 20,
+          "activity_sort_boost": 9,
+          "public_note": "Im August und September ist das Witte Venn wegen der Heideblüte besonders lohnend."
+        }
+      ]
     }
   ]
 }

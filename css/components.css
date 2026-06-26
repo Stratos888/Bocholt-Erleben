@@ -2042,3 +2042,18 @@ body.has-bottom-tabbar{
 /* === END BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V7 === */
 
 /* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_COMPONENTS === */
+
+/* === BEGIN BLOCK: ACTIVITY_SEASONAL_HIGHLIGHT_CARD_CSS_V1 | Zweck: kennzeichnet aktive saisonale Activity-Highlights auf Karten und im Finder ohne neue Erklärflächen; Umfang: Activity-Filterchip + Card-Chips === */
+.page--activities .activity-filter-chip--seasonal{
+  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 18%, rgba(18,34,26,0.08) 82%);
+  background: color-mix(in srgb, var(--brand-green-100, #eaf6db) 68%, white 32%);
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--brand-gold-300, #b69b4c) 12%);
+  font-weight: 820;
+}
+
+.page--activities .activity-card-fact--seasonal{
+  background: color-mix(in srgb, var(--brand-green-100, #eaf6db) 72%, white 28%);
+  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 18%, rgba(18,34,26,0.065) 82%);
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--brand-gold-300, #b69b4c) 12%);
+}
+/* === END BLOCK: ACTIVITY_SEASONAL_HIGHLIGHT_CARD_CSS_V1 === */
