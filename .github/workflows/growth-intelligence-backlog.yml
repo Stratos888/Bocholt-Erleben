@@ -2,6 +2,7 @@
 name: Growth Intelligence Backlog
 
 on:
+  # Wie bei den bestehenden sichtbaren Workflows: Push registriert den Workflow in GitHub Actions.
   push:
     branches: ["main", "staging"]
     paths:
@@ -9,12 +10,11 @@ on:
       - "scripts/growth-intelligence-backlog.py"
       - "docs/GROWTH_INTELLIGENCE_BACKLOG.md"
 
+  # Manuell im GitHub UI startbar (Actions → Workflow → Run workflow).
+  # Bewusst ohne Inputs, damit GitHub den Button genauso wie bei Deploy to STRATO anzeigt.
+  # Branch-Auswahl fuer main/staging kommt automatisch von GitHub.
   workflow_dispatch:
-    inputs:
-      lookback_days:
-        description: "Analysezeitraum in Tagen"
-        required: false
-        default: "30"
+
   schedule:
     # Woechentlich Montagmorgen: nach einer vollen Vorwoche neue Growth-/Acquisition-Hinweise sammeln.
     - cron: "20 5 * * 1"
@@ -50,7 +50,6 @@ jobs:
       - name: Resolve Growth runtime
         shell: bash
         env:
-          INPUT_LOOKBACK_DAYS: ${{ github.event.inputs.lookback_days }}
           LIVE_SHEET_ID: ${{ secrets.LIVE_SHEET_ID }}
           LEGACY_SHEET_ID: ${{ secrets.SHEET_ID }}
         run: |
@@ -61,17 +60,11 @@ jobs:
             exit 1
           fi
 
-          LOOKBACK_DAYS="${INPUT_LOOKBACK_DAYS:-30}"
-          if ! echo "$LOOKBACK_DAYS" | grep -Eq '^[0-9]+$'; then
-            LOOKBACK_DAYS="30"
-          fi
-
           echo "GROWTH_BACKLOG_TAB=Growth_Backlog" >> "$GITHUB_ENV"
           echo "GROWTH_REPORT_TAB=Growth_Intelligence_Report" >> "$GITHUB_ENV"
-
           echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
-          echo "GROWTH_LOOKBACK_DAYS=$LOOKBACK_DAYS" >> "$GITHUB_ENV"
-          echo "Growth lookback days: $LOOKBACK_DAYS"
+          echo "GROWTH_LOOKBACK_DAYS=30" >> "$GITHUB_ENV"
+          echo "Growth lookback days: 30"
 
       - name: Update Growth Backlog
         timeout-minutes: 10
