@@ -53,7 +53,7 @@ Umfang:
     .inboxToolbar { position:absolute; right:0; top:calc(100% + 6px); z-index:20; min-width: 190px; display:grid; gap:7px; padding:9px; border-radius:14px; border:1px solid rgba(0,0,0,.12); background:#fff; box-shadow:0 16px 34px rgba(31,41,51,.14); }
     .inboxToolbar .btn { width:100%; text-align:left; }
     /* === BEGIN BLOCK: INBOX_CONTENT_VERIFICATION_WORKBENCH_CSS_V1 | Zweck: fuehrt Audit-Faelle als klare Content-Pruefaufgaben mit Anweisung, Checkliste und Korrekturfeldern; Umfang: Mode-Switch und Verification-Karten-Ergaenzungen === */
-    .reviewModeSwitch { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; margin: 12px 0 0; }
+    .reviewModeSwitch { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:8px; margin: 12px 0 0; }
     .reviewModeSwitch .btn { display:flex; align-items:center; min-height:46px; padding: 10px 12px; font-size: 13.5px; text-align:left; }
     .reviewModeSwitch .is-active { border-color: rgba(38,118,62,.42); background: rgba(38,118,62,.075); font-weight: 850; }
     .reviewModeLabel { display:block; font-size:13.5px; font-weight:850; line-height:1.18; }
@@ -223,6 +223,36 @@ Umfang:
       .actions .btn { padding: 10px; }
       .footer { margin-top: 8px; }
     }
+
+    /* === BEGIN BLOCK: INBOX_GROWTH_BACKLOG_CSS_V1 | Zweck: kompakte mobile Backlog-Liste mit expandierbaren Zeilen, manueller Notiz und zwei Abschlussaktionen; Umfang: nur Growth-Backlog-UI === */
+    .backlogHeader { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin:12px 0 10px; }
+    .backlogIntro { display:grid; gap:3px; min-width:0; }
+    .backlogIntro strong { font-size:15px; line-height:1.2; }
+    .backlogIntro span { font-size:12.8px; line-height:1.32; opacity:.72; }
+    .backlogList { display:grid; gap:8px; }
+    .backlogItem { border:1px solid rgba(31,41,51,.10); border-radius:15px; background:#fff; overflow:hidden; box-shadow:0 8px 20px rgba(31,41,51,.045); }
+    .backlogItem summary { list-style:none; cursor:pointer; padding:10px 11px; display:grid; gap:5px; }
+    .backlogItem summary::-webkit-details-marker { display:none; }
+    .backlogLine { display:flex; align-items:center; gap:6px; min-width:0; }
+    .backlogTitle { font-weight:880; line-height:1.22; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .backlogReason { font-size:12.8px; line-height:1.28; opacity:.74; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .backlogDetail { display:grid; gap:9px; padding:0 11px 11px; border-top:1px solid rgba(31,41,51,.08); }
+    .backlogBlock { display:grid; gap:3px; font-size:13.2px; line-height:1.35; }
+    .backlogBlock strong { font-size:11.5px; letter-spacing:.045em; text-transform:uppercase; opacity:.66; }
+    .backlogActions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:2px; }
+    .backlogAddSheet { position:fixed; inset:auto 10px 10px 10px; z-index:40; max-width:520px; margin:0 auto; border-radius:18px; border:1px solid rgba(31,41,51,.14); background:#fff; box-shadow:0 22px 50px rgba(31,41,51,.22); padding:12px; display:grid; gap:9px; }
+    .backlogAddSheet[hidden] { display:none; }
+    .backlogAddSheet label { display:grid; gap:4px; font-size:12px; font-weight:780; opacity:.78; }
+    .backlogAddSheet input, .backlogAddSheet select, .backlogAddSheet textarea { width:100%; box-sizing:border-box; border-radius:12px; border:1px solid rgba(31,41,51,.16); padding:9px 10px; font:inherit; }
+    .backlogAddSheet textarea { min-height:82px; resize:vertical; }
+    .backlogAddActions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    @media (max-width: 520px) {
+      .backlogHeader { align-items:stretch; }
+      .backlogHeader .btn { flex:0 0 auto; }
+      .backlogActions, .backlogAddActions { grid-template-columns:1fr; }
+      .backlogTitle, .backlogReason { white-space:normal; }
+    }
+    /* === END BLOCK: INBOX_GROWTH_BACKLOG_CSS_V1 === */
     /* === END BLOCK: REVIEW_INBOX_WORKBENCH_UI_V2 === */
   </style>
 </head>
@@ -259,6 +289,9 @@ Umfang:
       <button id="modeAuditBtn" class="btn" type="button" title="Bestehende Events und Aktivitäten prüfen oder korrigieren.">
         <span class="reviewModeLabel">Content-Prüfung <span id="modeAuditCount" class="reviewModeCount">(–)</span></span>
       </button>
+      <button id="modeBacklogBtn" class="btn" type="button" title="Growth-, SEO-, Akquise- und Produktideen als Arbeitsliste prüfen.">
+        <span class="reviewModeLabel">Backlog <span id="modeBacklogCount" class="reviewModeCount">(–)</span></span>
+      </button>
     </div>
     <!-- === END BLOCK: INBOX_CONTENT_AUDIT_MODE_SWITCH_V1 === -->
 
@@ -294,6 +327,11 @@ Umfang:
     const CONTENT_AUDIT_LIST_API_URL = "/api/content-audit/list.php";
     const CONTENT_AUDIT_UPDATE_API_URL = "/api/content-audit/update.php";
     /* === END BLOCK: INBOX_CONTENT_AUDIT_ENDPOINTS_V1 === */
+    /* === BEGIN BLOCK: INBOX_GROWTH_BACKLOG_ENDPOINTS_V1 | Zweck: bindet das Growth-/Acquisition-Backlog als eigenen Inbox-Bereich ohne KI-Suchlauf-Vermischung an; Umfang: Endpoint-Konstanten === */
+    const GROWTH_BACKLOG_LIST_API_URL = "/api/growth-backlog/list.php";
+    const GROWTH_BACKLOG_CREATE_API_URL = "/api/growth-backlog/create.php";
+    const GROWTH_BACKLOG_UPDATE_API_URL = "/api/growth-backlog/update.php";
+    /* === END BLOCK: INBOX_GROWTH_BACKLOG_ENDPOINTS_V1 === */
 
     /* === BEGIN BLOCK: INBOX_PUSH_ENDPOINTS_V1 | Zweck: interne Browser-Push-Registrierung nur für diese private Inbox-Seite; Umfang: Push-Endpunkt-Konstanten === */
     const PUSH_CONFIG_API_URL = "/api/push/config.php";
@@ -313,11 +351,14 @@ Umfang:
     /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_MODE_STATE_V1 | Zweck: haelt Kuratierung und Content-Pruefung als getrennte Queues in einer UI; Umfang: DOM-Referenzen und Mode-State === */
     const elModeCurationBtn = document.getElementById("modeCurationBtn");
     const elModeAuditBtn = document.getElementById("modeAuditBtn");
+    const elModeBacklogBtn = document.getElementById("modeBacklogBtn");
     const elModeCurationCount = document.getElementById("modeCurationCount");
     const elModeAuditCount = document.getElementById("modeAuditCount");
+    const elModeBacklogCount = document.getElementById("modeBacklogCount");
     let activeReviewMode = "curation";
     let curationTabCount = null;
     let contentAuditTabCount = null;
+    let growthBacklogTabCount = null;
     /* === END BLOCK: INBOX_CONTENT_AUDIT_MODE_STATE_V1 === */
     
     let queue = [];
@@ -370,20 +411,27 @@ Umfang:
     function refreshReviewModeButtons() {
       if (elModeCurationBtn) elModeCurationBtn.classList.toggle("is-active", activeReviewMode === "curation");
       if (elModeAuditBtn) elModeAuditBtn.classList.toggle("is-active", activeReviewMode === "content_audit");
+      if (elModeBacklogBtn) elModeBacklogBtn.classList.toggle("is-active", activeReviewMode === "growth_backlog");
       if (elModeCurationCount) elModeCurationCount.textContent = formatTabCount(curationTabCount);
       if (elModeAuditCount) elModeAuditCount.textContent = formatTabCount(contentAuditTabCount);
+      if (elModeBacklogCount) elModeBacklogCount.textContent = formatTabCount(growthBacklogTabCount);
     }
 
     async function refreshInactiveTabCount() {
       try {
-        if (activeReviewMode === "curation" && contentAuditTabCount === null) {
+        if (activeReviewMode !== "content_audit" && contentAuditTabCount === null) {
           const auditResult = await fetchContentAuditReviewItems();
           contentAuditTabCount = Array.isArray(auditResult.items) ? auditResult.items.length : 0;
           refreshReviewModeButtons();
-          return;
         }
 
-        if (activeReviewMode === "content_audit" && curationTabCount === null) {
+        if (activeReviewMode !== "growth_backlog" && growthBacklogTabCount === null) {
+          const backlogResult = await fetchGrowthBacklogItems();
+          growthBacklogTabCount = Array.isArray(backlogResult.items) ? backlogResult.items.length : 0;
+          refreshReviewModeButtons();
+        }
+
+        if (activeReviewMode !== "curation" && curationTabCount === null) {
           const [res, submissionsResult] = await Promise.all([
             jsonp(API_URL, { action: "listReview" }),
             fetchSubmissionReviewItems()
@@ -399,7 +447,7 @@ Umfang:
     }
 
     async function switchReviewMode(mode) {
-      activeReviewMode = mode === "content_audit" ? "content_audit" : "curation";
+      activeReviewMode = mode === "content_audit" ? "content_audit" : (mode === "growth_backlog" ? "growth_backlog" : "curation");
       refreshReviewModeButtons();
       const ok = await ensureUnlocked();
       if (!ok) {
@@ -414,6 +462,9 @@ Umfang:
     }
     if (elModeAuditBtn) {
       elModeAuditBtn.addEventListener("click", () => switchReviewMode("content_audit"));
+    }
+    if (elModeBacklogBtn) {
+      elModeBacklogBtn.addEventListener("click", () => switchReviewMode("growth_backlog"));
     }
     /* === END BLOCK: INBOX_CONTENT_AUDIT_MODE_BINDINGS_V1 === */
         /* === BEGIN BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BINDING_V1 | Zweck: testet lokale Notification-Anzeige auf genau diesem Gerät ohne Server-Push; Umfang: zusätzlicher Diagnose-Button === */
@@ -836,6 +887,51 @@ Umfang:
     }
     /* === END BLOCK: INBOX_CONTENT_VERIFICATION_FETCH_V2 === */
 
+    /* === BEGIN BLOCK: INBOX_GROWTH_BACKLOG_FETCH_V1 | Zweck: lädt und bearbeitet Growth-/Acquisition-Backlog-Punkte getrennt von Event-Suche und Content-Prüfung; Umfang: Fetch-Helper === */
+    function isGrowthBacklogItem(item) {
+      return String(item && item.review_source || "") === "growth_backlog";
+    }
+
+    async function fetchGrowthBacklogItems() {
+      if (!reviewApiPassword) return { items: [], total: 0, error: "growth_backlog_locked" };
+      try {
+        const response = await fetch(GROWTH_BACKLOG_LIST_API_URL, {
+          method: "GET",
+          credentials: "same-origin",
+          headers: { Accept: "application/json", "X-BE-Review-Password": reviewApiPassword },
+          cache: "no-store"
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload || payload.status !== "ok") {
+          return { items: [], total: 0, error: payload?.message || "growth_backlog_load_failed" };
+        }
+        const items = (Array.isArray(payload.data?.items) ? payload.data.items : []).map((item) => ({ ...item, review_source: "growth_backlog" }));
+        return { items, total: Number(payload.data?.total || items.length || 0), error: "" };
+      } catch (_error) {
+        return { items: [], total: 0, error: "growth_backlog_network_failed" };
+      }
+    }
+
+    async function postGrowthBacklogJson(url, payload) {
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+          "X-BE-Review-Password": reviewApiPassword
+        },
+        body: JSON.stringify(payload || {})
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data || data.status !== "ok") {
+        throw new Error(data?.message || "growth_backlog_update_failed");
+      }
+      return data.data || {};
+    }
+    /* === END BLOCK: INBOX_GROWTH_BACKLOG_FETCH_V1 === */
+
+
     function normalizeSheetReviewItem(item) {
       return {
         ...item,
@@ -880,6 +976,23 @@ Umfang:
           return;
         }
         /* === END BLOCK: INBOX_CONTENT_AUDIT_LOAD_BRANCH_V1 === */
+
+        /* === BEGIN BLOCK: INBOX_GROWTH_BACKLOG_LOAD_BRANCH_V1 | Zweck: laedt Growth-Backlog als kompakte Arbeitsliste ohne automatische Umsetzung oder KI-Suchauftrag; Umfang: eigener Load-Zweig === */
+        if (activeReviewMode === "growth_backlog") {
+          const backlogResult = await fetchGrowthBacklogItems();
+          queue = Array.isArray(backlogResult.items) ? backlogResult.items : [];
+          totalLoaded = Number(backlogResult.total || queue.length || 0);
+
+          refreshLock();
+          growthBacklogTabCount = queue.length;
+          refreshReviewModeButtons();
+          setStatus(backlogResult.error ? "Backlog nicht geladen: " + backlogResult.error : "");
+          renderGrowthBacklogList();
+          refreshInactiveTabCount();
+          return;
+        }
+        /* === END BLOCK: INBOX_GROWTH_BACKLOG_LOAD_BRANCH_V1 === */
+
 
         const [res, submissionsResult] = await Promise.all([
           jsonp(API_URL, { action: "listReview" }),
@@ -1409,6 +1522,12 @@ Umfang:
         return;
       }
 
+
+
+      if (activeReviewMode === "growth_backlog") {
+        renderGrowthBacklogList();
+        return;
+      }
       /* === BEGIN BLOCK: INBOX_CONTENT_AUDIT_RENDER_BRANCH_V1 | Zweck: rendert Content-Quality-Faelle als eigene Arbeitskarte statt sie durch die Event-Kandidaten-Logik zu schicken; Umfang: frueher Render-Branch === */
       if (isContentAuditItem(current)) {
         renderContentAuditCurrent(totalCount);
@@ -1674,6 +1793,124 @@ Umfang:
       ].filter(([, value]) => trimValue(value));
     }
 
+
+
+    /* === BEGIN BLOCK: INBOX_GROWTH_BACKLOG_RENDER_V1 | Zweck: rendert das Growth-/Acquisition-Backlog als mobile, expandierbare Arbeitsliste mit manueller Notiz; Umfang: UI und Button-Bindings === */
+    function formatBacklogPriority(value) {
+      const key = trimValue(value).toLowerCase();
+      if (key === "hoch") return "Hoch";
+      if (key === "niedrig") return "Niedrig";
+      return "Mittel";
+    }
+
+    function renderGrowthBacklogList() {
+      refreshLock();
+      const items = queue.filter(isGrowthBacklogItem);
+      elLeft.textContent = `${items.length} offen`;
+      elRight.textContent = totalLoaded ? `Backlog: ${totalLoaded}` : "";
+      const listHtml = items.length ? items.map((item) => `
+        <details class="backlogItem" data-backlog-id="${escapeHtml(item.id)}">
+          <summary>
+            <div class="backlogLine">
+              <span class="pill">${escapeHtml(formatBacklogPriority(item.priority))}</span>
+              <span class="pill muted">${escapeHtml(trimValue(item.type) || "Sonstiges")}</span>
+            </div>
+            <div class="backlogTitle">${escapeHtml(trimValue(item.title) || "Unbenannter Backlog-Punkt")}</div>
+            <div class="backlogReason">${escapeHtml(trimValue(item.short_reason) || "Kurzgrund fehlt")}</div>
+          </summary>
+          <div class="backlogDetail">
+            ${renderBacklogBlock("Warum relevant?", item.why_relevant || item.short_reason)}
+            ${renderBacklogBlock("Was genau tun?", item.recommended_action)}
+            ${renderBacklogBlock("Erwarteter Nutzen", item.expected_benefit)}
+            ${trimValue(item.acquisition_note) ? renderBacklogBlock("Akquise-Einschätzung", item.acquisition_note) : ""}
+            <div class="backlogActions">
+              <button class="btn" type="button" data-backlog-action="complete" data-backlog-id="${escapeHtml(item.id)}">Abgeschlossen</button>
+              <button class="btn danger" type="button" data-backlog-action="reject" data-backlog-id="${escapeHtml(item.id)}">Ablehnen</button>
+            </div>
+          </div>
+        </details>
+      `).join("") : `
+        <article class="card">
+          <h1>Backlog leer</h1>
+          <div class="muted">Keine offenen Growth-, SEO-, Akquise- oder Produktpunkte. Du kannst manuell eine Notiz ergänzen.</div>
+        </article>
+      `;
+
+      elOne.innerHTML = `
+        <div class="backlogHeader">
+          <div class="backlogIntro">
+            <strong>Growth-/Acquisition-Backlog</strong>
+            <span>Deduplizierte Arbeitspakete. Keine automatische Umsetzung und kein KI-Suchauftrag.</span>
+          </div>
+          <button id="btnBacklogAdd" class="btn" type="button">+ Notiz</button>
+        </div>
+        <div class="backlogList">${listHtml}</div>
+        <form id="backlogAddSheet" class="backlogAddSheet" hidden>
+          <strong>Backlog-Notiz hinzufügen</strong>
+          <label>Titel<input id="backlogAddTitle" name="title" maxlength="140" required placeholder="z. B. Kindergeburtstag-Angebote prüfen"></label>
+          <label>Typ
+            <select id="backlogAddType" name="type">
+              <option>Content</option><option>SEO</option><option>Akquise</option><option>UX</option><option>Activity-Idee</option><option>Sonstiges</option>
+            </select>
+          </label>
+          <label>Notiz<textarea id="backlogAddNote" name="note" maxlength="1200" placeholder="Warum ist das relevant, was soll später geprüft werden?"></textarea></label>
+          <div class="backlogAddActions">
+            <button class="btn" type="submit">Speichern</button>
+            <button id="btnBacklogAddCancel" class="btn" type="button">Schließen</button>
+          </div>
+        </form>
+      `;
+      bindGrowthBacklogButtons();
+    }
+
+    function renderBacklogBlock(label, value) {
+      const clean = trimValue(value);
+      if (!clean) return "";
+      return `<div class="backlogBlock"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(clean)}</span></div>`;
+    }
+
+    function bindGrowthBacklogButtons() {
+      const addBtn = document.getElementById("btnBacklogAdd");
+      const sheet = document.getElementById("backlogAddSheet");
+      const cancelBtn = document.getElementById("btnBacklogAddCancel");
+      if (addBtn && sheet) addBtn.addEventListener("click", () => { sheet.hidden = false; document.getElementById("backlogAddTitle")?.focus(); });
+      if (cancelBtn && sheet) cancelBtn.addEventListener("click", () => { sheet.hidden = true; });
+
+      document.querySelectorAll("[data-backlog-action]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const id = button.getAttribute("data-backlog-id") || "";
+          const action = button.getAttribute("data-backlog-action") || "";
+          try {
+            button.disabled = true;
+            await postGrowthBacklogJson(GROWTH_BACKLOG_UPDATE_API_URL, { id, action });
+            queue = queue.filter((item) => trimValue(item.id) !== id);
+            growthBacklogTabCount = queue.length;
+            refreshReviewModeButtons();
+            renderGrowthBacklogList();
+          } catch (error) {
+            setStatus("Backlog-Aktion fehlgeschlagen: " + (error && error.message ? error.message : error));
+            button.disabled = false;
+          }
+        });
+      });
+
+      if (sheet) {
+        sheet.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const title = trimValue(document.getElementById("backlogAddTitle")?.value);
+          const type = trimValue(document.getElementById("backlogAddType")?.value) || "Sonstiges";
+          const note = trimValue(document.getElementById("backlogAddNote")?.value);
+          if (!title) return;
+          try {
+            await postGrowthBacklogJson(GROWTH_BACKLOG_CREATE_API_URL, { title, type, note });
+            await loadAndShow();
+          } catch (error) {
+            setStatus("Backlog-Notiz konnte nicht gespeichert werden: " + (error && error.message ? error.message : error));
+          }
+        });
+      }
+    }
+    /* === END BLOCK: INBOX_GROWTH_BACKLOG_RENDER_V1 === */
     function contentAuditGuide(item) {
       const code = trimValue(item.issue_code);
       const type = trimValue(item.content_type);
