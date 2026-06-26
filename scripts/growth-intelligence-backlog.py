@@ -64,6 +64,94 @@ class Candidate:
     signals: Dict[str, Any]
 
 
+INTENT_RULES = [
+    ("today-events", re.compile(r"\b(was|wo)\b.*\b(los|veranstaltung|veranstaltungen|event|events)\b|\bheute\b.*\b(los|veranstaltung|veranstaltungen|event|events)\b", re.I),
+     "Today-/Was-ist-los-Suchintention", "Today-Bereich und SEO für tagesaktuelle Veranstaltungen verbessern"),
+    ("weekend-events", re.compile(r"\bwochenende\b.*\b(los|veranstaltung|veranstaltungen|event|events)\b|\b(los|veranstaltung|veranstaltungen|event|events)\b.*\bwochenende\b", re.I),
+     "Wochenend-Event-Suchintention", "Wochenend- und Heute-Logik für Veranstaltungen prüfen"),
+    ("bad-weather-indoor", re.compile(r"\b(regen|schlechtwetter|indoor|drinnen)\b", re.I),
+     "Indoor-/Schlechtwetter-Suchintention", "Indoor- und Regen-Inhalte als Arbeitspaket prüfen"),
+    ("family-kids", re.compile(r"\b(kinder|familie|familien|kind|spielplatz|indoorspielplatz|kindergeburtstag)\b", re.I),
+     "Familien-/Kinder-Suchintention", "Familien- und Kinder-Inhalte priorisiert prüfen"),
+    ("swimming", re.compile(r"\b(hallenbad|schwimmbad|freibad|bahia|badesee|aasee)\b", re.I),
+     "Schwimmen-/Wasser-Suchintention", "Schwimmen-/Wasser-Content prüfen"),
+    ("food-after-activity", re.compile(r"\b(cafe|café|restaurant|essen|eiscafe|eiscafé)\b", re.I),
+     "Gastro-/Anschluss-Suchintention", "Gastro-Verknüpfung nach Events/Aktivitäten prüfen"),
+]
+
+def infer_intent(text: str) -> dict[str, str]:
+    normalized = text.lower().translate(str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}))
+    for key, pattern, label, recommendation in INTENT_RULES:
+        if pattern.search(normalized):
+            return {"key": key, "label": label, "recommendation": recommendation}
+    topic = canonical_topic(text)
+    return {"key": slug(topic) or "general", "label": topic.title() or "Allgemeine Suchintention", "recommendation": "Content-/SEO-Potenzial fachlich prüfen"}
+
+def score_priority(impressions: float = 0, clicks: float = 0, sessions: float = 0, confidence: float = 0.7, effort: int = 2) -> tuple[str, dict[str, Any]]:
+    impact = 0
+    if impressions >= 1000 or sessions >= 250:
+        impact = 5
+    elif impressions >= 500 or sessions >= 150:
+        impact = 4
+    elif impressions >= 150 or sessions >= 50:
+        impact = 3
+    elif impressions >= 40 or sessions >= 15:
+        impact = 2
+    else:
+        impact = 1
+    value = impact * confidence / max(1, effort)
+    priority = "hoch" if value >= 1.35 or impact >= 5 else "mittel" if value >= 0.75 or impact >= 3 else "niedrig"
+    return priority, {"impact_score": impact, "effort_score": effort, "confidence": confidence, "value_score": round(value, 3)}
+
+def recommendation_for_intent(intent_key: str, impressions: float, clicks: float, ctr: float, covered: bool) -> tuple[str, str, str, int]:
+    if intent_key == "today-events":
+        title = "Today-/Was-ist-los-Suchintention besser bedienen"
+        action = "Today-Ansicht, Home-Platzierung, Seitentitel, Snippet-Texte und interne Verlinkung für tagesaktuelle Veranstaltungen prüfen."
+        benefit = "Nutzer mit klarer Heute-Absicht schneller abholen und vorhandene Event-Inhalte organisch besser nutzbar machen."
+        effort = 2
+    elif intent_key == "weekend-events":
+        title = "Wochenend-Suchintention für Veranstaltungen prüfen"
+        action = "Prüfen, ob Wochenende/Heute als klare Einstiegslogik, Landingpage oder Filterzustand abbildbar ist."
+        benefit = "Bessere Abdeckung typischer Freizeitplanung und stärkere Nutzung vorhandener Eventdaten."
+        effort = 2
+    elif intent_key == "bad-weather-indoor":
+        title = "Indoor-/Schlechtwetter-Inhalte als Arbeitspaket prüfen"
+        action = "Prüfen, ob vorhandene Indoor-Aktivitäten, Events und Landingpages bei Regen besser gebündelt werden sollten."
+        benefit = "Höherer Nutzerwert bei schlechtem Wetter und klare saisonale Content-Chance."
+        effort = 3
+    elif intent_key == "family-kids":
+        title = "Familien-/Kinder-Inhalte gezielt prüfen"
+        action = "Prüfen, ob Kinder-/Familienangebote, Filter, Highlights oder Landingpages vollständiger und prominenter werden sollten."
+        benefit = "Stärkeres Kern-Nutzersegment und spätere Akquisegrundlage für familienorientierte Anbieter."
+        effort = 3
+    elif intent_key == "swimming":
+        title = "Schwimmen-/Wasser-Content prüfen"
+        action = "Prüfen, ob bestehende Schwimmen-/Badesee-/Hallenbad-Inhalte vollständig, aktuell und sinnvoll verlinkt sind."
+        benefit = "Suchnachfrage bedienen; Akquise nur nachrangig, weil öffentliche/bekannte Anbieter oft geringe Zahlungsbereitschaft haben."
+        effort = 2
+    elif intent_key == "food-after-activity":
+        title = "Gastro-Verknüpfung nach Events/Aktivitäten prüfen"
+        action = "Prüfen, ob Café/Restaurant-Suchen als Anschlussnutzen nach Events oder Aktivitäten besser verknüpft werden können."
+        benefit = "Mehr Alltagstauglichkeit und mögliche spätere Partner-/Akquisegrundlage für buchungs- oder gastroorientierte Anbieter."
+        effort = 3
+    elif not covered:
+        title = "Content-Lücke mit belegter Nachfrage prüfen"
+        action = "Prüfen, ob eine Activity, Landingpage oder Content-Erweiterung sinnvoll ist. Keine automatische Übernahme."
+        benefit = "Belegte Nachfrage-Lücke schließen und organische Sichtbarkeit verbessern."
+        effort = 3
+    elif ctr < 0.025:
+        title = "SEO-Chance bei vorhandener Sichtbarkeit prüfen"
+        action = "Title, Beschreibung, Snippet-Relevanz, interne Verlinkung und Zielinhalt prüfen."
+        benefit = "Mehr Klicks aus vorhandener Google-Sichtbarkeit ohne neuen Suchlauf."
+        effort = 2
+    else:
+        title = "Growth-Signal fachlich prüfen"
+        action = "Als Arbeitspaket prüfen, ob Content, UX oder interne Verlinkung verbessert werden sollte."
+        benefit = "Rohsignal in konkrete Projektentscheidung übersetzen."
+        effort = 2
+    return title, action, benefit, effort
+
+
 def log(msg: str) -> None:
     print(msg, flush=True)
 
@@ -232,9 +320,9 @@ def fetch_gsc(creds, site_url: str, start: str, end: str) -> List[Dict[str, Any]
     return rows
 
 
-def fetch_ga4(creds, property_id: str, start: str, end: str) -> List[Dict[str, Any]]:
+def fetch_ga4(creds, property_id: str, start: str, end: str) -> Tuple[List[Dict[str, Any]], str]:
     if not property_id:
-        return []
+        return [], "GA4_PROPERTY_ID nicht gesetzt; GA4 übersprungen."
     analytics = service("analyticsdata", "v1beta", creds)
     name = f"properties/{property_id}"
     body = {
@@ -243,7 +331,24 @@ def fetch_ga4(creds, property_id: str, start: str, end: str) -> List[Dict[str, A
         "metrics": [{"name": "sessions"}, {"name": "engagementRate"}, {"name": "averageSessionDuration"}],
         "limit": 10000,
     }
-    res = analytics.properties().runReport(property=name, body=body).execute()
+    try:
+        res = analytics.properties().runReport(property=name, body=body).execute()
+    except HttpError as exc:
+        raw = ""
+        try:
+            raw = exc.content.decode("utf-8", errors="replace") if getattr(exc, "content", None) else str(exc)
+        except Exception:
+            raw = str(exc)
+        lower = raw.lower()
+        if exc.resp.status in (401, 403) or "permission" in lower or "access" in lower:
+            return [], "GA4 Diagnose: Zugriff verweigert. Service Account in GA4 Property-Zugriffsverwaltung als Betrachter/Analyst hinzufügen und Analytics Data API prüfen."
+        if "analyticsdata" in lower and ("disabled" in lower or "not been used" in lower or "enable" in lower):
+            return [], "GA4 Diagnose: Google Analytics Data API ist im Google-Cloud-Projekt wahrscheinlich nicht aktiviert."
+        if exc.resp.status == 404 or "not found" in lower:
+            return [], "GA4 Diagnose: Property nicht gefunden. GA4_PROPERTY_ID prüfen; benötigt wird die numerische Property-ID, nicht die Measurement-ID G-..."
+        return [], f"GA4 Diagnose: API-Fehler HTTP {exc.resp.status}: {raw[:500]}"
+    except Exception as exc:
+        return [], f"GA4 Diagnose: unerwarteter Fehler: {type(exc).__name__}: {exc}"
     rows = []
     for r in res.get("rows", []) or []:
         dims = [d.get("value", "") for d in r.get("dimensionValues", [])]
@@ -255,7 +360,9 @@ def fetch_ga4(creds, property_id: str, start: str, end: str) -> List[Dict[str, A
             "engagement_rate": float(mets[1] if len(mets) > 1 else 0),
             "avg_duration": float(mets[2] if len(mets) > 2 else 0),
         })
-    return rows
+    if not rows:
+        return rows, "GA4 Diagnose: API erreichbar und berechtigt, aber keine Zeilen im Zeitraum/Abfrageschema geliefert. Zeitraum, Traffic oder Datenerhebung prüfen."
+    return rows, f"GA4 Diagnose: API erreichbar; {len(rows)} Zeilen gelesen."
 
 
 def acquisition_note(topic: str) -> str:
@@ -277,55 +384,51 @@ def build_candidates(gsc_rows: List[Dict[str, Any]], ga4_rows: List[Dict[str, An
         ql = q.lower()
         if "bocholt" not in ql and not any(t in ql for t in ACTIVITY_TERMS):
             continue
-        topic = canonical_topic(q)
-        g = grouped.setdefault(topic, {"queries": [], "impressions": 0.0, "clicks": 0.0, "positions": [], "pages": set()})
+        intent = infer_intent(q)
+        topic = intent["key"]
+        g = grouped.setdefault(topic, {"intent": intent, "queries": [], "impressions": 0.0, "clicks": 0.0, "positions": [], "pages": set(), "raw_topics": Counter()})
         g["queries"].append(q)
         g["impressions"] += float(r.get("impressions", 0))
         g["clicks"] += float(r.get("clicks", 0))
         g["positions"].append(float(r.get("position", 0) or 0))
+        g["raw_topics"][canonical_topic(q)] += 1
         if r.get("page"):
             g["pages"].add(str(r.get("page")))
 
     for topic, g in grouped.items():
+        intent = g["intent"]
         impressions = g["impressions"]
         clicks = g["clicks"]
         ctr = clicks / impressions if impressions else 0.0
         pos = sum(g["positions"]) / max(1, len(g["positions"]))
-        covered = seems_covered(topic, inventory)
-        top_queries = sorted(set(g["queries"]), key=lambda x: (-g["queries"].count(x), x))[:6]
-        if topic == "heute veranstaltungen events":
-            kind = "SEO-/Landingpage-Chance"
-            title = "Heute-in-Bocholt / Was-ist-los-Suchen prüfen"
-            short = f"{int(impressions)} Impressionen für tagesaktuelle Event-Suchintentionen."
-            action = "Prüfen, ob die Today-Ansicht, interne Verlinkung, Seitentitel und Snippet-Texte für 'heute in Bocholt' bzw. 'was ist los' klar genug sind."
-            benefit = "Bündelt Nachfrage nach tagesaktuellen Veranstaltungen in ein konkretes Optimierungs-Arbeitspaket statt einzelne Suchbegriffe als Backlog-Punkte zu sammeln."
-        elif not covered:
+        covered = seems_covered(" ".join(g["raw_topics"].keys()) or topic, inventory)
+        top_queries = sorted(set(g["queries"]), key=lambda x: (-g["queries"].count(x), x))[:8]
+        title, action, benefit, effort = recommendation_for_intent(topic, impressions, clicks, ctr, covered)
+        confidence = 0.9 if topic in {"today-events", "weekend-events", "bad-weather-indoor", "family-kids", "swimming"} else 0.7
+        priority, score = score_priority(impressions=impressions, clicks=clicks, confidence=confidence, effort=effort)
+        kind = "SEO-/Content-Arbeitspaket"
+        if not covered and topic not in {"today-events", "weekend-events"}:
             kind = "Content-Lücke"
-            title = f"{topic.title()} prüfen"
-            short = f"{int(impressions)} Impressionen, aber kein klar erkennbarer Zielinhalt."
-            action = "Prüfen, ob eine Activity, Landingpage oder Content-Erweiterung sinnvoll ist. Nicht automatisch live übernehmen."
-            benefit = "Schließt eine belegte Nachfrage-Lücke und kann organische Sichtbarkeit sowie spätere Akquisegrundlagen verbessern."
-        elif impressions >= MIN_IMPRESSIONS and ctr < 0.025 and pos <= 25:
+        elif ctr < 0.025 and impressions >= MIN_IMPRESSIONS:
             kind = "SEO-Optimierung"
-            title = f"SEO-Chance: {topic.title()}"
-            short = f"{int(impressions)} Impressionen, niedrige CTR ({ctr:.1%})."
-            action = "Title, Beschreibung, Snippet-Relevanz, interne Verlinkung und passenden Zielinhalt prüfen."
-            benefit = "Mehr Klicks aus bereits vorhandener Google-Sichtbarkeit ohne neue Inhalte erzwingen zu müssen."
-        else:
-            continue
+        description = (
+            f"Search-Console-Daten vom {start} bis {end} zeigen {int(impressions)} Impressionen und {int(clicks)} Klicks für die Suchintention „{intent['label']}“ "
+            f"(Beispiele: {', '.join(top_queries[:5])}). Empfohlenes Arbeitspaket: {action} "
+            f"Erwarteter Nutzen: {benefit} Interner Score: Nutzen {score['impact_score']}/5, Aufwand {score['effort_score']}/5, Konfidenz {score['confidence']:.0%}."
+        )
         key = cluster_key(kind, topic)
         candidates[key] = Candidate(
             cluster_key=key,
-            priority=priority_from(impressions=impressions, clicks=clicks, ctr=ctr),
+            priority=priority,
             type=kind,
             title=title,
-            short_reason=short,
-            why_relevant=f"Search-Console-Daten vom {start} bis {end} zeigen Nachfrage für: {', '.join(top_queries)}.",
+            short_reason=description,
+            why_relevant=description,
             recommended_action=action,
             expected_benefit=benefit,
-            acquisition_note=acquisition_note(topic),
-            source="growth-intelligence:gsc",
-            signals={"period_start": start, "period_end": end, "impressions": impressions, "clicks": clicks, "ctr": ctr, "avg_position": pos, "queries": top_queries, "covered": covered},
+            acquisition_note=acquisition_note(" ".join(top_queries)),
+            source="growth-intelligence:gsc-intent",
+            signals={"period_start": start, "period_end": end, "intent": intent, "impressions": impressions, "clicks": clicks, "ctr": ctr, "avg_position": pos, "queries": top_queries, "covered": covered, **score},
         )
 
     for r in ga4_rows:
@@ -341,19 +444,25 @@ def build_candidates(gsc_rows: List[Dict[str, Any]], ga4_rows: List[Dict[str, An
         if engagement >= 0.35 and duration >= 20:
             continue
         topic = page.strip("/") or "Startseite"
+        priority, score = score_priority(sessions=sessions, confidence=0.75, effort=2)
         key = cluster_key("UX-/Content-Prüfung", topic)
+        desc = (
+            f"GA4-Daten vom {start} bis {end} zeigen {int(sessions)} organische Sessions mit schwachen Engagement-Signalen auf „{topic}“ "
+            f"(Engagement {engagement:.0%}, Ø Dauer {duration:.0f}s). Prüfen, ob Erwartung, Inhalt, Card-Auswahl, interne Verlinkung oder mobile Darstellung verbessert werden müssen. "
+            f"Interner Score: Nutzen {score['impact_score']}/5, Aufwand {score['effort_score']}/5, Konfidenz {score['confidence']:.0%}."
+        )
         candidates.setdefault(key, Candidate(
             cluster_key=key,
-            priority=priority_from(sessions=sessions),
+            priority=priority,
             type="UX-/Content-Prüfung",
-            title=f"Landingpage prüfen: {topic}",
-            short_reason=f"{int(sessions)} organische Sessions, schwache Engagement-Signale.",
-            why_relevant=f"GA4-Daten vom {start} bis {end} zeigen niedrige Interaktion auf dieser Einstiegsseite.",
-            recommended_action="Prüfen, ob Erwartung, Inhalt, Card-Auswahl, interne Verlinkung oder mobile Darstellung verbessert werden müssen.",
+            title=f"Landingpage-Nutzung prüfen: {topic}",
+            short_reason=desc,
+            why_relevant=desc,
+            recommended_action="Erwartung, Inhalt, Card-Auswahl, interne Verlinkung und mobile Darstellung prüfen.",
             expected_benefit="Bessere Nutzerführung und höhere Chance, organische Besucher in echte Nutzung der Seite zu überführen.",
             acquisition_note="Keine direkte Akquise-Aktion. Erst Produkt-/Content-Qualität verbessern.",
             source="growth-intelligence:ga4",
-            signals={"period_start": start, "period_end": end, "landing_page": page, "channel": channel, "sessions": sessions, "engagement_rate": engagement, "avg_duration": duration},
+            signals={"period_start": start, "period_end": end, "landing_page": page, "channel": channel, "sessions": sessions, "engagement_rate": engagement, "avg_duration": duration, **score},
         ))
     return list(candidates.values())
 
@@ -580,8 +689,15 @@ def main() -> None:
             str(r.get("why_relevant", "")),
             str(r.get("recommended_action", "")),
         ])
-        if canonical_topic(existing_text) == "heute veranstaltungen events":
+        intent = infer_intent(existing_text)
+        if intent.get("key") == "today-events" or canonical_topic(existing_text) == "heute veranstaltungen events":
             known_cluster_keys.add(cluster_key("SEO-/Landingpage-Chance", "heute veranstaltungen events"))
+            known_cluster_keys.add(cluster_key("SEO-/Content-Arbeitspaket", "today-events"))
+            known_cluster_keys.add(cluster_key("SEO-Optimierung", "today-events"))
+        if intent.get("key"):
+            known_cluster_keys.add(cluster_key("SEO-/Content-Arbeitspaket", intent["key"]))
+            known_cluster_keys.add(cluster_key("SEO-Optimierung", intent["key"]))
+            known_cluster_keys.add(cluster_key("Content-Lücke", intent["key"]))
     inv = inventory_text(sheets, sheet_id)
 
     gsc_rows: List[Dict[str, Any]] = []
@@ -595,15 +711,20 @@ def main() -> None:
     except Exception as exc:
         status = "partial"
         messages.append(f"GSC Fehler: {exc}")
+    ga4_diag = ""
     try:
-        ga4_rows = fetch_ga4(creds, ga4_property_id, start, end) if ga4_property_id else []
-        if not ga4_property_id:
-            messages.append("GA4_PROPERTY_ID nicht gesetzt; GA4 übersprungen.")
+        ga4_rows, ga4_diag = fetch_ga4(creds, ga4_property_id, start, end)
+        if ga4_diag:
+            messages.append(ga4_diag)
+        if ga4_property_id and not ga4_rows:
+            status = "partial"
     except Exception as exc:
         status = "partial"
-        messages.append(f"GA4 Fehler: {exc}")
+        messages.append(f"GA4 Diagnose: unerwarteter Fehler außerhalb API-Call: {type(exc).__name__}: {exc}")
 
     value_rows = fetch_value_metrics(start, end)
+    if not value_rows:
+        messages.append("Interne Nutzungsdaten Diagnose: value_metric_daily lieferte 0 Zeilen oder DB-Zugriff/Tabellenstruktur ist nicht verfügbar.")
     candidates = build_candidates(gsc_rows, ga4_rows, inv, start, end)
     candidates.extend(build_internal_metric_candidates(value_rows, start, end))
     candidates.extend(build_sheet_history_candidates(sheets, sheet_id, start, end))
@@ -652,6 +773,10 @@ def main() -> None:
         "message": " | ".join(messages) if messages else f"Growth-Backlog erfolgreich aktualisiert. Interne Metrik-Zeilen: {len(value_rows)}.",
     }])
     log(f"Growth Intelligence: created={len(created)} suppressed={suppressed} gsc_rows={len(gsc_rows)} ga4_rows={len(ga4_rows)} value_rows={len(value_rows)} status={status}")
+    if messages:
+        log("Growth Intelligence diagnostics:")
+        for m in messages:
+            log(f"- {m}")
 
 
 if __name__ == "__main__":

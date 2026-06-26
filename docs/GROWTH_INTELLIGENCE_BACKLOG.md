@@ -213,3 +213,70 @@ Der Growth-Backlog-Prozess verändert nicht:
 - Content-Prüfungsregeln
 
 Er ist ein eigenständiger Entscheidungs- und Backlog-Loop.
+
+## Abschlussausbau: Decision Engine und Diagnose
+
+Der Growth-Workflow enthält eine fachliche Decision Engine. Sie verdichtet Rohdaten nicht mehr direkt zu Suchbegriff-Einträgen, sondern zu Arbeitspaketen:
+
+```text
+Rohsignal
+-> Intent-Erkennung
+-> Maßnahmenbibliothek
+-> Impact-/Aufwandsbewertung
+-> deduplizierter Backlog-Eintrag
+```
+
+### Intent-Erkennung
+
+Aktuell werden insbesondere diese Muster zusammengeführt:
+
+- `Heute / Was ist los / Veranstaltungen` -> Today-/SEO-Arbeitspaket
+- `Wochenende / Veranstaltungen` -> Wochenend-/Event-Arbeitspaket
+- `Regen / Schlechtwetter / Indoor` -> Indoor-/Schlechtwetter-Arbeitspaket
+- `Kinder / Familie / Spielplatz / Kindergeburtstag` -> Familien-/Kinder-Arbeitspaket
+- `Hallenbad / Schwimmbad / Bahia / Badesee / Aasee` -> Schwimmen-/Wasser-Arbeitspaket
+- `Café / Restaurant / Essen` -> Gastro-Verknüpfungs-Arbeitspaket
+
+Damit sollen mehrere ähnliche Suchanfragen nicht als mehrere Backlog-Zeilen erscheinen.
+
+### Priorisierung
+
+Die sichtbare Priorität bleibt bewusst einfach:
+
+- `hoch`
+- `mittel`
+- `niedrig`
+
+Intern werden zusätzlich in `signals_json` gespeichert:
+
+- `impact_score`
+- `effort_score`
+- `confidence`
+- `value_score`
+
+Die Inbox zeigt diese Zusatzwerte nicht an, damit der Backlog mobil schlank bleibt.
+
+### Diagnose-Logging
+
+Der Workflow schreibt nach jedem Lauf eine Diagnose in den Action-Log und in `Growth_Intelligence_Report`.
+
+Wichtige Diagnosefälle:
+
+- GA4-Secret fehlt
+- GA4-Zugriff verweigert
+- Google Analytics Data API vermutlich nicht aktiviert
+- GA4-Property-ID falsch
+- GA4 erreichbar, aber keine Daten im Zeitraum
+- interne Nutzungsdaten nicht erreichbar oder 0 Zeilen
+
+Damit ist ein `ga4_rows=0` künftig nicht mehr nur ein Zahlenwert, sondern mit einer konkreten Ursache oder nächsten Prüfrichtung verbunden.
+
+### Mobile Inbox UI
+
+Die Inbox bleibt absichtlich reduziert. Sichtbar und bearbeitbar sind nur:
+
+- Priorität
+- Titel
+- Beschreibung
+
+Weitere technische Felder bleiben im Sheet als Historie und Diagnose erhalten, werden aber nicht als UI-Komplexität ausgespielt.
