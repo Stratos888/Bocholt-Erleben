@@ -74,6 +74,8 @@ Umfang:
     .auditField textarea { min-height:76px; resize:vertical; }
     .auditActionHint { font-size:12.5px; line-height:1.35; opacity:.76; }
     .auditStateNote { border-radius:12px; padding:9px 10px; background:rgba(0,0,0,.035); font-size:13px; line-height:1.35; }
+    .auditStateActions { display:grid; gap:8px; margin-top:8px; }
+    .auditStateActions .btn { width:100%; }
     /* === BEGIN BLOCK: INBOX_REPO_PATCH_BUNDLE_CSS_V1 | Zweck: macht Repo-Patch-Kandidaten als Sammelpaket sichtbar und kopierbar, ohne Daten zu ändern; Umfang: nur Content-Prüfung-Bündelanzeige === */
     .auditBundleBox { display:grid; gap:8px; margin:0; padding:11px 12px; border-radius:14px; border:1px solid rgba(38,118,62,.22); background:rgba(38,118,62,.04); font-size:13.5px; line-height:1.35; }
     .auditBundleList { margin:0; padding-left:18px; display:grid; gap:4px; }
@@ -1680,10 +1682,10 @@ Umfang:
           nextReviewDays: 14
         },
         event_ticket_portal_as_primary_source: {
-          actionTitle: "Offizielle Eventquelle statt Ticketportal setzen",
+          actionTitle: "Offizielle Quelle übernehmen",
           why: "Ticketportale sind Buchungslinks. Die primäre Quelle soll die offizielle Event- oder Veranstalterseite sein, damit Datum, Ort und Status belastbar nachprüfbar bleiben.",
-          action: "Wenn eine empfohlene offizielle Quelle angezeigt wird, diese öffnen, gegen Datum/Uhrzeit/Ort vergleichen und erst danach unten speichern. Falls kein Vorschlag vorhanden ist: Fall zurückstellen oder Quelle recherchieren lassen. Das Ticketportal nicht blind als Hauptquelle bestätigen.",
-          checklist: ["Ticketportal öffnen und Event identifizieren", "empfohlene offizielle Quelle öffnen, falls vorhanden", "Datum/Uhrzeit/Ort vergleichen", "offizielle Quelle in der Content-Prüfung speichern oder Fall zurückstellen"],
+          action: "Öffne die aktuelle Ticketportal-Quelle und die vorgeschlagene offizielle Quelle. Wenn Titel, Datum, Uhrzeit und Ort passen, die offizielle Quelle übernehmen. Nur wenn keine bessere Quelle nutzbar ist, das Ticketportal bewusst behalten.",
+          checklist: ["Ticketportal nur zur Identifikation öffnen", "offizielle Quelle öffnen", "Titel, Datum, Uhrzeit und Ort vergleichen", "wenn passend: offizielle Quelle übernehmen"],
           nextReviewDays: 14
         },
         event_time_format_unusual: {
@@ -1786,6 +1788,10 @@ Umfang:
       return trimValue(fields[name]);
     }
 
+    function isTicketPortalPrimarySourceIssue(item) {
+      return trimValue(item?.issue_code) === "event_ticket_portal_as_primary_source";
+    }
+
     function renderAuditChecklist(items) {
       return `<ul class="auditChecklist">${items.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>`;
     }
@@ -1793,15 +1799,21 @@ Umfang:
     function renderSourceSuggestion(item) {
       const suggestedUrl = trimValue(item.suggested_url);
       if (!suggestedUrl) return "";
+      const isTicketSourceIssue = isTicketPortalPrimarySourceIssue(item);
       const label = trimValue(item.suggested_url_label) || "Empfohlene offizielle Quelle";
       const reason = trimValue(item.suggestion_reason);
+      const sectionTitle = isTicketSourceIssue ? "Offizielle Quelle" : "Empfohlene Quelle";
+      const buttonLabel = isTicketSourceIssue ? "Offizielle Quelle öffnen" : "Vorschlag öffnen";
       return `
-        <section class="reviewSection" aria-label="Empfohlene Quelle">
-          <div class="reviewSectionTitle">Empfohlene Quelle</div>
+        <section class="reviewSection" aria-label="${escapeHtml(sectionTitle)}">
+          <div class="reviewSectionTitle">${escapeHtml(sectionTitle)}</div>
           <div class="auditStateNote auditStateNote--suggestedSource">
             <strong>${escapeHtml(label)}</strong><br />
             <span>${escapeHtml(suggestedUrl)}</span>
             ${reason ? `<br /><span>${escapeHtml(reason)}</span>` : ``}
+            <div class="auditStateActions">
+              <button class="btn sourceBtn" type="button" data-open-url="${escapeHtml(suggestedUrl)}" title="Öffnet den vorgeschlagenen offiziellen Quelllink.">${escapeHtml(buttonLabel)}</button>
+            </div>
           </div>
         </section>
       `;
@@ -1815,6 +1827,10 @@ Umfang:
         not_confirmed: "nicht bestätigt",
         unavailable: "nicht erreichbar",
         manual_check_needed: "manuell prüfen",
+        source_confirms_core_facts: "Quelle bestätigt die Kernangaben",
+        source_confirms_core_facts_with_weak_location: "Quelle bestätigt Titel, Datum und Uhrzeit; Ort nur allgemein bestätigt",
+        source_partially_confirms_core_facts: "Quelle bestätigt die Angaben nur teilweise",
+        source_does_not_confirm_core_facts: "Quelle bestätigt die Kernangaben nicht",
         unknown: "unklar"
       };
       return labels[key] || key;
@@ -1831,7 +1847,7 @@ Umfang:
         <section class="reviewSection" aria-label="Faktenprobe">
           <div class="reviewSectionTitle">Quellencheck</div>
           <div class="auditStateNote">
-            ${status ? `<div><strong>Status:</strong> ${escapeHtml(formatEvidenceStatus(status))}</div>` : ``}
+            ${status ? `<div><strong>Ergebnis:</strong> ${escapeHtml(formatEvidenceStatus(status))}</div>` : ``}
             ${summary ? `<div>${escapeHtml(summary)}</div>` : ``}
             ${checked ? `<div><strong>Geprüft:</strong> ${escapeHtml(checked)}</div>` : ``}
             ${missing ? `<div><strong>Noch offen:</strong> ${escapeHtml(missing)}</div>` : ``}
@@ -1862,11 +1878,13 @@ Umfang:
     function renderEventCorrectionForm(item, suggestedUrl) {
       if (!isContentAuditEventItem(item)) return "";
       const issueCode = trimValue(item.issue_code);
+      const isTicketSourceIssue = isTicketPortalPrimarySourceIssue(item);
       const currentSourceValue = eventFieldValue(item, "source_url") || eventFieldValue(item, "url") || eventFieldValue(item, "event_url") || trimValue(item.source_url);
-      const sourceValue = suggestedUrl || (issueCode === "event_ticket_portal_as_primary_source" ? "" : currentSourceValue);
+      const sourceValue = suggestedUrl || (isTicketSourceIssue ? "" : currentSourceValue);
+      const sectionTitle = isTicketSourceIssue ? "Offizielle Quelle übernehmen" : "Eventdaten korrigieren";
       return `
-        <section class="reviewSection" aria-label="Eventdaten korrigieren">
-          <div class="reviewSectionTitle">Eventdaten korrigieren</div>
+        <section class="reviewSection" aria-label="${escapeHtml(sectionTitle)}">
+          <div class="reviewSectionTitle">${escapeHtml(sectionTitle)}</div>
           <div class="auditFormGrid">
             <div class="auditField auditField--wide">
               <label for="auditEventTitle">Titel</label>
@@ -1892,14 +1910,16 @@ Umfang:
               <label for="auditEventLocation">Ort / Location</label>
               <input id="auditEventLocation" type="text" value="${escapeHtml(eventFieldValue(item, "location"))}" autocomplete="off" />
             </div>
-            <div class="auditField">
-              <label for="auditEventVisualKey">Bildtyp / visual_key</label>
-              <input id="auditEventVisualKey" type="text" value="${escapeHtml(eventFieldValue(item, "visual_key") || item.suggested_visual_key || "")}" autocomplete="off" />
-            </div>
-            <div class="auditField">
-              <label for="auditEventVisualMotif">Motiv / visual_motif</label>
-              <input id="auditEventVisualMotif" type="text" value="${escapeHtml(eventFieldValue(item, "visual_motif") || eventFieldValue(item, "image_visual_motif") || item.suggested_visual_motif || "")}" autocomplete="off" />
-            </div>
+            ${isTicketSourceIssue ? `` : `
+              <div class="auditField">
+                <label for="auditEventVisualKey">Bildtyp / visual_key</label>
+                <input id="auditEventVisualKey" type="text" value="${escapeHtml(eventFieldValue(item, "visual_key") || item.suggested_visual_key || "")}" autocomplete="off" />
+              </div>
+              <div class="auditField">
+                <label for="auditEventVisualMotif">Motiv / visual_motif</label>
+                <input id="auditEventVisualMotif" type="text" value="${escapeHtml(eventFieldValue(item, "visual_motif") || eventFieldValue(item, "image_visual_motif") || item.suggested_visual_motif || "")}" autocomplete="off" />
+              </div>
+            `}
             <div class="auditField auditField--wide">
               <label for="auditEventSourceUrl">Offizielle Quelle</label>
               <input id="auditEventSourceUrl" type="url" value="${escapeHtml(sourceValue)}" inputmode="url" autocomplete="off" />
@@ -2145,7 +2165,16 @@ Umfang:
       const suggestedUrl = trimValue(it.suggested_url);
       const publicUrl = trimValue(it.public_url);
       const sourceUrl = trimValue(it.source_url);
-      const showPublicLink = publicUrl && comparableUrl(publicUrl) !== comparableUrl(sourceUrl);
+      const isTicketSourceIssue = isTicketPortalPrimarySourceIssue(it);
+      const showPublicLink = !isTicketSourceIssue && publicUrl && comparableUrl(publicUrl) !== comparableUrl(sourceUrl);
+      const sourceSectionTitle = isTicketSourceIssue ? "Aktuelle Quelle" : "Quelle prüfen";
+      const sourceButtonLabel = isTicketSourceIssue ? "Ticketportal öffnen" : "Quelle prüfen";
+      const sourceButtonTitle = isTicketSourceIssue ? "Öffnet die aktuell hinterlegte Ticketportal-Quelle." : "Öffnet die Originalquelle, anhand der du den Befund prüfst.";
+      const saveButtonLabel = isTicketSourceIssue ? "Offizielle Quelle übernehmen" : "Korrektur speichern";
+      const saveButtonTitle = isTicketSourceIssue ? "Speichert die vorgeschlagene offizielle Quelle als primäre Eventquelle." : "Speichert die sichtbaren Korrekturfelder direkt in den Eventdaten.";
+      const verifiedButtonLabel = isTicketSourceIssue ? "Ticketportal behalten" : "Als geprüft abschließen";
+      const verifiedButtonClass = isTicketSourceIssue ? "btn" : "btn btn-good";
+      const verifiedButtonTitle = isTicketSourceIssue ? "Nur nutzen, wenn keine bessere offizielle Quelle übernommen werden soll." : "Markiert den Fall als geprüft, wenn keine Änderung nötig ist.";
       const auditRowsHtml = buildContentAuditRows(it).map(([label, value]) => `
         <div class="reviewRow">
           <div class="reviewLabel">${escapeHtml(label)}</div>
@@ -2189,10 +2218,10 @@ Umfang:
           </section>
 
           <section class="reviewSection" aria-label="Links">
-            <div class="reviewSectionTitle">Quelle prüfen</div>
+            <div class="reviewSectionTitle">${escapeHtml(sourceSectionTitle)}</div>
             <div class="auditLinkGrid">
-              ${showPublicLink ? `<button id="btnOpenEvent" class="btn sourceBtn" type="button" title="Öffnet den aktuellen öffentlichen Eintrag in der App.">Eintrag öffnen</button>` : ``}
-              <button id="btnOpenSource" class="btn sourceBtn" type="button" title="Öffnet die Originalquelle, anhand der du den Befund prüfst." ${sourceUrl ? "" : "disabled"}>Quelle prüfen</button>
+              ${showPublicLink ? `<button id="btnOpenEvent" class="btn sourceBtn" type="button" title="Öffnet den aktuellen öffentlichen Eintrag in der App.">App-Eintrag öffnen</button>` : ``}
+              <button id="btnOpenSource" class="btn sourceBtn" type="button" title="${escapeHtml(sourceButtonTitle)}" ${sourceUrl ? "" : "disabled"}>${escapeHtml(sourceButtonLabel)}</button>
             </div>
 
           </section>
@@ -2225,8 +2254,8 @@ Umfang:
               <button id="btnAuditNext" class="btn" type="button" title="Zur nächsten Karte wechseln. Speichert nichts." ${queue.length ? "" : "disabled"}>Weiter</button>
             </div>
             <div class="actions actions--compact">
-              ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button" title="Speichert die sichtbaren Korrekturfelder direkt in den Eventdaten.">Korrektur speichern</button>` : ``}
-              <button id="btnAuditVerified" class="btn btn-good" type="button" title="Markiert den Fall als geprüft, wenn keine Änderung nötig ist.">Als geprüft abschließen</button>
+              ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button" title="${escapeHtml(saveButtonTitle)}">${escapeHtml(saveButtonLabel)}</button>` : ``}
+              <button id="btnAuditVerified" class="${escapeHtml(verifiedButtonClass)}" type="button" title="${escapeHtml(verifiedButtonTitle)}">${escapeHtml(verifiedButtonLabel)}</button>
               ${isActivity ? `<button id="btnAuditPatchNeeded" class="btn btn-bad" type="button" title="Markiert diesen Activity-Fall für einen bewussten Repo-Patch.">Patch nötig</button>` : ``}
               <button id="btnAuditSnooze" class="btn" type="button" title="Blendet den Fall 7 Tage aus und prüft ihn danach erneut.">7 Tage parken</button>
             </div>
@@ -2250,9 +2279,15 @@ Umfang:
       document.querySelectorAll("[data-audit-bundle-copy]").forEach((button) => {
         button.addEventListener("click", () => copyContentAuditPackageToClipboard(trimValue(button.getAttribute("data-audit-bundle-copy"))));
       });
+      document.querySelectorAll("[data-open-url]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const url = trimValue(button.getAttribute("data-open-url"));
+          if (url) window.open(url, "_blank", "noopener,noreferrer");
+        });
+      });
       document.getElementById("btnAuditVerified").addEventListener("click", () => writeContentAuditAction(it, "verify_full", {
         next_review_days: guide.nextReviewDays || (isActivity ? 30 : 7),
-        review_note: "Über interne Inbox vollständig fachlich geprüft."
+        review_note: isTicketSourceIssue ? "Ticketportal als primaere Quelle bewusst beibehalten; keine bessere offizielle Quelle uebernommen." : "Über interne Inbox vollständig fachlich geprüft."
       }));
       document.getElementById("btnAuditSnooze").addEventListener("click", () => writeContentAuditAction(it, "snooze", {
         next_review_days: 7,
@@ -2271,7 +2306,7 @@ Umfang:
         saveFieldsButton.addEventListener("click", () => writeContentAuditAction(it, "update_event_fields", {
           event_updates: collectEventUpdateFields(),
           next_review_days: guide.nextReviewDays || 7,
-          review_note: "Eventdaten über interne Inbox korrigiert und fachlich geprüft."
+          review_note: isTicketSourceIssue ? "Offizielle Quelle über interne Inbox übernommen und Kernangaben geprüft." : "Eventdaten über interne Inbox korrigiert und fachlich geprüft."
         }));
       }
     }
@@ -2296,8 +2331,8 @@ Umfang:
 
         await postJson(CONTENT_AUDIT_UPDATE_API_URL, payload);
         const labels = {
-          update_event_fields: "Eventdaten korrigiert.",
-          verify_full: "Content-Fall vollständig geprüft.",
+          update_event_fields: isTicketPortalPrimarySourceIssue(it) ? "Offizielle Quelle übernommen." : "Eventdaten korrigiert.",
+          verify_full: isTicketPortalPrimarySourceIssue(it) ? "Ticketportal bewusst beibehalten." : "Content-Fall vollständig geprüft.",
           snooze: "Content-Fall 7 Tage zurückgestellt.",
           mark_patch_needed: "Content-Fall als Patch nötig markiert."
         };
