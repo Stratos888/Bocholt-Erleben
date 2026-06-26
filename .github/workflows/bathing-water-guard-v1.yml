@@ -1,0 +1,72 @@
+name: Bathing Water Guard V1
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_measurement_age_days:
+        description: "Maximum age in days for a positive NRW sample before state becomes unknown"
+        required: false
+        default: "45"
+      warn_measurement_age_days:
+        description: "Age in days where an otherwise OK NRW sample becomes watch"
+        required: false
+        default: "35"
+      guard_date:
+        description: "Optional guard date YYYY-MM-DD; empty = today UTC"
+        required: false
+        default: ""
+  schedule:
+    # Daily during the usual bathing season. The script itself remains conservative
+    # and never writes product data.
+    - cron: "17 5 * 5-9 *"
+  push:
+    paths:
+      - "scripts/check-bathing-water-status.py"
+      - ".github/workflows/bathing-water-guard-v1.yml"
+      - "BATHING_WATER_GUARD_V1.md"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  guard-report:
+    name: Build report-only bathing water guard artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile guard script
+        run: python3 -m py_compile scripts/check-bathing-water-status.py
+
+      - name: Run bathing water guard V1
+        run: |
+          mkdir -p artifacts/bathing-water-guard-v1
+          args=(
+            --max-measurement-age-days "${{ github.event.inputs.max_measurement_age_days || '45' }}"
+            --warn-measurement-age-days "${{ github.event.inputs.warn_measurement_age_days || '35' }}"
+            --out-json artifacts/bathing-water-guard-v1/bathing-water-status-guard.json
+            --out-md artifacts/bathing-water-guard-v1/bathing-water-status-guard.md
+          )
+          if [ -n "${{ github.event.inputs.guard_date || '' }}" ]; then
+            args+=(--today "${{ github.event.inputs.guard_date }}")
+          fi
+          python3 scripts/check-bathing-water-status.py "${args[@]}"
+
+      - name: Upload guard artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bathing-water-guard-v1
+          path: artifacts/bathing-water-guard-v1/
+          if-no-files-found: error
