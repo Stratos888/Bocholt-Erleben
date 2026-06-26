@@ -1,3 +1,104 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_SEASONAL_ACTIVITY_HIGHLIGHTS_V1_DONE_2026_06_26 | Zweck: dokumentiert Abschluss des Workpacks Seasonal Activity Highlights V1 inklusive Content Batch 01, Bade-/Status-Gate und Home-Rotationshaertung; Umfang: Staging-Deploy, fachlicher Smoke, Datenstand und bewusste Folgeregeln === -->
+## Seasonal Activity Highlights V1 + Content Batch 01 – abgeschlossen (2026-06-26)
+
+Status: auf Staging eingebracht, deployed und fachlich per Smoke-Test bestaetigt.
+
+### Umgesetzter Zielzustand
+
+- Saisonale Activity-Highlights sind als gepruefte Zusatzschicht in `data/offers.json` modelliert.
+- Home nutzt aktive Highlights kuratierend, aber nicht mehr dauerhaft dominierend.
+- Die Aktivitaetenseite zeigt aktive Highlights ueber:
+  - Card-Pill `Jetzt: ...`,
+  - Filter `Jetzt besonders`,
+  - Detailpanel-Block `Jetzt besonders`.
+- Zustandsabhaengige Bade-/Wasser-Highlights werden nur mit frischer positiver Statusquelle ausgespielt.
+- Negative oder unbekannte Statuslage blockiert Bade-Highlights auch dann, wenn das saisonale Grundfenster passt.
+- Konkrete Aktionen, Fuehrungen und Termine bleiben Events und werden nicht als Activity-Highlight gepflegt.
+- Weiche Annahmen wie `Park = Bluete`, `Sommer = Baden` oder `Naturgebiet = Tiere sichtbar` werden nicht ausgespielt.
+
+### Aktueller Datenstand
+
+- Activities gesamt: 44.
+- Saisonale Highlight-Datensaetze: 10.
+- Stabile saisonale Highlights: 6.
+- Zustandsabhaengige Bade-/Status-Highlights: 4.
+- Aktive Bade-Highlights ohne frische positive Statusquelle: 0.
+
+Aktiv stabile Highlights je Saisonfenster:
+
+- `zwillbrocker-venn-flamingos-entdecken` – Flamingo-Zeit.
+- `korenburgerveen-entdecken` – Moor-/Wollgraszeit.
+- `quellengrundpark-weseke-entdecken` – Apothekergarten-Saison.
+- `witte-venn-ahaus-alstaette-entdecken` – Heidebluete-Zeit.
+- `wasserburg-anholt-erleben` – Landschaftspark-Saison.
+- `anholter-schweiz-erleben` – Wildpark-Saison.
+
+Bewusst nicht aktiv als Bade-Highlight ausgespielt:
+
+- `aasee-erleben` – aktueller Status `blocked`.
+- `hilgelo-erleben` – aktueller Status `unknown`.
+- `proebstingsee-borken-erleben` – aktueller Status `unknown`.
+- `auesee-wesel-erleben` – aktueller Status `unknown`.
+
+### Gepruefter Staging-Smoke
+
+Bestanden:
+
+- GitHub Actions / Deploy nach den Seasonal-Highlight-Patches gruen.
+- Kurzzeitiger STRATO-/Smoke-Timeout wurde per Rerun ohne Codeaenderung geloest.
+- Staging laedt wieder auf Mobile und Desktop.
+- Home laedt ohne kaputte Cards.
+- Aktivitaetenseite laedt und zeigt `Jetzt besonders (5)` im aktuellen Saisonkontext.
+- Cards zeigen `Jetzt: ...` nur bei aktivem, erlaubtem Highlight-Zeitfenster.
+- Aasee, Hilgelo, Proebstingsee und Auesee zeigen keine Bade-Highlight-Pill.
+- Zwillbrocker Venn, Quellengrundpark Weseke, Wasserburg Anholt, Anholter Schweiz und Korenburgerveen zeigen im aktuellen Zeitraum passende `Jetzt`-Pills.
+- Detailpanel zeigt bei stabilen Highlights einen kompakten Block `Jetzt besonders` mit vorsichtiger Sprache.
+- Home-Rotationshaertung verhindert, dass saisonale Highlights dauerhaft die komplette Empfehlungsliste dominieren.
+
+### Validierung
+
+Bestanden im Patch-/Deploy-Kontext:
+
+- JS-Syntaxchecks fuer die betroffenen Frontend-Dateien.
+- Python-Compile-Checks fuer Content-/Highlight-Audit-Skripte.
+- `data/offers.json` JSON-valid.
+- `python3 scripts/audit-activity-highlights.py --scope full` bestanden.
+- Audit-Datenstand nach Content Batch 01:
+  - `seasonal_highlights=10`
+  - `stable=6`
+  - `condition_sensitive=4`
+  - `condition_currently_playable=0`
+  - `blocked=1`
+  - `unknown=3`
+
+### Bewusste Produkt- und Prozessregeln
+
+- Ein Saisonfenster allein reicht nicht fuer Badeempfehlungen.
+- Bade-/Wasser-Highlights brauchen aktuelle positive Statusdaten aus offizieller oder vergleichbar belastbarer Quelle.
+- Presse-/News-Hinweise koennen als Negativsignal blockieren, aber nicht allein positiv freigeben.
+- `blocked` und `unknown` schlagen immer das Saisonfenster.
+- Content-Pruefung soll zustandsabhaengige Highlights wie Badeseen taeglich bzw. saisonal eng pruefen, aber nur echte Handlungsfaelle in die Inbox bringen.
+- Frontend fragt keine Live-News ab; ausgespielt werden nur gepruefte Repo-/Contentdaten.
+
+### Abschlussbewertung
+
+Das Workpack `Seasonal Activity Highlights V1` ist fuer den aktuellen Staging-Stand abgeschlossen.
+
+Abgeschlossen sind:
+
+- Systemlogik fuer saisonale Activity-Highlights.
+- Status-/Blockerlogik fuer zustandsabhaengige Highlights.
+- Aktivitaetenseiten-Filter und Card-/Detailpanel-Ausweisung.
+- Content Batch 01 mit konservativ geprueften Zusatzhighlights.
+- Home-Rotationshaertung gegen monotone saisonale Toplisten.
+
+Weitere Arbeit nur als separater Folgeworkpack:
+
+- Content Batch 02 nach erneuter quellenbasierter Recherche.
+- Operationalisierung/Automatisierung des taeglichen Badegewaesser-Status-Guards.
+- Zusätzliche Highlights nur mit belastbarer Quelle und klarer Aktivierungslogik.
+<!-- === END BLOCK: TEST_STATUS_SEASONAL_ACTIVITY_HIGHLIGHTS_V1_DONE_2026_06_26 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_INBOX_CONTENT_AUTOMATION_ROUTING_FREEZE_2026_06_26 | Zweck: dokumentiert den eingefrorenen Staging-Stand fuer Content-Automation-Routing und mobile Inbox-Nutzung; Umfang: Prozessentscheid, Validierung, offene Live-Nutzungsbeobachtung === -->
 ## Inbox / Content-Automation-Routing – Mobile-Arbeitsstand eingefroren (2026-06-26)
 
