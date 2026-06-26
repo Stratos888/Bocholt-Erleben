@@ -69,7 +69,7 @@ jobs:
         env:
           BE_SHEET_ID: ${{ env.BE_SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL || secrets.SEARCH_METRICS_GOOGLE_SITE_URL }}
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
           GROWTH_LOOKBACK_DAYS: ${{ env.GROWTH_LOOKBACK_DAYS }}
           GROWTH_BACKLOG_TAB: ${{ env.GROWTH_BACKLOG_TAB }}
