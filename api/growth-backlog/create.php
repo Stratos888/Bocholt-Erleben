@@ -17,6 +17,8 @@ if (!is_array($payload)) $payload = [];
 $title = trim((string)($payload['title'] ?? ''));
 $type = trim((string)($payload['type'] ?? 'Sonstiges'));
 $note = trim((string)($payload['note'] ?? ''));
+$priority = mb_strtolower(trim((string)($payload['priority'] ?? 'mittel')), 'UTF-8');
+if (!in_array($priority, ['hoch', 'mittel', 'niedrig'], true)) $priority = 'mittel';
 if ($title === '') {
     be_json_response(422, ['status' => 'error', 'message' => 'Titel fehlt.']);
 }
@@ -40,7 +42,7 @@ try {
         'id' => 'manual-' . gmdate('YmdHis') . '-' . substr(hash('sha256', $clusterKey), 0, 8),
         'cluster_key' => $clusterKey,
         'status' => 'open',
-        'priority' => 'mittel',
+        'priority' => $priority,
         'type' => $type !== '' ? $type : 'Sonstiges',
         'title' => $title,
         'short_reason' => $note !== '' ? mb_substr($note, 0, 140, 'UTF-8') : 'Manuell notiert',

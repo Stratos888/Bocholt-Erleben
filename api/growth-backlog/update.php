@@ -20,8 +20,14 @@ $status = match ($action) {
     'reject' => 'rejected',
     default => '',
 };
-if ($id === '' || $status === '') {
+$allowedPriorities = ['hoch', 'mittel', 'niedrig'];
+$priority = mb_strtolower(trim((string)($payload['priority'] ?? '')), 'UTF-8');
+$editAction = $action === 'edit';
+if ($id === '' || ($status === '' && !$editAction)) {
     be_json_response(422, ['status' => 'error', 'message' => 'Ungültige Backlog-Aktion.']);
+}
+if ($priority !== '' && !in_array($priority, $allowedPriorities, true)) {
+    be_json_response(422, ['status' => 'error', 'message' => 'Ungültige Priorität.']);
 }
 
 try {
@@ -29,6 +35,18 @@ try {
     foreach ($rows as $row) {
         if ((string)($row['id'] ?? '') !== $id) continue;
         $now = gbl_now_iso();
+        if ($editAction) {
+            $updates = ['updated_at' => $now];
+            foreach (['title', 'type', 'short_reason', 'why_relevant', 'recommended_action', 'expected_benefit', 'acquisition_note'] as $field) {
+                if (array_key_exists($field, $payload)) {
+                    $updates[$field] = trim((string)$payload[$field]);
+                }
+            }
+            if ($priority !== '') $updates['priority'] = $priority;
+            gbl_update_cells($header, $index, (int)$row['_sheet_row'], $updates);
+            be_json_response(200, ['status' => 'ok', 'data' => ['item' => gbl_public_item(array_merge($row, $updates))]]);
+        }
+
         gbl_update_cells($header, $index, (int)$row['_sheet_row'], [
             'status' => $status,
             'updated_at' => $now,

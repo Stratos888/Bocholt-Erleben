@@ -245,6 +245,13 @@ Umfang:
     .backlogAddSheet label { display:grid; gap:4px; font-size:12px; font-weight:780; opacity:.78; }
     .backlogAddSheet input, .backlogAddSheet select, .backlogAddSheet textarea { width:100%; box-sizing:border-box; border-radius:12px; border:1px solid rgba(31,41,51,.16); padding:9px 10px; font:inherit; }
     .backlogAddSheet textarea { min-height:82px; resize:vertical; }
+    .backlogPriorityEdit { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:780; opacity:.82; }
+    .backlogPriorityEdit select { max-width:92px; border-radius:999px; border:1px solid rgba(31,41,51,.16); padding:4px 8px; background:#fff; font:inherit; }
+    .backlogEditForm { display:grid; gap:8px; padding:10px; border-radius:14px; background:rgba(249,251,246,.92); border:1px solid rgba(31,41,51,.10); }
+    .backlogEditForm[hidden] { display:none; }
+    .backlogEditForm label { display:grid; gap:4px; font-size:12px; font-weight:780; opacity:.80; }
+    .backlogEditForm input, .backlogEditForm textarea { width:100%; box-sizing:border-box; border-radius:12px; border:1px solid rgba(31,41,51,.16); padding:8px 10px; font:inherit; background:#fff; }
+    .backlogEditForm textarea { min-height:68px; resize:vertical; }
     .backlogAddActions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
     @media (max-width: 520px) {
       .backlogHeader { align-items:stretch; }
@@ -1803,8 +1810,54 @@ Umfang:
       return "Mittel";
     }
 
+    function backlogPriorityRank(priority) {
+      const key = trimValue(priority).toLowerCase();
+      return key === "hoch" ? 0 : (key === "mittel" ? 1 : (key === "niedrig" ? 2 : 3));
+    }
+
+    function sortGrowthBacklogQueue() {
+      queue = queue.slice().sort((a, b) => {
+        const byPriority = backlogPriorityRank(a.priority) - backlogPriorityRank(b.priority);
+        if (byPriority) return byPriority;
+        return trimValue(b.created_at).localeCompare(trimValue(a.created_at));
+      });
+    }
+
+    function renderBacklogPrioritySelect(item, compact = false) {
+      const currentPriority = trimValue(item.priority).toLowerCase() || "mittel";
+      const options = ["hoch", "mittel", "niedrig"];
+      return `
+        <label class="backlogPriorityEdit${compact ? " is-compact" : ""}">
+          <span>${compact ? "Prio" : "Priorität"}</span>
+          <select data-backlog-priority="${escapeHtml(item.id)}">
+            ${options.map((value) => `<option value="${escapeHtml(value)}"${currentPriority === value ? " selected" : ""}>${escapeHtml(formatBacklogPriority(value))}</option>`).join("")}
+          </select>
+        </label>
+      `;
+    }
+
+    function renderBacklogEditForm(item) {
+      return `
+        <form class="backlogEditForm" data-backlog-edit-form="${escapeHtml(item.id)}" hidden>
+          <strong>Eintrag bearbeiten</strong>
+          <label>Titel<input name="title" maxlength="160" value="${escapeHtml(trimValue(item.title))}"></label>
+          <label>Typ<input name="type" maxlength="80" value="${escapeHtml(trimValue(item.type) || "Sonstiges")}"></label>
+          <label>Kurzgrund<input name="short_reason" maxlength="220" value="${escapeHtml(trimValue(item.short_reason))}"></label>
+          <label>Warum relevant?<textarea name="why_relevant" maxlength="1200">${escapeHtml(trimValue(item.why_relevant || item.short_reason))}</textarea></label>
+          <label>Was genau tun?<textarea name="recommended_action" maxlength="1200">${escapeHtml(trimValue(item.recommended_action))}</textarea></label>
+          <label>Erwarteter Nutzen<textarea name="expected_benefit" maxlength="1200">${escapeHtml(trimValue(item.expected_benefit))}</textarea></label>
+          <label>Akquise-Einschätzung<textarea name="acquisition_note" maxlength="1200">${escapeHtml(trimValue(item.acquisition_note))}</textarea></label>
+          <div class="backlogAddActions">
+            <button class="btn" type="submit">Änderungen speichern</button>
+            <button class="btn" type="button" data-backlog-edit-cancel="${escapeHtml(item.id)}">Schließen</button>
+          </div>
+        </form>
+      `;
+    }
+
     function renderGrowthBacklogList() {
       refreshLock();
+      sortGrowthBacklogQueue();
       const items = queue.filter(isGrowthBacklogItem);
       elLeft.textContent = `${items.length} offen`;
       elRight.textContent = totalLoaded ? `Backlog: ${totalLoaded}` : "";
@@ -1812,7 +1865,7 @@ Umfang:
         <details class="backlogItem" data-backlog-id="${escapeHtml(item.id)}">
           <summary>
             <div class="backlogLine">
-              <span class="pill">${escapeHtml(formatBacklogPriority(item.priority))}</span>
+              ${renderBacklogPrioritySelect(item, true)}
               <span class="pill muted">${escapeHtml(trimValue(item.type) || "Sonstiges")}</span>
             </div>
             <div class="backlogTitle">${escapeHtml(trimValue(item.title) || "Unbenannter Backlog-Punkt")}</div>
@@ -1823,6 +1876,8 @@ Umfang:
             ${renderBacklogBlock("Was genau tun?", item.recommended_action)}
             ${renderBacklogBlock("Erwarteter Nutzen", item.expected_benefit)}
             ${trimValue(item.acquisition_note) ? renderBacklogBlock("Akquise-Einschätzung", item.acquisition_note) : ""}
+            <button class="btn" type="button" data-backlog-edit="${escapeHtml(item.id)}">Bearbeiten</button>
+            ${renderBacklogEditForm(item)}
             <div class="backlogActions">
               <button class="btn" type="button" data-backlog-action="complete" data-backlog-id="${escapeHtml(item.id)}">Abgeschlossen</button>
               <button class="btn danger" type="button" data-backlog-action="reject" data-backlog-id="${escapeHtml(item.id)}">Ablehnen</button>
@@ -1853,6 +1908,11 @@ Umfang:
               <option>Content</option><option>SEO</option><option>Akquise</option><option>UX</option><option>Activity-Idee</option><option>Sonstiges</option>
             </select>
           </label>
+          <label>Priorität
+            <select id="backlogAddPriority" name="priority">
+              <option value="hoch">Hoch</option><option value="mittel" selected>Mittel</option><option value="niedrig">Niedrig</option>
+            </select>
+          </label>
           <label>Notiz<textarea id="backlogAddNote" name="note" maxlength="1200" placeholder="Warum ist das relevant, was soll später geprüft werden?"></textarea></label>
           <div class="backlogAddActions">
             <button class="btn" type="submit">Speichern</button>
@@ -1875,6 +1935,58 @@ Umfang:
       const cancelBtn = document.getElementById("btnBacklogAddCancel");
       if (addBtn && sheet) addBtn.addEventListener("click", () => { sheet.hidden = false; document.getElementById("backlogAddTitle")?.focus(); });
       if (cancelBtn && sheet) cancelBtn.addEventListener("click", () => { sheet.hidden = true; });
+
+      document.querySelectorAll("[data-backlog-priority]").forEach((select) => {
+        select.addEventListener("click", (event) => event.stopPropagation());
+        select.addEventListener("change", async () => {
+          const id = select.getAttribute("data-backlog-priority") || "";
+          const priority = trimValue(select.value) || "mittel";
+          try {
+            select.disabled = true;
+            const result = await postGrowthBacklogJson(GROWTH_BACKLOG_UPDATE_API_URL, { id, action: "edit", priority });
+            queue = queue.map((item) => trimValue(item.id) === id ? { ...item, ...(result.item || {}), priority } : item);
+            renderGrowthBacklogList();
+          } catch (error) {
+            setStatus("Priorität konnte nicht gespeichert werden: " + (error && error.message ? error.message : error));
+            select.disabled = false;
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-backlog-edit]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const id = button.getAttribute("data-backlog-edit") || "";
+          const form = document.querySelector(`[data-backlog-edit-form="${CSS.escape(id)}"]`);
+          if (form) form.hidden = !form.hidden;
+        });
+      });
+
+      document.querySelectorAll("[data-backlog-edit-cancel]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const id = button.getAttribute("data-backlog-edit-cancel") || "";
+          const form = document.querySelector(`[data-backlog-edit-form="${CSS.escape(id)}"]`);
+          if (form) form.hidden = true;
+        });
+      });
+
+      document.querySelectorAll("[data-backlog-edit-form]").forEach((form) => {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const id = form.getAttribute("data-backlog-edit-form") || "";
+          const data = new FormData(form);
+          const payload = { id, action: "edit" };
+          ["title", "type", "short_reason", "why_relevant", "recommended_action", "expected_benefit", "acquisition_note"].forEach((field) => {
+            payload[field] = trimValue(data.get(field));
+          });
+          try {
+            const result = await postGrowthBacklogJson(GROWTH_BACKLOG_UPDATE_API_URL, payload);
+            queue = queue.map((item) => trimValue(item.id) === id ? { ...item, ...(result.item || {}), ...payload } : item);
+            renderGrowthBacklogList();
+          } catch (error) {
+            setStatus("Backlog-Eintrag konnte nicht gespeichert werden: " + (error && error.message ? error.message : error));
+          }
+        });
+      });
 
       document.querySelectorAll("[data-backlog-action]").forEach((button) => {
         button.addEventListener("click", async () => {
@@ -1899,10 +2011,11 @@ Umfang:
           event.preventDefault();
           const title = trimValue(document.getElementById("backlogAddTitle")?.value);
           const type = trimValue(document.getElementById("backlogAddType")?.value) || "Sonstiges";
+          const priority = trimValue(document.getElementById("backlogAddPriority")?.value) || "mittel";
           const note = trimValue(document.getElementById("backlogAddNote")?.value);
           if (!title) return;
           try {
-            await postGrowthBacklogJson(GROWTH_BACKLOG_CREATE_API_URL, { title, type, note });
+            await postGrowthBacklogJson(GROWTH_BACKLOG_CREATE_API_URL, { title, type, priority, note });
             await loadAndShow();
           } catch (error) {
             setStatus("Backlog-Notiz konnte nicht gespeichert werden: " + (error && error.message ? error.message : error));
