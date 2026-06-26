@@ -77,3 +77,21 @@ python3 scripts/audit-activity-highlights.py --scope full
 ```
 
 Der bestehende Activity-Highlight-Audit prüft die strukturierten Highlight-Daten. Zustandsabhängige Bade-/Wasser-Highlights bleiben ohne `current_status.state=ok` unsichtbar. Der separate Badegewässer-Guard kann als Report-Proof genutzt werden, schreibt aber ohne eigenes Freigabe-Workpack keine Produktdaten zurück.
+
+## Badegewässer-Statusdatei V2
+
+Ab Guard V2 ist `data/offers.json` nicht mehr die einzige Statusquelle für Badegewässer. Die redaktionellen Activity-Daten bleiben dort erhalten; der tagesaktuelle Guard-Status wird separat generiert:
+
+```text
+data/bathing_water_status.json
+```
+
+Frontend-Regel:
+
+1. `data/offers.json` liefert die Activity- und Highlight-Stammdaten.
+2. `data/bathing_water_status.json` überschreibt bei Badegewässer-Highlights nur `current_status`.
+3. Wenn die Statusdatei fehlt, kaputt oder nicht passend ist, bleibt der konservative Fallback aus `offers.json` aktiv.
+4. `ok` aus der Statusdatei darf nur aktivierend wirken, wenn der Guard `water_state=ok` und `local_suitability_state=ok` liefert.
+5. `watch`, `blocked` und `unknown` verhindern weiter Bade-Highlights und Bade-Boosts.
+
+Damit können tägliche Guard-Läufe Live-Hinweise aktualisieren, ohne redaktionelle Stammdaten automatisch umzuschreiben.

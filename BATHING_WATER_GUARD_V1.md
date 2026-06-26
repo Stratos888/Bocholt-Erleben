@@ -164,3 +164,32 @@ V1.2 trennt weiterhin Report-Guard und Produktdaten. Wenn ein lokaler Hinweis fa
 - `unknown` erzeugt keinen Card-Chip, um die Aktivitaetenliste nicht mit unklaren Hinweisen zu ueberfrachten.
 - Das Detailpanel erklaert die Ursache kompakt, z. B. Wasserwerte unauffaellig, aber lokaler Schlamm-/Geruchshinweis aktiv.
 - Ein negativer lokaler Hinweis laeuft ueber `valid_until` ab oder wird durch eine staerkere positive lokale Quelle ersetzt. Das blosse Fehlen neuer Negativmeldungen ist keine Entwarnung.
+
+## Guard V2 – Safe Writeback über Statusdatei
+
+V2 beendet den reinen Report-only-Endzustand, ohne `data/offers.json` automatisch zu verändern.
+
+Neue generierte Produktdatei:
+
+```text
+data/bathing_water_status.json
+```
+
+Ablauf:
+
+1. Der Guard prüft die konfigurierten Badegewässerquellen.
+2. Er erzeugt weiterhin Report-Artefakte (`bathing-water-status-guard.json` und `.md`).
+3. Zusätzlich schreibt er mit `--write-data data/bathing_water_status.json` eine kleine Frontend-Statusdatei.
+4. Der Workflow committet diese Datei nur bei echtem Diff.
+5. Der normale Deploy spielt die geänderte Statusdatei live aus.
+6. Das Frontend lädt `offers.json` plus `bathing_water_status.json` und nutzt die Statusdatei als Override für `current_status`.
+
+Abgrenzung:
+
+- `data/offers.json` bleibt redaktioneller Stammdatenbestand.
+- `data/bathing_water_status.json` ist ein generiertes Laufzeit-/Statusartefakt.
+- `ok` wird nur wirksam, wenn der Guard sowohl `water_state=ok` als auch `local_suitability_state=ok` schreibt.
+- `watch`, `blocked` und `unknown` werden automatisch live sichtbar bzw. suppressen Bade-Highlights.
+- Bei fehlender oder fehlerhafter Statusdatei fällt das Frontend auf die konservativen Statuswerte aus `offers.json` zurück.
+
+Der Workflow heißt weiterhin technisch `.github/workflows/bathing-water-guard-v1.yml`, trägt aber den Anzeigenamen `Bathing Water Guard V2`, damit bestehende Dateipfade nicht unnötig verschoben werden.

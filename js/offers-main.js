@@ -96,6 +96,10 @@ const OffersApp = {
 
       const data = await response.json();
 
+      if (typeof window.BEActivityHighlights?.loadStatusOverrides === "function") {
+        await window.BEActivityHighlights.loadStatusOverrides();
+      }
+
       try {
         const visualPoolResponse = await fetch("/data/activity_visual_pool.json", { cache: "no-store" });
         if (visualPoolResponse.ok) {

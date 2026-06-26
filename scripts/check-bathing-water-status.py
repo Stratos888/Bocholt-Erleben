@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Report-only bathing-water status guard for Bocholt erleben.
+"""Bathing-water status guard for Bocholt erleben.
 
-This script reads official bathing-water sources found by the V2 source discovery
-workpack and produces JSON/Markdown artifacts. It intentionally does not write to
-`data/offers.json` and does not activate any public highlight.
+The guard reads official bathing-water sources found by the V2 source discovery
+workpack and produces JSON/Markdown report artifacts. In V2 it can also write a
+small generated frontend status file. It never edits `data/offers.json`;
+redactional activity data and time-sensitive bathing status stay separated.
 
 Status policy is conservative:
 - `blocked` beats all other states.
 - `ok` is only emitted for current, parseable, positive source data.
-- ambiguous, stale or unavailable source data becomes `unknown`.
+- ambiguous, stale or unavailable source data becomes `unknown` or `watch`.
+- public bathing highlights require both positive water status and positive local
+  suitability; positive lab values alone are not enough.
 """
 
 from __future__ import annotations
@@ -27,7 +30,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-SCRIPT_VERSION = "BATHING_WATER_GUARD_V1_2_LOCAL_SUITABILITY_REPORT_ONLY"
+SCRIPT_VERSION = "BATHING_WATER_GUARD_V2_SAFE_WRITEBACK"
 USER_AGENT = "BocholtErlebenBathingWaterGuard/1.0 (+https://bocholt-erleben.de)"
 REQUEST_TIMEOUT_SECONDS = 25
 
@@ -187,6 +190,7 @@ class SourceConfig:
 class GroupConfig:
     group_id: str
     activity_ids: List[str]
+    highlight_id: str
     title: str
     season_start: str
     season_end: str
@@ -220,6 +224,7 @@ GROUPS: List[GroupConfig] = [
     GroupConfig(
         group_id="aasee-bocholt",
         activity_ids=["aasee-erleben"],
+        highlight_id="aasee-bathing-status",
         title="Aasee Bocholt",
         season_start="06-01",
         season_end="09-15",
@@ -259,6 +264,7 @@ GROUPS: List[GroupConfig] = [
     GroupConfig(
         group_id="hilgelo-winterswijk",
         activity_ids=["hilgelo-erleben"],
+        highlight_id="hilgelo-bathing-status",
         title="'t Hilgelo Winterswijk",
         season_start="05-01",
         season_end="10-01",
@@ -276,6 +282,7 @@ GROUPS: List[GroupConfig] = [
     GroupConfig(
         group_id="proebstingsee-borken",
         activity_ids=["proebstingsee-borken-erleben"],
+        highlight_id="proebstingsee-bathing-status",
         title="Pröbstingsee Borken",
         season_start="05-15",
         season_end="09-15",
@@ -293,6 +300,7 @@ GROUPS: List[GroupConfig] = [
     GroupConfig(
         group_id="auesee-wesel",
         activity_ids=["auesee-wesel-erleben"],
+        highlight_id="auesee-bathing-status",
         title="Auesee Wesel",
         season_start="05-15",
         season_end="09-15",
@@ -921,6 +929,134 @@ def result_to_dict(result: SourceResult) -> Dict[str, Any]:
     }
 
 
+
+
+def add_days_iso(day: dt.date, days: int) -> str:
+    return (day + dt.timedelta(days=days)).isoformat()
+
+
+def pick_status_source(group: Dict[str, Any]) -> Dict[str, Any]:
+    sources = group.get("sources") if isinstance(group.get("sources"), list) else []
+    state = str(group.get("state") or "unknown")
+    preferred_states = ["blocked", "watch"] if state in {"blocked", "watch"} else ["ok"]
+    for wanted in preferred_states:
+        for source in sources:
+            if isinstance(source, dict) and source.get("state") == wanted:
+                return source
+    for source in sources:
+        if isinstance(source, dict):
+            return source
+    return {}
+
+
+def status_label(state: str) -> str:
+    if state == "blocked":
+        return "Baden aktuell nicht empfohlen"
+    if state == "watch":
+        return "Badehinweis prüfen"
+    if state == "ok":
+        return "Badestelle freigegeben"
+    return "Status vor Empfehlung prüfen"
+
+
+def public_note_for_group(group: Dict[str, Any]) -> str:
+    state = str(group.get("state") or "unknown")
+    confidence = str(group.get("confidence") or "")
+    water_state = str(group.get("water_state") or "unknown")
+    local_state = str(group.get("local_suitability_state") or "unknown")
+
+    if state == "blocked":
+        if confidence == "water_blocked":
+            return "Für diese Badestelle liegt aktuell ein Badeverbot, ein Sperrsignal oder ein kritisches Wasserqualitäts-Signal vor."
+        return "Für diese Badestelle liegt aktuell ein lokales Sperr- oder Warnsignal vor."
+    if state == "watch":
+        if confidence == "local_watch":
+            return (
+                "Die Wasserwerte sind aktuell unauffällig, es gibt aber lokale Hinweise auf Schlamm, "
+                "Geruch oder Ablagerungen. Deshalb wird Baden hier aktuell nicht als Tipp empfohlen."
+            )
+        if confidence == "water_watch":
+            return "Der letzte automatisch ausgelesene Messwert ist nicht frisch genug für eine aktive Badeempfehlung."
+        if confidence == "local_not_proven" or (water_state == "ok" and local_state == "unknown"):
+            return (
+                "Die Wasserwerte sind aktuell unauffällig, aber eine positive lokale Badeeignung ist "
+                "nicht belegt. Deshalb wird Baden hier aktuell nicht als Tipp empfohlen."
+            )
+        return "Der aktuelle Badegewässerstatus ist nur auf Watch-Level. Deshalb wird Baden hier nicht aktiv empfohlen."
+    if state == "ok":
+        return "Wasserstatus und lokale Badeeignung sind aktuell positiv geprüft."
+    if state == "out_of_season":
+        return "Die konfigurierte Badesaison ist aktuell nicht aktiv."
+    return "Der aktuelle Badegewässerstatus konnte nicht eindeutig geprüft werden. Deshalb gibt es keine Badeempfehlung."
+
+
+def build_public_status_data(report: Dict[str, Any]) -> Dict[str, Any]:
+    guard_date_text = str(report.get("guard_date") or "")
+    try:
+        guard_date = dt.date.fromisoformat(guard_date_text)
+    except ValueError:
+        guard_date = dt.datetime.now(dt.timezone.utc).date()
+
+    group_configs = {group.group_id: group for group in GROUPS}
+    items: Dict[str, Dict[str, Any]] = {}
+
+    for group in report.get("groups", []):
+        if not isinstance(group, dict):
+            continue
+        config = group_configs.get(str(group.get("group_id") or ""))
+        if not config:
+            continue
+        source = pick_status_source(group)
+        final_state = str(group.get("state") or "unknown")
+        status = {
+            "state": final_state,
+            "label": status_label(final_state),
+            "source_type": "guard_verified",
+            "guard_source": "bathing_water_guard_v2",
+            "source_url": str(source.get("source_url") or ""),
+            "source_urls": [str(item.get("source_url") or "") for item in group.get("sources", []) if isinstance(item, dict) and item.get("source_url")],
+            "checked_at": guard_date.isoformat(),
+            "valid_until": add_days_iso(guard_date, 2),
+            "reason": str(group.get("reason") or ""),
+            "public_note": public_note_for_group(group),
+            "confidence": str(group.get("confidence") or ""),
+            "water_state": str(group.get("water_state") or "unknown"),
+            "water_confidence": str(group.get("water_confidence") or ""),
+            "local_suitability_state": str(group.get("local_suitability_state") or "unknown"),
+            "local_suitability_confidence": str(group.get("local_suitability_confidence") or ""),
+            "latest_sample_date": None,
+            "latest_sample_age_days": None,
+            "group_id": config.group_id,
+            "activity_ids": config.activity_ids,
+            "highlight_id": config.highlight_id,
+        }
+        for water_source in group.get("water_sources", []):
+            if not isinstance(water_source, dict):
+                continue
+            if water_source.get("latest_sample_date"):
+                status["latest_sample_date"] = water_source.get("latest_sample_date")
+                status["latest_sample_age_days"] = water_source.get("latest_sample_age_days")
+                break
+        for activity_id in config.activity_ids:
+            key = f"{activity_id}:{config.highlight_id}"
+            items[key] = {"activity_id": activity_id, "highlight_id": config.highlight_id, **status}
+
+    return {
+        "generated_at": report.get("generated_at"),
+        "source": "bathing-water-guard-v2",
+        "script_version": report.get("script_version"),
+        "guard_date": report.get("guard_date"),
+        "policy": {
+            "mode": "safe_writeback_status_file",
+            "status_file": "data/bathing_water_status.json",
+            "does_not_edit": "data/offers.json",
+            "ok_requires": "water_state=ok and local_suitability_state=ok",
+            "fallback": "Frontend falls back to conservative data/offers.json status if this file is missing or invalid.",
+        },
+        "summary": report.get("summary", {}),
+        "items": items,
+    }
+
 def build_report(today: dt.date, max_age_days: int, warn_age_days: int) -> Dict[str, Any]:
     generated_at = today_utc_iso()
     groups_output: List[Dict[str, Any]] = []
@@ -944,6 +1080,7 @@ def build_report(today: dt.date, max_age_days: int, warn_age_days: int) -> Dict[
             {
                 "group_id": group.group_id,
                 "activity_ids": group.activity_ids,
+                "highlight_id": group.highlight_id,
                 "title": group.title,
                 "state": group_state,
                 "confidence": group_confidence,
@@ -974,21 +1111,22 @@ def build_report(today: dt.date, max_age_days: int, warn_age_days: int) -> Dict[
     return {
         "generated_at": generated_at,
         "script_version": SCRIPT_VERSION,
-        "scope": "bathing_water_guard_v1_2_report_only_no_product_writeback",
+        "scope": "bathing_water_guard_v2_safe_writeback_status_file",
         "guard_date": today.isoformat(),
         "policy": {
             "max_measurement_age_days": max_age_days,
             "warn_measurement_age_days": warn_age_days,
             "state_order": STATE_ORDER,
-            "important": "This report never writes public activity highlight status. A public bathing recommendation requires both positive water status and positive local suitability; positive lab values alone are not enough.",
+            "important": "The report can write data/bathing_water_status.json when --write-data is used. It never edits data/offers.json. A public bathing recommendation requires both positive water status and positive local suitability; positive lab values alone are not enough.",
         },
         "summary": {
             "groups_total": len(groups_output),
             "state_counts": counts,
             "operationally_positive_groups": operationally_positive,
             "guarded_or_blocked_groups": guarded_or_blocked,
+            "ready_for_status_file_writeback": True,
             "ready_for_product_writeback": False,
-            "recommendation": "review_report_before_any_writeback",
+            "recommendation": "write_generated_status_file_only",
         },
         "groups": groups_output,
     }
@@ -996,7 +1134,7 @@ def build_report(today: dt.date, max_age_days: int, warn_age_days: int) -> Dict[
 
 def render_markdown(report: Dict[str, Any]) -> str:
     lines: List[str] = []
-    lines.append("# Bathing Water Guard V1.2 Report")
+    lines.append("# Bathing Water Guard V2 Report")
     lines.append("")
     lines.append(f"Generated: `{report['generated_at']}`")
     lines.append(f"Guard date: `{report['guard_date']}`")
@@ -1010,7 +1148,7 @@ def render_markdown(report: Dict[str, Any]) -> str:
     lines.append(f"- Ready for product writeback: `{str(summary['ready_for_product_writeback']).lower()}`")
     lines.append(f"- Recommendation: `{summary['recommendation']}`")
     lines.append("")
-    lines.append("> Report-only: this artifact does not update `data/offers.json` and does not activate public bathing highlights.")
+    lines.append("> Safe writeback: this artifact may update `data/bathing_water_status.json`, but it does not edit `data/offers.json`.")
     lines.append("")
     lines.append("## Activity groups")
     lines.append("")
@@ -1079,12 +1217,13 @@ def ensure_parent(path: Path) -> None:
 
 
 def main(argv: Optional[List[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="Report-only bathing-water status guard.")
+    parser = argparse.ArgumentParser(description="Bathing-water status guard with optional safe status-file writeback.")
     parser.add_argument("--today", help="Guard date as YYYY-MM-DD; defaults to current UTC date.")
     parser.add_argument("--max-measurement-age-days", type=int, default=45)
     parser.add_argument("--warn-measurement-age-days", type=int, default=35)
     parser.add_argument("--out-json", default="bathing-water-status-guard.json")
     parser.add_argument("--out-md", default="bathing-water-status-guard.md")
+    parser.add_argument("--write-data", default="", help="Optional path for generated frontend status data, e.g. data/bathing_water_status.json.")
     args = parser.parse_args(argv)
     today = parse_today(args.today)
     if args.warn_measurement_age_days > args.max_measurement_age_days:
@@ -1096,6 +1235,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     ensure_parent(out_md)
     out_json.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     out_md.write_text(render_markdown(report), encoding="utf-8")
+    if args.write_data:
+        data_path = Path(args.write_data)
+        ensure_parent(data_path)
+        data_path.write_text(json.dumps(build_public_status_data(report), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report["summary"], ensure_ascii=False, indent=2))
     return 0
 

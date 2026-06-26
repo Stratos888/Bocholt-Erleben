@@ -1,0 +1,141 @@
+{
+  "generated_at": "2026-06-26T12:37:59+00:00",
+  "source": "bathing-water-guard-v2",
+  "script_version": "BATHING_WATER_GUARD_V2_SAFE_WRITEBACK",
+  "guard_date": "2026-06-26",
+  "policy": {
+    "mode": "safe_writeback_status_file",
+    "status_file": "data/bathing_water_status.json",
+    "does_not_edit": "data/offers.json",
+    "ok_requires": "water_state=ok and local_suitability_state=ok",
+    "fallback": "Frontend falls back to conservative data/offers.json status if this file is missing or invalid."
+  },
+  "summary": {
+    "groups_total": 4,
+    "state_counts": {
+      "ok": 0,
+      "watch": 3,
+      "blocked": 0,
+      "unknown": 1,
+      "out_of_season": 0
+    },
+    "operationally_positive_groups": 0,
+    "guarded_or_blocked_groups": 4,
+    "ready_for_product_writeback": false,
+    "recommendation": "write_generated_status_file_only",
+    "ready_for_status_file_writeback": true
+  },
+  "items": {
+    "aasee-erleben:aasee-bathing-status": {
+      "activity_id": "aasee-erleben",
+      "highlight_id": "aasee-bathing-status",
+      "state": "watch",
+      "label": "Badehinweis prüfen",
+      "source_type": "guard_verified",
+      "guard_source": "bathing_water_guard_v2",
+      "source_url": "https://www.bbv-net.de/bocholt/bocholter-aasee-schlamm-geruch-stinkt-keine-badegaeste-seezustand-probleme-w1212295-6000574615/",
+      "source_urls": [
+        "https://db.badegewaesser.nrw.de/badegewaesser-nrw/48/",
+        "https://www.bocholt.de/aasee",
+        "https://www.bbv-net.de/bocholt/bocholter-aasee-schlamm-geruch-stinkt-keine-badegaeste-seezustand-probleme-w1212295-6000574615/"
+      ],
+      "checked_at": "2026-06-26",
+      "valid_until": "2026-06-28",
+      "reason": "Local suitability warning suppresses an active bathing recommendation.",
+      "public_note": "Die Wasserwerte sind aktuell unauffällig, es gibt aber lokale Hinweise auf Schlamm, Geruch oder Ablagerungen. Deshalb wird Baden hier aktuell nicht als Tipp empfohlen.",
+      "confidence": "local_watch",
+      "water_state": "ok",
+      "water_confidence": "all_sources_ok",
+      "local_suitability_state": "watch",
+      "local_suitability_confidence": "watch_source",
+      "latest_sample_date": "2026-06-17",
+      "latest_sample_age_days": 9,
+      "group_id": "aasee-bocholt",
+      "activity_ids": [
+        "aasee-erleben"
+      ]
+    },
+    "hilgelo-erleben:hilgelo-bathing-status": {
+      "activity_id": "hilgelo-erleben",
+      "highlight_id": "hilgelo-bathing-status",
+      "state": "unknown",
+      "label": "Status vor Empfehlung prüfen",
+      "source_type": "guard_verified",
+      "guard_source": "bathing_water_guard_v2",
+      "source_url": "https://www.zwemwater.nl/home?id=1750",
+      "source_urls": [
+        "https://www.zwemwater.nl/home?id=1750"
+      ],
+      "checked_at": "2026-06-26",
+      "valid_until": "2026-06-28",
+      "reason": "Water-quality status is unknown or stale.",
+      "public_note": "Der aktuelle Badegewässerstatus konnte nicht eindeutig geprüft werden. Deshalb gibt es keine Badeempfehlung.",
+      "confidence": "water_unknown",
+      "water_state": "unknown",
+      "water_confidence": "no_positive_source",
+      "local_suitability_state": "unknown",
+      "local_suitability_confidence": "no_sources",
+      "latest_sample_date": null,
+      "latest_sample_age_days": null,
+      "group_id": "hilgelo-winterswijk",
+      "activity_ids": [
+        "hilgelo-erleben"
+      ]
+    },
+    "proebstingsee-borken-erleben:proebstingsee-bathing-status": {
+      "activity_id": "proebstingsee-borken-erleben",
+      "highlight_id": "proebstingsee-bathing-status",
+      "state": "watch",
+      "label": "Badehinweis prüfen",
+      "source_type": "guard_verified",
+      "guard_source": "bathing_water_guard_v2",
+      "source_url": "https://db.badegewaesser.nrw.de/badegewaesser-nrw/50/",
+      "source_urls": [
+        "https://db.badegewaesser.nrw.de/badegewaesser-nrw/50/"
+      ],
+      "checked_at": "2026-06-26",
+      "valid_until": "2026-06-28",
+      "reason": "Water-quality source is only watch-level.",
+      "public_note": "Der letzte automatisch ausgelesene Messwert ist nicht frisch genug für eine aktive Badeempfehlung.",
+      "confidence": "water_watch",
+      "water_state": "watch",
+      "water_confidence": "watch_source",
+      "local_suitability_state": "unknown",
+      "local_suitability_confidence": "no_sources",
+      "latest_sample_date": "2026-05-20",
+      "latest_sample_age_days": 37,
+      "group_id": "proebstingsee-borken",
+      "activity_ids": [
+        "proebstingsee-borken-erleben"
+      ]
+    },
+    "auesee-wesel-erleben:auesee-bathing-status": {
+      "activity_id": "auesee-wesel-erleben",
+      "highlight_id": "auesee-bathing-status",
+      "state": "watch",
+      "label": "Badehinweis prüfen",
+      "source_type": "guard_verified",
+      "guard_source": "bathing_water_guard_v2",
+      "source_url": "https://db.badegewaesser.nrw.de/badegewaesser-nrw/22/",
+      "source_urls": [
+        "https://db.badegewaesser.nrw.de/badegewaesser-nrw/22/",
+        "https://db.badegewaesser.nrw.de/badegewaesser-nrw/23/"
+      ],
+      "checked_at": "2026-06-26",
+      "valid_until": "2026-06-28",
+      "reason": "Water status is positive, but local suitability is not positively proven.",
+      "public_note": "Die Wasserwerte sind aktuell unauffällig, aber eine positive lokale Badeeignung ist nicht belegt. Deshalb wird Baden hier aktuell nicht als Tipp empfohlen.",
+      "confidence": "local_not_proven",
+      "water_state": "ok",
+      "water_confidence": "all_sources_ok",
+      "local_suitability_state": "unknown",
+      "local_suitability_confidence": "no_sources",
+      "latest_sample_date": "2026-06-02",
+      "latest_sample_age_days": 24,
+      "group_id": "auesee-wesel",
+      "activity_ids": [
+        "auesee-wesel-erleben"
+      ]
+    }
+  }
+}
