@@ -83,6 +83,8 @@ def slug(value: str) -> str:
 
 def canonical_topic(text: str) -> str:
     s = text.lower().translate(str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}))
+    if re.search(r"\b(was|wo)\b.*\b(los|veranstaltung|veranstaltungen|event|events)\b", s) or re.search(r"\bheute\b.*\b(los|veranstaltung|veranstaltungen|event|events)\b", s):
+        return "heute veranstaltungen events"
     s = re.sub(r"[^a-z0-9\s-]+", " ", s)
     words = [w for w in re.split(r"\s+", s) if w and w not in STOPWORDS]
     if not words:
@@ -288,7 +290,13 @@ def build_candidates(gsc_rows: List[Dict[str, Any]], ga4_rows: List[Dict[str, An
         pos = sum(g["positions"]) / max(1, len(g["positions"]))
         covered = seems_covered(topic, inventory)
         top_queries = sorted(set(g["queries"]), key=lambda x: (-g["queries"].count(x), x))[:6]
-        if not covered:
+        if topic == "heute veranstaltungen events":
+            kind = "SEO-/Landingpage-Chance"
+            title = "Heute-in-Bocholt / Was-ist-los-Suchen prüfen"
+            short = f"{int(impressions)} Impressionen für tagesaktuelle Event-Suchintentionen."
+            action = "Prüfen, ob die Today-Ansicht, interne Verlinkung, Seitentitel und Snippet-Texte für 'heute in Bocholt' bzw. 'was ist los' klar genug sind."
+            benefit = "Bündelt Nachfrage nach tagesaktuellen Veranstaltungen in ein konkretes Optimierungs-Arbeitspaket statt einzelne Suchbegriffe als Backlog-Punkte zu sammeln."
+        elif not covered:
             kind = "Content-Lücke"
             title = f"{topic.title()} prüfen"
             short = f"{int(impressions)} Impressionen, aber kein klar erkennbarer Zielinhalt."
@@ -364,6 +372,15 @@ def main() -> None:
 
     existing = read_records(sheets, sheet_id, BACKLOG_TAB)
     known_cluster_keys = {r.get("cluster_key", "").strip() for r in existing if r.get("cluster_key", "").strip()}
+    for r in existing:
+        existing_text = " ".join([
+            str(r.get("title", "")),
+            str(r.get("short_reason", "")),
+            str(r.get("why_relevant", "")),
+            str(r.get("recommended_action", "")),
+        ])
+        if canonical_topic(existing_text) == "heute veranstaltungen events":
+            known_cluster_keys.add(cluster_key("SEO-/Landingpage-Chance", "heute veranstaltungen events"))
     inv = inventory_text(sheets, sheet_id)
 
     gsc_rows: List[Dict[str, Any]] = []
