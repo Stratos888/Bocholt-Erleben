@@ -106,3 +106,13 @@ Erst nach Sichtung der Artefakte entscheiden:
 Bis zu einem separat freigegebenen Writeback-Workpack gilt:
 
 > Bade-/Wasser-Highlights bleiben unsichtbar, solange keine frische positive Statusquelle fachlich bestaetigt und gepflegt wurde.
+
+
+## Guard V1.1 Hardening
+
+Der erste echte Guard-Lauf zeigte zwei wichtige Härtungspunkte:
+
+- NRW-DataTables können geplante/future-dated Probenahmen enthalten. Der Guard ignoriert künftig Zukunftszeilen und verwendet die letzte nicht-zukünftige Probe.
+- Zwemwater-Seiten können positive, Warn- und Negativformulierungen gleichzeitig als Legende/Hilfetext enthalten. Gemischte ungescopedte Seitensignale werden künftig konservativ `unknown`, statt vorschnell `blocked` zu setzen. Nur klar gescopte Statusformulierungen wie `Zwemplek status:goed` oder `Actuele situatie: in orde` dürfen zu `ok` führen.
+
+Damit bleibt der Guard weiter report-only und schreibt keine Produktdaten.

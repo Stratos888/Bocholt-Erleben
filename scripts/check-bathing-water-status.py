@@ -27,7 +27,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-SCRIPT_VERSION = "BATHING_WATER_GUARD_V1_REPORT_ONLY"
+SCRIPT_VERSION = "BATHING_WATER_GUARD_V1_1_REPORT_ONLY"
 USER_AGENT = "BocholtErlebenBathingWaterGuard/1.0 (+https://bocholt-erleben.de)"
 REQUEST_TIMEOUT_SECONDS = 25
 
@@ -69,10 +69,49 @@ WATCH_ZWEMWATER_PHRASES = [
 ]
 POSITIVE_ZWEMWATER_PHRASES = [
     "actuele situatie: in orde",
+    "actuele situatie:in orde",
     "actuele situatie in orde",
     "zwemplek status: goed",
+    "zwemplek status:goed",
     "zwemplek status goed",
+    "zwemplek status: in orde",
+    "zwemplek status:in orde",
+    "zwemplek status in orde",
     "de waterkwaliteit is goed",
+]
+
+STRICT_NEGATIVE_ZWEMWATER_PHRASES = [
+    "actuele situatie: negatief zwemadvies",
+    "actuele situatie:negatief zwemadvies",
+    "actuele situatie negatief zwemadvies",
+    "zwemplek status: negatief zwemadvies",
+    "zwemplek status:negatief zwemadvies",
+    "zwemplek status negatief zwemadvies",
+    "actuele situatie: zwemmen wordt afgeraden",
+    "actuele situatie:zwemmen wordt afgeraden",
+    "zwemplek status: zwemmen wordt afgeraden",
+    "zwemplek status:zwemmen wordt afgeraden",
+]
+STRICT_WATCH_ZWEMWATER_PHRASES = [
+    "actuele situatie: waarschuwing",
+    "actuele situatie:waarschuwing",
+    "zwemplek status: waarschuwing",
+    "zwemplek status:waarschuwing",
+    "actuele situatie: waterkwaliteit wordt onderzocht",
+    "actuele situatie:waterkwaliteit wordt onderzocht",
+    "zwemplek status: waterkwaliteit wordt onderzocht",
+    "zwemplek status:waterkwaliteit wordt onderzocht",
+]
+STRICT_POSITIVE_ZWEMWATER_PHRASES = [
+    "actuele situatie: in orde",
+    "actuele situatie:in orde",
+    "actuele situatie in orde",
+    "zwemplek status: goed",
+    "zwemplek status:goed",
+    "zwemplek status goed",
+    "zwemplek status: in orde",
+    "zwemplek status:in orde",
+    "zwemplek status in orde",
 ]
 
 STATE_ORDER = {"blocked": 3, "watch": 2, "unknown": 1, "ok": 0, "out_of_season": -1}
@@ -434,23 +473,44 @@ def check_nrw_source(source: SourceConfig, today: dt.date, max_age_days: int, wa
             reason="No dated current-year sample row found in NRW endpoint.",
             raw_signals={"endpoint_url": url, "http_status": status, "content_type": content_type},
         )
-    dated.sort(key=lambda item: item["sample_date"])
-    latest = dated[-1]
+    warnings: List[str] = []
+    future_dated = [
+        item for item in dated
+        if dt.date.fromisoformat(str(item["sample_date"])) > today
+    ]
+    dated_non_future = [
+        item for item in dated
+        if dt.date.fromisoformat(str(item["sample_date"])) <= today
+    ]
+    if future_dated:
+        warnings.append(f"{len(future_dated)} future sample rows ignored")
+    if not dated_non_future:
+        return SourceResult(
+            source_id=source.id,
+            title=source.title,
+            type=source.type,
+            authority_type=source.authority_type,
+            state="unknown",
+            confidence="no_non_future_sample",
+            checked_at=checked_at,
+            source_url=source.url,
+            rows_seen=len(rows),
+            reason="Only future-dated NRW sample rows were found; no current status can be derived.",
+            warnings=warnings,
+            raw_signals={"endpoint_url": url, "http_status": status, "content_type": content_type},
+        )
+    dated_non_future.sort(key=lambda item: item["sample_date"])
+    latest = dated_non_future[-1]
     latest_date = dt.date.fromisoformat(str(latest["sample_date"]))
     age_days = (today - latest_date).days
-    warnings: List[str] = []
     state_from_values = str(latest.get("state_from_values") or "unknown")
     state = state_from_values
     confidence = "official_current_sample"
-    reason = "Latest NRW sample is recent enough and no blocking signal was parsed."
-    if age_days < 0:
-        state = "unknown"
-        confidence = "future_sample_date"
-        reason = "Latest sample date is in the future relative to guard date."
-    elif age_days > max_age_days:
+    reason = "Latest NRW non-future sample is recent enough and no blocking signal was parsed."
+    if age_days > max_age_days:
         state = "unknown"
         confidence = "stale_sample"
-        reason = f"Latest NRW sample is older than {max_age_days} days."
+        reason = f"Latest NRW non-future sample is older than {max_age_days} days."
     elif age_days > warn_age_days and state == "ok":
         state = "watch"
         confidence = "sample_near_stale"
@@ -503,21 +563,49 @@ def check_zwemwater_source(source: SourceConfig, today: dt.date) -> SourceResult
     found_negative = [phrase for phrase in NEGATIVE_ZWEMWATER_PHRASES if phrase in plain]
     found_watch = [phrase for phrase in WATCH_ZWEMWATER_PHRASES if phrase in plain]
     found_positive = [phrase for phrase in POSITIVE_ZWEMWATER_PHRASES if phrase in plain]
+    strict_negative = [phrase for phrase in STRICT_NEGATIVE_ZWEMWATER_PHRASES if phrase in plain]
+    strict_watch = [phrase for phrase in STRICT_WATCH_ZWEMWATER_PHRASES if phrase in plain]
+    strict_positive = [phrase for phrase in STRICT_POSITIVE_ZWEMWATER_PHRASES if phrase in plain]
+
     state = "unknown"
     confidence = "no_specific_status_signal"
     reason = "No sufficiently specific Zwemwater status phrase was parsed."
-    if found_negative:
+
+    # Zwemwater pages can contain complete status legends or advice text for all
+    # possible states. Page-wide phrase matches are therefore not enough for a
+    # public status decision when positive and negative/watch terms coexist.
+    if strict_negative:
         state = "blocked"
-        confidence = "official_negative_status_phrase"
-        reason = "Zwemwater page contains a negative swimming advice/status phrase."
+        confidence = "official_scoped_negative_status_phrase"
+        reason = "Zwemwater page contains a scoped negative current-status phrase."
+    elif strict_watch:
+        state = "watch"
+        confidence = "official_scoped_watch_status_phrase"
+        reason = "Zwemwater page contains a scoped watch-level current-status phrase."
+    elif strict_positive:
+        state = "ok"
+        confidence = "official_scoped_positive_status_phrase"
+        reason = "Zwemwater page contains a scoped positive current-status phrase."
+    elif found_positive and (found_negative or found_watch):
+        state = "unknown"
+        confidence = "mixed_unscoped_status_phrases"
+        reason = (
+            "Zwemwater page contains mixed positive and negative/watch phrases outside "
+            "a scoped current-status context; no status decision is safe."
+        )
+    elif found_negative:
+        state = "blocked"
+        confidence = "unscoped_negative_status_phrase"
+        reason = "Zwemwater page contains a negative phrase and no positive phrase was parsed."
     elif found_watch:
         state = "watch"
-        confidence = "official_watch_status_phrase"
-        reason = "Zwemwater page contains a watch-level warning phrase."
+        confidence = "unscoped_watch_status_phrase"
+        reason = "Zwemwater page contains a watch phrase and no positive phrase was parsed."
     elif found_positive:
         state = "ok"
-        confidence = "official_positive_status_phrase"
-        reason = "Zwemwater page contains a positive current status phrase."
+        confidence = "unscoped_positive_status_phrase"
+        reason = "Zwemwater page contains a positive phrase and no negative/watch phrase was parsed."
+
     return SourceResult(
         source_id=source.id,
         title=source.title,
@@ -535,6 +623,9 @@ def check_zwemwater_source(source: SourceConfig, today: dt.date) -> SourceResult
             "negative_phrases": found_negative,
             "watch_phrases": found_watch,
             "positive_phrases": found_positive,
+            "strict_negative_phrases": strict_negative,
+            "strict_watch_phrases": strict_watch,
+            "strict_positive_phrases": strict_positive,
         },
     )
 
