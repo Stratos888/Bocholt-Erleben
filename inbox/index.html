@@ -1836,17 +1836,16 @@ Umfang:
       `;
     }
 
+    function getBacklogDescription(item) {
+      return trimValue(item.description || item.why_relevant || item.short_reason || item.recommended_action || item.expected_benefit);
+    }
+
     function renderBacklogEditForm(item) {
       return `
         <form class="backlogEditForm" data-backlog-edit-form="${escapeHtml(item.id)}" hidden>
           <strong>Eintrag bearbeiten</strong>
           <label>Titel<input name="title" maxlength="160" value="${escapeHtml(trimValue(item.title))}"></label>
-          <label>Typ<input name="type" maxlength="80" value="${escapeHtml(trimValue(item.type) || "Sonstiges")}"></label>
-          <label>Kurzgrund<input name="short_reason" maxlength="220" value="${escapeHtml(trimValue(item.short_reason))}"></label>
-          <label>Warum relevant?<textarea name="why_relevant" maxlength="1200">${escapeHtml(trimValue(item.why_relevant || item.short_reason))}</textarea></label>
-          <label>Was genau tun?<textarea name="recommended_action" maxlength="1200">${escapeHtml(trimValue(item.recommended_action))}</textarea></label>
-          <label>Erwarteter Nutzen<textarea name="expected_benefit" maxlength="1200">${escapeHtml(trimValue(item.expected_benefit))}</textarea></label>
-          <label>Akquise-Einschätzung<textarea name="acquisition_note" maxlength="1200">${escapeHtml(trimValue(item.acquisition_note))}</textarea></label>
+          <label>Beschreibung<textarea name="description" maxlength="1600">${escapeHtml(getBacklogDescription(item))}</textarea></label>
           <div class="backlogAddActions">
             <button class="btn" type="submit">Änderungen speichern</button>
             <button class="btn" type="button" data-backlog-edit-cancel="${escapeHtml(item.id)}">Schließen</button>
@@ -1861,21 +1860,19 @@ Umfang:
       const items = queue.filter(isGrowthBacklogItem);
       elLeft.textContent = `${items.length} offen`;
       elRight.textContent = totalLoaded ? `Backlog: ${totalLoaded}` : "";
-      const listHtml = items.length ? items.map((item) => `
+      const listHtml = items.length ? items.map((item) => {
+        const description = getBacklogDescription(item);
+        return `
         <details class="backlogItem" data-backlog-id="${escapeHtml(item.id)}">
           <summary>
             <div class="backlogLine">
               ${renderBacklogPrioritySelect(item, true)}
-              <span class="pill muted">${escapeHtml(trimValue(item.type) || "Sonstiges")}</span>
             </div>
             <div class="backlogTitle">${escapeHtml(trimValue(item.title) || "Unbenannter Backlog-Punkt")}</div>
-            <div class="backlogReason">${escapeHtml(trimValue(item.short_reason) || "Kurzgrund fehlt")}</div>
+            <div class="backlogReason">${escapeHtml(description || "Beschreibung fehlt")}</div>
           </summary>
           <div class="backlogDetail">
-            ${renderBacklogBlock("Warum relevant?", item.why_relevant || item.short_reason)}
-            ${renderBacklogBlock("Was genau tun?", item.recommended_action)}
-            ${renderBacklogBlock("Erwarteter Nutzen", item.expected_benefit)}
-            ${trimValue(item.acquisition_note) ? renderBacklogBlock("Akquise-Einschätzung", item.acquisition_note) : ""}
+            ${renderBacklogBlock("Beschreibung", description)}
             <button class="btn" type="button" data-backlog-edit="${escapeHtml(item.id)}">Bearbeiten</button>
             ${renderBacklogEditForm(item)}
             <div class="backlogActions">
@@ -1883,11 +1880,11 @@ Umfang:
               <button class="btn danger" type="button" data-backlog-action="reject" data-backlog-id="${escapeHtml(item.id)}">Ablehnen</button>
             </div>
           </div>
-        </details>
-      `).join("") : `
+        </details>`;
+      }).join("") : `
         <article class="card">
           <h1>Backlog leer</h1>
-          <div class="muted">Keine offenen Growth-, SEO-, Akquise- oder Produktpunkte. Du kannst manuell eine Notiz ergänzen.</div>
+          <div class="muted">Keine offenen Backlog-Punkte. Du kannst manuell eine Notiz ergänzen.</div>
         </article>
       `;
 
@@ -1903,17 +1900,12 @@ Umfang:
         <form id="backlogAddSheet" class="backlogAddSheet" hidden>
           <strong>Backlog-Notiz hinzufügen</strong>
           <label>Titel<input id="backlogAddTitle" name="title" maxlength="140" required placeholder="z. B. Kindergeburtstag-Angebote prüfen"></label>
-          <label>Typ
-            <select id="backlogAddType" name="type">
-              <option>Content</option><option>SEO</option><option>Akquise</option><option>UX</option><option>Activity-Idee</option><option>Sonstiges</option>
-            </select>
-          </label>
           <label>Priorität
             <select id="backlogAddPriority" name="priority">
               <option value="hoch">Hoch</option><option value="mittel" selected>Mittel</option><option value="niedrig">Niedrig</option>
             </select>
           </label>
-          <label>Notiz<textarea id="backlogAddNote" name="note" maxlength="1200" placeholder="Warum ist das relevant, was soll später geprüft werden?"></textarea></label>
+          <label>Beschreibung<textarea id="backlogAddNote" name="note" maxlength="1600" placeholder="Kurz notieren, warum das Thema wichtig ist und was später geprüft werden soll."></textarea></label>
           <div class="backlogAddActions">
             <button class="btn" type="submit">Speichern</button>
             <button id="btnBacklogAddCancel" class="btn" type="button">Schließen</button>
@@ -1974,10 +1966,12 @@ Umfang:
           event.preventDefault();
           const id = form.getAttribute("data-backlog-edit-form") || "";
           const data = new FormData(form);
-          const payload = { id, action: "edit" };
-          ["title", "type", "short_reason", "why_relevant", "recommended_action", "expected_benefit", "acquisition_note"].forEach((field) => {
-            payload[field] = trimValue(data.get(field));
-          });
+          const payload = {
+            id,
+            action: "edit",
+            title: trimValue(data.get("title")),
+            description: trimValue(data.get("description"))
+          };
           try {
             const result = await postGrowthBacklogJson(GROWTH_BACKLOG_UPDATE_API_URL, payload);
             queue = queue.map((item) => trimValue(item.id) === id ? { ...item, ...(result.item || {}), ...payload } : item);
@@ -2010,12 +2004,11 @@ Umfang:
         sheet.addEventListener("submit", async (event) => {
           event.preventDefault();
           const title = trimValue(document.getElementById("backlogAddTitle")?.value);
-          const type = trimValue(document.getElementById("backlogAddType")?.value) || "Sonstiges";
           const priority = trimValue(document.getElementById("backlogAddPriority")?.value) || "mittel";
           const note = trimValue(document.getElementById("backlogAddNote")?.value);
           if (!title) return;
           try {
-            await postGrowthBacklogJson(GROWTH_BACKLOG_CREATE_API_URL, { title, type, priority, note });
+            await postGrowthBacklogJson(GROWTH_BACKLOG_CREATE_API_URL, { title, priority, note });
             await loadAndShow();
           } catch (error) {
             setStatus("Backlog-Notiz konnte nicht gespeichert werden: " + (error && error.message ? error.message : error));

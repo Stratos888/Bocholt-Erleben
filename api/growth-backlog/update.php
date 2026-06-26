@@ -37,10 +37,16 @@ try {
         $now = gbl_now_iso();
         if ($editAction) {
             $updates = ['updated_at' => $now];
-            foreach (['title', 'type', 'short_reason', 'why_relevant', 'recommended_action', 'expected_benefit', 'acquisition_note'] as $field) {
-                if (array_key_exists($field, $payload)) {
-                    $updates[$field] = trim((string)$payload[$field]);
-                }
+            if (array_key_exists('title', $payload)) {
+                $updates['title'] = trim((string)$payload['title']);
+            }
+            if (array_key_exists('description', $payload)) {
+                $description = trim((string)$payload['description']);
+                $updates['short_reason'] = mb_substr($description, 0, 220, 'UTF-8');
+                $updates['why_relevant'] = $description;
+                $updates['recommended_action'] = '';
+                $updates['expected_benefit'] = '';
+                $updates['acquisition_note'] = '';
             }
             if ($priority !== '') $updates['priority'] = $priority;
             gbl_update_cells($header, $index, (int)$row['_sheet_row'], $updates);

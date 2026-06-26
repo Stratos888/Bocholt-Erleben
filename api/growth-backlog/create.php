@@ -15,7 +15,7 @@ $payload = json_decode((string)file_get_contents('php://input'), true);
 if (!is_array($payload)) $payload = [];
 
 $title = trim((string)($payload['title'] ?? ''));
-$type = trim((string)($payload['type'] ?? 'Sonstiges'));
+$type = 'Sonstiges';
 $note = trim((string)($payload['note'] ?? ''));
 $priority = mb_strtolower(trim((string)($payload['priority'] ?? 'mittel')), 'UTF-8');
 if (!in_array($priority, ['hoch', 'mittel', 'niedrig'], true)) $priority = 'mittel';
@@ -45,10 +45,10 @@ try {
         'priority' => $priority,
         'type' => $type !== '' ? $type : 'Sonstiges',
         'title' => $title,
-        'short_reason' => $note !== '' ? mb_substr($note, 0, 140, 'UTF-8') : 'Manuell notiert',
+        'short_reason' => $note !== '' ? mb_substr($note, 0, 220, 'UTF-8') : 'Manuell notiert',
         'why_relevant' => $note,
-        'recommended_action' => 'Manuell prüfen und bei Bedarf als Arbeitspaket ausarbeiten.',
-        'expected_benefit' => 'Projektidee bleibt sichtbar, ohne die KI-Suche oder Content-Prüfung zu vermischen.',
+        'recommended_action' => '',
+        'expected_benefit' => '',
         'acquisition_note' => '',
         'source' => 'manual',
         'signals_json' => '{}',
