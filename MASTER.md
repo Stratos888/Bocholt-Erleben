@@ -1,3 +1,22 @@
+<!-- === BEGIN BLOCK: MASTER_INBOX_CONTENT_ROUTING_CONTROL_2026_06_26 | Zweck: aktualisiert den strategischen Steuerungsstand fuer Inbox, Content-Pruefung und Visual-Backlog-Trennung; Umfang: Produkt-/Prozessregel, kein Implementierungsdetail === -->
+### Inbox und Content-Pruefung – strategische Steuerungsregel
+
+Stand: 2026-06-26.
+
+Die private `/inbox/` ist keine technische Fehlerliste, sondern eine mobile-first Ausnahme-Arbeitsansicht.
+
+Grundregeln:
+
+- Neue Events und bestehende Content-Prueffaelle bleiben getrennte Queues.
+- In der Content-Pruefung erscheinen nur Faelle, bei denen eine menschliche Entscheidung oder Bestaetigung wirklich noetig ist.
+- Automatisch ableitbare, rein technische oder backlog-faehige Hinweise sollen nicht als einzelne manuelle Karten erscheinen.
+- Activity-Visual-Gaps, z. B. fehlender `visual_key` bei ansonsten nutzbarer Activity mit vorhandener Quelle/Bildbasis, werden als Visual-/Bildbedarf aggregiert und nicht als Content-Sofortaktion behandelt.
+- Offizielle Quellen haben Vorrang vor Ticketportalen als primaere Eventquelle. Ticketportale sollen nur bewusst behalten oder als Buchungslink gefuehrt werden.
+- Die UI soll mobile-first, knapp und handlungsorientiert bleiben: kurze Labels, klare Hauptaktion, technische Details nur nachrangig bzw. im Debug-Kontext.
+
+Dieser Stand ist vorerst eingefroren und wird durch reale mobile Nutzung validiert, bevor weitere UI-/Prozessumbauten erfolgen.
+<!-- === END BLOCK: MASTER_INBOX_CONTENT_ROUTING_CONTROL_2026_06_26 === -->
+
 # MASTER CONTROL FILE — BOCHOLT ERLEBEN
 
 <!-- === BEGIN CANONICAL MASTER FILE: Strategic project control only === -->

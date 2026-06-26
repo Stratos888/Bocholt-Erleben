@@ -1,3 +1,55 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_INBOX_CONTENT_AUTOMATION_ROUTING_FREEZE_2026_06_26 | Zweck: dokumentiert den eingefrorenen Staging-Stand fuer Content-Automation-Routing und mobile Inbox-Nutzung; Umfang: Prozessentscheid, Validierung, offene Live-Nutzungsbeobachtung === -->
+## Inbox / Content-Automation-Routing – Mobile-Arbeitsstand eingefroren (2026-06-26)
+
+Status: Staging-Deployment gruen; UI-/Prozessstand wird vorerst eingefroren und im Alltag mobil genutzt.
+
+### Eingefrorener Zielzustand
+
+- Die private `/inbox/` bleibt die zentrale Arbeitsansicht fuer:
+  1. neue Event-Kandidaten,
+  2. echte manuelle Content-Prueffaelle.
+- Die Inbox ist mobile-first zu bewerten, weil sie primaer am Smartphone genutzt wird.
+- Die normale Content-Pruefung soll keine technische Vollfehlerliste sein, sondern eine Ausnahme-Queue:
+  - nur Faelle anzeigen, bei denen der Nutzer wirklich entscheiden, bestaetigen oder korrigieren muss,
+  - keine reinen Visual-/Premium-Backlog-Hinweise als manuelle Sofortaktion anzeigen.
+- Activity-Faelle wie `visual_key fehlt`, bei denen die Activity sonst nutzbar ist und nur ein Premium-Visual-Pool bzw. neues Bild fehlt, werden als Visual-Backlog aggregiert statt in der normalen Content-Inbox angezeigt.
+- Beispielentscheid: `Buergerpark Rhede` soll nicht als normale Content-Aktion erscheinen, sondern in `Content_Visual_Feedback(_Staging)` bzw. im Visual-Backlog gesammelt werden.
+- Ticketportal-als-Primärquelle-Faelle bleiben echte Content-Prueffaelle, wenn eine offizielle Quelle vorgeschlagen wurde:
+  - Ticketportal oeffnen nur zur Identifikation,
+  - offizielle Quelle pruefen,
+  - bei Uebereinstimmung offizielle Quelle uebernehmen,
+  - Ticketportal nur bewusst behalten, wenn keine bessere Quelle nutzbar ist.
+
+### UI-Stand
+
+- Tabs zeigen Counts direkt: `Neue Events (x)` und `Content-Pruefung (x)`.
+- Erklaerende Zwischenbloecke wurden entfernt.
+- Content-Karten wurden fuer Mobile verdichtet:
+  - weniger sichtbarer Fliesstext,
+  - technische Issue-Codes nicht prominent,
+  - Quellencheck gekuerzt,
+  - Eventdaten-Korrekturfelder bei Quellenfaellen eingeklappt,
+  - Hauptaktion steht vor Navigation.
+- Technische Pruefdaten/Arbeitspakete bleiben nicht Teil der normalen Arbeitsansicht; Debug-/Diagnosezugriff bleibt separat.
+
+### Geprueft
+
+- Deployment nach Content-Automation-Routing und UI-Polish war gruen.
+- Nach Routing-Patch sank die sichtbare Content-Pruefung von vorherigen Visual-Key-Pflichtfeldfaellen auf echte manuelle Faelle.
+- Ticketportal-Fall `Borken Open Air - ABBA Gold The Concert Show` wurde in der Inbox als echter manueller Quellenfall sichtbar und UI-seitig auf `Offizielle Quelle uebernehmen` gefuehrt.
+- Mobile-Screenshots zeigten noch zu viel vertikale Hoehe; daraufhin wurde der mobile Kompaktstand als aktueller Arbeitsstand erstellt.
+
+### Noch beobachten, nicht sofort neu umbauen
+
+- Der Nutzer arbeitet jetzt zunaechst mit diesem Stand.
+- Weitere UI-Aenderungen erst nach realer mobiler Nutzung und konkreten Screenshots/Faellen.
+- Besonders beobachten:
+  - ob `Offizielle Quelle uebernehmen` Faelle sauber verschwinden,
+  - ob Counts nach Aktionen stabil sinken,
+  - ob reine Visual-Gaps dauerhaft aus der normalen Content-Pruefung herausbleiben,
+  - ob `Content_Visual_Feedback(_Staging)` die Visual-/Bildbedarfe ausreichend aggregiert.
+<!-- === END BLOCK: TEST_STATUS_INBOX_CONTENT_AUTOMATION_ROUTING_FREEZE_2026_06_26 === -->
+
 <!-- === BEGIN FILE: TEST_STATUS.md | Zweck: kanonisches Test- und Freigabeprotokoll für geprüfte Funktionen im Projekt „Bocholt erleben“; Umfang: Staging-/Live-Teststände, bestandene Smoke-Tests, offene Regressionen === -->
 
 # TEST STATUS — BOCHOLT ERLEBEN
