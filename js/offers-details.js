@@ -624,29 +624,35 @@ const OfferDetailPanel = {
   },
   /* === END BLOCK: ACTIVITIES_DETAIL_OPENING_STATUS_CALLOUT_V1 === */
 
-  /* === BEGIN BLOCK: ACTIVITY_DETAIL_SEASONAL_HIGHLIGHT_V1 | Zweck: zeigt aktive quellenbasierte Saison-Highlights im Activity-Detailpanel kompakt an; Umfang: ergänzt nur einen optionalen Callout === */
+
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_SEASONAL_HIGHLIGHT_V1 | Zweck: zeigt nur aktiv erlaubte Seasonal-Highlights und blockierte zustandsabhaengige Hinweise im Activity-Detailpanel; Umfang: reine Detailpanel-UI ohne Rankinglogik === */
   renderSeasonalHighlight(offer) {
-    const highlight = window.BEActivityHighlights?.getPrimaryHighlight?.(offer) || null;
-    if (!highlight) return "";
+    const highlight = window.BEActivityHighlights?.getDetailBlock?.(offer, { now: new Date(), surface: "activity" });
+    const statusNote = window.BEActivityHighlights?.getConditionStatusNote?.(offer, { now: new Date(), surface: "activity" });
 
-    const windowLabel = window.BEActivityHighlights?.formatWindowLabel
-      ? window.BEActivityHighlights.formatWindowLabel(highlight)
-      : "";
-    const note = String(highlight.publicNote || "").trim();
-    const value = [
-      highlight.label,
-      windowLabel ? `typisch ${windowLabel}` : ""
-    ].filter(Boolean).join(" · ");
+    if (!highlight && !statusNote) return "";
 
+    if (highlight) {
+      const note = String(highlight.note || "").trim();
+      return `
+        <section class="activity-detail__fact-callout activity-detail__seasonal-highlight" aria-label="Jetzt besonders">
+          <div class="activity-detail__fact-label">Jetzt besonders</div>
+          <div class="activity-detail__fact-value">${this.escapeHtml(highlight.title || highlight.label || "Saisonales Highlight")}</div>
+          ${note ? `<div class="activity-detail__opening-note">${this.escapeHtml(note)}</div>` : ""}
+        </section>
+      `.trim();
+    }
+
+    const note = String(statusNote?.note || "").trim();
     return `
-      <section class="activity-detail__fact-callout activity-detail__seasonal-highlight" aria-label="Saisonales Highlight">
-        <div class="activity-detail__fact-label">Jetzt besonders</div>
-        <div class="activity-detail__fact-value">${this.escapeHtml(value)}</div>
-        ${note ? `<div class="activity-detail__seasonal-note">${this.escapeHtml(note)}</div>` : ""}
+      <section class="activity-detail__fact-callout activity-detail__seasonal-highlight activity-detail__seasonal-highlight--status" aria-label="Statushinweis">
+        <div class="activity-detail__fact-label">${this.escapeHtml(statusNote?.title || "Statushinweis")}</div>
+        <div class="activity-detail__fact-value">${this.escapeHtml(statusNote?.label || "Aktuellen Status prüfen")}</div>
+        ${note ? `<div class="activity-detail__opening-note">${this.escapeHtml(note)}</div>` : ""}
       </section>
     `.trim();
   },
-  /* === END BLOCK: ACTIVITY_DETAIL_SEASONAL_HIGHLIGHT_V1 === */
+  /* === END BLOCK: ACTIVITIES_DETAIL_SEASONAL_HIGHLIGHT_V1 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_OUTBOUND_ANALYTICS_V3 | Zweck: ergänzt im Activity-Detailpanel sauberes Outbound-Tracking für Maps- und Website-Links, ohne sichtbare UI oder Linkziele zu verändern | Umfang: ersetzt nur renderContent(offer) in js/offers-details.js === */
   renderContent(offer) {
@@ -727,8 +733,8 @@ const OfferDetailPanel = {
 
         <div class="activity-detail__body">
           ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
-          ${this.renderSeasonalHighlight(offer)}
           ${this.renderOpeningStatus(offer)}
+          ${this.renderSeasonalHighlight(offer)}
           ${this.renderFacts(offer)}
           ${this.renderImageAttribution(offer)}
         </div>

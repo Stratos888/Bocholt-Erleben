@@ -822,12 +822,25 @@
     return "sonstige";
   }
 
+  /* === BEGIN BLOCK: TODAY_ACTIVITY_SEASONAL_HIGHLIGHT_CURATION_V1 | Zweck: laesst belegte saisonale Highlights die Activity-Spur sichtbar beeinflussen, ohne Region/Vielfalt komplett zu uebersteuern === */
+  function hasActiveActivityHighlight(item) {
+    if (item?.type !== "activity") return false;
+    return !!window.BEActivityHighlights?.getPrimaryActiveHighlight?.(item.raw || item, { now: new Date(), surface: "home" });
+  }
+
   function compareActivityCandidates(a, b) {
+    const highlightDiff = Number(hasActiveActivityHighlight(b)) - Number(hasActiveActivityHighlight(a));
+    if (highlightDiff) return highlightDiff;
+
+    const scoreDiff = todayScore(b) - todayScore(a);
+    if (Math.abs(scoreDiff) >= 10) return scoreDiff;
+
     const regionDiff = activityRegionRank(a) - activityRegionRank(b);
     if (regionDiff) return regionDiff;
 
     return compareTodayItems(a, b);
   }
+  /* === END BLOCK: TODAY_ACTIVITY_SEASONAL_HIGHLIGHT_CURATION_V1 === */
 
   function selectDiverseActivities(items, limit) {
     const candidates = Array.isArray(items) ? items : [];

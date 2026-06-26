@@ -1,36 +1,26 @@
-/* === BEGIN FILE: js/activity-highlights.js | Zweck: zentrale, quellenbasierte Saison-/Zeit-Highlight-Logik fuer Activities; Umfang: reine Datenlogik ohne DOM-Autostart === */
+/* === BEGIN FILE: js/activity-highlights.js | Zweck: zentrale, quellenbasierte Seasonal-Activity-Highlight-Logik mit Status-Gate fuer zustandsabhaengige Empfehlungen; Umfang: reine Daten-/Scoring-Helfer ohne DOM-Zugriff === */
 (function () {
   "use strict";
 
-  const VERIFIED_CONFIDENCE = new Set([
-    "verified_stable",
-    "verified_current",
-    "official_source"
-  ]);
+  const ACTIVE_MODES = new Set(["stable_seasonal", "condition_sensitive"]);
+  const HIDDEN_MODES = new Set(["event_only", "candidate_only"]);
+  const STATUS_VALUES = new Set(["ok", "watch", "blocked", "unknown"]);
+  const DEFAULT_CONDITION_MAX_AGE_DAYS = 7;
 
   function asString(value) {
     return value == null ? "" : String(value).trim();
   }
 
   function asArray(value) {
-    return Array.isArray(value) ? value : [];
+    return Array.isArray(value) ? value.filter((item) => item && typeof item === "object") : [];
   }
 
   function readObject(value) {
     return value && typeof value === "object" && !Array.isArray(value) ? value : {};
   }
 
-  function unique(values) {
-    const out = [];
-    values.forEach((value) => {
-      const text = asString(value);
-      if (text && !out.includes(text)) out.push(text);
-    });
-    return out;
-  }
-
-  function parseDateLocal(value) {
-    const text = asString(value);
+  function normalizeDate(value) {
+    const text = asString(value).slice(0, 10);
     const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
     if (!match) return null;
 
@@ -39,188 +29,296 @@
     const day = Number(match[3]);
     const date = new Date(year, month, day);
 
-    if (
-      date.getFullYear() !== year ||
-      date.getMonth() !== month ||
-      date.getDate() !== day
-    ) {
+    if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
       return null;
     }
 
     return date;
   }
 
-  function parseMonthDay(value) {
-    const text = asString(value);
-    const match = /^(\d{2})-(\d{2})$/.exec(text);
+  function startOfDay(value) {
+    const source = value instanceof Date ? value : new Date();
+    return new Date(source.getFullYear(), source.getMonth(), source.getDate());
+  }
+
+  function diffDays(from, to) {
+    return Math.round((startOfDay(to).getTime() - startOfDay(from).getTime()) / 86400000);
+  }
+
+  function monthDayToOrdinal(value) {
+    const match = /^(\d{2})-(\d{2})$/.exec(asString(value));
     if (!match) return null;
 
     const month = Number(match[1]);
     const day = Number(match[2]);
     if (month < 1 || month > 12 || day < 1 || day > 31) return null;
 
-    return { month, day };
+    const probe = new Date(2024, month - 1, day);
+    if (probe.getMonth() !== month - 1 || probe.getDate() !== day) return null;
+
+    return month * 100 + day;
   }
 
-  function monthDayToDate(monthDay, year) {
-    if (!monthDay) return null;
-
-    const date = new Date(year, monthDay.month - 1, monthDay.day);
-    if (date.getMonth() !== monthDay.month - 1 || date.getDate() !== monthDay.day) return null;
-    return date;
+  function currentMonthDayOrdinal(now) {
+    const date = startOfDay(now || new Date());
+    return (date.getMonth() + 1) * 100 + date.getDate();
   }
 
-  function startOfDay(value) {
-    const date = value instanceof Date ? value : new Date();
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  function inMonthDayWindow(now, starts, ends) {
+    const start = monthDayToOrdinal(starts);
+    const end = monthDayToOrdinal(ends);
+    if (start == null || end == null) return false;
+
+    const current = currentMonthDayOrdinal(now);
+    if (start <= end) return current >= start && current <= end;
+
+    return current >= start || current <= end;
   }
 
-  function isDateExpired(validUntil, now) {
-    const date = parseDateLocal(validUntil);
-    if (!date) return false;
-    return startOfDay(date).getTime() < startOfDay(now).getTime();
+  function hasFreshValidity(source, now) {
+    const checkedAt = normalizeDate(source.checked_at || source.checkedAt);
+    const validUntil = normalizeDate(source.valid_until || source.validUntil);
+    const today = startOfDay(now || new Date());
+
+    if (!checkedAt || !validUntil) return false;
+    if (checkedAt > today) return false;
+    return validUntil >= today;
   }
 
-  function isInMonthDayWindow(startText, endText, now) {
-    const start = parseMonthDay(startText);
-    const end = parseMonthDay(endText);
-    const current = startOfDay(now || new Date());
-    if (!start || !end) return false;
-
-    const year = current.getFullYear();
-    let startDate = monthDayToDate(start, year);
-    let endDate = monthDayToDate(end, year);
-    if (!startDate || !endDate) return false;
-
-    if (endDate.getTime() < startDate.getTime()) {
-      if (current.getTime() < startDate.getTime()) {
-        startDate = monthDayToDate(start, year - 1);
-      } else {
-        endDate = monthDayToDate(end, year + 1);
-      }
-    }
-
-    return current.getTime() >= startOfDay(startDate).getTime() && current.getTime() <= startOfDay(endDate).getTime();
+  function statusState(highlight) {
+    const status = readObject(highlight.current_status || highlight.currentStatus);
+    const state = asString(status.state || "unknown").toLowerCase();
+    return STATUS_VALUES.has(state) ? state : "unknown";
   }
 
-  function normalizeHighlight(raw, now) {
-    const obj = readObject(raw);
-    const id = asString(obj.id);
-    const label = asString(obj.label);
-    const sourceUrl = asString(obj.source_url || obj.sourceUrl);
-    const confidence = asString(obj.confidence || obj.verification);
+  function conditionStatusIsFresh(highlight, now) {
+    const status = readObject(highlight.current_status || highlight.currentStatus);
+    const checkedAt = normalizeDate(status.checked_at || status.checkedAt);
+    const validUntil = normalizeDate(status.valid_until || status.validUntil);
+    const maxAgeDays = Number(highlight.current_status_max_age_days || highlight.currentStatusMaxAgeDays || DEFAULT_CONDITION_MAX_AGE_DAYS);
+    const today = startOfDay(now || new Date());
 
-    if (!id || !label) return null;
-    if (!VERIFIED_CONFIDENCE.has(confidence)) return null;
-    if (!sourceUrl) return null;
-    if (isDateExpired(obj.valid_until || obj.validUntil, now)) return null;
+    if (!checkedAt || !validUntil) return false;
+    if (checkedAt > today) return false;
+    if (validUntil < today) return false;
 
-    const active = isInMonthDayWindow(obj.starts, obj.ends, now);
-    const peak = active && isInMonthDayWindow(obj.peak_starts || obj.peakStarts, obj.peak_ends || obj.peakEnds, now);
+    return diffDays(checkedAt, today) <= Math.max(1, Number.isFinite(maxAgeDays) ? maxAgeDays : DEFAULT_CONDITION_MAX_AGE_DAYS);
+  }
 
-    return Object.freeze({
-      id,
-      type: asString(obj.type) || "seasonal",
-      label,
-      shortLabel: asString(obj.short_label || obj.shortLabel) || label,
-      publicNote: asString(obj.public_note || obj.publicNote),
-      sourceUrl,
-      checkedAt: asString(obj.checked_at || obj.checkedAt),
-      validUntil: asString(obj.valid_until || obj.validUntil),
+  function sourceTypeAllowedForPositive(highlight) {
+    const status = readObject(highlight.current_status || highlight.currentStatus);
+    const sourceType = asString(status.source_type || status.sourceType).toLowerCase();
+    const policy = readObject(highlight.source_policy || highlight.sourcePolicy);
+    const allowed = Array.isArray(policy.positive_requires)
+      ? policy.positive_requires.map((entry) => asString(entry).toLowerCase()).filter(Boolean)
+      : [];
+
+    if (!allowed.length) return true;
+    return allowed.includes(sourceType);
+  }
+
+  function normalizeHighlight(highlight) {
+    const obj = readObject(highlight);
+    const activationMode = asString(obj.activation_mode || obj.activationMode || "stable_seasonal").toLowerCase();
+
+    return {
+      ...obj,
+      id: asString(obj.id),
+      type: asString(obj.type),
+      activation_mode: activationMode,
+      label: asString(obj.label),
+      short_label: asString(obj.short_label || obj.shortLabel || obj.label),
+      shortLabel: asString(obj.short_label || obj.shortLabel || obj.label),
+      detail_label: asString(obj.detail_label || obj.detailLabel || obj.label),
+      detailLabel: asString(obj.detail_label || obj.detailLabel || obj.label),
       starts: asString(obj.starts),
       ends: asString(obj.ends),
-      peakStarts: asString(obj.peak_starts || obj.peakStarts),
-      peakEnds: asString(obj.peak_ends || obj.peakEnds),
-      confidence,
-      homeBoost: Number.isFinite(Number(obj.home_boost || obj.homeBoost)) ? Number(obj.home_boost || obj.homeBoost) : 18,
-      activitySortBoost: Number.isFinite(Number(obj.activity_sort_boost || obj.activitySortBoost)) ? Number(obj.activity_sort_boost || obj.activitySortBoost) : 8,
-      active,
-      peak
-    });
+      peak_starts: asString(obj.peak_starts || obj.peakStarts),
+      peak_ends: asString(obj.peak_ends || obj.peakEnds),
+      source_url: asString(obj.source_url || obj.sourceUrl),
+      checked_at: asString(obj.checked_at || obj.checkedAt),
+      valid_until: asString(obj.valid_until || obj.validUntil),
+      public_note: asString(obj.public_note || obj.publicNote),
+      publicNote: asString(obj.public_note || obj.publicNote),
+      source_label: asString(obj.source_label || obj.sourceLabel),
+      sourceLabel: asString(obj.source_label || obj.sourceLabel),
+      home_boost: Number(obj.home_boost || obj.homeBoost || 0) || 0,
+      homeBoost: Number(obj.home_boost || obj.homeBoost || 0) || 0,
+      activity_sort_boost: Number(obj.activity_sort_boost || obj.activitySortBoost || 0) || 0,
+      activitySortBoost: Number(obj.activity_sort_boost || obj.activitySortBoost || 0) || 0
+    };
   }
 
-  function getHighlights(offer, options = {}) {
-    const now = options.now instanceof Date ? options.now : new Date();
-    return asArray(offer?.seasonal_highlights || offer?.seasonalHighlights)
-      .map((entry) => normalizeHighlight(entry, now))
-      .filter(Boolean);
+  function getHighlights(offer) {
+    return asArray(offer?.seasonal_highlights || offer?.seasonalHighlights).map(normalizeHighlight);
   }
 
-  function getActiveHighlights(offer, options = {}) {
-    return getHighlights(offer, options).filter((highlight) => highlight.active);
+  function isInSeason(highlight, now) {
+    return inMonthDayWindow(now, highlight.starts, highlight.ends);
   }
 
-  function getPrimaryHighlight(offer, options = {}) {
-    const active = getActiveHighlights(offer, options);
-    if (!active.length) return null;
-
-    return [...active].sort((a, b) => {
-      const peakDiff = Number(b.peak) - Number(a.peak);
-      if (peakDiff) return peakDiff;
-
-      const scoreDiff = b.activitySortBoost - a.activitySortBoost;
-      if (scoreDiff) return scoreDiff;
-
-      return a.label.localeCompare(b.label, "de");
-    })[0] || null;
+  function isInPeak(highlight, now) {
+    if (!highlight.peak_starts || !highlight.peak_ends) return false;
+    return inMonthDayWindow(now, highlight.peak_starts, highlight.peak_ends);
   }
 
-  function hasActiveHighlight(offer, options = {}) {
-    return !!getPrimaryHighlight(offer, options);
+  function stableSeasonalAllowed(highlight, now) {
+    if (!highlight.source_url || !highlight.checked_at || !highlight.valid_until) return false;
+    if (!hasFreshValidity(highlight, now)) return false;
+    return isInSeason(highlight, now);
   }
 
-  function getScoreAdjustment(offer, options = {}) {
-    const mode = asString(options.mode || "activity");
-    const highlight = getPrimaryHighlight(offer, options);
+  function conditionSensitiveAllowed(highlight, now) {
+    if (!isInSeason(highlight, now)) return false;
+    if (highlight.requires_current_status !== true && highlight.requiresCurrentStatus !== true) return false;
+    if (statusState(highlight) !== "ok") return false;
+    if (!conditionStatusIsFresh(highlight, now)) return false;
+    return sourceTypeAllowedForPositive(highlight);
+  }
+
+  function isActiveHighlight(highlight, context = {}) {
+    const item = normalizeHighlight(highlight);
+    const now = context.now instanceof Date ? context.now : new Date();
+
+    if (!item.id || !item.label || !item.starts || !item.ends) return false;
+    if (HIDDEN_MODES.has(item.activation_mode)) return false;
+    if (!ACTIVE_MODES.has(item.activation_mode)) return false;
+
+    if (item.activation_mode === "stable_seasonal") {
+      return stableSeasonalAllowed(item, now);
+    }
+
+    if (item.activation_mode === "condition_sensitive") {
+      return conditionSensitiveAllowed(item, now);
+    }
+
+    return false;
+  }
+
+  function getActiveHighlights(offer, context = {}) {
+    const now = context.now instanceof Date ? context.now : new Date();
+    return getHighlights(offer)
+      .filter((highlight) => isActiveHighlight(highlight, { ...context, now }))
+      .sort((a, b) => {
+        const peakDiff = Number(isInPeak(b, now)) - Number(isInPeak(a, now));
+        if (peakDiff) return peakDiff;
+        const boostDiff = Number(b.home_boost || 0) - Number(a.home_boost || 0);
+        if (boostDiff) return boostDiff;
+        return a.id.localeCompare(b.id, "de");
+      });
+  }
+
+  function getPrimaryActiveHighlight(offer, context = {}) {
+    return getActiveHighlights(offer, context)[0] || null;
+  }
+
+  function getPrimaryHighlight(offer, context = {}) {
+    return getPrimaryActiveHighlight(offer, context);
+  }
+
+  function getSurfaceBoost(offer, context = {}) {
+    const surface = asString(context.surface || "home");
+    const now = context.now instanceof Date ? context.now : new Date();
+    const highlight = getPrimaryActiveHighlight(offer, { ...context, now });
     if (!highlight) return 0;
 
-    const base = mode === "home" ? highlight.homeBoost : highlight.activitySortBoost;
-    return base + (highlight.peak ? Math.max(3, Math.round(base * 0.25)) : 0);
+    let score = surface === "activity" ? highlight.activity_sort_boost : highlight.home_boost;
+    if (surface !== "activity" && isInPeak(highlight, now)) score += 4;
+    return Number.isFinite(score) ? score : 0;
   }
 
-  function getSearchTerms(offer, options = {}) {
-    return unique(getHighlights(offer, options).flatMap((highlight) => [
-      highlight.label,
-      highlight.shortLabel,
-      highlight.publicNote,
-      highlight.type,
-      highlight.peak ? "Jetzt besonders" : "",
-      "Saisonales Highlight"
-    ]));
+  function getScoreAdjustment(offer, context = {}) {
+    const mode = asString(context.mode || context.surface || "activity");
+    return getSurfaceBoost(offer, { ...context, surface: mode === "home" ? "home" : "activity" });
   }
 
-  function formatWindowLabel(highlight) {
+  function getReasonLabel(offer, context = {}) {
+    const highlight = getPrimaryActiveHighlight(offer, context);
     if (!highlight) return "";
+    return highlight.short_label || highlight.label;
+  }
 
-    const start = asString(highlight.starts);
-    const end = asString(highlight.ends);
-    if (!start || !end) return "";
+  function getDetailBlock(offer, context = {}) {
+    const highlight = getPrimaryActiveHighlight(offer, context);
+    if (!highlight) return null;
 
-    const monthNames = [
-      "Januar", "Februar", "März", "April", "Mai", "Juni",
-      "Juli", "August", "September", "Oktober", "November", "Dezember"
-    ];
-
-    const parse = (value) => {
-      const parsed = parseMonthDay(value);
-      return parsed ? monthNames[parsed.month - 1] : "";
+    return {
+      title: highlight.detail_label || highlight.label,
+      label: highlight.label,
+      shortLabel: highlight.short_label || highlight.label,
+      period: highlight.starts && highlight.ends ? `${highlight.starts} bis ${highlight.ends}` : "",
+      note: highlight.public_note || "",
+      sourceLabel: highlight.source_label || "Quelle",
+      sourceUrl: highlight.source_url || ""
     };
+  }
 
-    const startLabel = parse(start);
-    const endLabel = parse(end);
-    if (!startLabel || !endLabel) return "";
-    if (startLabel === endLabel) return startLabel;
-    return `${startLabel} bis ${endLabel}`;
+  function getConditionStatusNote(offer, context = {}) {
+    const now = context.now instanceof Date ? context.now : new Date();
+    const highlights = getHighlights(offer).filter((highlight) => highlight.activation_mode === "condition_sensitive");
+    const active = highlights.find((highlight) => isActiveHighlight(highlight, { ...context, now }));
+    if (active) return null;
+
+    const candidates = highlights.filter((highlight) => isInSeason(highlight, now));
+    if (!candidates.length) return null;
+
+    const candidate = candidates[0];
+    const status = readObject(candidate.current_status || candidate.currentStatus);
+    const state = statusState(candidate);
+    const publicNote = asString(status.public_note || status.publicNote || candidate.status_public_note || candidate.statusPublicNote);
+
+    if (state === "blocked") {
+      return {
+        title: asString(status.label) || "Statushinweis",
+        label: "Aktuell nicht als Highlight empfohlen",
+        note: publicNote || asString(status.reason) || "Aktuell liegt kein positives Statussignal für dieses zustandsabhängige Highlight vor.",
+        state
+      };
+    }
+
+    if (state === "watch" || state === "unknown") {
+      return {
+        title: "Statushinweis",
+        label: "Aktuellen Status prüfen",
+        note: publicNote || "Für dieses zustandsabhängige Highlight liegt aktuell keine frische positive Freigabe vor.",
+        state
+      };
+    }
+
+    return null;
+  }
+
+  function getSearchTerms(offer, context = {}) {
+    const active = getActiveHighlights(offer, context).flatMap((highlight) => [
+      highlight.label,
+      highlight.short_label,
+      highlight.detail_label,
+      highlight.public_note
+    ]);
+
+    const all = getHighlights(offer).flatMap((highlight) => [
+      highlight.label,
+      highlight.short_label,
+      highlight.detail_label
+    ]);
+
+    return Array.from(new Set([...active, ...all].map(asString).filter(Boolean)));
   }
 
   window.BEActivityHighlights = {
     getHighlights,
     getActiveHighlights,
+    getPrimaryActiveHighlight,
     getPrimaryHighlight,
-    hasActiveHighlight,
+    getReasonLabel,
+    getSurfaceBoost,
     getScoreAdjustment,
+    getDetailBlock,
+    getConditionStatusNote,
     getSearchTerms,
-    formatWindowLabel
+    isActiveHighlight,
+    isInSeason,
+    isInPeak
   };
 }());
 /* === END FILE: js/activity-highlights.js === */

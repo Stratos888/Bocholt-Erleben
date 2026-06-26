@@ -373,6 +373,25 @@ def infer_process_metadata(
             "automation_policy": "human_review_before_write",
         }
 
+    activity_highlight_status_codes = {
+        "activity_highlight_invalid",
+        "activity_highlight_source_missing",
+        "activity_highlight_source_invalid",
+        "activity_highlight_source_expired",
+        "activity_highlight_condition_status_missing",
+        "activity_highlight_condition_status_unknown",
+        "activity_highlight_condition_status_expired",
+        "activity_highlight_condition_positive_untrusted",
+        "activity_highlight_condition_positive_stale",
+    }
+    if code in activity_highlight_status_codes:
+        return {
+            "process_category": "activity_condition_status_guard",
+            "correction_owner": "content_inbox_activity_condition_status",
+            "workbench_group": "Activity-Status-Guard",
+            "automation_policy": "human_review_before_public_highlight",
+        }
+
     activity_review_codes = {
         "activity_checked_at_missing_or_invalid",
         "activity_check_too_old",
@@ -2660,8 +2679,336 @@ def audit_activities(
             # Activity-Oeffnungszeiten/Kosten/Saison duerfen nicht durch eine zu grobe Textprobe verrauscht werden.
 
 
+
     log_checkpoint(f"activity audit done: rows={total_offers}, issues={len(issues)}")
     return issues
+
+
+# === BEGIN BLOCK: CONTENT_QUALITY_ACTIVITY_HIGHLIGHT_STATUS_GUARD_V1 | Zweck: prueft Seasonal-Activity-Highlights inkl. taeglichem Status-Gate fuer zustandsabhaengige Empfehlungen wie Badeseen; Umfang: Repo-Datencheck ohne automatische fachliche Aenderung ===
+HIGHLIGHT_ACTIVE_MODES = {"stable_seasonal", "condition_sensitive"}
+HIGHLIGHT_HIDDEN_MODES = {"event_only", "candidate_only"}
+HIGHLIGHT_STATUS_VALUES = {"ok", "watch", "blocked", "unknown"}
+HIGHLIGHT_POSITIVE_SOURCE_TYPES = {
+    "official_city",
+    "official_authority",
+    "official_bathing_water_status",
+    "official_operator",
+}
+RE_MONTH_DAY = re.compile(r"^\d{2}-\d{2}$")
+
+
+def parse_month_day(value: Any) -> Optional[tuple[int, int]]:
+    text = norm(value)
+    if not RE_MONTH_DAY.match(text):
+        return None
+    try:
+        parsed = datetime.strptime(f"2024-{text}", "%Y-%m-%d")
+        return parsed.month, parsed.day
+    except ValueError:
+        return None
+
+
+def month_day_ordinal(value: Any) -> Optional[int]:
+    parsed = parse_month_day(value)
+    if not parsed:
+        return None
+    month, day = parsed
+    return month * 100 + day
+
+
+def is_today_in_month_day_window(today: date, starts: Any, ends: Any) -> bool:
+    start = month_day_ordinal(starts)
+    end = month_day_ordinal(ends)
+    if start is None or end is None:
+        return False
+    current = today.month * 100 + today.day
+    if start <= end:
+        return start <= current <= end
+    return current >= start or current <= end
+
+
+def highlight_current_status(highlight: Dict[str, Any]) -> Dict[str, Any]:
+    status = highlight.get("current_status")
+    return status if isinstance(status, dict) else {}
+
+
+def audit_activity_highlights(
+    offers_json: Path,
+    today: date,
+    scope: str,
+    base_url: str,
+) -> List[Issue]:
+    data = load_json(offers_json, required=False) or {}
+    offers = data.get("offers") if isinstance(data, dict) else []
+    public_url = f"{base_url.rstrip('/')}/aktivitaeten/" if base_url else ""
+
+    if not isinstance(offers, list):
+        return [issue(
+            "critical",
+            "activity",
+            "offers_json",
+            "offers",
+            "Activities",
+            "activity_highlight_invalid",
+            "data/offers.json enthaelt keine gueltige offers-Liste; Activity-Highlights koennen nicht geprueft werden.",
+            "JSON-Struktur reparieren, bevor Seasonal-Highlights ausgespielt werden.",
+            public_url=public_url,
+        )]
+
+    issues: List[Issue] = []
+    log_checkpoint(f"activity highlight audit start: rows={len(offers)}, scope={scope}")
+
+    for offer in offers:
+        if not isinstance(offer, dict):
+            continue
+
+        content_id = norm(offer.get("id"))
+        title = norm(offer.get("title"))
+        highlights = offer.get("seasonal_highlights")
+        if highlights is None:
+            continue
+        if not isinstance(highlights, list):
+            issues.append(issue(
+                "review_needed",
+                "activity",
+                "offers_json",
+                content_id,
+                title,
+                "activity_highlight_invalid",
+                "seasonal_highlights ist keine Liste.",
+                "Activity-Highlight-Datenstruktur per Repo-Patch korrigieren.",
+                source_url=norm(offer.get("url")),
+                public_url=public_url,
+            ))
+            continue
+
+        for highlight in highlights:
+            if not isinstance(highlight, dict):
+                issues.append(issue(
+                    "review_needed",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_highlight_invalid",
+                    "seasonal_highlights enthaelt einen nicht-objektartigen Eintrag.",
+                    "Highlight-Eintrag entfernen oder korrekt strukturieren.",
+                    source_url=norm(offer.get("url")),
+                    public_url=public_url,
+                ))
+                continue
+
+            highlight_id = norm(highlight.get("id"))
+            mode = norm(highlight.get("activation_mode") or "stable_seasonal").lower()
+            source_url = norm(highlight.get("source_url")) or norm(offer.get("url"))
+            starts = norm(highlight.get("starts"))
+            ends = norm(highlight.get("ends"))
+            in_season = is_today_in_month_day_window(today, starts, ends)
+            evidence_fields = "seasonal_highlights.id,activation_mode,label,starts,ends,source_url,checked_at,valid_until,current_status"
+
+            if not highlight_id or not norm(highlight.get("label")) or mode not in HIGHLIGHT_ACTIVE_MODES | HIGHLIGHT_HIDDEN_MODES or parse_month_day(starts) is None or parse_month_day(ends) is None:
+                issues.append(issue(
+                    "review_needed",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_highlight_invalid",
+                    f"Activity-Highlight ist unvollstaendig oder ungueltig: id={highlight_id!r}, mode={mode!r}, starts={starts!r}, ends={ends!r}.",
+                    "Highlight nur mit vollstaendigen, pruefbaren Pflichtfeldern ausspielen.",
+                    source_url=source_url,
+                    evidence_checked_fields=evidence_fields,
+                    evidence_summary=f"highlight_id={highlight_id}",
+                    public_url=public_url,
+                ))
+                continue
+
+            if mode in HIGHLIGHT_HIDDEN_MODES:
+                hidden_boost = highlight.get("home_boost") or highlight.get("activity_sort_boost")
+                if hidden_boost:
+                    issues.append(issue(
+                        "review_needed",
+                        "activity",
+                        "offers_json",
+                        content_id,
+                        title,
+                        "activity_highlight_invalid",
+                        f"Nicht-oeffentlicher Highlight-Modus {mode} darf keinen Boost tragen.",
+                        "Boost entfernen oder Highlight bewusst als verified stable/condition_sensitive modellieren.",
+                        source_url=source_url,
+                        evidence_summary=f"highlight_id={highlight_id}; boost={hidden_boost}",
+                        public_url=public_url,
+                    ))
+                continue
+
+            if not source_url:
+                issues.append(issue(
+                    "review_needed",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_highlight_source_missing",
+                    f"Activity-Highlight {highlight_id} hat keine source_url.",
+                    "Saisonales Highlight nur mit belastbarer Quelle pflegen.",
+                    source_url=source_url,
+                    evidence_summary=f"highlight_id={highlight_id}",
+                    public_url=public_url,
+                ))
+            elif not is_http_url(source_url):
+                issues.append(issue(
+                    "review_needed",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_highlight_source_invalid",
+                    f"Activity-Highlight {highlight_id} hat keine http(s)-Quelle: {source_url}",
+                    "Quellen-URL korrigieren.",
+                    source_url=source_url,
+                    evidence_summary=f"highlight_id={highlight_id}",
+                    public_url=public_url,
+                ))
+
+            checked_at = parse_iso_date(norm(highlight.get("checked_at")))
+            valid_until = parse_iso_date(norm(highlight.get("valid_until")))
+            if not checked_at or not valid_until or valid_until < today:
+                issues.append(issue(
+                    "review_needed",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_highlight_source_expired",
+                    f"Activity-Highlight {highlight_id} hat keine gueltige Quellenpruefung oder ist abgelaufen.",
+                    "checked_at/valid_until nach fachlicher Quellenpruefung aktualisieren oder Highlight deaktivieren.",
+                    source_url=source_url,
+                    evidence_summary=f"highlight_id={highlight_id}; checked_at={norm(highlight.get('checked_at'))}; valid_until={norm(highlight.get('valid_until'))}",
+                    public_url=public_url,
+                ))
+
+            if mode == "stable_seasonal":
+                if norm(highlight.get("confidence")) != "verified_stable":
+                    issues.append(issue(
+                        "review_needed",
+                        "activity",
+                        "offers_json",
+                        content_id,
+                        title,
+                        "activity_highlight_invalid",
+                        f"Stable Highlight {highlight_id} braucht confidence=verified_stable.",
+                        "Keine stabilen Saison-Highlights ohne expliziten Quellenstatus ausspielen.",
+                        source_url=source_url,
+                        evidence_summary=f"highlight_id={highlight_id}",
+                        public_url=public_url,
+                    ))
+                continue
+
+            if mode != "condition_sensitive":
+                continue
+
+            if highlight.get("requires_current_status") is not True:
+                issues.append(issue(
+                    "review_needed",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_highlight_condition_status_missing",
+                    f"Zustandsabhaengiges Highlight {highlight_id} braucht requires_current_status=true.",
+                    "Status-Gate ergaenzen; zustandsabhaengige Highlights duerfen nicht nur ueber Saisonfenster laufen.",
+                    source_url=source_url,
+                    evidence_summary=f"highlight_id={highlight_id}",
+                    public_url=public_url,
+                ))
+
+            status = highlight_current_status(highlight)
+            state = norm(status.get("state") or "unknown").lower()
+            if state not in HIGHLIGHT_STATUS_VALUES:
+                issues.append(issue(
+                    "review_needed",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_highlight_condition_status_missing",
+                    f"current_status.state ist ungueltig: {state!r}.",
+                    "Status auf ok/watch/blocked/unknown setzen.",
+                    source_url=source_url,
+                    evidence_summary=f"highlight_id={highlight_id}",
+                    public_url=public_url,
+                ))
+                state = "unknown"
+
+            status_checked_at = parse_iso_date(norm(status.get("checked_at")))
+            status_valid_until = parse_iso_date(norm(status.get("valid_until")))
+            status_url = norm(status.get("source_url")) or source_url
+
+            if state == "ok":
+                source_type = norm(status.get("source_type")).lower()
+                max_age_days = int(highlight.get("current_status_max_age_days") or 7)
+                if source_type not in HIGHLIGHT_POSITIVE_SOURCE_TYPES:
+                    issues.append(issue(
+                        "review_needed",
+                        "activity",
+                        "offers_json",
+                        content_id,
+                        title,
+                        "activity_highlight_condition_positive_untrusted",
+                        f"Positive Statusfreigabe fuer {highlight_id} stammt nicht aus einer offiziellen Statusquelle: {source_type!r}.",
+                        "Positive Freigabe nur von Stadt/Behoerde/Badewasserstatus/Betreiber akzeptieren.",
+                        source_url=status_url,
+                        evidence_summary=f"highlight_id={highlight_id}; state=ok; source_type={source_type}",
+                        public_url=public_url,
+                    ))
+                if not status_checked_at or not status_valid_until or status_valid_until < today or (today - status_checked_at).days > max_age_days:
+                    issues.append(issue(
+                        "review_needed",
+                        "activity",
+                        "offers_json",
+                        content_id,
+                        title,
+                        "activity_highlight_condition_positive_stale",
+                        f"Positive Statusfreigabe fuer {highlight_id} ist nicht frisch genug.",
+                        "Statusquelle taeglich/regelmaessig pruefen; ohne frische positive Quelle kein Bade-/Statushighlight.",
+                        source_url=status_url,
+                        evidence_summary=f"highlight_id={highlight_id}; checked_at={norm(status.get('checked_at'))}; valid_until={norm(status.get('valid_until'))}",
+                        public_url=public_url,
+                    ))
+            elif state in {"blocked", "watch"}:
+                if not status_checked_at or not status_valid_until or status_valid_until < today:
+                    issues.append(issue(
+                        "review_needed",
+                        "activity",
+                        "offers_json",
+                        content_id,
+                        title,
+                        "activity_highlight_condition_status_expired",
+                        f"{state}-Status fuer {highlight_id} ist nicht mehr gueltig oder nicht datiert.",
+                        "Blocker/Warnstatus pruefen, verlaengern oder durch offizielle Entwarnung ersetzen.",
+                        source_url=status_url,
+                        evidence_summary=f"highlight_id={highlight_id}; state={state}; checked_at={norm(status.get('checked_at'))}; valid_until={norm(status.get('valid_until'))}",
+                        public_url=public_url,
+                    ))
+            elif state == "unknown" and in_season and scope in {"daily", "full"}:
+                issues.append(issue(
+                    "warning",
+                    "activity",
+                    "offers_json",
+                    content_id,
+                    title,
+                    "activity_highlight_condition_status_unknown",
+                    f"Zustandsabhaengiges Highlight {highlight_id} liegt im Saisonfenster, hat aber keine frische positive Statusquelle.",
+                    "Aktuelle offizielle Statusquelle pruefen. Bis dahin bleibt das Highlight unsichtbar und ohne Boost.",
+                    source_url=status_url,
+                    evidence_status="status_unknown_blocks_highlight",
+                    evidence_summary=f"highlight_id={highlight_id}; state=unknown; season={starts}..{ends}",
+                    public_url=public_url,
+                ))
+
+    log_checkpoint(f"activity highlight audit done: issues={len(issues)}")
+    return issues
+# === END BLOCK: CONTENT_QUALITY_ACTIVITY_HIGHLIGHT_STATUS_GUARD_V1 ===
 
 
 def summarize(issues: List[Issue]) -> Dict[str, Any]:
@@ -3306,6 +3653,13 @@ def main() -> None:
             args.network,
             args.base_url,
         ))
+
+    issues.extend(audit_activity_highlights(
+        ROOT / args.offers_json,
+        today,
+        args.scope,
+        args.base_url,
+    ))
 
     issues.sort(key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.workbench_group, x.content_type, x.date, x.title, x.issue_code))
 

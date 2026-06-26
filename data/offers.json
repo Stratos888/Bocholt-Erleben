@@ -111,21 +111,52 @@
       },
       "seasonal_highlights": [
         {
-          "id": "aasee-badesaison",
-          "type": "water",
-          "label": "Jetzt Badezeit",
-          "short_label": "Badezeit",
+          "id": "aasee-bathing-status",
+          "type": "bathing_water",
+          "activation_mode": "condition_sensitive",
+          "label": "Badestelle aktuell freigegeben",
+          "short_label": "Baden freigegeben",
+          "detail_label": "Badehinweis",
           "starts": "06-01",
-          "ends": "09-30",
-          "peak_starts": "06-15",
-          "peak_ends": "08-31",
-          "confidence": "official_source",
+          "ends": "09-15",
+          "requires_current_status": true,
+          "current_status_max_age_days": 7,
+          "confidence": "verified_condition_sensitive",
+          "source_label": "Stadt Bocholt / Aasee",
           "source_url": "https://www.bocholt.de/aasee",
-          "checked_at": "2026-06-25",
-          "valid_until": "2027-06-01",
-          "home_boost": 22,
-          "activity_sort_boost": 9,
-          "public_note": "Saisonale Badestelle am Aasee. Wasserqualität und Hinweise vor Ort prüfen."
+          "checked_at": "2026-06-26",
+          "valid_until": "2027-03-01",
+          "home_boost": 0,
+          "activity_sort_boost": 0,
+          "visibility": [
+            "activity_detail"
+          ],
+          "public_note": "Nur bei frischer positiver Statuslage, beaufsichtigtem Badebetrieb und Freigabe als Bade-Highlight ausspielen.",
+          "source_policy": {
+            "positive_requires": [
+              "official_city",
+              "official_authority",
+              "official_bathing_water_status",
+              "official_operator"
+            ],
+            "negative_allows": [
+              "official_city",
+              "official_authority",
+              "official_bathing_water_status",
+              "official_operator",
+              "local_press"
+            ]
+          },
+          "current_status": {
+            "state": "blocked",
+            "label": "Aktuell kein Bade-Highlight",
+            "source_type": "local_press",
+            "source_url": "https://www.bbv-net.de/bocholt/bocholter-aasee-schlamm-geruch-stinkt-keine-badegaeste-seezustand-probleme-w1212295-6000574615/",
+            "checked_at": "2026-06-26",
+            "valid_until": "2026-07-10",
+            "reason": "Aktuelle lokale Medienlage spricht gegen eine Badeempfehlung; saisonales Grundfenster reicht nicht als Freigabe.",
+            "public_note": "Der Aasee bleibt als Freizeitort nutzbar, wird aktuell aber nicht als Bade-Highlight empfohlen."
+          }
         }
       ]
     },
@@ -310,21 +341,52 @@
       },
       "seasonal_highlights": [
         {
-          "id": "hilgelo-zwemseizoen",
-          "type": "water",
-          "label": "Jetzt Badesee-Zeit",
-          "short_label": "Badesee-Zeit",
+          "id": "hilgelo-bathing-status",
+          "type": "bathing_water",
+          "activation_mode": "condition_sensitive",
+          "label": "Badestelle aktuell freigegeben",
+          "short_label": "Baden freigegeben",
+          "detail_label": "Badehinweis",
           "starts": "05-01",
           "ends": "09-30",
-          "peak_starts": "06-15",
-          "peak_ends": "08-31",
-          "confidence": "official_source",
-          "source_url": "https://www.leisurelands.nl/nl/ontdek-recreatiegebieden-leisurelands/achterhoek/hilgelo/activiteiten-op-hilgelo/naar-het-strand-op-hilgelo/zwemmen-op-hilgelo",
-          "checked_at": "2026-06-25",
-          "valid_until": "2027-05-01",
-          "home_boost": 20,
-          "activity_sort_boost": 8,
-          "public_note": "Offizielle Badestelle; die Wasserqualität wird im Zwemseizoen regelmäßig kontrolliert."
+          "requires_current_status": true,
+          "current_status_max_age_days": 7,
+          "confidence": "verified_condition_sensitive",
+          "source_label": "Zwemwater / Hilgelo",
+          "source_url": "https://www.zwemwater.nl/home?id=1750",
+          "checked_at": "2026-06-26",
+          "valid_until": "2027-03-01",
+          "home_boost": 0,
+          "activity_sort_boost": 0,
+          "visibility": [
+            "activity_detail"
+          ],
+          "public_note": "Nur mit frischer positiver Badewasser-/Betreiberstatusquelle als Bade-Highlight ausspielen.",
+          "source_policy": {
+            "positive_requires": [
+              "official_city",
+              "official_authority",
+              "official_bathing_water_status",
+              "official_operator"
+            ],
+            "negative_allows": [
+              "official_city",
+              "official_authority",
+              "official_bathing_water_status",
+              "official_operator",
+              "local_press"
+            ]
+          },
+          "current_status": {
+            "state": "unknown",
+            "label": "Status vor Empfehlung prüfen",
+            "source_type": "",
+            "source_url": "",
+            "checked_at": "",
+            "valid_until": "",
+            "reason": "Noch keine frische positive Statusquelle im Repo hinterlegt.",
+            "public_note": "Vor einer Badeempfehlung muss der aktuelle Badewasserstatus geprüft werden."
+          }
         }
       ]
     },
@@ -1539,21 +1601,29 @@
       },
       "seasonal_highlights": [
         {
-          "id": "zwillbrocker-venn-flamingozeit",
+          "id": "zwillbrock-flamingo-season",
           "type": "wildlife",
+          "activation_mode": "stable_seasonal",
           "label": "Jetzt gute Flamingo-Zeit",
           "short_label": "Flamingo-Zeit",
+          "detail_label": "Gute Zeit für Flamingobeobachtung",
           "starts": "03-01",
           "ends": "08-31",
           "peak_starts": "04-01",
-          "peak_ends": "07-31",
+          "peak_ends": "06-30",
           "confidence": "verified_stable",
-          "source_url": "https://www.muensterland.com/tourismus/themen/radfahren-muensterland/radrouten-muensterland/flamingoroute/",
-          "checked_at": "2026-06-25",
+          "source_label": "Biologische Station Zwillbrock",
+          "source_url": "https://www.bszwillbrock.de/de/biologische-vielfalt/flamingos/flamingos-beobachten/",
+          "checked_at": "2026-06-26",
           "valid_until": "2027-03-01",
           "home_boost": 24,
           "activity_sort_boost": 10,
-          "public_note": "Gute Zeit für Flamingo-Beobachtung; Fernglas mitnehmen und aus Distanz beobachten."
+          "visibility": [
+            "home",
+            "activity_card",
+            "activity_detail"
+          ],
+          "public_note": "Gute Zeit für Beobachtung aus Distanz; Fernglas mitnehmen und ausgewiesene Wege/Beobachtungspunkte nutzen."
         }
       ]
     },
@@ -1639,21 +1709,29 @@
       },
       "seasonal_highlights": [
         {
-          "id": "korenburgerveen-wollgras-veenpluis",
-          "type": "nature",
-          "label": "Wollgras & Moorzeit",
+          "id": "korenburgerveen-wollgras-moorzeit",
+          "type": "nature_season",
+          "activation_mode": "stable_seasonal",
+          "label": "Wollgras- und Moorzeit",
           "short_label": "Moorzeit",
+          "detail_label": "Saison für Moor- und Wollgras-Eindrücke",
           "starts": "04-01",
           "ends": "08-31",
           "peak_starts": "05-01",
           "peak_ends": "07-31",
           "confidence": "verified_stable",
+          "source_label": "Natuurmonumenten Korenburgerveen",
           "source_url": "https://www.natuurmonumenten.nl/natuurgebieden/korenburgerveen",
-          "checked_at": "2026-06-25",
+          "checked_at": "2026-06-26",
           "valid_until": "2027-04-01",
-          "home_boost": 16,
-          "activity_sort_boost": 7,
-          "public_note": "Im Frühjahr und Sommer ist das Moor mit Wollgras und Veenpluis besonders interessant."
+          "home_boost": 14,
+          "activity_sort_boost": 8,
+          "visibility": [
+            "home",
+            "activity_card",
+            "activity_detail"
+          ],
+          "public_note": "Saisonaler Naturhinweis, keine Sichtgarantie. Bitte Wege und Schutzregeln beachten."
         }
       ]
     },
@@ -3495,21 +3573,29 @@
       },
       "seasonal_highlights": [
         {
-          "id": "quellengrundpark-apothekergarten-saison",
-          "type": "nature_culture",
+          "id": "quellengrundpark-apothekergarten-season",
+          "type": "garden_season",
+          "activation_mode": "stable_seasonal",
           "label": "Apothekergarten-Saison",
           "short_label": "Apothekergarten",
+          "detail_label": "Apothekergarten-Saison",
           "starts": "05-01",
           "ends": "10-31",
           "peak_starts": "05-15",
           "peak_ends": "09-30",
           "confidence": "verified_stable",
+          "source_label": "Naturparke Rheinland",
           "source_url": "https://naturparke-rheinland.lvr.de/de/barrierefreie_angebote/hohe_mark___westmuensterland/borken_weseke_apothekergarten.html",
-          "checked_at": "2026-06-25",
+          "checked_at": "2026-06-26",
           "valid_until": "2027-05-01",
-          "home_boost": 14,
-          "activity_sort_boost": 6,
-          "public_note": "Der Quellengrundpark mit Apothekergarten ist in der warmen Jahreszeit besonders interessant."
+          "home_boost": 18,
+          "activity_sort_boost": 8,
+          "visibility": [
+            "home",
+            "activity_card",
+            "activity_detail"
+          ],
+          "public_note": "Der Apothekergarten ist in der Saison besonders passend; Pflanzenstände können wetterbedingt variieren."
         }
       ]
     },
@@ -4143,20 +4229,28 @@
       "seasonal_highlights": [
         {
           "id": "witte-venn-heidebluete",
-          "type": "nature",
+          "type": "nature_bloom",
+          "activation_mode": "stable_seasonal",
           "label": "Heideblüte-Zeit",
           "short_label": "Heideblüte",
+          "detail_label": "Saison für Heideblüte",
           "starts": "08-01",
           "ends": "09-30",
           "peak_starts": "08-15",
           "peak_ends": "09-15",
           "confidence": "verified_stable",
+          "source_label": "Münsterland / Witte Venn",
           "source_url": "https://www.muensterland.com/tourismus/themen/erlebnis-region-muensterland/naturerlebnis/witte-venn/",
-          "checked_at": "2026-06-25",
+          "checked_at": "2026-06-26",
           "valid_until": "2027-08-01",
-          "home_boost": 20,
-          "activity_sort_boost": 9,
-          "public_note": "Im August und September ist das Witte Venn wegen der Heideblüte besonders lohnend."
+          "home_boost": 22,
+          "activity_sort_boost": 10,
+          "visibility": [
+            "home",
+            "activity_card",
+            "activity_detail"
+          ],
+          "public_note": "Saisonaler Blütehinweis ohne Tagesgarantie. Bitte Schutzgebiet respektieren und auf Wegen bleiben."
         }
       ]
     }
