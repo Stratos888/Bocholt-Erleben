@@ -98,8 +98,8 @@ Umfang:
     .auditDecisionCard__title { font-weight:900; font-size:15px; line-height:1.22; }
     .auditDecisionCard__line { display:grid; gap:3px; }
     .auditDecisionCard__label { font-size:12px; font-weight:850; letter-spacing:.04em; text-transform:uppercase; opacity:.68; }
-    .auditChecklist { list-style:none; padding:0; grid-template-columns: repeat(2, minmax(0,1fr)); }
-    .auditChecklist li { padding:7px 9px; border-radius:12px; background:rgba(0,0,0,.035); font-size:13px; line-height:1.25; }
+    .auditChecklist { list-style:none; padding:0; display:flex; flex-wrap:wrap; gap:6px; }
+    .auditChecklist li { flex:1 1 calc(50% - 6px); min-width:180px; padding:7px 9px; border-radius:12px; background:rgba(0,0,0,.035); font-size:13px; line-height:1.25; }
     .auditChecklist li::before { content:""; }
     .auditPackageDisclosure { border-top: 1px solid rgba(0,0,0,.09); padding-top:9px; }
     .auditPackageDisclosure summary { cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px; font-weight:850; letter-spacing:.045em; text-transform:uppercase; opacity:.76; }
@@ -108,6 +108,18 @@ Umfang:
     .auditPackageDisclosure[open] summary::after { transform:rotate(-90deg); }
     .auditPackageDisclosureBody { display:grid; gap:9px; margin-top:8px; }
     .auditLinkGrid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+    .auditLinkGrid--single { grid-template-columns:1fr; }
+    .sourceSuggestionMeta { display:grid; gap:2px; font-size:13px; line-height:1.3; }
+    .sourceSuggestionUrl { opacity:.72; overflow-wrap:anywhere; }
+    .sourceSummaryList { display:grid; gap:4px; margin:0; padding:0; list-style:none; font-size:13px; line-height:1.28; }
+    .sourceSummaryList li { display:flex; gap:6px; align-items:flex-start; }
+    .sourceSummaryList li::before { content:"•"; opacity:.62; }
+    .auditEditDisclosure { border-top:1px solid rgba(0,0,0,.09); padding-top:8px; }
+    .auditEditDisclosure summary { cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px; font-weight:850; letter-spacing:.045em; text-transform:uppercase; opacity:.76; }
+    .auditEditDisclosure summary::-webkit-details-marker { display:none; }
+    .auditEditDisclosure summary::after { content:"›"; transform:rotate(90deg); font-size:18px; line-height:1; opacity:.7; }
+    .auditEditDisclosure[open] summary::after { transform:rotate(-90deg); }
+    .auditEditDisclosureBody { display:grid; gap:8px; margin-top:8px; }
     .auditLinkGrid .btn { width:100%; }
     .reviewDebugOnly { display:none; }
     body.is-debug .reviewDebugOnly { display:block; }
@@ -137,6 +149,7 @@ Umfang:
     .reviewCardHead { display:grid; gap:8px; padding-bottom: 2px; }
     .reviewCard h1 { margin: 0; font-size: 21px; line-height: 1.16; }
     .reviewMetaLine { color: rgba(20,35,28,.78); font-size: 13px; line-height: 1.3; overflow-wrap:anywhere; }
+    .reviewMetaLine--compact { opacity:.84; }
 
     .reviewBadgeRow { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
     .originBadge,
@@ -185,10 +198,30 @@ Umfang:
 
     @media (max-width: 560px) {
       .wrap { padding: 8px; }
-      .top { align-items:flex-start; }
+      .top { align-items:flex-start; gap:8px; }
+      .title { font-size:20px; }
+      .inboxEyebrow { gap:5px; font-size:11px; }
       .inboxToolbar .btn { padding: 8px 10px; }
+      .reviewModeSwitch { gap:6px; margin-top:10px; }
+      .reviewModeSwitch .btn { min-height:42px; padding: 9px 11px; }
+      .card { padding: 12px; border-radius: 14px; }
+      .reviewCard { gap: 10px; }
+      .reviewCardHead { gap: 6px; }
+      .reviewCard h1 { font-size: 18px; line-height: 1.14; }
+      .reviewMetaLine { font-size: 12px; }
+      .reviewSection { padding-top: 9px; }
+      .reviewSectionTitle, .reviewActionGroupTitle { font-size: 11px; margin-bottom: 6px; }
+      .auditIssueBox, .auditStateNote, .auditInstructionBox, .auditDecisionCard { padding: 10px; border-radius: 12px; }
+      .auditIssueBox span { font-size: 13px; line-height: 1.28; }
+      .auditChecklist { gap:5px; }
+      .auditChecklist li { min-width: 0; flex: 1 1 100%; padding: 6px 8px; font-size: 12.5px; }
+      .auditLinkGrid, .auditFormGrid { grid-template-columns: 1fr; gap: 7px; }
+      .auditField label { font-size: 11px; }
+      .auditField input, .auditField textarea { padding: 8px 10px; border-radius: 11px; }
       .reviewRow { grid-template-columns: 1fr; gap:1px; }
-      .actions { grid-template-columns: 1fr; }
+      .actions { grid-template-columns: 1fr; gap:7px; }
+      .actions .btn { padding: 10px; }
+      .footer { margin-top: 8px; }
     }
     /* === END BLOCK: REVIEW_INBOX_WORKBENCH_UI_V2 === */
   </style>
@@ -1684,8 +1717,8 @@ Umfang:
         event_ticket_portal_as_primary_source: {
           actionTitle: "Offizielle Quelle übernehmen",
           why: "Ticketportale sind Buchungslinks. Die primäre Quelle soll die offizielle Event- oder Veranstalterseite sein, damit Datum, Ort und Status belastbar nachprüfbar bleiben.",
-          action: "Öffne die aktuelle Ticketportal-Quelle und die vorgeschlagene offizielle Quelle. Wenn Titel, Datum, Uhrzeit und Ort passen, die offizielle Quelle übernehmen. Nur wenn keine bessere Quelle nutzbar ist, das Ticketportal bewusst behalten.",
-          checklist: ["Ticketportal nur zur Identifikation öffnen", "offizielle Quelle öffnen", "Titel, Datum, Uhrzeit und Ort vergleichen", "wenn passend: offizielle Quelle übernehmen"],
+          action: "Wenn Titel, Datum, Uhrzeit und Ort passen, die offizielle Quelle übernehmen. Nur wenn keine bessere Quelle nutzbar ist, das Ticketportal bewusst behalten.",
+          checklist: ["Ticketportal öffnen", "offizielle Quelle öffnen", "Titel/Datum/Uhrzeit/Ort vergleichen", "Quelle übernehmen"],
           nextReviewDays: 14
         },
         event_time_format_unusual: {
@@ -1792,6 +1825,35 @@ Umfang:
       return trimValue(item?.issue_code) === "event_ticket_portal_as_primary_source";
     }
 
+    function compactRecommendedAction(item, guide) {
+      const code = trimValue(item?.issue_code);
+      const custom = {
+        event_ticket_portal_as_primary_source: "Normalfall: offizielle Quelle pruefen und uebernehmen.",
+        event_source_url_broken: "Neue funktionierende Quelle suchen oder 7 Tage parken.",
+        event_source_url_redirect: "Finale Zielseite pruefen und bei Bedarf speichern.",
+        event_source_url_unstable: "Quelle im Browser pruefen und danach bestaetigen oder parken.",
+        event_full_verification_due: "Quelle einmal vollstaendig pruefen.",
+        activity_full_verification_due: "Quelle pruefen und danach bestaetigen oder Patch vormerken."
+      };
+      return custom[code] || trimValue(item?.recommended_action) || trimValue(guide?.actionTitle) || "Bitte fachlich pruefen.";
+    }
+
+    function compactEvidenceLines(item) {
+      const status = trimValue(item?.evidence_status);
+      const lines = [];
+      if (status === 'source_confirms_core_facts_with_weak_location') {
+        lines.push('Titel, Datum und Uhrzeit bestaetigt.');
+        lines.push('Ort nur allgemein bestaetigt.');
+        return lines;
+      }
+      if (status) lines.push(formatEvidenceStatus(status));
+      const summary = trimValue(item?.evidence_summary);
+      if (summary && !lines.includes(summary)) lines.push(summary);
+      const missing = trimValue(item?.evidence_missing_fields);
+      if (missing) lines.push(`Noch offen: ${missing}`);
+      return lines.filter(Boolean).slice(0, 3);
+    }
+
     function renderAuditChecklist(items) {
       return `<ul class="auditChecklist">${items.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>`;
     }
@@ -1808,9 +1870,11 @@ Umfang:
         <section class="reviewSection" aria-label="${escapeHtml(sectionTitle)}">
           <div class="reviewSectionTitle">${escapeHtml(sectionTitle)}</div>
           <div class="auditStateNote auditStateNote--suggestedSource">
-            <strong>${escapeHtml(label)}</strong><br />
-            <span>${escapeHtml(suggestedUrl)}</span>
-            ${reason ? `<br /><span>${escapeHtml(reason)}</span>` : ``}
+            <div class="sourceSuggestionMeta">
+              <strong>${escapeHtml(label)}</strong>
+              <span class="sourceSuggestionUrl">${escapeHtml(suggestedUrl)}</span>
+              ${reason ? `<span>${escapeHtml(reason)}</span>` : ``}
+            </div>
             <div class="auditStateActions">
               <button class="btn sourceBtn" type="button" data-open-url="${escapeHtml(suggestedUrl)}" title="Öffnet den vorgeschlagenen offiziellen Quelllink.">${escapeHtml(buttonLabel)}</button>
             </div>
@@ -1837,20 +1901,13 @@ Umfang:
     }
 
     function renderEvidenceSummary(item) {
-      const status = trimValue(item.evidence_status);
-      const summary = trimValue(item.evidence_summary);
-      const checked = trimValue(item.evidence_checked_fields);
-      const missing = trimValue(item.evidence_missing_fields);
-      const fieldStatuses = trimValue(item.evidence_field_statuses);
-      if (!status && !summary && !checked && !missing && !fieldStatuses) return "";
+      const lines = compactEvidenceLines(item);
+      if (!lines.length) return "";
       return `
         <section class="reviewSection" aria-label="Faktenprobe">
           <div class="reviewSectionTitle">Quellencheck</div>
           <div class="auditStateNote">
-            ${status ? `<div><strong>Ergebnis:</strong> ${escapeHtml(formatEvidenceStatus(status))}</div>` : ``}
-            ${summary ? `<div>${escapeHtml(summary)}</div>` : ``}
-            ${checked ? `<div><strong>Geprüft:</strong> ${escapeHtml(checked)}</div>` : ``}
-            ${missing ? `<div><strong>Noch offen:</strong> ${escapeHtml(missing)}</div>` : ``}
+            <ul class="sourceSummaryList">${lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
           </div>
         </section>
       `;
@@ -1877,15 +1934,11 @@ Umfang:
 
     function renderEventCorrectionForm(item, suggestedUrl) {
       if (!isContentAuditEventItem(item)) return "";
-      const issueCode = trimValue(item.issue_code);
       const isTicketSourceIssue = isTicketPortalPrimarySourceIssue(item);
       const currentSourceValue = eventFieldValue(item, "source_url") || eventFieldValue(item, "url") || eventFieldValue(item, "event_url") || trimValue(item.source_url);
       const sourceValue = suggestedUrl || (isTicketSourceIssue ? "" : currentSourceValue);
-      const sectionTitle = isTicketSourceIssue ? "Offizielle Quelle übernehmen" : "Eventdaten korrigieren";
-      return `
-        <section class="reviewSection" aria-label="${escapeHtml(sectionTitle)}">
-          <div class="reviewSectionTitle">${escapeHtml(sectionTitle)}</div>
-          <div class="auditFormGrid">
+      const sectionTitle = isTicketSourceIssue ? "Übernehmen" : "Eventdaten korrigieren";
+      const coreFieldsHtml = `
             <div class="auditField auditField--wide">
               <label for="auditEventTitle">Titel</label>
               <input id="auditEventTitle" type="text" value="${escapeHtml(eventFieldValue(item, "title") || item.title)}" autocomplete="off" />
@@ -1909,22 +1962,34 @@ Umfang:
             <div class="auditField auditField--wide">
               <label for="auditEventLocation">Ort / Location</label>
               <input id="auditEventLocation" type="text" value="${escapeHtml(eventFieldValue(item, "location"))}" autocomplete="off" />
+            </div>`;
+      const visualFieldsHtml = isTicketSourceIssue ? "" : `
+            <div class="auditField">
+              <label for="auditEventVisualKey">Bildtyp / visual_key</label>
+              <input id="auditEventVisualKey" type="text" value="${escapeHtml(eventFieldValue(item, "visual_key") || item.suggested_visual_key || "")}" autocomplete="off" />
             </div>
-            ${isTicketSourceIssue ? `` : `
-              <div class="auditField">
-                <label for="auditEventVisualKey">Bildtyp / visual_key</label>
-                <input id="auditEventVisualKey" type="text" value="${escapeHtml(eventFieldValue(item, "visual_key") || item.suggested_visual_key || "")}" autocomplete="off" />
-              </div>
-              <div class="auditField">
-                <label for="auditEventVisualMotif">Motiv / visual_motif</label>
-                <input id="auditEventVisualMotif" type="text" value="${escapeHtml(eventFieldValue(item, "visual_motif") || eventFieldValue(item, "image_visual_motif") || item.suggested_visual_motif || "")}" autocomplete="off" />
-              </div>
-            `}
+            <div class="auditField">
+              <label for="auditEventVisualMotif">Motiv / visual_motif</label>
+              <input id="auditEventVisualMotif" type="text" value="${escapeHtml(eventFieldValue(item, "visual_motif") || eventFieldValue(item, "image_visual_motif") || item.suggested_visual_motif || "")}" autocomplete="off" />
+            </div>`;
+      return `
+        <section class="reviewSection" aria-label="${escapeHtml(sectionTitle)}">
+          <div class="reviewSectionTitle">${escapeHtml(sectionTitle)}</div>
+          <div class="auditFormGrid">
             <div class="auditField auditField--wide">
               <label for="auditEventSourceUrl">Offizielle Quelle</label>
               <input id="auditEventSourceUrl" type="url" value="${escapeHtml(sourceValue)}" inputmode="url" autocomplete="off" />
             </div>
           </div>
+          <details class="auditEditDisclosure">
+            <summary>Eventdaten bei Bedarf anpassen</summary>
+            <div class="auditEditDisclosureBody">
+              <div class="auditFormGrid">
+                ${coreFieldsHtml}
+                ${visualFieldsHtml}
+              </div>
+            </div>
+          </details>
         </section>
       `;
     }
@@ -2195,11 +2260,10 @@ Umfang:
         <article class="card reviewCard">
           <header class="reviewCardHead">
             <div class="reviewBadgeRow">
-              <span class="originBadge">Content-Prüfung</span>
               <span class="reviewChip reviewChip--waiting">${escapeHtml(severityLabel)}</span>
             </div>
             <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
-            <div class="reviewMetaLine">${escapeHtml([formatGermanDate(it.date), trimValue(it.content_type), trimValue(it.issue_code)].filter(Boolean).join(" · "))}</div>
+            <div class="reviewMetaLine reviewMetaLine--compact">${escapeHtml([formatGermanDate(it.date), trimValue(it.content_type)].filter(Boolean).join(" · "))}</div>
           </header>
 
 
@@ -2207,7 +2271,7 @@ Umfang:
             <div class="reviewSectionTitle">Befund</div>
             <div class="auditIssueBox auditIssueBox--${escapeHtml(severity)}">
               <strong>${escapeHtml(it.issue_text || "Content-Fall prüfen")}</strong>
-              <span>${escapeHtml(it.recommended_action || "Bitte fachlich prüfen.")}</span>
+              <span>${escapeHtml(compactRecommendedAction(it, guide))}</span>
             </div>
           </section>
 
@@ -2250,14 +2314,14 @@ Umfang:
           <section class="reviewSection reviewSection--actions" aria-label="Content-Prüfaktionen">
             <div class="reviewActionGroupTitle">Aktion</div>
             <div class="actions actions--compact">
-              <button id="btnAuditPrevious" class="btn" type="button" title="Zur vorherigen Karte wechseln. Speichert nichts." ${contentAuditHistory.length ? "" : "disabled"}>Zurück</button>
-              <button id="btnAuditNext" class="btn" type="button" title="Zur nächsten Karte wechseln. Speichert nichts." ${queue.length ? "" : "disabled"}>Weiter</button>
-            </div>
-            <div class="actions actions--compact">
               ${canEditEvent ? `<button id="btnAuditSaveFields" class="btn btn-good actionPrimary" type="button" title="${escapeHtml(saveButtonTitle)}">${escapeHtml(saveButtonLabel)}</button>` : ``}
               <button id="btnAuditVerified" class="${escapeHtml(verifiedButtonClass)}" type="button" title="${escapeHtml(verifiedButtonTitle)}">${escapeHtml(verifiedButtonLabel)}</button>
               ${isActivity ? `<button id="btnAuditPatchNeeded" class="btn btn-bad" type="button" title="Markiert diesen Activity-Fall für einen bewussten Repo-Patch.">Patch nötig</button>` : ``}
               <button id="btnAuditSnooze" class="btn" type="button" title="Blendet den Fall 7 Tage aus und prüft ihn danach erneut.">7 Tage parken</button>
+            </div>
+            <div class="actions actions--compact actions--nav">
+              <button id="btnAuditPrevious" class="btn" type="button" title="Zur vorherigen Karte wechseln. Speichert nichts." ${contentAuditHistory.length ? "" : "disabled"}>Zurück</button>
+              <button id="btnAuditNext" class="btn" type="button" title="Zur nächsten Karte wechseln. Speichert nichts." ${queue.length ? "" : "disabled"}>Weiter</button>
             </div>
           </section>
         </article>
