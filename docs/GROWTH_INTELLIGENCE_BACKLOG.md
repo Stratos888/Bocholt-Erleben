@@ -97,9 +97,11 @@ Die Backlog-Struktur ist auf direkte API-Integration ausgelegt:
 
 - Google Search Console API
 - Google Analytics Data API
-- interne Klick- und Suchdaten
+- interne Nutzwert-Metriken aus `value_metric_daily`
+- Inbox-/Review-Historie, soweit im Sheet vorhanden
+- Repo-Visual-Backlog als aggregiertes Qualitätssignal
 - Content-/Event-/Activity-Bestand
-- Content-Audit-Ergebnisse
+- Content-Audit-Ergebnisse, sobald sie dauerhaft maschinenlesbar archiviert werden
 
 Diese Quellen sollen deduplizierte Backlog-Cluster erzeugen, nicht einzelne rohe Hinweise.
 
@@ -109,10 +111,13 @@ Der automatische Prozess erzeugt keine Live-Änderungen und gibt keine Aufträge
 
 ### Datenquellen
 
-- Google Search Console API über `GSC_SITE_URL`
+- Google Search Console API über `GSC_SITE_URL` oder `SEARCH_METRICS_GOOGLE_SITE_URL`
 - Google Analytics Data API über `GA4_PROPERTY_ID`
+- interne Nutzwert-Metriken aus der Datenbanktabelle `value_metric_daily`
 - kanonischer Content-Bestand aus dem Google Sheet, insbesondere `Events`, `Activities`/`Aktivitaeten` und `Locations`
 - vorhandene Backlog-Historie aus `Growth_Backlog`
+- Inbox-/Review-Historie aus `Inbox_Archive`, sofern vorhanden
+- Repo-Visual-Backlog als aggregiertes Qualitätssignal
 
 Es gibt keinen CSV-Import als Zielprozess und keinen zusätzlichen bezahlten KI-Websearch.
 
@@ -156,11 +161,30 @@ Der Prozess erzeugt `cluster_key`-basierte Themencluster. Ein Thema wird nicht e
 
 Damit verhindern auch abgeschlossene und abgelehnte Einträge ein erneutes Auftauchen desselben Punktes.
 
+### Semantische Entscheidungs- und Priorisierungsschicht
+
+Der Prozess schreibt keine einzelnen Rohsignale wie Suchbegriffe direkt ins Backlog. Vorher wird verdichtet:
+
+```text
+Rohsignal -> Such-/Nutzungsintention -> Projektproblem -> dedupliziertes Arbeitspaket
+```
+
+Beispiele:
+
+- „was ist heute los“ / „wo ist heute was los“ -> Arbeitspaket für Today-/Landingpage-/SEO-Prüfung
+- starke interne Detailaufrufe + viele Website-/Maps-Klicks -> prominente Verlinkung oder Highlight-Verwendung prüfen
+- wiederholte Ablehnungen im Inbox-Archiv -> Quellen-/Regel-/Review-Muster prüfen
+- viele offene Visual-Gaps -> Bildbestand als Arbeitspaket härten
+
 ### Output-Kategorien
 
 - `Content-Lücke`
 - `SEO-Optimierung`
 - `UX-/Content-Prüfung`
+- `Nutzungs-/Content-Chance`
+- `Akquise-/Funnel-Chance`
+- `Prozess-/Qualitätssignal`
+- `Visual-/Content-Qualität`
 
 Jeder Eintrag enthält:
 

@@ -9,6 +9,8 @@ import os
 import re
 import sys
 import time
+from collections import Counter, defaultdict
+from pathlib import Path
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Tuple
 
@@ -21,6 +23,7 @@ REPORT_TAB = os.environ.get("GROWTH_REPORT_TAB", "Growth_Intelligence_Report").s
 DAYS = int(os.environ.get("GROWTH_LOOKBACK_DAYS", "30") or "30")
 MIN_IMPRESSIONS = int(os.environ.get("GROWTH_MIN_IMPRESSIONS", "40") or "40")
 MIN_SESSIONS = int(os.environ.get("GROWTH_MIN_SESSIONS", "15") or "15")
+ROOT = Path(__file__).resolve().parents[1]
 
 BACKLOG_HEADER = [
     "id", "cluster_key", "status", "priority", "type", "title", "short_reason",
@@ -355,11 +358,209 @@ def build_candidates(gsc_rows: List[Dict[str, Any]], ga4_rows: List[Dict[str, An
     return list(candidates.values())
 
 
+
+def load_repo_visual_signals() -> list[Candidate]:
+    """Create coarse backlog candidates from repo-owned visual backlog files.
+
+    This is intentionally conservative: it does not create one item per image, only one
+    aggregated workpackage if unresolved visual work is visible in repo data.
+    """
+    candidates: list[Candidate] = []
+    now = now_iso()
+    asset_path = ROOT / "data" / "event_visual_asset_backlog.tsv"
+    remaster_path = ROOT / "data" / "event_visual_remaster_backlog.tsv"
+    planned_count = 0
+    high_count = 0
+    remaster_count = 0
+    try:
+        if asset_path.exists():
+            lines = asset_path.read_text(encoding="utf-8").splitlines()
+            header = lines[0].split("\t") if lines else []
+            idx_status = header.index("asset_status") if "asset_status" in header else -1
+            idx_prio = header.index("priority") if "priority" in header else -1
+            for line in lines[1:]:
+                cols = line.split("\t")
+                status = cols[idx_status].strip().lower() if idx_status >= 0 and idx_status < len(cols) else ""
+                prio = cols[idx_prio].strip().lower() if idx_prio >= 0 and idx_prio < len(cols) else ""
+                if status in {"planned", "candidate", "gap", "missing"}:
+                    planned_count += 1
+                    if prio == "high":
+                        high_count += 1
+        if remaster_path.exists():
+            lines = remaster_path.read_text(encoding="utf-8").splitlines()
+            remaster_count = max(0, len(lines) - 1)
+    except Exception:
+        return []
+
+    if planned_count + remaster_count >= 8:
+        title = "Event-Bildbestand gezielt weiter härten"
+        desc = (
+            f"Repo-Daten zeigen {planned_count} geplante/fehlende Event-Visuals und {remaster_count} Remaster-Kandidaten. "
+            "Als Arbeitspaket bündeln, statt einzelne Bildthemen im Backlog zu sammeln. Ziel: bessere Kartenwirkung, weniger falsche Motive und stabilere visuelle Qualität."
+        )
+        candidates.append(Candidate(
+            cluster_key="visual-event-bildbestand-haerten",
+            priority="mittel" if high_count < 5 else "hoch",
+            type="Visual-/Content-Qualität",
+            title=title,
+            short_reason=desc,
+            why_relevant=desc,
+            recommended_action="Visual-Backlog als eigenes Arbeitspaket priorisieren.",
+            expected_benefit="Höhere wahrgenommene Qualität und weniger manuelle Bildkorrekturen.",
+            acquisition_note="Keine direkte Akquise-Aktion.",
+            source="growth-intelligence:repo-visual",
+            signals={"planned_visuals": planned_count, "high_priority_visuals": high_count, "remaster_candidates": remaster_count, "generated_at": now},
+        ))
+    return candidates
+
+
+def fetch_value_metrics(start: str, end: str) -> list[dict[str, Any]]:
+    """Read anonymous value_metric_daily aggregates if DB secrets are available.
+
+    Uses staging DB on staging, live DB on main. Missing DB config is a clean skip.
+    """
+    env_name = os.environ.get("BE_ENVIRONMENT", "").strip().lower()
+    prefix = "LIVE" if env_name == "main" else "STAGING"
+    host = os.environ.get(f"{prefix}_DB_HOST", "").strip()
+    name = os.environ.get(f"{prefix}_DB_NAME", "").strip()
+    user = os.environ.get(f"{prefix}_DB_USER", "").strip()
+    password = os.environ.get(f"{prefix}_DB_PASSWORD", "").strip()
+    port = int(os.environ.get(f"{prefix}_DB_PORT", "3306") or "3306")
+    if not all([host, name, user, password]):
+        return []
+    try:
+        import pymysql  # type: ignore
+    except Exception:
+        return []
+    sql = """
+        SELECT metric_key, entity_type, entity_id, COALESCE(entity_title, '') AS entity_title,
+               reporting_target_type, reporting_target_id, COALESCE(reporting_target_title, '') AS reporting_target_title,
+               COALESCE(page_path, '') AS page_path, SUM(count_value) AS total
+        FROM value_metric_daily
+        WHERE metric_date BETWEEN %s AND %s
+        GROUP BY metric_key, entity_type, entity_id, entity_title, reporting_target_type, reporting_target_id, reporting_target_title, page_path
+        ORDER BY total DESC
+        LIMIT 200
+    """
+    try:
+        conn = pymysql.connect(host=host, user=user, password=password, database=name, port=port, charset="utf8mb4", cursorclass=pymysql.cursors.DictCursor, connect_timeout=8)
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (start, end))
+                return list(cur.fetchall() or [])
+    except Exception:
+        return []
+
+
+def build_internal_metric_candidates(rows: list[dict[str, Any]], start: str, end: str) -> list[Candidate]:
+    candidates: dict[str, Candidate] = {}
+    by_entity: dict[str, dict[str, Any]] = defaultdict(lambda: {"views": 0, "outbound": 0, "maps": 0, "title": "", "type": "", "page": ""})
+    organizer_clicks = 0
+    for r in rows:
+        metric = str(r.get("metric_key", ""))
+        total = int(float(r.get("total", 0) or 0))
+        if metric == "organizer_cta_click":
+            organizer_clicks += total
+            continue
+        entity_id = str(r.get("reporting_target_id") or r.get("entity_id") or r.get("page_path") or "").strip()
+        if not entity_id:
+            continue
+        b = by_entity[entity_id]
+        b["title"] = str(r.get("reporting_target_title") or r.get("entity_title") or entity_id)
+        b["type"] = str(r.get("reporting_target_type") or r.get("entity_type") or "content")
+        b["page"] = str(r.get("page_path") or "")
+        if metric in {"event_detail_view", "activity_detail_view"}:
+            b["views"] += total
+        elif metric in {"website_click", "location_click"}:
+            b["outbound"] += total
+        elif metric == "maps_click":
+            b["maps"] += total
+
+    for entity_id, b in by_entity.items():
+        views = int(b["views"])
+        outbound = int(b["outbound"])
+        maps = int(b["maps"])
+        if views < 25 and outbound + maps < 10:
+            continue
+        title = str(b["title"] or entity_id)
+        key = cluster_key("Interne-Nutzung", title)
+        desc = (
+            f"Interne Nutzungsdaten vom {start} bis {end} zeigen messbares Interesse an „{title}“ "
+            f"({views} Detailaufrufe, {outbound} Website-/Location-Klicks, {maps} Maps-Klicks). Prüfen, ob dieser Inhalt prominenter verlinkt, als Highlight genutzt oder als Muster für ähnliche Inhalte verwendet werden sollte."
+        )
+        candidates[key] = Candidate(
+            cluster_key=key,
+            priority="hoch" if views >= 100 or outbound + maps >= 40 else "mittel",
+            type="Nutzungs-/Content-Chance",
+            title=f"Stark genutzten Inhalt prüfen: {title[:80]}",
+            short_reason=desc,
+            why_relevant=desc,
+            recommended_action="Prominenz, interne Verlinkung, ähnliche Inhalte und ggf. spätere Akquise-Eignung prüfen.",
+            expected_benefit="Mehr Nutzen aus bereits beobachtetem Nutzerinteresse ziehen.",
+            acquisition_note="Akquise nur prüfen, wenn Anbieter privat/buchungsorientiert ist und eigene Nutzersignale stark genug sind.",
+            source="growth-intelligence:value-metrics",
+            signals={"period_start": start, "period_end": end, "entity_id": entity_id, "views": views, "outbound_clicks": outbound, "maps_clicks": maps},
+        )
+
+    if organizer_clicks >= 5:
+        desc = (
+            f"Interne Nutzungsdaten zeigen {organizer_clicks} Klicks auf Veranstalter-/Anbieter-CTAs im Zeitraum {start} bis {end}. "
+            "Prüfen, ob die Angebots-/Veranstalterstrecke verständlich genug ist und ob spätere Akquise-Unterlagen daraus abgeleitet werden sollten."
+        )
+        candidates["akquise-veranstalter-funnel-pruefen"] = Candidate(
+            cluster_key="akquise-veranstalter-funnel-pruefen",
+            priority="mittel" if organizer_clicks < 20 else "hoch",
+            type="Akquise-/Funnel-Chance",
+            title="Veranstalter-/Anbieter-Funnel prüfen",
+            short_reason=desc,
+            why_relevant=desc,
+            recommended_action="CTA-Texte, Preise/Angebote, Vertrauen und nächste Schritte prüfen.",
+            expected_benefit="Bessere Grundlage für spätere zahlende Anbieter, ohne direkte automatische Ansprache.",
+            acquisition_note="Akquise-relevant, aber erst nach inhaltlicher Prüfung und belastbaren Nutzersignalen.",
+            source="growth-intelligence:value-metrics",
+            signals={"period_start": start, "period_end": end, "organizer_cta_clicks": organizer_clicks},
+        )
+    return list(candidates.values())
+
+
+def build_sheet_history_candidates(sheets, spreadsheet_id: str, start: str, end: str) -> list[Candidate]:
+    """Use existing review/audit history as coarse signals, if tabs exist."""
+    candidates: list[Candidate] = []
+    archive = read_records(sheets, spreadsheet_id, "Inbox_Archive")
+    rejected_notes: Counter[str] = Counter()
+    for r in archive:
+        status = " ".join(str(r.get(k, "")).lower() for k in ["status", "decision", "review_status"])
+        if not any(x in status for x in ["verworfen", "abgelehnt", "rejected"]):
+            continue
+        text = " ".join(str(r.get(k, "")) for k in ["notes", "title", "source_name", "kategorie_suggestion"])
+        topic = canonical_topic(text)
+        if topic and len(topic) >= 5:
+            rejected_notes[topic] += 1
+    for topic, count in rejected_notes.most_common(5):
+        if count < 3:
+            continue
+        desc = f"Inbox-Archiv enthält {count} abgelehnte/verworfen markierte Einträge mit ähnlichem Muster („{topic}“). Prüfen, ob Quelle, Regelverständnis oder manuelle Bewertung dokumentiert werden sollte, damit gleiche Fälle weniger Arbeit verursachen."
+        candidates.append(Candidate(
+            cluster_key=cluster_key("Inbox-Ablehnungsmuster", topic),
+            priority="mittel" if count < 8 else "hoch",
+            type="Prozess-/Qualitätssignal",
+            title=f"Wiederholtes Ablehnungsmuster prüfen: {topic.title()}",
+            short_reason=desc,
+            why_relevant=desc,
+            recommended_action="Muster einmal fachlich bewerten und ggf. Regel-/Doku-/Quellenhinweis ableiten.",
+            expected_benefit="Weniger wiederkehrende Review-Arbeit und sauberere Kandidatenqualität.",
+            acquisition_note="Keine Akquise-Aktion.",
+            source="growth-intelligence:inbox-history",
+            signals={"period_start": start, "period_end": end, "topic": topic, "rejected_count": count},
+        ))
+    return candidates
+
+
 def main() -> None:
     sheet_id = os.environ.get("BE_SHEET_ID", "").strip() or os.environ.get("SHEET_ID", "").strip()
     if not sheet_id:
         fail("BE_SHEET_ID oder SHEET_ID fehlt.")
-    site_url = os.environ.get("GSC_SITE_URL", "").strip()
+    site_url = (os.environ.get("GSC_SITE_URL", "").strip() or os.environ.get("SEARCH_METRICS_GOOGLE_SITE_URL", "").strip())
     ga4_property_id = os.environ.get("GA4_PROPERTY_ID", "").strip()
     creds = parse_sa()
     sheets = service("sheets", "v4", creds)
@@ -402,7 +603,11 @@ def main() -> None:
         status = "partial"
         messages.append(f"GA4 Fehler: {exc}")
 
+    value_rows = fetch_value_metrics(start, end)
     candidates = build_candidates(gsc_rows, ga4_rows, inv, start, end)
+    candidates.extend(build_internal_metric_candidates(value_rows, start, end))
+    candidates.extend(build_sheet_history_candidates(sheets, sheet_id, start, end))
+    candidates.extend(load_repo_visual_signals())
     created: List[Dict[str, Any]] = []
     suppressed = 0
     ts = now_iso()
@@ -439,14 +644,14 @@ def main() -> None:
         "period_start": start,
         "period_end": end,
         "status": status,
-        "source": "gsc+ga4+content_inventory",
+        "source": "gsc+ga4+value_metrics+sheet_history+repo_visual+content_inventory",
         "items_created": len(created),
         "items_suppressed": suppressed,
         "gsc_rows": len(gsc_rows),
         "ga4_rows": len(ga4_rows),
-        "message": " | ".join(messages) if messages else "Growth-Backlog erfolgreich aktualisiert.",
+        "message": " | ".join(messages) if messages else f"Growth-Backlog erfolgreich aktualisiert. Interne Metrik-Zeilen: {len(value_rows)}.",
     }])
-    log(f"Growth Intelligence: created={len(created)} suppressed={suppressed} gsc_rows={len(gsc_rows)} ga4_rows={len(ga4_rows)} status={status}")
+    log(f"Growth Intelligence: created={len(created)} suppressed={suppressed} gsc_rows={len(gsc_rows)} ga4_rows={len(ga4_rows)} value_rows={len(value_rows)} status={status}")
 
 
 if __name__ == "__main__":
