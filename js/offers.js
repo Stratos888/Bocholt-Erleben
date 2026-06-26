@@ -473,6 +473,19 @@ function getCategoryPresentation(category) {
     return priorityMap[value] ?? 500;
   }
 
+  /* === BEGIN BLOCK: ACTIVITY_HIGHLIGHT_CARD_HELPERS_V1 | Zweck: macht aktive Saison-Highlights fuer Activity-Cards zentral nutzbar; Umfang: nur OfferVisuals-Helfer, keine DOM-Events === */
+  function getActiveHighlight(offer) {
+    if (offer?.activeHighlight && typeof offer.activeHighlight === "object") return offer.activeHighlight;
+    return window.BEActivityHighlights?.getPrimaryHighlight?.(offer) || null;
+  }
+
+  function getActiveHighlightLabel(offer) {
+    const highlight = getActiveHighlight(offer);
+    if (!highlight) return "";
+    return highlight.shortLabel ? `Jetzt: ${highlight.shortLabel}` : highlight.label;
+  }
+  /* === END BLOCK: ACTIVITY_HIGHLIGHT_CARD_HELPERS_V1 === */
+
   function getMeaningfulTagItems(offer) {
     const tags = Array.isArray(offer?.tags)
       ? offer.tags.map((entry) => toSingleLine(entry)).filter(Boolean)
@@ -519,7 +532,7 @@ function getCategoryPresentation(category) {
       const merged = [];
       const seen = new Set();
 
-      [...activeMatches, ...getRankedTagItems(offer, 3)].forEach((entry) => {
+      [getActiveHighlightLabel(offer), ...activeMatches, ...getRankedTagItems(offer, 3)].forEach((entry) => {
         const value = toSingleLine(entry);
         const key = normalizeComparable(value);
         if (!value || seen.has(key)) return;
@@ -531,7 +544,12 @@ function getCategoryPresentation(category) {
       return merged.slice(0, 3).join(" · ");
     }
 
+    const highlightLabel = getActiveHighlightLabel(offer);
     const primaryTags = getRankedTagItems(offer, 2);
+    if (highlightLabel) {
+      return [highlightLabel, ...primaryTags].slice(0, 3).join(" · ");
+    }
+
     if (primaryTags.length) return primaryTags.join(" · ");
 
     const season = toSingleLine(offer?.season);
@@ -547,6 +565,7 @@ function getCategoryPresentation(category) {
       ? offer.activeMatchLabels.map((entry) => toSingleLine(entry)).filter(Boolean)
       : [];
 
+    const activeHighlightLabel = getActiveHighlightLabel(offer);
     const primaryTags = getRankedTagItems(offer, 3);
     const curatedFacts = Array.isArray(offer?.cardFacts)
       ? offer.cardFacts.map((entry) => toSingleLine(entry)).filter(Boolean)
@@ -560,7 +579,7 @@ function getCategoryPresentation(category) {
       const merged = [];
       const seen = new Set();
 
-      [...activeMatches, ...primaryTags, ...curatedFacts, ...fallbackFacts].forEach((entry) => {
+      [activeHighlightLabel, ...activeMatches, ...primaryTags, ...curatedFacts, ...fallbackFacts].forEach((entry) => {
         const value = toSingleLine(entry);
         const key = normalizeComparable(value);
         if (!value || seen.has(key)) return;
@@ -570,6 +589,14 @@ function getCategoryPresentation(category) {
       });
 
       return merged.slice(0, 3);
+    }
+
+    if (activeHighlightLabel) {
+      return [activeHighlightLabel, ...primaryTags, ...curatedFacts, ...fallbackFacts]
+        .map((entry) => toSingleLine(entry))
+        .filter(Boolean)
+        .filter((entry, index, list) => list.findIndex((item) => normalizeComparable(item) === normalizeComparable(entry)) === index)
+        .slice(0, 3);
     }
 
     if (primaryTags.length) {
@@ -597,7 +624,9 @@ function getCategoryPresentation(category) {
     buildMetaLine,
     buildFactItems,
     pickSupportingLabel,
-    getRankedTagItems
+    getRankedTagItems,
+    getActiveHighlight,
+    getActiveHighlightLabel
   };
 })();
 
@@ -637,15 +666,19 @@ const OfferCards = (() => {
         .map((entry) => String(entry || "").replace(/\s+/g, " ").trim())
         .filter(Boolean)
     );
+    const seasonalLabel = String(OfferVisuals.getActiveHighlightLabel?.(offer) || "").replace(/\s+/g, " ").trim();
 
     return `
       <div class="activity-card-facts" aria-label="${activeMatches.size ? "Passende Merkmale" : "Wichtige Merkmale"}">
         ${items.map((item) => {
           const label = String(item || "").replace(/\s+/g, " ").trim();
           const isMatch = activeMatches.has(label);
-          const className = isMatch
-            ? "activity-card-fact activity-card-fact--match"
-            : "activity-card-fact";
+          const isSeasonal = seasonalLabel && label === seasonalLabel;
+          const className = [
+            "activity-card-fact",
+            isMatch ? "activity-card-fact--match" : "",
+            isSeasonal ? "activity-card-fact--seasonal" : ""
+          ].filter(Boolean).join(" ");
 
           return `<span class="${className}">${OfferVisuals.escapeHtml(label)}</span>`;
         }).join("")}

@@ -12,6 +12,7 @@ const OffersApp = {
   filteredOffers: [],
   searchTerm: "",
   activeFilters: {
+    special: new Set(),
     situation: new Set(),
     proximity: new Set(),
     activity_type: new Set(),
@@ -20,10 +21,15 @@ const OffersApp = {
   },
 
   /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V1 | Zweck: definiert eine einheitliche Nutzerlogik: jeder weitere Filter verengt die Treffer; Ort/Nähe blockiert dabei parallele Alternativen, damit Schnellfilter nicht wie OR-Wechsel wirken; Umfang: Filterreihenfolge, Exklusivgruppen und Filtergruppen-Konfiguration === */
-  filterGroupOrder: ["proximity", "situation", "activity_type", "features", "effort"],
+  filterGroupOrder: ["special", "proximity", "situation", "activity_type", "features", "effort"],
   exclusiveFilterGroups: new Set(["proximity"]),
 
   filterGroups: Object.freeze({
+    special: Object.freeze({
+      label: "Jetzt",
+      mode: "all",
+      options: Object.freeze(["Jetzt besonders"])
+    }),
     proximity: Object.freeze({
       label: "Ort / Nähe",
       mode: "all",
@@ -304,6 +310,9 @@ const OffersApp = {
       opening_hours: obj.opening_hours && typeof obj.opening_hours === "object"
         ? obj.opening_hours
         : null,
+      seasonal_highlights: Array.isArray(obj.seasonal_highlights)
+        ? obj.seasonal_highlights
+        : [],
       ...(reportingTarget.type && reportingTarget.id && reportingTarget.title
         ? { reporting_target: reportingTarget }
         : {}),
@@ -323,6 +332,7 @@ const OffersApp = {
       ...offer.filter_tags,
       ...offer.audience,
       ...offer.cardFacts,
+      ...(window.BEActivityHighlights?.getSearchTerms?.(offer, { surface: "activity" }) || []),
       ...filterValues
     ]);
 
@@ -543,9 +553,28 @@ const OffersApp = {
   },
   /* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V3 === */
 
+  /* === BEGIN BLOCK: ACTIVITIES_NOW_SPECIAL_FILTER_HELPERS_V1 | Zweck: macht belegte aktive Seasonal-Highlights als dynamischen Schnellfilter nutzbar; Umfang: Filterwerte/Ranking/Labels ohne DOM-Sonderroute === */
+  getPrimaryActiveHighlight(offer) {
+    return window.BEActivityHighlights?.getPrimaryActiveHighlight?.(offer, { now: new Date(), surface: "activity" }) || null;
+  },
+
+  hasActiveSeasonalHighlight(offer) {
+    return !!this.getPrimaryActiveHighlight(offer);
+  },
+
+  activeSeasonalHighlightLabel(offer) {
+    const highlight = this.getPrimaryActiveHighlight(offer);
+    return String(highlight?.short_label || highlight?.label || "Jetzt besonders").trim();
+  },
+
   getOfferFilterValues(offer, group) {
+    if (group === "special") {
+      return this.hasActiveSeasonalHighlight(offer) ? ["Jetzt besonders"] : [];
+    }
+
     return this.normalizeArray(offer?.filter?.[group]);
   },
+  /* === END BLOCK: ACTIVITIES_NOW_SPECIAL_FILTER_HELPERS_V1 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_MATCH_MODE_V1 | Zweck: wertet aktive Filter konsequent additiv aus; jeder weitere aktive Chip muss am Ergebnis vorhanden sein und kann Treffer nicht künstlich erweitern; Umfang: ersetzt nur matchesFilterGroup(offer, group, activeValues) === */
   matchesFilterGroup(offer, group, activeValues = this.getActiveValues(group)) {
@@ -611,7 +640,8 @@ const OffersApp = {
       const values = new Set(this.getOfferFilterValues(offer, group));
       activeValues.forEach((value) => {
         if (values.has(value)) {
-          if (group === "proximity") score += 18;
+          if (group === "special") score += 24;
+          else if (group === "proximity") score += 18;
           else if (group === "features") score += 14;
           else if (group === "situation") score += 12;
           else if (group === "activity_type") score += 10;
@@ -619,6 +649,10 @@ const OffersApp = {
         }
       });
     });
+
+    if (!this.hasActiveFilters()) {
+      score += Number(window.BEActivityHighlights?.getSurfaceBoost?.(offer, { now: new Date(), surface: "activity" }) || 0) || 0;
+    }
 
     if (!this.getActiveValues("proximity").length) {
       const proximity = new Set(this.getOfferFilterValues(offer, "proximity"));
@@ -649,6 +683,10 @@ const OffersApp = {
   getCardMatchLabel(offer, group, value) {
     const normalizedTags = new Set(this.normalizeArray(offer?.tags));
     const normalizedFacts = new Set(this.normalizeArray(offer?.cardFacts));
+
+    if (group === "special" && value === "Jetzt besonders") {
+      return this.activeSeasonalHighlightLabel(offer) || "Jetzt besonders";
+    }
 
     if (group === "situation" && value === "Mit Kindern") {
       if (normalizedTags.has("Familienfreundlich")) return "Familienfreundlich";
@@ -681,9 +719,16 @@ const OffersApp = {
   },
 
   getActiveMatchLabels(offer) {
-    const orderedGroups = ["situation", "features", "proximity", "activity_type", "effort"];
+    const orderedGroups = ["special", "situation", "features", "proximity", "activity_type", "effort"];
     const labels = [];
     const seen = new Set();
+
+    const activeSeasonalLabel = this.activeSeasonalHighlightLabel(offer);
+    if (activeSeasonalLabel && this.hasActiveSeasonalHighlight(offer)) {
+      const key = String(activeSeasonalLabel).trim().toLowerCase();
+      seen.add(key);
+      labels.push(activeSeasonalLabel);
+    }
 
     orderedGroups.forEach((group) => {
       const available = new Set(this.getOfferFilterValues(offer, group));
@@ -704,8 +749,14 @@ const OffersApp = {
   /* === END BLOCK: ACTIVITIES_CARD_MATCH_LABELS_ENTERPRISE_V1 === */
 
   withRenderedMatchContext(offer) {
+    const activeSeasonalHighlight = this.getPrimaryActiveHighlight(offer);
     return {
       ...offer,
+      activeSeasonalHighlight,
+      activeHighlight: activeSeasonalHighlight,
+      activeSeasonalHighlightLabel: activeSeasonalHighlight
+        ? String(activeSeasonalHighlight.short_label || activeSeasonalHighlight.label || "Jetzt besonders").trim()
+        : "",
       activeMatchLabels: this.getActiveMatchLabels(offer)
     };
   },
@@ -753,6 +804,14 @@ const OffersApp = {
       const isActive = this.getActiveSet(group).has(value);
       const isExclusiveBlocked = this.isBlockedByActiveExclusiveGroup(group, value);
       const count = this.countProjectedMatches(group, value);
+
+      if (group === "special") {
+        const shouldHide = !isActive && count === 0;
+        button.hidden = shouldHide;
+        const groupEl = button.closest?.(".activity-finder__group[data-filter-group='special']");
+        if (groupEl) groupEl.hidden = shouldHide;
+      }
+
       const disabled = !isActive && (isExclusiveBlocked || count === 0);
       const countLabel = count === 1 ? "1 Aktivität" : `${count} Aktivitäten`;
 

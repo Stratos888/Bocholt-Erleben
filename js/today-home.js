@@ -386,11 +386,25 @@
   ]);
 
   function eventVisualKey(item) {
-    return asString(item?.visualKey || item?.visual_key || item?.image_visual_key);
+    return asString(
+      item?.visualKey ||
+      item?.visual_key ||
+      item?.image_visual_key ||
+      item?.raw?.visual_key ||
+      item?.raw?.image_visual_key ||
+      ""
+    );
   }
 
   function eventVisualMotif(item) {
-    return asString(item?.visualMotif || item?.visual_motif || item?.image_visual_motif);
+    return asString(
+      item?.visualMotif ||
+      item?.visual_motif ||
+      item?.image_visual_motif ||
+      item?.raw?.visual_motif ||
+      item?.raw?.image_visual_motif ||
+      ""
+    );
   }
 
   function isFallbackEventVisual(visual) {
@@ -451,6 +465,28 @@
       if (visual) return visual;
     }
 
+    if (item?.type === "event") {
+      const visualKey = eventVisualKey(item);
+      const visualMotif = eventVisualMotif(item);
+      const pool = visualKey ? state.eventVisualPools[visualKey] : null;
+      const candidatePool = eventVisualCandidatePool(pool, visualMotif);
+
+      const pooledVisual = selectVisualFromPool(
+        candidatePool,
+        [
+          asString(item.id),
+          asString(item.date),
+          asString(item.endDate),
+          asString(item.title),
+          visualKey,
+          visualMotif
+        ].join("|"),
+        usedImages
+      );
+
+      if (pooledVisual) return pooledVisual;
+    }
+
     const ownImage = normalizeUrl(item?.image);
     if (ownImage) {
       if (usedImages) usedImages.add(ownImage);
@@ -460,27 +496,7 @@
       });
     }
 
-    if (item?.type !== "event") {
-      return null;
-    }
-
-    const visualKey = eventVisualKey(item);
-    const visualMotif = eventVisualMotif(item);
-    const pool = visualKey ? state.eventVisualPools[visualKey] : null;
-    const candidatePool = eventVisualCandidatePool(pool, visualMotif);
-
-    return selectVisualFromPool(
-      candidatePool,
-      [
-        asString(item.id),
-        asString(item.date),
-        asString(item.endDate),
-        asString(item.title),
-        visualKey,
-        visualMotif
-      ].join("|"),
-      usedImages
-    );
+    return null;
   }
 
   function resolveItemImage(item, usedImages) {
@@ -726,8 +742,12 @@
     return Array.isArray(candidatePool) && candidatePool.length > 0;
   }
 
+  /* === BEGIN BLOCK: TODAY_ACTIVITY_VISUAL_POOL_QUALITY_GATE_V2 | Zweck: blockiert Activities mit altem needs_review-Bild nicht mehr, wenn fuer dieselbe Activity ein ready Premium-Visual im Pool existiert; Umfang: ersetzt nur hasAllowedActivityVisual() === */
   function hasAllowedActivityVisual(item) {
     if (item?.type !== "activity") return true;
+
+    const pool = activityVisualPool(item);
+    if (Array.isArray(pool) && pool.length) return true;
 
     const quality = asString(
       item?.imageQuality ||
@@ -738,6 +758,7 @@
 
     return quality !== "needs_review" && quality !== "blocked";
   }
+  /* === END BLOCK: TODAY_ACTIVITY_VISUAL_POOL_QUALITY_GATE_V2 === */
 
   function isTopTipEligible(item, context) {
     return window.OpeningStatus?.isTopTipEligible?.(item, context) !== false;
@@ -817,12 +838,25 @@
     return "sonstige";
   }
 
+  /* === BEGIN BLOCK: TODAY_ACTIVITY_SEASONAL_HIGHLIGHT_CURATION_V1 | Zweck: laesst belegte saisonale Highlights die Activity-Spur sichtbar beeinflussen, ohne Region/Vielfalt komplett zu uebersteuern === */
+  function hasActiveActivityHighlight(item) {
+    if (item?.type !== "activity") return false;
+    return !!window.BEActivityHighlights?.getPrimaryActiveHighlight?.(item.raw || item, { now: new Date(), surface: "home" });
+  }
+
   function compareActivityCandidates(a, b) {
+    const highlightDiff = Number(hasActiveActivityHighlight(b)) - Number(hasActiveActivityHighlight(a));
+    if (highlightDiff) return highlightDiff;
+
+    const scoreDiff = todayScore(b) - todayScore(a);
+    if (Math.abs(scoreDiff) >= 10) return scoreDiff;
+
     const regionDiff = activityRegionRank(a) - activityRegionRank(b);
     if (regionDiff) return regionDiff;
 
     return compareTodayItems(a, b);
   }
+  /* === END BLOCK: TODAY_ACTIVITY_SEASONAL_HIGHLIGHT_CURATION_V1 === */
 
   function selectDiverseActivities(items, limit) {
     const candidates = Array.isArray(items) ? items : [];

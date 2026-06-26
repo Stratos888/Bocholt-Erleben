@@ -46,6 +46,7 @@ function cal_workbench_group_rank(string $group): int
         'Activity-Prüfung' => 50,
         'DB-/Anbieter-Review' => 60,
         'Visual-Fit' => 70,
+        'Visual-Backlog' => 75,
         'Beobachten / Retry' => 80,
         default => 90,
     };
@@ -55,6 +56,16 @@ function cal_content_audit_queue_role(array $item): string
 {
     $category = (string)($item['process_category'] ?? '');
     $severity = (string)($item['severity'] ?? '');
+    $policy = (string)($item['automation_policy'] ?? '');
+    $code = (string)($item['issue_code'] ?? '');
+
+    // Reine Visual-/Bildproduktions-Backlogs sind keine manuellen Content-Inbox-Aufgaben.
+    // Sie bleiben im Audit/Visual-Feedback nachvollziehbar, zaehlen aber nicht als offene Review-Karte.
+    if (in_array($category, ['visual_backlog_observation', 'visual_auto_patch_candidate'], true)
+        || in_array($policy, ['backlog_only_no_content_inbox', 'auto_patch_candidate_no_manual_inbox'], true)
+        || in_array($code, ['activity_visual_premium_gap', 'activity_visual_key_auto_patch_candidate', 'activity_visual_asset_missing'], true)) {
+        return 'package_only';
+    }
 
     if ($severity === 'critical' || $severity === 'review_needed') {
         return 'main_queue';

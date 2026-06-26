@@ -86,6 +86,31 @@
     return readObject(obj.recommendation);
   }
 
+  /* === BEGIN BLOCK: ACTIVITY_SEASONAL_HIGHLIGHT_RECOMMENDATION_HELPERS_V1 | Zweck: bindet quellengepruefte saisonale Activity-Highlights in Labels und Scoring ein, ohne Bade-/Statusannahmen aus allgemeinen Tags abzuleiten === */
+  function activeActivityHighlightLabel(item, context) {
+    if (item?.type !== "activity") return "";
+    return asString(window.BEActivityHighlights?.getReasonLabel?.(item.raw || item, context));
+  }
+
+  function activityHighlightBoost(item, context, surface) {
+    if (item?.type !== "activity") return 0;
+    return Number(window.BEActivityHighlights?.getSurfaceBoost?.(item.raw || item, { ...context, surface }) || 0) || 0;
+  }
+
+  function hasInactiveConditionSensitiveBathingHighlight(item, context) {
+    if (item?.type !== "activity") return false;
+
+    const source = item.raw || item;
+    const highlights = Array.isArray(source?.seasonal_highlights) ? source.seasonal_highlights : [];
+    return highlights.some((highlight) => {
+      const activationMode = asString(highlight?.activation_mode || highlight?.activationMode).toLowerCase();
+      const type = asString(highlight?.type).toLowerCase();
+      if (activationMode !== "condition_sensitive" || type !== "bathing_water") return false;
+      return window.BEActivityHighlights?.isActiveHighlight?.(highlight, context) !== true;
+    });
+  }
+  /* === END BLOCK: ACTIVITY_SEASONAL_HIGHLIGHT_RECOMMENDATION_HELPERS_V1 === */
+
   function readFilterValues(item, group) {
     const filter = readObject(item?.filter);
     return asArray(filter[group]);
@@ -291,6 +316,7 @@
       mapsTarget: asString(obj.location || obj.ort),
       image: asString(obj.image),
       visualKey: asString(obj.visual_key || obj.image_visual_key),
+      visualMotif: asString(obj.visual_motif || obj.image_visual_motif),
       date: asString(obj.date || obj.datum),
       endDate: asString(obj.endDate),
       time: asString(obj.time || obj.uhrzeit || obj.startzeit),
@@ -343,6 +369,7 @@
       availability: asString(obj.opening_status?.type || recommendation.availability) || "unknown",
       openingStatus: readObject(obj.opening_status),
       openingHours: readObject(obj.opening_hours),
+      seasonalHighlights: Array.isArray(obj.seasonal_highlights) ? obj.seasonal_highlights : [],
       situationTags,
       audienceTags: [],
       interestTags,
@@ -373,6 +400,9 @@
   function buildReasonLabels(item, context) {
     const labels = [];
 
+    const seasonalLabel = activeActivityHighlightLabel(item, context);
+    if (seasonalLabel) labels.push(seasonalLabel);
+
     asArray(window.OpeningStatus?.buildRecommendationDayLabels?.(item, context)).forEach((label) => {
       labels.push(label);
     });
@@ -390,7 +420,7 @@
       labels.push("Gut bei Regen");
     }
 
-    if (context.weather === "hot" && hasAny(item.interestTags, ["Baden", "Wasser"])) {
+    if (context.weather === "hot" && hasAny(item.interestTags, ["Baden", "Wasser"]) && !hasInactiveConditionSensitiveBathingHighlight(item, context)) {
       labels.push("Gut bei Wärme");
     }
 
@@ -475,8 +505,10 @@
 
     /* === BEGIN BLOCK: RECOMMENDATION_WEATHER_SCORING_HOT_COLD_WINDY_V1 | Zweck: nutzt Wetterklassen hot/cold/windy als echten Rankingfaktor fuer Premium-Home; Umfang: erweitert nur scoreItem(), keine DOM-/UI-Aenderung === */
     if (context.weather === "hot") {
-      if (hasAny(item.interestTags, ["Baden", "Wasser"])) {
+      if (hasAny(item.interestTags, ["Baden", "Wasser"]) && !hasInactiveConditionSensitiveBathingHighlight(item, context)) {
         score += 30;
+      } else if (hasInactiveConditionSensitiveBathingHighlight(item, context)) {
+        score -= 6;
       } else if (hasAny(item.weatherProfile, ["indoor", "weather_independent", "rain_ok"])) {
         score += 10;
       } else if (hasAny(item.interestTags, "Draußen")) {
@@ -506,6 +538,8 @@
     /* === END BLOCK: RECOMMENDATION_WEATHER_SCORING_HOT_COLD_WINDY_V1 === */
 
     if (item.type === "activity") {
+      score += activityHighlightBoost(item, context, "home");
+
       if (item.availability === "always") score += 6;
       if (item.availability === "opening_hours_check") score -= 3;
       if (hasAny(item.timeProfile, "short_spontaneous")) score += 7;

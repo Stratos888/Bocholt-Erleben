@@ -3432,3 +3432,17 @@ body.is-feedback-open{
   }
 }
 /* === END BLOCK: DESKTOP_IMAGE_CREDIT_ACCESS_MONOCHROME_POLISH_V2 === */
+
+/* === BEGIN BLOCK: ACTIVITY_DETAIL_SEASONAL_HIGHLIGHT_CSS_V1 | Zweck: zeigt saisonale Activity-Highlights im Detailpanel als kompakten Nutzwert-Callout; Umfang: nur Activity-Detailpanel Highlight-Callout === */
+#event-detail-panel .activity-detail__seasonal-highlight{
+  background: linear-gradient(180deg, color-mix(in srgb, var(--brand-green-100, #eaf6db) 68%, white 32%), rgba(246,248,243,0.94));
+  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 13%, rgba(18,34,26,0.06) 87%);
+}
+
+#event-detail-panel .activity-detail__seasonal-note{
+  font-size: 13px;
+  line-height: 1.42;
+  font-weight: 650;
+  color: rgba(31,41,51,0.68);
+}
+/* === END BLOCK: ACTIVITY_DETAIL_SEASONAL_HIGHLIGHT_CSS_V1 === */
