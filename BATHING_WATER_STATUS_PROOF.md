@@ -1,6 +1,21 @@
 <!-- === BEGIN FILE: BATHING_WATER_STATUS_PROOF.md | Zweck: beschreibt den Machbarkeits-Proof fuer automatische Badegewaesser-Statusquellen; Umfang: Proof vor Operationalisierung, keine Produktlogik === -->
 # Bathing Water Status Proof
 
+<!-- === BEGIN BLOCK: BATHING_WATER_STATUS_PROOF_CURRENT_STATUS_2026_06_27 | Zweck: current-first Einordnung nach Guard-V2-Abschluss; Umfang: Proof-Status, Abgrenzung zu aktueller Guard-Datei === -->
+## Current Status 2026-06-27
+
+Dieser Proof ist als eigenstaendiger naechster Schritt ueberholt. Die Erkenntnisse wurden in `BATHING_WATER_SOURCE_DISCOVERY_V2.md` und danach in `BATHING_WATER_GUARD_V1.md` / Guard V2 weitergefuehrt.
+
+Aktueller Stand:
+
+- Safe-Writeback ueber `data/bathing_water_status.json` ist auf Staging validiert.
+- Der Guard schreibt nicht nach `data/offers.json`.
+- Das Frontend nutzt die Statusdatei als Override und verhindert positive Badeempfehlungen ohne finalen Guard-Status `ok`.
+- Dieses Dokument bleibt als historischer Machbarkeits-/Proof-Kontext erhalten, ist aber kein offener Roadmap-Block.
+
+<!-- === END BLOCK: BATHING_WATER_STATUS_PROOF_CURRENT_STATUS_2026_06_27 === -->
+
+
 ## Zweck
 
 Dieser Proof klaert, ob offizielle Badegewaesser-Statusquellen fuer die saisonalen Activity-Highlights automatisch robust auslesbar sind.

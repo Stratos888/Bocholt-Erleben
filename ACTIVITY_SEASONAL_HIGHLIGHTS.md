@@ -1,5 +1,19 @@
 # Seasonal Activity Highlights V1
 
+<!-- === BEGIN BLOCK: ACTIVITY_SEASONAL_HIGHLIGHTS_CURRENT_STATUS_2026_06_27 | Zweck: current-first Einordnung nach Badegewaesser-Guard-V2-Abschluss; Umfang: Status, offene Punkte, keine veraltete report-only-Lesart === -->
+## Current Status 2026-06-27
+
+Seasonal Activity Highlights V1 ist abgeschlossen. Der Badegewaesserstatus-Proof / Guard V2 ist abgehakt und nicht mehr als offener Proof-Auftrag zu lesen.
+
+Aktueller Umgang:
+
+- Zustandsabhaengige Bade-/Wasser-Highlights bleiben ohne finalen Guard-Status `ok` unsichtbar.
+- Guard V2 schreibt nicht in `data/offers.json`, sondern sicher in `data/bathing_water_status.json`.
+- Das Frontend nutzt diese Statusdatei als Override und verhindert positive Badeempfehlungen bei `watch`, `blocked` oder `unknown`.
+- Weitere Arbeit nur bei konkretem Quellenausfall, falscher UI-Ausspielung oder neuer Badestelle.
+
+<!-- === END BLOCK: ACTIVITY_SEASONAL_HIGHLIGHTS_CURRENT_STATUS_2026_06_27 === -->
+
 ## Ziel
 
 Seasonal Activity Highlights sind eine geprüfte Zusatzschicht für Aktivitäten. Sie dürfen Home und Aktivitätenseite nur dann beeinflussen, wenn das Highlight quellenbasiert, zeitlich passend und nicht durch Status-/News-Lage blockiert ist.
@@ -66,7 +80,7 @@ Content Batch 01 ergänzt nur sichere Datensätze:
 - keine Badeempfehlung ohne aktuelle positive Statusquelle
 - keine Live-News-Abfrage im Browser
 
-Ergänzt wurden zwei stabile Saison-/Öffnungsfenster und zwei weitere zustandsabhängige Badegewässer-Kandidaten. Die Badegewässer-Kandidaten werden bewusst nicht aktiv ausgespielt, solange keine frische positive Quelle fachlich gepflegt ist. Der Badegewässer-Guard bleibt zunächst report-only und schreibt keine Produktdaten automatisch zurück.
+Ergänzt wurden zwei stabile Saison-/Öffnungsfenster und zwei weitere zustandsabhängige Badegewässer-Kandidaten. Die Badegewässer-Kandidaten werden bewusst nicht aktiv ausgespielt, solange keine frische positive Quelle fachlich gepflegt ist. Korrektur 2026-06-27: Guard V2 bleibt zwar safe-writeback und schreibt nicht direkt in `data/offers.json`, schreibt aber in die getrennte Statusdatei `data/bathing_water_status.json`; die frühere reine `report-only`-Einordnung ist überholt.
 
 ## Prüfung
 
@@ -76,7 +90,7 @@ Lokaler Struktur-Audit:
 python3 scripts/audit-activity-highlights.py --scope full
 ```
 
-Der bestehende Activity-Highlight-Audit prüft die strukturierten Highlight-Daten. Zustandsabhängige Bade-/Wasser-Highlights bleiben ohne `current_status.state=ok` unsichtbar. Der separate Badegewässer-Guard kann als Report-Proof genutzt werden, schreibt aber ohne eigenes Freigabe-Workpack keine Produktdaten zurück.
+Der bestehende Activity-Highlight-Audit prüft die strukturierten Highlight-Daten. Zustandsabhängige Bade-/Wasser-Highlights bleiben ohne finalen Status `ok` unsichtbar. Guard V2 aktualisiert den Badegewässerstatus über die getrennte Datei `data/bathing_water_status.json`; `data/offers.json` bleibt redaktionelles Stammdatenartefakt.
 
 ## Badegewässer-Statusdatei V2
 

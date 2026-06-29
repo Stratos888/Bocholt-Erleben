@@ -332,14 +332,29 @@ Die einzelnen Endpunkte sollen nur noch fachliche Daten liefern:
 
 ---
 
-## 12. Noch nicht erledigt
+## 12. Umsetzungsstatus 2026-06-27
 
-Noch offen:
-- zentralen HTML-Mail-Renderer implementieren
-- bestehende `be_send_mail()`-Signatur prüfen und sauber erweitern
-- Pilot-Mail technisch migrieren
-- echte Mailzustellung auf Staging prüfen
-- Darstellung in mindestens Gmail, Outlook und mobiler Mailansicht grob prüfen
-- danach weitere Mails einzeln migrieren
+Der Mail-System-Contract ist nicht mehr als offener Implementierungsauftrag zu lesen.
+
+Aktueller Stand:
+
+- zentrale Topic-Logik in `api/_bootstrap.php` umgesetzt,
+- HTML-Mail und Plain-Text-Fallback zentral ableitbar,
+- neun Mailtopics im Sammeltest geprüft,
+- Pilot- und Zahlungslink-/Statusmails als Systempfad dokumentiert,
+- dieses Dokument bleibt Referenz fuer Ton, Aufbau, Komponenten und kuenftige neue Mailtopics.
+
+Weitere Arbeit nur bei konkretem Anlass:
+
+- neues fachliches Mailtopic,
+- nachgewiesener Zustellfehler,
+- Darstellungsproblem in einem relevanten Mailclient,
+- geaenderter Zahlungs-/Freigabeprozess mit neuen Pflichtinformationen.
+
+Keine offene Standardaufgabe mehr:
+
+- kein pauschaler Neubau des Mail-Renderers,
+- keine blinde Migration ohne neuen Mailfall,
+- keine neue Mail-Designrunde ohne Symptom.
 
 <!-- === END FILE: MAIL_SYSTEM.md | Zweck: kanonischer Mail-System-Contract für vorgefertigte Bocholt-erleben-Systemmails; Umfang: Sprache, Layout, Formatierung, Pilot-Mail und Migrationsregeln === -->

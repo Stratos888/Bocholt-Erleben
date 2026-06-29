@@ -1,3 +1,28 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_CURRENT_DOKU_ABGLEICH_2026_06_27 | Zweck: korrigiert den aktuellen Test-/Statusindex nach Roadmap-/Doku-Abgleich; Umfang: erledigte Punkte, echte offene Beweise, kleine Rest-To-dos === -->
+## Aktueller Test- und Statusabgleich – 2026-06-27
+
+Dieser Block ist die aktuelle Einstiegsschicht. Aeltere Testbloecke darunter bleiben Beweisarchiv und koennen veraltete damalige "offen"-Hinweise enthalten.
+
+Aktuell als bestanden oder abgeschlossen zu behandeln:
+
+- Main-Merge und Live-Smoke bestanden.
+- KI-Suchlauf -> Manual Inbox -> Visual-Key-Handoff -> Events-/Live-Bildausspielung ist auf `main` bestanden.
+- Event-Visual-Motif-Fit ist fuer den aktuellen Sheet-/Matrix-Stand abgeschlossen; keine offenen Event-Produktions-/Review-Gaps.
+- Mail-System V1 ist zentral umgesetzt und mit 9 Topics getestet; `MAIL_SYSTEM.md` ist Contract/Referenz, kein offener Implementierungsauftrag.
+- Anbieterbereich/Nutzwertdaten sind technisch vorhanden; naechster Punkt ist Datenlauf/Bewertung, nicht Neubau.
+- Aktivitaetspraesenz-/Abo-Livebeweis wird als erledigt gefuehrt; Activity-Presence-Funnel, Zahlungslink-/Checkout-Kette, Anbieterbereich-Kontext und Review-/Inbox-Sichtbarkeit sind belegt.
+- Badegewaesserstatus-Proof / Guard V2 ist abgehakt: Statusdatei, Commit, Deploy, Frontend-Override und keine positive Badeempfehlung ohne `ok` sind validiert.
+- Seasonal Activity Highlights V1 ist abgeschlossen; Bade-/Wasser-Highlights bleiben ohne frische positive Quelle unsichtbar.
+
+Aktuell noch zu beobachten oder gezielt zu beweisen:
+
+- Dienstag-/Mittwoch-Automation mit echten Live-Daten: Weekly-KI, Import, Cleanup/Archiv, Content-Audit.
+- Content Search Feedback Loop: lokal/statisch umgesetzt; echte Livewirkung und Logs nach dem naechsten Lauf pruefen.
+- Inbox-Owner-UX fuer `visual_key`: Handoff bestanden, komfortable Korrektur vor Uebernahme noch kleiner UI-/Handoff-Rest.
+- Activity-Visual-Rest `buergerpark-rhede`, `suderwicker-maerchenspielplatz`, `waldlehrpfad-am-vossenpand`: weiterhin kleiner Visual-Pruefpunkt / To-do, aber kein Content-Blocker und keine normale Inbox-Sofortaktion.
+
+<!-- === END BLOCK: TEST_STATUS_CURRENT_DOKU_ABGLEICH_2026_06_27 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_SEASONAL_ACTIVITY_HIGHLIGHTS_V1_DONE_2026_06_26 | Zweck: dokumentiert Abschluss des Workpacks Seasonal Activity Highlights V1 inklusive Content Batch 01, Bade-/Status-Gate und Home-Rotationshaertung; Umfang: Staging-Deploy, fachlicher Smoke, Datenstand, bewusste Grenzen und Folge-Proof statt unbewiesener Automatisierung === -->
 ## Seasonal Activity Highlights V1 + Content Batch 01 – abgeschlossen (2026-06-26)
 
@@ -97,24 +122,23 @@ Abgeschlossen sind:
 - Weitere saisonale Highlights nur bei neuem konkretem Quellenfund oder bewusstem spaeterem Rechercheauftrag.
 - Zusaetzliche Highlights nur mit belastbarer Quelle und klarer Aktivierungslogik.
 
-### Optionaler naechster Pruefpunkt: Badegewaesser Status Proof
+### Badegewaesser-Status: Proof/Guard inzwischen weitergefuehrt
 
-Bevor Bade-/Wasser-Highlights automatisch aktiviert werden, soll zuerst ein separater Proof klaeren, ob offizielle Statusquellen fuer die relevanten Badestellen robust auslesbar sind:
+Der urspruenglich optionale Proof wurde durch Guard-/Source-Discovery- und Guard-V2-Arbeiten weitergefuehrt. Der aktuelle Stand ist nicht mehr "Proof noch starten", sondern: Safe-Writeback ueber `data/bathing_water_status.json` ist auf Staging belegt. Gepruefte Badestellen:
 
 - `aasee-erleben`
 - `hilgelo-erleben`
 - `proebstingsee-borken-erleben`
 - `auesee-wesel-erleben`
 
-Ziel des Proofs:
+Aktueller Guard-V2-Stand:
 
-- offizielle Statusquelle abrufen,
-- Status eindeutig auf `ok`, `watch`, `blocked` oder `unknown` mappen,
-- Aktualitaet bzw. Pruefstand erkennen,
-- Fehler- und Unsicherheitsfaelle konservativ auf `unknown` oder `blocked` fallen lassen,
-- erst danach entscheiden, ob ein taeglicher Badegewaesser-Status-Guard technisch operationalisiert wird.
+- Statusquelle/Statusfile-Kette ist technisch umgesetzt.
+- `ok` wird nur aktiv, wenn Wasserstatus und lokale Badeeignung positiv sind.
+- Unsichere oder negative Zustaende bleiben unterdrueckt bzw. als knapper Hinweis sichtbar.
+- Badegewaesserstatus-Proof / Guard V2 ist damit abgehakt; kein neuer Proof-Start.
 
-Bis dieser Proof bestanden ist, bleibt die aktuelle sichere Regel verbindlich:
+Weiterhin verbindliche sichere Regel:
 
 - Keine Badeempfehlung ohne frische positive Statusquelle.
 - `unknown`, `watch` und `blocked` erzeugen keinen Chip, keinen Boost und keinen `Jetzt besonders`-Treffer.
@@ -176,7 +200,7 @@ Status: Staging-Deployment gruen; UI-/Prozessstand wird vorerst eingefroren und 
 
 # TEST STATUS — BOCHOLT ERLEBEN
 
-<!-- === BEGIN BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_22 | Zweck: macht das lange Testprotokoll fuer Folgechats current-first lesbar; Umfang: aktuelle Hauptbeweise, offene/geparkte Beweise, Umgang mit historischen Alt-Routen === -->
+<!-- === BEGIN BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_27 | Zweck: macht das lange Testprotokoll current-first lesbar; Umfang: aktuelle Hauptbeweise, offene Beobachtungen und kleine Restbeweise, Umgang mit historischen Alt-Routen und Alt-Offenpunkten === -->
 ## Aktueller Test-Index für Folgechats
 
 Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter bleiben als Beweisarchiv erhalten, sind aber nicht automatisch aktuelle Aufgaben.
@@ -185,26 +209,31 @@ Dieser Index ist die aktuelle Einstiegsschicht. Ältere Testblöcke darunter ble
 
 - Main-Merge und Live-Smoke bestanden; öffentliche Kernbereiche laden ohne bekannten Blocker.
 - KI-Suchlauf → Manual Inbox → Visual-Key-Handoff → Events-/Live-Bildausspielung ist auf `main` mit dem aktuellen Prüflauf bestanden.
-- Event-Visual-Motif-Fit ist für den aktuellen Sheet-Stand abgeschlossen; keine offenen Produktions-/Review-Gaps.
+- Event-Visual-Motif-Fit ist für den aktuellen Sheet-/Matrix-Stand abgeschlossen; keine offenen Event-Produktions-/Review-Gaps.
+- Badegewässerstatus-Proof / Guard V2 ist abgehakt: Guard erzeugt `data/bathing_water_status.json`, Workflow committet bei Diff, Deploy läuft, Frontend nutzt den Override und spielt keine falsche Badeempfehlung aus.
+- Seasonal Activity Highlights V1 ist abgeschlossen; kein geplanter Massen-Content-Batch-02 als Pflichtfolge.
+- Mail-System V1 ist zentral umgesetzt und mit 9 Topics getestet.
+- Anbieterbereich/Nutzwert-Metrikpfad ist technisch vorhanden; organischer Datenlauf bleibt abzuwarten.
+- Aktivitaetspraesenz-/Abo-Livebeweis wird als erledigt gefuehrt; Activity-Presence-Funnel, Zahlungslink-/Checkout-Kette, Anbieterbereich-Kontext und Review-/Inbox-Sichtbarkeit sind belegt.
 - `/angebote/` ist Legacy-Redirect; kanonische Aktivitätenroute ist `/aktivitaeten/`.
 - Aktivitätspräsenz-Funnel ist unter `/aktivitaeten/sichtbar-werden/...` kanonisch; alte `/angebote/sichtbar-werden/...`-Routen sind nur Redirects.
-- Public-Shell/Footer-Konsistenz ist auf öffentlichen Neben-/Funnel-Seiten eingebracht und geprüft.
-- Reporting-/Tracking-Hardening ist live bewiesen: Anbieter-/CTA-Klick auf `/aktivitaeten/sichtbar-werden/` wurde im Dashboard gezählt.
-- CSS-Governance ist eingeführt; CSS-Audit, `style.css`-Entry-Point und ZIP-first-Fallback sind geprüft.
-- Aktivitätspräsenz-Funnel und Stripe-Rücksprunglogik sind statisch gegen die neue Route geprüft.
+- Public-Shell/Footer-Konsistenz, Reporting-/Tracking-Hardening, CSS-Governance und Stripe-Rücksprunglogik sind geprüft.
 
-### Offene oder bewusst geparkte Beweise
+### Offene Beobachtungen oder kleine Restbeweise
 
-- Inbox-Review-UI soll den `visual_key` künftig sichtbar und vor dem Übernehmen änderbar machen; der zugrunde liegende Handoff ist bereits bestanden.
+- Dienstag-/Mittwoch-Automationslauf mit echten Live-Daten beobachten und nach erfolgreichem Lauf als Betriebsbeweis dokumentieren.
+- Content Search Feedback Loop ist lokal/statisch bestanden; echte Livewirkung und Logbeleg nach dem nächsten Weekly-Lauf prüfen.
+- Inbox-Review-UI soll den `visual_key` künftig sichtbarer und vor dem Übernehmen komfortabel änderbar machen; der technische Handoff ist bereits bestanden.
 - 28-/30-Tage-Reporting-Datenlauf abwarten, bevor Akquise-/Feedbackberichte als belastbar gelten.
-- Activity-Visual-Restschuld (`fallback`, `needs_review`) ist bewusst späterer Qualitätsworkpack.
-- Echte Zahlungs-/Webhook-/Stripe-Livefälle bleiben nur dann erneut zu testen, wenn ein konkreter Zahlungsflow geändert wurde oder ein neues Symptom auftritt.
+- Activity-Visual-Restschuld `buergerpark-rhede`, `suderwicker-maerchenspielplatz`, `waldlehrpfad-am-vossenpand` bleibt als kleiner Visual-Pruefpunkt / To-do offen, ist aber kein Content-Blocker.
+- Echte Zahlungs-/Webhook-/Stripe-Livefälle, inklusive Aktivitaetspraesenz-/Abo, bleiben nur dann erneut zu testen, wenn ein konkreter Zahlungsflow geändert wurde oder ein neues Symptom auftritt.
 
 ### Hinweis zu historischen Blöcken
 
 - Alte Erwähnungen von `/angebote/...` in früheren Testblöcken sind historische Nachweise, nicht aktuelle Informationsarchitektur.
+- Alte `Noch offen`-Abschnitte in Spezialdokumenten gelten nur, wenn sie nicht durch diesen Index, `MASTER.md` oder einen späteren Abschlussblock überholt wurden.
 - Bei Widerspruch gilt: `MASTER.md` für strategische Steuerung, `ROADMAP.md` für aktuelle Taktik, `ENGINEERING.md` für Arbeitsregeln.
-<!-- === END BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_22 === -->
+<!-- === END BLOCK: TEST_STATUS_CURRENT_INDEX_2026_06_27 === -->
 
 
 <!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_SEARCH_FEEDBACK_LOOP_FINAL_STATIC_2026_06_25 | Zweck: dokumentiert lokale/statische Validierung des finalen KI-Suchlauf-Feedback-Loop-Prozesspatches; Umfang: kein Live-Proof, keine Eventdatenfixes === -->
@@ -1049,7 +1078,7 @@ Nicht durch diesen Stand bewiesen:
 
 - tatsächlicher Push-Versand in Live
 - erzwungener technischer Push-Fehler während einer neuen Submission
-- echte Live-Zahlung für Aktivitätspräsenz nach Zahlungslink
+- echte Live-Zahlung für Aktivitätspräsenz nach Zahlungslink (historische Grenze; Korrektur 2026-06-27: Aktivitaetspraesenz-/Abo-Livebeweis wird inzwischen als erledigt gefuehrt)
 
 Diese Punkte sind keine Blocker für den stille-Ausfall-Proof. Der tatsächliche Push-Versand bleibt optional, solange die Review-Inbox zuverlässig ist.
 
@@ -1060,7 +1089,7 @@ Für Roadmap-Punkt 5 ist kein weiterer P0-Test nötig.
 Später optional:
 
 - tatsächlichen Live-Push-Versand prüfen, falls Live-Push aktiv genutzt werden soll
-- echte Live-Zahlung für Aktivitätspräsenz separat testen, wenn der Activity-Abo-Zahlungsbeweis priorisiert wird
+- Aktivitaetspraesenz-/Abo-Zahlungsflow nur erneut testen, wenn ein konkreter Zahlungsflow geaendert wurde oder ein Stripe-/Billing-Symptom auftritt
 
 <!-- === END BLOCK: TEST_STATUS_REVIEW_PUSH_SMOKE_PROOF_2026_05_27 === -->
 
@@ -1416,7 +1445,7 @@ Damit ist der bezahlte Einzeltermin-Kernfluss für spätere Akquise belastbar.
 
 Noch separat zu prüfen:
 
-- Mitgliedschafts-/Abo-Live-Test, falls aktive Vermarktung der Mitgliedschaft breiter gestartet wird.
+- Mitgliedschafts-/Abo-Live-Test: Korrektur 2026-06-27, als erledigt fuehren; neue Tests nur bei Flow-Aenderung oder Stripe-/Billing-Symptom.
 - `past_due` und echtes Periodenende bleiben gesonderte Stripe-/Billing-Fälle.
 - Test-/Proofstand in Roadmap berücksichtigen, aber keine weitere Codeänderung aus diesem Test ableiten.
 
@@ -4215,9 +4244,9 @@ Offen nach diesem Nachweis:
 <!-- === END BLOCK: TEST_STATUS_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_BATHING_WATER_GUARD_V2_SAFE_WRITEBACK_2026_06_26 | Zweck: dokumentiert den Wechsel vom Report-only-Proof zum sicheren Live-Statusdatei-Writeback fuer Badegewaesser; Umfang: Architektur, UI-Wirkung, Guard-Ergebnis, offene Grenzen === -->
-## Badegewässer Guard V2 – Safe Writeback vorbereitet (2026-06-26)
+## Badegewässer Guard V2 – Safe Writeback validiert (2026-06-26)
 
-Status: bereit für Staging-Deploy und Guard-/UI-Smoke.
+Status: Staging-Guard, Statusdatei, Deploy und Frontend-Override validiert.
 
 Kontext:
 - Guard V1/V1.1/V1.2 haben Quellenzugriff, Zukunftszeilen-Handling, Zwemwater-Konservativlogik und lokale Badeeignung geprüft.

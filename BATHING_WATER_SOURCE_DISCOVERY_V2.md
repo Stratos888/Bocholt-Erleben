@@ -1,6 +1,21 @@
 <!-- === BEGIN FILE: BATHING_WATER_SOURCE_DISCOVERY_V2.md | Zweck: dokumentiert den tieferen Discovery-Proof fuer aktuelle Badegewaesser-Statusquellen; Umfang: Machbarkeit vor Guard-Operationalisierung, kein Produkt-Writeback === -->
 # Bathing Water Source Discovery V2
 
+<!-- === BEGIN BLOCK: BATHING_WATER_SOURCE_DISCOVERY_V2_CURRENT_STATUS_2026_06_27 | Zweck: current-first Einordnung nach Guard-V2-Abschluss; Umfang: Discovery-Status, kein offener Proof-Auftrag === -->
+## Current Status 2026-06-27
+
+Dieser Discovery-Proof ist als Vorarbeit abgeschlossen und in Guard V2 ueberfuehrt.
+
+Aktueller Stand:
+
+- `scripts/check-bathing-water-status.py` nutzt die Guard-V2-Architektur mit sicherem Statusdatei-Writeback.
+- `data/bathing_water_status.json` ist das generierte Laufzeit-/Statusartefakt.
+- Positive Badeempfehlungen entstehen nur bei eindeutig positivem Wasserstatus und positiver lokaler Badeeignung.
+- Dieses Dokument bleibt technische Herleitung/Archiv, ist aber kein offener naechster Roadmap-Block.
+
+<!-- === END BLOCK: BATHING_WATER_SOURCE_DISCOVERY_V2_CURRENT_STATUS_2026_06_27 === -->
+
+
 ## Zweck
 
 Dieser Proof klaert tiefer als der erste Badegewaesser-Proof, ob fuer die relevanten Badestellen ein **aktueller, technischer Statuskanal** auffindbar ist.

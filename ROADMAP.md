@@ -1,3 +1,62 @@
+<!-- === BEGIN BLOCK: ROADMAP_CURRENT_OWNER_VIEW_2026_06_27 | Zweck: current-first Status fuer Projektbesitzer nach Doku-Abgleich; Umfang: echte naechste Workpacks, abgeschlossene Punkte, kleine Rest-To-dos, Dokumentationshygiene === -->
+## Current Owner Roadmap – Stand 2026-06-27
+
+Dieser Block ist die aktuelle Einstiegsschicht fuer Folgechats. Aeltere Roadmap-Bloecke darunter bleiben als Historie/Beweisarchiv erhalten, sind aber **keine automatisch offenen To-dos**.
+
+### Aktueller Projektzustand
+
+Das Projekt ist nicht mehr im Feature-Aufbau-Grundmodus, sondern im Betriebs-/Qualitaetssicherungsmodus.
+
+Als erledigt bzw. nicht mehr als grosses naechstes To-do zu behandeln:
+
+- Mail-System V1: zentraler Topic-/HTML-/Plaintext-Mailpfad ist umgesetzt und getestet; weitere Mailarbeit nur bei neuem konkretem Mailtopic oder Zustell-/Darstellungsfehler.
+- Anbieterbereich/Nutzwertdaten: technische Basis mit Dashboard-/Metrikpfad ist vorhanden; naechste Bewertung erst nach belastbarem 28-/30-Tage-Datenlauf.
+- Aktivitaetspraesenz-/Abo-Livebeweis: als erledigt behandeln; Activity-Presence-Funnel, Zahlungslink-/Checkout-Kette und Anbieterbereich-Kontext sind im Teststatus belegt. Weitere Abo-Tests nur bei konkreter Flow-Aenderung oder Stripe-/Billing-Symptom.
+- Event-Visual-Motif-Fit: fuer den aktuellen Sheet-/Matrix-Stand abgeschlossen; neue Event-Visual-Arbeit nur bei neuem konkretem Gap oder falscher Bildzuordnung.
+- Badegewaesserstatus-Proof / Guard V2: abgehakt. Safe-Writeback ueber `data/bathing_water_status.json`, Deploy und Frontend-Override sind auf Staging belegt; kein neuer Proof-Block und kein aktives To-do.
+- Seasonal Activity Highlights V1: abgeschlossen; keine aktive Content-Batch-02-Pflicht.
+- Content-Audit/Inbox-Routing: Prozessbasis ist umgesetzt; normale Inbox soll nur echte Entscheidungen zeigen, nicht technische Backloglisten.
+
+### Echte naechste Prioritaeten nach gruenem Dienstag-/Mittwoch-Lauf
+
+1. **Live-Lauf belegen und dokumentieren**
+   - Dienstag: Weekly-KI-Suche, Manual-Inbox-Import, Ablehn-/Archivlogik, Visual-Key-Handoff beobachten.
+   - Mittwoch: Content-Audit mit echten Sheet-/Runtime-Events pruefen.
+   - Ziel: nicht neu bauen, sondern beweisen, dass der Betriebsprozess selbststaendig laeuft.
+
+2. **Inbox: Visual-Key vor Uebernahme komfortabel korrigierbar machen**
+   - Der Handoff `Inbox.visual_key -> Events.visual_key -> Runtime-Bild` ist belegt.
+   - Offener Rest ist die bessere Owner-Bedienung: sichtbarer Bildtyp, klarer Labeltext und Dropdown/Korrektur vor Uebernahme.
+   - Ziel: falsche Live-Bilder frueh verhindern, ohne den Such-/Importprozess neu zu bauen.
+
+3. **Feedback-Loop-Livebeweis dokumentieren**
+   - Der Feedback-Loop ist lokal/statisch umgesetzt.
+   - Noch zu belegen: Weekly-Suchlauf liest Feedbackregeln/Ablehnungshistorie sichtbar ein und reduziert Wiederholfehler.
+   - Ziel: Beweis/Logging/Status, kein neuer Mechanik-Entwurf.
+
+4. **Activity-Visual-Rest als Pruefpunkt / kleines To-do behalten**
+   - Der aktuelle Audit nennt noch `buergerpark-rhede`, `suderwicker-maerchenspielplatz` und `waldlehrpfad-am-vossenpand` als `visual_backlog_observation`.
+   - Diese Punkte sind **keine Content-Blocker** und sollen nicht in die normale Content-Inbox.
+   - Sie bleiben aber bewusst als kleiner Visual-Pruefpunkt offen: pruefen, ob Uebergangsbilder reichen oder ob Premium-Pool-Ergaenzungen sinnvoll sind.
+
+5. **Dokumentationshygiene current-first halten**
+   - `MASTER.md` steuert Strategie.
+   - `ROADMAP.md` steuert aktuelle taktische Reihenfolge.
+   - `TEST_STATUS.md` ist Beweisarchiv und Testindex.
+   - Spezialdokumente wie `MAIL_SYSTEM.md`, `BATHING_WATER_*`, `VISUAL_WORKFLOW.md`, `ACTIVITY_VISUAL_*` bleiben als Fachvertraege/Workstream-Historie erhalten.
+   - Nicht loeschen: Die Dateien sind redundant wirkend, haben aber unterschiedliche Rollen. Problem ist nicht Dateimenge, sondern veraltete offene Hinweise ohne current-first Klarstellung.
+
+### Nicht als naechstes starten
+
+- keinen manuellen bezahlten KI-Lauf ohne konkreten Testzweck,
+- keine grosse UI-Runde ohne echte neue Mobile-Faelle,
+- keine neue Event-Bildproduktion ohne konkreten Matrix-/Audit-Gap,
+- keine SEO-/Growth-Landingpages vor belastbaren Daten,
+- keine Mail-System-Neuentwicklung,
+- keinen Badegewaesser-Neu-Proof; Guard V2 / Badegewaesserstatus-Proof ist abgehakt.
+
+<!-- === END BLOCK: ROADMAP_CURRENT_OWNER_VIEW_2026_06_27 === -->
+
 <!-- === BEGIN BLOCK: ROADMAP_INBOX_CONTENT_AUTOMATION_ROUTING_FREEZE_2026_06_26 | Zweck: setzt den aktuellen Inbox-/Content-Quality-Fortsetzungspunkt nach Mobile-Kompaktfreeze; Umfang: naechste Arbeit erst nach echter Nutzung, keine sofortige neue UI-Runde === -->
 ## Inbox / Content-Pruefung – Mobile-Kompaktstand eingefroren, echte Nutzung abwarten (2026-06-26)
 
@@ -558,7 +617,7 @@ Bewertung:
 - P0 `Live-Zahlungsfall bewusst vollständig testen` ist für den Einzeltermin-Funnel erledigt.
 - Kein Code-Patch und keine direkte DB-Korrektur waren nötig.
 - Für breite Akquise ist der bezahlte Einzeltermin-Kernfluss praktisch belastbar.
-- Mitgliedschafts-/Abo-Live-Test bleibt ein separater Testfall, weil dort Abo-, Billing-Portal- und Periodenlogik zusätzlich betroffen sind.
+- Korrektur 2026-06-27: Der Aktivitaetspraesenz-/Abo-Livebeweis wird als erledigt behandelt. Weitere echte Abo-/Billing-Tests sind nur bei konkreter Flow-Aenderung, Periodenende-/`past_due`-Fragestellung oder Stripe-Symptom noetig, nicht als offener naechster Roadmap-Punkt.
 
 <!-- === END BLOCK: ROADMAP_LIVE_SINGLE_EVENT_PAYMENT_PROOF_2026_05_27 === -->
 
