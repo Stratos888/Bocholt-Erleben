@@ -150,10 +150,23 @@ function persistStatisticsConsent(state) {
   writeCookieValue(cookieName, state, maxAgeSeconds);
 }
 
+function notifyStatisticsConsentChanged(state) {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.dispatchEvent(new CustomEvent("be:privacy-consent-changed", {
+      detail: { state }
+    }));
+  } catch (_) {}
+}
+
 function setStatisticsConsent(granted) {
-  persistStatisticsConsent(granted ? "granted" : "denied");
+  const state = granted ? "granted" : "denied";
+
+  persistStatisticsConsent(state);
   removePrivacyConsentBanner();
   updatePrivacySettingsPanel();
+  notifyStatisticsConsentChanged(state);
 
   if (granted) {
     initAnalytics();
@@ -171,11 +184,23 @@ function resetStatisticsConsent() {
   writeCookieValue(cookieName, "", 0);
   removePrivacyConsentBanner();
   updatePrivacySettingsPanel();
-  initPrivacyConsentUi();
+  notifyStatisticsConsentChanged("unset");
+  syncPrivacyConsentUi();
 }
 
 function shouldOfferStatisticsConsent() {
   return isConsentUiHostAllowed() && !hasStatisticsConsentChoice();
+}
+
+function syncPrivacyConsentUi() {
+  if (typeof document === "undefined") return;
+
+  if (!shouldOfferStatisticsConsent()) {
+    removePrivacyConsentBanner();
+    return;
+  }
+
+  initPrivacyConsentUi();
 }
 
 function shouldEnableAnalytics() {
@@ -437,6 +462,7 @@ function initPrivacyApi() {
   window.BEPrivacy.setStatisticsConsent = setStatisticsConsent;
   window.BEPrivacy.resetStatisticsConsent = resetStatisticsConsent;
   window.BEPrivacy.updateSettingsPanel = updatePrivacySettingsPanel;
+  window.BEPrivacy.syncConsentUi = syncPrivacyConsentUi;
 }
 
 function removePrivacyConsentBanner() {
@@ -571,11 +597,40 @@ function initAnalytics() {
   });
 }
 
+let privacyRuntimeResyncBound = false;
+
+function resyncPrivacyRuntime() {
+  updatePrivacySettingsPanel();
+  syncPrivacyConsentUi();
+  initAnalytics();
+}
+
+function bindPrivacyRuntimeResync() {
+  if (privacyRuntimeResyncBound || typeof window === "undefined" || typeof document === "undefined") return;
+
+  privacyRuntimeResyncBound = true;
+
+  window.addEventListener("pageshow", () => {
+    window.setTimeout(resyncPrivacyRuntime, 0);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) resyncPrivacyRuntime();
+  });
+
+  window.addEventListener("focus", resyncPrivacyRuntime);
+
+  window.addEventListener("storage", (event) => {
+    if (!event || event.key === CONFIG.privacy.statisticsConsentStorageKey) {
+      resyncPrivacyRuntime();
+    }
+  });
+}
+
 function initPrivacyRuntime() {
   initPrivacyApi();
-  updatePrivacySettingsPanel();
-  initPrivacyConsentUi();
-  initAnalytics();
+  bindPrivacyRuntimeResync();
+  resyncPrivacyRuntime();
 }
 
 if (document.readyState === "loading") {

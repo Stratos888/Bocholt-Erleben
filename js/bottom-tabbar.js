@@ -80,6 +80,20 @@
     }
   }
 
+  function hasResolvedStatisticsConsentChoice() {
+    try {
+      const api = window.BEPrivacy;
+      if (!api || typeof api.getStatisticsConsentState !== "function") return false;
+      return api.getStatisticsConsentState() !== "unset";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function removeSpeculationRules() {
+    document.getElementById(SPECULATION_RULES_ID)?.remove();
+  }
+
   function addDocumentPrefetch(href) {
     const normalizedHref = normalizePath(href);
     if (!normalizedHref || warmedUrls.has(`doc:${normalizedHref}`) || !document.head) return;
@@ -113,6 +127,11 @@
 
   function applyPrerenderRules(urls) {
     if (!supportsSpeculationRules() || !document.head) return;
+
+    if (!hasResolvedStatisticsConsentChoice()) {
+      removeSpeculationRules();
+      return;
+    }
 
     const normalizedUrls = Array.from(
       new Set(
@@ -277,6 +296,12 @@
     renderDesktopNav(desktopRoot, activeItem);
     warmInactiveRoutes(activeItem.key);
   }
+
+  window.addEventListener("be:privacy-consent-changed", () => {
+    const activeItem = getActiveItem(normalizePath(window.location.pathname));
+    if (!activeItem) return;
+    warmInactiveRoutes(activeItem.key);
+  });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", render, { once: true });
