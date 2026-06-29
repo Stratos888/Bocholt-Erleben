@@ -476,7 +476,7 @@ function initPrivacyConsentUi() {
   title.textContent = "Optionale Statistik";
 
   const copy = document.createElement("p");
-  copy.textContent = "Hilf uns zu verstehen, welche Inhalte gut funktionieren. Ohne Zustimmung bleibt alles vollständig nutzbar.";
+  copy.textContent = "Wir nutzen optionale, anonyme Statistik, um Bocholt erleben zu verbessern. Ohne Zustimmung bleibt alles vollständig nutzbar.";
 
   const actions = document.createElement("div");
   actions.className = "privacy-consent__actions";
