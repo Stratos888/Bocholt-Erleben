@@ -1,33 +1,38 @@
-<!-- === BEGIN BLOCK: ROADMAP_PRODUCT_MATURITY_NON_CONTENT_2026_06_29 | Zweck: validierte Nicht-Content-Roadmap nach Gesamtprojektanalyse; Umfang: Produktreife, Nutzerbindung, Standort, Anbieter-/Rechtsreife, technische Konsolidierung; Content-Live-Lauf, KI-Suche und Content-Pruefung bewusst ausgeklammert === -->
+<!-- === BEGIN BLOCK: ROADMAP_PRODUCT_MATURITY_NON_CONTENT_2026_06_29 | Zweck: aktualisierte Nicht-Content-Roadmap nach Abschluss P0 Datenschutz/Tracking; Umfang: P0 abgeschlossen, P1 Browser-Smoke-Tests als naechster aktiver Workpack, Product-Maturity-Reihenfolge; Content-Live-Lauf, KI-Suche und Content-Pruefung bewusst ausgeklammert === -->
 ## Product-Maturity-Roadmap ohne Content-Operation – Stand 2026-06-29
 
-### Aktueller Abarbeitungsstand – P0 Datenschutz/Tracking
+Dieser Block ist die aktuelle Einstiegsschicht fuer **nicht-contentbezogene** Folgearbeiten. Der Content-/KI-/Audit-Betriebsstrang bleibt separat dokumentiert und wird hier bewusst nicht neu bewertet.
 
-Status: P0 ist mit diesem Patch technisch umgesetzt und nach Upload/Deploy nur noch per Live-Smoke zu bestaetigen.
+### Aktueller Abarbeitungsstand
 
-Umgesetzt:
+#### P0 – Datenschutz-/Tracking-Konsistenz: abgeschlossen
 
-- `config.js` startet GA4 und internes Nutzwerttracking nicht mehr automatisch, sondern erst nach aktiver Statistik-Zustimmung.
-- `/api/value-track.php` ignoriert Nutzwert-Metriken serverseitig, wenn die Statistik-Zustimmung fehlt oder das alte Opt-out-Cookie gesetzt ist.
+Status: **abgenommen nach Main-Merge und Live-Pruefung**.
+
+Abgenommen:
+
+- GA4 und internes Nutzwerttracking starten nicht mehr ohne aktive Statistik-Zustimmung.
+- `/api/value-track.php` ignoriert Nutzwert-Metriken ohne Statistik-Zustimmung serverseitig.
 - `/datenschutz/` beschreibt Cookies/lokale Speicherung, Statistik, Google Analytics 4, First-Party-Nutzwerttracking, Anbieterbereich und Zahlungen konsistent zum Runtime-Verhalten.
-- Die Datenschutzseite enthaelt eine einfache Einstellungsflaeche fuer `Statistik erlauben`, `Nur notwendige Funktionen` und `Auswahl zuruecksetzen`.
-- Das Consent-Banner bietet gleichwertig `Nur notwendige` und `Statistik erlauben` an; ohne Auswahl bleibt Statistik aus.
+- Consent-Systemlayer ist optisch auf Desktop/Mobile/PWA-nah validiert: Systemhinweis statt Feed-Card, kein greller Zustimmungs-CTA, gleichwertige Optionen.
+- Bottom-Tabbar-/Prerender-Reappearing-Bug nach erster Auswahl ist behoben: Nach `Ohne Statistik` oder `Statistik erlauben` erscheint der Hinweis beim ersten Tabwechsel nicht erneut.
+- Live-Konsolen-Smoke war gruen: `9/9 OK`.
 
-Naechster nicht-contentbezogener Workpack nach Deploy-Smoke:
+#### Naechster aktiver Workpack
 
 ```text
 P1 Browser-Smoke-Tests fuer Kernwege einfuehren
 ```
 
-Dieser Block ist die aktuelle Einstiegsschicht fuer **nicht-contentbezogene** Folgearbeiten. Der Content-/KI-/Audit-Betriebsstrang bleibt separat im bisherigen Current-Owner-Block dokumentiert und wird durch diesen Block nicht neu bewertet.
+Ziel: Wenige echte Browserpruefungen als Sicherheitsnetz, damit kommende Produktfeatures nicht nur Syntaxchecks bestehen, sondern auch die wichtigsten Nutzerwege real laden und bedienbar bleiben.
 
 ### Validierte Ausgangslage
 
-Die App ist fuer den aktuellen Stand kein Feature-Rohbau mehr. Events, Activities, Anbieter-/Zahlungslogik, Mail-System, Visual-System und Betriebsdokumentation sind weit aufgebaut. Die naechsten groesseren Arbeiten sollen deshalb nicht weitere Einzelinhalte oder neue KI-Automation sein, sondern Produktreife fuer echte Nutzer und zahlende Anbieter.
+Die App ist fuer den aktuellen Stand kein Feature-Rohbau mehr. Events, Activities, Anbieter-/Zahlungslogik, Mail-System, Visual-System, Datenschutz-/Consent-Runtime und Betriebsdokumentation sind weit aufgebaut. Die naechsten groesseren Arbeiten sollen deshalb nicht weitere Einzelinhalte oder neue KI-Automation sein, sondern Produktreife fuer echte Nutzer und zahlende Anbieter.
 
-Validierungsbefunde aus dem Repo-Stand:
+Validierungsbefunde aus dem Repo-/Live-Stand:
 
-- `config.js` startete bisher GA4 und internes Nutzwerttracking automatisch, waehrend `/datenschutz/` noch keine Analyse-Tools beschrieb. Dieses P0-Konsistenzproblem ist mit dem Consent-/Datenschutz-Patch behoben; nach Deploy bleibt nur der Live-Smoke.
+- Datenschutz/Tracking ist mit P0 abgeschlossen und soll nicht ohne konkreten neuen Tracking-/Personalisierungsgrund wieder geoeffnet werden.
 - `js/user-preferences.js` und `js/recommendations.js` enthalten bereits lokale Interessen-, Merkliste-, Ausblendungs- und Empfehlungslogik; daraus ist aber noch kein klares Nutzerfeature mit sichtbarer Merken-/Fuer-dich-/Erinnern-UX geworden.
 - `data/offers.json` nutzt Ortsnamen und `maps_query`, aber keine robusten Koordinatenfelder; echte Naehe-, Karten- oder Umkreissortierung ist damit noch kein Produktfeature.
 - Anbieterbereich, Stripe-/Abo-Flows, Magic Link, Mail-System und Nutzwertmetriken sind technisch vorhanden; der naechste Hebel ist Verkaufsverstaendlichkeit, nicht ein kompletter Neubau.
@@ -37,33 +42,37 @@ Validierungsbefunde aus dem Repo-Stand:
 
 #### 1. P0 – Datenschutz-/Tracking-Konsistenz herstellen
 
-Status: umgesetzt in diesem Patch; nach Deploy nur noch kurzer Live-Smoke.
+Status: **abgeschlossen**.
 
-Ziel: Technik, Datenschutzerklaerung und ggf. Einwilligungslogik muessen dasselbe sagen.
-
-Warum zuerst: Vertrauen und Rechtssicherheit. Eine App darf nicht intern messen und oeffentlich behaupten, es gebe kein Tracking.
-
-Akzeptanzkriterien:
-
-- Es ist entschieden, ob GA4 aktiv bleibt, angepasst wird oder deaktiviert wird.
-- `/datenschutz/` beschreibt den tatsaechlichen Stand von GA4, internem Nutzwerttracking, LocalStorage, Push, Formspree, Stripe und Anbieterbereich konsistent.
-- Falls eine Einwilligung noetig ist, wird sie vor nicht notwendiger Analyseverarbeitung eingeholt.
-- Internes Nutzwerttracking fuer Anbieterberichte bleibt klar von allgemeinem Marketingtracking getrennt dokumentiert.
+Nicht erneut als offenes To-do behandeln. Weitere Arbeit nur, wenn neue Statistik-, Tracking-, Push-, Reminder-, Karten- oder Personalisierungsfunktionen den Consent-/Datenschutz-Contract beruehren.
 
 #### 2. P1 – Browser-Smoke-Tests fuer Kernwege einfuehren
 
+Status: **naechster aktiver Workpack**.
+
 Ziel: Vor groesseren Produktfeatures einfache echte Browserpruefungen haben, nicht nur Syntaxchecks.
 
-Warum jetzt: Die App hat viele kritische UI- und Funnelpfade. Ohne Browser-Smoke-Tests werden neue Featurearbeiten riskanter.
+Warum jetzt: Die App hat viele kritische UI- und Funnelpfade. Ohne Browser-Smoke-Tests werden neue Featurearbeiten riskanter und muessen immer wieder manuell per Screenshot nachgeprueft werden.
+
+V1-Zuschnitt:
+
+- Ein kleines, wartbares Browser-Smoke-Setup, bevorzugt headless in GitHub Actions nutzbar.
+- Tests duerfen keine echten Zahlungen, E-Mails oder produktiven Schreibaktionen ausloesen.
+- Tests pruefen Laden, sichtbare Kernbereiche, wichtige Buttons/Links und einfache UI-Interaktionen.
+- Ziel ist ein Sicherheitsnetz, keine Vollabdeckung.
 
 Erste Teststrecken:
 
-- Startseite laedt und zeigt Today-Karten.
-- Events-Seite laedt; Mobile-Detailpanel und Desktop-Direct-Outbound bleiben gemaess Policy intakt.
-- Aktivitaeten-Seite laedt; Mobile-Detailpanel funktioniert.
-- Event einreichen, Aktivitaet einreichen, Zahlung-starten-Seite, Anbieterlogin und Anbieter-Dashboard laden grundsaetzlich.
+- `/` Startseite: Header, Today-Content, Bottom-Tabbar bzw. Navigation, Consent-Zustand ohne Blockade.
+- `/events/`: Seite laedt, Eventkarten erscheinen, mobile Detailpanel-Policy und Desktop-Klickpolitik werden nicht offensichtlich gebrochen.
+- `/aktivitaeten/`: Seite laedt, Activity-Karten erscheinen, mobile Detailpanel-Policy bleibt intakt.
+- `/events-veroeffentlichen/einreichen/`: Formular/Einreichungsstrecke laedt bis zur sichtbaren Hauptaktion, ohne produktiv abzusenden.
+- `/aktivitaeten/sichtbar-werden/`: Activity-Presence-/Sichtbar-werden-Strecke laedt bis zur sichtbaren Hauptaktion, ohne produktiv abzusenden.
+- `/zahlung-starten/`: Zahlungsstartseite laedt, ohne Checkout auszufuehren.
+- `/fuer-veranstalter/login/`: Login/Magic-Link-Oberflaeche laedt, ohne E-Mail zu versenden.
+- `/fuer-veranstalter/dashboard/`: Dashboard-route bricht nicht hart; falls Login erforderlich ist, wird ein verstaendlicher Login-/Zugangszustand erwartet.
 
-Nicht-Ziel: Kein grosses Testframework-Projekt mit Vollabdeckung. Erst wenige robuste Kernpfade.
+Nicht-Ziel: Kein grosses Testframework-Projekt mit Vollabdeckung, keine echten DB-Schreibtests, keine Stripe-Live-Zahlungen, keine Content-/KI-Audit-Pruefung.
 
 #### 3. P1 – Nutzerbindung: Merken / Fuer dich / Erinnern produktreif machen
 
@@ -146,15 +155,13 @@ Regel:
 - SEO-/Growth-Landingpages ohne belastbare Daten.
 - Pauschale UI-Komplettüberarbeitung ohne konkreten Nutzer- oder Anbieterbefund.
 
-### Empfohlener erster Workpack
-
-Als naechstes nicht-contentbezogenes Workpack gilt:
+### Empfohlener naechster Workpack
 
 ```text
-P0 Datenschutz-/Tracking-Konsistenz herstellen
+P1 Browser-Smoke-Tests fuer Kernwege einfuehren
 ```
 
-Da P0 in diesem Patch umgesetzt ist, folgt danach ein kleiner Browser-Smoke-Test-Grundstock, bevor `Merken / Fuer dich / Erinnern` oder Standort-/Kartenlogik groesser angefasst werden.
+Dieser Workpack soll zuerst ein kleines Sicherheitsnetz liefern. Erst danach sollen `Merken / Fuer dich / Erinnern` oder Standort-/Kartenlogik groesser angefasst werden.
 <!-- === END BLOCK: ROADMAP_PRODUCT_MATURITY_NON_CONTENT_2026_06_29 === -->
 
 <!-- === BEGIN BLOCK: ROADMAP_CURRENT_OWNER_VIEW_2026_06_27 | Zweck: current-first Status fuer Projektbesitzer nach Doku-Abgleich; Umfang: echte naechste Workpacks, abgeschlossene Punkte, kleine Rest-To-dos, Dokumentationshygiene === -->

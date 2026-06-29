@@ -57,44 +57,51 @@ The following workpack is intentionally on hold:
 
 ## CURRENT FOCUS
 
-<!-- === BEGIN BLOCK: MASTER_PRODUCT_MATURITY_CONTROL_2026_06_29 | Zweck: strategische Steuerung fuer nicht-contentbezogene Produktreife; Umfang: Datenschutz/Tracking, Smoke-Tests, Nutzerbindung, Standort, Anbieter-/Rechtsreife, Konsolidierung === -->
+<!-- === BEGIN BLOCK: MASTER_PRODUCT_MATURITY_CONTROL_2026_06_29 | Zweck: strategische Steuerung fuer nicht-contentbezogene Produktreife nach Abschluss P0; Umfang: Datenschutz/Tracking abgenommen, Browser-Smoke-Tests als naechster aktiver Workpack, danach Nutzerbindung/Standort/Anbieterreife === -->
 ### Produktreife-Roadmap ausserhalb Content-Operation
 
 Stand: 2026-06-29.
 
 Dieser Block steuert die naechsten groesseren Arbeiten, wenn Content-Live-Lauf, KI-Suche und Content-Pruefung bewusst ausgeklammert werden.
 
-Validierte Reihenfolge:
+Aktueller Status:
 
-1. Datenschutz-/Tracking-Konsistenz herstellen.
-   - GA4, internes Nutzwerttracking, LocalStorage, Push, Formspree, Stripe und Anbieterbereich muessen in Technik, Datenschutztext und ggf. Einwilligung konsistent beschrieben bzw. gesteuert sein.
-   - Der bisherige Widerspruch `Analytics aktiv` vs. `/datenschutz/` mit `kein Tracking` ist mit dem Consent-/Datenschutz-Patch behoben; nach Upload/Deploy bleibt nur der Live-Smoke.
+- **P0 Datenschutz-/Tracking-Konsistenz ist abgeschlossen.**
+  - Technischer Live-Smoke: `9/9 OK`.
+  - Consent-Systemlayer ist auf Desktop/Mobile/PWA-nah visuell abgenommen.
+  - Bottom-Tabbar-/Prerender-Reappearing nach erster Auswahl ist behoben.
+  - P0 nur wieder oeffnen, wenn neue Tracking-, Statistik-, Push-, Reminder-, Karten- oder Personalisierungsfunktionen den Consent-/Datenschutz-Contract beruehren.
 
-2. Browser-Smoke-Tests fuer Kernwege einfuehren.
-   - Vor groesseren neuen Produktfeatures braucht die App wenige echte Browserpruefungen fuer Home, Events, Activities, Einreichung, Zahlung-starten, Anbieterlogin und Dashboard.
-   - Ziel ist ein kleines Sicherheitsnetz, keine Volltestabdeckung.
+Naechster aktiver Workpack:
 
-3. Nutzerbindung produktisieren: Merken / Fuer dich / Erinnern.
-   - Vorhandene lokale Profil-/Recommendation-Logik soll als klares Nutzerfeature sichtbar werden.
-   - Keine Account-/Sync-Pflicht. Erinnern/Push erst nach Datenschutz-/Einwilligungsentscheidung.
+1. **P1 Browser-Smoke-Tests fuer Kernwege einfuehren.**
+   - Ziel: wenige echte Browserpruefungen fuer die wichtigsten Nutzer- und Anbieterwege, damit neue Produktfeatures nicht nur Syntaxchecks bestehen.
+   - Gemeint sind Startseite, Events, Aktivitaeten, Einreichungsstrecken, Zahlung-starten, Anbieterlogin und Dashboard-Grundzustand.
+   - Nicht gemeint sind Content-Audit, KI-Suche, echte Zahlungen, echte E-Mail-Sendungen oder produktive Schreibtests.
 
-4. Standort-/Karten-/Naehe-Schicht aufbauen.
-   - Zuerst Datenmodell fuer Koordinaten/Location-IDs und einheitliche Maps-Ziele, danach erst UI wie Karte oder Naehe-Sortierung.
+Danach:
 
-5. Anbieterbereich und Verkaufsstrecke verkaufsfertig machen.
-   - Technischer Anbieterbereich ist vorhanden; naechster Hebel ist Verstaendlichkeit: Nutzen, Status, naechste Aktion, Zahlungs-/Abo-Status und Billing fuer echte Anbieter.
+2. Nutzerbindung produktisieren: Merken / Fuer dich / Erinnern.
+   - Auf vorhandener lokaler Profil-/Recommendation-Logik aufbauen.
+   - Keine Account-/Sync-Pflicht ohne ausdrueckliche Produktentscheidung.
+   - Erinnern/Push erst nach Datenschutz-/Einwilligungsentscheidung.
 
-6. Recht-/Verkaufsseiten fuer bezahlte Produkte haerten.
-   - Oeffentliche Texte muessen zum `Produktvertrag.md` passen: redaktionelle Pruefung, Zahlung, Ablehnung, Laufzeit, Kuendigung, Widerruf/AGB, Datenschutz.
+3. Standort-/Karten-/Naehe-Schicht aufbauen.
+   - Zuerst Datenmodell fuer Koordinaten/Location-IDs klaeren.
+   - Danach Karten-, Naehe- oder Umkreissortierung.
 
-7. UI-/CSS-/JS-Konsolidierung gezielt fortsetzen.
-   - Keine Neuarchitektur; nur owner-file-orientierte Entflechtung bei konkretem Feature-/Bugfix-Kontext.
+4. Anbieterbereich und Verkaufsstrecke verkaufsfertig machen.
+   - Kein Dashboard-Neubau, sondern bessere Verstaendlichkeit: Nutzen, Status, naechste Aktion, Zahlung/Abo/Billing.
 
-Abgrenzung:
+5. Recht-/Verkaufsseiten fuer bezahlte Produkte haerten.
+   - Oeffentliche Texte muessen zum `Produktvertrag.md` passen.
 
-- Der Content-/KI-/Audit-Strang bleibt separat im bestehenden Current-Control-Block gefuehrt.
-- Growth/SEO bleibt datenabhaengig und ist kein Ersatz fuer Produktreife.
-- Neue Nutzerfeatures duerfen nicht vor Datenschutz-/Tracking-Konsistenz und minimalem Browser-Smoke-Netz groesser gebaut werden.
+6. UI-/CSS-/JS-Konsolidierung gezielt fortsetzen.
+   - Keine Neuarchitektur, nur owner-file-orientiert bei konkretem Feature-/Bugfix-Kontext.
+
+Strategische Regel:
+
+- Vor `Merken / Fuer dich / Erinnern` oder Standort/Karte kommt P1 Browser-Smoke. Das reduziert Regressionen in der ohnehin gewachsenen App.
 <!-- === END BLOCK: MASTER_PRODUCT_MATURITY_CONTROL_2026_06_29 === -->
 
 <!-- === BEGIN BLOCK: MASTER_CURRENT_CONTROL_2026_06_27 | Zweck: konsolidiert aktuellen Projektbesitzer-Steuerungsstand nach Doku-/Roadmap-Abgleich; Umfang: Betrieb statt Featureaufbau, erledigte Grossbloecke, echte naechste Steuerung === -->
