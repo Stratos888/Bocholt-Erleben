@@ -1,39 +1,54 @@
-<!-- === BEGIN BLOCK: ENGINEERING_PRIVACY_TRACKING_RUNTIME_CONTRACT_2026_06_29 | Zweck: technischer Contract fuer Datenschutz-/Tracking-Runtime nach finaler P0-Abnahme; Umfang: Consent-Gating, Serverguard, Systemlayer, Prerender-Resync, Folgearbeiten === -->
+<!-- === BEGIN BLOCK: ENGINEERING_BROWSER_SMOKE_RULES_V1_2026_06_29 | Zweck: technische Regeln fuer Browser-Smoke-V1; Umfang: read-only, Trigger, Artefakte, keine Auto-Reparatur === -->
+## Browser-Smoke V1 — Engineering-Regeln
+
+Browser-Smoke ist erlaubt und gewuenscht, wenn er folgende Grenzen einhaelt:
+
+- Nur read-only Browseraktionen.
+- Keine echten Checkouts, E-Mails oder produktiven Schreibaktionen.
+- Keine Auto-Reparatur und kein Auto-Rollback.
+- Stabil vor vollstaendig: wenige robuste Kernwege statt viele fragile Detailtests.
+- Desktop und Mobile werden mit Chromium/Playwright geprueft.
+- Fehler erzeugen Summary, JSON und Screenshots als GitHub-Artefakte.
+- Ein roter Staging-Browser-Smoke blockiert fachlich den Merge nach `main`.
+- Ein roter Main-Browser-Smoke erzeugt Handlungsbedarf fuer Hotfix/Rollback-Entscheidung, fuehrt aber nicht automatisch Code aus.
+
+Owner-Dateien:
+
+- Script: `scripts/browser-smoke.mjs`
+- Manueller Workflow: `.github/workflows/browser-smoke.yml`
+- Deploy-Integration: `.github/workflows/deploy-strato.yml`
+- Betriebsdoku: `BROWSER_SMOKE_SYSTEM.md`
+<!-- === END BLOCK: ENGINEERING_BROWSER_SMOKE_RULES_V1_2026_06_29 === -->
+
+<!-- === BEGIN BLOCK: ENGINEERING_PRIVACY_TRACKING_RUNTIME_CONTRACT_2026_06_29 | Zweck: technischer Contract fuer Datenschutz-/Tracking-Runtime nach P0-Umsetzung; Umfang: Consent-Gating, Serverguard, Folgearbeiten === -->
 ## Datenschutz-/Tracking-Runtime-Contract
 
-Stand: 2026-06-29. P0 ist final abgenommen.
+Stand: 2026-06-29.
 
 - GA4 und First-Party-Nutzwerttracking duerfen im Client nur nach aktiver Statistik-Zustimmung starten.
 - `window.BEAnalytics` wird erst nach Zustimmung initialisiert; Featurecode muss weiterhin defensiv auf Existenz/Funktionen pruefen.
 - `/api/value-track.php` muss Metriken ohne `be_statistics_consent=granted` ignorieren.
 - Consent-/Datenschutzeinstellungen liegen in `config.js`; UI-Styles liegen in `css/components.css`; oeffentlicher Erklaertext liegt in `/datenschutz/`.
-- Der Consent-Hinweis ist als System-Layer zu behandeln, nicht als normale Content-/Feed-Card.
-- Bottom-Tabbar/Prerender/Prefetch darf keinen alten Consent-UI-Zustand erneut anzeigen. Bei Seitenaktivierung muss der aktuelle Consent-Status synchronisiert werden.
 - Neue Tracking-, Reminder-, Push-, Karten- oder Personalisierungsfunktionen muessen zuerst gegen diesen Contract geprueft werden.
 - Nach jeder Aenderung an Tracking/Consent mindestens pruefen: `node --check config.js`, `php -l api/value-track.php`, CSS-Governance-Audit und Live-Smoke ohne/mit Zustimmung.
-- Reine CSS-Polishes am abgenommenen Consent-Systemlayer sollen vermieden werden, solange kein konkreter Fehler oder neuer Produkt-/Rechtsbedarf vorliegt.
 
 <!-- === END BLOCK: ENGINEERING_PRIVACY_TRACKING_RUNTIME_CONTRACT_2026_06_29 === -->
 
-<!-- === BEGIN BLOCK: ENGINEERING_PRODUCT_MATURITY_ROADMAP_RULES_2026_06_29 | Zweck: technische Arbeitsregeln fuer die validierte nicht-contentbezogene Produktreife-Roadmap nach Abschluss P0; Umfang: P1 Browser-Smoke-Test-Grundstock, Workpack-Reihenfolge, Validierung, Trennung von Content-Operation === -->
+<!-- === BEGIN BLOCK: ENGINEERING_PRODUCT_MATURITY_ROADMAP_RULES_2026_06_29 | Zweck: technische Arbeitsregeln fuer die validierte nicht-contentbezogene Produktreife-Roadmap; Umfang: Workpack-Reihenfolge, Validierung, Trennung von Content-Operation === -->
 ## Produktreife-Roadmap – technische Arbeitsregeln
 
-Stand: 2026-06-29. P0 Datenschutz/Tracking ist abgeschlossen; P1 Browser-Smoke-Tests ist der naechste aktive Workpack.
+Stand: 2026-06-29.
 
 Fuer die validierte Nicht-Content-Roadmap gilt:
 
-1. Datenschutz-/Tracking-Konsistenz ist abgeschlossen.
-   - Nicht ohne konkreten neuen Bedarf wieder oeffnen.
-   - Neue Statistik-, Tracking-, Push-, Reminder-, Karten- oder Personalisierungsfunktionen muessen gegen den Datenschutz-/Tracking-Runtime-Contract geprueft werden.
+1. Datenschutz-/Tracking-Konsistenz ist P0.
+   - Vor neuen groesseren Nutzerfeatures klaeren, ob GA4 aktiv bleibt, angepasst wird oder deaktiviert wird.
+   - Datenschutzerklaerung, technische Runtime (`config.js`, `BEAnalytics`, `/api/value-track.php`), LocalStorage, Push, Formspree, Stripe und Anbieterbereich muessen konsistent behandelt werden.
    - Rechtstexte nicht beiläufig in einem Feature-Patch nebenbei umschreiben; als eigener Review-fähiger Workpack.
 
 2. Vor groesseren Produktfeatures einen kleinen Browser-Smoke-Test-Grundstock einfuehren.
-   - Zielpfade: `/`, `/events/`, `/aktivitaeten/`, `/events-veroeffentlichen/einreichen/`, `/aktivitaeten/sichtbar-werden/`, `/zahlung-starten/`, `/fuer-veranstalter/login/`, `/fuer-veranstalter/dashboard/`.
-   - Tests pruefen Laden, sichtbare Kernbereiche, wichtige Navigations-/CTA-Elemente und einfache nicht-destruktive Interaktionen.
-   - Tests duerfen keine echten Zahlungen, E-Mails, DB-Schreibaktionen, Content-Imports oder KI-Laeufe ausloesen.
-   - Mobile-Policy muss zumindest fuer die wichtigsten Routen beruecksichtigt werden: Mobile Detailpanel, Desktop Direct-Outbound/Card-first dort, wo diese Policy gilt.
+   - Zielpfade: `/`, `/events/`, `/aktivitaeten/`, Einreichungsseiten, `/zahlung-starten/`, `/fuer-veranstalter/login/`, `/fuer-veranstalter/dashboard/`.
    - Kein Volltest-Projekt als Einstieg; wenige stabile, wartbare Checks reichen.
-   - Ergebnis soll in GitHub Actions oder einem klaren Script laufen koennen, damit der Nutzer nicht manuell lange Checklisten abarbeiten muss.
 
 3. `Merken / Fuer dich / Erinnern` nur auf vorhandener lokaler Profil-/Recommendation-Schicht aufbauen.
    - Keine Account-/Sync-Pflicht ohne ausdrueckliche Produktentscheidung.
