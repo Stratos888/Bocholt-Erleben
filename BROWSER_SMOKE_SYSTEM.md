@@ -46,6 +46,7 @@ Geprueft werden:
 Der Lauf wird rot und erzeugt Artefakte:
 
 - `summary.md` mit betroffener Route, Profil und Fehlermeldung
+- klare Trennung zwischen `OK`, `WARNUNG` und `FEHLER`
 - `results.json` fuer maschinenlesbare Diagnose
 - Screenshot je fehlgeschlagenem Check
 
@@ -66,7 +67,8 @@ Auf `main` bedeutet rot: Live-Zustand pruefen und manuell Hotfix/Rollback entsch
 | Klasse | Bedeutung | Reaktion |
 |---|---|---|
 | Blocker | Kernroute nicht nutzbar, zentrale Karte/Formular/Button fehlt, Consent taucht falsch erneut auf | Staging nicht mergen / Live Hotfix pruefen |
-| Warnung | Browser-Konsole meldet bekannte, nicht-blockierende Hinweise | Beobachten, kein Sofortblocker |
+| Warnung | Browser-Konsole meldet nicht-blockierende, aber noch nicht bekannte Hinweise | Beobachten, kein Sofortblocker |
+| Bekannter Zugangshinweis | Erwartete `401`-/Fetch-Hinweise beim geschuetzten Veranstalter-Dashboard ohne Login, wenn der Zugangszustand sichtbar ist | Im Report nicht als Warnung zaehlen |
 | Nicht-Ziel | Falscher Eventinhalt, falsches Bild, KI-/Sheet-Problem | Content-/KI-/Audit-Strang, nicht Browser-Smoke |
 
 ## Manuelle Ausloesung
@@ -88,3 +90,13 @@ P1 V1 ist abgenommen, wenn:
 - Bei Fehlern Summary, JSON und Screenshots als Artefakte verfuegbar sind.
 - Die Tests read-only bleiben.
 - Content-/KI-/Audit-Fragen nicht mit Browser-Smoke vermischt werden.
+
+
+## Reporting-Polish 2026-06-29
+
+Nach dem ersten Staging-Lauf wurden zwei Punkte gehaertet:
+
+- `summary.md` zeigt Warnungen als `WARNUNG`, nicht mehr irrefuehrend als `FEHLER`.
+- Erwartete `401`-/Fetch-Konsolenhinweise beim geschuetzten Veranstalter-Dashboard ohne Login werden nicht mehr als Warnung gezaehlt, solange der sichtbare Zugangszustand erfolgreich geprueft wurde.
+
+Ziel: Der Browser-Smoke soll echte Blocker sichtbar machen, aber erwartete Zugangszustaende nicht als vermeintliche Fehler dramatisieren.

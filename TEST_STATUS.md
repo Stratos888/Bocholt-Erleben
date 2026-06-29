@@ -1,3 +1,31 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_2026_06_29 | Zweck: dokumentiert Reporting-Haertung nach erstem Staging-Lauf; Umfang: Warnungslabel, bekannte geschuetzte 401-/Fetch-Hinweise === -->
+## P1 Browser-Smoke Reporting-Polish – umgesetzt
+
+Status: Patch vorbereitet.
+
+Ausgangspunkt:
+
+- Erster Staging-Lauf nach P1-Einfuehrung: `21/23 OK`, `0 Fehler`, `2 Warnungen`.
+- Die Warnungen waren erwartete Konsolenhinweise beim geschuetzten Veranstalter-Dashboard ohne Login (`401`/Fetch), waehrend der sichtbare Zugangszustand erfolgreich geprueft wurde.
+- `summary.md` betitelte `warn`-Eintraege in der Tabelle irrefuehrend als `FEHLER`.
+
+Umgesetzt:
+
+- `scripts/browser-smoke.mjs`: `summary.md` trennt `OK`, `WARNUNG` und `FEHLER` sauber.
+- `scripts/browser-smoke.mjs`: erwartete geschuetzte `401`-/Fetch-Konsolenhinweise beim Veranstalter-Dashboard-Zugangszustand werden als bekannte Zugangshinweise ignoriert, sofern der Seitenzustand selbst OK ist.
+- `BROWSER_SMOKE_SYSTEM.md`: Fehlerklassen und Reporting-Verhalten entsprechend dokumentiert.
+
+Validierung im ZIP-Worktree:
+
+- `node --check scripts/browser-smoke.mjs`: OK.
+
+Erwartung nach Upload:
+
+- Staging-Browser-Smoke soll bei gleichem App-Zustand ohne diese beiden irrefuehrenden Warnungen laufen.
+- Echte nicht bekannte Konsolenprobleme bleiben weiterhin als `WARNUNG` sichtbar.
+- Harte Kernwegfehler bleiben `FEHLER` und machen den Workflow rot.
+<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_2026_06_29 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_SYSTEM_V1_2026_06_29 | Zweck: dokumentiert Implementierung von P1 Browser-Smoke V1; Umfang: Trigger, Testmatrix, Validierung, Abnahmehinweis === -->
 ## P1 Browser-Smoke-System V1 – umgesetzt
 

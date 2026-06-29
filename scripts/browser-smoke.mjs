@@ -159,25 +159,39 @@ async function writeJson(filePath, data) {
   await fs.writeFile(filePath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
 }
 
+function statusLabel(status) {
+  if (status === 'ok') return 'OK';
+  if (status === 'warn') return 'WARNUNG';
+  return 'FEHLER';
+}
+
 async function writeSummary(outDir, results, startedAt, finishedAt, baseUrl) {
   const passed = results.filter((entry) => entry.status === 'ok').length;
-  const failed = results.filter((entry) => entry.status !== 'ok');
+  const failed = results.filter((entry) => entry.status === 'fail');
+  const warnings = results.filter((entry) => entry.status === 'warn');
   const lines = [
     '# Browser-Smoke',
     '',
     `Base URL: ${baseUrl}`,
     `Start: ${startedAt}`,
     `Ende: ${finishedAt}`,
-    `Ergebnis: ${passed}/${results.length} OK`,
+    `Ergebnis: ${passed}/${results.length} OK, ${failed.length} Fehler, ${warnings.length} Warnungen`,
     '',
     '| Status | Profil | Check | Pfad | Hinweis |',
     '|---|---|---|---|---|',
     ...results.map((entry) => {
-      const status = entry.status === 'ok' ? 'OK' : 'FEHLER';
+      const status = statusLabel(entry.status);
       const hint = entry.error ? entry.error.replace(/\|/g, '/') : '';
       return `| ${status} | ${entry.profile} | ${entry.name} | ${entry.path || ''} | ${hint} |`;
     }),
   ];
+
+  if (warnings.length) {
+    lines.push('', '## Warnungen', '');
+    warnings.forEach((entry) => {
+      lines.push(`- ${entry.name} (${entry.profile}${entry.path ? `, ${entry.path}` : ''}): ${entry.error || 'Warnung ohne Detail'}`);
+    });
+  }
 
   if (failed.length) {
     lines.push('', '## Fehler-Artefakte', '');
@@ -265,6 +279,38 @@ async function expectAnySelectorCount(page, selectors, timeoutMs = 12000) {
   );
 }
 
+
+function normalizeConsoleEntry(entry) {
+  const text = String(entry?.text || '');
+  const check = String(entry?.check || '');
+  const routePath = String(entry?.path || '');
+  const url = String(entry?.url || '');
+  return { text, check, path: routePath, url };
+}
+
+function isIgnoredConsoleNoise(entry) {
+  const { text, check, path: routePath, url } = normalizeConsoleEntry(entry);
+  const knownBrowserNoise = /favicon|apple-mobile-web-app-capable|beforeinstallprompt|Images loaded lazily/i.test(text);
+  if (knownBrowserNoise) return true;
+
+  const isProtectedAccessCheck =
+    check === 'Veranstalter Dashboard Zugangszustand' ||
+    /\/fuer-veranstalter\/dashboard\/?/.test(routePath) ||
+    /\/fuer-veranstalter\/dashboard\/?/.test(url);
+
+  const protectedAccessNoise =
+    isProtectedAccessCheck &&
+    (/Failed to load resource:\s*the server responded with a status of 401/i.test(text) ||
+      /App initialization failed:\s*TypeError:\s*Failed to fetch/i.test(text));
+
+  return protectedAccessNoise;
+}
+
+function formatConsoleWarning(entry) {
+  const { text, path: routePath } = normalizeConsoleEntry(entry);
+  return routePath ? `${routePath}: ${text}` : text;
+}
+
 async function checkRoute(page, baseUrl, route, timeoutMs) {
   await gotoReady(page, baseUrl, route.path, timeoutMs);
   await ensureNoFatal(page);
@@ -342,37 +388,68 @@ async function runProfile(browser, baseUrl, profileName, args, results) {
   const context = await createContext(browser, baseUrl, profileName, { consentState: 'denied' });
   const page = await context.newPage();
 
-  const consoleErrors = [];
+  const consoleEntries = [];
+  let activeCheck = null;
+
+  function captureConsoleEntry(text) {
+    let currentPath = '';
+    try {
+      currentPath = new URL(page.url()).pathname;
+    } catch (_) {}
+
+    consoleEntries.push({
+      text,
+      check: activeCheck?.name || '',
+      path: activeCheck?.path || currentPath,
+    });
+  }
+
   page.on('console', (message) => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
+    if (message.type() === 'error') captureConsoleEntry(message.text());
   });
-  page.on('pageerror', (error) => consoleErrors.push(error.message));
+  page.on('pageerror', (error) => captureConsoleEntry(error.message));
+
+  async function runChecked(name, routePath, callback) {
+    await runSingleCheck(results, page, args.outDir, profileName, name, routePath, async () => {
+      activeCheck = { name, path: routePath };
+      try {
+        await callback();
+      } finally {
+        activeCheck = null;
+      }
+    });
+  }
 
   try {
     for (const route of ROUTE_CHECKS) {
-      await runSingleCheck(results, page, args.outDir, profileName, route.name, route.path, async () => {
+      await runChecked(route.name, route.path, async () => {
         await checkRoute(page, baseUrl, route, args.timeoutMs);
       });
     }
 
     if (profileName === 'mobile') {
-      await runSingleCheck(results, page, args.outDir, profileName, 'Bottom-Tabbar Navigation', '/', async () => {
+      await runChecked('Bottom-Tabbar Navigation', '/', async () => {
         await checkBottomNavigation(page, baseUrl, args.timeoutMs);
       });
 
-      await runSingleCheck(results, page, args.outDir, profileName, 'Consent bleibt nach Tabwechsel weg', '/', async () => {
+      await runChecked('Consent bleibt nach Tabwechsel weg', '/', async () => {
         await checkConsentNavigationResync(browser, baseUrl, profileName, args.timeoutMs);
       });
     }
 
-    const hardConsoleErrors = consoleErrors.filter((entry) => !/favicon|apple-mobile-web-app-capable|beforeinstallprompt|Images loaded lazily/i.test(entry));
-    if (hardConsoleErrors.length > 0) {
+    const visibleConsoleWarnings = consoleEntries.filter((entry) => !isIgnoredConsoleNoise(entry));
+    const ignoredConsoleCount = consoleEntries.length - visibleConsoleWarnings.length;
+    if (ignoredConsoleCount > 0) {
+      console.log(`ℹ️ ${profileName}: ${ignoredConsoleCount} bekannte Konsolenhinweise ignoriert`);
+    }
+
+    if (visibleConsoleWarnings.length > 0) {
       results.push({
         profile: profileName,
         name: 'Browser-Konsole',
         path: '',
         status: 'warn',
-        error: hardConsoleErrors.slice(0, 3).join(' | '),
+        error: visibleConsoleWarnings.slice(0, 3).map(formatConsoleWarning).join(' | '),
       });
     }
   } finally {
