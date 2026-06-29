@@ -454,26 +454,30 @@ function initPrivacyConsentUi() {
   const content = document.createElement("div");
   content.className = "privacy-consent__content";
 
+  const kicker = document.createElement("div");
+  kicker.className = "privacy-consent__kicker";
+  kicker.textContent = "Datenschutz";
+
   const title = document.createElement("h2");
   title.id = "privacy-consent-title";
-  title.textContent = "Statistik erlauben?";
+  title.textContent = "Optionale Statistik";
 
   const copy = document.createElement("p");
-  copy.textContent = "Bocholt erleben kann anonyme Statistik nutzen, um Nutzung und Anbieter-Nutzwert zu messen. Ohne Zustimmung bleiben nur technisch notwendige Funktionen aktiv.";
+  copy.textContent = "Hilf uns zu verstehen, welche Inhalte gut funktionieren. Ohne Zustimmung bleibt alles vollständig nutzbar.";
 
   const actions = document.createElement("div");
   actions.className = "privacy-consent__actions";
   actions.append(
-    buildPrivacyButton("Nur notwendige", () => setStatisticsConsent(false)),
+    buildPrivacyButton("Ohne Statistik weiter", () => setStatisticsConsent(false)),
     buildPrivacyButton("Statistik erlauben", () => setStatisticsConsent(true), "primary")
   );
 
   const link = document.createElement("a");
   link.className = "privacy-consent__link";
   link.href = CONFIG.privacy.settingsUrl || "/datenschutz/#datenschutz-einstellungen";
-  link.textContent = "Details und Einstellungen";
+  link.textContent = "Details ansehen";
 
-  content.append(title, copy, actions, link);
+  content.append(kicker, title, copy, actions, link);
   banner.append(content);
   document.body.appendChild(banner);
 }
