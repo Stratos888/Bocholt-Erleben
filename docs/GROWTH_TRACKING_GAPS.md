@@ -37,6 +37,17 @@ Diese Punkte wären sinnvoll, sind aber im aktuellen Stand nicht als robuste Gro
 - Content-Audit-Ergebnisse als dauerhaftes Sheet-/JSON-Archiv pro Lauf
 - Visual-Korrekturen aus der Inbox als strukturierte Historie
 
+
+## Current Note 2026-06-29 – Abgrenzung zur Produktreife-Roadmap
+
+Neue Trackingquellen aus Nutzerbindung, z. B. Merkliste, Interessen, Reminder oder Card-Impressions, duerfen erst produktisiert bzw. als Growth-Signal genutzt werden, wenn der P0-Workpack `Datenschutz-/Tracking-Konsistenz` abgeschlossen ist.
+
+Bis dahin gilt:
+
+- keine neuen personenbezogenen oder nicht notwendigen Trackingquellen stillschweigend ergaenzen,
+- internes Nutzwerttracking und GA4 in Datenschutz/Consent konsistent klaeren,
+- Favoriten/Merkliste zuerst als lokales Nutzerfeature denken, nicht als Datenquelle.
+
 ## Zielregel
 
 Es sollen keine Rohdaten blind in das Backlog geschrieben werden. Neue Trackingquellen müssen zuerst zu deduplizierten Arbeitspaketen verdichtet werden:

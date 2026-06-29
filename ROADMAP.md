@@ -1,3 +1,142 @@
+<!-- === BEGIN BLOCK: ROADMAP_PRODUCT_MATURITY_NON_CONTENT_2026_06_29 | Zweck: validierte Nicht-Content-Roadmap nach Gesamtprojektanalyse; Umfang: Produktreife, Nutzerbindung, Standort, Anbieter-/Rechtsreife, technische Konsolidierung; Content-Live-Lauf, KI-Suche und Content-Pruefung bewusst ausgeklammert === -->
+## Product-Maturity-Roadmap ohne Content-Operation – Stand 2026-06-29
+
+Dieser Block ist die aktuelle Einstiegsschicht fuer **nicht-contentbezogene** Folgearbeiten. Der Content-/KI-/Audit-Betriebsstrang bleibt separat im bisherigen Current-Owner-Block dokumentiert und wird durch diesen Block nicht neu bewertet.
+
+### Validierte Ausgangslage
+
+Die App ist fuer den aktuellen Stand kein Feature-Rohbau mehr. Events, Activities, Anbieter-/Zahlungslogik, Mail-System, Visual-System und Betriebsdokumentation sind weit aufgebaut. Die naechsten groesseren Arbeiten sollen deshalb nicht weitere Einzelinhalte oder neue KI-Automation sein, sondern Produktreife fuer echte Nutzer und zahlende Anbieter.
+
+Validierungsbefunde aus dem Repo-Stand:
+
+- `config.js` aktiviert GA4 und internes Nutzwerttracking ueber `/api/value-track.php`; `/datenschutz/` sagt aktuell noch, dass keine Tracking- und Analyse-Tools eingesetzt werden. Das ist ein P0-Konsistenzproblem.
+- `js/user-preferences.js` und `js/recommendations.js` enthalten bereits lokale Interessen-, Merkliste-, Ausblendungs- und Empfehlungslogik; daraus ist aber noch kein klares Nutzerfeature mit sichtbarer Merken-/Fuer-dich-/Erinnern-UX geworden.
+- `data/offers.json` nutzt Ortsnamen und `maps_query`, aber keine robusten Koordinatenfelder; echte Naehe-, Karten- oder Umkreissortierung ist damit noch kein Produktfeature.
+- Anbieterbereich, Stripe-/Abo-Flows, Magic Link, Mail-System und Nutzwertmetriken sind technisch vorhanden; der naechste Hebel ist Verkaufsverstaendlichkeit, nicht ein kompletter Neubau.
+- CSS/JS sind funktional, aber historisch gewachsen (`css/home.css`, `css/pages.css`, `css/overlays.css`, `js/today-home.js`, `js/details.js`, `js/organizer-portal.js`). Neue groessere Features brauchen vorher oder parallel klarere Owner-Grenzen und einfache Browser-Smoke-Tests.
+
+### Reihenfolge der naechsten groesseren Baustellen
+
+#### 1. P0 – Datenschutz-/Tracking-Konsistenz herstellen
+
+Ziel: Technik, Datenschutzerklaerung und ggf. Einwilligungslogik muessen dasselbe sagen.
+
+Warum zuerst: Vertrauen und Rechtssicherheit. Eine App darf nicht intern messen und oeffentlich behaupten, es gebe kein Tracking.
+
+Akzeptanzkriterien:
+
+- Es ist entschieden, ob GA4 aktiv bleibt, angepasst wird oder deaktiviert wird.
+- `/datenschutz/` beschreibt den tatsaechlichen Stand von GA4, internem Nutzwerttracking, LocalStorage, Push, Formspree, Stripe und Anbieterbereich konsistent.
+- Falls eine Einwilligung noetig ist, wird sie vor nicht notwendiger Analyseverarbeitung eingeholt.
+- Internes Nutzwerttracking fuer Anbieterberichte bleibt klar von allgemeinem Marketingtracking getrennt dokumentiert.
+
+#### 2. P1 – Browser-Smoke-Tests fuer Kernwege einfuehren
+
+Ziel: Vor groesseren Produktfeatures einfache echte Browserpruefungen haben, nicht nur Syntaxchecks.
+
+Warum jetzt: Die App hat viele kritische UI- und Funnelpfade. Ohne Browser-Smoke-Tests werden neue Featurearbeiten riskanter.
+
+Erste Teststrecken:
+
+- Startseite laedt und zeigt Today-Karten.
+- Events-Seite laedt; Mobile-Detailpanel und Desktop-Direct-Outbound bleiben gemaess Policy intakt.
+- Aktivitaeten-Seite laedt; Mobile-Detailpanel funktioniert.
+- Event einreichen, Aktivitaet einreichen, Zahlung-starten-Seite, Anbieterlogin und Anbieter-Dashboard laden grundsaetzlich.
+
+Nicht-Ziel: Kein grosses Testframework-Projekt mit Vollabdeckung. Erst wenige robuste Kernpfade.
+
+#### 3. P1 – Nutzerbindung: Merken / Fuer dich / Erinnern produktreif machen
+
+Ziel: Aus vorhandener lokaler Empfehlungslogik ein sichtbares Nutzerfeature machen.
+
+Warum: Die App soll nicht nur eine schoene Liste sein, sondern Nutzern helfen, wiederzukommen und relevante Dinge schneller zu finden.
+
+Moeglicher V1-Zuschnitt:
+
+- Event oder Aktivitaet merken.
+- Gemerkte Inhalte auf Today oder eigener kompakter Ansicht zeigen.
+- Interessen einfach setzen/aendern.
+- `Fuer dich` sichtbarer erklaeren, ohne lange Texte.
+- Erinnern/Push nur nach Datenschutz-/Einwilligungsentscheidung und nur, wenn der Nutzen klar ist.
+
+Akzeptanzkriterien:
+
+- Nutzer versteht ohne Konto, was lokal gespeichert wird.
+- Merken funktioniert fuer Events und Activities konsistent.
+- Keine Account-/Sync-Pflicht.
+- Datenschutztext und UI-Hinweise passen zusammen.
+
+#### 4. P1/P2 – Standort-/Karten-/Naehe-Schicht aufbauen
+
+Ziel: Lokale Nutzbarkeit verbessern: Wo ist es, wie komme ich hin, was ist in der Naehe?
+
+Warum: Eine lokale App ohne echte Naehe-/Kartenlogik verschenkt einen Kernnutzen.
+
+Moeglicher V1-Zuschnitt:
+
+- Koordinatenmodell fuer Activities und wichtige Locations definieren.
+- Datenpflege fuer `lat`/`lng` oder kanonische Location-IDs einfuehren.
+- Karten-/Routenlinks vereinheitlichen.
+- Optional: einfache Kartenansicht oder `in der Naehe`-Sortierung, aber erst nach Datenmodell.
+
+Nicht-Ziel: Sofort eine komplexe Live-Karte mit Geolocation-Zwang.
+
+#### 5. P2 – Anbieterbereich und Verkaufsstrecke verkaufsfertig machen
+
+Ziel: Ein echter Veranstalter soll sofort verstehen, was er bekommt, was zu tun ist und welchen Nutzen Bocholt erleben liefert.
+
+Warum: Die Technik ist vorhanden; jetzt zaehlt Verstaendlichkeit und Abschlussfaehigkeit.
+
+Pruefpunkte:
+
+- Startseite fuer Veranstalter / Sichtbar-werden-Seiten: Leistungsversprechen, Ablauf, Preis, Grenzen.
+- Anbieter-Dashboard: Status, naechste Aktion, Zahlungs-/Abo-Status und Nutzwertdaten fuer Laien erklaeren.
+- Billing Portal, Kuendigung/Aenderung, Ablehnung und redaktionelle Pruefung eindeutig formulieren.
+- Nutzwertdaten nicht ueberverkaufen; erst nach belastbaren Daten als Akquisebeleg nutzen.
+
+#### 6. P2 – Recht-/Verkaufsseiten fuer bezahlte Produkte haerten
+
+Ziel: Die oeffentlichen Texte zu Zahlung, Laufzeit, Kuendigung, Ablehnung, Widerruf/AGB und Datenschutz muessen zur Produktlogik im `Produktvertrag.md` passen.
+
+Warum: Bei bezahlten Produkten sind unklare Erwartungen gefaehrlich.
+
+Akzeptanzkriterien:
+
+- Oeffentliche Leistungsbeschreibung widerspricht nicht dem Produktvertrag.
+- Zahlung wird nicht als automatische Veroeffentlichung verkauft.
+- Redaktionelle Pruefung, Ablehnung, Zahlung, Laufzeit und Kuendigung sind verstaendlich.
+- Kein interner Begriff wie Token/Kontingent wird als oeffentliche Produktbotschaft genutzt.
+
+#### 7. P2/P3 – UI-/CSS-/JS-Konsolidierung gezielt fortsetzen
+
+Ziel: Historisch gewachsene UI- und JS-Bloecke stabiler wartbar machen.
+
+Warum: Die App funktioniert, aber weitere grosse Features werden sonst zunehmend riskant.
+
+Regel:
+
+- Keine komplette Neuarchitektur.
+- Nur owner-file-orientierte Konsolidierung, wenn ein konkreter Feature- oder Bugfix-Kontext es rechtfertigt.
+- Gemeinsame Card-, Detailpanel-, Funnel- und Dashboard-Muster schrittweise vereinheitlichen.
+
+### Nicht Teil dieser Roadmap
+
+- KI-Suchlauf, Content-Audit, Inbox-Content-Routing und Dienstag-/Mittwoch-Liveprozess.
+- Neue Event-Bildproduktion ohne konkreten Gap.
+- SEO-/Growth-Landingpages ohne belastbare Daten.
+- Pauschale UI-Komplettüberarbeitung ohne konkreten Nutzer- oder Anbieterbefund.
+
+### Empfohlener erster Workpack
+
+Als naechstes nicht-contentbezogenes Workpack gilt:
+
+```text
+P0 Datenschutz-/Tracking-Konsistenz herstellen
+```
+
+Direkt danach sollte ein kleiner Browser-Smoke-Test-Grundstock folgen, bevor `Merken / Fuer dich / Erinnern` oder Standort-/Kartenlogik groesser angefasst werden.
+<!-- === END BLOCK: ROADMAP_PRODUCT_MATURITY_NON_CONTENT_2026_06_29 === -->
+
 <!-- === BEGIN BLOCK: ROADMAP_CURRENT_OWNER_VIEW_2026_06_27 | Zweck: current-first Status fuer Projektbesitzer nach Doku-Abgleich; Umfang: echte naechste Workpacks, abgeschlossene Punkte, kleine Rest-To-dos, Dokumentationshygiene === -->
 ## Current Owner Roadmap – Stand 2026-06-27
 

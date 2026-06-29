@@ -1,3 +1,36 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_PRODUCT_MATURITY_ROADMAP_VALIDATION_2026_06_29 | Zweck: dokumentiert Validierung der nicht-contentbezogenen Produktreife-Roadmap gegen den aktuellen Repo-Stand; Umfang: Befunde, Reihenfolge, keine Implementierung === -->
+## Produktreife-Roadmap ohne Content-Operation – Validierung 2026-06-29
+
+Status: Roadmap validiert und in `ROADMAP.md` / `MASTER.md` als eigener Nicht-Content-Strang eingetragen.
+
+Bewusst ausgeklammert:
+
+- Dienstag-/Mittwoch-Liveprozess.
+- KI-Suche.
+- Content-Audit.
+- Inbox-Content-Routing.
+
+Validierte Befunde:
+
+- Datenschutz/Tracking: `config.js` aktiviert GA4 (`G-Y6QLCQ4HXT`) und internes Nutzwerttracking ueber `/api/value-track.php`; `/datenschutz/` sagt noch `kein Tracking und keine Analyse-Tools`. Daraus folgt P0: Datenschutz-/Tracking-Konsistenz herstellen.
+- Nutzerbindung: `js/user-preferences.js` und `js/recommendations.js` enthalten lokale Interessen-, Merkliste-, Ausblendungs- und Scoring-Grundlagen; sichtbar produktisiert ist `Merken / Fuer dich / Erinnern` noch nicht. Daraus folgt P1 nach Datenschutz-/Smoke-Test-Grundlage.
+- Standort/Naehe: `data/offers.json` enthaelt Ortsnamen, `maps_query` und `maps_label`, aber keine robusten Koordinatenfelder fuer Activities. Daraus folgt P1/P2 Standort-/Karten-/Naehe-Schicht.
+- Anbieter/Monetarisierung: Anbieterbereich, Stripe-/Abo-Flows, Magic-Link, Mail-System und Nutzwertmetriken sind technisch vorhanden. Daraus folgt kein Neubau, sondern Verkaufsverstaendlichkeit und oeffentliche Rechts-/Leistungsseiten haerten.
+- Technik: Mehrere zentrale CSS-/JS-Dateien sind gross und historisch gewachsen; Syntax-/Auditchecks reichen nicht als Nutzerflussbeweis. Daraus folgt zuerst kleiner Browser-Smoke-Test-Grundstock, danach gezielte Konsolidierung.
+
+Validierte Reihenfolge:
+
+1. P0 Datenschutz-/Tracking-Konsistenz.
+2. P1 Browser-Smoke-Tests fuer Kernwege.
+3. P1 Nutzerbindung: Merken / Fuer dich / Erinnern.
+4. P1/P2 Standort-/Karten-/Naehe-Schicht.
+5. P2 Anbieterbereich und Verkaufsstrecke verkaufsfertig machen.
+6. P2 Recht-/Verkaufsseiten fuer bezahlte Produkte haerten.
+7. P2/P3 UI-/CSS-/JS-Konsolidierung gezielt fortsetzen.
+
+Diese Validierung ist ein Planungs-/Doku-Stand. Sie implementiert keine Datenschutz-, Tracking-, Consent-, Karten- oder Browser-Test-Aenderung.
+<!-- === END BLOCK: TEST_STATUS_PRODUCT_MATURITY_ROADMAP_VALIDATION_2026_06_29 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_CURRENT_DOKU_ABGLEICH_2026_06_27 | Zweck: korrigiert den aktuellen Test-/Statusindex nach Roadmap-/Doku-Abgleich; Umfang: erledigte Punkte, echte offene Beweise, kleine Rest-To-dos === -->
 ## Aktueller Test- und Statusabgleich – 2026-06-27
 

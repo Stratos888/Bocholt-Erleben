@@ -2,7 +2,7 @@
 
 # Mail-System V1
 
-Status: Pilot festgelegt / noch nicht technisch umgesetzt.
+Status: V1 umgesetzt und getestet; dieses Dokument ist der kanonische Mail-Contract und kein offener Implementierungsauftrag.
 
 Dieser Contract definiert Sprache, Formatierung und visuelle Systematik für vorgefertigte Systemmails von Bocholt erleben.
 
@@ -17,6 +17,18 @@ Er gilt für:
 Ziel ist ein einheitlicher, persönlicher und hochwertiger Mail-Auftritt, der zur Produkt- und Designsprache von Bocholt erleben passt.
 
 ---
+
+<!-- === BEGIN BLOCK: MAIL_SYSTEM_CURRENT_STATUS_2026_06_29 | Zweck: verhindert erneutes Oeffnen des Mail-Systems als Grossbaustelle; Umfang: Statusklaerung und Abgrenzung zur Produktreife-Roadmap === -->
+## Aktueller Status 2026-06-29
+
+Mail-System V1 ist umgesetzt und getestet. Weitere Mailarbeit ist nur noetig, wenn:
+
+- ein konkretes neues Mailtopic entsteht,
+- ein Zustell-/Darstellungsfehler belegt ist,
+- oeffentliche Verkaufs-/Rechtstexte neue Pflichtinformationen in bestehenden Mails erfordern.
+
+Das Mail-System ist nicht Teil der naechsten groesseren Produktbaustellen. Es kann aber beim Workpack `Anbieterbereich und Verkaufsstrecke verkaufsfertig machen` punktuell betroffen sein.
+<!-- === END BLOCK: MAIL_SYSTEM_CURRENT_STATUS_2026_06_29 === -->
 
 ## 1. Grundsatz
 
