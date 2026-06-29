@@ -481,14 +481,14 @@ function initPrivacyConsentUi() {
   const actions = document.createElement("div");
   actions.className = "privacy-consent__actions";
   actions.append(
-    buildPrivacyButton("Ohne Statistik weiter", () => setStatisticsConsent(false)),
+    buildPrivacyButton("Ohne Statistik", () => setStatisticsConsent(false)),
     buildPrivacyButton("Statistik erlauben", () => setStatisticsConsent(true), "primary")
   );
 
   const link = document.createElement("a");
   link.className = "privacy-consent__link";
   link.href = CONFIG.privacy.settingsUrl || "/datenschutz/#datenschutz-einstellungen";
-  link.textContent = "Details ansehen";
+  link.textContent = "Details & Einstellungen";
 
   content.append(kicker, title, copy, actions, link);
   banner.append(content);
