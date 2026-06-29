@@ -52,6 +52,7 @@ const CONFIG = {
     statisticsConsentStorageKey: "be_statistics_consent_v1",
     statisticsConsentCookieName: "be_statistics_consent",
     statisticsConsentMaxAgeDays: 180,
+    consentUiHosts: ["bocholt-erleben.de", "www.bocholt-erleben.de", "staging.bocholt-erleben.de"],
     settingsUrl: "/datenschutz/#datenschutz-einstellungen"
   },
   /* === END BLOCK: GA4_RUNTIME_CONFIG_AND_VALUE_METRICS_V4 === */
@@ -84,6 +85,18 @@ function isAnalyticsHostAllowed() {
 
   const host = String(window.location.hostname || "").toLowerCase();
   return CONFIG.analytics.enabledHosts.includes(host);
+}
+
+function isConsentUiHostAllowed() {
+  if (typeof window === "undefined" || typeof document === "undefined") return false;
+  if (IS_LOCAL) return false;
+
+  const host = String(window.location.hostname || "").toLowerCase();
+  const hosts = Array.isArray(CONFIG.privacy?.consentUiHosts)
+    ? CONFIG.privacy.consentUiHosts
+    : CONFIG.analytics.enabledHosts;
+
+  return hosts.includes(host);
 }
 
 function getCookieValue(name) {
@@ -162,7 +175,7 @@ function resetStatisticsConsent() {
 }
 
 function shouldOfferStatisticsConsent() {
-  return isAnalyticsHostAllowed() && !hasStatisticsConsentChoice();
+  return isConsentUiHostAllowed() && !hasStatisticsConsentChoice();
 }
 
 function shouldEnableAnalytics() {
@@ -489,14 +502,16 @@ function updatePrivacySettingsPanel() {
   if (!panel) return;
 
   const state = getStatisticsConsentState();
-  const isActiveHost = isAnalyticsHostAllowed();
-  const statusLabel = !isActiveHost
+  const isConsentHost = isConsentUiHostAllowed();
+  const isAnalyticsHost = isAnalyticsHostAllowed();
+  const stagingSuffix = isConsentHost && !isAnalyticsHost ? " (Staging-Vorschau, kein Analytics-Start)" : "";
+  const statusLabel = !isConsentHost
     ? "Auf dieser Umgebung nicht aktiv"
     : state === "granted"
-      ? "Statistik erlaubt"
+      ? `Statistik erlaubt${stagingSuffix}`
       : state === "denied"
-        ? "Nur notwendige Funktionen"
-        : "Noch keine Auswahl";
+        ? `Nur notwendige Funktionen${stagingSuffix}`
+        : `Noch keine Auswahl${stagingSuffix}`;
 
   panel.innerHTML = `
     <div class="privacy-settings__status">
