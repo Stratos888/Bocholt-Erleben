@@ -526,34 +526,149 @@ function getCategoryPresentation(category) {
     return meaningfulTags.slice(0, Math.max(0, Number.isFinite(limit) ? limit : meaningfulTags.length));
   }
 
+  const seasonalCardNoiseTokens = new Set([
+    "aktuell",
+    "besonders",
+    "freigegeben",
+    "geeignet",
+    "gute",
+    "guter",
+    "gutes",
+    "jetzt",
+    "pruefen",
+    "saison",
+    "sommersaison",
+    "und",
+    "zeit"
+  ]);
+
+  function normalizeSeasonalToken(token) {
+    let value = normalizeComparable(token).replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, "");
+    if (!value) return "";
+
+    ["oeffnung", "saison", "zeit"].forEach((suffix) => {
+      if (value.length > suffix.length + 3 && value.endsWith(suffix)) {
+        value = value.slice(0, -suffix.length);
+      }
+    });
+
+    if (value.length > 4 && value.endsWith("s")) value = value.slice(0, -1);
+    if (seasonalCardNoiseTokens.has(value)) return "";
+    return value.length >= 4 ? value : "";
+  }
+
+  function tokenizeSeasonalCardText(value) {
+    return normalizeComparable(value)
+      .replace(/ß/g, "ss")
+      .replace(/[^a-z0-9]+/g, " ")
+      .split(" ")
+      .map((entry) => normalizeSeasonalToken(entry))
+      .filter(Boolean);
+  }
+
+  function buildSeasonalCardTermSet(offer) {
+    const highlights = Array.isArray(offer?.seasonal_highlights)
+      ? offer.seasonal_highlights
+      : Array.isArray(offer?.seasonalHighlights)
+        ? offer.seasonalHighlights
+        : [];
+
+    const terms = new Set();
+    highlights.forEach((highlight) => {
+      if (!highlight || typeof highlight !== "object") return;
+
+      [
+        highlight.short_label,
+        highlight.shortLabel,
+        highlight.label,
+        highlight.detail_label,
+        highlight.detailLabel
+      ].forEach((entry) => {
+        tokenizeSeasonalCardText(entry).forEach((token) => terms.add(token));
+      });
+    });
+
+    return terms;
+  }
+
+  function isSeasonalCardTerm(offer, value) {
+    const tokens = tokenizeSeasonalCardText(value);
+    if (!tokens.length) return false;
+
+    const seasonalTerms = buildSeasonalCardTermSet(offer);
+    if (!seasonalTerms.size) return false;
+
+    return tokens.every((token) => seasonalTerms.has(token));
+  }
+
+  function getCardTagItems(offer, limit = Infinity) {
+    const rankedTags = getRankedTagItems(offer, Infinity)
+      .filter((tag) => !isSeasonalCardTerm(offer, tag));
+
+    return rankedTags.slice(0, Math.max(0, Number.isFinite(limit) ? limit : rankedTags.length));
+  }
+
+  function getCardCuratedFacts(offer, limit = Infinity) {
+    const facts = Array.isArray(offer?.cardFacts)
+      ? offer.cardFacts.map((entry) => toSingleLine(entry)).filter(Boolean)
+      : [];
+    const filtered = facts.filter((entry) => !isSeasonalCardTerm(offer, entry));
+
+    return filtered.slice(0, Math.max(0, Number.isFinite(limit) ? limit : filtered.length));
+  }
+
+  function cardFactKey(value) {
+    return normalizeComparable(value).replace(/^jetzt\s*:?\s*/, "");
+  }
+
+  function pushCardFact(target, seen, offer, entry, options = {}) {
+    const value = toSingleLine(entry);
+    if (!value) return;
+    if (!options.keepSeasonalSignal && isSeasonalCardTerm(offer, value)) return;
+
+    const key = cardFactKey(value);
+    if (!key || seen.has(key)) return;
+
+    seen.add(key);
+    target.push(value);
+  }
+
+  function compactCardFacts(offer, groups, limit) {
+    const items = [];
+    const seen = new Set();
+    groups.forEach((group) => {
+      const entries = Array.isArray(group?.entries) ? group.entries : [];
+      entries.forEach((entry) => {
+        if (items.length >= limit) return;
+        pushCardFact(items, seen, offer, entry, { keepSeasonalSignal: group.keepSeasonalSignal === true });
+      });
+    });
+    return items;
+  }
+
   /* === BEGIN BLOCK: ACTIVITIES_CARD_SUPPORTING_MATCH_SUMMARY_V1 | Zweck: nutzt bei aktiven Filtern die Card-Zeile auf Mobile als direkte Passungsbegründung statt nur als allgemeine Tag-Zeile; Umfang: ersetzt nur pickSupportingLabel(offer) === */
   function pickSupportingLabel(offer) {
     const activeMatches = Array.isArray(offer?.activeMatchLabels)
       ? offer.activeMatchLabels.map((entry) => toSingleLine(entry)).filter(Boolean)
       : [];
 
+    const highlightLabel = getActiveHighlightLabel(offer);
     const statusLabel = getConditionStatusCardLabel(offer);
 
     if (activeMatches.length) {
-      const merged = [];
-      const seen = new Set();
-
-      [getActiveHighlightLabel(offer), statusLabel, ...activeMatches, ...getRankedTagItems(offer, 3)].forEach((entry) => {
-        const value = toSingleLine(entry);
-        const key = normalizeComparable(value);
-        if (!value || seen.has(key)) return;
-
-        seen.add(key);
-        merged.push(value);
-      });
-
-      return merged.slice(0, 3).join(" · ");
+      return compactCardFacts(offer, [
+        { entries: [highlightLabel, statusLabel], keepSeasonalSignal: true },
+        { entries: activeMatches },
+        { entries: getCardTagItems(offer, 2) }
+      ], 3).join(" · ");
     }
 
-    const highlightLabel = getActiveHighlightLabel(offer);
-    const primaryTags = getRankedTagItems(offer, 2);
+    const primaryTags = getCardTagItems(offer, highlightLabel || statusLabel ? 1 : 2);
     if (highlightLabel || statusLabel) {
-      return [highlightLabel, statusLabel, ...primaryTags].filter(Boolean).slice(0, 3).join(" · ");
+      return compactCardFacts(offer, [
+        { entries: [highlightLabel, statusLabel], keepSeasonalSignal: true },
+        { entries: primaryTags }
+      ], 2).join(" · ");
     }
 
     if (primaryTags.length) return primaryTags.join(" · ");
@@ -573,37 +688,30 @@ function getCategoryPresentation(category) {
 
     const activeHighlightLabel = getActiveHighlightLabel(offer);
     const statusLabel = getConditionStatusCardLabel(offer);
-    const primaryTags = getRankedTagItems(offer, 3);
-    const curatedFacts = Array.isArray(offer?.cardFacts)
-      ? offer.cardFacts.map((entry) => toSingleLine(entry)).filter(Boolean)
-      : [];
-
+    const hasTimeSensitiveSignal = Boolean(activeHighlightLabel || statusLabel);
+    const primaryTags = getCardTagItems(offer, hasTimeSensitiveSignal ? 1 : 3);
+    const curatedFacts = getCardCuratedFacts(offer, hasTimeSensitiveSignal ? 1 : 3);
     const fallbackFacts = [offer?.duration, offer?.mode, offer?.price]
       .map((entry) => toSingleLine(entry))
       .filter(Boolean);
 
     if (activeMatches.length) {
-      const merged = [];
-      const seen = new Set();
-
-      [activeHighlightLabel, statusLabel, ...activeMatches, ...primaryTags, ...curatedFacts, ...fallbackFacts].forEach((entry) => {
-        const value = toSingleLine(entry);
-        const key = normalizeComparable(value);
-        if (!value || seen.has(key)) return;
-
-        seen.add(key);
-        merged.push(value);
-      });
-
-      return merged.slice(0, 3);
+      return compactCardFacts(offer, [
+        { entries: [activeHighlightLabel, statusLabel], keepSeasonalSignal: true },
+        { entries: activeMatches },
+        { entries: primaryTags },
+        { entries: curatedFacts },
+        { entries: fallbackFacts }
+      ], 3);
     }
 
-    if (activeHighlightLabel || statusLabel) {
-      return [activeHighlightLabel, statusLabel, ...primaryTags, ...curatedFacts, ...fallbackFacts]
-        .map((entry) => toSingleLine(entry))
-        .filter(Boolean)
-        .filter((entry, index, list) => list.findIndex((item) => normalizeComparable(item) === normalizeComparable(entry)) === index)
-        .slice(0, 3);
+    if (hasTimeSensitiveSignal) {
+      return compactCardFacts(offer, [
+        { entries: [activeHighlightLabel, statusLabel], keepSeasonalSignal: true },
+        { entries: primaryTags },
+        { entries: curatedFacts },
+        { entries: fallbackFacts }
+      ], 2);
     }
 
     if (primaryTags.length) {

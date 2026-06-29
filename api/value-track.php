@@ -158,14 +158,17 @@ if (!be_value_metrics_same_origin_allowed()) {
     ]);
 }
 
-/* === BEGIN BLOCK: VALUE_METRICS_SERVER_OPTOUT_V1 | Zweck: ignoriert eigene Geräte mit Opt-out-Cookie, damit interne Testklicks nicht in Nutzwert-Metriken landen; Umfang: ergänzt serverseitigen Guard vor Payload-Verarbeitung === */
-if (trim((string)($_COOKIE['be_value_metrics_opt_out'] ?? '')) === '1') {
+/* === BEGIN BLOCK: VALUE_METRICS_SERVER_CONSENT_GUARD_V1 | Zweck: akzeptiert interne Nutzwertmetriken nur nach expliziter Statistik-Zustimmung; Umfang: ersetzt serverseitigen Opt-out-Guard vor Payload-Verarbeitung === */
+$statisticsConsent = trim((string)($_COOKIE['be_statistics_consent'] ?? ''));
+$legacyOptOut = trim((string)($_COOKIE['be_value_metrics_opt_out'] ?? ''));
+
+if ($statisticsConsent !== 'granted' || $legacyOptOut === '1') {
     be_json_response(200, [
         'status' => 'ignored',
-        'reason' => 'opt_out',
+        'reason' => $legacyOptOut === '1' ? 'opt_out' : 'statistics_consent_missing',
     ]);
 }
-/* === END BLOCK: VALUE_METRICS_SERVER_OPTOUT_V1 === */
+/* === END BLOCK: VALUE_METRICS_SERVER_CONSENT_GUARD_V1 === */
 
 $rawBody = file_get_contents('php://input') ?: '';
 $payload = json_decode($rawBody, true);

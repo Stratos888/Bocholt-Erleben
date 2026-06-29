@@ -2,7 +2,7 @@
 
 # Mail-System V1
 
-Status: Pilot festgelegt / noch nicht technisch umgesetzt.
+Status: V1 umgesetzt und getestet; dieses Dokument ist der kanonische Mail-Contract und kein offener Implementierungsauftrag.
 
 Dieser Contract definiert Sprache, Formatierung und visuelle Systematik für vorgefertigte Systemmails von Bocholt erleben.
 
@@ -17,6 +17,18 @@ Er gilt für:
 Ziel ist ein einheitlicher, persönlicher und hochwertiger Mail-Auftritt, der zur Produkt- und Designsprache von Bocholt erleben passt.
 
 ---
+
+<!-- === BEGIN BLOCK: MAIL_SYSTEM_CURRENT_STATUS_2026_06_29 | Zweck: verhindert erneutes Oeffnen des Mail-Systems als Grossbaustelle; Umfang: Statusklaerung und Abgrenzung zur Produktreife-Roadmap === -->
+## Aktueller Status 2026-06-29
+
+Mail-System V1 ist umgesetzt und getestet. Weitere Mailarbeit ist nur noetig, wenn:
+
+- ein konkretes neues Mailtopic entsteht,
+- ein Zustell-/Darstellungsfehler belegt ist,
+- oeffentliche Verkaufs-/Rechtstexte neue Pflichtinformationen in bestehenden Mails erfordern.
+
+Das Mail-System ist nicht Teil der naechsten groesseren Produktbaustellen. Es kann aber beim Workpack `Anbieterbereich und Verkaufsstrecke verkaufsfertig machen` punktuell betroffen sein.
+<!-- === END BLOCK: MAIL_SYSTEM_CURRENT_STATUS_2026_06_29 === -->
 
 ## 1. Grundsatz
 
@@ -332,14 +344,29 @@ Die einzelnen Endpunkte sollen nur noch fachliche Daten liefern:
 
 ---
 
-## 12. Noch nicht erledigt
+## 12. Umsetzungsstatus 2026-06-27
 
-Noch offen:
-- zentralen HTML-Mail-Renderer implementieren
-- bestehende `be_send_mail()`-Signatur prüfen und sauber erweitern
-- Pilot-Mail technisch migrieren
-- echte Mailzustellung auf Staging prüfen
-- Darstellung in mindestens Gmail, Outlook und mobiler Mailansicht grob prüfen
-- danach weitere Mails einzeln migrieren
+Der Mail-System-Contract ist nicht mehr als offener Implementierungsauftrag zu lesen.
+
+Aktueller Stand:
+
+- zentrale Topic-Logik in `api/_bootstrap.php` umgesetzt,
+- HTML-Mail und Plain-Text-Fallback zentral ableitbar,
+- neun Mailtopics im Sammeltest geprüft,
+- Pilot- und Zahlungslink-/Statusmails als Systempfad dokumentiert,
+- dieses Dokument bleibt Referenz fuer Ton, Aufbau, Komponenten und kuenftige neue Mailtopics.
+
+Weitere Arbeit nur bei konkretem Anlass:
+
+- neues fachliches Mailtopic,
+- nachgewiesener Zustellfehler,
+- Darstellungsproblem in einem relevanten Mailclient,
+- geaenderter Zahlungs-/Freigabeprozess mit neuen Pflichtinformationen.
+
+Keine offene Standardaufgabe mehr:
+
+- kein pauschaler Neubau des Mail-Renderers,
+- keine blinde Migration ohne neuen Mailfall,
+- keine neue Mail-Designrunde ohne Symptom.
 
 <!-- === END FILE: MAIL_SYSTEM.md | Zweck: kanonischer Mail-System-Contract für vorgefertigte Bocholt-erleben-Systemmails; Umfang: Sprache, Layout, Formatierung, Pilot-Mail und Migrationsregeln === -->

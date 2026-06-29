@@ -1,6 +1,21 @@
 # Bathing Water Guard V1
 
-Status: report-only proof workflow.
+<!-- === BEGIN BLOCK: BATHING_WATER_GUARD_CURRENT_STATUS_2026_06_27 | Zweck: current-first Einordnung fuer Badegewaesser-Guard nach Safe-Writeback-Validierung; Umfang: Status, naechster Umgang === -->
+## Current Status 2026-06-27
+
+Der aktuelle Badegewaesser-Stand ist Guard V2, auch wenn die Workflow-Datei historisch `bathing-water-guard-v1.yml` heisst.
+
+Status:
+
+- Safe-Writeback nach `data/bathing_water_status.json` ist auf Staging validiert.
+- Frontend-Override ist validiert.
+- Keine Badeempfehlung wird ohne finalen Guard-Status `ok` ausgespielt.
+- Naechster Schritt ist Main-/Schedule-Beobachtung, kein neuer Proof- oder Architektur-Workpack.
+
+<!-- === END BLOCK: BATHING_WATER_GUARD_CURRENT_STATUS_2026_06_27 === -->
+
+
+Status: Guard V2 safe-writeback workflow; historic file name retained.
 
 ## Ziel
 
@@ -11,19 +26,24 @@ Der Guard prueft offizielle Badegewaesserquellen fuer die zustandsabhaengigen Ac
 - Proebstingsee Borken
 - Auesee Wesel
 
-Ziel ist ein tagesaktueller Schutz gegen falsche Badeempfehlungen. Der Guard erzeugt zunaechst nur ein Artefakt und schreibt keine Produktdaten.
+Ziel ist ein tagesaktueller Schutz gegen falsche Badeempfehlungen. Der aktuelle V2-Stand schreibt eine getrennte generierte Statusdatei (`data/bathing_water_status.json`) und laesst `data/offers.json` unveraendert.
 
 ## Nicht-Ziel
 
-Dieser Workpack aktiviert keine Bade-Highlights automatisch.
+Dieser Workpack aktiviert Bade-Highlights nicht blind.
 
 Nicht enthalten:
 
 - kein Writeback nach `data/offers.json`
-- keine direkte Aenderung an `current_status`
-- keine UI-Aktivierung
-- kein automatisches `ok` im Frontend
-- keine Integration in die normale Content-Inbox
+- kein positives `ok` ohne Wasserstatus **und** lokale Badeeignung `ok`
+- kein normaler Content-Inbox-Fall fuer unsichere Badegewaesserstaende
+- keine positive Home-/Filter-Empfehlung bei `watch`, `blocked` oder `unknown`
+
+Enthalten im aktuellen V2-Stand:
+
+- sicherer Writeback in `data/bathing_water_status.json`,
+- Frontend-Override nur fuer bekannte Badegewaesser-Highlights,
+- konservativer Fallback auf `offers.json`, wenn Statusdatei fehlt oder ungueltig ist.
 
 ## Quellen
 
@@ -146,18 +166,18 @@ Aktuell ergänzt fuer Aasee:
 - offizielle Stadt-Bocholt-Aasee-Seite als lokale Freigabe-/Warnquelle,
 - lokales BBV-Negativsignal zu Schlamm/Geruch als zeitlich begrenzter Empfehlungssuppressor bis `2026-07-15`.
 
-Der Guard bleibt report-only:
+Historischer V1.2-Stand vor Guard V2: Der Guard blieb damals report-only:
 
 - kein Writeback nach `data/offers.json`,
 - keine direkte Änderung an Activity-Highlights,
 - keine UI-Aktivierung,
 - keine automatische Inbox-Aktion.
 
-Erst nach Sichtung von 1–2 V1.2-Artefakten wird entschieden, ob und wie lokale Badeeignung in einen spaeteren Content-/Statusprozess uebernommen wird.
+Diese Entscheidung ist durch Guard V2 getroffen: lokale Badeeignung fliesst in die getrennte Statusdatei ein, nicht direkt in `data/offers.json`.
 
 ## UI-Policy fuer lokale Badehinweise
 
-V1.2 trennt weiterhin Report-Guard und Produktdaten. Wenn ein lokaler Hinweis fachlich in `data/offers.json` gepflegt wird, gilt fuer die UI:
+V2 trennt weiterhin Guard-Statusdatei und redaktionelle Produktdaten. Wenn ein lokaler Hinweis ueber `data/bathing_water_status.json` oder bewusst redaktionell gepflegt wird, gilt fuer die UI:
 
 - Home zeigt keine negative grosse Warnung. Der Bade-/Wasser-Boost wird nur unterdrueckt.
 - Activity-Cards duerfen bei konkretem `watch`/`blocked` einen knappen Statuschip zeigen, z. B. `Badehinweis pruefen`.

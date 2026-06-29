@@ -1,3 +1,221 @@
+<!-- === BEGIN BLOCK: ROADMAP_PRODUCT_MATURITY_NON_CONTENT_2026_06_29 | Zweck: validierte Nicht-Content-Roadmap nach Gesamtprojektanalyse; Umfang: Produktreife, Nutzerbindung, Standort, Anbieter-/Rechtsreife, technische Konsolidierung; Content-Live-Lauf, KI-Suche und Content-Pruefung bewusst ausgeklammert === -->
+## Product-Maturity-Roadmap ohne Content-Operation – Stand 2026-06-29
+
+### Aktueller Abarbeitungsstand – P0 Datenschutz/Tracking
+
+Status: P0 ist mit diesem Patch technisch umgesetzt und nach Upload/Deploy nur noch per Live-Smoke zu bestaetigen.
+
+Umgesetzt:
+
+- `config.js` startet GA4 und internes Nutzwerttracking nicht mehr automatisch, sondern erst nach aktiver Statistik-Zustimmung.
+- `/api/value-track.php` ignoriert Nutzwert-Metriken serverseitig, wenn die Statistik-Zustimmung fehlt oder das alte Opt-out-Cookie gesetzt ist.
+- `/datenschutz/` beschreibt Cookies/lokale Speicherung, Statistik, Google Analytics 4, First-Party-Nutzwerttracking, Anbieterbereich und Zahlungen konsistent zum Runtime-Verhalten.
+- Die Datenschutzseite enthaelt eine einfache Einstellungsflaeche fuer `Statistik erlauben`, `Nur notwendige Funktionen` und `Auswahl zuruecksetzen`.
+- Das Consent-Banner bietet gleichwertig `Nur notwendige` und `Statistik erlauben` an; ohne Auswahl bleibt Statistik aus.
+
+Naechster nicht-contentbezogener Workpack nach Deploy-Smoke:
+
+```text
+P1 Browser-Smoke-Tests fuer Kernwege einfuehren
+```
+
+Dieser Block ist die aktuelle Einstiegsschicht fuer **nicht-contentbezogene** Folgearbeiten. Der Content-/KI-/Audit-Betriebsstrang bleibt separat im bisherigen Current-Owner-Block dokumentiert und wird durch diesen Block nicht neu bewertet.
+
+### Validierte Ausgangslage
+
+Die App ist fuer den aktuellen Stand kein Feature-Rohbau mehr. Events, Activities, Anbieter-/Zahlungslogik, Mail-System, Visual-System und Betriebsdokumentation sind weit aufgebaut. Die naechsten groesseren Arbeiten sollen deshalb nicht weitere Einzelinhalte oder neue KI-Automation sein, sondern Produktreife fuer echte Nutzer und zahlende Anbieter.
+
+Validierungsbefunde aus dem Repo-Stand:
+
+- `config.js` startete bisher GA4 und internes Nutzwerttracking automatisch, waehrend `/datenschutz/` noch keine Analyse-Tools beschrieb. Dieses P0-Konsistenzproblem ist mit dem Consent-/Datenschutz-Patch behoben; nach Deploy bleibt nur der Live-Smoke.
+- `js/user-preferences.js` und `js/recommendations.js` enthalten bereits lokale Interessen-, Merkliste-, Ausblendungs- und Empfehlungslogik; daraus ist aber noch kein klares Nutzerfeature mit sichtbarer Merken-/Fuer-dich-/Erinnern-UX geworden.
+- `data/offers.json` nutzt Ortsnamen und `maps_query`, aber keine robusten Koordinatenfelder; echte Naehe-, Karten- oder Umkreissortierung ist damit noch kein Produktfeature.
+- Anbieterbereich, Stripe-/Abo-Flows, Magic Link, Mail-System und Nutzwertmetriken sind technisch vorhanden; der naechste Hebel ist Verkaufsverstaendlichkeit, nicht ein kompletter Neubau.
+- CSS/JS sind funktional, aber historisch gewachsen (`css/home.css`, `css/pages.css`, `css/overlays.css`, `js/today-home.js`, `js/details.js`, `js/organizer-portal.js`). Neue groessere Features brauchen vorher oder parallel klarere Owner-Grenzen und einfache Browser-Smoke-Tests.
+
+### Reihenfolge der naechsten groesseren Baustellen
+
+#### 1. P0 – Datenschutz-/Tracking-Konsistenz herstellen
+
+Status: umgesetzt in diesem Patch; nach Deploy nur noch kurzer Live-Smoke.
+
+Ziel: Technik, Datenschutzerklaerung und ggf. Einwilligungslogik muessen dasselbe sagen.
+
+Warum zuerst: Vertrauen und Rechtssicherheit. Eine App darf nicht intern messen und oeffentlich behaupten, es gebe kein Tracking.
+
+Akzeptanzkriterien:
+
+- Es ist entschieden, ob GA4 aktiv bleibt, angepasst wird oder deaktiviert wird.
+- `/datenschutz/` beschreibt den tatsaechlichen Stand von GA4, internem Nutzwerttracking, LocalStorage, Push, Formspree, Stripe und Anbieterbereich konsistent.
+- Falls eine Einwilligung noetig ist, wird sie vor nicht notwendiger Analyseverarbeitung eingeholt.
+- Internes Nutzwerttracking fuer Anbieterberichte bleibt klar von allgemeinem Marketingtracking getrennt dokumentiert.
+
+#### 2. P1 – Browser-Smoke-Tests fuer Kernwege einfuehren
+
+Ziel: Vor groesseren Produktfeatures einfache echte Browserpruefungen haben, nicht nur Syntaxchecks.
+
+Warum jetzt: Die App hat viele kritische UI- und Funnelpfade. Ohne Browser-Smoke-Tests werden neue Featurearbeiten riskanter.
+
+Erste Teststrecken:
+
+- Startseite laedt und zeigt Today-Karten.
+- Events-Seite laedt; Mobile-Detailpanel und Desktop-Direct-Outbound bleiben gemaess Policy intakt.
+- Aktivitaeten-Seite laedt; Mobile-Detailpanel funktioniert.
+- Event einreichen, Aktivitaet einreichen, Zahlung-starten-Seite, Anbieterlogin und Anbieter-Dashboard laden grundsaetzlich.
+
+Nicht-Ziel: Kein grosses Testframework-Projekt mit Vollabdeckung. Erst wenige robuste Kernpfade.
+
+#### 3. P1 – Nutzerbindung: Merken / Fuer dich / Erinnern produktreif machen
+
+Ziel: Aus vorhandener lokaler Empfehlungslogik ein sichtbares Nutzerfeature machen.
+
+Warum: Die App soll nicht nur eine schoene Liste sein, sondern Nutzern helfen, wiederzukommen und relevante Dinge schneller zu finden.
+
+Moeglicher V1-Zuschnitt:
+
+- Event oder Aktivitaet merken.
+- Gemerkte Inhalte auf Today oder eigener kompakter Ansicht zeigen.
+- Interessen einfach setzen/aendern.
+- `Fuer dich` sichtbarer erklaeren, ohne lange Texte.
+- Erinnern/Push nur nach Datenschutz-/Einwilligungsentscheidung und nur, wenn der Nutzen klar ist.
+
+Akzeptanzkriterien:
+
+- Nutzer versteht ohne Konto, was lokal gespeichert wird.
+- Merken funktioniert fuer Events und Activities konsistent.
+- Keine Account-/Sync-Pflicht.
+- Datenschutztext und UI-Hinweise passen zusammen.
+
+#### 4. P1/P2 – Standort-/Karten-/Naehe-Schicht aufbauen
+
+Ziel: Lokale Nutzbarkeit verbessern: Wo ist es, wie komme ich hin, was ist in der Naehe?
+
+Warum: Eine lokale App ohne echte Naehe-/Kartenlogik verschenkt einen Kernnutzen.
+
+Moeglicher V1-Zuschnitt:
+
+- Koordinatenmodell fuer Activities und wichtige Locations definieren.
+- Datenpflege fuer `lat`/`lng` oder kanonische Location-IDs einfuehren.
+- Karten-/Routenlinks vereinheitlichen.
+- Optional: einfache Kartenansicht oder `in der Naehe`-Sortierung, aber erst nach Datenmodell.
+
+Nicht-Ziel: Sofort eine komplexe Live-Karte mit Geolocation-Zwang.
+
+#### 5. P2 – Anbieterbereich und Verkaufsstrecke verkaufsfertig machen
+
+Ziel: Ein echter Veranstalter soll sofort verstehen, was er bekommt, was zu tun ist und welchen Nutzen Bocholt erleben liefert.
+
+Warum: Die Technik ist vorhanden; jetzt zaehlt Verstaendlichkeit und Abschlussfaehigkeit.
+
+Pruefpunkte:
+
+- Startseite fuer Veranstalter / Sichtbar-werden-Seiten: Leistungsversprechen, Ablauf, Preis, Grenzen.
+- Anbieter-Dashboard: Status, naechste Aktion, Zahlungs-/Abo-Status und Nutzwertdaten fuer Laien erklaeren.
+- Billing Portal, Kuendigung/Aenderung, Ablehnung und redaktionelle Pruefung eindeutig formulieren.
+- Nutzwertdaten nicht ueberverkaufen; erst nach belastbaren Daten als Akquisebeleg nutzen.
+
+#### 6. P2 – Recht-/Verkaufsseiten fuer bezahlte Produkte haerten
+
+Ziel: Die oeffentlichen Texte zu Zahlung, Laufzeit, Kuendigung, Ablehnung, Widerruf/AGB und Datenschutz muessen zur Produktlogik im `Produktvertrag.md` passen.
+
+Warum: Bei bezahlten Produkten sind unklare Erwartungen gefaehrlich.
+
+Akzeptanzkriterien:
+
+- Oeffentliche Leistungsbeschreibung widerspricht nicht dem Produktvertrag.
+- Zahlung wird nicht als automatische Veroeffentlichung verkauft.
+- Redaktionelle Pruefung, Ablehnung, Zahlung, Laufzeit und Kuendigung sind verstaendlich.
+- Kein interner Begriff wie Token/Kontingent wird als oeffentliche Produktbotschaft genutzt.
+
+#### 7. P2/P3 – UI-/CSS-/JS-Konsolidierung gezielt fortsetzen
+
+Ziel: Historisch gewachsene UI- und JS-Bloecke stabiler wartbar machen.
+
+Warum: Die App funktioniert, aber weitere grosse Features werden sonst zunehmend riskant.
+
+Regel:
+
+- Keine komplette Neuarchitektur.
+- Nur owner-file-orientierte Konsolidierung, wenn ein konkreter Feature- oder Bugfix-Kontext es rechtfertigt.
+- Gemeinsame Card-, Detailpanel-, Funnel- und Dashboard-Muster schrittweise vereinheitlichen.
+
+### Nicht Teil dieser Roadmap
+
+- KI-Suchlauf, Content-Audit, Inbox-Content-Routing und Dienstag-/Mittwoch-Liveprozess.
+- Neue Event-Bildproduktion ohne konkreten Gap.
+- SEO-/Growth-Landingpages ohne belastbare Daten.
+- Pauschale UI-Komplettüberarbeitung ohne konkreten Nutzer- oder Anbieterbefund.
+
+### Empfohlener erster Workpack
+
+Als naechstes nicht-contentbezogenes Workpack gilt:
+
+```text
+P0 Datenschutz-/Tracking-Konsistenz herstellen
+```
+
+Da P0 in diesem Patch umgesetzt ist, folgt danach ein kleiner Browser-Smoke-Test-Grundstock, bevor `Merken / Fuer dich / Erinnern` oder Standort-/Kartenlogik groesser angefasst werden.
+<!-- === END BLOCK: ROADMAP_PRODUCT_MATURITY_NON_CONTENT_2026_06_29 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_CURRENT_OWNER_VIEW_2026_06_27 | Zweck: current-first Status fuer Projektbesitzer nach Doku-Abgleich; Umfang: echte naechste Workpacks, abgeschlossene Punkte, kleine Rest-To-dos, Dokumentationshygiene === -->
+## Current Owner Roadmap – Stand 2026-06-27
+
+Dieser Block ist die aktuelle Einstiegsschicht fuer Folgechats. Aeltere Roadmap-Bloecke darunter bleiben als Historie/Beweisarchiv erhalten, sind aber **keine automatisch offenen To-dos**.
+
+### Aktueller Projektzustand
+
+Das Projekt ist nicht mehr im Feature-Aufbau-Grundmodus, sondern im Betriebs-/Qualitaetssicherungsmodus.
+
+Als erledigt bzw. nicht mehr als grosses naechstes To-do zu behandeln:
+
+- Mail-System V1: zentraler Topic-/HTML-/Plaintext-Mailpfad ist umgesetzt und getestet; weitere Mailarbeit nur bei neuem konkretem Mailtopic oder Zustell-/Darstellungsfehler.
+- Anbieterbereich/Nutzwertdaten: technische Basis mit Dashboard-/Metrikpfad ist vorhanden; naechste Bewertung erst nach belastbarem 28-/30-Tage-Datenlauf.
+- Aktivitaetspraesenz-/Abo-Livebeweis: als erledigt behandeln; Activity-Presence-Funnel, Zahlungslink-/Checkout-Kette und Anbieterbereich-Kontext sind im Teststatus belegt. Weitere Abo-Tests nur bei konkreter Flow-Aenderung oder Stripe-/Billing-Symptom.
+- Event-Visual-Motif-Fit: fuer den aktuellen Sheet-/Matrix-Stand abgeschlossen; neue Event-Visual-Arbeit nur bei neuem konkretem Gap oder falscher Bildzuordnung.
+- Badegewaesserstatus-Proof / Guard V2: abgehakt. Safe-Writeback ueber `data/bathing_water_status.json`, Deploy und Frontend-Override sind auf Staging belegt; kein neuer Proof-Block und kein aktives To-do.
+- Seasonal Activity Highlights V1: abgeschlossen; keine aktive Content-Batch-02-Pflicht.
+- Content-Audit/Inbox-Routing: Prozessbasis ist umgesetzt; normale Inbox soll nur echte Entscheidungen zeigen, nicht technische Backloglisten.
+
+### Echte naechste Prioritaeten nach gruenem Dienstag-/Mittwoch-Lauf
+
+1. **Live-Lauf belegen und dokumentieren**
+   - Dienstag: Weekly-KI-Suche, Manual-Inbox-Import, Ablehn-/Archivlogik, Visual-Key-Handoff beobachten.
+   - Mittwoch: Content-Audit mit echten Sheet-/Runtime-Events pruefen.
+   - Ziel: nicht neu bauen, sondern beweisen, dass der Betriebsprozess selbststaendig laeuft.
+
+2. **Inbox: Visual-Key vor Uebernahme komfortabel korrigierbar machen**
+   - Der Handoff `Inbox.visual_key -> Events.visual_key -> Runtime-Bild` ist belegt.
+   - Offener Rest ist die bessere Owner-Bedienung: sichtbarer Bildtyp, klarer Labeltext und Dropdown/Korrektur vor Uebernahme.
+   - Ziel: falsche Live-Bilder frueh verhindern, ohne den Such-/Importprozess neu zu bauen.
+
+3. **Feedback-Loop-Livebeweis dokumentieren**
+   - Der Feedback-Loop ist lokal/statisch umgesetzt.
+   - Noch zu belegen: Weekly-Suchlauf liest Feedbackregeln/Ablehnungshistorie sichtbar ein und reduziert Wiederholfehler.
+   - Ziel: Beweis/Logging/Status, kein neuer Mechanik-Entwurf.
+
+4. **Activity-Visual-Rest als Pruefpunkt / kleines To-do behalten**
+   - Der aktuelle Audit nennt noch `buergerpark-rhede`, `suderwicker-maerchenspielplatz` und `waldlehrpfad-am-vossenpand` als `visual_backlog_observation`.
+   - Diese Punkte sind **keine Content-Blocker** und sollen nicht in die normale Content-Inbox.
+   - Sie bleiben aber bewusst als kleiner Visual-Pruefpunkt offen: pruefen, ob Uebergangsbilder reichen oder ob Premium-Pool-Ergaenzungen sinnvoll sind.
+
+5. **Dokumentationshygiene current-first halten**
+   - `MASTER.md` steuert Strategie.
+   - `ROADMAP.md` steuert aktuelle taktische Reihenfolge.
+   - `TEST_STATUS.md` ist Beweisarchiv und Testindex.
+   - Spezialdokumente wie `MAIL_SYSTEM.md`, `BATHING_WATER_*`, `VISUAL_WORKFLOW.md`, `ACTIVITY_VISUAL_*` bleiben als Fachvertraege/Workstream-Historie erhalten.
+   - Nicht loeschen: Die Dateien sind redundant wirkend, haben aber unterschiedliche Rollen. Problem ist nicht Dateimenge, sondern veraltete offene Hinweise ohne current-first Klarstellung.
+
+### Nicht als naechstes starten
+
+- keinen manuellen bezahlten KI-Lauf ohne konkreten Testzweck,
+- keine grosse UI-Runde ohne echte neue Mobile-Faelle,
+- keine neue Event-Bildproduktion ohne konkreten Matrix-/Audit-Gap,
+- keine SEO-/Growth-Landingpages vor belastbaren Daten,
+- keine Mail-System-Neuentwicklung,
+- keinen Badegewaesser-Neu-Proof; Guard V2 / Badegewaesserstatus-Proof ist abgehakt.
+
+<!-- === END BLOCK: ROADMAP_CURRENT_OWNER_VIEW_2026_06_27 === -->
+
 <!-- === BEGIN BLOCK: ROADMAP_INBOX_CONTENT_AUTOMATION_ROUTING_FREEZE_2026_06_26 | Zweck: setzt den aktuellen Inbox-/Content-Quality-Fortsetzungspunkt nach Mobile-Kompaktfreeze; Umfang: naechste Arbeit erst nach echter Nutzung, keine sofortige neue UI-Runde === -->
 ## Inbox / Content-Pruefung – Mobile-Kompaktstand eingefroren, echte Nutzung abwarten (2026-06-26)
 
@@ -558,7 +776,7 @@ Bewertung:
 - P0 `Live-Zahlungsfall bewusst vollständig testen` ist für den Einzeltermin-Funnel erledigt.
 - Kein Code-Patch und keine direkte DB-Korrektur waren nötig.
 - Für breite Akquise ist der bezahlte Einzeltermin-Kernfluss praktisch belastbar.
-- Mitgliedschafts-/Abo-Live-Test bleibt ein separater Testfall, weil dort Abo-, Billing-Portal- und Periodenlogik zusätzlich betroffen sind.
+- Korrektur 2026-06-27: Der Aktivitaetspraesenz-/Abo-Livebeweis wird als erledigt behandelt. Weitere echte Abo-/Billing-Tests sind nur bei konkreter Flow-Aenderung, Periodenende-/`past_due`-Fragestellung oder Stripe-Symptom noetig, nicht als offener naechster Roadmap-Punkt.
 
 <!-- === END BLOCK: ROADMAP_LIVE_SINGLE_EVENT_PAYMENT_PROOF_2026_05_27 === -->
 

@@ -5,6 +5,18 @@
 Stand: 2026-06-10
 Branch-Basis bei Anlage: `staging` / `c0629ee`
 
+<!-- === BEGIN BLOCK: TODAY_HOME_PRODUCT_MATURITY_LINK_2026_06_29 | Zweck: ordnet Merken/Fuer-dich/Erinnern nach der Produktreife-Roadmap ein; Umfang: Abgrenzung zum abgeschlossenen Today-Release-Plan === -->
+## Current Note 2026-06-29 – Nutzerbindung als neuer Produktreife-Strang
+
+Der Today-Home-Release-Plan bleibt fuer die Home-Release-Haertung abgeschlossen bzw. historisch. Die neue Roadmap-Aufgabe `Merken / Fuer dich / Erinnern` ist **kein Wiederaufrollen** der Today-P0-/P1-Releasepunkte.
+
+Ein spaeteres Nutzerbindungs-Workpack darf vorhandene Today-, Recommendation- und User-Preference-Grundlagen nutzen, muss aber separat validiert werden:
+
+1. Datenschutz-/Tracking-Konsistenz zuerst.
+2. Browser-Smoke-Test-Grundstock vor groesserem UI-Ausbau.
+3. Dann Merken-/Fuer-dich-/Erinnern-UX als eigener Produktfeature-Workpack.
+<!-- === END BLOCK: TODAY_HOME_PRODUCT_MATURITY_LINK_2026_06_29 === -->
+
 ## Ziel
 
 Die neue Home-Seite `/` soll als tägliche Einstiegsseite für „Bocholt erleben“ funktionieren.

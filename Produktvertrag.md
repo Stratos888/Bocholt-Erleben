@@ -40,6 +40,22 @@ Dieses Dokument definiert die verbindliche Produktlogik.
 
 ---
 
+<!-- === BEGIN BLOCK: PRODUKTVERTRAG_PUBLIC_LEGAL_ALIGNMENT_2026_06_29 | Zweck: verankert den Roadmap-Punkt Recht-/Verkaufsseiten als Ableitung aus dem Produktvertrag; Umfang: keine Tarif- oder Flow-Aenderung === -->
+## Aktueller Abgleich 2026-06-29 – oeffentliche Rechts-/Verkaufsseiten
+
+Die validierte Produktreife-Roadmap fuehrt `Recht-/Verkaufsseiten fuer bezahlte Produkte haerten` als P2-Workpack. Dieser Punkt aendert die Produktlogik dieses Vertrags nicht.
+
+Ziel ist nur, dass oeffentliche Seiten und Hilfetexte dieselben Regeln fuer Laien verstaendlich ausdruecken:
+
+1. Zahlung ist keine automatische Veroeffentlichungsgarantie.
+2. Redaktionelle Pruefung bleibt verbindlich.
+3. Ablehnung, Zahlungsfreigabe, Laufzeit, Kuendigung/Aenderung und ggf. Widerruf/AGB muessen klar erklaert sein.
+4. Interne Begriffe wie Token, Kontingent oder Entitlement bleiben intern und werden nicht zur oeffentlichen Produktbotschaft.
+5. Datenschutz-/Tracking-Hinweise muessen separat konsistent mit der tatsaechlichen Technik sein.
+
+Dieser Abgleich ist ein Dokumentations-/Kommunikations-Workpack, kein neuer Produkt- oder Tarifentwurf.
+<!-- === END BLOCK: PRODUKTVERTRAG_PUBLIC_LEGAL_ALIGNMENT_2026_06_29 === -->
+
 ## 2. Kanonische Grundregeln
 
 ### 2.1 Allgemeine Produktregeln

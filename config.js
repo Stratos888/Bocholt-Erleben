@@ -40,14 +40,21 @@ const CONFIG = {
   },
   /* === END BLOCK: FEEDBACK_FORMSPREE_CONFIG_V1 === */
 
-  /* === BEGIN BLOCK: GA4_RUNTIME_CONFIG_AND_VALUE_METRICS_V3 | Zweck: zentrale Live-Analytics-Konfiguration plus First-Party-Nutzwert-Endpunkt für automatisches Mehrwert-Dashboard; Umfang: ersetzt GA4-Config und Analytics-Bootstrap/Helper === */
+  /* === BEGIN BLOCK: GA4_RUNTIME_CONFIG_AND_VALUE_METRICS_V4 | Zweck: zentrale Live-Analytics-Konfiguration plus First-Party-Nutzwert-Endpunkt; Tracking wird erst nach aktiver Statistik-Zustimmung gestartet; Umfang: ersetzt Analytics-Konfiguration === */
   analytics: {
     measurementId: "G-Y6QLCQ4HXT",
     enabledHosts: ["bocholt-erleben.de", "www.bocholt-erleben.de"],
     scriptUrl: "https://www.googletagmanager.com/gtag/js?id=G-Y6QLCQ4HXT",
     valueMetricsEndpoint: "/api/value-track.php"
   },
-  /* === END BLOCK: GA4_RUNTIME_CONFIG_AND_VALUE_METRICS_V3 === */
+
+  privacy: {
+    statisticsConsentStorageKey: "be_statistics_consent_v1",
+    statisticsConsentCookieName: "be_statistics_consent",
+    statisticsConsentMaxAgeDays: 180,
+    settingsUrl: "/datenschutz/#datenschutz-einstellungen"
+  },
+  /* === END BLOCK: GA4_RUNTIME_CONFIG_AND_VALUE_METRICS_V4 === */
 
   // Debug Mode (nur lokal aktiv)
   debug: IS_LOCAL
@@ -70,13 +77,96 @@ function formatDate(dateString) {
   });
 }
 
-/* === BEGIN BLOCK: GA4_BOOTSTRAP_OUTBOUND_AND_VALUE_METRICS_V3 | Zweck: trackt GA4 weiterhin und schreibt zusätzlich anonyme aggregierte Nutzwert-Events in die eigene DB; Umfang: ersetzt nur Analytics-Bootstrap/Helper in config.js === */
-function shouldEnableAnalytics() {
+/* === BEGIN BLOCK: GA4_BOOTSTRAP_OUTBOUND_AND_VALUE_METRICS_V4 | Zweck: startet GA4 und First-Party-Nutzwerttracking erst nach aktiver Statistik-Zustimmung; Umfang: ersetzt Analytics-Bootstrap/Helper in config.js === */
+function isAnalyticsHostAllowed() {
   if (typeof window === "undefined" || typeof document === "undefined") return false;
   if (IS_LOCAL) return false;
 
   const host = String(window.location.hostname || "").toLowerCase();
   return CONFIG.analytics.enabledHosts.includes(host);
+}
+
+function getCookieValue(name) {
+  const cookieName = `${name}=`;
+  return String(document.cookie || "")
+    .split(";")
+    .map((entry) => entry.trim())
+    .find((entry) => entry.startsWith(cookieName))
+    ?.slice(cookieName.length) || "";
+}
+
+function writeCookieValue(name, value, maxAgeSeconds) {
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAgeSeconds}; Path=/; SameSite=Lax${secure}`;
+}
+
+function getStatisticsConsentState() {
+  const key = CONFIG.privacy.statisticsConsentStorageKey;
+  const cookieName = CONFIG.privacy.statisticsConsentCookieName;
+
+  try {
+    const stored = window.localStorage?.getItem(key);
+    if (stored === "granted" || stored === "denied") return stored;
+  } catch (_) {}
+
+  const cookieValue = decodeURIComponent(getCookieValue(cookieName) || "");
+  if (cookieValue === "granted" || cookieValue === "denied") return cookieValue;
+
+  return "unset";
+}
+
+function hasStatisticsConsentChoice() {
+  return getStatisticsConsentState() !== "unset";
+}
+
+function isStatisticsConsentGranted() {
+  return getStatisticsConsentState() === "granted";
+}
+
+function persistStatisticsConsent(state) {
+  if (state !== "granted" && state !== "denied") return;
+
+  const key = CONFIG.privacy.statisticsConsentStorageKey;
+  const cookieName = CONFIG.privacy.statisticsConsentCookieName;
+  const maxAgeSeconds = Math.max(1, Number(CONFIG.privacy.statisticsConsentMaxAgeDays || 180)) * 24 * 60 * 60;
+
+  try {
+    window.localStorage?.setItem(key, state);
+  } catch (_) {}
+
+  writeCookieValue(cookieName, state, maxAgeSeconds);
+}
+
+function setStatisticsConsent(granted) {
+  persistStatisticsConsent(granted ? "granted" : "denied");
+  removePrivacyConsentBanner();
+  updatePrivacySettingsPanel();
+
+  if (granted) {
+    initAnalytics();
+  }
+}
+
+function resetStatisticsConsent() {
+  const key = CONFIG.privacy.statisticsConsentStorageKey;
+  const cookieName = CONFIG.privacy.statisticsConsentCookieName;
+
+  try {
+    window.localStorage?.removeItem(key);
+  } catch (_) {}
+
+  writeCookieValue(cookieName, "", 0);
+  removePrivacyConsentBanner();
+  updatePrivacySettingsPanel();
+  initPrivacyConsentUi();
+}
+
+function shouldOfferStatisticsConsent() {
+  return isAnalyticsHostAllowed() && !hasStatisticsConsentChoice();
+}
+
+function shouldEnableAnalytics() {
+  return isAnalyticsHostAllowed() && isStatisticsConsentGranted();
 }
 
 function sanitizeAnalyticsValue(value, maxLength = 200) {
@@ -89,30 +179,17 @@ function sanitizeMetricKey(value) {
   return sanitizeAnalyticsValue(value, 64).toLowerCase().replace(/[^a-z0-9_-]+/g, "_").replace(/^[_-]+|[_-]+$/g, "");
 }
 
-/* === BEGIN BLOCK: VALUE_METRICS_OPTOUT_HELPERS_V1 | Zweck: ermöglicht Ausschluss eigener Geräte aus dem internen Nutzwert-Tracking; Umfang: ergänzt nur Client-Opt-out-Helfer für First-Party-Metriken === */
+/* === BEGIN BLOCK: VALUE_METRICS_OPTOUT_HELPERS_V2 | Zweck: haelt Legacy-Opt-out-Helfer kompatibel; neue Steuerung erfolgt ueber die Statistik-Zustimmung; Umfang: ersetzt Client-Opt-out-Helfer === */
 const VALUE_METRICS_OPT_OUT_KEY = "be_value_metrics_opt_out";
 
 function isValueMetricsOptedOut() {
-  try {
-    if (window.localStorage?.getItem(VALUE_METRICS_OPT_OUT_KEY) === "1") return true;
-  } catch (_) {}
-
-  return String(document.cookie || "")
-    .split(";")
-    .some((entry) => entry.trim() === `${VALUE_METRICS_OPT_OUT_KEY}=1`);
+  return !isStatisticsConsentGranted();
 }
 
 function setValueMetricsOptOut(enabled) {
-  try {
-    if (enabled) window.localStorage?.setItem(VALUE_METRICS_OPT_OUT_KEY, "1");
-    else window.localStorage?.removeItem(VALUE_METRICS_OPT_OUT_KEY);
-  } catch (_) {}
-
-  const maxAge = enabled ? 60 * 60 * 24 * 365 : 0;
-  const secure = window.location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `${VALUE_METRICS_OPT_OUT_KEY}=${enabled ? "1" : ""}; Max-Age=${maxAge}; Path=/; SameSite=Lax${secure}`;
+  setStatisticsConsent(!enabled);
 }
-/* === END BLOCK: VALUE_METRICS_OPTOUT_HELPERS_V1 === */
+/* === END BLOCK: VALUE_METRICS_OPTOUT_HELPERS_V2 === */
 
 function getDomainFromUrl(url) {
   try {
@@ -339,10 +416,105 @@ function initOrganizerCtaTracking() {
   }, { capture: true });
 }
 
+function initPrivacyApi() {
+  if (typeof window === "undefined") return;
+
+  window.BEPrivacy = window.BEPrivacy || {};
+  window.BEPrivacy.getStatisticsConsentState = getStatisticsConsentState;
+  window.BEPrivacy.setStatisticsConsent = setStatisticsConsent;
+  window.BEPrivacy.resetStatisticsConsent = resetStatisticsConsent;
+  window.BEPrivacy.updateSettingsPanel = updatePrivacySettingsPanel;
+}
+
+function removePrivacyConsentBanner() {
+  document.querySelector("[data-privacy-consent-banner]")?.remove();
+}
+
+function buildPrivacyButton(label, action, variant = "secondary") {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `privacy-consent__button privacy-consent__button--${variant}`;
+  button.textContent = label;
+  button.addEventListener("click", action);
+  return button;
+}
+
+function initPrivacyConsentUi() {
+  if (typeof document === "undefined") return;
+  if (!shouldOfferStatisticsConsent()) return;
+  if (document.querySelector("[data-privacy-consent-banner]")) return;
+
+  const banner = document.createElement("section");
+  banner.className = "privacy-consent";
+  banner.setAttribute("data-privacy-consent-banner", "");
+  banner.setAttribute("role", "dialog");
+  banner.setAttribute("aria-live", "polite");
+  banner.setAttribute("aria-labelledby", "privacy-consent-title");
+
+  const content = document.createElement("div");
+  content.className = "privacy-consent__content";
+
+  const title = document.createElement("h2");
+  title.id = "privacy-consent-title";
+  title.textContent = "Statistik erlauben?";
+
+  const copy = document.createElement("p");
+  copy.textContent = "Bocholt erleben kann anonyme Statistik nutzen, um Nutzung und Anbieter-Nutzwert zu messen. Ohne Zustimmung bleiben nur technisch notwendige Funktionen aktiv.";
+
+  const actions = document.createElement("div");
+  actions.className = "privacy-consent__actions";
+  actions.append(
+    buildPrivacyButton("Nur notwendige", () => setStatisticsConsent(false)),
+    buildPrivacyButton("Statistik erlauben", () => setStatisticsConsent(true), "primary")
+  );
+
+  const link = document.createElement("a");
+  link.className = "privacy-consent__link";
+  link.href = CONFIG.privacy.settingsUrl || "/datenschutz/#datenschutz-einstellungen";
+  link.textContent = "Details und Einstellungen";
+
+  content.append(title, copy, actions, link);
+  banner.append(content);
+  document.body.appendChild(banner);
+}
+
+function updatePrivacySettingsPanel() {
+  if (typeof document === "undefined") return;
+
+  const panel = document.querySelector("[data-privacy-settings]");
+  if (!panel) return;
+
+  const state = getStatisticsConsentState();
+  const isActiveHost = isAnalyticsHostAllowed();
+  const statusLabel = !isActiveHost
+    ? "Auf dieser Umgebung nicht aktiv"
+    : state === "granted"
+      ? "Statistik erlaubt"
+      : state === "denied"
+        ? "Nur notwendige Funktionen"
+        : "Noch keine Auswahl";
+
+  panel.innerHTML = `
+    <div class="privacy-settings__status">
+      <strong>Aktueller Status:</strong> ${statusLabel}
+    </div>
+    <div class="privacy-settings__actions">
+      <button type="button" class="privacy-consent__button privacy-consent__button--primary" data-privacy-action="grant">Statistik erlauben</button>
+      <button type="button" class="privacy-consent__button privacy-consent__button--secondary" data-privacy-action="deny">Nur notwendige Funktionen</button>
+      <button type="button" class="privacy-consent__button privacy-consent__button--ghost" data-privacy-action="reset">Auswahl zurücksetzen</button>
+    </div>
+  `;
+
+  panel.querySelector('[data-privacy-action="grant"]')?.addEventListener("click", () => setStatisticsConsent(true));
+  panel.querySelector('[data-privacy-action="deny"]')?.addEventListener("click", () => setStatisticsConsent(false));
+  panel.querySelector('[data-privacy-action="reset"]')?.addEventListener("click", resetStatisticsConsent);
+}
+
 function initAnalytics() {
   if (!shouldEnableAnalytics()) {
-    debugLog("GA4/value metrics disabled for current host", {
-      host: typeof window !== "undefined" ? window.location.hostname : ""
+    debugLog("GA4/value metrics disabled until statistics consent is granted", {
+      host: typeof window !== "undefined" ? window.location.hostname : "",
+      consent: getStatisticsConsentState()
     });
     return;
   }
@@ -356,7 +528,9 @@ function initAnalytics() {
   };
 
   window.gtag("js", new Date());
-  window.gtag("config", CONFIG.analytics.measurementId);
+  window.gtag("config", CONFIG.analytics.measurementId, {
+    anonymize_ip: true
+  });
 
   const script = document.createElement("script");
   script.async = true;
@@ -373,13 +547,24 @@ function initAnalytics() {
 
   initOrganizerCtaTracking();
 
-  debugLog("GA4 and value metrics initialized", {
+  debugLog("GA4 and value metrics initialized after statistics consent", {
     measurementId: CONFIG.analytics.measurementId
   });
 }
 
-initAnalytics();
-/* === END BLOCK: GA4_BOOTSTRAP_OUTBOUND_AND_VALUE_METRICS_V3 === */
+function initPrivacyRuntime() {
+  initPrivacyApi();
+  updatePrivacySettingsPanel();
+  initPrivacyConsentUi();
+  initAnalytics();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initPrivacyRuntime, { once: true });
+} else {
+  initPrivacyRuntime();
+}
+/* === END BLOCK: GA4_BOOTSTRAP_OUTBOUND_AND_VALUE_METRICS_V4 === */
 
 debugLog("Config loaded successfully", {
   ui: CONFIG.ui,

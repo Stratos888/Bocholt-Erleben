@@ -1,5 +1,26 @@
 # Activity Visual Workflow
 
+<!-- === BEGIN BLOCK: ACTIVITY_VISUAL_CURRENT_STATUS_2026_06_27 | Zweck: current-first Einordnung der Activity-Visual-Reste; Umfang: kleiner Pruefpunkt / To-do vs. Content-Blocker === -->
+## Current Status 2026-06-27
+
+Der Activity-Visual-Stand ist nicht als akuter Content-Blocker zu lesen, bleibt aber als kleiner Visual-Pruefpunkt / To-do offen.
+
+Aktueller Audit-Rest:
+
+- `buergerpark-rhede`
+- `suderwicker-maerchenspielplatz`
+- `waldlehrpfad-am-vossenpand`
+
+Einordnung:
+
+- Diese drei Activities haben nutzbare Direktbilder bzw. Uebergangsbilder.
+- Es fehlt weiterhin ein finaler Premium-Bildpool-/`visual_key`-Eintrag.
+- Deshalb bleiben sie `visual_backlog_observation`, sollen aber nicht als normale Content-Inbox-Aktion erscheinen.
+- Ein kleiner Visual-Workpack darf sie buendeln; als Pruefpunkt offen lassen, aber kein grosses Visual-Systemprojekt daraus ableiten.
+
+<!-- === END BLOCK: ACTIVITY_VISUAL_CURRENT_STATUS_2026_06_27 === -->
+
+
 Stand: 2026-06-09
 Scope: Activity-Bilder für `Bocholt erleben`
 Status: Prozessvertrag vor Massenproduktion

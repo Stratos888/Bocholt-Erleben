@@ -57,65 +57,96 @@ The following workpack is intentionally on hold:
 
 ## CURRENT FOCUS
 
-<!-- === BEGIN BLOCK: MASTER_CURRENT_CONTROL_2026_06_25 | Zweck: konsolidiert strategischen Steuerungsstand fuer nachhaltige Content-Sicherung; Umfang: Content-Quality-V1, KI-Faktencheck-Cache, naechster Feedback-Loop-Workpack, keine Growth-Arbeiten vor Stabilisierung === -->
-### Aktueller Steuerungsstand: Content-Sicherung vor weiterem Wachstum
+<!-- === BEGIN BLOCK: MASTER_PRODUCT_MATURITY_CONTROL_2026_06_29 | Zweck: strategische Steuerung fuer nicht-contentbezogene Produktreife; Umfang: Datenschutz/Tracking, Smoke-Tests, Nutzerbindung, Standort, Anbieter-/Rechtsreife, Konsolidierung === -->
+### Produktreife-Roadmap ausserhalb Content-Operation
 
-Stand: 2026-06-25.
+Stand: 2026-06-29.
 
-Aktuell abgeschlossen und nicht erneut öffnen ohne konkretes Symptom:
+Dieser Block steuert die naechsten groesseren Arbeiten, wenn Content-Live-Lauf, KI-Suche und Content-Pruefung bewusst ausgeklammert werden.
+
+Validierte Reihenfolge:
+
+1. Datenschutz-/Tracking-Konsistenz herstellen.
+   - GA4, internes Nutzwerttracking, LocalStorage, Push, Formspree, Stripe und Anbieterbereich muessen in Technik, Datenschutztext und ggf. Einwilligung konsistent beschrieben bzw. gesteuert sein.
+   - Der bisherige Widerspruch `Analytics aktiv` vs. `/datenschutz/` mit `kein Tracking` ist mit dem Consent-/Datenschutz-Patch behoben; nach Upload/Deploy bleibt nur der Live-Smoke.
+
+2. Browser-Smoke-Tests fuer Kernwege einfuehren.
+   - Vor groesseren neuen Produktfeatures braucht die App wenige echte Browserpruefungen fuer Home, Events, Activities, Einreichung, Zahlung-starten, Anbieterlogin und Dashboard.
+   - Ziel ist ein kleines Sicherheitsnetz, keine Volltestabdeckung.
+
+3. Nutzerbindung produktisieren: Merken / Fuer dich / Erinnern.
+   - Vorhandene lokale Profil-/Recommendation-Logik soll als klares Nutzerfeature sichtbar werden.
+   - Keine Account-/Sync-Pflicht. Erinnern/Push erst nach Datenschutz-/Einwilligungsentscheidung.
+
+4. Standort-/Karten-/Naehe-Schicht aufbauen.
+   - Zuerst Datenmodell fuer Koordinaten/Location-IDs und einheitliche Maps-Ziele, danach erst UI wie Karte oder Naehe-Sortierung.
+
+5. Anbieterbereich und Verkaufsstrecke verkaufsfertig machen.
+   - Technischer Anbieterbereich ist vorhanden; naechster Hebel ist Verstaendlichkeit: Nutzen, Status, naechste Aktion, Zahlungs-/Abo-Status und Billing fuer echte Anbieter.
+
+6. Recht-/Verkaufsseiten fuer bezahlte Produkte haerten.
+   - Oeffentliche Texte muessen zum `Produktvertrag.md` passen: redaktionelle Pruefung, Zahlung, Ablehnung, Laufzeit, Kuendigung, Widerruf/AGB, Datenschutz.
+
+7. UI-/CSS-/JS-Konsolidierung gezielt fortsetzen.
+   - Keine Neuarchitektur; nur owner-file-orientierte Entflechtung bei konkretem Feature-/Bugfix-Kontext.
+
+Abgrenzung:
+
+- Der Content-/KI-/Audit-Strang bleibt separat im bestehenden Current-Control-Block gefuehrt.
+- Growth/SEO bleibt datenabhaengig und ist kein Ersatz fuer Produktreife.
+- Neue Nutzerfeatures duerfen nicht vor Datenschutz-/Tracking-Konsistenz und minimalem Browser-Smoke-Netz groesser gebaut werden.
+<!-- === END BLOCK: MASTER_PRODUCT_MATURITY_CONTROL_2026_06_29 === -->
+
+<!-- === BEGIN BLOCK: MASTER_CURRENT_CONTROL_2026_06_27 | Zweck: konsolidiert aktuellen Projektbesitzer-Steuerungsstand nach Doku-/Roadmap-Abgleich; Umfang: Betrieb statt Featureaufbau, erledigte Grossbloecke, echte naechste Steuerung === -->
+### Aktueller Steuerungsstand: Betrieb beweisen, Restluecken gezielt schliessen
+
+Stand: 2026-06-27.
+
+Aktuell nicht erneut als grosse offene Workpacks behandeln:
 
 - `/angebote/` ist nur noch Legacy-Redirect auf `/aktivitaeten/`; die Aktivitätspräsenz läuft kanonisch unter `/aktivitaeten/sichtbar-werden/...`.
 - Öffentliche Neben-/Funnel-Seiten nutzen den zentralen Footer/Shell-Abschluss.
-- Reporting-/Tracking-Hardening ist technisch abgeschlossen und live bewiesen.
+- Reporting-/Tracking-Hardening ist technisch abgeschlossen und live bewiesen; belastbare Akquise-Aussagen brauchen nur noch organische 28-/30-Tage-Daten.
 - CSS-Governance ist eingeführt.
-- Event-Visual-Motif-Fit ist für den bisherigen Sheet-Stand technisch abgeschlossen.
-- Content-Quality-Grundsystem existiert: Workflow, Script, Google-Sheet-Audittab und `/inbox/`-Arbeitsbereich.
-- Content Quality Guard V2 ist auf Staging als Prozessgrundlage belegt: Audit-Report mit Prozesskategorien, Arbeitspaketen und Correction Ownern; `/inbox/` zeigt Repo-Datenpatch, Quellencheck, Faktencheck, Beobachten/Retry und Visual-Fit getrennt.
-- Content Quality AI Verification Fallback mit Prüfcache ist live belegt: `ai_verification_candidate`, Budgetlimit, strukturiertes Kandidaten-Artefakt, Acceptance-Tab, Cache-Writeback, Cache-Hit und bessere Runtime-Logs funktionieren.
+- Mail-System V1 ist zentral umgesetzt und getestet; weitere Mailarbeit nur bei neuem konkretem Mailtopic oder Zustell-/Darstellungsfehler.
+- Aktivitaetspraesenz-/Abo-Livebeweis ist als erledigt zu fuehren; neue Abo-/Billing-Tests nur bei konkreter Flow-Aenderung oder Stripe-Symptom.
+- Anbieterbereich und Nutzwert-Metrikpfad sind technisch vorhanden; kein neuer Dashboard-Aufbau ohne Datenbefund.
+- Event-Visual-Motif-Fit ist für den bisherigen Sheet-/Matrix-Stand abgeschlossen.
+- Badegewaesserstatus-Proof / Guard V2 ist abgehakt: Guard -> `data/bathing_water_status.json` -> Commit -> Deploy -> Frontend-Override -> keine falsche Badeempfehlung.
+- Seasonal Activity Highlights V1 ist abgeschlossen; kein geplanter Content-Batch-02 als Pflichtfolge.
+- Content-Quality-Grundsystem existiert: Workflow, Script, Google-Sheet-Audittab, Prüfcache, Acceptance-/Feedback-Artefakte und private `/inbox/`-Arbeitsoberfläche.
+- KI-Suchlauf -> Manual Inbox -> Visual-Key-Handoff -> Events-/Live-Bildausspielung ist auf `main` mit dem aktuellen Prüflauf bestanden.
 
 Aktueller strategischer Zielzustand:
 
+- P0 Datenschutz-/Tracking-Konsistenz ist mit diesem Patch umgesetzt: Statistik erst nach aktiver Zustimmung, Datenschutzseite aktualisiert, interne Nutzwertmetriken serverseitig consent-geschuetzt. Nach Upload/Deploy ist nur ein kurzer Live-Smoke noetig.
+- Naechster nicht-contentbezogener Workpack danach: P1 Browser-Smoke-Tests fuer Kernwege.
+
 - Der Content Quality Guard ist ein automatischer Prüf- und Vorentscheidungsprozess, nicht eine wöchentliche manuelle Vollprüfung.
-- Jedes regelmäßige Audit prüft die relevanten Event- und Activity-Daten erneut:
-  1. Google-Sheet `Events` für redaktionelle Events.
-  2. DB/API für freigegebene Veranstalter-Events.
-  3. `data/offers.json` für Activities.
-- Sichere technische Fälle werden automatisch behandelt oder still protokolliert, zum Beispiel abgelaufene ausgeblendete Events, harmlose Canonical-/Sprach-Redirects oder einzelne temporäre Netzwerkaussetzer.
-- In der Content-Prüfung erscheinen nur Fälle, bei denen wirklich etwas zu tun ist und die weder durch das Prüfskript noch durch einen frischen KI-Faktencheck sicher geklärt werden können.
-- Für Quellen, die das GitHub-/HTTP-Prüfskript blockieren, schwer lesbar sind oder Fakten nicht eindeutig maschinell bestätigen, gilt der Hybridmodus: billiges Audit-Skript zuerst, gezielter KI-Faktencheck nur als Fallback.
-- KI-Faktenchecks werden gecacht: Wenn Quelle und Inhalt unverändert sind und `verified_until` noch gilt, wird nicht jede Woche erneut teuer geprüft.
-- Die private `/inbox/` ist die Arbeitsoberfläche für Content-Prüfung und Korrektur. Der Nutzer soll nicht direkt in technischen Google-Sheet-Spalten arbeiten müssen.
-- Source Ownership bleibt erhalten:
-  - Sheet-Events werden aus der Content-Prüfung heraus kontrolliert ins Google Sheet `Events` zurückgeschrieben.
-  - Anbieter-/DB-Events werden über Review-/Adminlogik bzw. DB-Owner korrigiert.
-  - Activities bleiben repo-/JSON-owned und werden in V1 als Patch-Kandidaten gesammelt; später kann daraus ein PR-/Patchpaket-Workflow werden.
-- Keine KI- oder Website-Textauswertung darf fachliche Inhalte blind überschreiben. Semantische Änderungen brauchen eine explizite geprüfte Aktion.
-- Eine 0%-Fehlerquote wird nicht behauptet. Der Qualitätsstandard lautet: definierte Event-/Activity-Kerndaten regelmäßig prüfen, sichere Fälle automatisch abräumen, keine bekannten ungeprüften kritischen Fehler online lassen und nur echte Restaufgaben zur Bewertung vorlegen.
+- In der privaten `/inbox/` erscheinen nur Fälle, bei denen wirklich eine menschliche Entscheidung oder Bestätigung nötig ist.
+- Activity-Visual-Gaps mit nutzbarem Übergangsbild sind kleine Visual-Pruefpunkte / To-dos, aber keine normale Content-Sofortaktion.
+- Google-Sheet-Events, Anbieter-/DB-Events und repo-owned Activities behalten ihre jeweiligen Owner; keine KI darf fachliche Inhalte blind überschreiben.
+- Eine 0%-Fehlerquote wird nicht behauptet. Ziel ist: kritische Kernfelder regelmäßig prüfen, sichere Fälle automatisch abräumen, echte Restentscheidungen knapp vorlegen.
+- KI-Suchlauf-Feedback bleibt kontrolliert: typisierte Fehlerklassen und Ablehnungshistorie werden begrenzt in den nächsten Suchlauf gegeben; kein unkontrolliertes Selbsttraining und kein Rohdump alter Einzelfälle.
 
-Aktueller strategischer Ausbau: KI-Suchlauf Feedback Loop / Self-Improving Search
+Aktuell echte nächste Steuerungspunkte:
 
-- Die Content-Prüfung erzeugt Lernsignale für den KI-Suchlauf, damit wiederkehrende Fehler nicht nur korrigiert, sondern die Such-/Prompt-/Quellenlogik verbessert wird.
-- Inbox-Ablehnungsgründe, Audit-Findings, KI-Faktencheck-Ergebnisse und Cache-/Bestätigungssignale werden nicht manuell in Suchregeln umgeschrieben, sondern strukturiert typisiert und begrenzt an den nächsten Suchlauf übergeben.
-- Finale Prozessarchitektur: Content-Audit verdichtet typisierte Findings in `content-search-feedback.json` und schreibt daraus `Content_Search_Feedback(_Staging)`; der Weekly-KI-Suchlauf kombiniert diesen Tab mit realer Inbox-/Archiv-Ablehnungshistorie und baut daraus einen gedeckelten `CONTENT_SEARCH_FEEDBACK`-Promptkontext.
-- Regel-Bloat ist technisch begrenzt: Feedback wird nach Fehlerklassen gruppiert, duplizierte Einzelfälle werden gezählt statt angehängt, alte Einzelablehnungen laufen aus, und der Suchprompt erhält nur die priorisierten Top-Regeln.
-- Ziel ist keine unkontrolliert selbsttrainierende KI, sondern ein kontrollierter, belegbarer Prozess: Fehlerklassifikation -> Feedback-Artefakt/Ablehnungshistorie -> begrenzter Suchlauf-Kontext -> Diagnose -> Messung, ob dieselbe Fehlerklasse seltener wiederkommt.
-
-Separater strategischer Punkt:
-
-- KI-Visual-Key-/Bild-Fit-Qualität wird als eigener Workstream geführt.
-- Die Event-Suche muss passende `visual_key`/`visual_motif`-Zuordnungen liefern oder fehlende/unsichere Bildpassung als Gap ausgeben.
-- Geprüft werden muss nicht nur, ob ein Bild existiert, sondern ob das konkrete Bild bzw. Motiv zum Event passt und nicht zu oft im gleichen Kontext wiederholt wird.
-- Dieser Punkt wird nicht mit der Datenwahrheitsprüfung vermischt.
+1. Geplanten Dienstag-/Mittwoch-Liveprozess beobachten und danach als Beweis dokumentieren.
+2. Inbox-Owner-UX für `visual_key` verbessern: sichtbar, verständlich, vor Übernahme korrigierbar.
+3. Feedback-Loop-Livewirkung belegen: Suchlauf liest Regeln, Logs zeigen angewandte Feedbackklassen, Wiederholfehler sinken.
+4. Drei Activity-Visual-Reste als kleinen Pruefpunkt / To-do behalten (`buergerpark-rhede`, `suderwicker-maerchenspielplatz`, `waldlehrpfad-am-vossenpand`), aber nicht als Content-Blocker oder normale Inbox-Aktion.
+5. Roadmap und Teststatus current-first halten, damit erledigte Spezialworkstreams nicht wieder als neue Grossbaustellen gelesen werden.
 
 Bewusst geparkt:
 
-- Weiterer SEO-/Content-Ausbau.
-- Anbieter-Akquise mit Qualitätsversprechen.
+- Weiterer SEO-/Content-Ausbau bis belastbare GSC-/GA4-/Nutzwertdaten vorliegen.
+- Anbieter-Akquise mit Qualitätsversprechen bis Reportingdaten belastbar sind.
 - Neue Event-Visual-Produktion ohne konkreten Gap.
 - Pauschale manuelle Vollprüfung aller Inhalte in der Inbox.
 - Pauschaler KI-Prüflauf über alle Inhalte ohne Kandidatenfilter, Cache und Budgetgrenze.
-- Manuelle periodische KI-Regelpflege aus Ablehnungslisten ohne Automations-/Feedback-Mechanik.
-<!-- === END BLOCK: MASTER_CURRENT_CONTROL_2026_06_25 === -->
+- Mail-System-Neuentwicklung ohne konkreten neuen Mailfall.
+- Badegewaesser-Neu-Proof; Guard V2 / Badegewaesserstatus-Proof ist abgehakt, nicht neu zu entwerfen.
+<!-- === END BLOCK: MASTER_CURRENT_CONTROL_2026_06_27 === -->
 
 ---
 
@@ -177,10 +208,10 @@ Bewusst geparkt:
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.
-- Current next workpack: deploy and prove the final Content Quality Feedback Loop / Self-Improving Search process patch on staging, then decide main promotion.
-- The feedback-loop workpack connects typed audit findings, Inbox/rejection-reason defaults and KI-facts outcomes back into the KI search workflow without requiring the user to manually maintain search rules every few weeks.
-- Content Quality Guard V2 and the AI verification cache are no longer basic-introduction workpacks; further changes need a concrete finding from current reports or from the feedback-loop design.
-- Manual-KI-Intake / Visual-Key-Handoff and Activity-Premium-Visuals remain separate workstreams and must only be reopened when the current Content-Quality/Visual-Fit package produces a concrete need.
+- Current next workpack: planned Tuesday/Wednesday live process beobachten, danach Beweisstatus in `TEST_STATUS.md` dokumentieren.
+- If the live process is green, the next implementation workpack is narrowly scoped: Inbox visual-key owner UX, so event candidates show the proposed image type and can be corrected before takeover.
+- Do not reopen Mail-System, Anbieter-Dashboard, Badegewaesser-Proof, Activity-Presence/Abo live proof, Event-Visual-Motif-Fit or broad Content-Quality architecture without a concrete new symptom.
+- Activity-Visual residuals remain a small visual check / todo, but are not content blockers.
 - Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.
 
 <!-- === END CANONICAL MASTER FILE === -->
