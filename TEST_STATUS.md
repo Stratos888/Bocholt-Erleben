@@ -1,3 +1,32 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_PRIVACY_TRACKING_P0_IMPLEMENTED_2026_06_29 | Zweck: dokumentiert Umsetzung des ersten Product-Maturity-Workpacks Datenschutz/Tracking; Umfang: Runtime-Gating, Datenschutzseite, serverseitiger Consent-Guard, Validierung === -->
+## Product-Maturity P0 Datenschutz/Tracking – umgesetzt im Patch 2026-06-29
+
+Status: Patch vorbereitet; nach Upload/Deploy kurzer Live-Smoke erforderlich.
+
+Umgesetzt:
+
+- `config.js`: GA4 und `BEAnalytics`/Nutzwerttracking starten nur noch auf Live-Hosts und nur nach aktiver Statistik-Zustimmung.
+- `config.js`: Consent-Banner und `window.BEPrivacy`-API fuer Datenschutz-Einstellungen ergaenzt.
+- `api/value-track.php`: serverseitiger Consent-Guard; Metriken ohne `be_statistics_consent=granted` werden ignoriert.
+- `datenschutz/index.html`: Datenschutztext fuer lokale Speicherung, Statistik, GA4, First-Party-Nutzwerttracking, Anbieterbereich und Zahlungen aktualisiert.
+- `css/components.css`: UI-Stile fuer Consent-Banner und Datenschutz-Einstellungen ergaenzt.
+
+Lokale Validierung im ZIP-Worktree:
+
+- `node --check config.js`: OK.
+- `php -l api/value-track.php`: OK.
+- `python3 tools/audit-css-governance.py`: OK.
+
+Live-Smoke nach Deploy:
+
+1. Auf `bocholt-erleben.de` ohne Auswahl pruefen: kein `googletagmanager.com`-Request, kein `/api/value-track.php`-POST.
+2. `Nur notwendige` klicken: Banner verschwindet, weiterhin keine Statistikrequests.
+3. Auf `/datenschutz/#datenschutz-einstellungen` `Statistik erlauben` klicken: GA4-Script darf laden, interne Nutzwertmetriken duerfen bei Detail-/Outbound-Aktionen gesendet werden.
+4. `Auswahl zuruecksetzen` pruefen: Banner erscheint wieder.
+
+Naechster Product-Maturity-Workpack nach Live-Smoke: P1 Browser-Smoke-Tests fuer Kernwege.
+<!-- === END BLOCK: TEST_STATUS_PRIVACY_TRACKING_P0_IMPLEMENTED_2026_06_29 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_PRODUCT_MATURITY_ROADMAP_VALIDATION_2026_06_29 | Zweck: dokumentiert Validierung der nicht-contentbezogenen Produktreife-Roadmap gegen den aktuellen Repo-Stand; Umfang: Befunde, Reihenfolge, keine Implementierung === -->
 ## Produktreife-Roadmap ohne Content-Operation – Validierung 2026-06-29
 
@@ -12,7 +41,7 @@ Bewusst ausgeklammert:
 
 Validierte Befunde:
 
-- Datenschutz/Tracking: `config.js` aktiviert GA4 (`G-Y6QLCQ4HXT`) und internes Nutzwerttracking ueber `/api/value-track.php`; `/datenschutz/` sagt noch `kein Tracking und keine Analyse-Tools`. Daraus folgt P0: Datenschutz-/Tracking-Konsistenz herstellen.
+- Datenschutz/Tracking: `config.js` startete bisher GA4 (`G-Y6QLCQ4HXT`) und internes Nutzwerttracking ueber `/api/value-track.php`, waehrend `/datenschutz/` noch `kein Tracking und keine Analyse-Tools` sagte. Mit dem P0-Patch gilt: Statistik erst nach Zustimmung; Datenschutztext und Runtime sind konsistent. Nach Deploy bleibt nur der Live-Smoke.
 - Nutzerbindung: `js/user-preferences.js` und `js/recommendations.js` enthalten lokale Interessen-, Merkliste-, Ausblendungs- und Scoring-Grundlagen; sichtbar produktisiert ist `Merken / Fuer dich / Erinnern` noch nicht. Daraus folgt P1 nach Datenschutz-/Smoke-Test-Grundlage.
 - Standort/Naehe: `data/offers.json` enthaelt Ortsnamen, `maps_query` und `maps_label`, aber keine robusten Koordinatenfelder fuer Activities. Daraus folgt P1/P2 Standort-/Karten-/Naehe-Schicht.
 - Anbieter/Monetarisierung: Anbieterbereich, Stripe-/Abo-Flows, Magic-Link, Mail-System und Nutzwertmetriken sind technisch vorhanden. Daraus folgt kein Neubau, sondern Verkaufsverstaendlichkeit und oeffentliche Rechts-/Leistungsseiten haerten.

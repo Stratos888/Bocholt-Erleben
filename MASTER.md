@@ -68,7 +68,7 @@ Validierte Reihenfolge:
 
 1. Datenschutz-/Tracking-Konsistenz herstellen.
    - GA4, internes Nutzwerttracking, LocalStorage, Push, Formspree, Stripe und Anbieterbereich muessen in Technik, Datenschutztext und ggf. Einwilligung konsistent beschrieben bzw. gesteuert sein.
-   - Der aktuelle Widerspruch `Analytics aktiv` vs. `/datenschutz/` mit `kein Tracking` ist ein P0-Produktvertrauensproblem.
+   - Der bisherige Widerspruch `Analytics aktiv` vs. `/datenschutz/` mit `kein Tracking` ist mit dem Consent-/Datenschutz-Patch behoben; nach Upload/Deploy bleibt nur der Live-Smoke.
 
 2. Browser-Smoke-Tests fuer Kernwege einfuehren.
    - Vor groesseren neuen Produktfeatures braucht die App wenige echte Browserpruefungen fuer Home, Events, Activities, Einreichung, Zahlung-starten, Anbieterlogin und Dashboard.
@@ -118,6 +118,9 @@ Aktuell nicht erneut als grosse offene Workpacks behandeln:
 - KI-Suchlauf -> Manual Inbox -> Visual-Key-Handoff -> Events-/Live-Bildausspielung ist auf `main` mit dem aktuellen Prüflauf bestanden.
 
 Aktueller strategischer Zielzustand:
+
+- P0 Datenschutz-/Tracking-Konsistenz ist mit diesem Patch umgesetzt: Statistik erst nach aktiver Zustimmung, Datenschutzseite aktualisiert, interne Nutzwertmetriken serverseitig consent-geschuetzt. Nach Upload/Deploy ist nur ein kurzer Live-Smoke noetig.
+- Naechster nicht-contentbezogener Workpack danach: P1 Browser-Smoke-Tests fuer Kernwege.
 
 - Der Content Quality Guard ist ein automatischer Prüf- und Vorentscheidungsprozess, nicht eine wöchentliche manuelle Vollprüfung.
 - In der privaten `/inbox/` erscheinen nur Fälle, bei denen wirklich eine menschliche Entscheidung oder Bestätigung nötig ist.

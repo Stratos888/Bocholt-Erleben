@@ -1,3 +1,17 @@
+<!-- === BEGIN BLOCK: ENGINEERING_PRIVACY_TRACKING_RUNTIME_CONTRACT_2026_06_29 | Zweck: technischer Contract fuer Datenschutz-/Tracking-Runtime nach P0-Umsetzung; Umfang: Consent-Gating, Serverguard, Folgearbeiten === -->
+## Datenschutz-/Tracking-Runtime-Contract
+
+Stand: 2026-06-29.
+
+- GA4 und First-Party-Nutzwerttracking duerfen im Client nur nach aktiver Statistik-Zustimmung starten.
+- `window.BEAnalytics` wird erst nach Zustimmung initialisiert; Featurecode muss weiterhin defensiv auf Existenz/Funktionen pruefen.
+- `/api/value-track.php` muss Metriken ohne `be_statistics_consent=granted` ignorieren.
+- Consent-/Datenschutzeinstellungen liegen in `config.js`; UI-Styles liegen in `css/components.css`; oeffentlicher Erklaertext liegt in `/datenschutz/`.
+- Neue Tracking-, Reminder-, Push-, Karten- oder Personalisierungsfunktionen muessen zuerst gegen diesen Contract geprueft werden.
+- Nach jeder Aenderung an Tracking/Consent mindestens pruefen: `node --check config.js`, `php -l api/value-track.php`, CSS-Governance-Audit und Live-Smoke ohne/mit Zustimmung.
+
+<!-- === END BLOCK: ENGINEERING_PRIVACY_TRACKING_RUNTIME_CONTRACT_2026_06_29 === -->
+
 <!-- === BEGIN BLOCK: ENGINEERING_PRODUCT_MATURITY_ROADMAP_RULES_2026_06_29 | Zweck: technische Arbeitsregeln fuer die validierte nicht-contentbezogene Produktreife-Roadmap; Umfang: Workpack-Reihenfolge, Validierung, Trennung von Content-Operation === -->
 ## Produktreife-Roadmap – technische Arbeitsregeln
 

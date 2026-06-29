@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Datenschutz – Bocholt erleben</title>
-  <meta name="description" content="Datenschutzhinweise für Bocholt erleben: Hosting bei STRATO, Server-Logs, Kontakt per E-Mail sowie Ihre Rechte nach DSGVO.">
+  <meta name="description" content="Datenschutzhinweise für Bocholt erleben: Hosting, Formulare, Statistik-Einstellungen, Anbieterbereich, Zahlungen sowie Ihre Rechte nach DSGVO.">
 
   <link rel="canonical" href="https://bocholt-erleben.de/datenschutz/">
   <link rel="manifest" href="/manifest.json">
@@ -105,16 +105,60 @@
       </p>
     </section>
 
+    <!-- === BEGIN BLOCK: PRIVACY_TRACKING_CONSENT_TEXT_V1 | Zweck: bringt Datenschutzseite mit GA4/Nutzwerttracking und Consent-Gating in Einklang; Umfang: ersetzt Cookies/Tracking-, Rechte- und Stand-Abschnitte === -->
     <section class="content-card" aria-labelledby="privacy-cookies">
-      <h2 id="privacy-cookies">5. Cookies / Tracking</h2>
+      <h2 id="privacy-cookies">5. Cookies, lokale Speicherung und Statistik</h2>
       <p>
-        Wir setzen nach aktuellem Stand kein Tracking und keine Analyse-Tools ein.
-        Technisch notwendige Datenverarbeitungen (z. B. im Rahmen des Hostings) finden dennoch statt.
+        Bocholt erleben nutzt technisch notwendige lokale Speicherung und Cookies, damit Grundfunktionen
+        zuverlässig funktionieren. Dazu gehören zum Beispiel die optionale Veranstalter-Portal-Session,
+        Datenschutz-Einstellungen, einfache lokale App-Einstellungen sowie technisch notwendige Abrufe
+        von Seitendaten und Bildern.
+      </p>
+      <p>
+        Statistik- und Nutzwertmessung wird erst nach Ihrer aktiven Zustimmung gestartet. Ohne Zustimmung
+        lädt Bocholt erleben kein Google-Analytics-Skript und sendet keine internen Nutzwert-Metriken
+        an <code>/api/value-track.php</code>.
+      </p>
+      <p>
+        Bei Zustimmung verwenden wir Google Analytics 4 zur aggregierten Nutzungsanalyse sowie ein eigenes
+        First-Party-Nutzwerttracking. Das eigene Nutzwerttracking zählt zum Beispiel Detailaufrufe und Klicks
+        auf Website-, Ticket- oder Kartenlinks. Die Werte werden tagesbezogen aggregiert und für technische
+        Qualitätsbewertung sowie Anbieter-Nutzwertberichte verwendet.
+      </p>
+      <p>
+        Rechtsgrundlage für die optionale Statistikverarbeitung ist Ihre Einwilligung. Sie können Ihre Auswahl
+        jederzeit unten ändern oder zurücksetzen.
+      </p>
+    </section>
+
+    <section class="content-card" aria-labelledby="privacy-settings" id="datenschutz-einstellungen">
+      <h2 id="privacy-settings">6. Datenschutz-Einstellungen</h2>
+      <p>
+        Hier können Sie festlegen, ob Bocholt erleben optionale Statistik verwenden darf. Die Auswahl gilt
+        für dieses Gerät und diesen Browser.
+      </p>
+      <div class="privacy-settings-panel" data-privacy-settings>
+        <p>Die Datenschutzeinstellungen werden geladen.</p>
+      </div>
+    </section>
+
+    <section class="content-card" aria-labelledby="privacy-payments">
+      <h2 id="privacy-payments">7. Einreichungen, Anbieterbereich und Zahlungen</h2>
+      <p>
+        Wenn Sie Veranstaltungen oder Aktivitäten einreichen, einen Veröffentlichungsprozess starten, den
+        Anbieterbereich nutzen oder eine Zahlung auslösen, verarbeiten wir die jeweils eingegebenen Angaben
+        zur Bearbeitung, Veröffentlichung, Kommunikation und Abwicklung des gebuchten Produkts.
+      </p>
+      <p>
+        Für Zahlungs- und Abo-Funktionen kann Stripe als Zahlungsdienstleister eingesetzt werden. Die eigentliche
+        Zahlungsabwicklung erfolgt auf den Seiten bzw. Systemen von Stripe. Im Anbieterbereich können technisch
+        notwendige Session-Cookies eingesetzt werden, damit der Login und die Bearbeitung eigener Einreichungen
+        funktionieren.
       </p>
     </section>
 
     <section class="content-card" aria-labelledby="privacy-rights">
-      <h2 id="privacy-rights">6. Ihre Rechte</h2>
+      <h2 id="privacy-rights">8. Ihre Rechte</h2>
       <p>
         Sie haben nach DSGVO insbesondere folgende Rechte: Auskunft, Berichtigung, Löschung,
         Einschränkung der Verarbeitung, Datenübertragbarkeit sowie Widerspruch gegen bestimmte Verarbeitungen.
@@ -123,9 +167,10 @@
     </section>
 
     <section class="content-card" aria-labelledby="privacy-status">
-      <h2 id="privacy-status">7. Stand</h2>
-      <p>Stand: Januar 2026</p>
+      <h2 id="privacy-status">9. Stand</h2>
+      <p>Stand: Juni 2026</p>
     </section>
+    <!-- === END BLOCK: PRIVACY_TRACKING_CONSENT_TEXT_V1 === -->
   </main>
 
   <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 | Zweck: ergänzt den zentral gerenderten Site-Footer auf öffentlichen Unterseiten; Umfang: Footer-Slot direkt nach dem Hauptinhalt === -->

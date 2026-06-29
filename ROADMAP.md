@@ -1,6 +1,24 @@
 <!-- === BEGIN BLOCK: ROADMAP_PRODUCT_MATURITY_NON_CONTENT_2026_06_29 | Zweck: validierte Nicht-Content-Roadmap nach Gesamtprojektanalyse; Umfang: Produktreife, Nutzerbindung, Standort, Anbieter-/Rechtsreife, technische Konsolidierung; Content-Live-Lauf, KI-Suche und Content-Pruefung bewusst ausgeklammert === -->
 ## Product-Maturity-Roadmap ohne Content-Operation – Stand 2026-06-29
 
+### Aktueller Abarbeitungsstand – P0 Datenschutz/Tracking
+
+Status: P0 ist mit diesem Patch technisch umgesetzt und nach Upload/Deploy nur noch per Live-Smoke zu bestaetigen.
+
+Umgesetzt:
+
+- `config.js` startet GA4 und internes Nutzwerttracking nicht mehr automatisch, sondern erst nach aktiver Statistik-Zustimmung.
+- `/api/value-track.php` ignoriert Nutzwert-Metriken serverseitig, wenn die Statistik-Zustimmung fehlt oder das alte Opt-out-Cookie gesetzt ist.
+- `/datenschutz/` beschreibt Cookies/lokale Speicherung, Statistik, Google Analytics 4, First-Party-Nutzwerttracking, Anbieterbereich und Zahlungen konsistent zum Runtime-Verhalten.
+- Die Datenschutzseite enthaelt eine einfache Einstellungsflaeche fuer `Statistik erlauben`, `Nur notwendige Funktionen` und `Auswahl zuruecksetzen`.
+- Das Consent-Banner bietet gleichwertig `Nur notwendige` und `Statistik erlauben` an; ohne Auswahl bleibt Statistik aus.
+
+Naechster nicht-contentbezogener Workpack nach Deploy-Smoke:
+
+```text
+P1 Browser-Smoke-Tests fuer Kernwege einfuehren
+```
+
 Dieser Block ist die aktuelle Einstiegsschicht fuer **nicht-contentbezogene** Folgearbeiten. Der Content-/KI-/Audit-Betriebsstrang bleibt separat im bisherigen Current-Owner-Block dokumentiert und wird durch diesen Block nicht neu bewertet.
 
 ### Validierte Ausgangslage
@@ -9,7 +27,7 @@ Die App ist fuer den aktuellen Stand kein Feature-Rohbau mehr. Events, Activitie
 
 Validierungsbefunde aus dem Repo-Stand:
 
-- `config.js` aktiviert GA4 und internes Nutzwerttracking ueber `/api/value-track.php`; `/datenschutz/` sagt aktuell noch, dass keine Tracking- und Analyse-Tools eingesetzt werden. Das ist ein P0-Konsistenzproblem.
+- `config.js` startete bisher GA4 und internes Nutzwerttracking automatisch, waehrend `/datenschutz/` noch keine Analyse-Tools beschrieb. Dieses P0-Konsistenzproblem ist mit dem Consent-/Datenschutz-Patch behoben; nach Deploy bleibt nur der Live-Smoke.
 - `js/user-preferences.js` und `js/recommendations.js` enthalten bereits lokale Interessen-, Merkliste-, Ausblendungs- und Empfehlungslogik; daraus ist aber noch kein klares Nutzerfeature mit sichtbarer Merken-/Fuer-dich-/Erinnern-UX geworden.
 - `data/offers.json` nutzt Ortsnamen und `maps_query`, aber keine robusten Koordinatenfelder; echte Naehe-, Karten- oder Umkreissortierung ist damit noch kein Produktfeature.
 - Anbieterbereich, Stripe-/Abo-Flows, Magic Link, Mail-System und Nutzwertmetriken sind technisch vorhanden; der naechste Hebel ist Verkaufsverstaendlichkeit, nicht ein kompletter Neubau.
@@ -18,6 +36,8 @@ Validierungsbefunde aus dem Repo-Stand:
 ### Reihenfolge der naechsten groesseren Baustellen
 
 #### 1. P0 – Datenschutz-/Tracking-Konsistenz herstellen
+
+Status: umgesetzt in diesem Patch; nach Deploy nur noch kurzer Live-Smoke.
 
 Ziel: Technik, Datenschutzerklaerung und ggf. Einwilligungslogik muessen dasselbe sagen.
 
@@ -134,7 +154,7 @@ Als naechstes nicht-contentbezogenes Workpack gilt:
 P0 Datenschutz-/Tracking-Konsistenz herstellen
 ```
 
-Direkt danach sollte ein kleiner Browser-Smoke-Test-Grundstock folgen, bevor `Merken / Fuer dich / Erinnern` oder Standort-/Kartenlogik groesser angefasst werden.
+Da P0 in diesem Patch umgesetzt ist, folgt danach ein kleiner Browser-Smoke-Test-Grundstock, bevor `Merken / Fuer dich / Erinnern` oder Standort-/Kartenlogik groesser angefasst werden.
 <!-- === END BLOCK: ROADMAP_PRODUCT_MATURITY_NON_CONTENT_2026_06_29 === -->
 
 <!-- === BEGIN BLOCK: ROADMAP_CURRENT_OWNER_VIEW_2026_06_27 | Zweck: current-first Status fuer Projektbesitzer nach Doku-Abgleich; Umfang: echte naechste Workpacks, abgeschlossene Punkte, kleine Rest-To-dos, Dokumentationshygiene === -->
