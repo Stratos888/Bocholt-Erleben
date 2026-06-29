@@ -998,7 +998,52 @@ jobs:
             SMOKE_BASE_URL="https://bocholt-erleben.de"
           fi
 
+          echo "SMOKE_BASE_URL=$SMOKE_BASE_URL" >> "$GITHUB_ENV"
+
           python tools/smoke-check-deploy.py \
             --base-url "$SMOKE_BASE_URL" \
             --expected-build "$BUILD_ID"
       # === END BLOCK: DEPLOY_HTTP_SMOKE_CHECK_V1 ===
+
+      # === BEGIN BLOCK: DEPLOY_BROWSER_SMOKE_V1 | Zweck: prueft nach Upload die wichtigsten Browser-Nutzerwege read-only mit Desktop/Mobile-Profil; Umfang: Playwright Chromium, Summary und Screenshots bei Fehlern ===
+      - name: Setup Node for browser smoke
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright for browser smoke
+        shell: bash
+        run: |
+          set -e
+          npm install --no-save playwright@1.50.1
+          npx playwright install --with-deps chromium
+
+      - name: Browser-smoke deployed site
+        shell: bash
+        run: |
+          set -e
+          mkdir -p artifacts/browser-smoke
+          node scripts/browser-smoke.mjs \
+            --base-url "$SMOKE_BASE_URL" \
+            --profile all \
+            --expected-build "$BUILD_ID" \
+            --out-dir artifacts/browser-smoke
+
+      - name: Add browser smoke summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f artifacts/browser-smoke/summary.md ]; then
+            cat artifacts/browser-smoke/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Browser-Smoke hat keine summary.md erzeugt." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload browser smoke artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-smoke-${{ github.ref_name }}-${{ github.run_number }}
+          path: artifacts/browser-smoke/
+          if-no-files-found: warn
+      # === END BLOCK: DEPLOY_BROWSER_SMOKE_V1 ===
