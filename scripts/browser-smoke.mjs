@@ -394,11 +394,25 @@ async function checkActivityFavorites(page, baseUrl, timeoutMs) {
     { timeout: 7000 },
   );
 
-  const favoriteFilter = page.locator('[data-filter-group="personal"][data-filter-value="Favoriten"]').first();
-  await favoriteFilter.waitFor({ state: 'attached', timeout: 7000 });
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: timeoutMs });
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+  await expectVisible(page, '#offer-cards');
 
-  const isDisabled = await favoriteFilter.evaluate((button) => button.disabled || button.getAttribute('aria-disabled') === 'true').catch(() => false);
-  if (isDisabled) throw new Error('Favoriten-Filter bleibt trotz gespeichertem Favorit deaktiviert.');
+  const favoriteFilterCount = await page.locator('[data-filter-group="personal"][data-filter-value="Favoriten"]').count();
+  if (favoriteFilterCount > 0) {
+    throw new Error('Favoriten duerfen nicht mehr als Schnellfilter-Pill erscheinen.');
+  }
+
+  const firstRenderedFavorite = page.locator('#offer-cards [data-activity-favorite-toggle]').first();
+  await firstRenderedFavorite.waitFor({ state: 'visible', timeout: 8000 });
+  const firstRenderedId = String(await firstRenderedFavorite.getAttribute('data-activity-id') || '').trim();
+  const firstRenderedPressed = String(await firstRenderedFavorite.getAttribute('aria-pressed') || '').trim();
+
+  if (firstRenderedId !== activityId || firstRenderedPressed !== 'true') {
+    throw new Error('Gespeicherter Favorit steht nach Reload nicht priorisiert oben.');
+  }
+
+  await expectAnyText(page, ['Deine Favoriten']);
 }
 
 async function checkConsentNavigationResync(browser, baseUrl, profileName, timeoutMs) {

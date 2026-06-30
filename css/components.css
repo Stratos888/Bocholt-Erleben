@@ -1379,7 +1379,7 @@
 }
 /* === END BLOCK: ACTIVITIES_MOBILE_CARD_MEDIA_PARITY_V2 === */
 
-/* === BEGIN BLOCK: ACTIVITY_FAVORITES_CARD_UI_V1 | Zweck: lokale Activity-Favoriten als ruhige Herz-Aktion auf Activity-Cards und Detailpanel; Umfang: Card-Button, Favoriten-Chip und Actionbar-Aktivzustand === */
+/* === BEGIN BLOCK: ACTIVITY_FAVORITES_CARD_UI_V2 | Zweck: lokale Activity-Favoriten als ruhige Herz-Aktion ohne Filter-Pill; Favoriten werden im Feed priorisiert und optional gruppiert === */
 .page--activities .activity-favorite-button{
   position: absolute;
   top: 8px;
@@ -1388,15 +1388,24 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid rgba(18,34,26,0.10);
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(18,34,26,0.09);
   border-radius: 999px;
-  color: color-mix(in srgb, var(--brand-green-900, #18281e) 74%, var(--color-text-secondary, #5f6b73) 26%);
-  background: rgba(255,255,255,0.88);
-  box-shadow: 0 8px 18px rgba(12,22,17,0.10), inset 0 1px 0 rgba(255,255,255,0.88);
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 68%, var(--color-text-secondary, #5f6b73) 32%);
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 8px 18px rgba(12,22,17,0.09), inset 0 1px 0 rgba(255,255,255,0.90);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+@media (hover: hover){
+  .page--activities .activity-favorite-button:hover{
+    transform: translateY(-1px);
+    border-color: rgba(18,34,26,0.14);
+    box-shadow: 0 10px 22px rgba(12,22,17,0.12), inset 0 1px 0 rgba(255,255,255,0.92);
+  }
 }
 
 .page--activities .activity-favorite-button:focus-visible{
@@ -1411,20 +1420,41 @@
 }
 
 .page--activities .activity-favorite-button.is-active{
-  color: color-mix(in srgb, var(--brand-green-900, #18281e) 86%, var(--brand-gold-300, #b69b4c) 14%);
-  background: color-mix(in srgb, var(--brand-green-100, #eaf6db) 72%, white 28%);
-  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 20%, rgba(18,34,26,0.10) 80%);
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--brand-gold-300, #b69b4c) 12%);
+  background: color-mix(in srgb, var(--brand-green-100, #eaf6db) 78%, white 22%);
+  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 22%, rgba(18,34,26,0.08) 78%);
 }
 
 .page--activities .activity-favorite-button.is-active .activity-favorite-button__icon-svg{
   fill: currentColor;
 }
 
-.page--activities .activity-filter-chip--favorite.is-active,
-.page--activities .activity-filter-chip--favorite:not(.is-disabled):hover{
-  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 20%, rgba(18,34,26,0.08) 80%);
-  background: color-mix(in srgb, var(--brand-green-100, #eaf6db) 70%, white 30%);
-  color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--brand-gold-300, #b69b4c) 12%);
+.page--activities .activity-card--rich.is-favorite{
+  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 12%, rgba(18,34,26,0.07) 88%);
+}
+
+.page--activities .activity-feed-section-heading{
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 2px -2px;
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 76%, var(--color-text-secondary, #5f6b73) 24%);
+}
+
+.page--activities .activity-feed-section-heading__title{
+  font-size: 0.82rem;
+  line-height: 1.15;
+  font-weight: 860;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page--activities .activity-feed-section-heading__subtitle{
+  color: var(--color-text-secondary, #5f6b73);
+  font-size: 0.86rem;
+  line-height: 1.22;
+  font-weight: 650;
 }
 
 .activity-detail__favorite-btn.is-active{
@@ -1435,7 +1465,7 @@
 .activity-detail__favorite-btn.is-active .activity-detail__actionbar-icon-svg{
   fill: currentColor;
 }
-/* === END BLOCK: ACTIVITY_FAVORITES_CARD_UI_V1 === */
+/* === END BLOCK: ACTIVITY_FAVORITES_CARD_UI_V2 === */
 
 .page--activities .discovery-card--compact .event-title{
   margin: 0;
@@ -1822,6 +1852,10 @@ body.has-bottom-tabbar{
     gap: 24px;
     max-width: 1140px;
     margin: 0 auto;
+  }
+
+  .page--activities .activity-feed-section-heading{
+    margin: 2px 4px -8px;
   }
 
   .page--activities .discovery-card--compact{

@@ -3,7 +3,7 @@
 
 P1 Browser-Smoke ist auf Main abgenommen: 21/21 OK, 0 Fehler, 0 Warnungen.
 
-Der folgende Produktreife-Schritt ist lokale Activity-Favoriten mit Herz, ohne Login, ohne Cookies und ohne Backend. Favorisierte Aktivitaeten werden in der Aktivitaetenliste bevorzugt und sind per Filter `Favoriten` erreichbar. Events erhalten keine Favoritenlogik; dort bleibt die bestehende Kalender-/Terminaktion massgeblich.
+Der folgende Produktreife-Schritt ist lokale Activity-Favoriten mit Herz, ohne Login, ohne Cookies und ohne Backend. Favorisierte Aktivitaeten werden in der Aktivitaetenliste bevorzugt und ruhig als `Deine Favoriten` gruppiert; sie sind kein Schnellfilter-Pill. Events erhalten keine Favoritenlogik; dort bleibt die bestehende Kalender-/Terminaktion massgeblich.
 
 Mobile Activity-Cards werden in der Bildgeometrie an Event-Cards angeglichen, damit der Wechsel zwischen Events und Aktivitaeten ruhiger wirkt.
 <!-- === END BLOCK: MASTER_ACTIVITY_FAVORITES_STATUS_2026_06_30 === -->

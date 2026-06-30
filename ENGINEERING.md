@@ -6,6 +6,7 @@
 - Es gibt keine Backend-Synchronisierung, kein Login und keine Serveruebertragung.
 - Der gespeicherte Schluessel ist fachlich `activity:<id>`.
 - Events bekommen keine Favoritenlogik; fuer Events bleibt Kalender/Terminaktion der passende Nutzerpfad.
+- Favoriten sind im UI als persoenliche Priorisierung zu behandeln, nicht als Filtergruppe. Schnellfilter bleiben Inhaltsfilter wie Situation, Ort/Naehe oder Aktivitaetsart.
 - UI-Zustand muss ueber `activity:favorites-changed` neu gerendert werden, damit Card, Filter und Detailpanel synchron bleiben.
 - Browser-Smoke muss die lokale Favoritenfunktion pruefen, ohne produktive Daten zu schreiben.
 <!-- === END BLOCK: ENGINEERING_ACTIVITY_FAVORITES_LOCAL_STORAGE_2026_06_30 === -->

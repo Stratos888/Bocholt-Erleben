@@ -1,7 +1,7 @@
-<!-- === BEGIN BLOCK: BROWSER_SMOKE_ACTIVITY_FAVORITES_2026_06_30 | Zweck: erweitert den Browser-Smoke um lokale Activity-Favoriten als neuen Kernpfad; Umfang: Testmatrix-/Reporting-Ergaenzung === -->
+<!-- === BEGIN BLOCK: BROWSER_SMOKE_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 | Zweck: erweitert den Browser-Smoke um lokale Activity-Favoriten als neuen Kernpfad; Umfang: Testmatrix-/Reporting-Ergaenzung === -->
 ## Erweiterung: Activity-Favoriten
 
-Der Browser-Smoke prueft nach diesem Patch zusaetzlich, ob die lokale Activity-Favoritenfunktion im echten Browser nutzbar ist.
+Der Browser-Smoke prueft zusaetzlich, ob die lokale Activity-Favoritenfunktion im echten Browser nutzbar ist und dem Premium-Zielzustand folgt: Favoriten sind persoenliche Priorisierung, kein Schnellfilter.
 
 Pruefung:
 
@@ -10,7 +10,9 @@ Pruefung:
 - Ersten Activity-Herzbutton klicken.
 - Pruefen, ob `activity:<id>` lokal im Nutzerpraeferenzspeicher gespeichert ist.
 - Pruefen, ob der Herzbutton den aktiven Zustand zeigt.
-- Pruefen, ob der Filter `Favoriten` nach gespeicherter Auswahl nicht deaktiviert bleibt.
+- Seite neu laden.
+- Pruefen, ob kein `Favoriten`-Schnellfilter-Pill existiert.
+- Pruefen, ob der gespeicherte Favorit priorisiert oben steht und die Gruppe `Deine Favoriten` sichtbar ist.
 
 Abgrenzung:
 
@@ -18,7 +20,7 @@ Abgrenzung:
 - Keine echten Nutzerkonten.
 - Keine Event-Favoriten.
 - Keine produktiven Schreibaktionen ausser lokaler Browserzustand im isolierten Testkontext.
-<!-- === END BLOCK: BROWSER_SMOKE_ACTIVITY_FAVORITES_2026_06_30 === -->
+<!-- === END BLOCK: BROWSER_SMOKE_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 === -->
 
 # Browser-Smoke-System — Bocholt erleben
 
