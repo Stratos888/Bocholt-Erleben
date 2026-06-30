@@ -412,7 +412,10 @@ async function checkActivityFavorites(page, baseUrl, timeoutMs) {
     throw new Error('Gespeicherter Favorit steht nach Reload nicht priorisiert oben.');
   }
 
-  await expectAnyText(page, ['Deine Favoriten']);
+  const sectionHeadingCount = await page.locator('.activity-feed-section-heading').count();
+  if (sectionHeadingCount > 0) {
+    throw new Error('Favoriten duerfen keine eigene Feed-Section oder Erklaerzeile erzeugen.');
+  }
 }
 
 async function checkConsentNavigationResync(browser, baseUrl, profileName, timeoutMs) {

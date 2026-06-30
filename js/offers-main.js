@@ -20,7 +20,7 @@ const OffersApp = {
     effort: new Set()
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V2 | Zweck: definiert eine einheitliche Nutzerlogik: Schnellfilter bleiben Inhaltsfilter; Favoriten sind persönliche Priorisierung, kein Filterchip | Umfang: Filterreihenfolge, Exklusivgruppen und Filtergruppen-Konfiguration === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V3 | Zweck: definiert eine einheitliche Nutzerlogik: Schnellfilter bleiben Inhaltsfilter; Favoriten sind stille Sortierprioritaet, kein Filterchip und keine Feed-Section | Umfang: Filterreihenfolge, Exklusivgruppen und Filtergruppen-Konfiguration === */
   filterGroupOrder: ["special", "proximity", "situation", "activity_type", "features", "effort"],
   exclusiveFilterGroups: new Set(["proximity"]),
 
@@ -56,7 +56,7 @@ const OffersApp = {
       options: Object.freeze(["Spontan", "Halber Tag", "Längerer Ausflug"])
     })
   }),
-  /* === END BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V2 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V3 === */
   refs: {
     finder: null,
     searchInput: null,
@@ -962,10 +962,7 @@ const OffersApp = {
     this.updateFinderUI();
     this.showLoading(false);
     window.OfferCards.render(
-      this.filteredOffers.map((offer) => this.withRenderedMatchContext(offer)),
-      {
-        groupFavorites: !this.hasActiveFilters() && !String(this.searchTerm || "").trim()
-      }
+      this.filteredOffers.map((offer) => this.withRenderedMatchContext(offer))
     );
   },
   /* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_OWNER_V1 === */

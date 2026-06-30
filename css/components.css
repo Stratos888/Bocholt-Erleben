@@ -1379,7 +1379,7 @@
 }
 /* === END BLOCK: ACTIVITIES_MOBILE_CARD_MEDIA_PARITY_V2 === */
 
-/* === BEGIN BLOCK: ACTIVITY_FAVORITES_CARD_UI_V2 | Zweck: lokale Activity-Favoriten als ruhige Herz-Aktion ohne Filter-Pill; Favoriten werden im Feed priorisiert und optional gruppiert === */
+/* === BEGIN BLOCK: ACTIVITY_FAVORITES_CARD_UI_V3 | Zweck: lokale Activity-Favoriten als ruhige Herz-Aktion ohne Filter-Pill; Favoriten bleiben stille Sortierprioritaet ohne Feed-Section === */
 .page--activities .activity-favorite-button{
   position: absolute;
   top: 8px;
@@ -1433,29 +1433,6 @@
   border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 12%, rgba(18,34,26,0.07) 88%);
 }
 
-.page--activities .activity-feed-section-heading{
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin: 2px 2px -2px;
-  color: color-mix(in srgb, var(--brand-green-900, #18281e) 76%, var(--color-text-secondary, #5f6b73) 24%);
-}
-
-.page--activities .activity-feed-section-heading__title{
-  font-size: 0.82rem;
-  line-height: 1.15;
-  font-weight: 860;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.page--activities .activity-feed-section-heading__subtitle{
-  color: var(--color-text-secondary, #5f6b73);
-  font-size: 0.86rem;
-  line-height: 1.22;
-  font-weight: 650;
-}
 
 .activity-detail__favorite-btn.is-active{
   color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--brand-gold-300, #b69b4c) 12%);
@@ -1465,7 +1442,7 @@
 .activity-detail__favorite-btn.is-active .activity-detail__actionbar-icon-svg{
   fill: currentColor;
 }
-/* === END BLOCK: ACTIVITY_FAVORITES_CARD_UI_V2 === */
+/* === END BLOCK: ACTIVITY_FAVORITES_CARD_UI_V3 === */
 
 .page--activities .discovery-card--compact .event-title{
   margin: 0;
@@ -1854,9 +1831,6 @@ body.has-bottom-tabbar{
     margin: 0 auto;
   }
 
-  .page--activities .activity-feed-section-heading{
-    margin: 2px 4px -8px;
-  }
 
   .page--activities .discovery-card--compact{
     grid-template-columns: minmax(0, 1fr);

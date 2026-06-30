@@ -8,7 +8,7 @@ Umgesetzt:
 - Activity-Favoriten als Herz-Aktion auf Aktivitaetskarten.
 - Activity-Favoriten als Herz-Aktion im mobilen Activity-Detailpanel.
 - Favoriten werden lokal im Browser bzw. in der PWA gespeichert, ohne Cookies, Login, Backend oder Serveruebertragung.
-- Favoriten werden auf `/aktivitaeten/` bevorzugt oben einsortiert und bei vorhandenen Favoriten ruhig unter `Deine Favoriten` gruppiert.
+- Favoriten werden auf `/aktivitaeten/` bevorzugt oben einsortiert, ohne eigene Favoriten-Section, ohne Erklaerzeile und ohne Filterstatus.
 - Kein `Favoriten`-Schnellfilter-Pill: Favoriten sind persoenliche Priorisierung, keine Inhaltskategorie.
 - Mobile Activity-Bilder wurden an die kompaktere Event-Thumbnail-Geometrie angeglichen, damit der Wechsel Events/Aktivitaeten ruhiger wirkt.
 - Events erhalten bewusst keine Favoritenlogik; dort bleibt Kalender/Terminaktion der passende Nutzerpfad.
@@ -24,7 +24,7 @@ Datenschutz-/Rechtsbewertung:
 P1 Browser-Smoke:
 
 - P1 Browser-Smoke auf Main abgenommen: 21/21 OK, 0 Fehler, 0 Warnungen.
-- Neuer Favoriten-Smoke prueft Herz, lokalen Speicher, Reload, Priorisierung und Wegfall des Favoriten-Schnellfilters.
+- Neuer Favoriten-Smoke prueft Herz, lokalen Speicher, Reload, Priorisierung, Wegfall des Favoriten-Schnellfilters und Wegfall einer eigenen Favoriten-Section.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_FAVORITES_CARD_PARITY_2026_06_30 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_2026_06_29 | Zweck: dokumentiert Reporting-Haertung nach erstem Staging-Lauf; Umfang: Warnungslabel, bekannte geschuetzte 401-/Fetch-Hinweise === -->

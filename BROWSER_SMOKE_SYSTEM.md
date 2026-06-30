@@ -1,7 +1,7 @@
 <!-- === BEGIN BLOCK: BROWSER_SMOKE_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 | Zweck: erweitert den Browser-Smoke um lokale Activity-Favoriten als neuen Kernpfad; Umfang: Testmatrix-/Reporting-Ergaenzung === -->
 ## Erweiterung: Activity-Favoriten
 
-Der Browser-Smoke prueft zusaetzlich, ob die lokale Activity-Favoritenfunktion im echten Browser nutzbar ist und dem Premium-Zielzustand folgt: Favoriten sind persoenliche Priorisierung, kein Schnellfilter.
+Der Browser-Smoke prueft zusaetzlich, ob die lokale Activity-Favoritenfunktion im echten Browser nutzbar ist und dem Premium-Zielzustand folgt: Favoriten sind stille persoenliche Sortierprioritaet, kein Schnellfilter und keine eigene Feed-Section.
 
 Pruefung:
 
@@ -12,7 +12,7 @@ Pruefung:
 - Pruefen, ob der Herzbutton den aktiven Zustand zeigt.
 - Seite neu laden.
 - Pruefen, ob kein `Favoriten`-Schnellfilter-Pill existiert.
-- Pruefen, ob der gespeicherte Favorit priorisiert oben steht und die Gruppe `Deine Favoriten` sichtbar ist.
+- Pruefen, ob der gespeicherte Favorit priorisiert oben steht, ohne Favoriten-Pill, ohne `Deine Favoriten`-Section und ohne Erklaerzeile.
 
 Abgrenzung:
 

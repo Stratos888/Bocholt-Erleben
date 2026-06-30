@@ -1,7 +1,7 @@
 <!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 | Zweck: schaerft Nutzerbindung als Premium-Zielzustand ohne Account-Schwere und ohne Event-Favoriten; Umfang: Activity-Favoriten, lokale Priorisierung, Card-Parity === -->
 ## P1 Nutzerbindung Premium – Activity-Favoriten
 
-Zielzustand: Bocholt erleben bietet lokale Aktivitaets-Favoriten als leicht verstaendliches Premium-Nutzerfeature. Nutzer markieren wiederkehrend interessante Aktivitaeten per Herz; die App priorisiert diese Aktivitaeten automatisch oben und gruppiert sie ruhig unter `Deine Favoriten`. Favoriten sind keine Inhaltsfilter und erscheinen nicht als Schnellfilter-Pill.
+Zielzustand: Bocholt erleben bietet lokale Aktivitaets-Favoriten als leicht verstaendliches Premium-Nutzerfeature. Nutzer markieren wiederkehrend interessante Aktivitaeten per Herz; die App priorisiert diese Aktivitaeten automatisch oben. Favoriten sind keine Inhaltsfilter, erscheinen nicht als Schnellfilter-Pill und erzeugen keine eigene Feed-Section.
 
 Entscheidungen:
 
@@ -16,9 +16,8 @@ Akzeptanzkriterien:
 
 - Herz auf Activity-Cards und im mobilen Detailpanel sichtbar und antippbar.
 - Favoritenzustand bleibt nach Reload im selben Browser/PWA erhalten.
-- Favoritenzustand bleibt nach Reload im selben Browser/PWA erhalten.
 - Favorisierte Aktivitaeten werden nach oben priorisiert.
-- Bei vorhandenen Favoriten erscheint die ruhige Gruppe `Deine Favoriten`.
+- Bei vorhandenen Favoriten bleibt die Ergebniszeile ruhig; keine `Deine Favoriten`-Section und keine Erklaerzeile.
 - Schnellfilter bleiben echte Inhaltsfilter; kein Favoriten-Pill in der Schnellfilterleiste.
 - Events erhalten keine parallele Favoritenlogik.
 - Browser-Smoke prueft die Favoritenfunktion read-only/lokal.

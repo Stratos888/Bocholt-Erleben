@@ -3550,6 +3550,7 @@ body.page-route-activities .activity-finder-card .activity-finder__quick-options
   margin-left: 4px;
 }
 
+body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Jetzt besonders"],
 body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Mit Kindern"],
 body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Bei Regen"],
 body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Draußen"]{

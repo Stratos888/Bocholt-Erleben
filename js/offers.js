@@ -1222,28 +1222,8 @@ const OfferCards = (() => {
     return link;
   }
 
-  function createFeedSectionHeading(title, subtitle = "") {
-    const heading = document.createElement("div");
-    heading.className = "activity-feed-section-heading";
-    heading.setAttribute("role", "presentation");
-
-    const titleEl = document.createElement("div");
-    titleEl.className = "activity-feed-section-heading__title";
-    titleEl.textContent = title;
-    heading.appendChild(titleEl);
-
-    if (subtitle) {
-      const subtitleEl = document.createElement("div");
-      subtitleEl.className = "activity-feed-section-heading__subtitle";
-      subtitleEl.textContent = subtitle;
-      heading.appendChild(subtitleEl);
-    }
-
-    return heading;
-  }
-
-  /* === BEGIN BLOCK: ACTIVITIES_FAVORITES_PRIORITY_FEED_V2 | Zweck: Favoriten bleiben persönliche Priorisierung statt Schnellfilter; im ungefilterten Feed werden sie oben ruhig gruppiert, ohne die Filterleiste zu überladen === */
-  function render(offers, options = {}) {
+  /* === BEGIN BLOCK: ACTIVITIES_FAVORITES_SILENT_PRIORITY_FEED_V3 | Zweck: Favoriten bleiben eine stille Sortierpriorität mit Herzstatus; keine Favoriten-Sections, keine Erklaerzeilen und keine Filter-Anmutung im Feed === */
+  function render(offers) {
     const target = ensureContainer();
     if (!target) return;
 
@@ -1270,14 +1250,10 @@ const OfferCards = (() => {
       return;
     }
 
-    const shouldGroupFavorites = !!options.groupFavorites;
-    const favorites = shouldGroupFavorites ? list.filter((offer) => isFavorite(offer)) : [];
-    const others = shouldGroupFavorites ? list.filter((offer) => !isFavorite(offer)) : list;
-    const hasFavoriteGroup = favorites.length > 0;
     let renderedIndex = 0;
     let presenceInserted = false;
 
-    const appendOffer = (offer) => {
+    list.forEach((offer) => {
       target.appendChild(createCard(offer, renderedIndex));
       renderedIndex += 1;
 
@@ -1285,27 +1261,11 @@ const OfferCards = (() => {
         target.appendChild(createActivityPresenceEntry());
         presenceInserted = true;
       }
-    };
-
-    if (hasFavoriteGroup) {
-      target.appendChild(createFeedSectionHeading(
-        "Deine Favoriten",
-        favorites.length === 1 ? "1 Aktivität steht für dich oben." : `${favorites.length} Aktivitäten stehen für dich oben.`
-      ));
-      favorites.forEach(appendOffer);
-
-      if (others.length) {
-        target.appendChild(createFeedSectionHeading("Weitere Aktivitäten"));
-      }
-      others.forEach(appendOffer);
-      return;
-    }
-
-    list.forEach(appendOffer);
+    });
   }
 
   return { render, renderSkeleton };
-  /* === END BLOCK: ACTIVITIES_FAVORITES_PRIORITY_FEED_V2 === */
+  /* === END BLOCK: ACTIVITIES_FAVORITES_SILENT_PRIORITY_FEED_V3 === */
   /* === END BLOCK: ACTIVITIES_MOBILE_PRESENCE_FEED_ENTRY_V1 === */
   /* === END BLOCK: ACTIVITIES_SKELETON_AND_EMPTYSTATE_PARITY_V1 === */
 })();
