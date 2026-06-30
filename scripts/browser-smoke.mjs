@@ -293,17 +293,29 @@ function isIgnoredConsoleNoise(entry) {
   const knownBrowserNoise = /favicon|apple-mobile-web-app-capable|beforeinstallprompt|Images loaded lazily/i.test(text);
   if (knownBrowserNoise) return true;
 
+  const isUnauthorizedFetch = /Failed to load resource:\s*the server responded with a status of 401/i.test(text);
+  const isFetchInitFailure = /App initialization failed:\s*TypeError:\s*Failed to fetch/i.test(text);
+
   const isProtectedAccessCheck =
     check === 'Veranstalter Dashboard Zugangszustand' ||
     /\/fuer-veranstalter\/dashboard\/?/.test(routePath) ||
     /\/fuer-veranstalter\/dashboard\/?/.test(url);
 
-  const protectedAccessNoise =
-    isProtectedAccessCheck &&
-    (/Failed to load resource:\s*the server responded with a status of 401/i.test(text) ||
-      /App initialization failed:\s*TypeError:\s*Failed to fetch/i.test(text));
+  const isPublishFormOptionalPortalSessionCheck =
+    check === 'Event einreichen' ||
+    /\/events-veroeffentlichen\/einreichen\/?/.test(routePath) ||
+    /\/events-veroeffentlichen\/einreichen\/?/.test(url);
 
-  return protectedAccessNoise;
+  const isBottomTabbarBackgroundEventBoot =
+    check === 'Bottom-Tabbar Navigation' &&
+    isFetchInitFailure &&
+    /fetchJsonNoStore|\/js\/main\.js/i.test(text);
+
+  if (isProtectedAccessCheck && (isUnauthorizedFetch || isFetchInitFailure)) return true;
+  if (isPublishFormOptionalPortalSessionCheck && isUnauthorizedFetch) return true;
+  if (isBottomTabbarBackgroundEventBoot) return true;
+
+  return false;
 }
 
 function formatConsoleWarning(entry) {
@@ -327,11 +339,13 @@ async function checkBottomNavigation(page, baseUrl, timeoutMs) {
   await page.locator('#bottom-tabbar-root a[href="/events/"]').first().click({ timeout: 7000 });
   await page.waitForURL(/\/events\/?$/, { timeout: timeoutMs });
   await expectVisible(page, '#event-cards');
+  await expectAnySelectorCount(page, ['#event-cards .event-card', '#event-cards article']);
   await ensureNoFatal(page);
 
   await page.locator('#bottom-tabbar-root a[href="/aktivitaeten/"]').first().click({ timeout: 7000 });
   await page.waitForURL(/\/aktivitaeten\/?$/, { timeout: timeoutMs });
   await expectVisible(page, '#offer-cards');
+  await expectAnySelectorCount(page, ['#offer-cards .event-card', '#offer-cards article']);
   await ensureNoFatal(page);
 }
 

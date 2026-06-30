@@ -68,7 +68,7 @@ Auf `main` bedeutet rot: Live-Zustand pruefen und manuell Hotfix/Rollback entsch
 |---|---|---|
 | Blocker | Kernroute nicht nutzbar, zentrale Karte/Formular/Button fehlt, Consent taucht falsch erneut auf | Staging nicht mergen / Live Hotfix pruefen |
 | Warnung | Browser-Konsole meldet nicht-blockierende, aber noch nicht bekannte Hinweise | Beobachten, kein Sofortblocker |
-| Bekannter Zugangshinweis | Erwartete `401`-/Fetch-Hinweise beim geschuetzten Veranstalter-Dashboard ohne Login, wenn der Zugangszustand sichtbar ist | Im Report nicht als Warnung zaehlen |
+| Bekannter Zugangshinweis | Erwartete `401`-/Fetch-Hinweise beim geschuetzten Veranstalter-Dashboard oder bei optionaler Portal-Session auf der Einreichungsseite ohne Login, wenn der sichtbare Zielzustand OK ist | Im Report nicht als Warnung zaehlen |
 | Nicht-Ziel | Falscher Eventinhalt, falsches Bild, KI-/Sheet-Problem | Content-/KI-/Audit-Strang, nicht Browser-Smoke |
 
 ## Manuelle Ausloesung
@@ -100,3 +100,16 @@ Nach dem ersten Staging-Lauf wurden zwei Punkte gehaertet:
 - Erwartete `401`-/Fetch-Konsolenhinweise beim geschuetzten Veranstalter-Dashboard ohne Login werden nicht mehr als Warnung gezaehlt, solange der sichtbare Zugangszustand erfolgreich geprueft wurde.
 
 Ziel: Der Browser-Smoke soll echte Blocker sichtbar machen, aber erwartete Zugangszustaende nicht als vermeintliche Fehler dramatisieren.
+
+## Reporting-Polish 2026-06-29 V2
+
+Der Staging-Lauf `browser-smoke-staging-3303` zeigte danach noch erwartete Browser-Konsole-Hinweise:
+
+- `401` auf `/events-veroeffentlichen/einreichen/`, weil die Einreichungsseite optional eine vorhandene Veranstalter-Session via `/api/organizer-portal/me.php` prueft. Ohne Login ist `401` fachlich korrekt; die Seite selbst bleibt nutzbar.
+- Ein mobiler `App initialization failed: TypeError: Failed to fetch` waehrend der Bottom-Tabbar-Navigation. Der Navigationscheck wird deshalb verschaerft: Events und Aktivitaeten muessen nach Tabwechsel nicht nur Container, sondern echte Karten rendern. Erst dann wird dieser bekannte Hintergrund-Hinweis ignoriert.
+
+Damit gilt:
+
+- Erwartete Zugangshinweise werden nicht als Warnung gezaehlt.
+- Bottom-Tabbar-Navigation ist strenger: leere Zielcontainer reichen nicht mehr.
+- Echte Konsolenprobleme ausserhalb dieser bekannten Muster bleiben weiterhin sichtbar.

@@ -4412,3 +4412,32 @@ Erwartete Live-Wirkung:
 Offene Grenze:
 - Neue Badegewässer-Aktivitäten müssen künftig bewusst im Guard ergänzt werden. Der Activity-Highlight-Audit warnt, wenn ein Badegewässer-Highlight keinen Eintrag in `data/bathing_water_status.json` hat.
 <!-- === END BLOCK: TEST_STATUS_BATHING_WATER_GUARD_V2_SAFE_WRITEBACK_2026_06_26 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V2_2026_06_29 | Zweck: dokumentiert die zweite Reporting-Haertung nach Staging-Artefakt 3303; Umfang: erwartete 401 auf Einreichungsseite, strengere Bottom-Tabbar-Dynamik, keine App-Funktionsaenderung === -->
+## P1 Browser-Smoke – Reporting-Polish V2 nach Staging-Artefakt 3303 (2026-06-29)
+
+Status: Reporting-Haertung vorbereitet; keine App-Funktionsaenderung.
+
+Befund aus `browser-smoke-staging-3303`:
+- Ergebnis: `21/23 OK, 0 Fehler, 2 Warnungen`.
+- Die Summary klassifiziert Warnungen korrekt als `WARNUNG`, nicht mehr als `FEHLER`.
+- Verbliebene Warnungen:
+  - erwarteter `401` auf `/events-veroeffentlichen/einreichen/` durch optionale Portal-Session-Pruefung ohne Login,
+  - mobiler `App initialization failed: TypeError: Failed to fetch` waehrend Navigation/Browserkontext.
+
+Bewertung:
+- Kein Deploy-Blocker.
+- Event-Einreichung, Bottom-Tabbar, Consent-Reappearing-Fix und alle Kernwege waren sichtbar OK.
+- Der `401` auf der Einreichungsseite ist erwarteter Zugangszustand, weil ohne Login keine Portal-Session existiert.
+
+Haertung:
+- Erwartete `401`-Konsolenhinweise der Einreichungsseite werden als bekannte Zugangshinweise ignoriert, sofern der Seitencheck erfolgreich war.
+- Die Bottom-Tabbar-Navigation prueft nun nach Tabwechsel nicht nur Container-Sichtbarkeit, sondern echte Event-/Activity-Karten.
+- Ein bekannter Hintergrund-Fetch-Hinweis waehrend dieser Navigation wird nur dann nicht gewarnt, wenn der strengere Navigationscheck bestanden hat.
+
+Zielzustand:
+- Stable Baseline soll ohne fachlich erwartete Warnungen laufen.
+- Echte neue Browser-Konsolenprobleme bleiben sichtbar.
+- Harte Kernwegfehler bleiben weiterhin `FEHLER` und machen den Workflow rot.
+<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V2_2026_06_29 === -->
