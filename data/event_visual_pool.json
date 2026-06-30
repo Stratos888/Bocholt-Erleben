@@ -2382,6 +2382,22 @@
           "visual_motif": "neutral_family_play_outdoor"
         },
         {
+          "id": "playfountain-water-splash-01",
+          "src": "/assets/event-visuals/playfountain-water-splash-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches PlayFountain-Visual mit ebenerdigen Wasserfontänen, nasser gelblich-beiger Spielfläche und anonymen Personenbeinen im sommerlichen Spritzbereich.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_playfountain_specific_2026_06_30",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "playfountain_water_splash",
+          "visual_motif_role": "specific",
+          "public_note": "Symbolisches Detailbild; zeigt keine konkrete Orts- oder Rathausansicht."
+        },
+        {
           "id": "family-play-outdoor-03",
           "src": "/assets/event-visuals/family-play-outdoor-03.webp",
           "status": "blocked",
