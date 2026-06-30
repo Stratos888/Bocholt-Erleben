@@ -1,3 +1,25 @@
+<!-- === BEGIN BLOCK: ENGINEERING_BROWSER_SMOKE_RULES_V1_2026_06_29 | Zweck: technische Regeln fuer Browser-Smoke-V1; Umfang: read-only, Trigger, Artefakte, keine Auto-Reparatur === -->
+## Browser-Smoke V1 — Engineering-Regeln
+
+Browser-Smoke ist erlaubt und gewuenscht, wenn er folgende Grenzen einhaelt:
+
+- Nur read-only Browseraktionen.
+- Keine echten Checkouts, E-Mails oder produktiven Schreibaktionen.
+- Keine Auto-Reparatur und kein Auto-Rollback.
+- Stabil vor vollstaendig: wenige robuste Kernwege statt viele fragile Detailtests.
+- Desktop und Mobile werden mit Chromium/Playwright geprueft.
+- Fehler erzeugen Summary, JSON und Screenshots als GitHub-Artefakte.
+- Ein roter Staging-Browser-Smoke blockiert fachlich den Merge nach `main`.
+- Ein roter Main-Browser-Smoke erzeugt Handlungsbedarf fuer Hotfix/Rollback-Entscheidung, fuehrt aber nicht automatisch Code aus.
+
+Owner-Dateien:
+
+- Script: `scripts/browser-smoke.mjs`
+- Manueller Workflow: `.github/workflows/browser-smoke.yml`
+- Deploy-Integration: `.github/workflows/deploy-strato.yml`
+- Betriebsdoku: `BROWSER_SMOKE_SYSTEM.md`
+<!-- === END BLOCK: ENGINEERING_BROWSER_SMOKE_RULES_V1_2026_06_29 === -->
+
 <!-- === BEGIN BLOCK: ENGINEERING_PRIVACY_TRACKING_RUNTIME_CONTRACT_2026_06_29 | Zweck: technischer Contract fuer Datenschutz-/Tracking-Runtime nach P0-Umsetzung; Umfang: Consent-Gating, Serverguard, Folgearbeiten === -->
 ## Datenschutz-/Tracking-Runtime-Contract
 

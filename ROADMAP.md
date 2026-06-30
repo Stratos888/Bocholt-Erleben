@@ -1,3 +1,26 @@
+<!-- === BEGIN BLOCK: ROADMAP_BROWSER_SMOKE_SYSTEM_V1_2026_06_29 | Zweck: finalisiert P1 Browser-Smoke als kleines Deploy-/Manual-Sicherheitsnetz statt grosses Testframework; Umfang: Zielzustand, Trigger, Fehlerverhalten, Abgrenzung === -->
+## P1 Browser-Smoke-System – Zielzustand V1
+
+Status: mit diesem Patch als kleiner read-only Browser-Smoke eingefuehrt.
+
+Entscheidung: Der Browser-Smoke ist notwendig, aber bewusst klein. Er ist kein grosses Testframework und kein Content-Audit. Er schuetzt nur die zentralen App-Wege, die durch UI-/JS-/CSS-Patches real brechen koennen.
+
+Warum notwendig:
+
+- HTTP-/Syntaxchecks beweisen nicht, dass Today, Events, Activities, Bottom-Tabbar, Consent-Systemlayer, Formulare und Anbieterzugang im Browser wirklich nutzbar sind.
+- Der Consent-Reappearing-Fehler nach Bottom-Tab-Wechsel war ein konkretes Beispiel fuer einen Fehler, den reine Syntax-/HTTP-Smokes nicht ausreichend absichern.
+
+Zielzustand:
+
+- Automatisch nach STRATO-Deploy auf `staging` und `main`.
+- Manuell ueber GitHub Actions -> `Browser Smoke`, ohne Redeploy.
+- Read-only: keine echten Zahlungen, E-Mails oder produktiven Schreibaktionen.
+- Bei Fehler: roter Lauf plus `summary.md`, `results.json` und Screenshot-Artefakte.
+- Keine automatische Reparatur, kein automatischer Rollback.
+
+Massgebliche Detaildoku: `BROWSER_SMOKE_SYSTEM.md`.
+<!-- === END BLOCK: ROADMAP_BROWSER_SMOKE_SYSTEM_V1_2026_06_29 === -->
+
 <!-- === BEGIN BLOCK: ROADMAP_PRODUCT_MATURITY_NON_CONTENT_2026_06_29 | Zweck: validierte Nicht-Content-Roadmap nach Gesamtprojektanalyse; Umfang: Produktreife, Nutzerbindung, Standort, Anbieter-/Rechtsreife, technische Konsolidierung; Content-Live-Lauf, KI-Suche und Content-Pruefung bewusst ausgeklammert === -->
 ## Product-Maturity-Roadmap ohne Content-Operation – Stand 2026-06-29
 

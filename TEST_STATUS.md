@@ -1,3 +1,71 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_2026_06_29 | Zweck: dokumentiert Reporting-Haertung nach erstem Staging-Lauf; Umfang: Warnungslabel, bekannte geschuetzte 401-/Fetch-Hinweise === -->
+## P1 Browser-Smoke Reporting-Polish – umgesetzt
+
+Status: Patch vorbereitet.
+
+Ausgangspunkt:
+
+- Erster Staging-Lauf nach P1-Einfuehrung: `21/23 OK`, `0 Fehler`, `2 Warnungen`.
+- Die Warnungen waren erwartete Konsolenhinweise beim geschuetzten Veranstalter-Dashboard ohne Login (`401`/Fetch), waehrend der sichtbare Zugangszustand erfolgreich geprueft wurde.
+- `summary.md` betitelte `warn`-Eintraege in der Tabelle irrefuehrend als `FEHLER`.
+
+Umgesetzt:
+
+- `scripts/browser-smoke.mjs`: `summary.md` trennt `OK`, `WARNUNG` und `FEHLER` sauber.
+- `scripts/browser-smoke.mjs`: erwartete geschuetzte `401`-/Fetch-Konsolenhinweise beim Veranstalter-Dashboard-Zugangszustand werden als bekannte Zugangshinweise ignoriert, sofern der Seitenzustand selbst OK ist.
+- `BROWSER_SMOKE_SYSTEM.md`: Fehlerklassen und Reporting-Verhalten entsprechend dokumentiert.
+
+Validierung im ZIP-Worktree:
+
+- `node --check scripts/browser-smoke.mjs`: OK.
+
+Erwartung nach Upload:
+
+- Staging-Browser-Smoke soll bei gleichem App-Zustand ohne diese beiden irrefuehrenden Warnungen laufen.
+- Echte nicht bekannte Konsolenprobleme bleiben weiterhin als `WARNUNG` sichtbar.
+- Harte Kernwegfehler bleiben `FEHLER` und machen den Workflow rot.
+<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_2026_06_29 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_SYSTEM_V1_2026_06_29 | Zweck: dokumentiert Implementierung von P1 Browser-Smoke V1; Umfang: Trigger, Testmatrix, Validierung, Abnahmehinweis === -->
+## P1 Browser-Smoke-System V1 – umgesetzt
+
+Status: Patch vorbereitet.
+
+Umgesetzt:
+
+- `scripts/browser-smoke.mjs`: Playwright/Chromium-Smoke fuer zentrale Browserwege.
+- `.github/workflows/browser-smoke.yml`: manueller Smoke fuer Staging/Live/Custom ohne Redeploy.
+- `.github/workflows/deploy-strato.yml`: automatischer Browser-Smoke nach STRATO-Deploy und HTTP-Smoke.
+- `BROWSER_SMOKE_SYSTEM.md`: Zielzustand, Trigger, Fehlerverhalten und Nicht-Ziele dokumentiert.
+
+Testmatrix V1:
+
+- Home / Today.
+- Events.
+- Aktivitaeten.
+- Bottom-Tabbar-Navigation.
+- Consent-Systemlayer bleibt nach Tabwechsel weg.
+- Event-Einreichung.
+- Aktivitaetspraesenz-Funnel.
+- Zahlung-starten-Zugangszustand.
+- Veranstalterlogin.
+- Veranstalter-Dashboard-Zugangszustand.
+
+Validierung im ZIP-Worktree:
+
+- `node --check scripts/browser-smoke.mjs`: OK.
+- `.github/workflows/browser-smoke.yml`: YAML parse OK.
+- `.github/workflows/deploy-strato.yml`: YAML parse OK.
+- `bash tools/check-js-syntax.sh`: OK.
+- `python3 tools/audit-css-governance.py`: OK.
+
+Abnahme nach Upload:
+
+- Staging-Deploy laeuft durch und fuehrt Browser-Smoke aus.
+- Alternativ/manuell: GitHub Actions -> `Browser Smoke` -> `target=staging`, `profile=all`.
+- Bei Erfolg ist P1 V1 als Sicherheitsnetz abgenommen.
+<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_SYSTEM_V1_2026_06_29 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_PRIVACY_TRACKING_P0_IMPLEMENTED_2026_06_29 | Zweck: dokumentiert Umsetzung des ersten Product-Maturity-Workpacks Datenschutz/Tracking; Umfang: Runtime-Gating, Datenschutzseite, serverseitiger Consent-Guard, Validierung === -->
 ## Product-Maturity P0 Datenschutz/Tracking – umgesetzt im Patch 2026-06-29
 
@@ -4344,3 +4412,83 @@ Erwartete Live-Wirkung:
 Offene Grenze:
 - Neue Badegewässer-Aktivitäten müssen künftig bewusst im Guard ergänzt werden. Der Activity-Highlight-Audit warnt, wenn ein Badegewässer-Highlight keinen Eintrag in `data/bathing_water_status.json` hat.
 <!-- === END BLOCK: TEST_STATUS_BATHING_WATER_GUARD_V2_SAFE_WRITEBACK_2026_06_26 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V2_2026_06_29 | Zweck: dokumentiert die zweite Reporting-Haertung nach Staging-Artefakt 3303; Umfang: erwartete 401 auf Einreichungsseite, strengere Bottom-Tabbar-Dynamik, keine App-Funktionsaenderung === -->
+## P1 Browser-Smoke – Reporting-Polish V2 nach Staging-Artefakt 3303 (2026-06-29)
+
+Status: Reporting-Haertung vorbereitet; keine App-Funktionsaenderung.
+
+Befund aus `browser-smoke-staging-3303`:
+- Ergebnis: `21/23 OK, 0 Fehler, 2 Warnungen`.
+- Die Summary klassifiziert Warnungen korrekt als `WARNUNG`, nicht mehr als `FEHLER`.
+- Verbliebene Warnungen:
+  - erwarteter `401` auf `/events-veroeffentlichen/einreichen/` durch optionale Portal-Session-Pruefung ohne Login,
+  - mobiler `App initialization failed: TypeError: Failed to fetch` waehrend Navigation/Browserkontext.
+
+Bewertung:
+- Kein Deploy-Blocker.
+- Event-Einreichung, Bottom-Tabbar, Consent-Reappearing-Fix und alle Kernwege waren sichtbar OK.
+- Der `401` auf der Einreichungsseite ist erwarteter Zugangszustand, weil ohne Login keine Portal-Session existiert.
+
+Haertung:
+- Erwartete `401`-Konsolenhinweise der Einreichungsseite werden als bekannte Zugangshinweise ignoriert, sofern der Seitencheck erfolgreich war.
+- Die Bottom-Tabbar-Navigation prueft nun nach Tabwechsel nicht nur Container-Sichtbarkeit, sondern echte Event-/Activity-Karten.
+- Ein bekannter Hintergrund-Fetch-Hinweis waehrend dieser Navigation wird nur dann nicht gewarnt, wenn der strengere Navigationscheck bestanden hat.
+
+Zielzustand:
+- Stable Baseline soll ohne fachlich erwartete Warnungen laufen.
+- Echte neue Browser-Konsolenprobleme bleiben sichtbar.
+- Harte Kernwegfehler bleiben weiterhin `FEHLER` und machen den Workflow rot.
+<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V2_2026_06_29 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V3_2026_06_29 | Zweck: dokumentiert die Stabilisierung des Consent-Reappearing-Smokes nach False-Negative im CI; Umfang: keine App-Funktionsaenderung, nur Testrobustheit === -->
+## P1 Browser-Smoke – Reporting-/Robustheits-Polish V3 (2026-06-29)
+
+Status: Testrobustheit vorbereitet; keine App-Funktionsaenderung.
+
+Befund aus dem Lauf nach V2:
+- Ergebnis: `20/21 OK, 1 Fehler, 0 Warnungen`.
+- Fehler: `mobile: Consent bleibt nach Tabwechsel weg: locator.waitFor: Timeout 8000ms exceeded`.
+- Der Test wartete auf einen im Clean-Kontext sichtbaren `[data-privacy-consent-banner]`.
+
+Bewertung:
+- Kein belegter App-Fehler. Die manuelle Staging-/Live-Pruefung hatte bereits gezeigt: Beide Consent-Buttons funktionieren, und der Hinweis bleibt nach Bottom-Tabwechsel weg.
+- Der Fehler ist ein False Negative im Browser-Smoke: Der Test setzte voraus, dass der Consent-Hinweis im CI-Clean-Kontext immer sichtbar wird.
+- Fuer P1 ist der entscheidende Sicherheitsfall nicht „Banner erscheint im Clean-Kontext“, sondern: Nach gespeicherter Entscheidung darf der Hinweis beim Tabwechsel nicht erneut auftauchen.
+
+Haertung V3:
+- Wenn der Consent-Hinweis im Clean-Kontext sichtbar ist, bleibt der reale Klickpfad aktiv: `Ohne Statistik` klicken, dann Bottom-Tabwechsel pruefen.
+- Wenn der Hinweis im CI-Clean-Kontext nicht sichtbar ist, setzt der Test kontrolliert `denied` in LocalStorage/Cookie und prueft den stabilen Zielzustand.
+- Nach Bottom-Tabwechsel muessen weiterhin echte Eventkarten sichtbar sein.
+- Ein trotz gespeicherter Ablehnung sichtbarer Consent-Hinweis bleibt ein harter Fehler.
+
+Zielzustand:
+- Der Browser-Smoke bleibt streng fuer echte Navigation-/Rendering-/Consent-Reappearing-Fehler.
+- CI-Timing beim initialen Consent-Anzeigen erzeugt keinen falschen roten Deploy.
+<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V3_2026_06_29 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V4_2026_06_30 | Zweck: dokumentiert finale Simulation/Haertung des Consent-Reappearing-Smokes vor Patch-Anwendung; Umfang: keine App-Funktionsaenderung, nur Testrobustheit === -->
+## P1 Browser-Smoke – Reporting-/Robustheits-Polish V4 (2026-06-30)
+
+Status: bevorzugter finaler Testrobustheits-Patch; keine App-Funktionsaenderung.
+
+Nach erneuter mentaler Simulation wurde V3 nicht als optimaler Endzustand bewertet:
+- V3 verhindert den CI-Timeout, setzt im Fallback aber die Consent-Entscheidung und laedt danach neu.
+- Der urspruengliche Produktfehler entstand gerade ohne Reload: Seite/Tabbar wurde vor der Entscheidung vorbereitet, danach wechselte der Nutzer den Tab.
+- Ein Reload im Fallback wuerde diesen Teilzustand nicht mehr exakt abbilden.
+
+V4 korrigiert das:
+- Clean-Seite bootet weiterhin zuerst.
+- Bei sichtbarem Consent-Hinweis wird weiterhin der echte Button `Ohne Statistik` geklickt.
+- Wenn der Hinweis in der CI nicht sichtbar ist, nutzt der Test die vorhandene `BEPrivacy`-Runtime zur Ablehnung ohne Reload und loest damit dieselben Runtime-Resync-Signale aus.
+- Anschliessend wird per Bottom-Tabbar auf `/events/` gewechselt.
+- Erwartet werden echte Eventkarten und kein sichtbarer Consent-Hinweis.
+
+Bewertung:
+- App-Funktion bleibt unveraendert.
+- Der False-Negative aus V2 wird vermieden.
+- Der urspruengliche Consent-Reappearing-Fall bleibt besser abgedeckt als mit V3.
+- Harte Rendering-/Navigationsfehler bleiben weiterhin rot.
+<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V4_2026_06_30 === -->

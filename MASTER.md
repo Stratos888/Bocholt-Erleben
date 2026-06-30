@@ -1,3 +1,22 @@
+<!-- === BEGIN BLOCK: MASTER_BROWSER_SMOKE_CONTROL_V1_2026_06_29 | Zweck: legt Browser-Smoke als naechsten Produktreife-Sicherheitsgurt fest; Umfang: Betriebsentscheidung, Fehlerreaktion, Abgrenzung zu Content/KI === -->
+## Browser-Smoke — strategischer Kontrollstand
+
+Stand: 2026-06-29.
+
+Der Browser-Smoke ist ein kleiner Sicherheitsgurt fuer zentrale Nutzerwege. Er wird nicht als Volltestframework betrieben.
+
+Regeln:
+
+- Automatisch nach Staging-/Main-Deploy pruefen.
+- Manuell ohne Redeploy ueber GitHub Actions `Browser Smoke` pruefbar machen.
+- Read-only bleiben: keine echten Formulare absenden, keine Zahlungen, keine E-Mails.
+- Fehler muessen mit Route, Profil, Screenshot und Summary sichtbar werden.
+- Automatische Reparatur oder Rollback ist nicht Teil von V1.
+- Content-, KI- und Audit-Probleme bleiben eigene Workstreams.
+
+P1 gilt erst als abgeschlossen, wenn der Deploy-Smoke und der manuelle Smoke diese Regeln erfuellen.
+<!-- === END BLOCK: MASTER_BROWSER_SMOKE_CONTROL_V1_2026_06_29 === -->
+
 <!-- === BEGIN BLOCK: MASTER_INBOX_CONTENT_ROUTING_CONTROL_2026_06_26 | Zweck: aktualisiert den strategischen Steuerungsstand fuer Inbox, Content-Pruefung und Visual-Backlog-Trennung; Umfang: Produkt-/Prozessregel, kein Implementierungsdetail === -->
 ### Inbox und Content-Pruefung – strategische Steuerungsregel
 
