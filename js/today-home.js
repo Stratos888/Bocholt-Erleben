@@ -6,6 +6,8 @@
   const FEED_ID = "today-feed";
   const STATUS_ID = "today-status";
   const WEATHER_ID = "today-weather-note";
+  const TODAY_IMPRESSIONS_STORAGE_KEY = "bocholt_erleben.today_home_impressions.v1";
+  const TODAY_IMPRESSIONS_RETENTION_DAYS = 14;
   let state = {
     events: [],
     offers: [],
@@ -24,6 +26,14 @@
 
   function qsa(selector, root = document) {
     return Array.from(root.querySelectorAll(selector));
+  }
+
+  function hasStorage() {
+    try {
+      return typeof window !== "undefined" && !!window.localStorage;
+    } catch (_) {
+      return false;
+    }
   }
 
   function asString(value) {
@@ -610,6 +620,7 @@
       rainRisk: asString(weatherContext.rainRisk || "unknown"),
       outdoorFit: asString(weatherContext.outdoorFit || "unknown"),
       showersLikely: weatherContext.showersLikely === true,
+      todayImpressions: readTodayImpressions(now),
       now
     };
 
@@ -661,6 +672,99 @@
     const base = startOfDay(date || new Date());
     return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}-${String(base.getDate()).padStart(2, "0")}`;
   }
+
+  /* === BEGIN BLOCK: TODAY_HOME_RECENT_ACTIVITY_ROTATION_V1 | Zweck: verhindert, dass dieselben Activity-Tipps ueber Tage hinweg immer wieder dominieren; Umfang: lokale, datenschutzarme Impression-Historie nur fuer Today-Home-Curation, keine UI-/Layout-Aenderung === */
+  function daysSinceDateKey(value, now) {
+    const date = parseLocalDate(value);
+    if (!date) return null;
+
+    return Math.round((startOfDay(now || new Date()).getTime() - startOfDay(date).getTime()) / 86400000);
+  }
+
+  function readTodayImpressions(now = new Date()) {
+    if (!hasStorage()) return Object.freeze({});
+
+    try {
+      const raw = window.localStorage.getItem(TODAY_IMPRESSIONS_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      const sourceItems = parsed && typeof parsed === "object" && parsed.items && typeof parsed.items === "object"
+        ? parsed.items
+        : {};
+      const out = Object.create(null);
+
+      Object.entries(sourceItems).forEach(([key, record]) => {
+        const itemKeyValue = asString(key);
+        const lastShown = asString(record?.lastShown);
+        const ageDays = daysSinceDateKey(lastShown, now);
+
+        if (!itemKeyValue || ageDays == null || ageDays < 0 || ageDays > TODAY_IMPRESSIONS_RETENTION_DAYS) return;
+
+        out[itemKeyValue] = Object.freeze({
+          lastShown,
+          count: Number.isFinite(Number(record?.count)) ? Number(record.count) : 1,
+          type: asString(record?.type),
+          title: asString(record?.title)
+        });
+      });
+
+      return Object.freeze(out);
+    } catch (_) {
+      return Object.freeze({});
+    }
+  }
+
+  function activityRecentPenalty(item, context = {}) {
+    if (item?.type !== "activity" || isSaved(item)) return 0;
+
+    const record = context?.todayImpressions?.[itemKey(item)];
+    const ageDays = daysSinceDateKey(record?.lastShown, context?.now || new Date());
+
+    if (ageDays == null || ageDays <= 0) return 0;
+    if (ageDays === 1) return -32;
+    if (ageDays === 2) return -26;
+    if (ageDays <= 4) return -18;
+    if (ageDays <= 7) return -10;
+    if (ageDays <= TODAY_IMPRESSIONS_RETENTION_DAYS) return -4;
+
+    return 0;
+  }
+
+  function activitySelectionScore(item, context = {}) {
+    return todayScore(item) + activityRecentPenalty(item, context);
+  }
+
+  function recordTodayImpressions(items, context = {}) {
+    const visibleItems = Array.isArray(items) ? items.filter(Boolean) : [];
+    if (!visibleItems.length || !hasStorage()) return;
+
+    const now = context?.now instanceof Date ? context.now : new Date();
+    const today = rotationKey(now);
+    const currentItems = { ...readTodayImpressions(now) };
+
+    visibleItems.forEach((item) => {
+      const key = itemKey(item);
+      if (!key) return;
+
+      const previous = currentItems[key] || {};
+      currentItems[key] = {
+        lastShown: today,
+        count: Number(previous.count || 0) + 1,
+        type: asString(item.type),
+        title: asString(item.title)
+      };
+    });
+
+    try {
+      window.localStorage.setItem(TODAY_IMPRESSIONS_STORAGE_KEY, JSON.stringify({
+        schemaVersion: 1,
+        updatedAt: new Date().toISOString(),
+        items: currentItems
+      }));
+    } catch (_) {
+      // Die Rotation bleibt auch ohne localStorage funktionsfaehig; dann greift nur die Tagesrotation.
+    }
+  }
+  /* === END BLOCK: TODAY_HOME_RECENT_ACTIVITY_ROTATION_V1 === */
 
   function isPastEventItem(item, now) {
     if (item?.type !== "event") return false;
@@ -841,7 +945,7 @@
   function compareActivityCandidates(a, b, context = {}) {
     const aHighlight = hasActiveActivityHighlight(a, context);
     const bHighlight = hasActiveActivityHighlight(b, context);
-    const scoreDiff = todayScore(b) - todayScore(a);
+    const scoreDiff = activitySelectionScore(b, context) - activitySelectionScore(a, context);
 
     if (Math.abs(scoreDiff) >= 18) return scoreDiff;
 
@@ -1109,42 +1213,21 @@
 
   function weatherMessage(context) {
     const weather = asString(context?.weather || "unknown");
-    const currentTemperature = Number(context?.temperature);
-    const maxTemperature = Number(context?.forecast?.maxTemperature);
-    const hasCurrentTemperature = Number.isFinite(currentTemperature);
-    const hasMaxTemperature = Number.isFinite(maxTemperature);
-    const tempLabel = weather === "hot" && hasMaxTemperature && (!hasCurrentTemperature || Math.round(maxTemperature) > Math.round(currentTemperature))
-      ? `bis ${Math.round(maxTemperature)} °C`
-      : hasCurrentTemperature
-        ? `${Math.round(currentTemperature)} °C`
-        : "";
+    const rainRisk = asString(context?.rainRisk || context?.forecast?.rainRisk || "unknown");
     const summaryLabel = asString(context?.summaryLabel);
 
     if (summaryLabel) {
-      return [tempLabel, summaryLabel].filter(Boolean).join(" · ");
+      return `${summaryLabel} · Wetter mitgedacht`;
     }
 
-    if (weather === "hot") {
-      return [tempLabel || "Warm heute", "ideal für Wasser & Schatten"].filter(Boolean).join(" · ");
-    }
+    if (weather === "hot") return "Heute Schatten und Wasser einplanen · Wetter mitgedacht";
+    if (weather === "rain" || rainRisk === "near_term") return "Heute wetterfest planen · Wetter mitgedacht";
+    if (rainRisk === "later_today") return "Heute mit Plan B planen · Wetter mitgedacht";
+    if (weather === "cold") return "Heute kurze Wege oder drinnen wählen · Wetter mitgedacht";
+    if (weather === "windy") return "Heute geschützte Orte wählen · Wetter mitgedacht";
+    if (weather === "dry") return "Heute gut für draußen · Wetter mitgedacht";
 
-    if (weather === "rain") {
-      return [tempLabel, "wechselhaft mit Schauern – wetterfest planen"].filter(Boolean).join(" · ");
-    }
-
-    if (weather === "cold") {
-      return [tempLabel || "Kühl heute", "kurz oder drinnen passt besser"].filter(Boolean).join(" · ");
-    }
-
-    if (weather === "windy") {
-      return [tempLabel, "geschützte Orte passen besser"].filter(Boolean).join(" · ");
-    }
-
-    if (weather === "dry") {
-      return [tempLabel, "ideal für draußen"].filter(Boolean).join(" · ");
-    }
-
-    return "Drei Ideen für Bocholt – ruhig vorsortiert für heute";
+    return "Heute passend vorsortiert · Wetter mitgedacht";
   }
 
   function typeLabel(item) {
@@ -1304,6 +1387,7 @@
 
     renderStatus(`${visible.length} Tipps`);
     hydrateIcons(feed);
+    recordTodayImpressions(visible, createContext());
   }
 
   function renderAll() {

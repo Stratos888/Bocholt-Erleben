@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-const STORAGE_KEY = "bocholt_erleben.weather_context.v3";
+const STORAGE_KEY = "bocholt_erleben.weather_context.v4";
   const CACHE_TTL_MS = 30 * 60 * 1000;
 
   const BOCHOLT = Object.freeze({
@@ -194,14 +194,18 @@ const STORAGE_KEY = "bocholt_erleben.weather_context.v3";
     const temperature = asNumber(current?.temperature_2m, null);
     const maxTemperature = asNumber(forecast?.maxTemperature, null);
     const isHotToday = currentClass === "hot" || (maxTemperature != null && maxTemperature >= 28);
+    const hasHeavyRestdayRain = forecast.rainRisk === "later_today" && (
+      forecast.rainHoursToday >= 4 ||
+      forecast.maxRainProbability >= 70 ||
+      forecast.rainAmountToday >= 3
+    );
 
-    if (currentClass === "rain" || forecast.rainRisk === "near_term") {
+    if (currentClass === "rain" || forecast.rainRisk === "near_term" || hasHeavyRestdayRain) {
       return "rain";
     }
 
     if (currentClass === "cold") return "cold";
     if (isHotToday) return "hot";
-    if (forecast.showersLikely) return "rain";
     if (currentClass === "windy" || forecast.maxWindSpeed >= 35) return "windy";
     if (temperature == null && !forecast.rainHoursToday) return "unknown";
 
@@ -209,19 +213,22 @@ const STORAGE_KEY = "bocholt_erleben.weather_context.v3";
   }
 
   function buildOutdoorSummary(weatherClass, forecast) {
+    const rainRisk = asString(forecast?.rainRisk || "unknown");
+
     if (weatherClass === "rain") {
-      if (forecast.rainRisk === "near_term") {
-        return "wechselhaft mit Schauern – wetterfest planen";
+      if (rainRisk === "near_term") {
+        return "Heute wetterfest planen";
       }
-      return "später Schauer möglich – draußen mit Plan B";
+      return "Heute mit Plan B planen";
     }
 
-    if (weatherClass === "hot") return "ideal für Wasser & Schatten";
-    if (weatherClass === "cold") return "kurz oder drinnen passt besser";
-    if (weatherClass === "windy") return "geschützte Orte passen besser";
-    if (weatherClass === "dry") return "ideal für draußen";
+    if (rainRisk === "later_today") return "Heute mit Plan B planen";
+    if (weatherClass === "hot") return "Heute Schatten und Wasser einplanen";
+    if (weatherClass === "cold") return "Heute kurze Wege oder drinnen wählen";
+    if (weatherClass === "windy") return "Heute geschützte Orte wählen";
+    if (weatherClass === "dry") return "Heute gut für draußen";
 
-    return "ruhig vorsortiert für heute";
+    return "Heute passend vorsortiert";
   }
 
   function buildContext(payload, source) {
@@ -255,7 +262,7 @@ const STORAGE_KEY = "bocholt_erleben.weather_context.v3";
       outdoorFit: "unknown",
       rainRisk: "unknown",
       showersLikely: false,
-      summaryLabel: "ruhig vorsortiert für heute.",
+      summaryLabel: "Heute passend vorsortiert",
       source: "fallback",
       location: "Bocholt",
       latitude: BOCHOLT.latitude,
@@ -349,12 +356,19 @@ const STORAGE_KEY = "bocholt_erleben.weather_context.v3";
   function toRecommendationWeather(context) {
     const data = context && typeof context === "object" ? context : { weather: context };
     const weather = normalizeWeatherClass(data.weather);
+    const forecast = data.forecast && typeof data.forecast === "object" ? data.forecast : {};
+    const rainRisk = asString(data.rainRisk || forecast.rainRisk || "unknown");
+    const hasHeavyRestdayRain = rainRisk === "later_today" && (
+      asNumber(forecast.rainHoursToday, 0) >= 4 ||
+      asNumber(forecast.maxRainProbability, 0) >= 70 ||
+      asNumber(forecast.rainAmountToday, 0) >= 3
+    );
 
-    if (weather === "dry" && (data.showersLikely || data.rainRisk === "near_term" || data.rainRisk === "later_today")) {
+    if (rainRisk === "near_term" || hasHeavyRestdayRain) {
       return "rain";
     }
 
-    return weather;
+    return weather === "rain" && rainRisk === "later_today" ? "dry" : weather;
   }
 
   window.BEWeatherContext = {

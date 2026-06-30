@@ -1,30 +1,3 @@
-<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_FAVORITES_CARD_PARITY_2026_06_30 | Zweck: dokumentiert Activity-Favoriten, mobile Card-Parity und Browser-Smoke-Main-Abnahme; Umfang: aktueller Produktreife-Status nach P1-Smoke === -->
-## Activity-Favoriten und Mobile Card-Parity – umgesetzt
-
-Status: mit diesem Patch umgesetzt; nach Deploy per Browser-Smoke und kurzer Mobile-Sichtprobe zu pruefen.
-
-Umgesetzt:
-
-- Activity-Favoriten als Herz-Aktion auf Aktivitaetskarten.
-- Activity-Favoriten als Herz-Aktion im mobilen Activity-Detailpanel.
-- Favoriten werden lokal im Browser bzw. in der PWA gespeichert, ohne Cookies, Login, Backend oder Serveruebertragung.
-- Favorisierte Aktivitaeten werden in der Aktivitaetenliste nach oben priorisiert.
-- Schnellfilter `Favoriten` zeigt gezielt lokal favorisierte Aktivitaeten.
-- Mobile Activity-Bilder wurden an die kompaktere Event-Thumbnail-Geometrie angeglichen, damit der Wechsel Events/Aktivitaeten ruhiger wirkt.
-- Browser-Smoke prueft die lokale Favoritenfunktion zusaetzlich als echten Browserpfad.
-
-Datenschutz-/Rechtsbewertung:
-
-- Keine neuen Cookies.
-- Keine optionale Statistik-/Trackingverarbeitung.
-- Lokale Speicherung ist fuer die vom Nutzer ausdruecklich gewaehlte Favoritenfunktion erforderlich und wird in `/datenschutz/` beschrieben.
-- Statistik-Consent bleibt davon getrennt.
-
-Vorheriger Abschlussstand:
-
-- P1 Browser-Smoke auf Main abgenommen: 21/21 OK, 0 Fehler, 0 Warnungen.
-<!-- === END BLOCK: TEST_STATUS_ACTIVITY_FAVORITES_CARD_PARITY_2026_06_30 === -->
-
 <!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_2026_06_29 | Zweck: dokumentiert Reporting-Haertung nach erstem Staging-Lauf; Umfang: Warnungslabel, bekannte geschuetzte 401-/Fetch-Hinweise === -->
 ## P1 Browser-Smoke Reporting-Polish – umgesetzt
 
@@ -4468,3 +4441,76 @@ Zielzustand:
 - Echte neue Browser-Konsolenprobleme bleiben sichtbar.
 - Harte Kernwegfehler bleiben weiterhin `FEHLER` und machen den Workflow rot.
 <!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V2_2026_06_29 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V3_2026_06_29 | Zweck: dokumentiert die Stabilisierung des Consent-Reappearing-Smokes nach False-Negative im CI; Umfang: keine App-Funktionsaenderung, nur Testrobustheit === -->
+## P1 Browser-Smoke – Reporting-/Robustheits-Polish V3 (2026-06-29)
+
+Status: Testrobustheit vorbereitet; keine App-Funktionsaenderung.
+
+Befund aus dem Lauf nach V2:
+- Ergebnis: `20/21 OK, 1 Fehler, 0 Warnungen`.
+- Fehler: `mobile: Consent bleibt nach Tabwechsel weg: locator.waitFor: Timeout 8000ms exceeded`.
+- Der Test wartete auf einen im Clean-Kontext sichtbaren `[data-privacy-consent-banner]`.
+
+Bewertung:
+- Kein belegter App-Fehler. Die manuelle Staging-/Live-Pruefung hatte bereits gezeigt: Beide Consent-Buttons funktionieren, und der Hinweis bleibt nach Bottom-Tabwechsel weg.
+- Der Fehler ist ein False Negative im Browser-Smoke: Der Test setzte voraus, dass der Consent-Hinweis im CI-Clean-Kontext immer sichtbar wird.
+- Fuer P1 ist der entscheidende Sicherheitsfall nicht „Banner erscheint im Clean-Kontext“, sondern: Nach gespeicherter Entscheidung darf der Hinweis beim Tabwechsel nicht erneut auftauchen.
+
+Haertung V3:
+- Wenn der Consent-Hinweis im Clean-Kontext sichtbar ist, bleibt der reale Klickpfad aktiv: `Ohne Statistik` klicken, dann Bottom-Tabwechsel pruefen.
+- Wenn der Hinweis im CI-Clean-Kontext nicht sichtbar ist, setzt der Test kontrolliert `denied` in LocalStorage/Cookie und prueft den stabilen Zielzustand.
+- Nach Bottom-Tabwechsel muessen weiterhin echte Eventkarten sichtbar sein.
+- Ein trotz gespeicherter Ablehnung sichtbarer Consent-Hinweis bleibt ein harter Fehler.
+
+Zielzustand:
+- Der Browser-Smoke bleibt streng fuer echte Navigation-/Rendering-/Consent-Reappearing-Fehler.
+- CI-Timing beim initialen Consent-Anzeigen erzeugt keinen falschen roten Deploy.
+<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V3_2026_06_29 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V4_2026_06_30 | Zweck: dokumentiert finale Simulation/Haertung des Consent-Reappearing-Smokes vor Patch-Anwendung; Umfang: keine App-Funktionsaenderung, nur Testrobustheit === -->
+## P1 Browser-Smoke – Reporting-/Robustheits-Polish V4 (2026-06-30)
+
+Status: bevorzugter finaler Testrobustheits-Patch; keine App-Funktionsaenderung.
+
+Nach erneuter mentaler Simulation wurde V3 nicht als optimaler Endzustand bewertet:
+- V3 verhindert den CI-Timeout, setzt im Fallback aber die Consent-Entscheidung und laedt danach neu.
+- Der urspruengliche Produktfehler entstand gerade ohne Reload: Seite/Tabbar wurde vor der Entscheidung vorbereitet, danach wechselte der Nutzer den Tab.
+- Ein Reload im Fallback wuerde diesen Teilzustand nicht mehr exakt abbilden.
+
+V4 korrigiert das:
+- Clean-Seite bootet weiterhin zuerst.
+- Bei sichtbarem Consent-Hinweis wird weiterhin der echte Button `Ohne Statistik` geklickt.
+- Wenn der Hinweis in der CI nicht sichtbar ist, nutzt der Test die vorhandene `BEPrivacy`-Runtime zur Ablehnung ohne Reload und loest damit dieselben Runtime-Resync-Signale aus.
+- Anschliessend wird per Bottom-Tabbar auf `/events/` gewechselt.
+- Erwartet werden echte Eventkarten und kein sichtbarer Consent-Hinweis.
+
+Bewertung:
+- App-Funktion bleibt unveraendert.
+- Der False-Negative aus V2 wird vermieden.
+- Der urspruengliche Consent-Reappearing-Fall bleibt besser abgedeckt als mit V3.
+- Harte Rendering-/Navigationsfehler bleiben weiterhin rot.
+<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V4_2026_06_30 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_TODAY_HOME_WEATHER_ROTATION_POLISH_2026_06_30 | Zweck: dokumentiert die Home-Validierung "Heute" statt "Jetzt", Wetter als Entscheidungsbegruendung und lokale Activity-Rotation; Umfang: index.html, js/weather-context.js, js/today-home.js === -->
+## Today/Home – Wettererklaerung und Activity-Rotation (2026-06-30)
+
+Status: Premium-Polish vorbereitet.
+
+Produktentscheidung:
+- Home bleibt konsequent eine `Heute`-Seite, nicht eine enge `Jetzt`-Seite.
+- Wetter ist kein eigenes Anzeigeziel, sondern erklaert knapp, dass die drei Empfehlungen fuer den heutigen Tag wetter- und situationsbewusst vorsortiert wurden.
+- Der sichtbare Aufbau auf Desktop und Mobile bleibt unveraendert.
+
+Aenderungen:
+- Abschnittstitel von `Was passt jetzt?` auf `Drei Ideen fuer heute` umgestellt.
+- Wetterzeile von temperatur-/algorithmusnahen Formulierungen auf ein konsistentes, nutzerfreundliches Muster umgestellt: `Heute ... · Wetter mitgedacht`.
+- Spaeterer Regen fuehrt nicht mehr automatisch zu einer harten Regenlogik, solange die naechsten Stunden nicht betroffen sind und kein starker Resttagsregen vorliegt.
+- Today-Home merkt lokal und datenschutzarm die zuletzt angezeigten Karten und demotet wiederholt angezeigte Activities fuer mehrere Tage, damit nicht dieselbe Aktivitaet dauerhaft die Home-Auswahl dominiert.
+- Favorisierte/gespeicherte Items werden von dieser Demotion ausgenommen.
+
+Validierung:
+- JS-Syntaxcheck bestanden: `bash tools/check-js-syntax.sh`.
+- Keine CSS-/Layout-Aenderung; Desktop-/Mobile-Aufbau bleibt unveraendert.
+<!-- === END BLOCK: TEST_STATUS_TODAY_HOME_WEATHER_ROTATION_POLISH_2026_06_30 === -->
