@@ -113,3 +113,34 @@ Damit gilt:
 - Erwartete Zugangshinweise werden nicht als Warnung gezaehlt.
 - Bottom-Tabbar-Navigation ist strenger: leere Zielcontainer reichen nicht mehr.
 - Echte Konsolenprobleme ausserhalb dieser bekannten Muster bleiben weiterhin sichtbar.
+
+## Reporting-Polish 2026-06-29 V3
+
+Der Lauf nach V2 zeigte keinen App-Fehler, sondern einen instabilen Consent-Testpfad:
+
+- Der Test erwartete im Clean-Kontext zwingend einen sichtbaren Consent-Hinweis.
+- In der CI kann der Hinweis je nach Timing/Runtime-Zustand nicht sichtbar werden, obwohl der eigentliche Produktzustand korrekt ist.
+- Dadurch entstand ein False Negative: `locator.waitFor: Timeout ... [data-privacy-consent-banner]`.
+
+V3 stabilisiert den Test fachlich:
+
+- Wenn der Consent-Hinweis im Clean-Kontext sichtbar ist, wird weiterhin real `Ohne Statistik` geklickt und danach der Bottom-Tabwechsel geprüft.
+- Wenn der Hinweis im CI-Clean-Kontext nicht sichtbar wird, setzt der Test kontrolliert eine gespeicherte Ablehnung und prüft den eigentlichen P1-Sicherheitsfall: Nach gespeicherter Entscheidung darf der Hinweis beim Bottom-Tabwechsel nicht erscheinen.
+- Nach dem Tabwechsel werden weiterhin echte Eventkarten erwartet. Der Test wird dadurch nicht weicher fuer Navigation oder Rendering.
+
+Damit bleibt der urspruengliche Schutz erhalten, aber der Smoke laeuft nicht wegen eines nicht reproduzierbaren Consent-Anzeige-Timings rot.
+
+
+## Reporting-/Robustheits-Polish 2026-06-30 V4
+
+Vor Anwendung von V3 wurde der Consent-Testpfad erneut gegen den urspruenglichen Fehler simuliert. Ergebnis: V3 wuerde zwar den CI-Timeout vermeiden, aber im Fallback durch einen Reload einen Teil des urspruenglichen Risikos abschneiden. Der relevante Fehler war: Eine Seite wurde ohne Consent-Auswahl vorbereitet, danach wurde die Entscheidung getroffen, und erst beim Bottom-Tabwechsel erschien ein alter Hinweis erneut.
+
+V4 bildet diesen Zustand robuster ab:
+
+- Der Test startet weiterhin in einem Clean-Kontext und laesst die App initial booten.
+- Wenn der Consent-Hinweis sichtbar ist, wird real `Ohne Statistik` geklickt.
+- Wenn der Hinweis in der CI nicht sichtbar wird, setzt der Test die Ablehnung ueber die vorhandene `BEPrivacy`-Runtime statt per Reload. Dadurch bleibt der bereits gebootete Seitenzustand erhalten.
+- Erst danach erfolgt der Bottom-Tabwechsel. So bleibt der urspruengliche Reappearing-Fall abgedeckt.
+- Nach dem Tabwechsel muessen echte Eventkarten sichtbar sein, und ein sichtbarer Consent-Hinweis bleibt ein harter Fehler.
+
+Damit ist V4 der bevorzugte Patch gegenueber V3: stabiler als V2, aber naeher am realen Bug als der V3-Fallback mit Reload.
