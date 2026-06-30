@@ -215,7 +215,7 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
 
     # 4) Feste, Stadtleben, Familie.
     # Familien-/Kinderfeste zuerst, damit Weltkindertagsfest nicht als leeres Stadtfestbild endet.
-    if match(r"\b(weltkindertag(?:sfest)?|kinderfest|familienfest|familienprogramm|spielfest|jugendfarm|ostereiersuche|wasserspaß|wasserspass)\b"):
+    if match(r"\b(weltkindertag(?:sfest)?|kinderfest|familienfest|familienprogramm|spielfest|jugendfarm|ostereiersuche|playfountain|play fountain|wasserspaß|wasserspass|wasserspiel|wasserspielfläche|wasserspielflaeche)\b"):
         return "family_play_outdoor"
 
     if match(r"\b(stadtfest|cityfest|verkaufsoffen|lichtersonntag|aktionstag|innenstadtfest|tag der offenen tür|tag der offenen tuer)\b"):

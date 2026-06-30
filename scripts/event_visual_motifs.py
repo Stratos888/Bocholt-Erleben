@@ -120,6 +120,7 @@ EVENT_VISUAL_MOTIF_RULES: Dict[str, Dict[str, Dict[str, str]]] = {
     },
     "family_play_outdoor": {
         "neutral_family_play_outdoor": {"role": "fallback", "label": "Familie / Spiel draussen allgemein"},
+        "playfountain_water_splash": {"role": "specific", "label": "PlayFountain / Wasserspielflaeche"},
         "children_flea_market": {"role": "specific", "label": "Kinderflohmarkt"},
         "egg_hunt_family": {"role": "specific", "label": "Ostern / Eiersuche"},
     },
@@ -365,6 +366,8 @@ def infer_event_visual_motif(
             return "tasting_event"
 
     if key == "family_play_outdoor":
+        if _match(hay, r"\b(playfountain|play fountain|wasserspa(ß|ss)|wasserspiel|wasserspielfl(ä|ae)che|wasserfont(ä|ae)ne|spritzbereich|spritzfl(ä|ae)che)\b"):
+            return "playfountain_water_splash"
         if _match(hay, r"\b(kinderflohmarkt|kindertr(ö|oe)del)\b"):
             return "children_flea_market"
         if _match(hay, r"\b(ostern|osterei|eiersuche)\b"):

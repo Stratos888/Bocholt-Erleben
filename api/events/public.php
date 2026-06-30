@@ -43,6 +43,22 @@ function public_events_category_for_submission(array $row): string
     return 'Sonstiges';
 }
 
+function public_events_visual_fields_for_submission(array $row): array
+{
+    $title = mb_strtolower(trim((string)($row['title'] ?? '')));
+    $description = mb_strtolower(trim((string)($row['description_text'] ?? '')));
+    $combined = $title . ' ' . $description;
+
+    if (preg_match('/\b(playfountain|play fountain|wasserspaß|wasserspass|wasserspiel|wasserspielfläche|wasserspielflaeche)\b/u', $combined)) {
+        return [
+            'visual_key' => 'family_play_outdoor',
+            'visual_motif' => 'playfountain_water_splash',
+        ];
+    }
+
+    return [];
+}
+
 function public_events_city_from_address(?string $address): string
 {
     $text = trim((string)$address);
@@ -109,6 +125,11 @@ function public_events_normalize_row(array $row): array
 
     if ($url !== '') {
         $event['url'] = $url;
+    }
+
+    $visualFields = public_events_visual_fields_for_submission($row);
+    if ($visualFields !== []) {
+        $event += $visualFields;
     }
 
     $reportingTarget = public_events_reporting_target($row);
