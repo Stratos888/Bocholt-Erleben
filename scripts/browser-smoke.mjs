@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 
 const CONSENT_KEY = 'be_statistics_consent_v1';
 const CONSENT_COOKIE = 'be_statistics_consent';
+const USER_PREFS_KEY = 'bocholt_erleben.user_preferences.v1';
 
 const PROFILES = {
   desktop: {
@@ -349,53 +350,55 @@ async function checkBottomNavigation(page, baseUrl, timeoutMs) {
   await ensureNoFatal(page);
 }
 
-async function setConsentDecisionOnPage(page, state = 'denied') {
-  await page.evaluate(
-    ({ key, cookie, consentState }) => {
-      const maxAge = 180 * 24 * 60 * 60;
-      const secure = window.location.protocol === 'https:' ? '; Secure' : '';
-
-      try {
-        if (window.BEPrivacy && typeof window.BEPrivacy.setStatisticsConsent === 'function') {
-          window.BEPrivacy.setStatisticsConsent(consentState === 'granted');
-          return;
-        }
-      } catch (_) {}
-
-      try {
-        window.localStorage.setItem(key, consentState);
-      } catch (_) {}
-
-      document.cookie = `${cookie}=${encodeURIComponent(consentState)}; Max-Age=${maxAge}; Path=/; SameSite=Lax${secure}`;
-
-      try {
-        window.dispatchEvent(new CustomEvent('be:privacy-consent-changed', { detail: { state: consentState } }));
-      } catch (_) {}
-
-      try {
-        document.querySelector('[data-privacy-consent-banner]')?.remove();
-      } catch (_) {}
-    },
-    { key: CONSENT_KEY, cookie: CONSENT_COOKIE, consentState: state },
-  );
-}
-
-async function clearConsentDecisionOnPage(page) {
-  await page.evaluate(({ key, cookie }) => {
+async function checkActivityFavorites(page, baseUrl, timeoutMs) {
+  await gotoReady(page, baseUrl, '/aktivitaeten/', timeoutMs);
+  await page.evaluate((storageKey) => {
     try {
-      window.localStorage.removeItem(key);
+      localStorage.removeItem(storageKey);
     } catch (_) {}
-    document.cookie = `${cookie}=; Max-Age=0; path=/; SameSite=Lax`;
-  }, { key: CONSENT_KEY, cookie: CONSENT_COOKIE });
-}
+  }, USER_PREFS_KEY);
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: timeoutMs });
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+  await expectVisible(page, '#offer-cards');
+  await expectAnySelectorCount(page, ['#offer-cards .event-card', '#offer-cards article']);
 
-async function isConsentBannerVisible(page, timeoutMs = 1200) {
-  return page
-    .locator('[data-privacy-consent-banner]')
-    .first()
-    .waitFor({ state: 'visible', timeout: timeoutMs })
-    .then(() => true)
-    .catch(() => false);
+  const firstFavorite = page.locator('#offer-cards [data-activity-favorite-toggle]').first();
+  await firstFavorite.waitFor({ state: 'visible', timeout: 8000 });
+
+  const activityId = String(await firstFavorite.getAttribute('data-activity-id') || '').trim();
+  if (!activityId) throw new Error('Favoriten-Button hat keine Activity-ID.');
+
+  await firstFavorite.click({ timeout: 7000 });
+
+  await page.waitForFunction(
+    ({ storageKey, id }) => {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed?.saved) && parsed.saved.includes(`activity:${id}`);
+      } catch (_) {
+        return false;
+      }
+    },
+    { storageKey: USER_PREFS_KEY, id: activityId },
+    { timeout: 7000 },
+  );
+
+  await page.waitForFunction(
+    (id) => {
+      const buttons = Array.from(document.querySelectorAll('[data-activity-favorite-toggle]'));
+      return buttons.some((button) => button.getAttribute('data-activity-id') === id && button.getAttribute('aria-pressed') === 'true');
+    },
+    activityId,
+    { timeout: 7000 },
+  );
+
+  const favoriteFilter = page.locator('[data-filter-group="personal"][data-filter-value="Favoriten"]').first();
+  await favoriteFilter.waitFor({ state: 'attached', timeout: 7000 });
+
+  const isDisabled = await favoriteFilter.evaluate((button) => button.disabled || button.getAttribute('aria-disabled') === 'true').catch(() => false);
+  if (isDisabled) throw new Error('Favoriten-Filter bleibt trotz gespeichertem Favorit deaktiviert.');
 }
 
 async function checkConsentNavigationResync(browser, baseUrl, profileName, timeoutMs) {
@@ -408,33 +411,27 @@ async function checkConsentNavigationResync(browser, baseUrl, profileName, timeo
 
   try {
     await page.goto(absoluteUrl(baseUrl, '/'), { waitUntil: 'domcontentloaded', timeout: timeoutMs });
-    await clearConsentDecisionOnPage(page);
+    await page.evaluate(({ key, cookie }) => {
+      try {
+        localStorage.removeItem(key);
+      } catch (_) {}
+      document.cookie = `${cookie}=; Max-Age=0; path=/; SameSite=Lax`;
+    }, { key: CONSENT_KEY, cookie: CONSENT_COOKIE });
     await page.reload({ waitUntil: 'domcontentloaded', timeout: timeoutMs });
     await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
-    await page.waitForTimeout(500);
 
-    const cleanBannerVisible = await isConsentBannerVisible(page, 4500);
-    if (cleanBannerVisible) {
-      await page.getByRole('button', { name: /Ohne Statistik/i }).click({ timeout: 7000 });
-      await page.locator('[data-privacy-consent-banner]').waitFor({ state: 'hidden', timeout: 7000 });
-    } else {
-      console.log(`ℹ️ ${profileName}: Consent-Hinweis im Clean-Kontext nicht sichtbar; simuliere Ablehnung ueber BEPrivacy-Runtime und pruefe denselben Tabwechsel-Zustand`);
-      await setConsentDecisionOnPage(page, 'denied');
-      await page.waitForTimeout(500);
-      if (await isConsentBannerVisible(page, 1200)) {
-        throw new Error('Consent-Hinweis ist trotz gespeicherter Ablehnung sichtbar.');
-      }
-    }
+    await expectVisible(page, '[data-privacy-consent-banner]', 8000);
+    await page.getByRole('button', { name: /Ohne Statistik/i }).click({ timeout: 7000 });
+    await page.locator('[data-privacy-consent-banner]').waitFor({ state: 'detached', timeout: 7000 });
 
     const eventsLink = page.locator('#bottom-tabbar-root a[href="/events/"]').first();
     await eventsLink.waitFor({ state: 'visible', timeout: 7000 });
     await eventsLink.click();
     await page.waitForURL(/\/events\/?$/, { timeout: timeoutMs });
-    await expectVisible(page, '#event-cards');
-    await expectAnySelectorCount(page, ['#event-cards .event-card', '#event-cards article']);
     await page.waitForTimeout(1000);
 
-    if (await isConsentBannerVisible(page, 1200)) {
+    const bannerCount = await page.locator('[data-privacy-consent-banner]').count();
+    if (bannerCount !== 0) {
       throw new Error('Consent-Hinweis erscheint nach Bottom-Tab-Wechsel erneut.');
     }
   } finally {
@@ -495,6 +492,10 @@ async function runProfile(browser, baseUrl, profileName, args, results) {
         await checkRoute(page, baseUrl, route, args.timeoutMs);
       });
     }
+
+    await runChecked('Activity-Favoriten lokal', '/aktivitaeten/', async () => {
+      await checkActivityFavorites(page, baseUrl, args.timeoutMs);
+    });
 
     if (profileName === 'mobile') {
       await runChecked('Bottom-Tabbar Navigation', '/', async () => {

@@ -1267,8 +1267,8 @@
 /* === BEGIN BLOCK: ACTIVITIES_MOBILE_CARD_MEDIA_PARITY_V2 | Zweck: zeigt Activity-Bilder im mobilen Card-Feed als ruhige Thumbnail-Spalte analog zu Eventcards und entfernt redundante Kategorie-Kicker aus der Card-Hierarchie | Umfang: mobile Activity-Card-Shell, Media, Body-Anbindung und Kicker-Ausblendung === */
 .page--activities .discovery-card--compact{
   --rail-w: 0px;
-  --activity-card-thumb-w: clamp(78px, 23vw, 90px);
-  --activity-card-thumb-h: clamp(62px, 18vw, 72px);
+  --activity-card-thumb-w: clamp(66px, 19vw, 76px);
+  --activity-card-thumb-h: clamp(58px, 16vw, 66px);
   grid-template-columns: minmax(0, 1fr) var(--activity-card-thumb-w);
   column-gap: 10px;
   align-items: center;
@@ -1378,6 +1378,64 @@
   display: none;
 }
 /* === END BLOCK: ACTIVITIES_MOBILE_CARD_MEDIA_PARITY_V2 === */
+
+/* === BEGIN BLOCK: ACTIVITY_FAVORITES_CARD_UI_V1 | Zweck: lokale Activity-Favoriten als ruhige Herz-Aktion auf Activity-Cards und Detailpanel; Umfang: Card-Button, Favoriten-Chip und Actionbar-Aktivzustand === */
+.page--activities .activity-favorite-button{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(18,34,26,0.10);
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 74%, var(--color-text-secondary, #5f6b73) 26%);
+  background: rgba(255,255,255,0.88);
+  box-shadow: 0 8px 18px rgba(12,22,17,0.10), inset 0 1px 0 rgba(255,255,255,0.88);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page--activities .activity-favorite-button:focus-visible{
+  outline: 2px solid var(--cmp-focus-ring-brand);
+  outline-offset: 2px;
+}
+
+.page--activities .activity-favorite-button__icon-svg{
+  display: block;
+  width: 17px;
+  height: 17px;
+}
+
+.page--activities .activity-favorite-button.is-active{
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 86%, var(--brand-gold-300, #b69b4c) 14%);
+  background: color-mix(in srgb, var(--brand-green-100, #eaf6db) 72%, white 28%);
+  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 20%, rgba(18,34,26,0.10) 80%);
+}
+
+.page--activities .activity-favorite-button.is-active .activity-favorite-button__icon-svg{
+  fill: currentColor;
+}
+
+.page--activities .activity-filter-chip--favorite.is-active,
+.page--activities .activity-filter-chip--favorite:not(.is-disabled):hover{
+  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 20%, rgba(18,34,26,0.08) 80%);
+  background: color-mix(in srgb, var(--brand-green-100, #eaf6db) 70%, white 30%);
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--brand-gold-300, #b69b4c) 12%);
+}
+
+.activity-detail__favorite-btn.is-active{
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--brand-gold-300, #b69b4c) 12%);
+  background: color-mix(in srgb, var(--brand-green-100, #eaf6db) 70%, white 30%);
+}
+
+.activity-detail__favorite-btn.is-active .activity-detail__actionbar-icon-svg{
+  fill: currentColor;
+}
+/* === END BLOCK: ACTIVITY_FAVORITES_CARD_UI_V1 === */
 
 .page--activities .discovery-card--compact .event-title{
   margin: 0;

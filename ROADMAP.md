@@ -1,3 +1,27 @@
+<!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 | Zweck: schaerft Nutzerbindung als Premium-Zielzustand ohne Account-Schwere und ohne Event-Favoriten; Umfang: Activity-Favoriten, lokale Priorisierung, Card-Parity === -->
+## P1 Nutzerbindung Premium – Activity-Favoriten
+
+Zielzustand: Bocholt erleben bietet lokale Aktivitaets-Favoriten als leicht verstaendliches Premium-Nutzerfeature. Nutzer markieren wiederkehrend interessante Aktivitaeten per Herz, finden sie ueber `Favoriten` schneller wieder und sehen sie in der Aktivitaetenliste bevorzugt oben.
+
+Entscheidungen:
+
+- Begriff und Icon: `Favoriten` mit Herz.
+- Geltung: nur Aktivitaeten, nicht Events. Events bleiben ueber Kalender-/Terminaktionen geloest.
+- Kein Login, kein Konto, kein Sync, kein Backend.
+- Speicherung: lokal im Browser/PWA via bestehendem Nutzerpraeferenz-Speicher.
+- Datenschutz: keine Cookies, keine Serveruebertragung, kein Tracking; Hinweis in `/datenschutz/`.
+- Mobile UI: Activity-Cards werden in der Bildgeometrie an Event-Cards angeglichen, damit Seitenwechsel nicht wie ein Layoutsprung wirken.
+
+Akzeptanzkriterien:
+
+- Herz auf Activity-Cards und im mobilen Detailpanel sichtbar und antippbar.
+- Favoritenzustand bleibt nach Reload im selben Browser/PWA erhalten.
+- Favorisierte Aktivitaeten werden nach oben priorisiert.
+- Filter `Favoriten` zeigt die lokale Auswahl.
+- Events erhalten keine parallele Favoritenlogik.
+- Browser-Smoke prueft die Favoritenfunktion read-only/lokal.
+<!-- === END BLOCK: ROADMAP_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 === -->
+
 <!-- === BEGIN BLOCK: ROADMAP_BROWSER_SMOKE_SYSTEM_V1_2026_06_29 | Zweck: finalisiert P1 Browser-Smoke als kleines Deploy-/Manual-Sicherheitsnetz statt grosses Testframework; Umfang: Zielzustand, Trigger, Fehlerverhalten, Abgrenzung === -->
 ## P1 Browser-Smoke-System – Zielzustand V1
 

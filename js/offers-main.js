@@ -13,6 +13,7 @@ const OffersApp = {
   searchTerm: "",
   activeFilters: {
     special: new Set(),
+    personal: new Set(),
     situation: new Set(),
     proximity: new Set(),
     activity_type: new Set(),
@@ -21,10 +22,15 @@ const OffersApp = {
   },
 
   /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V1 | Zweck: definiert eine einheitliche Nutzerlogik: jeder weitere Filter verengt die Treffer; Ort/Nähe blockiert dabei parallele Alternativen, damit Schnellfilter nicht wie OR-Wechsel wirken; Umfang: Filterreihenfolge, Exklusivgruppen und Filtergruppen-Konfiguration === */
-  filterGroupOrder: ["special", "proximity", "situation", "activity_type", "features", "effort"],
+  filterGroupOrder: ["personal", "special", "proximity", "situation", "activity_type", "features", "effort"],
   exclusiveFilterGroups: new Set(["proximity"]),
 
   filterGroups: Object.freeze({
+    personal: Object.freeze({
+      label: "Persönlich",
+      mode: "all",
+      options: Object.freeze(["Favoriten"])
+    }),
     special: Object.freeze({
       label: "Jetzt",
       mode: "all",
@@ -423,6 +429,10 @@ const OffersApp = {
       this.resetFilters();
     });
 
+    window.addEventListener("activity:favorites-changed", () => {
+      this.applyFilterAndRender();
+    });
+
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
       this.closeAdvancedFilters();
@@ -566,12 +576,24 @@ const OffersApp = {
     return !!this.getPrimaryActiveHighlight(offer);
   },
 
+  isFavoriteOffer(offer) {
+    try {
+      return !!window.BEUserPreferences?.isSaved?.("activity", offer?.id);
+    } catch (_) {
+      return false;
+    }
+  },
+
   activeSeasonalHighlightLabel(offer) {
     const highlight = this.getPrimaryActiveHighlight(offer);
     return String(highlight?.short_label || highlight?.label || "Jetzt besonders").trim();
   },
 
   getOfferFilterValues(offer, group) {
+    if (group === "personal") {
+      return this.isFavoriteOffer(offer) ? ["Favoriten"] : [];
+    }
+
     if (group === "special") {
       return this.hasActiveSeasonalHighlight(offer) ? ["Jetzt besonders"] : [];
     }
@@ -637,6 +659,10 @@ const OffersApp = {
   rankOffer(offer) {
     let score = 0;
 
+    if (this.isFavoriteOffer(offer)) {
+      score += 120;
+    }
+
     this.filterGroupOrder.forEach((group) => {
       const activeValues = this.getActiveValues(group);
       if (!activeValues.length) return;
@@ -644,7 +670,8 @@ const OffersApp = {
       const values = new Set(this.getOfferFilterValues(offer, group));
       activeValues.forEach((value) => {
         if (values.has(value)) {
-          if (group === "special") score += 24;
+          if (group === "personal") score += 40;
+          else if (group === "special") score += 24;
           else if (group === "proximity") score += 18;
           else if (group === "features") score += 14;
           else if (group === "situation") score += 12;
@@ -688,6 +715,10 @@ const OffersApp = {
     const normalizedTags = new Set(this.normalizeArray(offer?.tags));
     const normalizedFacts = new Set(this.normalizeArray(offer?.cardFacts));
 
+    if (group === "personal" && value === "Favoriten") {
+      return "Favorit";
+    }
+
     if (group === "special" && value === "Jetzt besonders") {
       return this.activeSeasonalHighlightLabel(offer) || "Jetzt besonders";
     }
@@ -723,7 +754,7 @@ const OffersApp = {
   },
 
   getActiveMatchLabels(offer) {
-    const orderedGroups = ["special", "situation", "features", "proximity", "activity_type", "effort"];
+    const orderedGroups = ["personal", "special", "situation", "features", "proximity", "activity_type", "effort"];
     const labels = [];
     const seen = new Set();
 
@@ -761,6 +792,7 @@ const OffersApp = {
       activeSeasonalHighlightLabel: activeSeasonalHighlight
         ? String(activeSeasonalHighlight.short_label || activeSeasonalHighlight.label || "Jetzt besonders").trim()
         : "",
+      isFavorite: this.isFavoriteOffer(offer),
       activeMatchLabels: this.getActiveMatchLabels(offer)
     };
   },
@@ -809,7 +841,7 @@ const OffersApp = {
       const isExclusiveBlocked = this.isBlockedByActiveExclusiveGroup(group, value);
       const count = this.countProjectedMatches(group, value);
 
-      if (group === "special") {
+      if (group === "special" && value === "Jetzt besonders") {
         const shouldHide = !isActive && count === 0;
         button.hidden = shouldHide;
         const groupEl = button.closest?.(".activity-finder__group[data-filter-group='special']");
