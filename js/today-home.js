@@ -1216,18 +1216,16 @@
     const rainRisk = asString(context?.rainRisk || context?.forecast?.rainRisk || "unknown");
     const summaryLabel = asString(context?.summaryLabel);
 
-    if (summaryLabel) {
-      return `${summaryLabel} · Wetter mitgedacht`;
-    }
+    if (summaryLabel) return summaryLabel;
 
-    if (weather === "hot") return "Heute Schatten und Wasser einplanen · Wetter mitgedacht";
-    if (weather === "rain" || rainRisk === "near_term") return "Heute wetterfest planen · Wetter mitgedacht";
-    if (rainRisk === "later_today") return "Heute mit Plan B planen · Wetter mitgedacht";
-    if (weather === "cold") return "Heute kurze Wege oder drinnen wählen · Wetter mitgedacht";
-    if (weather === "windy") return "Heute geschützte Orte wählen · Wetter mitgedacht";
-    if (weather === "dry") return "Heute gut für draußen · Wetter mitgedacht";
+    if (weather === "hot") return "Heiß und trocken";
+    if (weather === "rain" || rainRisk === "near_term") return "Regnerisch";
+    if (rainRisk === "later_today") return "Später Schauer möglich";
+    if (weather === "cold") return "Kühl und trocken";
+    if (weather === "windy") return "Windig";
+    if (weather === "dry") return "Trocken";
 
-    return "Heute passend vorsortiert · Wetter mitgedacht";
+    return "Wetterlage heute offen";
   }
 
   function typeLabel(item) {
@@ -1329,7 +1327,7 @@
               <span data-ui-icon="${escapeHtml(typeIcon(item))}" aria-hidden="true"></span>
               ${escapeHtml(typeLabel(item))}
             </span>
-            ${showTopBadge ? `<span class="today-card__badge">Top-Tipp</span>` : ""}
+            ${showTopBadge ? `<span class="today-card__badge">Empfohlen</span>` : ""}
           </div>
           <h2 class="today-card__title">${escapeHtml(item.title)}</h2>
           ${meta ? `<p class="today-card__meta">${escapeHtml(meta)}</p>` : ""}
@@ -1385,7 +1383,7 @@
       </section>
     `.trim();
 
-    renderStatus(`${visible.length} Tipps`);
+    renderStatus(`${visible.length} Vorschläge`);
     hydrateIcons(feed);
     recordTodayImpressions(visible, createContext());
   }
@@ -1521,7 +1519,7 @@
 
     bindEvents(root);
     renderSkeleton();
-    renderStatus("Lade Ideen für heute …");
+    renderStatus("Lade Vorschläge für heute …");
 
     try {
       await Promise.all([loadData(), loadWeather()]);

@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-const STORAGE_KEY = "bocholt_erleben.weather_context.v4";
+  const STORAGE_KEY = "bocholt_erleben.weather_context.v5";
   const CACHE_TTL_MS = 30 * 60 * 1000;
 
   const BOCHOLT = Object.freeze({
@@ -212,24 +212,60 @@ const STORAGE_KEY = "bocholt_erleben.weather_context.v4";
     return "dry";
   }
 
-  function buildOutdoorSummary(weatherClass, forecast) {
-    const rainRisk = asString(forecast?.rainRisk || "unknown");
+  /* === BEGIN BLOCK: TODAY_WEATHER_SUMMARY_LABELS_V2 | Zweck: beschreibt die Wetterlage als ruhigen Tages-Cue statt die Empfehlungslogik zu erklaeren; Umfang: nur Textableitung fuer Today-Home-Wetterhinweis === */
+  function temperatureLabel(maxTemperature, currentTemperature) {
+    const value = Number.isFinite(Number(maxTemperature))
+      ? Number(maxTemperature)
+      : Number.isFinite(Number(currentTemperature))
+        ? Number(currentTemperature)
+        : null;
 
-    if (weatherClass === "rain") {
-      if (rainRisk === "near_term") {
-        return "Heute wetterfest planen";
-      }
-      return "Heute mit Plan B planen";
+    if (value == null) return "";
+    if (value < 5) return "kalt";
+    if (value < 12) return "kühl";
+    if (value < 19) return "mild";
+    if (value < 26) return "warm";
+    if (value < 30) return "sehr warm";
+    return "heiß";
+  }
+
+  function capitalizeLabel(text) {
+    const value = asString(text);
+    return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : "";
+  }
+
+  function buildWeatherSummary(weatherClass, forecast, current) {
+    const rainRisk = asString(forecast?.rainRisk || "unknown");
+    const temp = temperatureLabel(forecast?.maxTemperature, current?.temperature_2m);
+    const tempStart = capitalizeLabel(temp);
+    const maxWindSpeed = asNumber(forecast?.maxWindSpeed, 0);
+    const isWindy = weatherClass === "windy" || maxWindSpeed >= 35;
+
+    if (weatherClass === "rain" || rainRisk === "near_term") {
+      if (temp) return `Regnerisch und ${temp}`;
+      return "Regnerisch";
     }
 
-    if (rainRisk === "later_today") return "Heute mit Plan B planen";
-    if (weatherClass === "hot") return "Heute Schatten und Wasser einplanen";
-    if (weatherClass === "cold") return "Heute kurze Wege oder drinnen wählen";
-    if (weatherClass === "windy") return "Heute geschützte Orte wählen";
-    if (weatherClass === "dry") return "Heute gut für draußen";
+    if (rainRisk === "later_today") {
+      if (tempStart) return `${tempStart}, später Schauer`;
+      return "Später Schauer möglich";
+    }
 
-    return "Heute passend vorsortiert";
+    if (isWindy) {
+      if (tempStart) return `${tempStart} und windig`;
+      return "Windig";
+    }
+
+    if (weatherClass === "hot") return `${tempStart || "Heiß"} und trocken`;
+    if (weatherClass === "cold") return `${tempStart || "Kühl"} und trocken`;
+    if (weatherClass === "dry") {
+      if (tempStart) return `${tempStart} und trocken`;
+      return "Trocken";
+    }
+
+    return "Wetterlage heute offen";
   }
+  /* === END BLOCK: TODAY_WEATHER_SUMMARY_LABELS_V2 === */
 
   function buildContext(payload, source) {
     const data = payload && typeof payload === "object" ? payload : {};
@@ -242,7 +278,7 @@ const STORAGE_KEY = "bocholt_erleben.weather_context.v4";
       outdoorFit: weatherClass === "dry" ? "good" : weatherClass === "rain" ? "changeable" : "limited",
       rainRisk: forecast.rainRisk,
       showersLikely: forecast.showersLikely,
-      summaryLabel: buildOutdoorSummary(weatherClass, forecast),
+      summaryLabel: buildWeatherSummary(weatherClass, forecast, current),
       source: source || "unknown",
       location: "Bocholt",
       latitude: BOCHOLT.latitude,
@@ -262,7 +298,7 @@ const STORAGE_KEY = "bocholt_erleben.weather_context.v4";
       outdoorFit: "unknown",
       rainRisk: "unknown",
       showersLikely: false,
-      summaryLabel: "Heute passend vorsortiert",
+      summaryLabel: "Wetterlage heute offen",
       source: "fallback",
       location: "Bocholt",
       latitude: BOCHOLT.latitude,
