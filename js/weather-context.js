@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "bocholt_erleben.weather_context.v6";
+  const STORAGE_KEY = "bocholt_erleben.weather_context.v7";
   const CACHE_TTL_MS = 30 * 60 * 1000;
 
   const BOCHOLT = Object.freeze({
@@ -232,21 +232,34 @@
     return "dry";
   }
 
-  /* === BEGIN BLOCK: TODAY_WEATHER_SUMMARY_LABELS_V3 | Zweck: liefert einen ruhigen Tages-Cue plus semantisches Wetter-Icon aus derselben Wetterlage; Umfang: Text- und Iconableitung fuer Today-Home ohne UI-/Layout-Entscheidung === */
-  function temperatureLabel(maxTemperature, currentTemperature) {
+  /* === BEGIN BLOCK: TODAY_WEATHER_SUMMARY_LABELS_V4 | Zweck: liefert einen ruhigen Tages-Cue plus semantisches Wetter-Icon aus derselben Wetterlage; Umfang: Text-, Temperaturband- und Iconableitung fuer Today-Home ohne UI-/Layout-Entscheidung === */
+  function temperatureBand(maxTemperature, currentTemperature) {
     const value = Number.isFinite(Number(maxTemperature))
       ? Number(maxTemperature)
       : Number.isFinite(Number(currentTemperature))
         ? Number(currentTemperature)
         : null;
 
-    if (value == null) return "";
-    if (value < 5) return "kalt";
-    if (value < 12) return "kühl";
+    if (value == null) return "unknown";
+    if (value < 5) return "cold";
+    if (value < 12) return "cool";
     if (value < 19) return "mild";
-    if (value < 26) return "warm";
-    if (value < 30) return "sehr warm";
-    return "heiß";
+    if (value < 28) return "warm";
+    if (value < 30) return "very_warm";
+    return "hot";
+  }
+
+  function temperatureLabel(maxTemperature, currentTemperature) {
+    const band = temperatureBand(maxTemperature, currentTemperature);
+
+    if (band === "cold") return "kalt";
+    if (band === "cool") return "kühl";
+    if (band === "mild") return "mild";
+    if (band === "warm") return "warm";
+    if (band === "very_warm") return "sehr warm";
+    if (band === "hot") return "heiß";
+
+    return "";
   }
 
   function capitalizeLabel(text) {
@@ -302,7 +315,7 @@
 
     return summary("Wetterlage heute offen", "weather-unknown");
   }
-  /* === END BLOCK: TODAY_WEATHER_SUMMARY_LABELS_V3 === */
+  /* === END BLOCK: TODAY_WEATHER_SUMMARY_LABELS_V4 === */
 
   function buildContext(payload, source) {
     const data = payload && typeof payload === "object" ? payload : {};
@@ -310,12 +323,14 @@
     const forecast = summarizeHourlyForecast(readHourlyRows(data.hourly), new Date());
     const weatherClass = classifyForecastWeather(current, forecast);
     const weatherSummary = buildWeatherSummary(weatherClass, forecast, current);
+    const todayTemperatureBand = temperatureBand(forecast?.maxTemperature, current?.temperature_2m);
 
     return {
       weather: normalizeWeatherClass(weatherClass),
       outdoorFit: weatherClass === "dry" ? "good" : weatherClass === "rain" ? "changeable" : "limited",
       rainRisk: forecast.rainRisk,
       showersLikely: forecast.showersLikely,
+      temperatureBand: todayTemperatureBand,
       summaryLabel: weatherSummary.label,
       summaryIcon: weatherSummary.icon,
       summary: weatherSummary,
@@ -338,6 +353,7 @@
       outdoorFit: "unknown",
       rainRisk: "unknown",
       showersLikely: false,
+      temperatureBand: "unknown",
       summaryLabel: "Wetterlage heute offen",
       summaryIcon: "weather-unknown",
       summary: Object.freeze({ label: "Wetterlage heute offen", icon: "weather-unknown" }),

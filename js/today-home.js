@@ -610,6 +610,8 @@
     const weatherApi = getWeather();
     const profile = getProfile();
     const weatherContext = state.weatherContext || {};
+    const weatherForecast = weatherContext.forecast && typeof weatherContext.forecast === "object" ? weatherContext.forecast : {};
+    const maxTemperature = Number(weatherForecast.maxTemperature);
     const weather = weatherApi?.toRecommendationWeather
       ? weatherApi.toRecommendationWeather(weatherContext)
       : "unknown";
@@ -620,6 +622,8 @@
       rainRisk: asString(weatherContext.rainRisk || "unknown"),
       outdoorFit: asString(weatherContext.outdoorFit || "unknown"),
       showersLikely: weatherContext.showersLikely === true,
+      temperatureBand: asString(weatherContext.temperatureBand || "unknown"),
+      maxTemperature: Number.isFinite(maxTemperature) ? maxTemperature : null,
       todayImpressions: readTodayImpressions(now),
       now
     };
@@ -1212,45 +1216,20 @@
   /* === END BLOCK: TODAY_HOME_COMPACT_ACTIVITY_META_V1 === */
 
   function weatherMessage(context) {
-    const weather = asString(context?.weather || "unknown");
-    const rainRisk = asString(context?.rainRisk || context?.forecast?.rainRisk || "unknown");
     const summaryLabel = asString(context?.summaryLabel || context?.summary?.label);
-
-    if (summaryLabel) return summaryLabel;
-
-    if (weather === "hot") return "Heiß und trocken";
-    if (weather === "rain" || rainRisk === "near_term") return "Regnerisch";
-    if (rainRisk === "later_today") return "Später Schauer möglich";
-    if (weather === "cold") return "Kühl und trocken";
-    if (weather === "windy") return "Windig";
-    if (weather === "dry") return "Trocken";
-
-    return "Wetterlage heute offen";
+    return summaryLabel || "Wetterlage heute offen";
   }
 
-  /* === BEGIN BLOCK: TODAY_HOME_WEATHER_ICON_TOKEN_V1 | Zweck: rendert Wetterhinweis mit semantischem zentralen Icon-Token statt hartem Magic-/Sparkles-Icon; Umfang: nur Iconwahl fuer die Today-Wetter-Pill, SVG kommt weiter aus js/icons.js === */
+  /* === BEGIN BLOCK: TODAY_HOME_WEATHER_ICON_TOKEN_V2 | Zweck: rendert Wetterhinweis ausschliesslich mit dem semantischen Icon-Token aus dem zentralen Wetterkontext; Umfang: Today-Home kennt keine eigene Wetter-Icon-Fallbackmatrix mehr === */
   function normalizeIconToken(value) {
     const token = asString(value);
     return /^[a-z0-9-]+$/.test(token) ? token : "";
   }
 
   function weatherIcon(context) {
-    const explicit = normalizeIconToken(context?.summaryIcon || context?.summary?.icon);
-    if (explicit) return explicit;
-
-    const weather = asString(context?.weather || "unknown");
-    const rainRisk = asString(context?.rainRisk || context?.forecast?.rainRisk || "unknown");
-
-    if (rainRisk === "later_today") return "weather-showers";
-    if (weather === "rain" || rainRisk === "near_term") return "weather-rain";
-    if (weather === "hot") return "weather-hot";
-    if (weather === "cold") return "weather-cold";
-    if (weather === "windy") return "weather-windy";
-    if (weather === "dry") return "weather-dry";
-
-    return "weather-unknown";
+    return normalizeIconToken(context?.summaryIcon || context?.summary?.icon) || "weather-unknown";
   }
-  /* === END BLOCK: TODAY_HOME_WEATHER_ICON_TOKEN_V1 === */
+  /* === END BLOCK: TODAY_HOME_WEATHER_ICON_TOKEN_V2 === */
 
   function typeLabel(item) {
     return item.type === "activity" ? "Aktivität" : "Event";
