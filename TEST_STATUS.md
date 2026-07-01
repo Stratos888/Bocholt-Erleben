@@ -4470,3 +4470,61 @@ Zielzustand:
 - Echte neue Browser-Konsolenprobleme bleiben sichtbar.
 - Harte Kernwegfehler bleiben weiterhin `FEHLER` und machen den Workflow rot.
 <!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V2_2026_06_29 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_HOME_TODAY_WEATHER_CONTEXT_FINAL_2026_07_01 | Zweck: dokumentiert Abschluss des Home-Today-Wetter-/Copy-/Icon-Workpacks; Umfang: Produktentscheidung, Wetter-Cue, zentrale Iconlogik, Temperaturbanding, Smoke-Ergebnis === -->
+## Home Today – Wetterkontext, Copy und Iconlogik finalisiert (2026-07-01)
+
+Status: Staging-Workpack fachlich und visuell abgenommen; Dokumentation nach Abschluss ergänzt.
+
+Produktentscheidung:
+- Die Home-Seite wird als `Heute`-Seite geführt, nicht als `Jetzt`-Seite.
+- Ziel der Seite sind wenige passende Vorschläge für den heutigen Tag.
+- Die Wetteranzeige ist kein Wettermodul und kein Current-Weather-Widget, sondern ein kompakter Tageskontext für die Auswahl.
+- Der sichtbare Wetter-Cue beschreibt die relevante Wetterlage knapp, z. B. `Warm und trocken`, `Warm, später Schauer`, `Regnerisch und kühl`, `Kühl und windig`.
+- Keine erklärenden Formulierungen wie `Wetter mitgedacht`, `draußen passt`, `Heute gut für draußen` oder Temperatur-first-Texte wie `19 °C · ideal für draußen`.
+
+Sichtbare Home-Copy:
+- Hero bleibt `Heute rund um Bocholt`.
+- Die Auswahlsektion nutzt `Unsere Auswahl` und den Status `3 Vorschläge`.
+- Card-Auszeichnung wurde von `Top-Tipp` auf `Empfohlen` beruhigt.
+- Die frühere Mischsprache aus `Ideen` und `Tipps` wurde zugunsten von `Vorschläge` vereinheitlicht.
+- Der Aufbau auf Desktop und Mobile bleibt unverändert; es wurden keine Layout- oder CSS-Umbauten vorgenommen.
+
+Wetter- und Temperaturmodell:
+- Die Wetterlage kombiniert Niederschlag/Trockenheit, Temperaturband, Wind und Tagesverlauf.
+- Temperatur-Banding wurde alltagstauglich entschärft:
+  - `< 5 °C`: kalt
+  - `5–11 °C`: kühl
+  - `12–18 °C`: mild
+  - `19–27 °C`: warm
+  - `28–29 °C`: sehr warm
+  - `ab 30 °C`: heiß
+- Bei etwa 25 °C Tagesmaximum wird `Warm und trocken` angezeigt, nicht `Sehr warm und trocken`.
+- `Sehr warm` soll erst greifen, wenn Schatten-/Wasser-/kurze-Wege-Signale stärker relevant werden; `Heiß` ab 30 °C.
+
+Zentrale Iconlogik:
+- Wettericons werden nicht lokal in `today-home.js` als SVG-Sonderfall gepflegt.
+- `weather-context.js` liefert Label und semantischen Icon-Token.
+- `js/icons.js` bleibt die zentrale Quelle für Icon-SVGs und semantische Aliase.
+- Home rendert nur noch das Wetterprofil, z. B. `summaryLabel` plus `summaryIcon`.
+- Die Wetter-Pill nutzt ein wetterspezifisches Icon statt `sparkles`; `sparkles` bleibt damit frei für Highlight-/Empfehlungssemantik und wird nicht für Wetter missbraucht.
+
+Auswahllogik und Rotation:
+- Die sichtbare Wetterlage muss dieselben Signale repräsentieren, die auch in die Auswahl-/Scoringlogik einfließen.
+- Bei warm/trocken sind Outdoor- und saisonale Vorschläge plausibel; bei sehr warm/heiß sollen Wasser, Schatten, kurze Wege oder wetterunabhängige Ziele stärker berücksichtigt werden.
+- Lokale Today-Impression-/Preference-Daten dürfen normale Browserzustände beeinflussen, damit Aktivitäten über Tage nicht immer identisch erscheinen.
+- Die frische Basis-Auswahl ist deterministisch genug: Mobile und Desktop-Inkognito zeigten dieselbe Auswahl; abweichende Desktop-Normalansicht wurde auf lokalen Browserzustand zurückgeführt.
+
+Validierter Smoke:
+- Mobile nach Patch: `Warm und trocken` mit Sonne/Wolken-Wettericon sichtbar.
+- Desktop-Inkognito: gleiche Basis-Auswahl wie Mobile sichtbar.
+- Desktop normal: mögliche Abweichung durch lokale Impression-/Preference-Historie verstanden und nicht als Layout-/Deploy-Fehler bewertet.
+- Keine alten Texte wie `Top-Tipp`, `3 Tipps`, `Wetter mitgedacht`, `draußen passt` oder `Sehr warm und trocken` bei ca. 25 °C sichtbar.
+- JS-Syntaxchecks der funktionalen Patchpakete waren grün.
+
+Abschlussbewertung:
+- Workpack ist abgeschlossen.
+- Keine weitere Änderung an Position, Aufbau, Mobile/Desktop-Layout oder Home-Hero nötig.
+- Falls künftig vollständige geräteübergreifende Identität aller drei Vorschläge gewünscht ist, wäre das ein separates Produktziel und nicht Teil dieses abgeschlossenen Workpacks.
+<!-- === END BLOCK: TEST_STATUS_HOME_TODAY_WEATHER_CONTEXT_FINAL_2026_07_01 === -->
+
