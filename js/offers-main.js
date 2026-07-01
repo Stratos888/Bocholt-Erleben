@@ -877,7 +877,7 @@ const OffersApp = {
   },
 
 
-  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_STATE_V2 | Zweck: synchronisiert Fade-Kanten und aktive Chips fuer die mobile horizontale Schnellfilter-Rail; Umfang: nur offer-quick-filters, keine Filterlogik === */
+  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_STATE_V3 | Zweck: synchronisiert Fade-Kanten und aktive Chips fuer die mobile horizontale Schnellfilter-Rail; Umfang: nur offer-quick-filters, keine Filterlogik === */
   isMobileQuickFilterRail() {
     return typeof window.matchMedia === "function"
       ? window.matchMedia("(max-width: 899.98px)").matches
@@ -908,10 +908,10 @@ const OffersApp = {
       return;
     }
 
-    activeChip.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
+    activeChip.scrollIntoView({ block: "nearest", inline: "center", behavior: "auto" });
     this.syncQuickFilterRailState();
   },
-  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_STATE_V2 === */
+  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_STATE_V3 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V5 | Zweck: synchronisiert Desktop- und Mobile-Filtertoggle gemeinsam; Mobile zeigt nur die Zahl, Desktop zeigt „x aktiv“, Summary bleibt ohne doppelte Trefferzeile; Umfang: ersetzt nur updateFinderUI() === */
   updateFinderUI() {

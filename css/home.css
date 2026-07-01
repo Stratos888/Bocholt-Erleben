@@ -4379,13 +4379,14 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 
 
-  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V2 | Zweck: setzt mobile Schnellfilter als einzeilige horizontale Premium-Chip-Rail um; Umfang: nur mobile Activity-Schnellfilter, Desktop bleibt unveraendert === */
+  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V3 | Zweck: setzt mobile Schnellfilter als einzeilige horizontale Premium-Chip-Rail mit ruhiger Scroll-Andeutung um; Umfang: nur mobile Activity-Schnellfilter, Desktop bleibt unveraendert === */
   body.page-route-activities .activity-finder-card .activity-finder__quick{
     position: relative;
     display: grid;
-    gap: 6px;
+    gap: 5px;
     width: 100%;
     min-width: 0;
+    margin-top: -1px;
     overflow: hidden;
   }
 
@@ -4394,8 +4395,8 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     content: "";
     position: absolute;
     z-index: 2;
-    bottom: 2px;
-    width: 24px;
+    bottom: 1px;
+    width: 14px;
     height: 32px;
     pointer-events: none;
     opacity: 0;
@@ -4403,37 +4404,50 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick::before{
-    left: 0;
-    background: linear-gradient(90deg, var(--home-bg-soft, #eef4e8) 0%, rgba(238,244,232,0) 100%);
+    left: -1px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--home-bg-soft, #eef4e8) 94%, #fff 6%) 0%, rgba(238,244,232,0) 100%);
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick::after{
-    right: 0;
-    background: linear-gradient(270deg, var(--home-bg-soft, #eef4e8) 0%, rgba(238,244,232,0) 100%);
+    right: -1px;
+    background: linear-gradient(270deg, color-mix(in srgb, var(--home-bg-soft, #eef4e8) 94%, #fff 6%) 0%, rgba(238,244,232,0) 100%);
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-start)::before,
   body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-end)::after{
-    opacity: 1;
+    opacity: .78;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick-options{
+    --activity-rail-fade-start: 0px;
+    --activity-rail-fade-end: 0px;
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
     width: 100%;
     max-width: 100%;
     min-width: 0;
     margin: 0;
-    padding: 0 22px 3px 0;
+    padding: 1px 18px 2px 0;
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-x: contain;
-    scroll-padding-inline: 0 24px;
+    scroll-padding-inline: 4px 30px;
+    scroll-snap-type: x proximity;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--activity-rail-fade-start), #000 calc(100% - var(--activity-rail-fade-end)), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 var(--activity-rail-fade-start), #000 calc(100% - var(--activity-rail-fade-end)), transparent 100%);
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-start) .activity-finder__quick-options{
+    --activity-rail-fade-start: 14px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-end) .activity-finder__quick-options{
+    --activity-rail-fade-end: 18px;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick-options::-webkit-scrollbar{
@@ -4445,15 +4459,16 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     width: auto;
     min-width: max-content;
     max-width: none;
-    min-height: 31px;
-    padding-inline: 12px;
+    min-height: 30px;
+    padding-inline: 11px;
     grid-column: auto !important;
     justify-content: center;
+    scroll-snap-align: start;
     text-align: center;
-    font-size: 0.76rem;
+    font-size: clamp(0.735rem, 3vw, 0.76rem);
     font-weight: 720;
   }
-  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V2 === */
+  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V3 === */
 
   body.page-route-activities .page--activities{
     gap: 4px;
