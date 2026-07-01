@@ -4379,7 +4379,7 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 
 
-  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V3 | Zweck: setzt mobile Schnellfilter als einzeilige horizontale Premium-Chip-Rail mit ruhiger Scroll-Andeutung um; Umfang: nur mobile Activity-Schnellfilter, Desktop bleibt unveraendert === */
+  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V4 | Zweck: finalisiert mobile Schnellfilter als kontrollierte Premium-Chip-Rail: Start links, klare Fade-Kanten, keine Masken-/Snap-Artefakte, Desktop unveraendert === */
   body.page-route-activities .activity-finder-card .activity-finder__quick{
     position: relative;
     display: grid;
@@ -4394,10 +4394,10 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   body.page-route-activities .activity-finder-card .activity-finder__quick::after{
     content: "";
     position: absolute;
-    z-index: 2;
-    bottom: 1px;
-    width: 14px;
-    height: 32px;
+    z-index: 3;
+    bottom: 0;
+    width: 22px;
+    height: 34px;
     pointer-events: none;
     opacity: 0;
     transition: opacity 140ms ease;
@@ -4405,22 +4405,28 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
 
   body.page-route-activities .activity-finder-card .activity-finder__quick::before{
     left: -1px;
-    background: linear-gradient(90deg, color-mix(in srgb, var(--home-bg-soft, #eef4e8) 94%, #fff 6%) 0%, rgba(238,244,232,0) 100%);
+    background: linear-gradient(90deg,
+      color-mix(in srgb, var(--home-bg-soft, #eef4e8) 98%, #fff 2%) 0%,
+      color-mix(in srgb, var(--home-bg-soft, #eef4e8) 82%, rgba(255,255,255,0) 18%) 52%,
+      rgba(238,244,232,0) 100%
+    );
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick::after{
     right: -1px;
-    background: linear-gradient(270deg, color-mix(in srgb, var(--home-bg-soft, #eef4e8) 94%, #fff 6%) 0%, rgba(238,244,232,0) 100%);
+    background: linear-gradient(270deg,
+      color-mix(in srgb, var(--home-bg-soft, #eef4e8) 98%, #fff 2%) 0%,
+      color-mix(in srgb, var(--home-bg-soft, #eef4e8) 82%, rgba(255,255,255,0) 18%) 52%,
+      rgba(238,244,232,0) 100%
+    );
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-start)::before,
   body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-end)::after{
-    opacity: .78;
+    opacity: .82;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick-options{
-    --activity-rail-fade-start: 0px;
-    --activity-rail-fade-end: 0px;
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
@@ -4429,25 +4435,15 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     max-width: 100%;
     min-width: 0;
     margin: 0;
-    padding: 1px 18px 2px 0;
+    padding: 1px 28px 2px 0;
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-x: contain;
-    scroll-padding-inline: 4px 30px;
-    scroll-snap-type: x proximity;
+    scroll-padding-inline: 0 30px;
+    scroll-snap-type: none;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x;
-    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--activity-rail-fade-start), #000 calc(100% - var(--activity-rail-fade-end)), transparent 100%);
-    mask-image: linear-gradient(90deg, transparent 0, #000 var(--activity-rail-fade-start), #000 calc(100% - var(--activity-rail-fade-end)), transparent 100%);
-  }
-
-  body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-start) .activity-finder__quick-options{
-    --activity-rail-fade-start: 14px;
-  }
-
-  body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-end) .activity-finder__quick-options{
-    --activity-rail-fade-end: 18px;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick-options::-webkit-scrollbar{
@@ -4463,12 +4459,11 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     padding-inline: 11px;
     grid-column: auto !important;
     justify-content: center;
-    scroll-snap-align: start;
     text-align: center;
     font-size: clamp(0.735rem, 3vw, 0.76rem);
     font-weight: 720;
   }
-  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V3 === */
+  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V4 === */
 
   body.page-route-activities .page--activities{
     gap: 4px;

@@ -2294,3 +2294,20 @@ Nächster sinnvoller Wartepunkt:
 - Nach einem vollständigen 28-Tage-/30-Tage-Zeitraum prüfen, ob genug organische Website-, Route-/Maps-, Detail- und CTA-Signale für einen ersten belastbaren Feedbackbericht vorliegen.
 - Bis dahin keine neuen Reporting-Features bauen, sondern Datenqualität beobachten.
 <!-- === END BLOCK: ROADMAP_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 | Zweck: haelt die finale UI-Entscheidung fuer mobile Schnellfilter fest; Umfang: Zielzustand und Nicht-Ziele === -->
+## Aktivitaeten Mobile Schnellfilter-Rail – kontrollierte Premium-Komponente
+
+Entscheidung:
+- Mobile Schnellfilter werden als horizontale Chip-Rail gefuehrt.
+- Der Filterbutton bleibt fuer die vollstaendige Filterauswahl zustaendig.
+- Desktop bleibt unveraendert.
+
+Nicht-Ziele:
+- Keine Rueckkehr zu drei Chip-Zeilen auf Mobile.
+- Kein reiner Filterdialog ohne sichtbare Schnellfilter.
+- Keine Favoriten als Schnellfilter.
+
+Premium-Kriterium:
+- Die Rail ist nicht nur CSS-Overflow, sondern wird per JS auf einen sauberen Startzustand gebracht: ungefiltert links, aktive Chips nur bei echter Auswahl sichtbar.
+<!-- === END BLOCK: ROADMAP_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 === -->

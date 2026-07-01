@@ -4530,3 +4530,24 @@ Abschlussbewertung:
 - Falls künftig vollständige geräteübergreifende Identität aller drei Vorschläge gewünscht ist, wäre das ein separates Produktziel und nicht Teil dieses abgeschlossenen Workpacks.
 <!-- === END BLOCK: TEST_STATUS_HOME_TODAY_WEATHER_CONTEXT_FINAL_2026_07_01 === -->
 
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 | Zweck: dokumentiert den finalen Zielzustand fuer die kontrollierte mobile Schnellfilter-Rail auf Aktivitaeten; Umfang: Status und Abnahmekriterien === -->
+## Aktivitaeten Mobile Schnellfilter-Rail – kontrollierter Premium-Zielzustand (2026-07-01)
+
+Status:
+- Umsetzungspatch vorbereitet, Staging-Abnahme ausstehend.
+
+Zielzustand:
+- Mobile Schnellfilter bleiben eine horizontale Chip-Rail.
+- Desktop bleibt unveraendert.
+- Im ungefilterten Startzustand beginnt die Rail immer links.
+- Wenn `Jetzt besonders` verfuegbar ist, ist dieser Chip initial der erste sichtbare Chip.
+- Alte Scrollpositionen, bfcache oder automatisches Zentrieren duerfen den Startzustand nicht verschieben.
+- Aktive Schnellfilter werden nur bei echter Auswahl sichtbar gehalten.
+- Fades zeigen reale Scrollkanten, nicht einen statischen harten Anschnitt.
+
+Abnahme:
+- `/aktivitaeten/` mobil zeigt initial: `Jetzt besonders`, `Mit Kindern`, `Bei Regen`, `Draußen`.
+- Seitliches Wischen zeigt die weiteren Schnellfilter.
+- Browser-Smoke Mobile Schnellfilter Rail bleibt gruen.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 === -->

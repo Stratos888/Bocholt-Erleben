@@ -424,6 +424,16 @@ async function checkMobileQuickFilterRail(page, baseUrl, timeoutMs) {
   await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
   await expectVisible(page, '#offer-quick-filters');
 
+  await page.waitForFunction(() => {
+    const rail = document.querySelector('#offer-quick-filters');
+    if (!rail) return false;
+    const buttons = Array.from(rail.querySelectorAll('.activity-filter-chip:not([hidden])'))
+      .filter((button) => getComputedStyle(button).display !== 'none');
+    return buttons.length >= 4;
+  }, null, { timeout: 8000 });
+
+  await page.waitForTimeout(250);
+
   const result = await page.locator('#offer-quick-filters').evaluate((rail) => {
     const styles = getComputedStyle(rail);
     const buttons = Array.from(rail.querySelectorAll('.activity-filter-chip:not([hidden])'))
@@ -432,6 +442,10 @@ async function checkMobileQuickFilterRail(page, baseUrl, timeoutMs) {
     const tops = rects.map((rect) => Math.round(rect.top));
     const heights = rects.map((rect) => rect.height);
     const railRect = rail.getBoundingClientRect();
+    const firstButton = buttons[0] || null;
+    const firstRect = firstButton ? firstButton.getBoundingClientRect() : null;
+    const nowSpecial = buttons.find((button) => String(button.getAttribute('data-filter-value') || '').trim() === 'Jetzt besonders') || null;
+    const nowSpecialRect = nowSpecial ? nowSpecial.getBoundingClientRect() : null;
     return {
       display: styles.display,
       flexWrap: styles.flexWrap,
@@ -442,6 +456,11 @@ async function checkMobileQuickFilterRail(page, baseUrl, timeoutMs) {
       maxButtonHeight: heights.length ? Math.max(...heights) : 0,
       scrollWidth: rail.scrollWidth,
       clientWidth: rail.clientWidth,
+      scrollLeft: rail.scrollLeft,
+      firstLabel: firstButton ? String(firstButton.textContent || '').trim() : '',
+      firstLeftDelta: firstRect ? Math.round(firstRect.left - railRect.left) : null,
+      nowSpecialVisible: !!nowSpecial,
+      nowSpecialLeftDelta: nowSpecialRect ? Math.round(nowSpecialRect.left - railRect.left) : null,
     };
   });
 
@@ -459,6 +478,18 @@ async function checkMobileQuickFilterRail(page, baseUrl, timeoutMs) {
 
   if (result.railHeight > result.maxButtonHeight + 10) {
     throw new Error(`Mobile Schnellfilter-Rail ist zu hoch (${Math.round(result.railHeight)}px).`);
+  }
+
+  if (result.scrollLeft > 2) {
+    throw new Error(`Mobile Schnellfilter-Rail startet nicht links (scrollLeft=${Math.round(result.scrollLeft)}).`);
+  }
+
+  if (result.nowSpecialVisible && !String(result.firstLabel || '').startsWith('Jetzt besonders')) {
+    throw new Error(`Mobile Schnellfilter-Rail startet mit falschem Chip (${result.firstLabel}).`);
+  }
+
+  if (result.nowSpecialVisible && Math.abs(Number(result.nowSpecialLeftDelta || 0)) > 3) {
+    throw new Error(`Jetzt besonders ist initial nicht links sichtbar (Delta ${result.nowSpecialLeftDelta}px).`);
   }
 
   const rail = page.locator('#offer-quick-filters');

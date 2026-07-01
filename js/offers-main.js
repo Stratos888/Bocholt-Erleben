@@ -435,6 +435,10 @@ const OffersApp = {
       }, { passive: true });
     }
 
+    window.addEventListener("pageshow", () => {
+      this.scheduleQuickFilterRailPosition();
+    }, { passive: true });
+
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
       this.closeAdvancedFilters();
@@ -442,6 +446,7 @@ const OffersApp = {
 
     window.addEventListener("resize", () => {
       this.updateFinderUI();
+      this.scheduleQuickFilterRailPosition();
     }, { passive: true });
   },
 
@@ -877,11 +882,27 @@ const OffersApp = {
   },
 
 
-  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_STATE_V3 | Zweck: synchronisiert Fade-Kanten und aktive Chips fuer die mobile horizontale Schnellfilter-Rail; Umfang: nur offer-quick-filters, keine Filterlogik === */
+  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_STATE_V4 | Zweck: behandelt die mobile Schnellfilter-Rail als kontrollierte UI-Komponente: ungefiltert immer links, aktive Schnellfilter nur bei echter Auswahl sichtbar halten, Fade-Zustand aus realem Scroll berechnen | Umfang: nur offer-quick-filters, keine Filterlogik === */
   isMobileQuickFilterRail() {
     return typeof window.matchMedia === "function"
       ? window.matchMedia("(max-width: 899.98px)").matches
       : true;
+  },
+
+  getVisibleQuickFilterButtons() {
+    const rail = this.refs.quickFilterRail;
+    if (!rail) return [];
+
+    return Array.from(rail.querySelectorAll(".activity-filter-chip[data-filter-group][data-filter-value]"))
+      .filter((button) => {
+        if (button.hidden) return false;
+        const styles = typeof window.getComputedStyle === "function" ? window.getComputedStyle(button) : null;
+        return !styles || (styles.display !== "none" && styles.visibility !== "hidden");
+      });
+  },
+
+  getActiveVisibleQuickFilterButton() {
+    return this.getVisibleQuickFilterButtons().find((button) => button.classList.contains("is-active")) || null;
   },
 
   syncQuickFilterRailState() {
@@ -898,20 +919,48 @@ const OffersApp = {
     shell.classList.toggle("is-at-end", !isScrollable || atEnd);
   },
 
-  scrollActiveQuickFilterIntoView() {
+  positionQuickFilterRail() {
     const rail = this.refs.quickFilterRail;
-    if (!rail || !this.isMobileQuickFilterRail()) return;
-
-    const activeChip = rail.querySelector(".activity-filter-chip.is-active:not([hidden])");
-    if (!activeChip) {
+    if (!rail || !this.isMobileQuickFilterRail()) {
       this.syncQuickFilterRailState();
       return;
     }
 
-    activeChip.scrollIntoView({ block: "nearest", inline: "center", behavior: "auto" });
+    const activeChip = this.getActiveVisibleQuickFilterButton();
+
+    if (activeChip) {
+      const railRect = rail.getBoundingClientRect();
+      const chipRect = activeChip.getBoundingClientRect();
+      const leftOverflow = chipRect.left - railRect.left;
+      const rightOverflow = chipRect.right - railRect.right;
+
+      if (leftOverflow < 0) {
+        rail.scrollLeft += leftOverflow - 8;
+      } else if (rightOverflow > 0) {
+        rail.scrollLeft += rightOverflow + 8;
+      }
+    } else if (rail.scrollLeft !== 0) {
+      rail.scrollLeft = 0;
+    }
+
     this.syncQuickFilterRailState();
   },
-  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_STATE_V3 === */
+
+  scheduleQuickFilterRailPosition() {
+    if (this._quickFilterRailRaf && typeof window.cancelAnimationFrame === "function") {
+      window.cancelAnimationFrame(this._quickFilterRailRaf);
+    }
+
+    const schedule = typeof window.requestAnimationFrame === "function"
+      ? window.requestAnimationFrame.bind(window)
+      : (callback) => window.setTimeout(callback, 0);
+
+    this._quickFilterRailRaf = schedule(() => {
+      this.positionQuickFilterRail();
+      schedule(() => this.syncQuickFilterRailState());
+    });
+  },
+  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_STATE_V4 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V5 | Zweck: synchronisiert Desktop- und Mobile-Filtertoggle gemeinsam; Mobile zeigt nur die Zahl, Desktop zeigt „x aktiv“, Summary bleibt ohne doppelte Trefferzeile; Umfang: ersetzt nur updateFinderUI() === */
   updateFinderUI() {
@@ -990,13 +1039,7 @@ const OffersApp = {
     this.updateFilterButtonStates();
     this.renderActiveFilterChips();
 
-    if (typeof window.requestAnimationFrame === "function") {
-      window.requestAnimationFrame(() => {
-        this.scrollActiveQuickFilterIntoView();
-      });
-    } else {
-      this.scrollActiveQuickFilterIntoView();
-    }
+    this.scheduleQuickFilterRailPosition();
   },
   /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V5 === */
 

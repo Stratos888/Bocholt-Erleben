@@ -158,3 +158,16 @@ Damit gilt:
 - Erwartete Zugangshinweise werden nicht als Warnung gezaehlt.
 - Bottom-Tabbar-Navigation ist strenger: leere Zielcontainer reichen nicht mehr.
 - Echte Konsolenprobleme ausserhalb dieser bekannten Muster bleiben weiterhin sichtbar.
+
+## Mobile Schnellfilter-Rail – kontrollierter Startzustand (2026-07-01)
+
+Der Browser-Smoke prueft die Activity-Schnellfilter auf Mobile nicht nur als einzeilige Rail, sondern als kontrollierte UI-Komponente:
+
+- `/aktivitaeten/` im Mobile-Profil.
+- Rail muss `display:flex` und `flex-wrap:nowrap` nutzen.
+- Schnellfilter duerfen nicht mehrzeilig umbrechen.
+- Die Rail muss im ungefilterten Startzustand links beginnen.
+- Wenn `Jetzt besonders` sichtbar ist, muss dieser Chip initial der erste sichtbare Chip sein.
+- Die Rail darf danach horizontal scrollbar bleiben.
+
+Zweck: Der Test verhindert Regressionen, bei denen die Rail nach Reload, bfcache oder altem Scrollzustand mitten in der Chip-Liste startet.
