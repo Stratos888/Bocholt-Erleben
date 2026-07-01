@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "bocholt_erleben.weather_context.v5";
+  const STORAGE_KEY = "bocholt_erleben.weather_context.v6";
   const CACHE_TTL_MS = 30 * 60 * 1000;
 
   const BOCHOLT = Object.freeze({
@@ -33,6 +33,10 @@
     71, 73, 75,
     77,
     85, 86
+  ]);
+
+  const THUNDER_CODES = new Set([
+    95, 96, 99
   ]);
 
   function hasStorage() {
@@ -93,6 +97,10 @@
 
   function isSnowCode(code) {
     return SNOW_CODES.has(asNumber(code, null));
+  }
+
+  function isThunderCode(code) {
+    return THUNDER_CODES.has(asNumber(code, null));
   }
 
   function classifyCurrentWeather(current) {
@@ -159,6 +167,10 @@
 
     const rainRowsToday = futureToday.filter((row) => isRainCode(row.weatherCode) || row.precipitation > 0.2 || row.precipitationProbability >= 45);
     const rainRowsNearTerm = nearTerm.filter((row) => isRainCode(row.weatherCode) || row.precipitation > 0.2 || row.precipitationProbability >= 45);
+    const snowRowsToday = futureToday.filter((row) => isSnowCode(row.weatherCode));
+    const snowRowsNearTerm = nearTerm.filter((row) => isSnowCode(row.weatherCode));
+    const thunderRowsToday = futureToday.filter((row) => isThunderCode(row.weatherCode));
+    const thunderRowsNearTerm = nearTerm.filter((row) => isThunderCode(row.weatherCode));
     const temperatureValuesToday = futureToday
       .map((row) => asNumber(row.temperature, null))
       .filter((temperature) => Number.isFinite(temperature));
@@ -180,6 +192,14 @@
       showersLikely,
       rainHoursToday: rainRowsToday.length,
       rainHoursNearTerm: rainRowsNearTerm.length,
+      snowHoursToday: snowRowsToday.length,
+      snowHoursNearTerm: snowRowsNearTerm.length,
+      thunderHoursToday: thunderRowsToday.length,
+      thunderHoursNearTerm: thunderRowsNearTerm.length,
+      hasSnowToday: snowRowsToday.length > 0,
+      hasSnowNearTerm: snowRowsNearTerm.length > 0,
+      hasThunderToday: thunderRowsToday.length > 0,
+      hasThunderNearTerm: thunderRowsNearTerm.length > 0,
       maxRainProbability,
       nearTermRainProbability,
       rainAmountToday: Math.round(rainAmountToday * 10) / 10,
@@ -212,7 +232,7 @@
     return "dry";
   }
 
-  /* === BEGIN BLOCK: TODAY_WEATHER_SUMMARY_LABELS_V2 | Zweck: beschreibt die Wetterlage als ruhigen Tages-Cue statt die Empfehlungslogik zu erklaeren; Umfang: nur Textableitung fuer Today-Home-Wetterhinweis === */
+  /* === BEGIN BLOCK: TODAY_WEATHER_SUMMARY_LABELS_V3 | Zweck: liefert einen ruhigen Tages-Cue plus semantisches Wetter-Icon aus derselben Wetterlage; Umfang: Text- und Iconableitung fuer Today-Home ohne UI-/Layout-Entscheidung === */
   function temperatureLabel(maxTemperature, currentTemperature) {
     const value = Number.isFinite(Number(maxTemperature))
       ? Number(maxTemperature)
@@ -234,51 +254,71 @@
     return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : "";
   }
 
+  function summary(label, icon) {
+    return Object.freeze({
+      label: asString(label) || "Wetterlage heute offen",
+      icon: asString(icon) || "weather-unknown"
+    });
+  }
+
   function buildWeatherSummary(weatherClass, forecast, current) {
     const rainRisk = asString(forecast?.rainRisk || "unknown");
     const temp = temperatureLabel(forecast?.maxTemperature, current?.temperature_2m);
     const tempStart = capitalizeLabel(temp);
     const maxWindSpeed = asNumber(forecast?.maxWindSpeed, 0);
     const isWindy = weatherClass === "windy" || maxWindSpeed >= 35;
+    const hasThunder = Boolean(forecast?.hasThunderNearTerm || forecast?.hasThunderToday || isThunderCode(current?.weather_code));
+    const hasSnow = Boolean(forecast?.hasSnowNearTerm || forecast?.hasSnowToday || isSnowCode(current?.weather_code));
+
+    if (hasThunder) {
+      return summary("Gewitter möglich", "weather-storm");
+    }
+
+    if (hasSnow) {
+      return summary("Schnee möglich", "weather-snow");
+    }
 
     if (weatherClass === "rain" || rainRisk === "near_term") {
-      if (temp) return `Regnerisch und ${temp}`;
-      return "Regnerisch";
+      if (temp) return summary(`Regnerisch und ${temp}`, "weather-rain");
+      return summary("Regnerisch", "weather-rain");
     }
 
     if (rainRisk === "later_today") {
-      if (tempStart) return `${tempStart}, später Schauer`;
-      return "Später Schauer möglich";
+      if (tempStart) return summary(`${tempStart}, später Schauer`, "weather-showers");
+      return summary("Später Schauer möglich", "weather-showers");
     }
 
     if (isWindy) {
-      if (tempStart) return `${tempStart} und windig`;
-      return "Windig";
+      if (tempStart) return summary(`${tempStart} und windig`, "weather-windy");
+      return summary("Windig", "weather-windy");
     }
 
-    if (weatherClass === "hot") return `${tempStart || "Heiß"} und trocken`;
-    if (weatherClass === "cold") return `${tempStart || "Kühl"} und trocken`;
+    if (weatherClass === "hot") return summary(`${tempStart || "Heiß"} und trocken`, "weather-hot");
+    if (weatherClass === "cold") return summary(`${tempStart || "Kühl"} und trocken`, "weather-cold");
     if (weatherClass === "dry") {
-      if (tempStart) return `${tempStart} und trocken`;
-      return "Trocken";
+      if (tempStart) return summary(`${tempStart} und trocken`, "weather-dry");
+      return summary("Trocken", "weather-dry");
     }
 
-    return "Wetterlage heute offen";
+    return summary("Wetterlage heute offen", "weather-unknown");
   }
-  /* === END BLOCK: TODAY_WEATHER_SUMMARY_LABELS_V2 === */
+  /* === END BLOCK: TODAY_WEATHER_SUMMARY_LABELS_V3 === */
 
   function buildContext(payload, source) {
     const data = payload && typeof payload === "object" ? payload : {};
     const current = data.current && typeof data.current === "object" ? data.current : {};
     const forecast = summarizeHourlyForecast(readHourlyRows(data.hourly), new Date());
     const weatherClass = classifyForecastWeather(current, forecast);
+    const weatherSummary = buildWeatherSummary(weatherClass, forecast, current);
 
     return {
       weather: normalizeWeatherClass(weatherClass),
       outdoorFit: weatherClass === "dry" ? "good" : weatherClass === "rain" ? "changeable" : "limited",
       rainRisk: forecast.rainRisk,
       showersLikely: forecast.showersLikely,
-      summaryLabel: buildWeatherSummary(weatherClass, forecast, current),
+      summaryLabel: weatherSummary.label,
+      summaryIcon: weatherSummary.icon,
+      summary: weatherSummary,
       source: source || "unknown",
       location: "Bocholt",
       latitude: BOCHOLT.latitude,
@@ -299,6 +339,8 @@
       rainRisk: "unknown",
       showersLikely: false,
       summaryLabel: "Wetterlage heute offen",
+      summaryIcon: "weather-unknown",
+      summary: Object.freeze({ label: "Wetterlage heute offen", icon: "weather-unknown" }),
       source: "fallback",
       location: "Bocholt",
       latitude: BOCHOLT.latitude,

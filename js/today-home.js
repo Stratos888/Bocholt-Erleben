@@ -1214,7 +1214,7 @@
   function weatherMessage(context) {
     const weather = asString(context?.weather || "unknown");
     const rainRisk = asString(context?.rainRisk || context?.forecast?.rainRisk || "unknown");
-    const summaryLabel = asString(context?.summaryLabel);
+    const summaryLabel = asString(context?.summaryLabel || context?.summary?.label);
 
     if (summaryLabel) return summaryLabel;
 
@@ -1227,6 +1227,30 @@
 
     return "Wetterlage heute offen";
   }
+
+  /* === BEGIN BLOCK: TODAY_HOME_WEATHER_ICON_TOKEN_V1 | Zweck: rendert Wetterhinweis mit semantischem zentralen Icon-Token statt hartem Magic-/Sparkles-Icon; Umfang: nur Iconwahl fuer die Today-Wetter-Pill, SVG kommt weiter aus js/icons.js === */
+  function normalizeIconToken(value) {
+    const token = asString(value);
+    return /^[a-z0-9-]+$/.test(token) ? token : "";
+  }
+
+  function weatherIcon(context) {
+    const explicit = normalizeIconToken(context?.summaryIcon || context?.summary?.icon);
+    if (explicit) return explicit;
+
+    const weather = asString(context?.weather || "unknown");
+    const rainRisk = asString(context?.rainRisk || context?.forecast?.rainRisk || "unknown");
+
+    if (rainRisk === "later_today") return "weather-showers";
+    if (weather === "rain" || rainRisk === "near_term") return "weather-rain";
+    if (weather === "hot") return "weather-hot";
+    if (weather === "cold") return "weather-cold";
+    if (weather === "windy") return "weather-windy";
+    if (weather === "dry") return "weather-dry";
+
+    return "weather-unknown";
+  }
+  /* === END BLOCK: TODAY_HOME_WEATHER_ICON_TOKEN_V1 === */
 
   function typeLabel(item) {
     return item.type === "activity" ? "Aktivität" : "Event";
@@ -1247,8 +1271,9 @@
     if (!el) return;
 
     const message = weatherMessage(state.weatherContext);
+    const icon = weatherIcon(state.weatherContext);
     el.innerHTML = `
-      <span class="today-weather-note__icon" data-ui-icon="sparkles" aria-hidden="true"></span>
+      <span class="today-weather-note__icon" data-ui-icon="${icon}" aria-hidden="true"></span>
       <span>${escapeHtml(message)}</span>
     `.trim();
 
