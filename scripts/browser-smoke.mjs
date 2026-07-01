@@ -418,6 +418,55 @@ async function checkActivityFavorites(page, baseUrl, timeoutMs) {
   }
 }
 
+
+async function checkMobileQuickFilterRail(page, baseUrl, timeoutMs) {
+  await page.goto(absoluteUrl(baseUrl, '/aktivitaeten/'), { waitUntil: 'domcontentloaded', timeout: timeoutMs });
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+  await expectVisible(page, '#offer-quick-filters');
+
+  const result = await page.locator('#offer-quick-filters').evaluate((rail) => {
+    const styles = getComputedStyle(rail);
+    const buttons = Array.from(rail.querySelectorAll('.activity-filter-chip:not([hidden])'))
+      .filter((button) => getComputedStyle(button).display !== 'none');
+    const rects = buttons.map((button) => button.getBoundingClientRect());
+    const tops = rects.map((rect) => Math.round(rect.top));
+    const heights = rects.map((rect) => rect.height);
+    const railRect = rail.getBoundingClientRect();
+    return {
+      display: styles.display,
+      flexWrap: styles.flexWrap,
+      overflowX: styles.overflowX,
+      buttonCount: buttons.length,
+      rowSpread: tops.length ? Math.max(...tops) - Math.min(...tops) : 0,
+      railHeight: railRect.height,
+      maxButtonHeight: heights.length ? Math.max(...heights) : 0,
+      scrollWidth: rail.scrollWidth,
+      clientWidth: rail.clientWidth,
+    };
+  });
+
+  if (result.display !== 'flex' || result.flexWrap !== 'nowrap') {
+    throw new Error(`Mobile Schnellfilter sind keine horizontale Rail (${result.display}/${result.flexWrap}).`);
+  }
+
+  if (result.buttonCount < 4) {
+    throw new Error('Mobile Schnellfilter-Rail enthaelt zu wenige sichtbare Chips.');
+  }
+
+  if (result.rowSpread > 4) {
+    throw new Error(`Mobile Schnellfilter brechen weiter in mehrere Zeilen um (${result.rowSpread}px Zeilenversatz).`);
+  }
+
+  if (result.railHeight > result.maxButtonHeight + 10) {
+    throw new Error(`Mobile Schnellfilter-Rail ist zu hoch (${Math.round(result.railHeight)}px).`);
+  }
+
+  const rail = page.locator('#offer-quick-filters');
+  await rail.evaluate((el) => { el.scrollLeft = el.scrollWidth; });
+  await page.waitForTimeout(100);
+  await expectVisible(page, '#offer-cards');
+}
+
 async function checkConsentNavigationResync(browser, baseUrl, profileName, timeoutMs) {
   const context = await browser.newContext({
     ...PROFILES[profileName],
@@ -515,6 +564,10 @@ async function runProfile(browser, baseUrl, profileName, args, results) {
     });
 
     if (profileName === 'mobile') {
+      await runChecked('Mobile Schnellfilter Rail', '/aktivitaeten/', async () => {
+        await checkMobileQuickFilterRail(page, baseUrl, args.timeoutMs);
+      });
+
       await runChecked('Bottom-Tabbar Navigation', '/', async () => {
         await checkBottomNavigation(page, baseUrl, args.timeoutMs);
       });

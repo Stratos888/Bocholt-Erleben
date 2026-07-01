@@ -7,6 +7,7 @@
 - Der gespeicherte Schluessel ist fachlich `activity:<id>`.
 - Events bekommen keine Favoritenlogik; fuer Events bleibt Kalender/Terminaktion der passende Nutzerpfad.
 - Favoriten sind im UI als persoenliche Priorisierung zu behandeln, nicht als Filtergruppe. Schnellfilter bleiben Inhaltsfilter wie Situation, Ort/Naehe oder Aktivitaetsart.
+- Mobile Schnellfilterleisten werden als horizontale Chip-Rail umgesetzt, sobald mehrere Chips sonst mehrzeilig werden. Desktop bleibt bei der bestehenden Wrap-/Grid-Darstellung; horizontales Scrollen ist dort kein Zielzustand.
 - UI-Zustand muss ueber `activity:favorites-changed` neu gerendert werden, damit Card, Filter und Detailpanel synchron bleiben.
 - Browser-Smoke muss die lokale Favoritenfunktion pruefen, ohne produktive Daten zu schreiben.
 <!-- === END BLOCK: ENGINEERING_ACTIVITY_FAVORITES_LOCAL_STORAGE_2026_06_30 === -->

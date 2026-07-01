@@ -11,6 +11,7 @@ Umgesetzt:
 - Favoriten werden auf `/aktivitaeten/` bevorzugt oben einsortiert, ohne eigene Favoriten-Section, ohne Erklaerzeile und ohne Filterstatus.
 - Kein `Favoriten`-Schnellfilter-Pill: Favoriten sind persoenliche Priorisierung, keine Inhaltskategorie.
 - Mobile Activity-Bilder wurden an die kompaktere Event-Thumbnail-Geometrie angeglichen, damit der Wechsel Events/Aktivitaeten ruhiger wirkt.
+- Mobile Schnellfilter wurden als horizontale Chip-Rail umgesetzt, damit der Filterblock eine Zeile spart und die Ergebnisliste frueher beginnt.
 - Events erhalten bewusst keine Favoritenlogik; dort bleibt Kalender/Terminaktion der passende Nutzerpfad.
 - Browser-Smoke prueft die lokale Favoritenfunktion zusaetzlich als echten Browserpfad.
 
@@ -25,6 +26,7 @@ P1 Browser-Smoke:
 
 - P1 Browser-Smoke auf Main abgenommen: 21/21 OK, 0 Fehler, 0 Warnungen.
 - Neuer Favoriten-Smoke prueft Herz, lokalen Speicher, Reload, Priorisierung, Wegfall des Favoriten-Schnellfilters und Wegfall einer eigenen Favoriten-Section.
+- Browser-Smoke prueft mobile Schnellfilter-Rail: flex/nowrap, eine sichtbare Chip-Zeile, Karten bleiben sichtbar.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_FAVORITES_CARD_PARITY_2026_06_30 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_2026_06_29 | Zweck: dokumentiert Reporting-Haertung nach erstem Staging-Lauf; Umfang: Warnungslabel, bekannte geschuetzte 401-/Fetch-Hinweise === -->

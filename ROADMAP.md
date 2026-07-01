@@ -11,6 +11,7 @@ Entscheidungen:
 - Speicherung: lokal im Browser/PWA via bestehendem Nutzerpraeferenz-Speicher.
 - Datenschutz: keine Cookies, keine Serveruebertragung, kein Tracking; Hinweis in `/datenschutz/`.
 - Mobile UI: Activity-Cards werden in der Bildgeometrie an Event-Cards angeglichen, damit Seitenwechsel nicht wie ein Layoutsprung wirken.
+- Mobile Schnellfilter: als einzeilige horizontale Premium-Chip-Rail; Desktop bleibt unveraendert.
 
 Akzeptanzkriterien:
 
@@ -21,6 +22,7 @@ Akzeptanzkriterien:
 - Schnellfilter bleiben echte Inhaltsfilter; kein Favoriten-Pill in der Schnellfilterleiste.
 - Events erhalten keine parallele Favoritenlogik.
 - Browser-Smoke prueft die Favoritenfunktion read-only/lokal.
+- Mobile Schnellfilter brechen nicht mehr mehrzeilig um; Browser-Smoke prueft die Rail.
 <!-- === END BLOCK: ROADMAP_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 === -->
 
 <!-- === BEGIN BLOCK: ROADMAP_BROWSER_SMOKE_SYSTEM_V1_2026_06_29 | Zweck: finalisiert P1 Browser-Smoke als kleines Deploy-/Manual-Sicherheitsnetz statt grosses Testframework; Umfang: Zielzustand, Trigger, Fehlerverhalten, Abgrenzung === -->

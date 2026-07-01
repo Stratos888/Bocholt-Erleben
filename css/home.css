@@ -4378,6 +4378,83 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     display: none !important;
   }
 
+
+  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V2 | Zweck: setzt mobile Schnellfilter als einzeilige horizontale Premium-Chip-Rail um; Umfang: nur mobile Activity-Schnellfilter, Desktop bleibt unveraendert === */
+  body.page-route-activities .activity-finder-card .activity-finder__quick{
+    position: relative;
+    display: grid;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick::before,
+  body.page-route-activities .activity-finder-card .activity-finder__quick::after{
+    content: "";
+    position: absolute;
+    z-index: 2;
+    bottom: 2px;
+    width: 24px;
+    height: 32px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 140ms ease;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick::before{
+    left: 0;
+    background: linear-gradient(90deg, var(--home-bg-soft, #eef4e8) 0%, rgba(238,244,232,0) 100%);
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick::after{
+    right: 0;
+    background: linear-gradient(270deg, var(--home-bg-soft, #eef4e8) 0%, rgba(238,244,232,0) 100%);
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-start)::before,
+  body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-end)::after{
+    opacity: 1;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options{
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0 22px 3px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 0 24px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options::-webkit-scrollbar{
+    display: none;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip{
+    flex: 0 0 auto;
+    width: auto;
+    min-width: max-content;
+    max-width: none;
+    min-height: 31px;
+    padding-inline: 12px;
+    grid-column: auto !important;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.76rem;
+    font-weight: 720;
+  }
+  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V2 === */
+
   body.page-route-activities .page--activities{
     gap: 4px;
   }

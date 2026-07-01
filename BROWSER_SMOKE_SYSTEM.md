@@ -22,6 +22,27 @@ Abgrenzung:
 - Keine produktiven Schreibaktionen ausser lokaler Browserzustand im isolierten Testkontext.
 <!-- === END BLOCK: BROWSER_SMOKE_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 === -->
 
+<!-- === BEGIN BLOCK: BROWSER_SMOKE_MOBILE_QUICK_FILTER_RAIL_2026_07_01 | Zweck: dokumentiert die mobile Schnellfilter-Rail als Browser-Smoke-Kerncheck; Umfang: Activities Quick Filters Mobile === -->
+## Erweiterung: Mobile Schnellfilter-Rail
+
+Der Browser-Smoke prueft zusaetzlich, dass die mobilen Schnellfilter auf `/aktivitaeten/` als einzeilige horizontale Chip-Rail gerendert werden.
+
+Pruefung:
+
+- `/aktivitaeten/` im Mobile-Profil laden.
+- `#offer-quick-filters` muss sichtbar sein.
+- Die Schnellfilter muessen als `flex` mit `nowrap` laufen.
+- Sichtbare Schnellfilter duerfen nicht in mehrere Zeilen umbrechen.
+- Die Rail darf nicht deutlich hoeher als eine Chip-Zeile sein.
+- Die Aktivitaetskarten muessen danach weiterhin sichtbar sein.
+
+Abgrenzung:
+
+- Kein Desktop-Scrollpattern; Desktop bleibt beim bestehenden Wrap-/Grid-Layout.
+- Keine Aenderung der Filterlogik.
+- Aktuell ist `/aktivitaeten/` die relevante Seite mit Schnellfilter-Chips; das Pattern gilt kuenftig fuer vergleichbare mobile Schnellfilterleisten.
+<!-- === END BLOCK: BROWSER_SMOKE_MOBILE_QUICK_FILTER_RAIL_2026_07_01 === -->
+
 # Browser-Smoke-System — Bocholt erleben
 
 Stand: 2026-06-29

@@ -3,9 +3,11 @@
 
 P1 Browser-Smoke ist auf Main abgenommen: 21/21 OK, 0 Fehler, 0 Warnungen.
 
-Der folgende Produktreife-Schritt ist lokale Activity-Favoriten mit Herz, ohne Login, ohne Cookies und ohne Backend. Favorisierte Aktivitaeten werden in der Aktivitaetenliste bevorzugt und ruhig als `Deine Favoriten` gruppiert; sie sind kein Schnellfilter-Pill. Events erhalten keine Favoritenlogik; dort bleibt die bestehende Kalender-/Terminaktion massgeblich.
+Der folgende Produktreife-Schritt ist lokale Activity-Favoriten mit Herz, ohne Login, ohne Cookies und ohne Backend. Favorisierte Aktivitaeten werden in der Aktivitaetenliste still bevorzugt; sie sind kein Schnellfilter-Pill und erzeugen keine eigene Listen-Section. Events erhalten keine Favoritenlogik; dort bleibt die bestehende Kalender-/Terminaktion massgeblich.
 
 Mobile Activity-Cards werden in der Bildgeometrie an Event-Cards angeglichen, damit der Wechsel zwischen Events und Aktivitaeten ruhiger wirkt.
+
+Mobile Schnellfilterleisten werden auf Mobile als einzeilige horizontale Chip-Rail gefuehrt; Desktop bleibt beim bestehenden Wrap-/Grid-Verhalten.
 <!-- === END BLOCK: MASTER_ACTIVITY_FAVORITES_STATUS_2026_06_30 === -->
 
 <!-- === BEGIN BLOCK: MASTER_BROWSER_SMOKE_CONTROL_V1_2026_06_29 | Zweck: legt Browser-Smoke als naechsten Produktreife-Sicherheitsgurt fest; Umfang: Betriebsentscheidung, Fehlerreaktion, Abgrenzung zu Content/KI === -->
