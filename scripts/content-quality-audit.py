@@ -171,6 +171,20 @@ def is_benign_redirect(source_url: str, detail: str) -> bool:
     return relevant_query(source_query) == relevant_query(target_query)
 
 
+def is_same_host_redirect(source_url: str, detail: str) -> bool:
+    """Return True for canonical/CMS redirects that stay on the same host.
+
+    These observations should remain visible in the report, but they are not
+    a weak-source signal for the weekly KI search prompt.
+    """
+    target_url = parse_redirect_target(detail)
+    if not target_url:
+        return False
+    source_host, _, _ = normalized_url_parts(source_url)
+    target_host, _, _ = normalized_url_parts(target_url)
+    return bool(source_host and target_host and source_host == target_host)
+
+
 def is_transient_network_warning(detail: str) -> bool:
     value = norm(detail).lower()
     transient_markers = (
@@ -270,7 +284,8 @@ def infer_process_metadata(
     - sichere technische Faelle verschwinden als auto_resolved aus der Arbeit,
     - echte Repo-Datenluecken werden als bewusstes Patch-Paket gebuendelt,
     - Quellen-/Retry-Faelle werden erst geprueft und nicht vorschnell gepatcht,
-    - Visual-Fit bleibt ein eigener Workstream.
+    - Visual-Fit bleibt ein eigener Workstream,
+    - Runtime-/Neutralbeobachtungen bleiben sichtbar, werden aber nicht als manuelle Arbeit oder negative KI-Lernsignale behandelt.
     """
     code = norm(issue_code)
     ctype = norm(content_type)
@@ -282,6 +297,29 @@ def infer_process_metadata(
             "correction_owner": "audit_script",
             "workbench_group": "Automatisch erledigt",
             "automation_policy": "safe_auto_resolved",
+        }
+
+    neutral_source_observation_codes = {
+        "event_source_url_same_host_redirect",
+        "activity_source_url_same_host_redirect",
+    }
+    if code in neutral_source_observation_codes:
+        return {
+            "process_category": "neutral_source_observation",
+            "correction_owner": "audit_observation",
+            "workbench_group": "Neutral beobachtet",
+            "automation_policy": "no_action_no_negative_search_feedback",
+        }
+
+    runtime_guard_codes = {
+        "activity_highlight_condition_status_unknown_guarded",
+    }
+    if code in runtime_guard_codes:
+        return {
+            "process_category": "activity_condition_runtime_guarded",
+            "correction_owner": "runtime_highlight_guard",
+            "workbench_group": "Runtime-Guard aktiv",
+            "automation_policy": "guarded_by_runtime_no_manual_action",
         }
 
     ai_verification_codes = {
@@ -296,9 +334,16 @@ def infer_process_metadata(
             "automation_policy": "ai_fallback_budgeted_no_auto_write",
         }
 
+    if code == "event_source_has_time_but_dataset_missing_time":
+        return {
+            "process_category": "ai_verification_candidate",
+            "correction_owner": "ai_fact_check_fallback",
+            "workbench_group": "KI-Faktencheck",
+            "automation_policy": "ai_extract_candidate_no_auto_write",
+        }
+
     fact_check_codes = {
         "event_source_facts_not_confirmed",
-        "event_source_has_time_but_dataset_missing_time",
         "activity_source_facts_not_confirmed",
     }
     if code in fact_check_codes:
@@ -337,10 +382,10 @@ def infer_process_metadata(
     )
     if any(marker in code for marker in visual_markers):
         return {
-            "process_category": "visual_fit_candidate",
+            "process_category": "visual_backlog_observation",
             "correction_owner": "visual_workflow",
             "workbench_group": "Visual-Fit",
-            "automation_policy": "human_decision_required",
+            "automation_policy": "visual_feedback_only_no_content_inbox",
         }
 
     retry_codes = {
@@ -1992,19 +2037,36 @@ def audit_event_rows(
                         public_url=public_url,
                     ))
             elif status == "redirect" and not is_benign_redirect(url, detail):
-                issues.append(issue(
-                    "warning",
-                    "event",
-                    source_system,
-                    content_id,
-                    title,
-                    "event_source_url_redirect",
-                    f"Quelle leitet weiter: {detail}",
-                    "Redirect nur prüfen, wenn Zielseite fachlich abweicht, auf eine fremde Domain wechselt oder nicht mehr die konkrete Event-/Veranstalterquelle ist.",
-                    date_value=date_value,
-                    source_url=url,
-                    public_url=public_url,
-                ))
+                if is_same_host_redirect(url, detail):
+                    issues.append(issue(
+                        "warning",
+                        "event",
+                        source_system,
+                        content_id,
+                        title,
+                        "event_source_url_same_host_redirect",
+                        f"Quelle leitet same-host weiter: {detail}",
+                        "Keine manuelle Sofortaktion: same-host CMS-/Kanonisch-Redirect bleibt sichtbar, erzeugt aber kein negatives KI-Quellenfeedback. Nur prüfen, wenn die Faktenprobe separat unsicher ist.",
+                        date_value=date_value,
+                        source_url=url,
+                        evidence_status="neutral_same_host_redirect",
+                        evidence_summary="same_host_redirect_observed_no_negative_search_feedback",
+                        public_url=public_url,
+                    ))
+                else:
+                    issues.append(issue(
+                        "warning",
+                        "event",
+                        source_system,
+                        content_id,
+                        title,
+                        "event_source_url_redirect",
+                        f"Quelle leitet weiter: {detail}",
+                        "Redirect nur prüfen, wenn Zielseite fachlich abweicht, auf eine fremde Domain wechselt oder nicht mehr die konkrete Event-/Veranstalterquelle ist.",
+                        date_value=date_value,
+                        source_url=url,
+                        public_url=public_url,
+                    ))
 
             # Faktenprobe: beobachtet, ob die Quelle die Kernangaben wirklich trägt.
             # Starke Unsicherheit wird jetzt zuerst als KI-Fallback-Kandidat statt als direkte Nutzeraufgabe geführt.
@@ -2661,18 +2723,34 @@ def audit_activities(
                         public_url=public_url,
                     ))
             elif status == "redirect" and not is_benign_redirect(source_url, detail):
-                issues.append(issue(
-                    "warning",
-                    "activity",
-                    "offers_json",
-                    content_id,
-                    title,
-                    "activity_source_url_redirect",
-                    f"Activity-Quelle leitet weiter: {detail}",
-                    "Redirect nur prüfen, wenn Zielseite fachlich abweicht, auf eine fremde Domain wechselt oder nicht mehr die konkrete Activity-/Anbieterquelle ist.",
-                    source_url=source_url,
-                    public_url=public_url,
-                ))
+                if is_same_host_redirect(source_url, detail):
+                    issues.append(issue(
+                        "warning",
+                        "activity",
+                        "offers_json",
+                        content_id,
+                        title,
+                        "activity_source_url_same_host_redirect",
+                        f"Activity-Quelle leitet same-host weiter: {detail}",
+                        "Keine manuelle Sofortaktion: same-host CMS-/Kanonisch-Redirect bleibt sichtbar, erzeugt aber kein negatives KI-Quellenfeedback. Activity-Faktencheck bleibt separat fuehrend.",
+                        source_url=source_url,
+                        evidence_status="neutral_same_host_redirect",
+                        evidence_summary="same_host_redirect_observed_no_negative_search_feedback",
+                        public_url=public_url,
+                    ))
+                else:
+                    issues.append(issue(
+                        "warning",
+                        "activity",
+                        "offers_json",
+                        content_id,
+                        title,
+                        "activity_source_url_redirect",
+                        f"Activity-Quelle leitet weiter: {detail}",
+                        "Redirect nur prüfen, wenn Zielseite fachlich abweicht, auf eine fremde Domain wechselt oder nicht mehr die konkrete Activity-/Anbieterquelle ist.",
+                        source_url=source_url,
+                        public_url=public_url,
+                    ))
 
             # Activity-Faktenproben bleiben bewusst ein separater Ausbau.
             # Der naechste sichere Sprung liegt zuerst bei feldgenauer Event-Faktenpruefung;
@@ -2997,12 +3075,12 @@ def audit_activity_highlights(
                     "offers_json",
                     content_id,
                     title,
-                    "activity_highlight_condition_status_unknown",
+                    "activity_highlight_condition_status_unknown_guarded",
                     f"Zustandsabhaengiges Highlight {highlight_id} liegt im Saisonfenster, hat aber keine frische positive Statusquelle.",
-                    "Aktuelle offizielle Statusquelle pruefen. Bis dahin bleibt das Highlight unsichtbar und ohne Boost.",
+                    "Keine manuelle Sofortaktion: Runtime-Guard blockiert Highlight und Boost automatisch, bis eine frische positive offizielle Statusquelle vorliegt. Sichtbar halten, nicht als auto_fixed zaehlen.",
                     source_url=status_url,
                     evidence_status="status_unknown_blocks_highlight",
-                    evidence_summary=f"highlight_id={highlight_id}; state=unknown; season={starts}..{ends}",
+                    evidence_summary=f"highlight_id={highlight_id}; state=unknown; season={starts}..{ends}; runtime_guard=blocked_until_positive_status",
                     public_url=public_url,
                 ))
 
@@ -3032,6 +3110,7 @@ def summarize(issues: List[Issue]) -> Dict[str, Any]:
         "by_process_category": by_process_category,
         "by_correction_owner": by_correction_owner,
         "by_workbench_group": by_workbench_group,
+        "by_action_route": summarize_action_routes(issues),
         "by_verification_status": by_verification_status,
         "total": len(issues),
     }
@@ -3051,6 +3130,41 @@ def summarize_observations(observations: List[Observation]) -> Dict[str, Any]:
         "by_code": by_code,
         "by_type": by_type,
     }
+
+
+def issue_action_route(item: Issue) -> str:
+    """Compact routing summary for humans and automations.
+
+    Keeps every signal visible while making clear whether manual work is needed.
+    This is deliberately derived from process metadata rather than replacing
+    severities, so existing consumers of critical/review/warning/auto_fixed keep working.
+    """
+    category = norm(item.process_category)
+    policy = norm(item.automation_policy)
+
+    if item.severity in {"critical", "review_needed"}:
+        return "manual_action_required"
+    if item.severity == "auto_fixed":
+        return "auto_fixed"
+    if category == "activity_condition_runtime_guarded" or policy.startswith("guarded_by_runtime"):
+        return "guarded_by_runtime"
+    if category == "ai_verification_candidate":
+        return "ai_factcheck_candidate"
+    if category.startswith("visual_"):
+        return "visual_workflow"
+    if category == "neutral_source_observation":
+        return "neutral_observed"
+    if "human_review" in policy or "human_decision" in policy:
+        return "manual_warning"
+    return "non_manual_observation"
+
+
+def summarize_action_routes(issues: List[Issue]) -> Dict[str, int]:
+    counts: Dict[str, int] = {}
+    for item in issues:
+        route = issue_action_route(item)
+        counts[route] = counts.get(route, 0) + 1
+    return counts
 
 
 
@@ -3166,12 +3280,36 @@ def search_feedback_config_for_issue(item: Issue) -> Dict[str, Any] | None:
         # Pool-Vertraege und reine Bildproduktion duerfen den Suchlauf nicht
         # zu falscher Selektion oder Bildautomatisierung verleiten.
         return None
-    if code in {"event_source_url_broken", "event_source_url_redirect", "event_source_url_missing", "event_source_url_invalid"}:
+    if code in {"event_source_url_same_host_redirect", "activity_source_url_same_host_redirect"}:
+        # Neutral observation only: keep visible in reports, but do not poison source quality.
+        return None
+
+    if code == "activity_source_url_redirect":
+        # Activity source checks are content-maintenance signals. They must not bias the
+        # weekly event search prompt unless a separate activity-search workflow consumes them.
+        return None
+
+    if code == "event_source_url_redirect":
+        # Same-host redirects are often canonical CMS moves, not weak sources. They must not
+        # poison the weekly KI source feedback for otherwise authoritative domains.
+        target_url = parse_redirect_target(item.issue_text)
+        source_host = url_host(item.source_url)
+        target_host = url_host(target_url)
+        if source_host and target_host and source_host == target_host:
+            return None
+        return {
+            "feedback_class": "event_source_quality_problem",
+            "field": "source_url",
+            "priority": 55,
+            "prompt_rule": "Quellen mit domainwechselndem Redirect nicht erneut als starke Eventquelle verwenden. Erst eine kanonische, erreichbare Detailquelle suchen.",
+        }
+
+    if code in {"event_source_url_broken", "event_source_url_missing", "event_source_url_invalid"}:
         return {
             "feedback_class": "event_source_quality_problem",
             "field": "source_url",
             "priority": 65,
-            "prompt_rule": "Quellen mit Broken-Link, Redirect, fehlender oder ungültiger URL nicht erneut als starke Eventquelle verwenden. Erst eine kanonische, erreichbare Detailquelle suchen.",
+            "prompt_rule": "Quellen mit Broken-Link, fehlender oder ungültiger URL nicht erneut als starke Eventquelle verwenden. Erst eine kanonische, erreichbare Detailquelle suchen.",
         }
     return None
 
@@ -3498,6 +3636,12 @@ def write_markdown_report(
         f"- Warning: {summary['counts'].get('warning', 0)}",
         f"- Auto fixed: {summary['counts'].get('auto_fixed', 0)}",
         "",
+        "## Action routing",
+        "",
+        "Diese Gruppe trennt echte manuelle Arbeit von sicher blockierten, KI-gerouteten oder neutral beobachteten Signalen.",
+        "",
+        *[f"- {key}: {value}" for key, value in sorted(summary.get("by_action_route", {}).items())],
+        "",
         "## Process categories",
         "",
         *[f"- {key}: {value}" for key, value in sorted(summary.get("by_process_category", {}).items())],
@@ -3536,8 +3680,8 @@ def write_markdown_report(
         "",
         "## Issues",
         "",
-        "| Severity | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL | Visual Key | Visual Motif | Visual Asset | Evidence | Verification | Priority | Field status |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "| Severity | Route | Workbench | Owner | Type | Source | ID | Title | Issue | Action | Suggested URL | Visual Key | Visual Motif | Visual Asset | Evidence | Verification | Priority | Field status |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for item in sorted(issues, key=lambda x: (SEVERITY_RANK.get(x.severity, 9), x.workbench_group, x.content_type, x.date, x.title)):
         def cell(value: str) -> str:
@@ -3545,6 +3689,7 @@ def write_markdown_report(
         lines.append(
             "| " + " | ".join([
                 cell(item.severity),
+                cell(issue_action_route(item)),
                 cell(item.workbench_group),
                 cell(item.correction_owner),
                 cell(item.content_type),

@@ -1,3 +1,43 @@
+<!-- === BEGIN BLOCK: MASTER_WEEKLY_KI_OPERATING_CONTROL_2026_07_02 | Zweck: aktualisiert den aktuellen Steuerungsstand fuer Weekly-KI, Manual Inbox, Feedback-Loop und kostenbewussten naechsten Proof; Umfang: aktueller Einstiegspunkt vor aelteren MASTER-Bloecken === -->
+## Aktueller Steuerungsstand – Weekly-KI und Content-Feedback 2026-07-02
+
+Status: Der Live-E2E-Prozess `Weekly KI -> Manual Inbox -> Ablehnen/Übernehmen -> Cleanup/Deploy -> Audit` ist bestanden. Nicht erneut als groesserer Neuaufbau behandeln.
+
+Als erledigt fuehren:
+
+- Weekly-KI-Run auf `main` erzeugt Kandidaten und triggert Manual KI Event Intake.
+- Manual KI Event Intake schreibt Kandidaten in die Live-Inbox.
+- Inbox erkennt abgelaufene KI-Kandidaten, blockiert `Übernehmen` und waehlt `Termin liegt in der Vergangenheit` vor.
+- Externes Google Apps Script akzeptiert die UI-Ablehnungsgruende nach Update der bestehenden Live-Bereitstellung.
+- Zwei abgelaufene KI-Kandidaten wurden erfolgreich verworfen.
+- Ein gewollter KI-Kandidat wurde übernommen und deployed.
+- Inbox Cleanup lief gruen.
+- Daily Content Quality Report nach Deploy: keine Criticals und keine Review-needed-Faelle.
+- Self-Learning-Mechanik ist strukturell kontrolliert: typisierte Feedbackklassen, harte Limits, keine Rohdump-/Selbstmutationslogik.
+
+Aktuelle Betriebsentscheidung:
+
+- Kein manueller kostenpflichtiger Weekly-KI-Lauf nur fuer einen Proof.
+- Der Upstream-Proof fuer `MIN_CANDIDATE_LEAD_DAYS=2`, `past_event` und `too_short_notice` erfolgt beim naechsten regulaeren Weekly-Lauf.
+- Bis dahin gilt: E2E-Inbox-Prozess bestanden; Upstream-Suchverbesserung strukturell geprueft, Runtime-Wirkung noch anhand des naechsten regulaeren Artifacts bestaetigen.
+
+Naechster Beweis ohne Zusatzkosten:
+
+1. Nach dem naechsten regulaeren Weekly-Lauf `weekly-event-diagnostics.zip` pruefen.
+2. Erwartung: keine normalen Kandidaten mit Vergangenheit, same-day oder next-day.
+3. Erwartung: Dropped-Kandidaten sind mit `past_event`, `too_short_notice` oder anderem klaren Grund nachvollziehbar.
+4. Erwartung: Feedbackregeln sind angewendet, aber weiterhin klein, typisiert und begrenzt.
+5. Erwartung: neue Kandidaten behalten Visual-Handoff-Felder (`visual_key`, `visual_motif`, `visual_asset_status`).
+
+Nicht als naechstes starten:
+
+- Kein neuer Prompt-/Regelwerksgrossumbau ohne Fehlbefund aus dem naechsten regulären Diagnostics-Artefakt.
+- Kein manueller Paid-Run nur zur Beruhigung.
+- Keine normale Inbox-Aufgabe fuer reine Visual-Backlog-/Guard-Hinweise.
+- Kein blindes automatisches Schreiben von KI-/Audit-Ergebnissen in fachliche Sheet-Daten.
+
+<!-- === END BLOCK: MASTER_WEEKLY_KI_OPERATING_CONTROL_2026_07_02 === -->
+
 <!-- === BEGIN BLOCK: MASTER_ACTIVITY_FAVORITES_STATUS_2026_06_30 | Zweck: aktueller Projektstatus fuer Activity-Favoriten und Browser-Smoke-Abschluss; Umfang: Einstiegspunkt fuer naechste Chats === -->
 ## Aktueller Stand – Activity-Favoriten, Card-Parity und Mobile Quick-Filter-Rail
 

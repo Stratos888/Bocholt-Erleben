@@ -1,3 +1,52 @@
+<!-- === BEGIN BLOCK: ROADMAP_WEEKLY_KI_FEEDBACK_LOOP_PROOF_2026_07_02 | Zweck: setzt den aktuellen taktischen Fortsetzungspunkt fuer die selbstlernende KI-Suche; Umfang: erledigte E2E-Punkte, naechster regulärer Proof, keine manuelle Kosten-Ausloesung === -->
+## Weekly-KI / Self-Learning Search – E2E bestanden, naechster Proof regulär
+
+Status: E2E-Liveprozess bestanden; kein manueller kostenpflichtiger Weekly-KI-Lauf als Zusatztest.
+
+### Abgeschlossen
+
+- Weekly-KI -> Manual KI Event Intake -> Live-Inbox ist auf `main` bewiesen.
+- Ablehnen mit neuem fachlichem Grund `Termin liegt in der Vergangenheit` funktioniert live nach Apps-Script-Fix.
+- Abgelaufene Kandidaten werden in der Inbox blockiert und koennen nicht mehr übernommen werden.
+- Ein gültiger Kandidat wurde übernommen und deployed.
+- Inbox Cleanup und Daily Content Quality Audit liefen nach dem Prozess ohne harte Fehler.
+- Self-Learning-Architektur ist nicht als unkontrolliertes Prompt-Wachstum gebaut, sondern als begrenzter Kontext:
+  - Typisierte Feedbackklassen.
+  - Begrenzter Regelpool.
+  - Begrenzte Prompt-Regeln.
+  - Keine automatische Regelbuch-Mutation.
+  - Keine automatische fachliche Datenkorrektur durch KI.
+  - Deterministischer Datums-/Vorlauf-Guard als Sicherheitsnetz.
+
+### Aktueller offener Beweis
+
+Der naechste regulaere Weekly-Lauf muss belegen, dass die Upstream-Suche nach dem Fix wirklich sauberer wird:
+
+- Keine Vergangenheit in `data/inbox_manual.json`.
+- Keine normalen same-day-/next-day-Kandidaten.
+- Falls das Modell solche Rohkandidaten liefert: Drop-Reason `past_event` oder `too_short_notice`.
+- Feedbackregeln werden sichtbar geladen und angewendet.
+- Feedback bleibt klein, typisiert und nicht aufgebläht.
+- Neue Kandidaten behalten belastbare Quellen, saubere Eventdaten und Visual-Handoff.
+
+### Pruefmaterial beim naechsten regulaeren Lauf
+
+Nach dem regulaeren Lauf pruefen:
+
+1. `weekly-event-diagnostics.zip`.
+2. Weekly-Run-Log, insbesondere `Run weekly KI websearch to manual inbox`.
+3. Live-Inbox-Screenshot, falls Kandidaten erzeugt wurden.
+4. Optional danach Daily Content Quality Report.
+
+### Nicht tun
+
+- Weekly-KI nicht manuell nur fuer diesen Proof ausloesen, weil der Lauf kostenpflichtig ist.
+- Keine neue Mechanik erfinden, bevor das naechste Diagnostics-Artefakt einen echten Fehlbefund zeigt.
+- Keine Feedbacksignale als lange Einzelfallliste in den Prompt kippen.
+- Keine Audit-/KI-Ergebnisse automatisch in fachliche Daten schreiben.
+
+<!-- === END BLOCK: ROADMAP_WEEKLY_KI_FEEDBACK_LOOP_PROOF_2026_07_02 === -->
+
 <!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 | Zweck: schaerft Nutzerbindung als Premium-Zielzustand ohne Account-Schwere und ohne Event-Favoriten; Umfang: Activity-Favoriten, lokale Priorisierung, Card-Parity === -->
 ## P1 Nutzerbindung Premium – Activity-Favoriten
 
