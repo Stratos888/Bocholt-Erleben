@@ -1,5 +1,5 @@
 <!-- === BEGIN BLOCK: MASTER_ACTIVITY_FAVORITES_STATUS_2026_06_30 | Zweck: aktueller Projektstatus fuer Activity-Favoriten und Browser-Smoke-Abschluss; Umfang: Einstiegspunkt fuer naechste Chats === -->
-## Aktueller Stand – Activity-Favoriten und Card-Parity
+## Aktueller Stand – Activity-Favoriten, Card-Parity und Mobile Quick-Filter-Rail
 
 P1 Browser-Smoke ist auf Main abgenommen: 21/21 OK, 0 Fehler, 0 Warnungen.
 
@@ -7,7 +7,7 @@ Der folgende Produktreife-Schritt ist lokale Activity-Favoriten mit Herz, ohne L
 
 Mobile Activity-Cards werden in der Bildgeometrie an Event-Cards angeglichen, damit der Wechsel zwischen Events und Aktivitaeten ruhiger wirkt.
 
-Mobile Schnellfilterleisten werden auf Mobile als einzeilige horizontale Chip-Rail gefuehrt; Desktop bleibt beim bestehenden Wrap-/Grid-Verhalten.
+Mobile Schnellfilterleisten werden auf Mobile als einzeilige horizontale Chip-Rail gefuehrt; Desktop bleibt beim bestehenden Wrap-/Grid-Verhalten. Die Aktivitaeten-Rail ist als kontrollierte Mobile-Komponente abgenommen: ungefiltert startet sie links mit `Jetzt besonders`, bleibt einzeilig und ist horizontal wischbar.
 <!-- === END BLOCK: MASTER_ACTIVITY_FAVORITES_STATUS_2026_06_30 === -->
 
 <!-- === BEGIN BLOCK: MASTER_BROWSER_SMOKE_CONTROL_V1_2026_06_29 | Zweck: legt Browser-Smoke als naechsten Produktreife-Sicherheitsgurt fest; Umfang: Betriebsentscheidung, Fehlerreaktion, Abgrenzung zu Content/KI === -->

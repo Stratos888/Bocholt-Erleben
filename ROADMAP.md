@@ -1,6 +1,8 @@
 <!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 | Zweck: schaerft Nutzerbindung als Premium-Zielzustand ohne Account-Schwere und ohne Event-Favoriten; Umfang: Activity-Favoriten, lokale Priorisierung, Card-Parity === -->
 ## P1 Nutzerbindung Premium – Activity-Favoriten
 
+Status: umgesetzt und auf Staging fachlich/visuell abgenommen.
+
 Zielzustand: Bocholt erleben bietet lokale Aktivitaets-Favoriten als leicht verstaendliches Premium-Nutzerfeature. Nutzer markieren wiederkehrend interessante Aktivitaeten per Herz; die App priorisiert diese Aktivitaeten automatisch oben. Favoriten sind keine Inhaltsfilter, erscheinen nicht als Schnellfilter-Pill und erzeugen keine eigene Feed-Section.
 
 Entscheidungen:
@@ -2298,6 +2300,8 @@ Nächster sinnvoller Wartepunkt:
 <!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 | Zweck: haelt die finale UI-Entscheidung fuer mobile Schnellfilter fest; Umfang: Zielzustand und Nicht-Ziele === -->
 ## Aktivitaeten Mobile Schnellfilter-Rail – kontrollierte Premium-Komponente
 
+Status: umgesetzt und per mobiler Staging-Sichtpruefung abgenommen.
+
 Entscheidung:
 - Mobile Schnellfilter werden als horizontale Chip-Rail gefuehrt.
 - Der Filterbutton bleibt fuer die vollstaendige Filterauswahl zustaendig.
@@ -2310,4 +2314,5 @@ Nicht-Ziele:
 
 Premium-Kriterium:
 - Die Rail ist nicht nur CSS-Overflow, sondern wird per JS auf einen sauberen Startzustand gebracht: ungefiltert links, aktive Chips nur bei echter Auswahl sichtbar.
+- Abgenommener Startzustand: `Jetzt besonders`, `Mit Kindern`, `Bei Regen` sind initial sichtbar; weitere Chips sind per horizontalem Wischen erreichbar.
 <!-- === END BLOCK: ROADMAP_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 === -->

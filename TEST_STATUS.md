@@ -1,7 +1,14 @@
 <!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_FAVORITES_CARD_PARITY_2026_06_30 | Zweck: dokumentiert Activity-Favoriten, mobile Card-Parity und Browser-Smoke-Main-Abnahme; Umfang: aktueller Produktreife-Status nach P1-Smoke === -->
 ## Activity-Favoriten und Mobile Card-Parity – umgesetzt
 
-Status: mit diesem Patch umgesetzt; nach Deploy per Browser-Smoke und kurzer Mobile-Sichtprobe zu pruefen.
+Status: umgesetzt und nach Staging-Deploy fachlich/visuell abgenommen.
+
+Abgenommen:
+
+- Activity-Favoriten funktionieren lokal und bleiben nach Reload erhalten.
+- Favoriten bleiben stille Priorisierung ohne Favoriten-Pill, ohne eigene Section und ohne Erklaerzeile.
+- Mobile Activity-Cards wirken ruhiger und sind in der Bildgeometrie an Event-Cards angenaehert.
+- Mobile Schnellfilter-Rail ist final abgenommen: einzeilig, links startend mit `Jetzt besonders`, horizontal wischbar.
 
 Umgesetzt:
 
@@ -26,7 +33,7 @@ P1 Browser-Smoke:
 
 - P1 Browser-Smoke auf Main abgenommen: 21/21 OK, 0 Fehler, 0 Warnungen.
 - Neuer Favoriten-Smoke prueft Herz, lokalen Speicher, Reload, Priorisierung, Wegfall des Favoriten-Schnellfilters und Wegfall einer eigenen Favoriten-Section.
-- Browser-Smoke prueft mobile Schnellfilter-Rail: flex/nowrap, eine sichtbare Chip-Zeile, Karten bleiben sichtbar.
+- Browser-Smoke prueft mobile Schnellfilter-Rail: flex/nowrap, eine sichtbare Chip-Zeile, linker Startzustand mit `Jetzt besonders`, Karten bleiben sichtbar.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_FAVORITES_CARD_PARITY_2026_06_30 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_2026_06_29 | Zweck: dokumentiert Reporting-Haertung nach erstem Staging-Lauf; Umfang: Warnungslabel, bekannte geschuetzte 401-/Fetch-Hinweise === -->
@@ -4535,7 +4542,7 @@ Abschlussbewertung:
 ## Aktivitaeten Mobile Schnellfilter-Rail – kontrollierter Premium-Zielzustand (2026-07-01)
 
 Status:
-- Umsetzungspatch vorbereitet, Staging-Abnahme ausstehend.
+- Umsetzungspatch eingebracht und per mobiler Staging-Sichtpruefung abgenommen.
 
 Zielzustand:
 - Mobile Schnellfilter bleiben eine horizontale Chip-Rail.
@@ -4547,7 +4554,7 @@ Zielzustand:
 - Fades zeigen reale Scrollkanten, nicht einen statischen harten Anschnitt.
 
 Abnahme:
-- `/aktivitaeten/` mobil zeigt initial: `Jetzt besonders`, `Mit Kindern`, `Bei Regen`, `Draußen`.
+- `/aktivitaeten/` mobil zeigt initial links startend: `Jetzt besonders`, `Mit Kindern`, `Bei Regen`. Weitere Chips sind per horizontalem Wischen erreichbar.
 - Seitliches Wischen zeigt die weiteren Schnellfilter.
-- Browser-Smoke Mobile Schnellfilter Rail bleibt gruen.
+- Browser-Smoke Mobile Schnellfilter Rail bleibt massgeblicher automatischer Guard fuer Regressionen.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 === -->
