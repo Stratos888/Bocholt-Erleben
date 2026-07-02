@@ -4560,63 +4560,55 @@ Abnahme:
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 === -->
 
 
-<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 | Zweck: dokumentiert den aktuellen Patch gegen sichtbare Event-Bildwiederholungen und falsche semantische Fallbacks im Feed; Umfang: Ursache, technische Loesung, Grenzen === -->
-## Event-Feed Visual Diversity – motivsichere Duplikatpraevention im sichtbaren Feed (2026-07-02)
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 | Zweck: dokumentiert den aktuellen Patch gegen sichtbare Event-Bildwiederholungen im Feed; Umfang: Ursache, technische Loesung, Grenzen === -->
+## Event-Feed Visual Diversity – Duplikatpraevention im sichtbaren Feed (2026-07-02)
 
 Status:
-- Korrekturpatch gegen den aktuellen Staging-ZIP-Stand `Bocholt-Erleben-staging (84)` aufgebaut.
-- Anlass war eine fachliche Regression nach dem ersten Diversity-Fix: Beim `2. Bocholter CSD` konnte ein Blaskapellen-/Musikzugbild aus `neutral_parade` erscheinen.
-
-Validierte Produktregel:
-- Motiv-Fit schlaegt Bild-Diversity.
-- Feed-Diversity bleibt wichtig, darf aber nur innerhalb semantisch freigegebener Bildkorridore stattfinden.
-- Falsche Fallbacks sind kritischer als wiederholte, aber korrekte Bilder.
+- Patch gegen den aktuellen Staging-ZIP-Stand `Bocholt-Erleben-staging (83)` neu aufgebaut.
+- Der vorherige Patch darf nicht unveraendert eingespielt werden, weil er aeltere Vollversionen von `today-home.js`, `VISUAL_WORKFLOW.md` und `TEST_STATUS.md` enthielt und aktuelle Home-/Activity-Dokumentation ueberschrieben haette.
 
 Ursache:
-- Der vorherige Resolver hatte exakte, neutrale und verwandte Bilder zu frueh in einen gemeinsamen Kandidatenpool gelegt.
-- Dadurch konnten neutrale Bilder gleichberechtigt vor dem exakten CSD-Bild gewaehlt werden.
-- `parade-festzug-02` und `parade-festzug-03` waren als `neutral_parade` klassifiziert, sind visuell aber Musikzug-/Blaskapellenbilder und damit kein sicherer Fallback fuer CSD/Pride.
+- Der Event-Visual-Resolver war zu hart motivexakt.
+- Sobald ein einziges exaktes `visual_motif`-Bild existierte, wurden neutrale/fallbackfaehige Bilder derselben Bildfamilie ausgeschlossen.
+- Bei mehreren benachbarten Kulturtage-/Open-Air- oder Live-Musik-Karten konnte die Anti-Duplikat-Logik deshalb nicht wirksam ausweichen.
 
 Technische Loesung:
-- `/events/` und Today/Home nutzen priorisierte Kandidatengruppen statt flachem Mischpool.
-- Exakte Motivbilder werden zuerst versucht.
-- Sichere Fallbacks werden nur genutzt, wenn sie fuer das konkrete `visual_motif` explizit freigegeben sind.
-- Live-Musik und Marktplatz-Open-Air behalten kontrollierte Diversity-Fallbacks.
-- CSD/Pride bekommt keine generischen Parade-/Musikzug-Fallbacks.
-- `parade-festzug-02` und `parade-festzug-03` wurden in `data/event_visual_pool.json` und Matrix als `marching_band_procession` spezifisch reklassifiziert.
-- `scripts/event_visual_motifs.py` kennt `marching_band_procession` fuer kuenftige Musikzug-/Blaskapellenfaelle.
-- Der Audit erkennt nun auch nicht freigegebene Motiv-Fallbacks und kombiniert Sheet-Events mit Public-DB-Events.
-
-Lokal validiert:
-- JS-Syntaxchecks fuer `js/events.js` und `js/today-home.js` gruen.
-- Python-Compile fuer `scripts/event_visual_motifs.py` und `scripts/audit-event-feed-visual-diversity.py` gruen.
-- Synthetischer Feed-Test: CSD waehlt `motif-gap-csd-pride-parade-01`; keine Blaskapellenbilder.
-- Synthetischer Feed-Test: Kulturtage/Open-Air und Live-Musik koennen weiter kontrolliert diversifizieren.
+- `/events/` und Today/Home nutzen weiterhin exakte Motivbilder bevorzugt.
+- Exakte Motivbilder bleiben erst ab drei Ready-Varianten exklusiv.
+- Bei nur ein bis zwei exakten Motivbildern werden neutrale/fallbackfaehige Bilder desselben `visual_key` ergaenzt.
+- Fuer `live_music_stage` sind definierte nahe Buehnen-/Konzertmotive als letzte Diversity-Stufe zugelassen.
+- Der neue Audit `scripts/audit-event-feed-visual-diversity.py` simuliert die Feed-Auswahl und meldet sichtbare Bildwiederholungen, niedrige Motivdiversitaet und moegliche Seriencluster.
 
 Grenze:
-- Der Patch behebt die motivsichere Bildauswahl.
+- Dieser Patch behebt den sichtbaren Bild-Duplikat-Effekt technisch.
 - Der spaetere Premium-Fix fuer echte Mehrtages-/Dachveranstaltungen bleibt ein eigenes Datenmodellthema: `event_group_id`, `group_title`, `group_role`, `occurrence_title`, `display_mode`.
 <!-- === END BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 === -->
 
+<!-- === BEGIN BLOCK: TEST_STATUS_INBOX_REJECTION_AND_LEAD_GUARD_2026_07_02 | Zweck: dokumentiert die Härtung der KI-Inbox gegen abgelaufene Kandidaten und instabile Ablehnungsgrund-Werte; Umfang: Review-Inbox, Weekly-KI-Suche und Feedback-Klassifizierung === -->
 
-<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_SHEET_OVERRIDE_GUARD_2026_07_02 | Zweck: dokumentiert automatisierte Feed-Pruefung mit aktuellem Sheet-CSV und Schutz gegen zu breite manuelle visual_key-Werte; Umfang: Validierungsergebnis und Resthinweise === -->
-## Event-Visual Sheet-Override-Guard – automatisierte Feed-Abnahme (2026-07-02)
+## Inbox-Ablehnung und KI-Vorlauf-Guard – 02.07.2026
 
-Status:
-- Aktueller Staging-ZIP-Stand `Bocholt-Erleben-staging (85)` wurde mit dem gelieferten Events-CSV offline gebaut und geprueft.
-- `scripts/build-events-from-tsv.py` ergaenzt weiter `visual_key` und `visual_motif`; breite manuelle Keys duerfen klare Eventformat-Signale nicht mehr unterdruecken.
+Auslöser war der Live-Run `Weekly KI Websearch → Manual Inbox #18`: Die technische Kette Weekly KI Websearch → Manual KI Event Intake → Live-Inbox lief grün, aber zwei neue KI-Kandidaten lagen bei manueller Prüfung bereits in der Vergangenheit. Zusätzlich meldete die Inbox beim Verwerfen `invalid_ablehnungsgrund`, weil die UI lange Erklärungstexte statt stabiler Kurzgründe an das externe Sheet-Writeback senden konnte.
 
-Korrekturgrund:
-- Im gelieferten Events-CSV hatten `Jazzgenuss³ – Musik und Fingerfood im FARB` und `NRW SongSlam Meisterschaften 2026` manuell `visual_key=local_history_heritage`.
-- Dadurch konnte trotz Musik-Kategorie ein Museums-/History-Bild entstehen.
-- Der Guard bevorzugt kuenftig den klar abgeleiteten Eventtyp, wenn ein breiter manueller Key ohne explizites `visual_motif` mit starken Titel-/Beschreibungssignalen kollidiert.
+Umgesetzte Härtung:
 
-Validierung:
-- CSD bleibt exakt `parade_festzug/csd_pride_parade` und nutzt kein Musikzug-/Blaskapellenbild.
-- Kulturtage/Open-Air diversifizieren weiter nur ueber freigegebene `neutral_open_air`-Fallbacks.
-- Live-Musik-Faelle wie Jazz/SongSlam fallen wieder in `live_music_stage/local_band_concert`.
-- Der Diversity-Audit kann CSV, TSV und JSON als Quellen auswerten.
+- Die Review-Inbox sendet bei Ablehnungen nun stabile, kurze deutsche Ablehnungsgrund-Werte statt langer Erklärungstexte.
+- Neuer Event-Ablehnungsgrund: `Termin liegt in der Vergangenheit`.
+- Abgelaufene Event-Kandidaten werden in der Karte sichtbar als abgelaufen markiert.
+- Bei abgelaufenen Event-Kandidaten wird `Übernehmen` blockiert und der Vergangenheitsgrund vorausgewählt.
+- Falls das externe Google-Apps-Script den neuen Vergangenheitsgrund noch nicht kennt, versucht die UI kompatibel mit `Terminangaben unklar` zu verwerfen und weist in der Statusmeldung darauf hin.
+- Die Bildzuordnung zeigt den `visual_key` zusätzlich als lesbares Label, z. B. `Geführter Spaziergang / Tour (active_route_tour)`.
+- Die Weekly-KI-Suche nutzt einen konfigurierbaren Vorlauf-Guard `MIN_CANDIDATE_LEAD_DAYS` mit Default `2`.
+- Same-day-, next-day- und abgelaufene Kandidaten werden vom normalen `candidates`-Output ausgeschlossen bzw. lokal als `too_short_notice` oder `past_event` verworfen.
+- Inbox-Ablehnungen mit `Termin liegt in der Vergangenheit` werden als Feedbackklasse `rejected_event_past` klassifiziert und gehen als Zeitlogik-Signal in spätere Suchläufe ein.
 
-Resthinweise:
-- Der Audit meldet weiterhin niedrige Variantenabdeckung fuer einzelne spezifische Motive, z. B. `shopping_sunday`, `district_festival` und `museum_history_exhibition`. Das ist Backlog-/Pool-Ausbau, kein CSD-/Fallback-Fehler.
-<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_SHEET_OVERRIDE_GUARD_2026_07_02 === -->
+Validierung im Patch-Artefakt:
+
+- `python3 -m py_compile scripts/weekly-ki-websearch-to-manual-inbox.py` erfolgreich.
+- Inline-JavaScript aus `inbox/index.html` mit `node --check` erfolgreich geprüft.
+
+Offener externer Hinweis:
+
+- Das Google-Apps-Script für Sheet-Writeback liegt nicht im Repo. Wenn der neue Grund dauerhaft exakt im Sheet-Archiv stehen soll, muss dessen Ablehnungsgrund-Whitelist ebenfalls um `Termin liegt in der Vergangenheit` ergänzt werden. Bis dahin verhindert der Kompatibilitäts-Fallback das Blockieren der Verwerfen-Aktion.
+
+<!-- === END BLOCK: TEST_STATUS_INBOX_REJECTION_AND_LEAD_GUARD_2026_07_02 === -->
