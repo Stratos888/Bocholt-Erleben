@@ -1234,3 +1234,22 @@ Verbindlicher Abschlussstand:
 - Frontend wählt Event-Visuals motivgenau über `visual_motif`.
 - Fallbacks dienen nur der technischen Robustheit, nicht als primäre Bildlogik.
 <!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_FIT_CLOSURE_RULE_2026_06_18 === -->
+
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 | Zweck: dokumentiert die Feed-Kontext-Erweiterung fuer Event-Visuals; Umfang: motivgenaue Auswahl plus Diversity-Fallback bei sichtbarem Wiederholungsrisiko === -->
+### Event-Feed Visual Diversity – sichtbarer Feed statt reine Asset-Existenz
+
+Premium-Invariante:
+- Die Runtime bleibt motivgenau: exakte `visual_motif`-Bilder werden bevorzugt.
+- Ein einzelnes exaktes Motivbild reicht aber nicht fuer mehrere sichtbare Karten im gleichen Feed-Umfeld.
+- Wenn ein exakter Motivpool weniger als drei Ready-Bilder hat, darf der Resolver neutrale/fallbackfaehige Bilder desselben `visual_key` ergaenzen.
+- Bei `live_music_stage` duerfen zusaetzlich definierte nahe Buehnen-/Konzertmotive als letzte Diversity-Stufe genutzt werden.
+
+Begruendung:
+- Der sichtbare Feed muss redaktionell kuratiert wirken, auch wenn mehrere Events desselben Motivs oder einer Dachveranstaltung direkt hintereinander erscheinen.
+- Motiv-Fit und Feed-Diversity sind keine Gegensaetze: Die Erweiterung bleibt gewichtet, regelbasiert und innerhalb fachlich passender Bildfamilien.
+
+Audit:
+- `scripts/audit-event-feed-visual-diversity.py` simuliert die Feed-Bildauswahl und meldet sichtbare Bildwiederholungen, niedrige Motivdiversitaet und moegliche Serien-/Dachveranstaltungscluster.
+- Der Workflow laeuft bewusst nicht-blockierend, damit echte redaktionelle Serien zuerst sichtbar und dann gezielt modelliert werden koennen.
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 === -->

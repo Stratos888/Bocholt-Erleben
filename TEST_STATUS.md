@@ -4558,3 +4558,28 @@ Abnahme:
 - Seitliches Wischen zeigt die weiteren Schnellfilter.
 - Browser-Smoke Mobile Schnellfilter Rail bleibt massgeblicher automatischer Guard fuer Regressionen.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 | Zweck: dokumentiert den aktuellen Patch gegen sichtbare Event-Bildwiederholungen im Feed; Umfang: Ursache, technische Loesung, Grenzen === -->
+## Event-Feed Visual Diversity – Duplikatpraevention im sichtbaren Feed (2026-07-02)
+
+Status:
+- Patch gegen den aktuellen Staging-ZIP-Stand `Bocholt-Erleben-staging (83)` neu aufgebaut.
+- Der vorherige Patch darf nicht unveraendert eingespielt werden, weil er aeltere Vollversionen von `today-home.js`, `VISUAL_WORKFLOW.md` und `TEST_STATUS.md` enthielt und aktuelle Home-/Activity-Dokumentation ueberschrieben haette.
+
+Ursache:
+- Der Event-Visual-Resolver war zu hart motivexakt.
+- Sobald ein einziges exaktes `visual_motif`-Bild existierte, wurden neutrale/fallbackfaehige Bilder derselben Bildfamilie ausgeschlossen.
+- Bei mehreren benachbarten Kulturtage-/Open-Air- oder Live-Musik-Karten konnte die Anti-Duplikat-Logik deshalb nicht wirksam ausweichen.
+
+Technische Loesung:
+- `/events/` und Today/Home nutzen weiterhin exakte Motivbilder bevorzugt.
+- Exakte Motivbilder bleiben erst ab drei Ready-Varianten exklusiv.
+- Bei nur ein bis zwei exakten Motivbildern werden neutrale/fallbackfaehige Bilder desselben `visual_key` ergaenzt.
+- Fuer `live_music_stage` sind definierte nahe Buehnen-/Konzertmotive als letzte Diversity-Stufe zugelassen.
+- Der neue Audit `scripts/audit-event-feed-visual-diversity.py` simuliert die Feed-Auswahl und meldet sichtbare Bildwiederholungen, niedrige Motivdiversitaet und moegliche Seriencluster.
+
+Grenze:
+- Dieser Patch behebt den sichtbaren Bild-Duplikat-Effekt technisch.
+- Der spaetere Premium-Fix fuer echte Mehrtages-/Dachveranstaltungen bleibt ein eigenes Datenmodellthema: `event_group_id`, `group_title`, `group_role`, `occurrence_title`, `display_mode`.
+<!-- === END BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 === -->

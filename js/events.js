@@ -361,17 +361,64 @@ const EventCards = (() => {
     return role === "fallback" || EVENT_VISUAL_FALLBACK_MOTIFS.has(motif);
   }
 
-  function resolveEventVisualCandidatePool(pool, visualMotif) {
-    if (!Array.isArray(pool) || !pool.length) return [];
+  const EVENT_VISUAL_MIN_MOTIF_DIVERSITY = 3;
+  const EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_KEY = Object.freeze({
+    live_music_stage: new Set([
+      "local_band_concert",
+      "music_school_fest",
+      "open_air_concert",
+      "tribute_band"
+    ])
+  });
+
+  function isRelatedDiversityVisualCandidate(visualKey, visualMotif, candidate) {
+    const related = EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_KEY[normalizeLookupKey(visualKey)];
+    if (!(related instanceof Set)) return false;
+
+    const candidateMotif = normalizeLookupKey(candidate?.visualMotif || candidate?.visual_motif || "");
+    return candidateMotif && candidateMotif !== normalizeLookupKey(visualMotif) && related.has(candidateMotif);
+  }
+
+  function dedupeEventVisualCandidates(candidates) {
+    const seen = new Set();
+    const out = [];
+
+    (Array.isArray(candidates) ? candidates : []).forEach((candidate) => {
+      if (!candidate?.src) return;
+
+      const key = String(candidate.id || candidate.src || "").trim();
+      if (!key || seen.has(key)) return;
+
+      seen.add(key);
+      out.push(candidate);
+    });
+
+    return out;
+  }
+
+  function resolveEventVisualCandidatePool(pool, visualMotif, visualKey = "") {
+    const readyPool = Array.isArray(pool) ? pool.filter((candidate) => candidate?.src) : [];
+    if (!readyPool.length) return [];
 
     const motif = normalizeLookupKey(visualMotif);
     if (motif) {
-      const exact = pool.filter((candidate) => normalizeLookupKey(candidate?.visualMotif) === motif);
-      if (exact.length) return exact;
+      const exact = readyPool.filter((candidate) => normalizeLookupKey(candidate?.visualMotif) === motif);
+      if (exact.length >= EVENT_VISUAL_MIN_MOTIF_DIVERSITY) return exact;
+
+      if (exact.length) {
+        const neutral = readyPool.filter((candidate) =>
+          normalizeLookupKey(candidate?.visualMotif || candidate?.visual_motif || "") !== motif && isFallbackVisualCandidate(candidate)
+        );
+        const related = readyPool.filter((candidate) =>
+          isRelatedDiversityVisualCandidate(visualKey, motif, candidate)
+        );
+        const expanded = dedupeEventVisualCandidates([...exact, ...neutral, ...related]);
+        return expanded.length ? expanded : exact;
+      }
     }
 
-    const neutral = pool.filter(isFallbackVisualCandidate);
-    return neutral.length ? neutral : pool;
+    const neutral = readyPool.filter(isFallbackVisualCandidate);
+    return neutral.length ? neutral : readyPool;
   }
 
   const EVENT_CARD_RECENT_VISUAL_WINDOW = 5;
@@ -445,7 +492,7 @@ const EventCards = (() => {
     const visualKey = getEventVisualKey(event);
     const visualMotif = getEventVisualMotif(event);
     const pool = visualKey ? readyVisualPools[visualKey] : null;
-    const candidatePool = resolveEventVisualCandidatePool(pool, visualMotif);
+    const candidatePool = resolveEventVisualCandidatePool(pool, visualMotif, visualKey);
 
     if (!Array.isArray(candidatePool) || candidatePool.length === 0) {
       return null;

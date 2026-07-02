@@ -403,25 +403,81 @@
     return asString(item?.visualMotif || item?.visual_motif || item?.image_visual_motif);
   }
 
+  function normalizeEventVisualToken(value) {
+    return asString(value)
+      .toLowerCase()
+      .replace(/[\s-]+/g, "_")
+      .replace(/[^a-z0-9_]/g, "")
+      .replace(/_+/g, "_")
+      .replace(/^_+|_+$/g, "");
+  }
+
   function isFallbackEventVisual(visual) {
-    const motif = asString(visual?.visualMotif || visual?.visual_motif);
+    const motif = normalizeEventVisualToken(visual?.visualMotif || visual?.visual_motif);
     if (!motif) return true;
 
-    const role = asString(visual?.visualMotifRole || visual?.visual_motif_role);
+    const role = normalizeEventVisualToken(visual?.visualMotifRole || visual?.visual_motif_role);
     return role === "fallback" || EVENT_VISUAL_FALLBACK_MOTIFS.has(motif);
   }
 
-  function eventVisualCandidatePool(pool, visualMotif) {
-    if (!Array.isArray(pool) || !pool.length) return [];
+  const EVENT_VISUAL_MIN_MOTIF_DIVERSITY = 3;
+  const EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_KEY = Object.freeze({
+    live_music_stage: new Set([
+      "local_band_concert",
+      "music_school_fest",
+      "open_air_concert",
+      "tribute_band"
+    ])
+  });
 
-    const motif = asString(visualMotif);
+  function isRelatedDiversityVisualCandidate(visualKey, visualMotif, candidate) {
+    const related = EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_KEY[normalizeEventVisualToken(visualKey)];
+    if (!(related instanceof Set)) return false;
+
+    const candidateMotif = normalizeEventVisualToken(candidate?.visualMotif || candidate?.visual_motif);
+    return candidateMotif && candidateMotif !== normalizeEventVisualToken(visualMotif) && related.has(candidateMotif);
+  }
+
+  function dedupeEventVisualCandidates(candidates) {
+    const seen = new Set();
+    const out = [];
+
+    (Array.isArray(candidates) ? candidates : []).forEach((candidate) => {
+      if (!candidate?.src) return;
+
+      const key = asString(candidate.id || candidate.src);
+      if (!key || seen.has(key)) return;
+
+      seen.add(key);
+      out.push(candidate);
+    });
+
+    return out;
+  }
+
+  function eventVisualCandidatePool(pool, visualMotif, visualKey = "") {
+    const readyPool = Array.isArray(pool) ? pool.filter((candidate) => candidate?.src) : [];
+    if (!readyPool.length) return [];
+
+    const motif = normalizeEventVisualToken(visualMotif);
     if (motif) {
-      const exact = pool.filter((candidate) => asString(candidate?.visualMotif) === motif);
-      if (exact.length) return exact;
+      const exact = readyPool.filter((candidate) => normalizeEventVisualToken(candidate?.visualMotif) === motif);
+      if (exact.length >= EVENT_VISUAL_MIN_MOTIF_DIVERSITY) return exact;
+
+      if (exact.length) {
+        const neutral = readyPool.filter((candidate) =>
+          normalizeEventVisualToken(candidate?.visualMotif || candidate?.visual_motif) !== motif && isFallbackEventVisual(candidate)
+        );
+        const related = readyPool.filter((candidate) =>
+          isRelatedDiversityVisualCandidate(visualKey, motif, candidate)
+        );
+        const expanded = dedupeEventVisualCandidates([...exact, ...neutral, ...related]);
+        return expanded.length ? expanded : exact;
+      }
     }
 
-    const neutral = pool.filter(isFallbackEventVisual);
-    return neutral.length ? neutral : pool;
+    const neutral = readyPool.filter(isFallbackEventVisual);
+    return neutral.length ? neutral : readyPool;
   }
 
   function activityVisualPool(item) {
@@ -477,7 +533,7 @@
     const visualKey = eventVisualKey(item);
     const visualMotif = eventVisualMotif(item);
     const pool = visualKey ? state.eventVisualPools[visualKey] : null;
-    const candidatePool = eventVisualCandidatePool(pool, visualMotif);
+    const candidatePool = eventVisualCandidatePool(pool, visualMotif, visualKey);
 
     return selectVisualFromPool(
       candidatePool,
@@ -829,7 +885,7 @@
     const visualKey = eventVisualKey(item);
     const visualMotif = eventVisualMotif(item);
     const pool = visualKey ? state.eventVisualPools[visualKey] : null;
-    const candidatePool = eventVisualCandidatePool(pool, visualMotif);
+    const candidatePool = eventVisualCandidatePool(pool, visualMotif, visualKey);
 
     return Array.isArray(candidatePool) && candidatePool.length > 0;
   }
