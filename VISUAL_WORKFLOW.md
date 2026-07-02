@@ -1262,3 +1262,22 @@ Audit:
 - Der Workflow wertet Sheet-Events und Public-DB-Events zusammen aus.
 - Der Workflow laeuft bewusst nicht-blockierend, damit echte redaktionelle Serien zuerst sichtbar und dann gezielt modelliert werden koennen.
 <!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 === -->
+
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_SHEET_OVERRIDE_GUARD_2026_07_02 | Zweck: fixiert Umgang mit manuellen visual_key-Werten aus dem Sheet; Umfang: Guard-Regel fuer Format-vor-Ort und Auditquellen === -->
+### Event-Visual Sheet-Override-Guard
+
+Verbindliche Prozessregel:
+- Manuelle `visual_key`-Werte aus dem Sheet sind keine absolute Wahrheit, wenn sie nur einen breiten Orts-/History-Kontext markieren.
+- Ein explizites `visual_motif` bleibt eine bewusste redaktionelle Festlegung.
+- Ohne explizites `visual_motif` darf ein breiter manueller Key wie `local_history_heritage` oder `default_city` klare Format-Signale nicht ueberschreiben.
+
+Beispiele:
+- Jazzabend, SongSlam, Konzert oder Live-Bands im FARB bleiben `live_music_stage`, nicht `local_history_heritage`.
+- Film bleibt `film_screening`; Theater bleibt `theater_stage`; CSD bleibt `parade_festzug/csd_pride_parade`.
+- Reine History-/Museums-/Ortsformate koennen weiterhin `local_history_heritage` bleiben.
+
+Audit-Regel:
+- Feed-Visual-Pruefungen muessen gegen den realen Sheet-Export laufen koennen. `scripts/audit-event-feed-visual-diversity.py` akzeptiert daher CSV, TSV und JSON.
+- Sichtbare Diversity ist nur bestanden, wenn die Bildauswahl sowohl wiederholungsarm als auch motivisch freigegeben ist.
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_SHEET_OVERRIDE_GUARD_2026_07_02 === -->

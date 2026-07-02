@@ -154,9 +154,17 @@ def rows_from_json_payload(payload: Any) -> List[Dict[str, Any]]:
     return []
 
 
-def read_tsv(path: Path) -> List[Dict[str, Any]]:
+def read_delimited(path: Path, delimiter: str) -> List[Dict[str, Any]]:
     with path.open("r", encoding="utf-8", newline="") as handle:
-        return [dict(row) for row in csv.DictReader(handle, delimiter="\t")]
+        return [dict(row) for row in csv.DictReader(handle, delimiter=delimiter)]
+
+
+def read_tsv(path: Path) -> List[Dict[str, Any]]:
+    return read_delimited(path, "\t")
+
+
+def read_csv(path: Path) -> List[Dict[str, Any]]:
+    return read_delimited(path, ",")
 
 
 def source_label(source: Path) -> str:
@@ -170,8 +178,11 @@ def load_events(sources: Sequence[Path]) -> Tuple[str, List[Dict[str, Any]]]:
     for source in sources:
         if not source.exists() or source.stat().st_size <= 0:
             continue
-        if source.suffix.lower() == ".tsv":
+        suffix = source.suffix.lower()
+        if suffix == ".tsv":
             rows = read_tsv(source)
+        elif suffix == ".csv":
+            rows = read_csv(source)
         else:
             rows = rows_from_json_payload(read_json(source))
         rows = [normalize_event_row(row, source) for row in rows]

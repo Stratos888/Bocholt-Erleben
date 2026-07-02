@@ -7,7 +7,7 @@ import unicodedata
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple
 
-from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+from event_visual_keys import infer_event_visual_key, normalize_event_visual_key, resolve_event_visual_key
 
 EVENT_VISUAL_POOL_PATH = Path(__file__).resolve().parents[1] / "data" / "event_visual_pool.json"
 
@@ -285,7 +285,7 @@ def infer_event_visual_motif(
             return "open_air_concert"
         if _match(hay, r"\b(musikschulfest|musikschule)\b"):
             return "music_school_fest"
-        if _match(hay, r"\b(band|konzert|live|rock|pop|unplugged)\b"):
+        if _match(hay, r"\b(bands?|konzert|live|rock|pop|jazz|song[- ]?slam|songslam|unplugged)\b"):
             return "local_band_concert"
 
     if key == "classical_music":
@@ -431,6 +431,8 @@ def infer_event_visual_motif(
     if key == "business_messe_info":
         if _match(hay, r"\b(gesundheitsberufemesse|gesundheitsberufe|pflegeberufe)\b"):
             return "health_career_fair"
+        if _match(hay, r"\b(gesundheitstage|gesundheitsprogramm|gesundheitsmesse|gesundheitsaktion|gesundheitsforum)\b"):
+            return "neutral_info_fair"
         if _match(hay, r"\b(markterschließung|markterschliessung|unternehmermesse|business|unternehmen|gr(ü|ue)ndung|netzwerk)\b"):
             return "business_fair"
         if _match(hay, r"\b(vereinsmesse|verein|vereine)\b"):
@@ -499,7 +501,7 @@ def infer_event_visual_fit(
     visual_motif: object = "",
     pool_payload: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, str]:
-    key = normalize_event_visual_key(visual_key) or infer_event_visual_key(title, description, category, location)
+    key = resolve_event_visual_key(title, description, category, location, visual_key, visual_motif)
     motif = normalize_event_visual_motif(visual_motif, key) or infer_event_visual_motif(
         title=title,
         description=description,

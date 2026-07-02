@@ -72,6 +72,44 @@ def normalize_event_visual_key(value: object) -> str:
     return LEGACY_VISUAL_KEY_MAP.get(raw, "")
 
 
+LOW_CONFIDENCE_MANUAL_VISUAL_KEYS = {
+    "default_city",
+    "local_history_heritage",
+}
+
+
+def should_prefer_inferred_event_visual_key(manual_key: object, inferred_key: object, visual_motif: object = "") -> bool:
+    """Return True when a broad manual key should not suppress a stronger inferred event type.
+
+    Manual visual_key values are still allowed, but broad catch-all keys such as
+    local_history_heritage often come from venue context (e.g. FARB) and must not
+    override clear format signals like jazz, concert, film, CSD, theater or market.
+    An explicit visual_motif keeps the manual override intentional.
+    """
+    manual = normalize_event_visual_key(manual_key)
+    inferred = normalize_event_visual_key(inferred_key)
+    if not manual or not inferred or manual == inferred:
+        return False
+    if str(visual_motif or "").strip():
+        return False
+    return manual in LOW_CONFIDENCE_MANUAL_VISUAL_KEYS and inferred not in LOW_CONFIDENCE_MANUAL_VISUAL_KEYS
+
+
+def resolve_event_visual_key(
+    title: object = "",
+    description: object = "",
+    category: object = "",
+    location: object = "",
+    visual_key: object = "",
+    visual_motif: object = "",
+) -> str:
+    manual = normalize_event_visual_key(visual_key)
+    inferred = infer_event_visual_key(title, description, category, location)
+    if manual and should_prefer_inferred_event_visual_key(manual, inferred, visual_motif):
+        return inferred
+    return manual or inferred
+
+
 def infer_event_visual_key(title: object = "", description: object = "", category: object = "", location: object = "") -> str:
     """Return a stable V3.1 visual key for event image pool selection.
 
@@ -116,6 +154,9 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(weinfest|wijnfeest|wine tasting|street ?food|food ?festival|city food festival|genuss|kulinarik|kulinarisch)\b"):
         return "food_drink_festival"
 
+    if match(r"\b(gesundheitstage|gesundheitsprogramm|gesundheitsmesse|gesundheitsaktion|gesundheitsforum)\b"):
+        return "business_messe_info"
+
     if match(r"\b(aaltendagen|innenstadtsommer|bokeltsen treff|verkaufsoffener sonntag|quartierfest|stadtteilfest)\b"):
         return "city_festival_street"
 
@@ -150,7 +191,7 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(orgel|oratorium|chor|chorkonzert|kammermusik|klassik|quartett|quartet|kirchenkonzert|sinfonie)\b"):
         return "classical_music"
 
-    if match(r"\b(konzert|open[- ]?air[- ]?konzert|live[- ]?musik|band|tribute|unplugged|dj|pop|rock|musikschulfest)\b"):
+    if match(r"\b(konzert|open[- ]?air[- ]?konzert|live[- ]?musik|live[- ]?bands?|bands?|jazz|song[- ]?slam|songslam|tribute|unplugged|dj|pop|rock|musikschulfest)\b"):
         return "live_music_stage"
 
     if match(r"\b(theater|theaterabend|schauspiel|schauspielabend|bühnenstück|buehnenstueck|bühnenfassung|buehnenfassung|theaterbühne|theaterbuehne|komödie|komoedie|musical)\b"):
@@ -207,7 +248,7 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(aasee[- ]?festival|open[- ]?air[- ]?festival|festivalgelände|festivalgelaende|kulturtage)\b"):
         return "open_air_festival"
 
-    if match(r"\b(konzert|open[- ]?air[- ]?konzert|live[- ]?musik|band|tribute|unplugged|dj|pop|rock|musikschulfest)\b"):
+    if match(r"\b(konzert|open[- ]?air[- ]?konzert|live[- ]?musik|live[- ]?bands?|bands?|jazz|song[- ]?slam|songslam|tribute|unplugged|dj|pop|rock|musikschulfest)\b"):
         return "live_music_stage"
 
     if match(r"\b(theater|theaterabend|schauspiel|schauspielabend|bühnenstück|buehnenstueck|bühnenfassung|buehnenfassung|theaterbühne|theaterbuehne|komödie|komoedie|musical)\b"):

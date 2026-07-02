@@ -4597,3 +4597,26 @@ Grenze:
 - Der Patch behebt die motivsichere Bildauswahl.
 - Der spaetere Premium-Fix fuer echte Mehrtages-/Dachveranstaltungen bleibt ein eigenes Datenmodellthema: `event_group_id`, `group_title`, `group_role`, `occurrence_title`, `display_mode`.
 <!-- === END BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_SHEET_OVERRIDE_GUARD_2026_07_02 | Zweck: dokumentiert automatisierte Feed-Pruefung mit aktuellem Sheet-CSV und Schutz gegen zu breite manuelle visual_key-Werte; Umfang: Validierungsergebnis und Resthinweise === -->
+## Event-Visual Sheet-Override-Guard – automatisierte Feed-Abnahme (2026-07-02)
+
+Status:
+- Aktueller Staging-ZIP-Stand `Bocholt-Erleben-staging (85)` wurde mit dem gelieferten Events-CSV offline gebaut und geprueft.
+- `scripts/build-events-from-tsv.py` ergaenzt weiter `visual_key` und `visual_motif`; breite manuelle Keys duerfen klare Eventformat-Signale nicht mehr unterdruecken.
+
+Korrekturgrund:
+- Im gelieferten Events-CSV hatten `Jazzgenuss³ – Musik und Fingerfood im FARB` und `NRW SongSlam Meisterschaften 2026` manuell `visual_key=local_history_heritage`.
+- Dadurch konnte trotz Musik-Kategorie ein Museums-/History-Bild entstehen.
+- Der Guard bevorzugt kuenftig den klar abgeleiteten Eventtyp, wenn ein breiter manueller Key ohne explizites `visual_motif` mit starken Titel-/Beschreibungssignalen kollidiert.
+
+Validierung:
+- CSD bleibt exakt `parade_festzug/csd_pride_parade` und nutzt kein Musikzug-/Blaskapellenbild.
+- Kulturtage/Open-Air diversifizieren weiter nur ueber freigegebene `neutral_open_air`-Fallbacks.
+- Live-Musik-Faelle wie Jazz/SongSlam fallen wieder in `live_music_stage/local_band_concert`.
+- Der Diversity-Audit kann CSV, TSV und JSON als Quellen auswerten.
+
+Resthinweise:
+- Der Audit meldet weiterhin niedrige Variantenabdeckung fuer einzelne spezifische Motive, z. B. `shopping_sunday`, `district_festival` und `museum_history_exhibition`. Das ist Backlog-/Pool-Ausbau, kein CSD-/Fallback-Fehler.
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_SHEET_OVERRIDE_GUARD_2026_07_02 === -->
