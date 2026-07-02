@@ -4560,26 +4560,40 @@ Abnahme:
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 === -->
 
 
-<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 | Zweck: dokumentiert den aktuellen Patch gegen sichtbare Event-Bildwiederholungen im Feed; Umfang: Ursache, technische Loesung, Grenzen === -->
-## Event-Feed Visual Diversity – Duplikatpraevention im sichtbaren Feed (2026-07-02)
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 | Zweck: dokumentiert den aktuellen Patch gegen sichtbare Event-Bildwiederholungen und falsche semantische Fallbacks im Feed; Umfang: Ursache, technische Loesung, Grenzen === -->
+## Event-Feed Visual Diversity – motivsichere Duplikatpraevention im sichtbaren Feed (2026-07-02)
 
 Status:
-- Patch gegen den aktuellen Staging-ZIP-Stand `Bocholt-Erleben-staging (83)` neu aufgebaut.
-- Der vorherige Patch darf nicht unveraendert eingespielt werden, weil er aeltere Vollversionen von `today-home.js`, `VISUAL_WORKFLOW.md` und `TEST_STATUS.md` enthielt und aktuelle Home-/Activity-Dokumentation ueberschrieben haette.
+- Korrekturpatch gegen den aktuellen Staging-ZIP-Stand `Bocholt-Erleben-staging (84)` aufgebaut.
+- Anlass war eine fachliche Regression nach dem ersten Diversity-Fix: Beim `2. Bocholter CSD` konnte ein Blaskapellen-/Musikzugbild aus `neutral_parade` erscheinen.
+
+Validierte Produktregel:
+- Motiv-Fit schlaegt Bild-Diversity.
+- Feed-Diversity bleibt wichtig, darf aber nur innerhalb semantisch freigegebener Bildkorridore stattfinden.
+- Falsche Fallbacks sind kritischer als wiederholte, aber korrekte Bilder.
 
 Ursache:
-- Der Event-Visual-Resolver war zu hart motivexakt.
-- Sobald ein einziges exaktes `visual_motif`-Bild existierte, wurden neutrale/fallbackfaehige Bilder derselben Bildfamilie ausgeschlossen.
-- Bei mehreren benachbarten Kulturtage-/Open-Air- oder Live-Musik-Karten konnte die Anti-Duplikat-Logik deshalb nicht wirksam ausweichen.
+- Der vorherige Resolver hatte exakte, neutrale und verwandte Bilder zu frueh in einen gemeinsamen Kandidatenpool gelegt.
+- Dadurch konnten neutrale Bilder gleichberechtigt vor dem exakten CSD-Bild gewaehlt werden.
+- `parade-festzug-02` und `parade-festzug-03` waren als `neutral_parade` klassifiziert, sind visuell aber Musikzug-/Blaskapellenbilder und damit kein sicherer Fallback fuer CSD/Pride.
 
 Technische Loesung:
-- `/events/` und Today/Home nutzen weiterhin exakte Motivbilder bevorzugt.
-- Exakte Motivbilder bleiben erst ab drei Ready-Varianten exklusiv.
-- Bei nur ein bis zwei exakten Motivbildern werden neutrale/fallbackfaehige Bilder desselben `visual_key` ergaenzt.
-- Fuer `live_music_stage` sind definierte nahe Buehnen-/Konzertmotive als letzte Diversity-Stufe zugelassen.
-- Der neue Audit `scripts/audit-event-feed-visual-diversity.py` simuliert die Feed-Auswahl und meldet sichtbare Bildwiederholungen, niedrige Motivdiversitaet und moegliche Seriencluster.
+- `/events/` und Today/Home nutzen priorisierte Kandidatengruppen statt flachem Mischpool.
+- Exakte Motivbilder werden zuerst versucht.
+- Sichere Fallbacks werden nur genutzt, wenn sie fuer das konkrete `visual_motif` explizit freigegeben sind.
+- Live-Musik und Marktplatz-Open-Air behalten kontrollierte Diversity-Fallbacks.
+- CSD/Pride bekommt keine generischen Parade-/Musikzug-Fallbacks.
+- `parade-festzug-02` und `parade-festzug-03` wurden in `data/event_visual_pool.json` und Matrix als `marching_band_procession` spezifisch reklassifiziert.
+- `scripts/event_visual_motifs.py` kennt `marching_band_procession` fuer kuenftige Musikzug-/Blaskapellenfaelle.
+- Der Audit erkennt nun auch nicht freigegebene Motiv-Fallbacks und kombiniert Sheet-Events mit Public-DB-Events.
+
+Lokal validiert:
+- JS-Syntaxchecks fuer `js/events.js` und `js/today-home.js` gruen.
+- Python-Compile fuer `scripts/event_visual_motifs.py` und `scripts/audit-event-feed-visual-diversity.py` gruen.
+- Synthetischer Feed-Test: CSD waehlt `motif-gap-csd-pride-parade-01`; keine Blaskapellenbilder.
+- Synthetischer Feed-Test: Kulturtage/Open-Air und Live-Musik koennen weiter kontrolliert diversifizieren.
 
 Grenze:
-- Dieser Patch behebt den sichtbaren Bild-Duplikat-Effekt technisch.
+- Der Patch behebt die motivsichere Bildauswahl.
 - Der spaetere Premium-Fix fuer echte Mehrtages-/Dachveranstaltungen bleibt ein eigenes Datenmodellthema: `event_group_id`, `group_title`, `group_role`, `occurrence_title`, `display_mode`.
 <!-- === END BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 === -->

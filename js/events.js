@@ -362,21 +362,59 @@ const EventCards = (() => {
   }
 
   const EVENT_VISUAL_MIN_MOTIF_DIVERSITY = 3;
-  const EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_KEY = Object.freeze({
-    live_music_stage: new Set([
-      "local_band_concert",
+
+  const EVENT_VISUAL_DIVERSITY_FALLBACK_MOTIFS_BY_MOTIF = Object.freeze({
+    lake_festival: new Set(["neutral_open_air"]),
+    local_band_concert: new Set(["neutral_live_stage"]),
+    market_square_open_air: new Set(["neutral_open_air"]),
+    music_school_fest: new Set(["neutral_live_stage"]),
+    open_air_concert: new Set(["neutral_live_stage"]),
+    tribute_band: new Set(["neutral_live_stage"])
+  });
+
+  const EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_MOTIF = Object.freeze({
+    local_band_concert: new Set([
       "music_school_fest",
       "open_air_concert",
       "tribute_band"
+    ]),
+    music_school_fest: new Set([
+      "local_band_concert",
+      "open_air_concert",
+      "tribute_band"
+    ]),
+    open_air_concert: new Set([
+      "local_band_concert",
+      "music_school_fest",
+      "tribute_band"
+    ]),
+    tribute_band: new Set([
+      "local_band_concert",
+      "music_school_fest",
+      "open_air_concert"
     ])
   });
 
-  function isRelatedDiversityVisualCandidate(visualKey, visualMotif, candidate) {
-    const related = EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_KEY[normalizeLookupKey(visualKey)];
-    if (!(related instanceof Set)) return false;
+  function getCandidateVisualMotif(candidate) {
+    return normalizeLookupKey(candidate?.visualMotif || candidate?.visual_motif || "");
+  }
 
-    const candidateMotif = normalizeLookupKey(candidate?.visualMotif || candidate?.visual_motif || "");
-    return candidateMotif && candidateMotif !== normalizeLookupKey(visualMotif) && related.has(candidateMotif);
+  function isAllowedDiversityFallbackVisualCandidate(visualMotif, candidate) {
+    const motif = normalizeLookupKey(visualMotif);
+    const allowed = EVENT_VISUAL_DIVERSITY_FALLBACK_MOTIFS_BY_MOTIF[motif];
+    if (!(allowed instanceof Set) || !allowed.size) return false;
+
+    const candidateMotif = getCandidateVisualMotif(candidate);
+    return candidateMotif && candidateMotif !== motif && allowed.has(candidateMotif) && isFallbackVisualCandidate(candidate);
+  }
+
+  function isRelatedDiversityVisualCandidate(visualMotif, candidate) {
+    const motif = normalizeLookupKey(visualMotif);
+    const related = EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_MOTIF[motif];
+    if (!(related instanceof Set) || !related.size) return false;
+
+    const candidateMotif = getCandidateVisualMotif(candidate);
+    return candidateMotif && candidateMotif !== motif && related.has(candidateMotif);
   }
 
   function dedupeEventVisualCandidates(candidates) {
@@ -396,29 +434,32 @@ const EventCards = (() => {
     return out;
   }
 
-  function resolveEventVisualCandidatePool(pool, visualMotif, visualKey = "") {
+  function flattenEventVisualCandidateGroups(groups) {
+    return dedupeEventVisualCandidates((Array.isArray(groups) ? groups : []).flat());
+  }
+
+  function resolveEventVisualCandidateGroups(pool, visualMotif) {
     const readyPool = Array.isArray(pool) ? pool.filter((candidate) => candidate?.src) : [];
     if (!readyPool.length) return [];
 
     const motif = normalizeLookupKey(visualMotif);
     if (motif) {
-      const exact = readyPool.filter((candidate) => normalizeLookupKey(candidate?.visualMotif) === motif);
-      if (exact.length >= EVENT_VISUAL_MIN_MOTIF_DIVERSITY) return exact;
+      const exact = readyPool.filter((candidate) => getCandidateVisualMotif(candidate) === motif);
+      if (exact.length >= EVENT_VISUAL_MIN_MOTIF_DIVERSITY) return [exact];
 
       if (exact.length) {
-        const neutral = readyPool.filter((candidate) =>
-          normalizeLookupKey(candidate?.visualMotif || candidate?.visual_motif || "") !== motif && isFallbackVisualCandidate(candidate)
-        );
-        const related = readyPool.filter((candidate) =>
-          isRelatedDiversityVisualCandidate(visualKey, motif, candidate)
-        );
-        const expanded = dedupeEventVisualCandidates([...exact, ...neutral, ...related]);
-        return expanded.length ? expanded : exact;
+        const safeFallback = readyPool.filter((candidate) => isAllowedDiversityFallbackVisualCandidate(motif, candidate));
+        const related = readyPool.filter((candidate) => isRelatedDiversityVisualCandidate(motif, candidate));
+        return [exact, safeFallback, related].map(dedupeEventVisualCandidates).filter((group) => group.length);
       }
     }
 
     const neutral = readyPool.filter(isFallbackVisualCandidate);
-    return neutral.length ? neutral : readyPool;
+    return [neutral.length ? neutral : readyPool];
+  }
+
+  function resolveEventVisualCandidatePool(pool, visualMotif) {
+    return flattenEventVisualCandidateGroups(resolveEventVisualCandidateGroups(pool, visualMotif));
   }
 
   const EVENT_CARD_RECENT_VISUAL_WINDOW = 5;
@@ -475,7 +516,10 @@ const EventCards = (() => {
     }
   }
 
-  function pickEventVisualCandidate(pool, startIndex, predicate) {
+  function pickEventVisualCandidate(pool, seed, predicate) {
+    if (!Array.isArray(pool) || !pool.length) return null;
+
+    const startIndex = stableHash(seed) % pool.length;
     for (let offset = 0; offset < pool.length; offset += 1) {
       const candidate = pool[(startIndex + offset) % pool.length];
       if (!candidate?.src) continue;
@@ -488,11 +532,21 @@ const EventCards = (() => {
     return null;
   }
 
+  function pickEventVisualCandidateFromGroups(groups, seed, predicate) {
+    for (const group of Array.isArray(groups) ? groups : []) {
+      const candidate = pickEventVisualCandidate(group, seed, predicate);
+      if (candidate) return candidate;
+    }
+
+    return null;
+  }
+
   function resolveEventVisual(event, visualUsage = null) {
     const visualKey = getEventVisualKey(event);
     const visualMotif = getEventVisualMotif(event);
     const pool = visualKey ? readyVisualPools[visualKey] : null;
-    const candidatePool = resolveEventVisualCandidatePool(pool, visualMotif, visualKey);
+    const candidateGroups = resolveEventVisualCandidateGroups(pool, visualMotif);
+    const candidatePool = flattenEventVisualCandidateGroups(candidateGroups);
 
     if (!Array.isArray(candidatePool) || candidatePool.length === 0) {
       return null;
@@ -510,8 +564,9 @@ const EventCards = (() => {
       .map((part) => String(part || "").trim())
       .join("|");
 
-    const startIndex = stableHash(seed) % candidatePool.length;
-    const fallback = candidatePool[startIndex];
+    const primaryGroups = candidateGroups.length ? [candidateGroups[0]] : [];
+    const diversityGroups = candidateGroups.slice(1);
+    const fallback = pickEventVisualCandidateFromGroups(primaryGroups, seed, () => true) || candidatePool[stableHash(seed) % candidatePool.length];
 
     if (!visualUsage || candidatePool.length <= 1) {
       if (!fallback?.src) return null;
@@ -521,33 +576,52 @@ const EventCards = (() => {
 
     const usedForKey = getVisualKeyUsageSet(visualUsage, usageScope);
 
-    const unusedAndNotRecent = pickEventVisualCandidate(candidatePool, startIndex, (candidate) => {
+    const unusedExactAndNotRecent = pickEventVisualCandidateFromGroups(primaryGroups, seed, (candidate) => {
       const usageKey = getVisualUsageKey(candidate);
       return usageKey && !usedForKey.has(usageKey) && !wasVisualRecentlyUsed(visualUsage, candidate);
     });
 
-    if (unusedAndNotRecent) {
-      markVisualUsage(visualUsage, usageScope, unusedAndNotRecent);
-      return unusedAndNotRecent;
+    if (unusedExactAndNotRecent) {
+      markVisualUsage(visualUsage, usageScope, unusedExactAndNotRecent);
+      return unusedExactAndNotRecent;
     }
 
-    const notRecent = pickEventVisualCandidate(candidatePool, startIndex, (candidate) =>
+    const exactNotRecent = pickEventVisualCandidateFromGroups(primaryGroups, seed, (candidate) =>
       !wasVisualRecentlyUsed(visualUsage, candidate)
     );
 
-    if (notRecent) {
-      markVisualUsage(visualUsage, usageScope, notRecent);
-      return notRecent;
+    if (exactNotRecent) {
+      markVisualUsage(visualUsage, usageScope, exactNotRecent);
+      return exactNotRecent;
     }
 
-    const unusedForKey = pickEventVisualCandidate(candidatePool, startIndex, (candidate) => {
+    const fallbackUnusedAndNotRecent = pickEventVisualCandidateFromGroups(diversityGroups, seed, (candidate) => {
+      const usageKey = getVisualUsageKey(candidate);
+      return usageKey && !usedForKey.has(usageKey) && !wasVisualRecentlyUsed(visualUsage, candidate);
+    });
+
+    if (fallbackUnusedAndNotRecent) {
+      markVisualUsage(visualUsage, usageScope, fallbackUnusedAndNotRecent);
+      return fallbackUnusedAndNotRecent;
+    }
+
+    const fallbackNotRecent = pickEventVisualCandidateFromGroups(diversityGroups, seed, (candidate) =>
+      !wasVisualRecentlyUsed(visualUsage, candidate)
+    );
+
+    if (fallbackNotRecent) {
+      markVisualUsage(visualUsage, usageScope, fallbackNotRecent);
+      return fallbackNotRecent;
+    }
+
+    const unusedExact = pickEventVisualCandidateFromGroups(primaryGroups, seed, (candidate) => {
       const usageKey = getVisualUsageKey(candidate);
       return usageKey && !usedForKey.has(usageKey);
     });
 
-    if (unusedForKey) {
-      markVisualUsage(visualUsage, usageScope, unusedForKey);
-      return unusedForKey;
+    if (unusedExact) {
+      markVisualUsage(visualUsage, usageScope, unusedExact);
+      return unusedExact;
     }
 
     if (!fallback?.src) return null;

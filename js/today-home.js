@@ -334,7 +334,17 @@
     return hash >>> 0;
   }
 
-  function selectVisualFromPool(pool, seed, usedImages) {
+  function freezeVisualCandidate(candidate) {
+    if (!candidate?.src) return null;
+
+    return Object.freeze({
+      ...candidate,
+      src: candidate.src,
+      alt: asString(candidate.alt)
+    });
+  }
+
+  function pickVisualFromPool(pool, seed, predicate) {
     if (!Array.isArray(pool) || !pool.length) {
       return null;
     }
@@ -345,17 +355,53 @@
       const candidate = pool[(start + offset) % pool.length];
       if (!candidate?.src) continue;
 
-      if (!usedImages || !usedImages.has(candidate.src) || offset === pool.length - 1) {
-        if (usedImages) usedImages.add(candidate.src);
-        return Object.freeze({
-          ...candidate,
-          src: candidate.src,
-          alt: asString(candidate.alt)
-        });
+      if (predicate(candidate, offset)) {
+        return candidate;
       }
     }
 
     return null;
+  }
+
+  function pickVisualFromGroups(groups, seed, predicate) {
+    for (const group of Array.isArray(groups) ? groups : []) {
+      const candidate = pickVisualFromPool(group, seed, predicate);
+      if (candidate) return candidate;
+    }
+
+    return null;
+  }
+
+  function rememberVisualCandidate(candidate, usedImages) {
+    if (candidate?.src && usedImages) usedImages.add(candidate.src);
+    return freezeVisualCandidate(candidate);
+  }
+
+  function selectVisualFromPool(pool, seed, usedImages) {
+    const candidate = pickVisualFromPool(pool, seed, (item, offset) =>
+      !usedImages || !usedImages.has(item.src) || offset === pool.length - 1
+    );
+
+    return rememberVisualCandidate(candidate, usedImages);
+  }
+
+  function selectEventVisualFromGroups(groups, seed, usedImages) {
+    const primaryGroups = Array.isArray(groups) && groups.length ? [groups[0]] : [];
+    const diversityGroups = Array.isArray(groups) ? groups.slice(1) : [];
+
+    if (usedImages) {
+      const unusedPrimary = pickVisualFromGroups(primaryGroups, seed, (candidate) => !usedImages.has(candidate.src));
+      if (unusedPrimary) return rememberVisualCandidate(unusedPrimary, usedImages);
+
+      const unusedDiversity = pickVisualFromGroups(diversityGroups, seed, (candidate) => !usedImages.has(candidate.src));
+      if (unusedDiversity) return rememberVisualCandidate(unusedDiversity, usedImages);
+    }
+
+    const primaryFallback = pickVisualFromGroups(primaryGroups, seed, () => true);
+    if (primaryFallback) return rememberVisualCandidate(primaryFallback, usedImages);
+
+    const diversityFallback = pickVisualFromGroups(diversityGroups, seed, () => true);
+    return rememberVisualCandidate(diversityFallback, usedImages);
   }
 
   const EVENT_VISUAL_FALLBACK_MOTIFS = new Set([
@@ -421,21 +467,59 @@
   }
 
   const EVENT_VISUAL_MIN_MOTIF_DIVERSITY = 3;
-  const EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_KEY = Object.freeze({
-    live_music_stage: new Set([
-      "local_band_concert",
+
+  const EVENT_VISUAL_DIVERSITY_FALLBACK_MOTIFS_BY_MOTIF = Object.freeze({
+    lake_festival: new Set(["neutral_open_air"]),
+    local_band_concert: new Set(["neutral_live_stage"]),
+    market_square_open_air: new Set(["neutral_open_air"]),
+    music_school_fest: new Set(["neutral_live_stage"]),
+    open_air_concert: new Set(["neutral_live_stage"]),
+    tribute_band: new Set(["neutral_live_stage"])
+  });
+
+  const EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_MOTIF = Object.freeze({
+    local_band_concert: new Set([
       "music_school_fest",
       "open_air_concert",
       "tribute_band"
+    ]),
+    music_school_fest: new Set([
+      "local_band_concert",
+      "open_air_concert",
+      "tribute_band"
+    ]),
+    open_air_concert: new Set([
+      "local_band_concert",
+      "music_school_fest",
+      "tribute_band"
+    ]),
+    tribute_band: new Set([
+      "local_band_concert",
+      "music_school_fest",
+      "open_air_concert"
     ])
   });
 
-  function isRelatedDiversityVisualCandidate(visualKey, visualMotif, candidate) {
-    const related = EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_KEY[normalizeEventVisualToken(visualKey)];
-    if (!(related instanceof Set)) return false;
+  function eventVisualCandidateMotif(candidate) {
+    return normalizeEventVisualToken(candidate?.visualMotif || candidate?.visual_motif);
+  }
 
-    const candidateMotif = normalizeEventVisualToken(candidate?.visualMotif || candidate?.visual_motif);
-    return candidateMotif && candidateMotif !== normalizeEventVisualToken(visualMotif) && related.has(candidateMotif);
+  function isAllowedDiversityFallbackEventVisual(visualMotif, candidate) {
+    const motif = normalizeEventVisualToken(visualMotif);
+    const allowed = EVENT_VISUAL_DIVERSITY_FALLBACK_MOTIFS_BY_MOTIF[motif];
+    if (!(allowed instanceof Set) || !allowed.size) return false;
+
+    const candidateMotif = eventVisualCandidateMotif(candidate);
+    return candidateMotif && candidateMotif !== motif && allowed.has(candidateMotif) && isFallbackEventVisual(candidate);
+  }
+
+  function isRelatedDiversityEventVisual(visualMotif, candidate) {
+    const motif = normalizeEventVisualToken(visualMotif);
+    const related = EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_MOTIF[motif];
+    if (!(related instanceof Set) || !related.size) return false;
+
+    const candidateMotif = eventVisualCandidateMotif(candidate);
+    return candidateMotif && candidateMotif !== motif && related.has(candidateMotif);
   }
 
   function dedupeEventVisualCandidates(candidates) {
@@ -455,29 +539,32 @@
     return out;
   }
 
-  function eventVisualCandidatePool(pool, visualMotif, visualKey = "") {
+  function eventVisualCandidateGroups(pool, visualMotif) {
     const readyPool = Array.isArray(pool) ? pool.filter((candidate) => candidate?.src) : [];
     if (!readyPool.length) return [];
 
     const motif = normalizeEventVisualToken(visualMotif);
     if (motif) {
-      const exact = readyPool.filter((candidate) => normalizeEventVisualToken(candidate?.visualMotif) === motif);
-      if (exact.length >= EVENT_VISUAL_MIN_MOTIF_DIVERSITY) return exact;
+      const exact = readyPool.filter((candidate) => eventVisualCandidateMotif(candidate) === motif);
+      if (exact.length >= EVENT_VISUAL_MIN_MOTIF_DIVERSITY) return [exact];
 
       if (exact.length) {
-        const neutral = readyPool.filter((candidate) =>
-          normalizeEventVisualToken(candidate?.visualMotif || candidate?.visual_motif) !== motif && isFallbackEventVisual(candidate)
-        );
-        const related = readyPool.filter((candidate) =>
-          isRelatedDiversityVisualCandidate(visualKey, motif, candidate)
-        );
-        const expanded = dedupeEventVisualCandidates([...exact, ...neutral, ...related]);
-        return expanded.length ? expanded : exact;
+        const safeFallback = readyPool.filter((candidate) => isAllowedDiversityFallbackEventVisual(motif, candidate));
+        const related = readyPool.filter((candidate) => isRelatedDiversityEventVisual(motif, candidate));
+        return [exact, safeFallback, related].map(dedupeEventVisualCandidates).filter((group) => group.length);
       }
     }
 
     const neutral = readyPool.filter(isFallbackEventVisual);
-    return neutral.length ? neutral : readyPool;
+    return [neutral.length ? neutral : readyPool];
+  }
+
+  function flattenEventVisualCandidateGroups(groups) {
+    return dedupeEventVisualCandidates((Array.isArray(groups) ? groups : []).flat());
+  }
+
+  function eventVisualCandidatePool(pool, visualMotif) {
+    return flattenEventVisualCandidateGroups(eventVisualCandidateGroups(pool, visualMotif));
   }
 
   function activityVisualPool(item) {
@@ -533,10 +620,10 @@
     const visualKey = eventVisualKey(item);
     const visualMotif = eventVisualMotif(item);
     const pool = visualKey ? state.eventVisualPools[visualKey] : null;
-    const candidatePool = eventVisualCandidatePool(pool, visualMotif, visualKey);
+    const candidateGroups = eventVisualCandidateGroups(pool, visualMotif);
 
-    return selectVisualFromPool(
-      candidatePool,
+    return selectEventVisualFromGroups(
+      candidateGroups,
       [
         asString(item.id),
         asString(item.date),

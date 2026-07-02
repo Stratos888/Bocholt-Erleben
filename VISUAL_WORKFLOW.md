@@ -1236,20 +1236,29 @@ Verbindlicher Abschlussstand:
 <!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_FIT_CLOSURE_RULE_2026_06_18 === -->
 
 
-<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 | Zweck: dokumentiert die Feed-Kontext-Erweiterung fuer Event-Visuals; Umfang: motivgenaue Auswahl plus Diversity-Fallback bei sichtbarem Wiederholungsrisiko === -->
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 | Zweck: dokumentiert die Feed-Kontext-Erweiterung fuer Event-Visuals; Umfang: motivgenaue Auswahl plus semantisch freigegebene Diversity-Fallbacks === -->
 ### Event-Feed Visual Diversity – sichtbarer Feed statt reine Asset-Existenz
 
 Premium-Invariante:
-- Die Runtime bleibt motivgenau: exakte `visual_motif`-Bilder werden bevorzugt.
-- Ein einzelnes exaktes Motivbild reicht aber nicht fuer mehrere sichtbare Karten im gleichen Feed-Umfeld.
-- Wenn ein exakter Motivpool weniger als drei Ready-Bilder hat, darf der Resolver neutrale/fallbackfaehige Bilder desselben `visual_key` ergaenzen.
-- Bei `live_music_stage` duerfen zusaetzlich definierte nahe Buehnen-/Konzertmotive als letzte Diversity-Stufe genutzt werden.
+- Motiv-Fit steht vor Bild-Diversity: ein korrektes wiederholtes Bild ist besser als ein abwechslungsreiches falsches Bild.
+- Die Runtime bleibt motivgenau: exakte `visual_motif`-Bilder werden immer als erste Prioritaetsstufe behandelt.
+- Sichere Diversity-Fallbacks sind nur fuer explizit freigegebene Motivfamilien erlaubt, z. B. `market_square_open_air → neutral_open_air` oder Live-Musik-Motive → `neutral_live_stage`/nahe Buehnenmotive.
+- Spezifische oder semantisch sensible Motive wie `csd_pride_parade`, `darts`, `fencing`, `puppet_theater`, `organ_concert` oder `choir` duerfen nicht breit in generische Poolbilder ausweichen.
+- Wenn eine spezifische Motivfamilie zu wenig Varianten hat, ist das ein Bildbedarf/Backlog-Thema, kein Freibrief fuer falsche Fallbacks.
 
-Begruendung:
-- Der sichtbare Feed muss redaktionell kuratiert wirken, auch wenn mehrere Events desselben Motivs oder einer Dachveranstaltung direkt hintereinander erscheinen.
-- Motiv-Fit und Feed-Diversity sind keine Gegensaetze: Die Erweiterung bleibt gewichtet, regelbasiert und innerhalb fachlich passender Bildfamilien.
+Pool-Hygiene:
+- `neutral_*` bedeutet nicht „irgendwie gleiche Oberkategorie“, sondern „fuer die meisten spezifischen Motive dieser Familie nicht irrefuehrend“.
+- Die Bilder `parade-festzug-02` und `parade-festzug-03` sind wegen Musikzug-/Blaskapellenwirkung aus `neutral_parade` herausklassifiziert und als `marching_band_procession` spezifisch markiert.
+- CSD/Pride nutzt nur `csd_pride_parade` oder kuenftig explizit CSD-kompatible Varianten, keine Musikzug-/Schuetzen-/Festzug-Fallbacks.
+
+Resolver-Verhalten:
+1. Exaktes Motiv verwenden, sofern vorhanden.
+2. Bei Wiederholungsdruck nur in freigegebene sichere Fallback-Stufen ausweichen.
+3. Danach definierte nahe Related-Motive nutzen, nur wenn die Motivfamilie dies ausdruecklich erlaubt.
+4. Ansonsten korrekt wiederholen und den Variantenbedarf im Audit sichtbar machen.
 
 Audit:
-- `scripts/audit-event-feed-visual-diversity.py` simuliert die Feed-Bildauswahl und meldet sichtbare Bildwiederholungen, niedrige Motivdiversitaet und moegliche Serien-/Dachveranstaltungscluster.
+- `scripts/audit-event-feed-visual-diversity.py` simuliert die Feed-Bildauswahl und meldet sichtbare Bildwiederholungen, niedrige Motivdiversitaet, nicht freigegebene Motiv-Fallbacks und moegliche Serien-/Dachveranstaltungscluster.
+- Der Workflow wertet Sheet-Events und Public-DB-Events zusammen aus.
 - Der Workflow laeuft bewusst nicht-blockierend, damit echte redaktionelle Serien zuerst sichtbar und dann gezielt modelliert werden koennen.
 <!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 === -->

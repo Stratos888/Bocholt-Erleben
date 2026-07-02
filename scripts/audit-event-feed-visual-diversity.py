@@ -38,12 +38,34 @@ FALLBACK_MOTIFS = {
     if isinstance(meta, Mapping) and meta.get("role") == "fallback"
 }
 MIN_MOTIF_DIVERSITY = 3
-DIVERSITY_RELATED_MOTIFS_BY_KEY = {
-    "live_music_stage": {
-        "local_band_concert",
+DIVERSITY_FALLBACK_MOTIFS_BY_MOTIF = {
+    "lake_festival": {"neutral_open_air"},
+    "local_band_concert": {"neutral_live_stage"},
+    "market_square_open_air": {"neutral_open_air"},
+    "music_school_fest": {"neutral_live_stage"},
+    "open_air_concert": {"neutral_live_stage"},
+    "tribute_band": {"neutral_live_stage"},
+}
+DIVERSITY_RELATED_MOTIFS_BY_MOTIF = {
+    "local_band_concert": {
         "music_school_fest",
         "open_air_concert",
         "tribute_band",
+    },
+    "music_school_fest": {
+        "local_band_concert",
+        "open_air_concert",
+        "tribute_band",
+    },
+    "open_air_concert": {
+        "local_band_concert",
+        "music_school_fest",
+        "tribute_band",
+    },
+    "tribute_band": {
+        "local_band_concert",
+        "music_school_fest",
+        "open_air_concert",
     },
 }
 
@@ -125,6 +147,10 @@ def rows_from_json_payload(payload: Any) -> List[Dict[str, Any]]:
             value = payload.get(key)
             if isinstance(value, list):
                 return [item for item in value if isinstance(item, dict)]
+            if isinstance(value, dict):
+                nested = rows_from_json_payload(value)
+                if nested:
+                    return nested
     return []
 
 
@@ -133,7 +159,14 @@ def read_tsv(path: Path) -> List[Dict[str, Any]]:
         return [dict(row) for row in csv.DictReader(handle, delimiter="\t")]
 
 
-def load_events(sources: Sequence[Path]) -> Tuple[Path, List[Dict[str, Any]]]:
+def source_label(source: Path) -> str:
+    return source.relative_to(ROOT).as_posix() if source.is_relative_to(ROOT) else source.as_posix()
+
+
+def load_events(sources: Sequence[Path]) -> Tuple[str, List[Dict[str, Any]]]:
+    labels: List[str] = []
+    combined: List[Dict[str, Any]] = []
+
     for source in sources:
         if not source.exists() or source.stat().st_size <= 0:
             continue
@@ -143,13 +176,15 @@ def load_events(sources: Sequence[Path]) -> Tuple[Path, List[Dict[str, Any]]]:
             rows = rows_from_json_payload(read_json(source))
         rows = [normalize_event_row(row, source) for row in rows]
         if rows:
-            return source, rows
-    return sources[0], []
+            labels.append(f"{source_label(source)}:{len(rows)}")
+            combined.extend(rows)
+
+    return ", ".join(labels) if labels else source_label(sources[0]), combined
 
 
 def normalize_event_row(row: Mapping[str, Any], source: Path) -> Dict[str, Any]:
     return {
-        "source": source.relative_to(ROOT).as_posix() if source.is_relative_to(ROOT) else source.as_posix(),
+        "source": source_label(source),
         "id": norm(row.get("id") or row.get("event_id") or row.get("slug")),
         "title": norm(row.get("title") or row.get("eventName") or row.get("name")),
         "description": norm(row.get("description") or row.get("beschreibung") or row.get("text")),
@@ -211,13 +246,30 @@ def is_fallback_visual(candidate: Mapping[str, Any], visual_key: str) -> bool:
     return motif == fallback_event_visual_motif(visual_key) or motif in FALLBACK_MOTIFS
 
 
+def is_allowed_diversity_fallback_visual(candidate: Mapping[str, Any], visual_key: str, visual_motif: str) -> bool:
+    motif = normalize_event_visual_motif(visual_motif, visual_key)
+    allowed = DIVERSITY_FALLBACK_MOTIFS_BY_MOTIF.get(motif, set())
+    if not allowed:
+        return False
+    candidate_motif = normalize_event_visual_motif(candidate.get("visual_motif"), visual_key)
+    return bool(candidate_motif and candidate_motif != motif and candidate_motif in allowed and is_fallback_visual(candidate, visual_key))
+
+
 def is_related_diversity_visual(candidate: Mapping[str, Any], visual_key: str, visual_motif: str) -> bool:
-    related = DIVERSITY_RELATED_MOTIFS_BY_KEY.get(normalize_event_visual_key(visual_key), set())
+    motif = normalize_event_visual_motif(visual_motif, visual_key)
+    related = DIVERSITY_RELATED_MOTIFS_BY_MOTIF.get(motif, set())
     if not related:
         return False
     candidate_motif = normalize_event_visual_motif(candidate.get("visual_motif"), visual_key)
-    motif = normalize_event_visual_motif(visual_motif, visual_key)
     return bool(candidate_motif and candidate_motif != motif and candidate_motif in related)
+
+
+def is_allowed_non_exact_motif(visual_motif: str, image_motif: str) -> bool:
+    motif = token(visual_motif)
+    image = token(image_motif)
+    if not motif or not image or motif == image:
+        return True
+    return image in DIVERSITY_FALLBACK_MOTIFS_BY_MOTIF.get(motif, set()) or image in DIVERSITY_RELATED_MOTIFS_BY_MOTIF.get(motif, set())
 
 
 def dedupe_candidates(candidates: Iterable[Mapping[str, Any]]) -> List[Dict[str, str]]:
@@ -235,7 +287,7 @@ def dedupe_candidates(candidates: Iterable[Mapping[str, Any]]) -> List[Dict[str,
     return out
 
 
-def candidate_pool(pool: Sequence[Mapping[str, Any]], visual_key: str, visual_motif: str, min_motif_diversity: int) -> List[Dict[str, str]]:
+def candidate_groups(pool: Sequence[Mapping[str, Any]], visual_key: str, visual_motif: str, min_motif_diversity: int) -> List[List[Dict[str, str]]]:
     ready = [dict(candidate) for candidate in pool if norm(candidate.get("src"))]
     if not ready:
         return []
@@ -244,42 +296,79 @@ def candidate_pool(pool: Sequence[Mapping[str, Any]], visual_key: str, visual_mo
     if motif:
         exact = [candidate for candidate in ready if normalize_event_visual_motif(candidate.get("visual_motif"), visual_key) == motif]
         if len(exact) >= min_motif_diversity:
-            return exact
+            return [exact]
         if exact:
-            neutral = [
-                candidate for candidate in ready
-                if normalize_event_visual_motif(candidate.get("visual_motif"), visual_key) != motif
-                and is_fallback_visual(candidate, visual_key)
-            ]
+            safe_fallback = [candidate for candidate in ready if is_allowed_diversity_fallback_visual(candidate, visual_key, motif)]
             related = [candidate for candidate in ready if is_related_diversity_visual(candidate, visual_key, motif)]
-            expanded = dedupe_candidates([*exact, *neutral, *related])
-            return expanded or exact
+            return [group for group in (dedupe_candidates(exact), dedupe_candidates(safe_fallback), dedupe_candidates(related)) if group]
 
     neutral = [candidate for candidate in ready if is_fallback_visual(candidate, visual_key)]
-    return neutral or ready
+    return [neutral or ready]
+
+
+def candidate_pool(pool: Sequence[Mapping[str, Any]], visual_key: str, visual_motif: str, min_motif_diversity: int) -> List[Dict[str, str]]:
+    return dedupe_candidates(candidate for group in candidate_groups(pool, visual_key, visual_motif, min_motif_diversity) for candidate in group)
 
 
 def visual_usage_key(visual: Mapping[str, Any]) -> str:
     return norm(visual.get("id")) or norm(visual.get("src"))
 
 
-def pick_visual(candidates: Sequence[Mapping[str, Any]], seed: str, used_for_scope: set[str], recent: deque[str]) -> Optional[Dict[str, str]]:
+def pick_from_pool(candidates: Sequence[Mapping[str, Any]], seed: str, predicate) -> Optional[Dict[str, str]]:
     if not candidates:
         return None
     start = stable_hash(seed) % len(candidates)
-
-    for predicate in (
-        lambda key: key and key not in used_for_scope and key not in recent,
-        lambda key: key and key not in recent,
-        lambda key: key and key not in used_for_scope,
-        lambda key: bool(key),
-    ):
-        for offset in range(len(candidates)):
-            candidate = dict(candidates[(start + offset) % len(candidates)])
-            key = visual_usage_key(candidate)
-            if predicate(key):
-                return candidate
+    for offset in range(len(candidates)):
+        candidate = dict(candidates[(start + offset) % len(candidates)])
+        if predicate(candidate):
+            return candidate
     return None
+
+
+def pick_from_groups(groups: Sequence[Sequence[Mapping[str, Any]]], seed: str, predicate) -> Optional[Dict[str, str]]:
+    for group in groups:
+        candidate = pick_from_pool(group, seed, predicate)
+        if candidate:
+            return candidate
+    return None
+
+
+def pick_visual(groups: Sequence[Sequence[Mapping[str, Any]]], seed: str, used_for_scope: set[str], recent: deque[str]) -> Tuple[Optional[Dict[str, str]], str]:
+    if not groups:
+        return None, "none"
+
+    primary = list(groups[:1])
+    diversity = list(groups[1:])
+
+    exact_unused_recent = pick_from_groups(primary, seed, lambda candidate: visual_usage_key(candidate) and visual_usage_key(candidate) not in used_for_scope and visual_usage_key(candidate) not in recent)
+    if exact_unused_recent:
+        return exact_unused_recent, "exact"
+
+    exact_not_recent = pick_from_groups(primary, seed, lambda candidate: visual_usage_key(candidate) and visual_usage_key(candidate) not in recent)
+    if exact_not_recent:
+        return exact_not_recent, "exact"
+
+    fallback_unused_recent = pick_from_groups(diversity, seed, lambda candidate: visual_usage_key(candidate) and visual_usage_key(candidate) not in used_for_scope and visual_usage_key(candidate) not in recent)
+    if fallback_unused_recent:
+        return fallback_unused_recent, "safe_fallback"
+
+    fallback_not_recent = pick_from_groups(diversity, seed, lambda candidate: visual_usage_key(candidate) and visual_usage_key(candidate) not in recent)
+    if fallback_not_recent:
+        return fallback_not_recent, "safe_fallback"
+
+    exact_unused = pick_from_groups(primary, seed, lambda candidate: visual_usage_key(candidate) and visual_usage_key(candidate) not in used_for_scope)
+    if exact_unused:
+        return exact_unused, "exact"
+
+    exact_fallback = pick_from_groups(primary, seed, lambda candidate: bool(visual_usage_key(candidate)))
+    if exact_fallback:
+        return exact_fallback, "exact"
+
+    diversity_fallback = pick_from_groups(diversity, seed, lambda candidate: bool(visual_usage_key(candidate)))
+    if diversity_fallback:
+        return diversity_fallback, "safe_fallback"
+
+    return None, "none"
 
 
 def resolve_visual(
@@ -289,7 +378,7 @@ def resolve_visual(
     usage_by_scope: Dict[str, set[str]],
     recent: deque[str],
     min_motif_diversity: int,
-) -> Tuple[str, str, Optional[Dict[str, str]], int]:
+) -> Tuple[str, str, Optional[Dict[str, str]], int, str]:
     fit = infer_event_visual_fit(
         title=item.get("title", ""),
         description=item.get("description", ""),
@@ -302,9 +391,10 @@ def resolve_visual(
     visual_key = fit.get("visual_key", "")
     visual_motif = fit.get("visual_motif", "")
     pool = ready_pools.get(visual_key, [])
-    candidates = candidate_pool(pool, visual_key, visual_motif, min_motif_diversity)
+    groups = candidate_groups(pool, visual_key, visual_motif, min_motif_diversity)
+    candidates = dedupe_candidates(candidate for group in groups for candidate in group)
     if not candidates:
-        return visual_key, visual_motif, None, 0
+        return visual_key, visual_motif, None, 0, "none"
 
     scope = f"{visual_key}:{visual_motif}" if visual_motif else visual_key
     used = usage_by_scope.setdefault(scope, set())
@@ -318,13 +408,13 @@ def resolve_visual(
             visual_motif,
         ]
     )
-    visual = pick_visual(candidates, seed, used, recent)
+    visual, match_tier = pick_visual(groups, seed, used, recent)
     if visual:
         key = visual_usage_key(visual)
         if key:
             used.add(key)
             recent.append(key)
-    return visual_key, visual_motif, visual, len(candidates)
+    return visual_key, visual_motif, visual, len(candidates), match_tier
 
 
 def normalized_series_title(title: Any) -> str:
@@ -349,11 +439,11 @@ def audit(args: argparse.Namespace) -> int:
         return 1
 
     sources = [Path(path) for path in args.source] if args.source else DEFAULT_EVENT_SOURCES
-    source, events = load_events(sources)
+    source_label_text, events = load_events(sources)
     if not events:
         print("Event Feed Visual Diversity Audit")
         print("================================")
-        print(f"HINWEIS: Keine Eventdaten gefunden. Quellen: {', '.join(str(path.relative_to(ROOT) if path.is_relative_to(ROOT) else path) for path in sources)}")
+        print(f"HINWEIS: Keine Eventdaten gefunden. Quellen: {', '.join(source_label(path) for path in sources)}")
         return 0
 
     today = date.today()
@@ -372,7 +462,7 @@ def audit(args: argparse.Namespace) -> int:
     rendered: List[Dict[str, Any]] = []
 
     for index, (day, _minutes, _title, item) in enumerate(sortable):
-        visual_key, visual_motif, visual, candidate_count = resolve_visual(
+        visual_key, visual_motif, visual, candidate_count, match_tier = resolve_visual(
             item=item,
             ready_pools=ready_pools,
             pool_payload=pool_payload,
@@ -390,6 +480,8 @@ def audit(args: argparse.Namespace) -> int:
                 "visual_motif": visual_motif,
                 "candidate_count": candidate_count,
                 "image": visual_usage_key(visual or {}),
+                "image_motif": normalize_event_visual_motif((visual or {}).get("visual_motif"), visual_key),
+                "match_tier": match_tier,
                 "src": norm((visual or {}).get("src")),
             }
         )
@@ -417,6 +509,13 @@ def audit(args: argparse.Namespace) -> int:
         if count >= 2 and candidates < min(args.min_motif_diversity, count):
             low_diversity.append((key[0], key[1], count, candidates))
 
+    semantic_issues = []
+    for row in rendered:
+        visual_motif = norm(row.get("visual_motif"))
+        image_motif = norm(row.get("image_motif"))
+        if visual_motif and image_motif and visual_motif != image_motif and not is_allowed_non_exact_motif(visual_motif, image_motif):
+            semantic_issues.append(row)
+
     series_groups: Dict[Tuple[str, str], List[Dict[str, Any]]] = defaultdict(list)
     for row in rendered:
         series_title = normalized_series_title(row["title"])
@@ -426,9 +525,9 @@ def audit(args: argparse.Namespace) -> int:
 
     print("Event Feed Visual Diversity Audit")
     print("================================")
-    print(f"Quelle: {source.relative_to(ROOT) if source.is_relative_to(ROOT) else source}")
+    print(f"Quellen: {source_label_text}")
     print(f"Ausgewertete Feed-Events: {len(rendered)} von {len(events)} Eventzeilen; Horizont: {args.days} Tage")
-    print(f"Resolver-Regel: exaktes Motiv ab {args.min_motif_diversity} Bildern exklusiv, darunter exakt + neutrale Pool-Fallbacks")
+    print(f"Resolver-Regel: Motiv-Fit priorisiert; sichere Fallbacks nur fuer freigegebene Motivfamilien, ab {args.min_motif_diversity} exakten Bildern exklusiv")
     print(f"Duplikat-Fenster: {args.window} sichtbare Karten")
 
     if duplicate_issues:
@@ -448,6 +547,16 @@ def audit(args: argparse.Namespace) -> int:
     else:
         print("\nOK: Keine akute Motiv-Diversitaetswarnung im betrachteten Feed-Horizont.")
 
+    if semantic_issues:
+        print("\nSemantisch nicht freigegebene Fallbacks:")
+        for row in semantic_issues[:20]:
+            print(
+                f"- #{row['index'] + 1} {row['date']} {row['title']}: "
+                f"{row['visual_key']}/{row['visual_motif']} → {row['image']} ({row['image_motif']})"
+            )
+    else:
+        print("\nOK: Keine nicht freigegebenen Motiv-Fallbacks im Feed gefunden.")
+
     if series_issues:
         print("\nMoegliche Dachveranstaltungs-/Seriencluster:")
         for items in series_issues[:10]:
@@ -459,7 +568,7 @@ def audit(args: argparse.Namespace) -> int:
     else:
         print("\nOK: Keine grossen gleichnamigen Seriencluster erkannt.")
 
-    has_issues = bool(duplicate_issues or low_diversity or series_issues)
+    has_issues = bool(duplicate_issues or low_diversity or semantic_issues or series_issues)
     if has_issues and not args.warn_only:
         print("\nFEHLER: Feed-Visual-Diversitaet braucht Review.")
         return 1
@@ -473,7 +582,7 @@ def audit(args: argparse.Namespace) -> int:
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Audit fuer sichtbare Event-Feed-Bildwiederholungen.")
-    parser.add_argument("--source", action="append", type=Path, help="Eventquelle als TSV oder JSON. Mehrfach erlaubt; erste nicht-leere Quelle gewinnt.")
+    parser.add_argument("--source", action="append", type=Path, help="Eventquelle als TSV oder JSON. Mehrfach erlaubt; Quellen werden kombiniert.")
     parser.add_argument("--visual-pool", type=Path, default=DEFAULT_VISUAL_POOL, help="Pfad zu data/event_visual_pool.json")
     parser.add_argument("--window", type=int, default=6, help="Sichtbares Kartenfenster fuer Wiederholungspruefung")
     parser.add_argument("--days", type=int, default=180, help="Zukunftshorizont fuer Feedsimulation")

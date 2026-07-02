@@ -95,6 +95,7 @@ EVENT_VISUAL_MOTIF_RULES: Dict[str, Dict[str, Dict[str, str]]] = {
         "neutral_parade": {"role": "fallback", "label": "Festzug / Parade allgemein"},
         "carnival_parade": {"role": "specific", "label": "Rosenmontagszug / Karneval"},
         "csd_pride_parade": {"role": "specific", "label": "CSD / Pride-Parade"},
+        "marching_band_procession": {"role": "specific", "label": "Musikzug / Blaskapellen-Festzug"},
     },
     "shooting_festival_tradition": {
         "shooting_festival_tradition": {"role": "fallback", "label": "Schuetzenfest / Tradition"},
@@ -342,10 +343,12 @@ def infer_event_visual_motif(
             return "market_square_open_air"
 
     if key == "parade_festzug":
-        if _match(hay, r"\b(rosenmontagszug|rosenmontag|karneval|karnevalszug)\b"):
-            return "neutral_parade"
         if _match(hay, r"\b(csd|pride)\b"):
             return "csd_pride_parade"
+        if _match(hay, r"\b(blaskapelle|musikzug|spielmannszug|fanfarenzug|tambourcorps|marschkapelle)\b"):
+            return "marching_band_procession"
+        if _match(hay, r"\b(rosenmontagszug|rosenmontag|karneval|karnevalszug)\b"):
+            return "neutral_parade"
 
     if key == "market_stalls":
         if _match(hay, r"\b(stoffmarkt|stoff market|stoffe)\b"):
