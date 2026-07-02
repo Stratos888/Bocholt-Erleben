@@ -65,6 +65,38 @@ Ausgabe:
 Regel:
 - Alles, was nicht 100% sicher FINAL-fähig ist, wird im Automationsmodus **komplett weggelassen**.
 
+
+<!-- === BEGIN BLOCK: EVENT_SEARCH_AUTOMATION_LEAD_GUARD_2026_07_02 | Zweck: verhindert Vergangenheit und zu kurzfristige Kandidaten im Weekly-Produktionslauf; Umfang: Automationsmodus, manuelle Chatlaeufe, Drop-/Feedbacklogik === -->
+### Automations-Vorlaufregel fuer Weekly-Produktionslaeufe
+
+Im automatisierten Weekly-Lauf duerfen normale Inbox-Kandidaten nur ausgegeben werden, wenn sie ausreichend Vorlauf haben.
+
+Verbindlich fuer den Automationsmodus:
+
+- Keine abgelaufenen Events als `candidates` ausgeben.
+- Keine same-day-Events als normale `candidates` ausgeben.
+- Keine next-day-Events als normale `candidates` ausgeben.
+- Standard-Vorlauf: mindestens 2 Tage ab Suchlaufdatum.
+- Kurzfristige oder abgelaufene Treffer nur als verworfene/diagnostische Rohbeobachtung fuehren, wenn das technische Artifact dies vorsieht; nicht in `data/inbox_manual.json` uebernehmen.
+
+Begruendung:
+
+- Die Weekly-Suche hat einen manuellen Review-Schritt. Same-day- und next-day-Kandidaten veralten zu schnell und erzeugen Scheinaufgaben.
+- Abgelaufene Kandidaten duerfen nicht als normale neue Events in der privaten Inbox erscheinen.
+- Die Inbox hat zwar einen Vergangenheitsschutz, aber die Suchlogik soll solche Kandidaten upstream vermeiden.
+
+Feedback-/Drop-Einordnung:
+
+- Abgelaufene Kandidaten: `past_event` bzw. Feedbackklasse `rejected_event_past`.
+- Zu kurzfristige Kandidaten: `too_short_notice`.
+- Kandidaten ausserhalb des Suchfensters: `out_of_window`.
+
+Manueller Chatmodus:
+
+- Im manuellen Prüfmodus koennen interessante kurzfristige Hinweise genannt werden, aber nicht im Block `FINAL FREIGEGEBEN`, wenn sie den produktiven Weekly-Vorlauf nicht erfuellen.
+- Fuer Import nach `data/inbox_manual.json` gilt immer die Automations-Vorlaufregel.
+<!-- === END BLOCK: EVENT_SEARCH_AUTOMATION_LEAD_GUARD_2026_07_02 === -->
+
 ---
 
 ## Wichtige Arbeitslogik

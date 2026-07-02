@@ -1,3 +1,112 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_WEEKLY_KI_SELF_LEARNING_E2E_2026_07_02 | Zweck: dokumentiert den live geprüften Weekly-KI-/Manual-Inbox-/Feedback-Loop-Stand; Umfang: bestandene E2E-Punkte, Apps-Script-Fix, Kostenentscheidung, noch offene Laufzeitbeweise === -->
+## Weekly-KI-Suche, Manual Inbox und Self-Learning-Feedback – Live-E2E-Stand 2026-07-02
+
+Status: E2E-Liveprozess bestanden; naechster Runtime-Beweis fuer den Upstream-Vorlauf-Guard erfolgt bewusst erst beim regulären Weekly-Lauf. Kein manueller kostenpflichtiger KI-Lauf nur fuer den Proof.
+
+### Live geprueft und bestanden
+
+Bestanden:
+
+- `Weekly KI Websearch -> Manual Inbox #18` lief auf `main` gruen durch.
+- Der Lauf erzeugte `data/inbox_manual.json` mit 3 neuen Kandidaten und commitete die Ausgabe auf `main`.
+- `Manual KI Event Intake #41` wurde automatisch ausgelöst und lief gruen durch.
+- Live-Inbox zeigte die 3 KI-/Sheet-Kandidaten in `Neue Events`.
+- Die GitHub-Annotations-Warnungen in Weekly-, Intake- und Cleanup-Runs waren Node.js-20-Deprecation-Hinweise der verwendeten Actions, keine Content-/Prozessfehler.
+- Frontend-Patch war live sichtbar: `visual_key` wurde als lesbares Bildtyp-Label angezeigt, z. B. `Geführter Spaziergang / Tour (active_route_tour)`.
+- Abgelaufene KI-Kandidaten wurden live erkannt: Warnbox `Termin ist abgelaufen`, `Übernehmen` blockiert, Ablehnungsgrund vorausgewählt.
+- Zwei abgelaufene Events wurden erfolgreich mit `Termin liegt in der Vergangenheit` verworfen:
+  - `1. Bocholter Kulturspaziergang` vom 30.06.2026.
+  - `Die Geschichte des Bocholter Stadtwaldlagers` vom 01.07.2026.
+- Der kurzfristige, noch gewollte Kandidat `Jubiläum: 10 Jahre BOHJazz-Konzerte` wurde übernommen.
+- Anschliessender Inbox-Deploy lief fachlich durch; BOHJazz wurde in den Live-Prozess übernommen.
+- `Inbox Cleanup (Archive) #152` lief auf `main` gruen durch.
+- `Content Quality Report daily` nach Deploy: `Critical: 0`, `Review needed: 0`, `Warning: 16`, `Auto fixed: 128`.
+- Die Daily-Warnings sind nicht durch den KI-Inbox-E2E-Fix blockierend entstanden; sie bleiben sauber geroutete Arbeitsgruppen: Activity-Status-Guard, Faktencheck, KI-Faktencheck, Quellenprüfung und Visual-Fit.
+
+### Externes Apps Script – live korrigiert
+
+Der urspruengliche Fehler `Serverfehler: invalid_ablehnungsgrund` lag nicht mehr im Repo-Frontend, sondern im externen Google Apps Script der Inbox-Web-App.
+
+Live korrigiert:
+
+- Die bestehende Live-Bereitstellung wurde nicht durch eine neue URL ersetzt, sondern auf eine neue Script-Version aktualisiert.
+- Das Apps Script akzeptiert jetzt dieselben UI-Ablehnungsgruende wie die Inbox.
+- Neuer Grund live bestaetigt: `Termin liegt in der Vergangenheit`.
+- Alte technische Codes bleiben kompatibel und werden auf deutsche UI-Gruende normalisiert, z. B. `DUBLETTE -> Doppelt / bereits abgedeckt`, `DATUM_FALSCH -> Terminangaben unklar`, `QUELLE_ZU_SCHWACH -> Quelle / Angaben reichen nicht`.
+- Fehlerantworten fuer unbekannte Gruende geben kuenftig `requested`, `normalized` und `allowed` zur Diagnose zurueck.
+
+Hinweis: Das produktive Apps Script liegt ausserhalb des Repos. Der Repo-Status kann den Apps-Script-Code nicht selbst versionieren; der Live-Beweis erfolgte ueber die erfolgreiche Verwerfung mit dem neuen Grund.
+
+### Self-Learning-/Feedback-Loop – strukturell geprueft
+
+Als strukturell korrekt geprueft:
+
+- Der Weekly-KI-Suchlauf liest Feedback nicht als Rohdump, sondern als typisierte und begrenzte Suchlauf-Regeln.
+- Feedbackquellen sind insbesondere `Content_Search_Feedback`, offene `Inbox`, `Inbox_Archive` und das Fallback-Artefakt `data/content-search-feedback.json`.
+- Ablehnungen aus Inbox/Archiv werden klassifiziert; Gruende wie `Vergangenheit`, `abgelaufen`, `Termin vorbei` oder `past event` werden zu `rejected_event_past` verdichtet.
+- Content-Gate-Signale aus dem Audit werden ebenfalls in Klassen verdichtet, z. B. `time_missing_from_source`, `event_source_unreadable_or_uncertain`, `event_source_quality_problem`, `visual_specific_motif_context` und `visual_context_preservation`.
+- Der Prompt-Kontext bleibt begrenzt: maximal 48 interne Feedback-Regeln und maximal 18 Regeln im Prompt.
+- Der Feedback-Loop mutiert das Regelwerk nicht blind und schreibt keine fachlichen Daten automatisch um.
+- Visual-Feedback bleibt als Kontext-/Motivsignal getrennt; es erzeugt keine automatische Bildproduktion und keine unkontrollierten neuen Visual Keys.
+- Die Search-Verbesserung ist nicht nur Prompt-Hoffnung: der Weekly-Code hat zusätzlich einen deterministischen Vorlauf-/Datums-Guard.
+
+### Deterministischer Guard fuer kuenftige Weekly-Laeufe
+
+Im Repo-Patch umgesetzt und lokal geprueft:
+
+- `MIN_CANDIDATE_LEAD_DAYS = 2` als Default.
+- Normale Weekly-Kandidaten muessen mindestens 2 Tage Vorlauf haben.
+- Same-day-, next-day- und abgelaufene Kandidaten sollen nicht mehr als normale `candidates` in `data/inbox_manual.json` landen.
+- Drop-/Filtergruende sind u. a. `past_event`, `too_short_notice` und `out_of_window`.
+- Neuer Feedbacktyp fuer den konkreten Fehlerfall: `rejected_event_past`.
+
+### Nach Deploy gepruefte Audit-Lage
+
+Daily-Audit nach dem Live-E2E:
+
+- `Critical: 0`.
+- `Review needed: 0`.
+- `Warning: 16`.
+- `Auto fixed: 128`.
+- Search-Feedback: 5 aktive Feedback-Regeln, 3 Default-Kontextregeln, 12 Feedback-Signale.
+- Visual-Feedback: 9 Signale, davon 8 search-relevant; `Visual asset gaps: 0`.
+
+Einordnung:
+
+- Keine harte Folgeaktion aus dem BOHJazz-Import.
+- Keine erneute Inbox-Vermuellung durch die verworfenen Alt-Kandidaten.
+- Activity-Bade-/Saison-Warnings bleiben bewusst Guard-Hinweise: ohne frische positive Quelle keine Bade-/Wasser-Highlight-Ausspielung.
+- Visual-Fit-Warnings bleiben separater Visual-Workflow, nicht normale Content-Sofortaktion.
+
+### Noch nicht final runtime-bewiesen
+
+Noch offen, aber nicht per kostenpflichtigem manuellen Lauf zu erzwingen:
+
+- Naechster regulaerer `Weekly KI Websearch -> Manual Inbox` muss zeigen, dass der neue Vorlauf-Guard upstream wirkt.
+- Erwartung beim naechsten regulaeren Lauf:
+  - keine abgelaufenen Kandidaten in `data/inbox_manual.json`,
+  - keine normalen same-day-/next-day-Kandidaten,
+  - falls solche Rohkandidaten auftreten: Drop-Reason `past_event` oder `too_short_notice`,
+  - `search_feedback_rules_applied` sichtbar groesser 0,
+  - Feedbackklassen bleiben typisiert und begrenzt, nicht aufgebläht,
+  - `visual_key`, `visual_motif` und `visual_asset_status` bleiben bei neuen Kandidaten vorhanden.
+- Coverage-Luecke aus dem letzten Diagnostics-Stand weiter beobachten: `Dick Brave - Open Air im Schlosspark` war `MISSING_FROM_RAW`.
+
+### Naechster Pruefpunkt ohne Zusatzkosten
+
+Beim naechsten regulaeren Weekly-Lauf nur die ohnehin erzeugten Artefakte pruefen:
+
+1. `weekly-event-diagnostics.zip`.
+2. Run-Log des Steps `Run weekly KI websearch to manual inbox`.
+3. Live-Inbox-Screenshot, falls neue Kandidaten erzeugt wurden.
+4. Danach bei Bedarf `Content Quality Report daily`.
+
+Erfolgsdefinition fuer den naechsten Lauf:
+
+`KI-Feedback gelesen -> neue Kandidaten mit ausreichendem Vorlauf -> keine Vergangenheit/zu kurzer Vorlauf in Neue Events -> Drop-Reasons nachvollziehbar -> Feedbackregelzahl bleibt klein und typisiert`.
+
+<!-- === END BLOCK: TEST_STATUS_WEEKLY_KI_SELF_LEARNING_E2E_2026_07_02 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_FAVORITES_CARD_PARITY_2026_06_30 | Zweck: dokumentiert Activity-Favoriten, mobile Card-Parity und Browser-Smoke-Main-Abnahme; Umfang: aktueller Produktreife-Status nach P1-Smoke === -->
 ## Activity-Favoriten und Mobile Card-Parity – umgesetzt
 
