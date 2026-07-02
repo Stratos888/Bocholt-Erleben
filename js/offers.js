@@ -830,6 +830,78 @@ const OfferCards = (() => {
   }
   /* === END BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_RENDER_ENTERPRISE === */
   /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V2 === */
+  /* === BEGIN BLOCK: ACTIVITY_FAVORITE_CARD_UI_V1 | Zweck: rendert lokale Activity-Favoriten als Herz-Aktion auf Activity-Cards ohne Cookies, Login oder Backend; Umfang: Helper fuer Button, Zustand und Toggle === */
+  function getFavoriteKey(offer) {
+    const id = String(offer?.id || "").trim();
+    return id ? { type: "activity", id } : null;
+  }
+
+  function isFavorite(offer) {
+    const key = getFavoriteKey(offer);
+    if (!key) return false;
+
+    try {
+      return !!window.BEUserPreferences?.isSaved?.(key.type, key.id);
+    } catch (_) {
+      return !!offer?.isFavorite;
+    }
+  }
+
+  function favoriteIconHtml() {
+    return window.Icons?.svg
+      ? window.Icons.svg("heart", { className: "activity-favorite-button__icon-svg" })
+      : '<span class="activity-favorite-button__icon-fallback" aria-hidden="true">♥</span>';
+  }
+
+  function renderFavoriteButton(offer) {
+    const active = isFavorite(offer);
+    const title = String(offer?.title || "Aktivität").trim() || "Aktivität";
+    return `
+      <button
+        type="button"
+        class="activity-favorite-button${active ? " is-active" : ""}"
+        data-activity-favorite-toggle
+        data-activity-id="${OfferVisuals.escapeHtml(offer?.id || "")}"
+        aria-pressed="${active ? "true" : "false"}"
+        aria-label="${OfferVisuals.escapeHtml(active ? `${title} aus Favoriten entfernen` : `${title} als Favorit speichern`)}"
+        title="${active ? "Favorit entfernen" : "Als Favorit speichern"}"
+      >
+        ${favoriteIconHtml()}
+      </button>
+    `.trim();
+  }
+
+  function updateFavoriteButton(button, offer, active) {
+    if (!button) return;
+    const title = String(offer?.title || "Aktivität").trim() || "Aktivität";
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+    button.setAttribute("aria-label", active ? `${title} aus Favoriten entfernen` : `${title} als Favorit speichern`);
+    button.setAttribute("title", active ? "Favorit entfernen" : "Als Favorit speichern");
+  }
+
+  function toggleFavorite(offer, button = null) {
+    const key = getFavoriteKey(offer);
+    if (!key || !window.BEUserPreferences?.toggleSaved) return false;
+
+    let profile = null;
+    try {
+      profile = window.BEUserPreferences.toggleSaved(key.type, key.id);
+    } catch (_) {
+      return false;
+    }
+
+    const active = Array.isArray(profile?.saved) && profile.saved.includes(`${key.type}:${key.id}`);
+    updateFavoriteButton(button, offer, active);
+
+    window.dispatchEvent(new CustomEvent("activity:favorites-changed", {
+      detail: { id: key.id, favorite: active }
+    }));
+
+    return active;
+  }
+  /* === END BLOCK: ACTIVITY_FAVORITE_CARD_UI_V1 === */
+
   /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V3 | Zweck: behaelt die bestehende Bildlade-Logik der Activity-Cards bei und ergänzt belastbare Alt-Texte fuer Suchmaschinen und Barrierefreiheit, ohne Kartenlayout oder Ladeprioritäten zu verändern | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
   const preconnectedImageOrigins = new Set();
 
@@ -995,7 +1067,7 @@ const OfferCards = (() => {
     const primaryUrl = OfferVisuals.normalizeHttpUrl(offer.url);
     const primaryOutboundPayload = buildPrimaryOutboundPayload(offer, primaryUrl);
 
-    article.className = "event-card discovery-card--compact activity-card--rich";
+    article.className = `event-card discovery-card--compact activity-card--rich${isFavorite(offer) ? " is-favorite" : ""}`;
     article.tabIndex = 0;
     article.setAttribute("role", "button");
     article.setAttribute(
@@ -1005,6 +1077,7 @@ const OfferCards = (() => {
 
     article.innerHTML = `
       ${renderMedia(offer, visual, index)}
+      ${renderFavoriteButton(offer)}
       <div class="event-card-body">
         <div class="activity-card-kicker">${OfferVisuals.escapeHtml(visual.label)}</div>
         <h2 class="event-title">
@@ -1044,10 +1117,20 @@ const OfferCards = (() => {
         return;
       }
 
+      const favoriteButton = event.target.closest("[data-activity-favorite-toggle]");
+      if (favoriteButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        const active = toggleFavorite(offer, favoriteButton);
+        article.classList.toggle("is-favorite", active);
+        return;
+      }
+
       open(event);
     });
     article.addEventListener("keydown", (event) => {
       if (event.target.closest("[data-image-credit-access]")) return;
+      if (event.target.closest("[data-activity-favorite-toggle]")) return;
       if (event.key !== "Enter" && event.key !== " ") return;
       open(event);
     });
@@ -1139,6 +1222,7 @@ const OfferCards = (() => {
     return link;
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_FAVORITES_SILENT_PRIORITY_FEED_V3 | Zweck: Favoriten bleiben eine stille Sortierpriorität mit Herzstatus; keine Favoriten-Sections, keine Erklaerzeilen und keine Filter-Anmutung im Feed === */
   function render(offers) {
     const target = ensureContainer();
     if (!target) return;
@@ -1166,15 +1250,22 @@ const OfferCards = (() => {
       return;
     }
 
-    list.forEach((offer, index) => {
-      target.appendChild(createCard(offer, index));
-      if (index === 0) {
+    let renderedIndex = 0;
+    let presenceInserted = false;
+
+    list.forEach((offer) => {
+      target.appendChild(createCard(offer, renderedIndex));
+      renderedIndex += 1;
+
+      if (!presenceInserted && renderedIndex === 1) {
         target.appendChild(createActivityPresenceEntry());
+        presenceInserted = true;
       }
     });
   }
 
   return { render, renderSkeleton };
+  /* === END BLOCK: ACTIVITIES_FAVORITES_SILENT_PRIORITY_FEED_V3 === */
   /* === END BLOCK: ACTIVITIES_MOBILE_PRESENCE_FEED_ENTRY_V1 === */
   /* === END BLOCK: ACTIVITIES_SKELETON_AND_EMPTYSTATE_PARITY_V1 === */
 })();

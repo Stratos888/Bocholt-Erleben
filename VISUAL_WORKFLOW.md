@@ -1234,3 +1234,50 @@ Verbindlicher Abschlussstand:
 - Frontend wählt Event-Visuals motivgenau über `visual_motif`.
 - Fallbacks dienen nur der technischen Robustheit, nicht als primäre Bildlogik.
 <!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_FIT_CLOSURE_RULE_2026_06_18 === -->
+
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 | Zweck: dokumentiert die Feed-Kontext-Erweiterung fuer Event-Visuals; Umfang: motivgenaue Auswahl plus semantisch freigegebene Diversity-Fallbacks === -->
+### Event-Feed Visual Diversity – sichtbarer Feed statt reine Asset-Existenz
+
+Premium-Invariante:
+- Motiv-Fit steht vor Bild-Diversity: ein korrektes wiederholtes Bild ist besser als ein abwechslungsreiches falsches Bild.
+- Die Runtime bleibt motivgenau: exakte `visual_motif`-Bilder werden immer als erste Prioritaetsstufe behandelt.
+- Sichere Diversity-Fallbacks sind nur fuer explizit freigegebene Motivfamilien erlaubt, z. B. `market_square_open_air → neutral_open_air` oder Live-Musik-Motive → `neutral_live_stage`/nahe Buehnenmotive.
+- Spezifische oder semantisch sensible Motive wie `csd_pride_parade`, `darts`, `fencing`, `puppet_theater`, `organ_concert` oder `choir` duerfen nicht breit in generische Poolbilder ausweichen.
+- Wenn eine spezifische Motivfamilie zu wenig Varianten hat, ist das ein Bildbedarf/Backlog-Thema, kein Freibrief fuer falsche Fallbacks.
+
+Pool-Hygiene:
+- `neutral_*` bedeutet nicht „irgendwie gleiche Oberkategorie“, sondern „fuer die meisten spezifischen Motive dieser Familie nicht irrefuehrend“.
+- Die Bilder `parade-festzug-02` und `parade-festzug-03` sind wegen Musikzug-/Blaskapellenwirkung aus `neutral_parade` herausklassifiziert und als `marching_band_procession` spezifisch markiert.
+- CSD/Pride nutzt nur `csd_pride_parade` oder kuenftig explizit CSD-kompatible Varianten, keine Musikzug-/Schuetzen-/Festzug-Fallbacks.
+
+Resolver-Verhalten:
+1. Exaktes Motiv verwenden, sofern vorhanden.
+2. Bei Wiederholungsdruck nur in freigegebene sichere Fallback-Stufen ausweichen.
+3. Danach definierte nahe Related-Motive nutzen, nur wenn die Motivfamilie dies ausdruecklich erlaubt.
+4. Ansonsten korrekt wiederholen und den Variantenbedarf im Audit sichtbar machen.
+
+Audit:
+- `scripts/audit-event-feed-visual-diversity.py` simuliert die Feed-Bildauswahl und meldet sichtbare Bildwiederholungen, niedrige Motivdiversitaet, nicht freigegebene Motiv-Fallbacks und moegliche Serien-/Dachveranstaltungscluster.
+- Der Workflow wertet Sheet-Events und Public-DB-Events zusammen aus.
+- Der Workflow laeuft bewusst nicht-blockierend, damit echte redaktionelle Serien zuerst sichtbar und dann gezielt modelliert werden koennen.
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 === -->
+
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_SHEET_OVERRIDE_GUARD_2026_07_02 | Zweck: fixiert Umgang mit manuellen visual_key-Werten aus dem Sheet; Umfang: Guard-Regel fuer Format-vor-Ort und Auditquellen === -->
+### Event-Visual Sheet-Override-Guard
+
+Verbindliche Prozessregel:
+- Manuelle `visual_key`-Werte aus dem Sheet sind keine absolute Wahrheit, wenn sie nur einen breiten Orts-/History-Kontext markieren.
+- Ein explizites `visual_motif` bleibt eine bewusste redaktionelle Festlegung.
+- Ohne explizites `visual_motif` darf ein breiter manueller Key wie `local_history_heritage` oder `default_city` klare Format-Signale nicht ueberschreiben.
+
+Beispiele:
+- Jazzabend, SongSlam, Konzert oder Live-Bands im FARB bleiben `live_music_stage`, nicht `local_history_heritage`.
+- Film bleibt `film_screening`; Theater bleibt `theater_stage`; CSD bleibt `parade_festzug/csd_pride_parade`.
+- Reine History-/Museums-/Ortsformate koennen weiterhin `local_history_heritage` bleiben.
+
+Audit-Regel:
+- Feed-Visual-Pruefungen muessen gegen den realen Sheet-Export laufen koennen. `scripts/audit-event-feed-visual-diversity.py` akzeptiert daher CSV, TSV und JSON.
+- Sichtbare Diversity ist nur bestanden, wenn die Bildauswahl sowohl wiederholungsarm als auch motivisch freigegeben ist.
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_SHEET_OVERRIDE_GUARD_2026_07_02 === -->

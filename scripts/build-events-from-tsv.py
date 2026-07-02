@@ -24,7 +24,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
-from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+from event_visual_keys import infer_event_visual_key, normalize_event_visual_key, resolve_event_visual_key, should_prefer_inferred_event_visual_key
 from event_visual_motifs import infer_event_visual_motif, normalize_event_visual_motif
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -353,12 +353,26 @@ def main() -> None:
             )
         seen_fingerprints.add(fp)
 
-        visual_key = normalize_event_visual_key(data.get("visual_key", "")) or infer_event_visual_key(
+        manual_visual_key = normalize_event_visual_key(data.get("visual_key", ""))
+        inferred_visual_key = infer_event_visual_key(
             title=data["title"],
             description=data.get("description", ""),
             category=cat,
             location=data["location"],
         )
+        visual_key = resolve_event_visual_key(
+            title=data["title"],
+            description=data.get("description", ""),
+            category=cat,
+            location=data["location"],
+            visual_key=manual_visual_key,
+            visual_motif=data.get("visual_motif", ""),
+        )
+        if manual_visual_key and should_prefer_inferred_event_visual_key(manual_visual_key, inferred_visual_key, data.get("visual_motif", "")):
+            warn(
+                f"Zeile {idx}: visual_key {manual_visual_key!r} wirkt zu breit; "
+                f"nutze abgeleiteten Eventtyp {visual_key!r} fuer {data['title']!r}."
+            )
         visual_motif = normalize_event_visual_motif(data.get("visual_motif", ""), visual_key) or infer_event_visual_motif(
             title=data["title"],
             description=data.get("description", ""),

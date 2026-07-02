@@ -1488,10 +1488,115 @@ Umfang:
       return ["Quelle öffnen", "Dubletten prüfen", "Bildtyp prüfen", "entscheiden"];
     }
 
+    const REVIEW_EVENT_REJECT_REASONS = Object.freeze([
+      ["", "Ablehnungsgrund auswählen …"],
+      ["Termin liegt in der Vergangenheit", "Termin liegt in der Vergangenheit"],
+      ["Doppelt / bereits abgedeckt", "Doppelt / bereits abgedeckt"],
+      ["Terminangaben unklar", "Terminangaben unklar"],
+      ["Nicht öffentlich zugänglich", "Nicht öffentlich zugänglich"],
+      ["Kein konkreter Einzeltermin", "Kein konkreter Einzeltermin"],
+      ["Quelle / Angaben reichen nicht", "Quelle / Angaben reichen nicht"],
+      ["Nicht lokal genug", "Nicht lokal genug"],
+      ["Redaktionell nicht passend", "Redaktionell nicht passend"]
+    ]);
+
+    const REVIEW_ACTIVITY_REJECT_REASONS = Object.freeze([
+      ["", "Ablehnungsgrund auswählen …"],
+      ["Doppelt / bereits abgedeckt", "Doppelt / bereits abgedeckt"],
+      ["Einzeltermin statt Aktivität", "Einzeltermin statt Aktivität"],
+      ["Nicht öffentlich nutzbar", "Nicht öffentlich nutzbar"],
+      ["Quelle / Angaben reichen nicht", "Quelle / Angaben reichen nicht"],
+      ["Nicht lokal genug", "Nicht lokal genug"],
+      ["Eher Werbung / Dienstleistung", "Eher Werbung / Dienstleistung"],
+      ["Keine eigene Aktivitätskarte", "Keine eigene Aktivitätskarte"]
+    ]);
+
+    const REVIEW_REJECT_FALLBACKS = Object.freeze({
+      "Termin liegt in der Vergangenheit": "Terminangaben unklar"
+    });
+
+    const EVENT_VISUAL_KEY_LABELS = Object.freeze({
+      active_route_tour: "Geführter Spaziergang / Tour",
+      art_exhibition_gallery: "Ausstellung / Kunst",
+      book_market: "Bücher- oder Medienmarkt",
+      cabaret_stage: "Kabarett / Kleinkunstbühne",
+      carnival_festival: "Karneval / Brauchtum",
+      choir_concert: "Chor / Konzert",
+      city_festival: "Stadtfest / Innenstadt",
+      community_festival: "Bürger- oder Nachbarschaftsfest",
+      costumed_history_tour: "Historische Kostümführung",
+      dance_party: "Tanz / Party",
+      darts_event: "Darts-Turnier",
+      family_festival: "Familienfest",
+      flea_market: "Flohmarkt",
+      food_festival: "Food-Festival",
+      generic_event: "Allgemeines Event",
+      kids_activity: "Kinderprogramm",
+      local_band_concert: "Lokales Konzert",
+      local_history_heritage: "Geschichte / Stadtgeschichte",
+      live_music_stage: "Livemusik / Bühne",
+      market_fair: "Markt / Fest",
+      museum_event: "Museum / Kulturort",
+      open_air_concert: "Open-Air-Konzert",
+      outdoor_nature_event: "Natur / draußen",
+      poetry_performance: "Lesung / Poetry",
+      public_guided_tour: "Öffentliche Führung",
+      running_event: "Laufveranstaltung",
+      shooting_festival_tradition: "Schützenfest / Tradition",
+      shopping_sunday: "Verkaufsoffener Sonntag",
+      sports_action: "Sport / Bewegung",
+      theater_play: "Theater / Schauspiel",
+      vehicle_classic: "Oldtimer / Fahrzeuge",
+      wine_festival: "Weinfest"
+    });
+
+    function parseReviewIsoDate(value) {
+      const raw = trimValue(value);
+      const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!match) return null;
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      if (!year || !month || !day) return null;
+      return new Date(year, month - 1, day);
+    }
+
+    function todayReviewDateOnly() {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
+
+    function isPastEventReviewItem(item) {
+      if (isActivityPresenceItem(item)) return false;
+      const endDate = parseReviewIsoDate(trimValue(item.endDate) || trimValue(item.date));
+      if (!endDate) return false;
+      return endDate < todayReviewDateOnly();
+    }
+
+    function buildPastEventReviewNotice(item) {
+      if (!isPastEventReviewItem(item)) return "";
+      return `
+        <div class="riskBox">
+          <strong>Termin ist abgelaufen</strong>
+          <ul>
+            <li>Nicht übernehmen.</li>
+            <li>Mit „Termin liegt in der Vergangenheit“ verwerfen.</li>
+          </ul>
+        </div>
+      `;
+    }
+
+    function formatVisualKeyLabel(value) {
+      const key = trimValue(value);
+      if (!key) return "";
+      const label = EVENT_VISUAL_KEY_LABELS[key] || key.replace(/_/g, " ");
+      return `${label} (${key})`;
+    }
+
     function renderCurationVisualBox(item) {
       if (isActivityPresenceItem(item)) return "";
       const rows = [
-        ["Bildtyp", trimValue(item.visual_key)],
+        ["Bildtyp", formatVisualKeyLabel(item.visual_key)],
         ["Motiv", trimValue(item.visual_motif)],
         ["Bildstatus", trimValue(item.visual_asset_status)]
       ].filter(([, value]) => value);
@@ -1502,7 +1607,7 @@ Umfang:
         <section class="reviewSection" aria-label="Bildzuordnung">
           <div class="reviewSectionTitle">Bildzuordnung</div>
           <div class="reviewFieldPills">
-            ${rows.map(([label, value]) => `<span class="reviewFieldPill"><strong>${escapeHtml(label)}:</strong> <span class="reviewCode">${escapeHtml(value)}</span></span>`).join("")}
+            ${rows.map(([label, value]) => `<span class="reviewFieldPill"><strong>${escapeHtml(label)}:</strong> <span>${escapeHtml(value)}</span></span>`).join("")}
           </div>
         </section>
       `;
@@ -1580,28 +1685,13 @@ Umfang:
       const openSourceDisabled = !sourceUrl;
       /* === END BLOCK: REVIEW_DISPLAY_CURATION_CORE_VALUES_V2 === */
 
-      const rejectOptions = isActivityPresence ? [
-        ["", "Ablehnungsgrund auswählen …"],
-        ["Die Aktivität ist bereits vorhanden oder wurde bereits ausreichend abgedeckt.", "Doppelt / bereits abgedeckt"],
-        ["Die Einreichung ist eher ein einzelner Termin als eine dauerhafte Aktivität.", "Einzeltermin statt Aktivität"],
-        ["Die Aktivität ist nicht öffentlich oder für Besucher nicht klar nutzbar.", "Nicht öffentlich nutzbar"],
-        ["Die Quelle oder die Angaben reichen für eine verlässliche Veröffentlichung nicht aus.", "Quelle / Angaben reichen nicht"],
-        ["Die Aktivität passt räumlich nicht ausreichend zu Bocholt und Umgebung.", "Nicht lokal genug"],
-        ["Die Einreichung ist eher Werbung, Dienstleistung oder Verkauf als eine redaktionelle Aktivität.", "Eher Werbung / Dienstleistung"],
-        ["Die Aktivität ist in dieser Form nicht eigenständig genug für eine eigene Aktivitätskarte oder passt nicht ausreichend zum redaktionellen Fokus von Bocholt erleben.", "Keine eigene Aktivitätskarte"]
-      ] : [
-        ["", "Ablehnungsgrund auswählen …"],
-        ["Die Veranstaltung ist bereits vorhanden oder wurde bereits ausreichend abgedeckt.", "Doppelt / bereits abgedeckt"],
-        ["Die Terminangaben sind nicht belastbar genug, zum Beispiel Datum, Uhrzeit, Ort oder Link sind unklar.", "Terminangaben unklar"],
-        ["Die Veranstaltung ist nicht öffentlich oder für Besucher nicht klar zugänglich.", "Nicht öffentlich zugänglich"],
-        ["Die Einreichung ist eher ein Dauerangebot, eine Öffnungszeit, eine Kursübersicht, eine allgemeine Information oder Werbung als ein konkreter Einzeltermin.", "Kein konkreter Einzeltermin"],
-        ["Die Quelle oder die Angaben reichen für eine verlässliche Veröffentlichung nicht aus.", "Quelle / Angaben reichen nicht"],
-        ["Die Veranstaltung passt räumlich nicht ausreichend zu Bocholt und Umgebung.", "Nicht lokal genug"],
-        ["Die Veranstaltung passt in dieser Form nicht ausreichend zum redaktionellen Fokus von Bocholt erleben.", "Redaktionell nicht passend"]
-      ];
+      const isPastEvent = isPastEventReviewItem(it);
+      const rejectOptions = isActivityPresence ? REVIEW_ACTIVITY_REJECT_REASONS : REVIEW_EVENT_REJECT_REASONS;
+      const defaultRejectReason = isPastEvent ? "Termin liegt in der Vergangenheit" : "";
 
       const rejectOptionsHtml = rejectOptions.map(([value, label]) => {
-        return `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`;
+        const selected = value && value === defaultRejectReason ? " selected" : "";
+        return `<option value="${escapeHtml(value)}"${selected}>${escapeHtml(label)}</option>`;
       }).join("");
 
       const originLabel = (it.intake_origin_label || "KI-Suche").trim();
@@ -1614,6 +1704,7 @@ Umfang:
           <ul>${reviewRiskFlags.map((flag) => `<li>${escapeHtml(flag)}</li>`).join("")}</ul>
         </div>
       ` : "";
+      const pastEventNoticeHtml = buildPastEventReviewNotice(it);
 
       /* === BEGIN BLOCK: REVIEW_CARD_WORKBENCH_LAYOUT_V2 | Zweck: verdichtet die Inbox-Karte zu einer kuratierbaren Arbeitsansicht mit priorisierten Daten, einklappbarem Flow und kompakter Aktionszone; Umfang: ersetzt Flow-/Datenzeilen und Kartenmarkup === */
       const statusKey = trimValue(it.status);
@@ -1715,6 +1806,8 @@ Umfang:
             </div>
           </section>
 
+          ${pastEventNoticeHtml}
+
           ${reviewRiskHtml}
 
           ${flowDetailsHtml}
@@ -1740,7 +1833,7 @@ Umfang:
             <div id="reviewCardNotice" class="reviewNotice" hidden role="status" aria-live="polite"></div>
 
             <div class="actions actions--compact">
-              <button id="btnOk" class="btn btn-good actionPrimary" type="button" title="Diesen Fall übernehmen oder zur nächsten Stufe freigeben.">${escapeHtml(reviewState.approveLabel)}</button>
+              <button id="btnOk" class="btn btn-good actionPrimary" type="button" title="${isPastEvent ? "Abgelaufene Termine nicht übernehmen." : "Diesen Fall übernehmen oder zur nächsten Stufe freigeben."}" ${isPastEvent ? "disabled" : ""}>${escapeHtml(reviewState.approveLabel)}</button>
               <button id="btnOpenEvent" class="btn sourceBtn" type="button" title="Öffnet den Link des Events oder der Einreichung in einem neuen Tab." ${openEventDisabled ? "disabled" : ""}>${escapeHtml(primaryLinkLabel)}</button>
               <button id="btnOpenSource" class="btn sourceBtn" type="button" title="Öffnet die Originalquelle zur Prüfung." ${openSourceDisabled ? "disabled" : ""}>Quelle öffnen</button>
               <button id="btnLater" class="btn" type="button" title="Schiebt diesen Fall nur in der aktuellen Sitzung nach hinten. Es wird nichts gespeichert.">Später</button>
@@ -1765,7 +1858,10 @@ Umfang:
       /* === BEGIN BLOCK: REVIEW_DEFER_BUTTON_BINDING_V1 | Zweck: bindet den Später-prüfen-Button an die lokale Zurückstellen-Funktion; Umfang: ein zusätzlicher Button-Listener im Render-Block === */
       document.getElementById("btnLater").addEventListener("click", deferCurrentItem);
       /* === END BLOCK: REVIEW_DEFER_BUTTON_BINDING_V1 === */
-      document.getElementById("btnOk").addEventListener("click", () => approveReject("übernehmen"));
+      const approveButton = document.getElementById("btnOk");
+      if (approveButton && !approveButton.disabled) {
+        approveButton.addEventListener("click", () => approveReject("übernehmen"));
+      }
       document.getElementById("btnNo").addEventListener("click", () => approveReject("verworfen"));
       // === END BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
     }
@@ -2803,7 +2899,12 @@ Umfang:
     function setReviewActionButtonsDisabled(disabled) {
       ["btnOk", "btnNo", "btnLater", "deployBtn"].forEach((id) => {
         const button = document.getElementById(id);
-        if (button) button.disabled = disabled;
+        if (!button) return;
+        if (!disabled && id === "btnOk" && current && isPastEventReviewItem(current)) {
+          button.disabled = true;
+          return;
+        }
+        button.disabled = disabled;
       });
 
       if (disabled) {
@@ -2830,7 +2931,13 @@ Umfang:
         }
 
         const isApprove = String(newStatus) === "übernehmen";
+        if (isApprove && isPastEventReviewItem(it)) {
+          setStatus("Abgelaufene Termine werden nicht übernommen. Bitte mit „Termin liegt in der Vergangenheit“ verwerfen.");
+          renderCurrent(totalLoaded);
+          return;
+        }
         let payload;
+        let ablehnungsgrund = "";
 
         if (isApprove) {
           payload = {
@@ -2840,7 +2947,7 @@ Umfang:
           };
         } else {
           const reasonSelect = document.getElementById("rejectReason");
-          const ablehnungsgrund = reasonSelect ? String(reasonSelect.value || "").trim() : "";
+          ablehnungsgrund = reasonSelect ? String(reasonSelect.value || "").trim() : "";
 
           if (!ablehnungsgrund) {
             alert("Bitte zuerst einen Ablehnungsgrund auswählen.");
@@ -2857,7 +2964,25 @@ Umfang:
           };
         }
 
-        const res = await jsonp(API_URL, payload);
+        let res = await jsonp(API_URL, payload);
+
+        if (
+          !isApprove
+          && res
+          && res.error === "invalid_ablehnungsgrund"
+          && REVIEW_REJECT_FALLBACKS[ablehnungsgrund]
+        ) {
+          const fallbackPayload = {
+            ...payload,
+            ablehnungsgrund: REVIEW_REJECT_FALLBACKS[ablehnungsgrund]
+          };
+          res = await jsonp(API_URL, fallbackPayload);
+          if (res && res.ok) {
+            setStatus(`Verworfen. Hinweis: Das externe Sheet-Script kennt „${ablehnungsgrund}“ noch nicht; gespeichert wurde kompatibel als „${fallbackPayload.ablehnungsgrund}“.`);
+            await loadAndShow();
+            return;
+          }
+        }
 
         if (res && res.ok) {
           setStatus(isApprove ? "Übernommen." : "Verworfen.");
@@ -2966,6 +3091,11 @@ Umfang:
       }
 
       const isApprove = String(newStatus) === "übernehmen";
+
+      if (isApprove && isPastEventReviewItem(it)) {
+        setReviewCardNotice("Abgelaufene Termine werden nicht übernommen. Bitte mit „Termin liegt in der Vergangenheit“ ablehnen.", "error");
+        return;
+      }
 
       if (isApprove) {
         const reviewState = getSubmissionReviewState(it);

@@ -1,3 +1,17 @@
+<!-- === BEGIN BLOCK: ENGINEERING_ACTIVITY_FAVORITES_LOCAL_STORAGE_2026_06_30 | Zweck: technische Leitplanken fuer lokale Activity-Favoriten; Umfang: Storage, Datenschutzabgrenzung, Event-Abgrenzung === -->
+## Activity-Favoriten – technische Leitplanken
+
+- Activity-Favoriten nutzen den bestehenden lokalen Nutzerpraeferenzspeicher `bocholt_erleben.user_preferences.v1`.
+- Es werden keine Cookies gesetzt.
+- Es gibt keine Backend-Synchronisierung, kein Login und keine Serveruebertragung.
+- Der gespeicherte Schluessel ist fachlich `activity:<id>`.
+- Events bekommen keine Favoritenlogik; fuer Events bleibt Kalender/Terminaktion der passende Nutzerpfad.
+- Favoriten sind im UI als persoenliche Priorisierung zu behandeln, nicht als Filtergruppe. Schnellfilter bleiben Inhaltsfilter wie Situation, Ort/Naehe oder Aktivitaetsart.
+- Mobile Schnellfilterleisten werden als horizontale Chip-Rail umgesetzt, sobald mehrere Chips sonst mehrzeilig werden. Desktop bleibt bei der bestehenden Wrap-/Grid-Darstellung; horizontales Scrollen ist dort kein Zielzustand.
+- UI-Zustand muss ueber `activity:favorites-changed` neu gerendert werden, damit Card, Filter und Detailpanel synchron bleiben.
+- Browser-Smoke muss die lokale Favoritenfunktion pruefen, ohne produktive Daten zu schreiben.
+<!-- === END BLOCK: ENGINEERING_ACTIVITY_FAVORITES_LOCAL_STORAGE_2026_06_30 === -->
+
 <!-- === BEGIN BLOCK: ENGINEERING_BROWSER_SMOKE_RULES_V1_2026_06_29 | Zweck: technische Regeln fuer Browser-Smoke-V1; Umfang: read-only, Trigger, Artefakte, keine Auto-Reparatur === -->
 ## Browser-Smoke V1 — Engineering-Regeln
 

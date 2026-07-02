@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 
 const CONSENT_KEY = 'be_statistics_consent_v1';
 const CONSENT_COOKIE = 'be_statistics_consent';
+const USER_PREFS_KEY = 'bocholt_erleben.user_preferences.v1';
 
 const PROFILES = {
   desktop: {
@@ -349,53 +350,152 @@ async function checkBottomNavigation(page, baseUrl, timeoutMs) {
   await ensureNoFatal(page);
 }
 
-async function setConsentDecisionOnPage(page, state = 'denied') {
-  await page.evaluate(
-    ({ key, cookie, consentState }) => {
-      const maxAge = 180 * 24 * 60 * 60;
-      const secure = window.location.protocol === 'https:' ? '; Secure' : '';
-
-      try {
-        if (window.BEPrivacy && typeof window.BEPrivacy.setStatisticsConsent === 'function') {
-          window.BEPrivacy.setStatisticsConsent(consentState === 'granted');
-          return;
-        }
-      } catch (_) {}
-
-      try {
-        window.localStorage.setItem(key, consentState);
-      } catch (_) {}
-
-      document.cookie = `${cookie}=${encodeURIComponent(consentState)}; Max-Age=${maxAge}; Path=/; SameSite=Lax${secure}`;
-
-      try {
-        window.dispatchEvent(new CustomEvent('be:privacy-consent-changed', { detail: { state: consentState } }));
-      } catch (_) {}
-
-      try {
-        document.querySelector('[data-privacy-consent-banner]')?.remove();
-      } catch (_) {}
-    },
-    { key: CONSENT_KEY, cookie: CONSENT_COOKIE, consentState: state },
-  );
-}
-
-async function clearConsentDecisionOnPage(page) {
-  await page.evaluate(({ key, cookie }) => {
+async function checkActivityFavorites(page, baseUrl, timeoutMs) {
+  await gotoReady(page, baseUrl, '/aktivitaeten/', timeoutMs);
+  await page.evaluate((storageKey) => {
     try {
-      window.localStorage.removeItem(key);
+      localStorage.removeItem(storageKey);
     } catch (_) {}
-    document.cookie = `${cookie}=; Max-Age=0; path=/; SameSite=Lax`;
-  }, { key: CONSENT_KEY, cookie: CONSENT_COOKIE });
+  }, USER_PREFS_KEY);
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: timeoutMs });
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+  await expectVisible(page, '#offer-cards');
+  await expectAnySelectorCount(page, ['#offer-cards .event-card', '#offer-cards article']);
+
+  const firstFavorite = page.locator('#offer-cards [data-activity-favorite-toggle]').first();
+  await firstFavorite.waitFor({ state: 'visible', timeout: 8000 });
+
+  const activityId = String(await firstFavorite.getAttribute('data-activity-id') || '').trim();
+  if (!activityId) throw new Error('Favoriten-Button hat keine Activity-ID.');
+
+  await firstFavorite.click({ timeout: 7000 });
+
+  await page.waitForFunction(
+    ({ storageKey, id }) => {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed?.saved) && parsed.saved.includes(`activity:${id}`);
+      } catch (_) {
+        return false;
+      }
+    },
+    { storageKey: USER_PREFS_KEY, id: activityId },
+    { timeout: 7000 },
+  );
+
+  await page.waitForFunction(
+    (id) => {
+      const buttons = Array.from(document.querySelectorAll('[data-activity-favorite-toggle]'));
+      return buttons.some((button) => button.getAttribute('data-activity-id') === id && button.getAttribute('aria-pressed') === 'true');
+    },
+    activityId,
+    { timeout: 7000 },
+  );
+
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: timeoutMs });
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+  await expectVisible(page, '#offer-cards');
+
+  const favoriteFilterCount = await page.locator('[data-filter-group="personal"][data-filter-value="Favoriten"]').count();
+  if (favoriteFilterCount > 0) {
+    throw new Error('Favoriten duerfen nicht mehr als Schnellfilter-Pill erscheinen.');
+  }
+
+  const firstRenderedFavorite = page.locator('#offer-cards [data-activity-favorite-toggle]').first();
+  await firstRenderedFavorite.waitFor({ state: 'visible', timeout: 8000 });
+  const firstRenderedId = String(await firstRenderedFavorite.getAttribute('data-activity-id') || '').trim();
+  const firstRenderedPressed = String(await firstRenderedFavorite.getAttribute('aria-pressed') || '').trim();
+
+  if (firstRenderedId !== activityId || firstRenderedPressed !== 'true') {
+    throw new Error('Gespeicherter Favorit steht nach Reload nicht priorisiert oben.');
+  }
+
+  const sectionHeadingCount = await page.locator('.activity-feed-section-heading').count();
+  if (sectionHeadingCount > 0) {
+    throw new Error('Favoriten duerfen keine eigene Feed-Section oder Erklaerzeile erzeugen.');
+  }
 }
 
-async function isConsentBannerVisible(page, timeoutMs = 1200) {
-  return page
-    .locator('[data-privacy-consent-banner]')
-    .first()
-    .waitFor({ state: 'visible', timeout: timeoutMs })
-    .then(() => true)
-    .catch(() => false);
+
+async function checkMobileQuickFilterRail(page, baseUrl, timeoutMs) {
+  await page.goto(absoluteUrl(baseUrl, '/aktivitaeten/'), { waitUntil: 'domcontentloaded', timeout: timeoutMs });
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+  await expectVisible(page, '#offer-quick-filters');
+
+  await page.waitForFunction(() => {
+    const rail = document.querySelector('#offer-quick-filters');
+    if (!rail) return false;
+    const buttons = Array.from(rail.querySelectorAll('.activity-filter-chip:not([hidden])'))
+      .filter((button) => getComputedStyle(button).display !== 'none');
+    return buttons.length >= 4;
+  }, null, { timeout: 8000 });
+
+  await page.waitForTimeout(250);
+
+  const result = await page.locator('#offer-quick-filters').evaluate((rail) => {
+    const styles = getComputedStyle(rail);
+    const buttons = Array.from(rail.querySelectorAll('.activity-filter-chip:not([hidden])'))
+      .filter((button) => getComputedStyle(button).display !== 'none');
+    const rects = buttons.map((button) => button.getBoundingClientRect());
+    const tops = rects.map((rect) => Math.round(rect.top));
+    const heights = rects.map((rect) => rect.height);
+    const railRect = rail.getBoundingClientRect();
+    const firstButton = buttons[0] || null;
+    const firstRect = firstButton ? firstButton.getBoundingClientRect() : null;
+    const nowSpecial = buttons.find((button) => String(button.getAttribute('data-filter-value') || '').trim() === 'Jetzt besonders') || null;
+    const nowSpecialRect = nowSpecial ? nowSpecial.getBoundingClientRect() : null;
+    return {
+      display: styles.display,
+      flexWrap: styles.flexWrap,
+      overflowX: styles.overflowX,
+      buttonCount: buttons.length,
+      rowSpread: tops.length ? Math.max(...tops) - Math.min(...tops) : 0,
+      railHeight: railRect.height,
+      maxButtonHeight: heights.length ? Math.max(...heights) : 0,
+      scrollWidth: rail.scrollWidth,
+      clientWidth: rail.clientWidth,
+      scrollLeft: rail.scrollLeft,
+      firstLabel: firstButton ? String(firstButton.textContent || '').trim() : '',
+      firstLeftDelta: firstRect ? Math.round(firstRect.left - railRect.left) : null,
+      nowSpecialVisible: !!nowSpecial,
+      nowSpecialLeftDelta: nowSpecialRect ? Math.round(nowSpecialRect.left - railRect.left) : null,
+    };
+  });
+
+  if (result.display !== 'flex' || result.flexWrap !== 'nowrap') {
+    throw new Error(`Mobile Schnellfilter sind keine horizontale Rail (${result.display}/${result.flexWrap}).`);
+  }
+
+  if (result.buttonCount < 4) {
+    throw new Error('Mobile Schnellfilter-Rail enthaelt zu wenige sichtbare Chips.');
+  }
+
+  if (result.rowSpread > 4) {
+    throw new Error(`Mobile Schnellfilter brechen weiter in mehrere Zeilen um (${result.rowSpread}px Zeilenversatz).`);
+  }
+
+  if (result.railHeight > result.maxButtonHeight + 10) {
+    throw new Error(`Mobile Schnellfilter-Rail ist zu hoch (${Math.round(result.railHeight)}px).`);
+  }
+
+  if (result.scrollLeft > 2) {
+    throw new Error(`Mobile Schnellfilter-Rail startet nicht links (scrollLeft=${Math.round(result.scrollLeft)}).`);
+  }
+
+  if (result.nowSpecialVisible && !String(result.firstLabel || '').startsWith('Jetzt besonders')) {
+    throw new Error(`Mobile Schnellfilter-Rail startet mit falschem Chip (${result.firstLabel}).`);
+  }
+
+  if (result.nowSpecialVisible && Math.abs(Number(result.nowSpecialLeftDelta || 0)) > 3) {
+    throw new Error(`Jetzt besonders ist initial nicht links sichtbar (Delta ${result.nowSpecialLeftDelta}px).`);
+  }
+
+  const rail = page.locator('#offer-quick-filters');
+  await rail.evaluate((el) => { el.scrollLeft = el.scrollWidth; });
+  await page.waitForTimeout(100);
+  await expectVisible(page, '#offer-cards');
 }
 
 async function checkConsentNavigationResync(browser, baseUrl, profileName, timeoutMs) {
@@ -408,33 +508,27 @@ async function checkConsentNavigationResync(browser, baseUrl, profileName, timeo
 
   try {
     await page.goto(absoluteUrl(baseUrl, '/'), { waitUntil: 'domcontentloaded', timeout: timeoutMs });
-    await clearConsentDecisionOnPage(page);
+    await page.evaluate(({ key, cookie }) => {
+      try {
+        localStorage.removeItem(key);
+      } catch (_) {}
+      document.cookie = `${cookie}=; Max-Age=0; path=/; SameSite=Lax`;
+    }, { key: CONSENT_KEY, cookie: CONSENT_COOKIE });
     await page.reload({ waitUntil: 'domcontentloaded', timeout: timeoutMs });
     await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
-    await page.waitForTimeout(500);
 
-    const cleanBannerVisible = await isConsentBannerVisible(page, 4500);
-    if (cleanBannerVisible) {
-      await page.getByRole('button', { name: /Ohne Statistik/i }).click({ timeout: 7000 });
-      await page.locator('[data-privacy-consent-banner]').waitFor({ state: 'hidden', timeout: 7000 });
-    } else {
-      console.log(`ℹ️ ${profileName}: Consent-Hinweis im Clean-Kontext nicht sichtbar; simuliere Ablehnung ueber BEPrivacy-Runtime und pruefe denselben Tabwechsel-Zustand`);
-      await setConsentDecisionOnPage(page, 'denied');
-      await page.waitForTimeout(500);
-      if (await isConsentBannerVisible(page, 1200)) {
-        throw new Error('Consent-Hinweis ist trotz gespeicherter Ablehnung sichtbar.');
-      }
-    }
+    await expectVisible(page, '[data-privacy-consent-banner]', 8000);
+    await page.getByRole('button', { name: /Ohne Statistik/i }).click({ timeout: 7000 });
+    await page.locator('[data-privacy-consent-banner]').waitFor({ state: 'detached', timeout: 7000 });
 
     const eventsLink = page.locator('#bottom-tabbar-root a[href="/events/"]').first();
     await eventsLink.waitFor({ state: 'visible', timeout: 7000 });
     await eventsLink.click();
     await page.waitForURL(/\/events\/?$/, { timeout: timeoutMs });
-    await expectVisible(page, '#event-cards');
-    await expectAnySelectorCount(page, ['#event-cards .event-card', '#event-cards article']);
     await page.waitForTimeout(1000);
 
-    if (await isConsentBannerVisible(page, 1200)) {
+    const bannerCount = await page.locator('[data-privacy-consent-banner]').count();
+    if (bannerCount !== 0) {
       throw new Error('Consent-Hinweis erscheint nach Bottom-Tab-Wechsel erneut.');
     }
   } finally {
@@ -496,7 +590,15 @@ async function runProfile(browser, baseUrl, profileName, args, results) {
       });
     }
 
+    await runChecked('Activity-Favoriten lokal', '/aktivitaeten/', async () => {
+      await checkActivityFavorites(page, baseUrl, args.timeoutMs);
+    });
+
     if (profileName === 'mobile') {
+      await runChecked('Mobile Schnellfilter Rail', '/aktivitaeten/', async () => {
+        await checkMobileQuickFilterRail(page, baseUrl, args.timeoutMs);
+      });
+
       await runChecked('Bottom-Tabbar Navigation', '/', async () => {
         await checkBottomNavigation(page, baseUrl, args.timeoutMs);
       });

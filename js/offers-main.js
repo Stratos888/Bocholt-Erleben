@@ -20,7 +20,7 @@ const OffersApp = {
     effort: new Set()
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V1 | Zweck: definiert eine einheitliche Nutzerlogik: jeder weitere Filter verengt die Treffer; Ort/Nähe blockiert dabei parallele Alternativen, damit Schnellfilter nicht wie OR-Wechsel wirken; Umfang: Filterreihenfolge, Exklusivgruppen und Filtergruppen-Konfiguration === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V3 | Zweck: definiert eine einheitliche Nutzerlogik: Schnellfilter bleiben Inhaltsfilter; Favoriten sind stille Sortierprioritaet, kein Filterchip und keine Feed-Section | Umfang: Filterreihenfolge, Exklusivgruppen und Filtergruppen-Konfiguration === */
   filterGroupOrder: ["special", "proximity", "situation", "activity_type", "features", "effort"],
   exclusiveFilterGroups: new Set(["proximity"]),
 
@@ -56,7 +56,7 @@ const OffersApp = {
       options: Object.freeze(["Spontan", "Halber Tag", "Längerer Ausflug"])
     })
   }),
-  /* === END BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V1 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V3 === */
   refs: {
     finder: null,
     searchInput: null,
@@ -72,7 +72,8 @@ const OffersApp = {
     advancedReset: null,
     resultCount: null,
     activeFilters: null,
-    activeFilterList: null
+    activeFilterList: null,
+    quickFilterRail: null
   },
 
   async init() {
@@ -154,6 +155,7 @@ const OffersApp = {
     this.refs.resultCount = document.getElementById("offer-result-count");
     this.refs.activeFilters = document.getElementById("offer-active-filters");
     this.refs.activeFilterList = document.getElementById("offer-active-filter-list");
+    this.refs.quickFilterRail = document.getElementById("offer-quick-filters");
   },
 
   normalizeArray(value) {
@@ -423,6 +425,20 @@ const OffersApp = {
       this.resetFilters();
     });
 
+    window.addEventListener("activity:favorites-changed", () => {
+      this.applyFilterAndRender();
+    });
+
+    if (this.refs.quickFilterRail) {
+      this.refs.quickFilterRail.addEventListener("scroll", () => {
+        this.syncQuickFilterRailState();
+      }, { passive: true });
+    }
+
+    window.addEventListener("pageshow", () => {
+      this.scheduleQuickFilterRailPosition();
+    }, { passive: true });
+
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
       this.closeAdvancedFilters();
@@ -430,6 +446,7 @@ const OffersApp = {
 
     window.addEventListener("resize", () => {
       this.updateFinderUI();
+      this.scheduleQuickFilterRailPosition();
     }, { passive: true });
   },
 
@@ -566,6 +583,14 @@ const OffersApp = {
     return !!this.getPrimaryActiveHighlight(offer);
   },
 
+  isFavoriteOffer(offer) {
+    try {
+      return !!window.BEUserPreferences?.isSaved?.("activity", offer?.id);
+    } catch (_) {
+      return false;
+    }
+  },
+
   activeSeasonalHighlightLabel(offer) {
     const highlight = this.getPrimaryActiveHighlight(offer);
     return String(highlight?.short_label || highlight?.label || "Jetzt besonders").trim();
@@ -636,6 +661,10 @@ const OffersApp = {
 
   rankOffer(offer) {
     let score = 0;
+
+    if (this.isFavoriteOffer(offer)) {
+      score += 120;
+    }
 
     this.filterGroupOrder.forEach((group) => {
       const activeValues = this.getActiveValues(group);
@@ -761,6 +790,7 @@ const OffersApp = {
       activeSeasonalHighlightLabel: activeSeasonalHighlight
         ? String(activeSeasonalHighlight.short_label || activeSeasonalHighlight.label || "Jetzt besonders").trim()
         : "",
+      isFavorite: this.isFavoriteOffer(offer),
       activeMatchLabels: this.getActiveMatchLabels(offer)
     };
   },
@@ -809,7 +839,7 @@ const OffersApp = {
       const isExclusiveBlocked = this.isBlockedByActiveExclusiveGroup(group, value);
       const count = this.countProjectedMatches(group, value);
 
-      if (group === "special") {
+      if (group === "special" && value === "Jetzt besonders") {
         const shouldHide = !isActive && count === 0;
         button.hidden = shouldHide;
         const groupEl = button.closest?.(".activity-finder__group[data-filter-group='special']");
@@ -850,6 +880,87 @@ const OffersApp = {
       ? "1 Aktivität gefunden"
       : `${count} Aktivitäten gefunden`;
   },
+
+
+  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_STATE_V4 | Zweck: behandelt die mobile Schnellfilter-Rail als kontrollierte UI-Komponente: ungefiltert immer links, aktive Schnellfilter nur bei echter Auswahl sichtbar halten, Fade-Zustand aus realem Scroll berechnen | Umfang: nur offer-quick-filters, keine Filterlogik === */
+  isMobileQuickFilterRail() {
+    return typeof window.matchMedia === "function"
+      ? window.matchMedia("(max-width: 899.98px)").matches
+      : true;
+  },
+
+  getVisibleQuickFilterButtons() {
+    const rail = this.refs.quickFilterRail;
+    if (!rail) return [];
+
+    return Array.from(rail.querySelectorAll(".activity-filter-chip[data-filter-group][data-filter-value]"))
+      .filter((button) => {
+        if (button.hidden) return false;
+        const styles = typeof window.getComputedStyle === "function" ? window.getComputedStyle(button) : null;
+        return !styles || (styles.display !== "none" && styles.visibility !== "hidden");
+      });
+  },
+
+  getActiveVisibleQuickFilterButton() {
+    return this.getVisibleQuickFilterButtons().find((button) => button.classList.contains("is-active")) || null;
+  },
+
+  syncQuickFilterRailState() {
+    const rail = this.refs.quickFilterRail;
+    const shell = rail?.closest?.(".activity-finder__quick");
+    if (!rail || !shell) return;
+
+    const isScrollable = rail.scrollWidth > rail.clientWidth + 2;
+    const atStart = rail.scrollLeft <= 2;
+    const atEnd = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2;
+
+    shell.classList.toggle("is-scrollable", isScrollable);
+    shell.classList.toggle("is-at-start", !isScrollable || atStart);
+    shell.classList.toggle("is-at-end", !isScrollable || atEnd);
+  },
+
+  positionQuickFilterRail() {
+    const rail = this.refs.quickFilterRail;
+    if (!rail || !this.isMobileQuickFilterRail()) {
+      this.syncQuickFilterRailState();
+      return;
+    }
+
+    const activeChip = this.getActiveVisibleQuickFilterButton();
+
+    if (activeChip) {
+      const railRect = rail.getBoundingClientRect();
+      const chipRect = activeChip.getBoundingClientRect();
+      const leftOverflow = chipRect.left - railRect.left;
+      const rightOverflow = chipRect.right - railRect.right;
+
+      if (leftOverflow < 0) {
+        rail.scrollLeft += leftOverflow - 8;
+      } else if (rightOverflow > 0) {
+        rail.scrollLeft += rightOverflow + 8;
+      }
+    } else if (rail.scrollLeft !== 0) {
+      rail.scrollLeft = 0;
+    }
+
+    this.syncQuickFilterRailState();
+  },
+
+  scheduleQuickFilterRailPosition() {
+    if (this._quickFilterRailRaf && typeof window.cancelAnimationFrame === "function") {
+      window.cancelAnimationFrame(this._quickFilterRailRaf);
+    }
+
+    const schedule = typeof window.requestAnimationFrame === "function"
+      ? window.requestAnimationFrame.bind(window)
+      : (callback) => window.setTimeout(callback, 0);
+
+    this._quickFilterRailRaf = schedule(() => {
+      this.positionQuickFilterRail();
+      schedule(() => this.syncQuickFilterRailState());
+    });
+  },
+  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_STATE_V4 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V5 | Zweck: synchronisiert Desktop- und Mobile-Filtertoggle gemeinsam; Mobile zeigt nur die Zahl, Desktop zeigt „x aktiv“, Summary bleibt ohne doppelte Trefferzeile; Umfang: ersetzt nur updateFinderUI() === */
   updateFinderUI() {
@@ -927,6 +1038,8 @@ const OffersApp = {
     this.updateResultCount();
     this.updateFilterButtonStates();
     this.renderActiveFilterChips();
+
+    this.scheduleQuickFilterRailPosition();
   },
   /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V5 === */
 
@@ -944,7 +1057,9 @@ const OffersApp = {
 
     this.updateFinderUI();
     this.showLoading(false);
-    window.OfferCards.render(this.filteredOffers.map((offer) => this.withRenderedMatchContext(offer)));
+    window.OfferCards.render(
+      this.filteredOffers.map((offer) => this.withRenderedMatchContext(offer))
+    );
   },
   /* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_OWNER_V1 === */
 

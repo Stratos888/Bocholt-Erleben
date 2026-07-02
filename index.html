@@ -43,19 +43,19 @@ Umfang: ersetzt nur den bestehenden SEO-Snippet-Block.
 === -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Heute rund um Bocholt – Bocholt erleben</title>
-<meta name="description" content="Heute rund um Bocholt: passende Events und Aktivitäten auf einen Blick – mit Wetter, Tag und spontanen Ideen für Bocholt und Umgebung.">
+<meta name="description" content="Heute rund um Bocholt: passende Events und Aktivitäten auf einen Blick – mit Wetter, Tag und Vorschlägen für Bocholt und Umgebung.">
 
 <meta property="og:locale" content="de_DE">
 <meta property="og:site_name" content="Bocholt erleben">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://bocholt-erleben.de/">
 <meta property="og:title" content="Heute rund um Bocholt – Bocholt erleben">
-<meta property="og:description" content="Passende Events und Aktivitäten für heute in Bocholt und Umgebung – kompakt, mobil und nach Situation sortiert.">
+<meta property="og:description" content="Passende Events und Aktivitäten für heute in Bocholt und Umgebung – kompakt, mobil und nach Situation ausgewählt.">
 <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Heute rund um Bocholt – Bocholt erleben">
-<meta name="twitter:description" content="Passende Events und Aktivitäten für heute in Bocholt und Umgebung – kompakt, mobil und nach Situation sortiert.">
+<meta name="twitter:description" content="Passende Events und Aktivitäten für heute in Bocholt und Umgebung – kompakt, mobil und nach Situation ausgewählt.">
 <meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 <!-- === END BLOCK: SEO SNIPPET (title + meta description + OG/Twitter) === -->
 <!-- === END BLOCK: HOME_HEAD_SOCIAL_PREVIEW_ENRICHMENT_V1 === -->
@@ -122,9 +122,9 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
         <span>Dein schneller Blick auf Bocholt</span>
       </div>
       <h1 id="today-title" class="today-title">Heute rund um Bocholt</h1>
-      <p class="today-lead">Drei passende Ideen für Bocholt und die Umgebung – kurz sortiert nach Wetter, Tag und Anlass.</p>
+      <p class="today-lead">Drei Vorschläge für heute.</p>
       <div id="today-weather-note" class="today-weather-note" aria-live="polite">
-        <span>Ideen für heute.</span>
+        <span>Wetterlage wird geprüft</span>
       </div>
     </div>
 
@@ -132,8 +132,8 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
 
   <section class="today-main" aria-label="Vorschläge">
     <div class="today-section-head">
-      <h2 class="today-section-title">Was passt jetzt?</h2>
-      <div id="today-status" class="today-status" aria-live="polite">Lade Ideen …</div>
+      <h2 class="today-section-title">Unsere Auswahl</h2>
+      <div id="today-status" class="today-status" aria-live="polite">Lade Vorschläge …</div>
     </div>
     <div id="today-feed" class="today-feed"></div>
   </section>
@@ -232,7 +232,7 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
 <!-- === BEGIN BLOCK: TODAY_HOME_JS_INCLUDES_V1 | Zweck: lädt auf / nur die Module für die neue Heute-Home inkl. gemeinsamer Detailpanels, Empfehlungen, lokalem Profil und Wetterkontext === -->
 <script src="/config.js?v=2026-02-04-1"></script>
 
-<script src="/js/icons.js?v=2026-06-15-image-attribution-v7"></script>
+<script src="/js/icons.js?v=2026-07-01-weather-icons-v1"></script>
 <script src="/js/image-attribution.js?v=2026-06-15-image-attribution-v7"></script>
 <script src="/js/details.js?v=2026-06-15-image-attribution-v7"></script>
 <script src="/js/offers.js?v=2026-06-29-seasonal-card-terms-v1"></script>
@@ -241,16 +241,16 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
 <script src="/js/activity-highlights.js?v=2026-06-22-css-governance-v1"></script>
 <script src="/js/opening-status.js?v=2026-06-08-opening-status-v1"></script>
 <script src="/js/activity-highlights.js?v=2026-06-26-seasonal-highlights-v1"></script>
-<script src="/js/recommendations.js?v=2026-05-29-recommendations-v1"></script>
+<script src="/js/recommendations.js?v=2026-07-01-weather-temperature-v1"></script>
 <script src="/js/user-preferences.js?v=2026-05-29-user-preferences-v1"></script>
-<script src="/js/weather-context.js?v=2026-05-29-weather-context-v1"></script>
+<script src="/js/weather-context.js?v=2026-07-01-weather-temperature-v1"></script>
 
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
 <script src="/js/bottom-tabbar.js?v=2026-05-29-today-nav-v1"></script>
 <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7"></script>
 <script src="/js/feedback.js?v=2026-04-17-1"></script>
 
-<script src="/js/today-home.js?v=2026-06-15-image-attribution-v7"></script>
+<script src="/js/today-home.js?v=2026-07-01-weather-temperature-v1"></script>
 <!-- === END BLOCK: TODAY_HOME_JS_INCLUDES_V1 === -->
 
 
@@ -299,7 +299,7 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
   "alternateName": "Heute rund um Bocholt",
   "url": "https://bocholt-erleben.de/",
   "inLanguage": "de-DE",
-  "description": "Heute rund um Bocholt: passende Events und Aktivitäten auf einen Blick – mit Wetter, Tag und spontanen Ideen für Bocholt und Umgebung."
+  "description": "Heute rund um Bocholt: passende Events und Aktivitäten auf einen Blick – mit Wetter, Tag und Vorschlägen für Bocholt und Umgebung."
 }
 </script>
 

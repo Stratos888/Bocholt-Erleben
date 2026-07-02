@@ -654,6 +654,48 @@ const OfferDetailPanel = {
   },
   /* === END BLOCK: ACTIVITIES_DETAIL_SEASONAL_HIGHLIGHT_V1 === */
 
+  /* === BEGIN BLOCK: ACTIVITY_DETAIL_FAVORITE_ACTION_V1 | Zweck: ergaenzt lokale Activity-Favoriten als Herz-Aktion im mobilen Detailpanel ohne Cookies, Login oder Backend === */
+  isFavorite(offer) {
+    try {
+      return !!window.BEUserPreferences?.isSaved?.("activity", offer?.id);
+    } catch (_) {
+      return false;
+    }
+  },
+
+  favoriteIconHtml() {
+    return window.Icons?.svg
+      ? window.Icons.svg("heart", { className: "activity-detail__actionbar-icon-svg" })
+      : '<span aria-hidden="true">♥</span>';
+  },
+
+  updateFavoriteAction(button, offer, active) {
+    if (!button) return;
+    const title = String(offer?.title || "Aktivität").trim() || "Aktivität";
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+    button.setAttribute("aria-label", active ? `${title} aus Favoriten entfernen` : `${title} als Favorit speichern`);
+    button.setAttribute("title", active ? "Favorit entfernen" : "Favorit");
+  },
+
+  toggleFavorite(offer, button = null) {
+    const id = String(offer?.id || "").trim();
+    if (!id || !window.BEUserPreferences?.toggleSaved) return false;
+
+    let profile = null;
+    try {
+      profile = window.BEUserPreferences.toggleSaved("activity", id);
+    } catch (_) {
+      return false;
+    }
+
+    const active = Array.isArray(profile?.saved) && profile.saved.includes(`activity:${id}`);
+    this.updateFavoriteAction(button, offer, active);
+    window.dispatchEvent(new CustomEvent("activity:favorites-changed", { detail: { id, favorite: active } }));
+    return active;
+  },
+  /* === END BLOCK: ACTIVITY_DETAIL_FAVORITE_ACTION_V1 === */
+
   /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_OUTBOUND_ANALYTICS_V3 | Zweck: ergänzt im Activity-Detailpanel sauberes Outbound-Tracking für Maps- und Website-Links, ohne sichtbare UI oder Linkziele zu verändern | Umfang: ersetzt nur renderContent(offer) in js/offers-details.js === */
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer);
@@ -680,6 +722,8 @@ const OfferDetailPanel = {
     const websiteIcon = window.Icons?.svg
       ? window.Icons.svg("external-link", { className: "activity-detail__actionbar-icon-svg" })
       : "";
+    const favoriteActive = this.isFavorite(offer);
+    const favoriteIcon = this.favoriteIconHtml();
 
     const baseOutboundPayload = {
       entityType: "activity",
@@ -742,6 +786,19 @@ const OfferDetailPanel = {
     `.trim();
 
     const actionbarHtml = [
+      `
+        <button
+          type="button"
+          class="detail-actionbar-btn is-icon activity-detail__actionbar-btn activity-detail__favorite-btn${favoriteActive ? " is-active" : ""}"
+          aria-label="${this.escapeHtml(favoriteActive ? `${offer.title} aus Favoriten entfernen` : `${offer.title} als Favorit speichern`)}"
+          aria-pressed="${favoriteActive ? "true" : "false"}"
+          title="${favoriteActive ? "Favorit entfernen" : "Favorit"}"
+          data-activity-detail-favorite
+        >
+          ${favoriteIcon}
+          <span class="detail-sr-only">Favorit</span>
+        </button>
+      `,
       mapsUrl ? `
         <a
           class="detail-actionbar-btn is-icon activity-detail__actionbar-btn"
@@ -783,6 +840,13 @@ const OfferDetailPanel = {
         this.actionbarSlot.hidden = true;
       }
     }
+
+    const favoriteButton = this.actionbarSlot?.querySelector("[data-activity-detail-favorite]");
+    favoriteButton?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.toggleFavorite(offer, favoriteButton);
+    });
 
     const bindOutboundTracking = (root) => {
       root?.querySelectorAll("a[data-outbound-type]").forEach((link) => {

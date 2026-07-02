@@ -3550,6 +3550,7 @@ body.page-route-activities .activity-finder-card .activity-finder__quick-options
   margin-left: 4px;
 }
 
+body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Jetzt besonders"],
 body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Mit Kindern"],
 body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Bei Regen"],
 body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Draußen"]{
@@ -4376,6 +4377,93 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip--desktop-only{
     display: none !important;
   }
+
+
+  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V4 | Zweck: finalisiert mobile Schnellfilter als kontrollierte Premium-Chip-Rail: Start links, klare Fade-Kanten, keine Masken-/Snap-Artefakte, Desktop unveraendert === */
+  body.page-route-activities .activity-finder-card .activity-finder__quick{
+    position: relative;
+    display: grid;
+    gap: 5px;
+    width: 100%;
+    min-width: 0;
+    margin-top: -1px;
+    overflow: hidden;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick::before,
+  body.page-route-activities .activity-finder-card .activity-finder__quick::after{
+    content: "";
+    position: absolute;
+    z-index: 3;
+    bottom: 0;
+    width: 22px;
+    height: 34px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 140ms ease;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick::before{
+    left: -1px;
+    background: linear-gradient(90deg,
+      color-mix(in srgb, var(--home-bg-soft, #eef4e8) 98%, #fff 2%) 0%,
+      color-mix(in srgb, var(--home-bg-soft, #eef4e8) 82%, rgba(255,255,255,0) 18%) 52%,
+      rgba(238,244,232,0) 100%
+    );
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick::after{
+    right: -1px;
+    background: linear-gradient(270deg,
+      color-mix(in srgb, var(--home-bg-soft, #eef4e8) 98%, #fff 2%) 0%,
+      color-mix(in srgb, var(--home-bg-soft, #eef4e8) 82%, rgba(255,255,255,0) 18%) 52%,
+      rgba(238,244,232,0) 100%
+    );
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-start)::before,
+  body.page-route-activities .activity-finder-card .activity-finder__quick.is-scrollable:not(.is-at-end)::after{
+    opacity: .82;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options{
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 1px 28px 2px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 0 30px;
+    scroll-snap-type: none;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options::-webkit-scrollbar{
+    display: none;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip{
+    flex: 0 0 auto;
+    width: auto;
+    min-width: max-content;
+    max-width: none;
+    min-height: 30px;
+    padding-inline: 11px;
+    grid-column: auto !important;
+    justify-content: center;
+    text-align: center;
+    font-size: clamp(0.735rem, 3vw, 0.76rem);
+    font-weight: 720;
+  }
+  /* === END BLOCK: ACTIVITIES_MOBILE_QUICK_FILTER_RAIL_V4 === */
 
   body.page-route-activities .page--activities{
     gap: 4px;

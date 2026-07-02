@@ -67,6 +67,7 @@ TAB_CONTENT_SEARCH_FEEDBACK = os.environ.get("TAB_CONTENT_SEARCH_FEEDBACK", "Con
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4").strip()
 MAX_NEW_CANDIDATES = int(os.environ.get("MAX_NEW_CANDIDATES", "24"))
 SEARCH_WINDOW_DAYS = int(os.environ.get("SEARCH_WINDOW_DAYS", "210"))
+MIN_CANDIDATE_LEAD_DAYS = int(os.environ.get("MIN_CANDIDATE_LEAD_DAYS", "2"))
 ALLOW_RADIUS_KM = int(os.environ.get("ALLOW_RADIUS_KM", "20"))
 
 WARN_ON_PENDING_INBOX = os.environ.get(
@@ -460,6 +461,11 @@ INBOX_REJECTION_FEEDBACK_CLASSES: dict[str, dict[str, Any]] = {
         "priority": 78,
         "prompt_rule": "Wenn ein Kandidat einem bestehenden, offenen, archivierten oder im aktuellen Lauf erkannten Event gleicht, nicht erneut ausgeben. Dedupe nach Titel, Datum, Ort und source_url konsequent anwenden.",
     },
+    "rejected_event_past": {
+        "field": "event_timing",
+        "priority": 96,
+        "prompt_rule": "Keine abgelaufenen, gleichen-Tag- oder zu kurzfristigen Termine als normalen Inbox-Kandidaten ausgeben. Fuer woechentliche manuelle Pruefung nur Kandidaten mit ausreichendem Vorlauf liefern.",
+    },
     "rejected_unclear_date_time_place": {
         "field": "date_time_location",
         "priority": 90,
@@ -509,6 +515,18 @@ INBOX_REJECTION_FEEDBACK_CLASSES: dict[str, dict[str, Any]] = {
 
 
 BUILTIN_DEFAULT_SEARCH_FEEDBACK_RULES: list[dict[str, Any]] = [
+    {
+        "feedback_class": "rejected_event_past",
+        "issue_code": "inbox_rejection_reason_default",
+        "content_type": "event",
+        "source_system": "inbox_rejection_defaults",
+        "source_host": "all",
+        "field": "event_timing",
+        "count": 0,
+        "priority": 90,
+        "status": "default_context",
+        "prompt_rule": INBOX_REJECTION_FEEDBACK_CLASSES["rejected_event_past"]["prompt_rule"],
+    },
     {
         "feedback_class": "rejected_unclear_date_time_place",
         "issue_code": "inbox_rejection_reason_default",
@@ -605,6 +623,8 @@ def classify_inbox_rejection(row: dict[str, str]) -> tuple[str, dict[str, Any]] 
 
     if not reason_key:
         feedback_class = "rejected_other_review_signal"
+    elif any(token in reason_key for token in ["vergangenheit", "abgelaufen", "termin vorbei", "termin ist vorbei", "past event"]):
+        feedback_class = "rejected_event_past"
     elif any(token in reason_key for token in ["doppelt", "dublette", "bereits vorhanden", "bereits ausreichend", "abgedeckt"]):
         feedback_class = "rejected_duplicate_existing"
     elif any(token in reason_key for token in ["terminangaben", "datum", "uhrzeit", "ort", "link", "unklar", "nicht belastbar"]):
@@ -954,7 +974,8 @@ Wichtig:
 Simuliere den späteren automatisierten Aufbau-/Backfill-Produktionslauf für Bocholt erleben so nah wie möglich.
 
 Rahmen:
-- Zeitraum: ab heute bis {SEARCH_WINDOW_DAYS} Tage in die Zukunft
+- Zeitraum: ab heute + {MIN_CANDIDATE_LEAD_DAYS} Tage bis {SEARCH_WINDOW_DAYS} Tage in die Zukunft
+- Normale Inbox-Kandidaten müssen mindestens {MIN_CANDIDATE_LEAD_DAYS} Tage Vorlauf haben; same-day, next-day und abgelaufene Termine nicht als candidates ausgeben
 - Suchgebiet: Bocholt + maximal ca. {ALLOW_RADIUS_KM} km Umkreis inklusive niederländischer Orte innerhalb dieses Radius
 - Liefere höchstens {MAX_NEW_CANDIDATES} neue Delta-Kandidaten
 - Wenn mehr als 12 starke FINAL-Kandidaten vorhanden sind, liefere mehr als 12
@@ -965,7 +986,7 @@ Rahmen:
 - Feedback ist kein Befehl zur Datenänderung und keine dauerhafte Regelbuch-Erweiterung, sondern ein begrenzter Qualitätsfilter für diesen Lauf
 - Visual-Feedback darf nie zu automatischer Bildgenerierung, neuen Visual Keys oder künstlich generischen Bildzuordnungen führen
 - Wiederhole bekannte Fehlerklassen nicht; leite aus Einzelfällen keine neuen Sonderregeln ab
-- Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
+- Liefere lieber weniger starke FINAL-Kandidaten als schwache, unsichere oder zu kurzfristige Treffer
 - Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
 
 Ziel dieses Laufs:
@@ -1081,7 +1102,7 @@ Wenn einer dieser Kandidaten nicht in candidates erscheint, darf das nur einen d
 - bereits in OFFENE_INBOX vorhanden
 - bereits in ARCHIV entschieden
 - bereits in MANUAL_JSON vorhanden
-- außerhalb Zeitraum
+- außerhalb Zeitraum oder zu kurzfristig für manuelle Wochenprüfung
 - nicht FINAL-sicher belegbar
 - wegen Regelwerk ausgeschlossen
 
@@ -1624,6 +1645,12 @@ def candidate_invalid_reason(item: Dict[str, str], start: date, end: date) -> st
             return "endDate_before_date"
     if item.get("time") and not re.match(r"^\d{2}:\d{2}$", item["time"]):
         return "bad_time"
+    start_date = parse_iso_date(item.get("date", ""))
+    end_date = parse_iso_date(item.get("endDate", "")) if item.get("endDate") else start_date
+    if end_date and end_date < start:
+        return "past_event"
+    if start_date and start_date < start + timedelta(days=MIN_CANDIDATE_LEAD_DAYS):
+        return "too_short_notice"
     if not candidate_in_window(item, start, end):
         return "out_of_window"
 

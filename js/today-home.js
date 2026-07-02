@@ -6,6 +6,8 @@
   const FEED_ID = "today-feed";
   const STATUS_ID = "today-status";
   const WEATHER_ID = "today-weather-note";
+  const TODAY_IMPRESSIONS_STORAGE_KEY = "bocholt_erleben.today_home_impressions.v1";
+  const TODAY_IMPRESSIONS_RETENTION_DAYS = 14;
   let state = {
     events: [],
     offers: [],
@@ -24,6 +26,14 @@
 
   function qsa(selector, root = document) {
     return Array.from(root.querySelectorAll(selector));
+  }
+
+  function hasStorage() {
+    try {
+      return typeof window !== "undefined" && !!window.localStorage;
+    } catch (_) {
+      return false;
+    }
   }
 
   function asString(value) {
@@ -324,7 +334,17 @@
     return hash >>> 0;
   }
 
-  function selectVisualFromPool(pool, seed, usedImages) {
+  function freezeVisualCandidate(candidate) {
+    if (!candidate?.src) return null;
+
+    return Object.freeze({
+      ...candidate,
+      src: candidate.src,
+      alt: asString(candidate.alt)
+    });
+  }
+
+  function pickVisualFromPool(pool, seed, predicate) {
     if (!Array.isArray(pool) || !pool.length) {
       return null;
     }
@@ -335,17 +355,53 @@
       const candidate = pool[(start + offset) % pool.length];
       if (!candidate?.src) continue;
 
-      if (!usedImages || !usedImages.has(candidate.src) || offset === pool.length - 1) {
-        if (usedImages) usedImages.add(candidate.src);
-        return Object.freeze({
-          ...candidate,
-          src: candidate.src,
-          alt: asString(candidate.alt)
-        });
+      if (predicate(candidate, offset)) {
+        return candidate;
       }
     }
 
     return null;
+  }
+
+  function pickVisualFromGroups(groups, seed, predicate) {
+    for (const group of Array.isArray(groups) ? groups : []) {
+      const candidate = pickVisualFromPool(group, seed, predicate);
+      if (candidate) return candidate;
+    }
+
+    return null;
+  }
+
+  function rememberVisualCandidate(candidate, usedImages) {
+    if (candidate?.src && usedImages) usedImages.add(candidate.src);
+    return freezeVisualCandidate(candidate);
+  }
+
+  function selectVisualFromPool(pool, seed, usedImages) {
+    const candidate = pickVisualFromPool(pool, seed, (item, offset) =>
+      !usedImages || !usedImages.has(item.src) || offset === pool.length - 1
+    );
+
+    return rememberVisualCandidate(candidate, usedImages);
+  }
+
+  function selectEventVisualFromGroups(groups, seed, usedImages) {
+    const primaryGroups = Array.isArray(groups) && groups.length ? [groups[0]] : [];
+    const diversityGroups = Array.isArray(groups) ? groups.slice(1) : [];
+
+    if (usedImages) {
+      const unusedPrimary = pickVisualFromGroups(primaryGroups, seed, (candidate) => !usedImages.has(candidate.src));
+      if (unusedPrimary) return rememberVisualCandidate(unusedPrimary, usedImages);
+
+      const unusedDiversity = pickVisualFromGroups(diversityGroups, seed, (candidate) => !usedImages.has(candidate.src));
+      if (unusedDiversity) return rememberVisualCandidate(unusedDiversity, usedImages);
+    }
+
+    const primaryFallback = pickVisualFromGroups(primaryGroups, seed, () => true);
+    if (primaryFallback) return rememberVisualCandidate(primaryFallback, usedImages);
+
+    const diversityFallback = pickVisualFromGroups(diversityGroups, seed, () => true);
+    return rememberVisualCandidate(diversityFallback, usedImages);
   }
 
   const EVENT_VISUAL_FALLBACK_MOTIFS = new Set([
@@ -393,25 +449,122 @@
     return asString(item?.visualMotif || item?.visual_motif || item?.image_visual_motif);
   }
 
+  function normalizeEventVisualToken(value) {
+    return asString(value)
+      .toLowerCase()
+      .replace(/[\s-]+/g, "_")
+      .replace(/[^a-z0-9_]/g, "")
+      .replace(/_+/g, "_")
+      .replace(/^_+|_+$/g, "");
+  }
+
   function isFallbackEventVisual(visual) {
-    const motif = asString(visual?.visualMotif || visual?.visual_motif);
+    const motif = normalizeEventVisualToken(visual?.visualMotif || visual?.visual_motif);
     if (!motif) return true;
 
-    const role = asString(visual?.visualMotifRole || visual?.visual_motif_role);
+    const role = normalizeEventVisualToken(visual?.visualMotifRole || visual?.visual_motif_role);
     return role === "fallback" || EVENT_VISUAL_FALLBACK_MOTIFS.has(motif);
   }
 
-  function eventVisualCandidatePool(pool, visualMotif) {
-    if (!Array.isArray(pool) || !pool.length) return [];
+  const EVENT_VISUAL_MIN_MOTIF_DIVERSITY = 3;
 
-    const motif = asString(visualMotif);
+  const EVENT_VISUAL_DIVERSITY_FALLBACK_MOTIFS_BY_MOTIF = Object.freeze({
+    lake_festival: new Set(["neutral_open_air"]),
+    local_band_concert: new Set(["neutral_live_stage"]),
+    market_square_open_air: new Set(["neutral_open_air"]),
+    music_school_fest: new Set(["neutral_live_stage"]),
+    open_air_concert: new Set(["neutral_live_stage"]),
+    tribute_band: new Set(["neutral_live_stage"])
+  });
+
+  const EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_MOTIF = Object.freeze({
+    local_band_concert: new Set([
+      "music_school_fest",
+      "open_air_concert",
+      "tribute_band"
+    ]),
+    music_school_fest: new Set([
+      "local_band_concert",
+      "open_air_concert",
+      "tribute_band"
+    ]),
+    open_air_concert: new Set([
+      "local_band_concert",
+      "music_school_fest",
+      "tribute_band"
+    ]),
+    tribute_band: new Set([
+      "local_band_concert",
+      "music_school_fest",
+      "open_air_concert"
+    ])
+  });
+
+  function eventVisualCandidateMotif(candidate) {
+    return normalizeEventVisualToken(candidate?.visualMotif || candidate?.visual_motif);
+  }
+
+  function isAllowedDiversityFallbackEventVisual(visualMotif, candidate) {
+    const motif = normalizeEventVisualToken(visualMotif);
+    const allowed = EVENT_VISUAL_DIVERSITY_FALLBACK_MOTIFS_BY_MOTIF[motif];
+    if (!(allowed instanceof Set) || !allowed.size) return false;
+
+    const candidateMotif = eventVisualCandidateMotif(candidate);
+    return candidateMotif && candidateMotif !== motif && allowed.has(candidateMotif) && isFallbackEventVisual(candidate);
+  }
+
+  function isRelatedDiversityEventVisual(visualMotif, candidate) {
+    const motif = normalizeEventVisualToken(visualMotif);
+    const related = EVENT_VISUAL_DIVERSITY_RELATED_MOTIFS_BY_MOTIF[motif];
+    if (!(related instanceof Set) || !related.size) return false;
+
+    const candidateMotif = eventVisualCandidateMotif(candidate);
+    return candidateMotif && candidateMotif !== motif && related.has(candidateMotif);
+  }
+
+  function dedupeEventVisualCandidates(candidates) {
+    const seen = new Set();
+    const out = [];
+
+    (Array.isArray(candidates) ? candidates : []).forEach((candidate) => {
+      if (!candidate?.src) return;
+
+      const key = asString(candidate.id || candidate.src);
+      if (!key || seen.has(key)) return;
+
+      seen.add(key);
+      out.push(candidate);
+    });
+
+    return out;
+  }
+
+  function eventVisualCandidateGroups(pool, visualMotif) {
+    const readyPool = Array.isArray(pool) ? pool.filter((candidate) => candidate?.src) : [];
+    if (!readyPool.length) return [];
+
+    const motif = normalizeEventVisualToken(visualMotif);
     if (motif) {
-      const exact = pool.filter((candidate) => asString(candidate?.visualMotif) === motif);
-      if (exact.length) return exact;
+      const exact = readyPool.filter((candidate) => eventVisualCandidateMotif(candidate) === motif);
+      if (exact.length >= EVENT_VISUAL_MIN_MOTIF_DIVERSITY) return [exact];
+
+      if (exact.length) {
+        const safeFallback = readyPool.filter((candidate) => isAllowedDiversityFallbackEventVisual(motif, candidate));
+        const related = readyPool.filter((candidate) => isRelatedDiversityEventVisual(motif, candidate));
+        return [exact, safeFallback, related].map(dedupeEventVisualCandidates).filter((group) => group.length);
+      }
     }
 
-    const neutral = pool.filter(isFallbackEventVisual);
-    return neutral.length ? neutral : pool;
+    const neutral = readyPool.filter(isFallbackEventVisual);
+    return [neutral.length ? neutral : readyPool];
+  }
+
+  function flattenEventVisualCandidateGroups(groups) {
+    return dedupeEventVisualCandidates((Array.isArray(groups) ? groups : []).flat());
+  }
+
+  function eventVisualCandidatePool(pool, visualMotif) {
+    return flattenEventVisualCandidateGroups(eventVisualCandidateGroups(pool, visualMotif));
   }
 
   function activityVisualPool(item) {
@@ -467,10 +620,10 @@
     const visualKey = eventVisualKey(item);
     const visualMotif = eventVisualMotif(item);
     const pool = visualKey ? state.eventVisualPools[visualKey] : null;
-    const candidatePool = eventVisualCandidatePool(pool, visualMotif);
+    const candidateGroups = eventVisualCandidateGroups(pool, visualMotif);
 
-    return selectVisualFromPool(
-      candidatePool,
+    return selectEventVisualFromGroups(
+      candidateGroups,
       [
         asString(item.id),
         asString(item.date),
@@ -600,6 +753,8 @@
     const weatherApi = getWeather();
     const profile = getProfile();
     const weatherContext = state.weatherContext || {};
+    const weatherForecast = weatherContext.forecast && typeof weatherContext.forecast === "object" ? weatherContext.forecast : {};
+    const maxTemperature = Number(weatherForecast.maxTemperature);
     const weather = weatherApi?.toRecommendationWeather
       ? weatherApi.toRecommendationWeather(weatherContext)
       : "unknown";
@@ -610,6 +765,9 @@
       rainRisk: asString(weatherContext.rainRisk || "unknown"),
       outdoorFit: asString(weatherContext.outdoorFit || "unknown"),
       showersLikely: weatherContext.showersLikely === true,
+      temperatureBand: asString(weatherContext.temperatureBand || "unknown"),
+      maxTemperature: Number.isFinite(maxTemperature) ? maxTemperature : null,
+      todayImpressions: readTodayImpressions(now),
       now
     };
 
@@ -661,6 +819,99 @@
     const base = startOfDay(date || new Date());
     return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}-${String(base.getDate()).padStart(2, "0")}`;
   }
+
+  /* === BEGIN BLOCK: TODAY_HOME_RECENT_ACTIVITY_ROTATION_V1 | Zweck: verhindert, dass dieselben Activity-Tipps ueber Tage hinweg immer wieder dominieren; Umfang: lokale, datenschutzarme Impression-Historie nur fuer Today-Home-Curation, keine UI-/Layout-Aenderung === */
+  function daysSinceDateKey(value, now) {
+    const date = parseLocalDate(value);
+    if (!date) return null;
+
+    return Math.round((startOfDay(now || new Date()).getTime() - startOfDay(date).getTime()) / 86400000);
+  }
+
+  function readTodayImpressions(now = new Date()) {
+    if (!hasStorage()) return Object.freeze({});
+
+    try {
+      const raw = window.localStorage.getItem(TODAY_IMPRESSIONS_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      const sourceItems = parsed && typeof parsed === "object" && parsed.items && typeof parsed.items === "object"
+        ? parsed.items
+        : {};
+      const out = Object.create(null);
+
+      Object.entries(sourceItems).forEach(([key, record]) => {
+        const itemKeyValue = asString(key);
+        const lastShown = asString(record?.lastShown);
+        const ageDays = daysSinceDateKey(lastShown, now);
+
+        if (!itemKeyValue || ageDays == null || ageDays < 0 || ageDays > TODAY_IMPRESSIONS_RETENTION_DAYS) return;
+
+        out[itemKeyValue] = Object.freeze({
+          lastShown,
+          count: Number.isFinite(Number(record?.count)) ? Number(record.count) : 1,
+          type: asString(record?.type),
+          title: asString(record?.title)
+        });
+      });
+
+      return Object.freeze(out);
+    } catch (_) {
+      return Object.freeze({});
+    }
+  }
+
+  function activityRecentPenalty(item, context = {}) {
+    if (item?.type !== "activity" || isSaved(item)) return 0;
+
+    const record = context?.todayImpressions?.[itemKey(item)];
+    const ageDays = daysSinceDateKey(record?.lastShown, context?.now || new Date());
+
+    if (ageDays == null || ageDays <= 0) return 0;
+    if (ageDays === 1) return -32;
+    if (ageDays === 2) return -26;
+    if (ageDays <= 4) return -18;
+    if (ageDays <= 7) return -10;
+    if (ageDays <= TODAY_IMPRESSIONS_RETENTION_DAYS) return -4;
+
+    return 0;
+  }
+
+  function activitySelectionScore(item, context = {}) {
+    return todayScore(item) + activityRecentPenalty(item, context);
+  }
+
+  function recordTodayImpressions(items, context = {}) {
+    const visibleItems = Array.isArray(items) ? items.filter(Boolean) : [];
+    if (!visibleItems.length || !hasStorage()) return;
+
+    const now = context?.now instanceof Date ? context.now : new Date();
+    const today = rotationKey(now);
+    const currentItems = { ...readTodayImpressions(now) };
+
+    visibleItems.forEach((item) => {
+      const key = itemKey(item);
+      if (!key) return;
+
+      const previous = currentItems[key] || {};
+      currentItems[key] = {
+        lastShown: today,
+        count: Number(previous.count || 0) + 1,
+        type: asString(item.type),
+        title: asString(item.title)
+      };
+    });
+
+    try {
+      window.localStorage.setItem(TODAY_IMPRESSIONS_STORAGE_KEY, JSON.stringify({
+        schemaVersion: 1,
+        updatedAt: new Date().toISOString(),
+        items: currentItems
+      }));
+    } catch (_) {
+      // Die Rotation bleibt auch ohne localStorage funktionsfaehig; dann greift nur die Tagesrotation.
+    }
+  }
+  /* === END BLOCK: TODAY_HOME_RECENT_ACTIVITY_ROTATION_V1 === */
 
   function isPastEventItem(item, now) {
     if (item?.type !== "event") return false;
@@ -721,7 +972,7 @@
     const visualKey = eventVisualKey(item);
     const visualMotif = eventVisualMotif(item);
     const pool = visualKey ? state.eventVisualPools[visualKey] : null;
-    const candidatePool = eventVisualCandidatePool(pool, visualMotif);
+    const candidatePool = eventVisualCandidatePool(pool, visualMotif, visualKey);
 
     return Array.isArray(candidatePool) && candidatePool.length > 0;
   }
@@ -841,7 +1092,7 @@
   function compareActivityCandidates(a, b, context = {}) {
     const aHighlight = hasActiveActivityHighlight(a, context);
     const bHighlight = hasActiveActivityHighlight(b, context);
-    const scoreDiff = todayScore(b) - todayScore(a);
+    const scoreDiff = activitySelectionScore(b, context) - activitySelectionScore(a, context);
 
     if (Math.abs(scoreDiff) >= 18) return scoreDiff;
 
@@ -1108,44 +1359,20 @@
   /* === END BLOCK: TODAY_HOME_COMPACT_ACTIVITY_META_V1 === */
 
   function weatherMessage(context) {
-    const weather = asString(context?.weather || "unknown");
-    const currentTemperature = Number(context?.temperature);
-    const maxTemperature = Number(context?.forecast?.maxTemperature);
-    const hasCurrentTemperature = Number.isFinite(currentTemperature);
-    const hasMaxTemperature = Number.isFinite(maxTemperature);
-    const tempLabel = weather === "hot" && hasMaxTemperature && (!hasCurrentTemperature || Math.round(maxTemperature) > Math.round(currentTemperature))
-      ? `bis ${Math.round(maxTemperature)} °C`
-      : hasCurrentTemperature
-        ? `${Math.round(currentTemperature)} °C`
-        : "";
-    const summaryLabel = asString(context?.summaryLabel);
-
-    if (summaryLabel) {
-      return [tempLabel, summaryLabel].filter(Boolean).join(" · ");
-    }
-
-    if (weather === "hot") {
-      return [tempLabel || "Warm heute", "ideal für Wasser & Schatten"].filter(Boolean).join(" · ");
-    }
-
-    if (weather === "rain") {
-      return [tempLabel, "wechselhaft mit Schauern – wetterfest planen"].filter(Boolean).join(" · ");
-    }
-
-    if (weather === "cold") {
-      return [tempLabel || "Kühl heute", "kurz oder drinnen passt besser"].filter(Boolean).join(" · ");
-    }
-
-    if (weather === "windy") {
-      return [tempLabel, "geschützte Orte passen besser"].filter(Boolean).join(" · ");
-    }
-
-    if (weather === "dry") {
-      return [tempLabel, "ideal für draußen"].filter(Boolean).join(" · ");
-    }
-
-    return "Drei Ideen für Bocholt – ruhig vorsortiert für heute";
+    const summaryLabel = asString(context?.summaryLabel || context?.summary?.label);
+    return summaryLabel || "Wetterlage heute offen";
   }
+
+  /* === BEGIN BLOCK: TODAY_HOME_WEATHER_ICON_TOKEN_V2 | Zweck: rendert Wetterhinweis ausschliesslich mit dem semantischen Icon-Token aus dem zentralen Wetterkontext; Umfang: Today-Home kennt keine eigene Wetter-Icon-Fallbackmatrix mehr === */
+  function normalizeIconToken(value) {
+    const token = asString(value);
+    return /^[a-z0-9-]+$/.test(token) ? token : "";
+  }
+
+  function weatherIcon(context) {
+    return normalizeIconToken(context?.summaryIcon || context?.summary?.icon) || "weather-unknown";
+  }
+  /* === END BLOCK: TODAY_HOME_WEATHER_ICON_TOKEN_V2 === */
 
   function typeLabel(item) {
     return item.type === "activity" ? "Aktivität" : "Event";
@@ -1166,8 +1393,9 @@
     if (!el) return;
 
     const message = weatherMessage(state.weatherContext);
+    const icon = weatherIcon(state.weatherContext);
     el.innerHTML = `
-      <span class="today-weather-note__icon" data-ui-icon="sparkles" aria-hidden="true"></span>
+      <span class="today-weather-note__icon" data-ui-icon="${icon}" aria-hidden="true"></span>
       <span>${escapeHtml(message)}</span>
     `.trim();
 
@@ -1246,7 +1474,7 @@
               <span data-ui-icon="${escapeHtml(typeIcon(item))}" aria-hidden="true"></span>
               ${escapeHtml(typeLabel(item))}
             </span>
-            ${showTopBadge ? `<span class="today-card__badge">Top-Tipp</span>` : ""}
+            ${showTopBadge ? `<span class="today-card__badge">Empfohlen</span>` : ""}
           </div>
           <h2 class="today-card__title">${escapeHtml(item.title)}</h2>
           ${meta ? `<p class="today-card__meta">${escapeHtml(meta)}</p>` : ""}
@@ -1302,8 +1530,9 @@
       </section>
     `.trim();
 
-    renderStatus(`${visible.length} Tipps`);
+    renderStatus(`${visible.length} Vorschläge`);
     hydrateIcons(feed);
+    recordTodayImpressions(visible, createContext());
   }
 
   function renderAll() {
@@ -1437,7 +1666,7 @@
 
     bindEvents(root);
     renderSkeleton();
-    renderStatus("Lade Ideen für heute …");
+    renderStatus("Lade Vorschläge für heute …");
 
     try {
       await Promise.all([loadData(), loadWeather()]);

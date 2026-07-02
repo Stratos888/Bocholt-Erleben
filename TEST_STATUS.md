@@ -1,3 +1,41 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_FAVORITES_CARD_PARITY_2026_06_30 | Zweck: dokumentiert Activity-Favoriten, mobile Card-Parity und Browser-Smoke-Main-Abnahme; Umfang: aktueller Produktreife-Status nach P1-Smoke === -->
+## Activity-Favoriten und Mobile Card-Parity – umgesetzt
+
+Status: umgesetzt und nach Staging-Deploy fachlich/visuell abgenommen.
+
+Abgenommen:
+
+- Activity-Favoriten funktionieren lokal und bleiben nach Reload erhalten.
+- Favoriten bleiben stille Priorisierung ohne Favoriten-Pill, ohne eigene Section und ohne Erklaerzeile.
+- Mobile Activity-Cards wirken ruhiger und sind in der Bildgeometrie an Event-Cards angenaehert.
+- Mobile Schnellfilter-Rail ist final abgenommen: einzeilig, links startend mit `Jetzt besonders`, horizontal wischbar.
+
+Umgesetzt:
+
+- Activity-Favoriten als Herz-Aktion auf Aktivitaetskarten.
+- Activity-Favoriten als Herz-Aktion im mobilen Activity-Detailpanel.
+- Favoriten werden lokal im Browser bzw. in der PWA gespeichert, ohne Cookies, Login, Backend oder Serveruebertragung.
+- Favoriten werden auf `/aktivitaeten/` bevorzugt oben einsortiert, ohne eigene Favoriten-Section, ohne Erklaerzeile und ohne Filterstatus.
+- Kein `Favoriten`-Schnellfilter-Pill: Favoriten sind persoenliche Priorisierung, keine Inhaltskategorie.
+- Mobile Activity-Bilder wurden an die kompaktere Event-Thumbnail-Geometrie angeglichen, damit der Wechsel Events/Aktivitaeten ruhiger wirkt.
+- Mobile Schnellfilter wurden als horizontale Chip-Rail umgesetzt, damit der Filterblock eine Zeile spart und die Ergebnisliste frueher beginnt.
+- Events erhalten bewusst keine Favoritenlogik; dort bleibt Kalender/Terminaktion der passende Nutzerpfad.
+- Browser-Smoke prueft die lokale Favoritenfunktion zusaetzlich als echten Browserpfad.
+
+Datenschutz-/Rechtsbewertung:
+
+- Keine neuen Cookies.
+- Keine optionale Statistik-/Trackingverarbeitung.
+- Lokale Speicherung ist fuer die vom Nutzer ausdruecklich gewaehlte Favoritenfunktion erforderlich und wird in `/datenschutz/` beschrieben.
+- Statistik-Consent bleibt davon getrennt.
+
+P1 Browser-Smoke:
+
+- P1 Browser-Smoke auf Main abgenommen: 21/21 OK, 0 Fehler, 0 Warnungen.
+- Neuer Favoriten-Smoke prueft Herz, lokalen Speicher, Reload, Priorisierung, Wegfall des Favoriten-Schnellfilters und Wegfall einer eigenen Favoriten-Section.
+- Browser-Smoke prueft mobile Schnellfilter-Rail: flex/nowrap, eine sichtbare Chip-Zeile, linker Startzustand mit `Jetzt besonders`, Karten bleiben sichtbar.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_FAVORITES_CARD_PARITY_2026_06_30 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_2026_06_29 | Zweck: dokumentiert Reporting-Haertung nach erstem Staging-Lauf; Umfang: Warnungslabel, bekannte geschuetzte 401-/Fetch-Hinweise === -->
 ## P1 Browser-Smoke Reporting-Polish – umgesetzt
 
@@ -4442,53 +4480,135 @@ Zielzustand:
 - Harte Kernwegfehler bleiben weiterhin `FEHLER` und machen den Workflow rot.
 <!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V2_2026_06_29 === -->
 
-<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V3_2026_06_29 | Zweck: dokumentiert die Stabilisierung des Consent-Reappearing-Smokes nach False-Negative im CI; Umfang: keine App-Funktionsaenderung, nur Testrobustheit === -->
-## P1 Browser-Smoke – Reporting-/Robustheits-Polish V3 (2026-06-29)
+<!-- === BEGIN BLOCK: TEST_STATUS_HOME_TODAY_WEATHER_CONTEXT_FINAL_2026_07_01 | Zweck: dokumentiert Abschluss des Home-Today-Wetter-/Copy-/Icon-Workpacks; Umfang: Produktentscheidung, Wetter-Cue, zentrale Iconlogik, Temperaturbanding, Smoke-Ergebnis === -->
+## Home Today – Wetterkontext, Copy und Iconlogik finalisiert (2026-07-01)
 
-Status: Testrobustheit vorbereitet; keine App-Funktionsaenderung.
+Status: Staging-Workpack fachlich und visuell abgenommen; Dokumentation nach Abschluss ergänzt.
 
-Befund aus dem Lauf nach V2:
-- Ergebnis: `20/21 OK, 1 Fehler, 0 Warnungen`.
-- Fehler: `mobile: Consent bleibt nach Tabwechsel weg: locator.waitFor: Timeout 8000ms exceeded`.
-- Der Test wartete auf einen im Clean-Kontext sichtbaren `[data-privacy-consent-banner]`.
+Produktentscheidung:
+- Die Home-Seite wird als `Heute`-Seite geführt, nicht als `Jetzt`-Seite.
+- Ziel der Seite sind wenige passende Vorschläge für den heutigen Tag.
+- Die Wetteranzeige ist kein Wettermodul und kein Current-Weather-Widget, sondern ein kompakter Tageskontext für die Auswahl.
+- Der sichtbare Wetter-Cue beschreibt die relevante Wetterlage knapp, z. B. `Warm und trocken`, `Warm, später Schauer`, `Regnerisch und kühl`, `Kühl und windig`.
+- Keine erklärenden Formulierungen wie `Wetter mitgedacht`, `draußen passt`, `Heute gut für draußen` oder Temperatur-first-Texte wie `19 °C · ideal für draußen`.
 
-Bewertung:
-- Kein belegter App-Fehler. Die manuelle Staging-/Live-Pruefung hatte bereits gezeigt: Beide Consent-Buttons funktionieren, und der Hinweis bleibt nach Bottom-Tabwechsel weg.
-- Der Fehler ist ein False Negative im Browser-Smoke: Der Test setzte voraus, dass der Consent-Hinweis im CI-Clean-Kontext immer sichtbar wird.
-- Fuer P1 ist der entscheidende Sicherheitsfall nicht „Banner erscheint im Clean-Kontext“, sondern: Nach gespeicherter Entscheidung darf der Hinweis beim Tabwechsel nicht erneut auftauchen.
+Sichtbare Home-Copy:
+- Hero bleibt `Heute rund um Bocholt`.
+- Die Auswahlsektion nutzt `Unsere Auswahl` und den Status `3 Vorschläge`.
+- Card-Auszeichnung wurde von `Top-Tipp` auf `Empfohlen` beruhigt.
+- Die frühere Mischsprache aus `Ideen` und `Tipps` wurde zugunsten von `Vorschläge` vereinheitlicht.
+- Der Aufbau auf Desktop und Mobile bleibt unverändert; es wurden keine Layout- oder CSS-Umbauten vorgenommen.
 
-Haertung V3:
-- Wenn der Consent-Hinweis im Clean-Kontext sichtbar ist, bleibt der reale Klickpfad aktiv: `Ohne Statistik` klicken, dann Bottom-Tabwechsel pruefen.
-- Wenn der Hinweis im CI-Clean-Kontext nicht sichtbar ist, setzt der Test kontrolliert `denied` in LocalStorage/Cookie und prueft den stabilen Zielzustand.
-- Nach Bottom-Tabwechsel muessen weiterhin echte Eventkarten sichtbar sein.
-- Ein trotz gespeicherter Ablehnung sichtbarer Consent-Hinweis bleibt ein harter Fehler.
+Wetter- und Temperaturmodell:
+- Die Wetterlage kombiniert Niederschlag/Trockenheit, Temperaturband, Wind und Tagesverlauf.
+- Temperatur-Banding wurde alltagstauglich entschärft:
+  - `< 5 °C`: kalt
+  - `5–11 °C`: kühl
+  - `12–18 °C`: mild
+  - `19–27 °C`: warm
+  - `28–29 °C`: sehr warm
+  - `ab 30 °C`: heiß
+- Bei etwa 25 °C Tagesmaximum wird `Warm und trocken` angezeigt, nicht `Sehr warm und trocken`.
+- `Sehr warm` soll erst greifen, wenn Schatten-/Wasser-/kurze-Wege-Signale stärker relevant werden; `Heiß` ab 30 °C.
+
+Zentrale Iconlogik:
+- Wettericons werden nicht lokal in `today-home.js` als SVG-Sonderfall gepflegt.
+- `weather-context.js` liefert Label und semantischen Icon-Token.
+- `js/icons.js` bleibt die zentrale Quelle für Icon-SVGs und semantische Aliase.
+- Home rendert nur noch das Wetterprofil, z. B. `summaryLabel` plus `summaryIcon`.
+- Die Wetter-Pill nutzt ein wetterspezifisches Icon statt `sparkles`; `sparkles` bleibt damit frei für Highlight-/Empfehlungssemantik und wird nicht für Wetter missbraucht.
+
+Auswahllogik und Rotation:
+- Die sichtbare Wetterlage muss dieselben Signale repräsentieren, die auch in die Auswahl-/Scoringlogik einfließen.
+- Bei warm/trocken sind Outdoor- und saisonale Vorschläge plausibel; bei sehr warm/heiß sollen Wasser, Schatten, kurze Wege oder wetterunabhängige Ziele stärker berücksichtigt werden.
+- Lokale Today-Impression-/Preference-Daten dürfen normale Browserzustände beeinflussen, damit Aktivitäten über Tage nicht immer identisch erscheinen.
+- Die frische Basis-Auswahl ist deterministisch genug: Mobile und Desktop-Inkognito zeigten dieselbe Auswahl; abweichende Desktop-Normalansicht wurde auf lokalen Browserzustand zurückgeführt.
+
+Validierter Smoke:
+- Mobile nach Patch: `Warm und trocken` mit Sonne/Wolken-Wettericon sichtbar.
+- Desktop-Inkognito: gleiche Basis-Auswahl wie Mobile sichtbar.
+- Desktop normal: mögliche Abweichung durch lokale Impression-/Preference-Historie verstanden und nicht als Layout-/Deploy-Fehler bewertet.
+- Keine alten Texte wie `Top-Tipp`, `3 Tipps`, `Wetter mitgedacht`, `draußen passt` oder `Sehr warm und trocken` bei ca. 25 °C sichtbar.
+- JS-Syntaxchecks der funktionalen Patchpakete waren grün.
+
+Abschlussbewertung:
+- Workpack ist abgeschlossen.
+- Keine weitere Änderung an Position, Aufbau, Mobile/Desktop-Layout oder Home-Hero nötig.
+- Falls künftig vollständige geräteübergreifende Identität aller drei Vorschläge gewünscht ist, wäre das ein separates Produktziel und nicht Teil dieses abgeschlossenen Workpacks.
+<!-- === END BLOCK: TEST_STATUS_HOME_TODAY_WEATHER_CONTEXT_FINAL_2026_07_01 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 | Zweck: dokumentiert den finalen Zielzustand fuer die kontrollierte mobile Schnellfilter-Rail auf Aktivitaeten; Umfang: Status und Abnahmekriterien === -->
+## Aktivitaeten Mobile Schnellfilter-Rail – kontrollierter Premium-Zielzustand (2026-07-01)
+
+Status:
+- Umsetzungspatch eingebracht und per mobiler Staging-Sichtpruefung abgenommen.
 
 Zielzustand:
-- Der Browser-Smoke bleibt streng fuer echte Navigation-/Rendering-/Consent-Reappearing-Fehler.
-- CI-Timing beim initialen Consent-Anzeigen erzeugt keinen falschen roten Deploy.
-<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V3_2026_06_29 === -->
+- Mobile Schnellfilter bleiben eine horizontale Chip-Rail.
+- Desktop bleibt unveraendert.
+- Im ungefilterten Startzustand beginnt die Rail immer links.
+- Wenn `Jetzt besonders` verfuegbar ist, ist dieser Chip initial der erste sichtbare Chip.
+- Alte Scrollpositionen, bfcache oder automatisches Zentrieren duerfen den Startzustand nicht verschieben.
+- Aktive Schnellfilter werden nur bei echter Auswahl sichtbar gehalten.
+- Fades zeigen reale Scrollkanten, nicht einen statischen harten Anschnitt.
+
+Abnahme:
+- `/aktivitaeten/` mobil zeigt initial links startend: `Jetzt besonders`, `Mit Kindern`, `Bei Regen`. Weitere Chips sind per horizontalem Wischen erreichbar.
+- Seitliches Wischen zeigt die weiteren Schnellfilter.
+- Browser-Smoke Mobile Schnellfilter Rail bleibt massgeblicher automatischer Guard fuer Regressionen.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 === -->
 
 
-<!-- === BEGIN BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V4_2026_06_30 | Zweck: dokumentiert finale Simulation/Haertung des Consent-Reappearing-Smokes vor Patch-Anwendung; Umfang: keine App-Funktionsaenderung, nur Testrobustheit === -->
-## P1 Browser-Smoke – Reporting-/Robustheits-Polish V4 (2026-06-30)
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 | Zweck: dokumentiert den aktuellen Patch gegen sichtbare Event-Bildwiederholungen im Feed; Umfang: Ursache, technische Loesung, Grenzen === -->
+## Event-Feed Visual Diversity – Duplikatpraevention im sichtbaren Feed (2026-07-02)
 
-Status: bevorzugter finaler Testrobustheits-Patch; keine App-Funktionsaenderung.
+Status:
+- Patch gegen den aktuellen Staging-ZIP-Stand `Bocholt-Erleben-staging (83)` neu aufgebaut.
+- Der vorherige Patch darf nicht unveraendert eingespielt werden, weil er aeltere Vollversionen von `today-home.js`, `VISUAL_WORKFLOW.md` und `TEST_STATUS.md` enthielt und aktuelle Home-/Activity-Dokumentation ueberschrieben haette.
 
-Nach erneuter mentaler Simulation wurde V3 nicht als optimaler Endzustand bewertet:
-- V3 verhindert den CI-Timeout, setzt im Fallback aber die Consent-Entscheidung und laedt danach neu.
-- Der urspruengliche Produktfehler entstand gerade ohne Reload: Seite/Tabbar wurde vor der Entscheidung vorbereitet, danach wechselte der Nutzer den Tab.
-- Ein Reload im Fallback wuerde diesen Teilzustand nicht mehr exakt abbilden.
+Ursache:
+- Der Event-Visual-Resolver war zu hart motivexakt.
+- Sobald ein einziges exaktes `visual_motif`-Bild existierte, wurden neutrale/fallbackfaehige Bilder derselben Bildfamilie ausgeschlossen.
+- Bei mehreren benachbarten Kulturtage-/Open-Air- oder Live-Musik-Karten konnte die Anti-Duplikat-Logik deshalb nicht wirksam ausweichen.
 
-V4 korrigiert das:
-- Clean-Seite bootet weiterhin zuerst.
-- Bei sichtbarem Consent-Hinweis wird weiterhin der echte Button `Ohne Statistik` geklickt.
-- Wenn der Hinweis in der CI nicht sichtbar ist, nutzt der Test die vorhandene `BEPrivacy`-Runtime zur Ablehnung ohne Reload und loest damit dieselben Runtime-Resync-Signale aus.
-- Anschliessend wird per Bottom-Tabbar auf `/events/` gewechselt.
-- Erwartet werden echte Eventkarten und kein sichtbarer Consent-Hinweis.
+Technische Loesung:
+- `/events/` und Today/Home nutzen weiterhin exakte Motivbilder bevorzugt.
+- Exakte Motivbilder bleiben erst ab drei Ready-Varianten exklusiv.
+- Bei nur ein bis zwei exakten Motivbildern werden neutrale/fallbackfaehige Bilder desselben `visual_key` ergaenzt.
+- Fuer `live_music_stage` sind definierte nahe Buehnen-/Konzertmotive als letzte Diversity-Stufe zugelassen.
+- Der neue Audit `scripts/audit-event-feed-visual-diversity.py` simuliert die Feed-Auswahl und meldet sichtbare Bildwiederholungen, niedrige Motivdiversitaet und moegliche Seriencluster.
 
-Bewertung:
-- App-Funktion bleibt unveraendert.
-- Der False-Negative aus V2 wird vermieden.
-- Der urspruengliche Consent-Reappearing-Fall bleibt besser abgedeckt als mit V3.
-- Harte Rendering-/Navigationsfehler bleiben weiterhin rot.
-<!-- === END BLOCK: TEST_STATUS_BROWSER_SMOKE_REPORTING_POLISH_V4_2026_06_30 === -->
+Grenze:
+- Dieser Patch behebt den sichtbaren Bild-Duplikat-Effekt technisch.
+- Der spaetere Premium-Fix fuer echte Mehrtages-/Dachveranstaltungen bleibt ein eigenes Datenmodellthema: `event_group_id`, `group_title`, `group_role`, `occurrence_title`, `display_mode`.
+<!-- === END BLOCK: TEST_STATUS_EVENT_FEED_VISUAL_DIVERSITY_2026_07_02 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_INBOX_REJECTION_AND_LEAD_GUARD_2026_07_02 | Zweck: dokumentiert die Härtung der KI-Inbox gegen abgelaufene Kandidaten und instabile Ablehnungsgrund-Werte; Umfang: Review-Inbox, Weekly-KI-Suche und Feedback-Klassifizierung === -->
+
+## Inbox-Ablehnung und KI-Vorlauf-Guard – 02.07.2026
+
+Auslöser war der Live-Run `Weekly KI Websearch → Manual Inbox #18`: Die technische Kette Weekly KI Websearch → Manual KI Event Intake → Live-Inbox lief grün, aber zwei neue KI-Kandidaten lagen bei manueller Prüfung bereits in der Vergangenheit. Zusätzlich meldete die Inbox beim Verwerfen `invalid_ablehnungsgrund`, weil die UI lange Erklärungstexte statt stabiler Kurzgründe an das externe Sheet-Writeback senden konnte.
+
+Umgesetzte Härtung:
+
+- Die Review-Inbox sendet bei Ablehnungen nun stabile, kurze deutsche Ablehnungsgrund-Werte statt langer Erklärungstexte.
+- Neuer Event-Ablehnungsgrund: `Termin liegt in der Vergangenheit`.
+- Abgelaufene Event-Kandidaten werden in der Karte sichtbar als abgelaufen markiert.
+- Bei abgelaufenen Event-Kandidaten wird `Übernehmen` blockiert und der Vergangenheitsgrund vorausgewählt.
+- Falls das externe Google-Apps-Script den neuen Vergangenheitsgrund noch nicht kennt, versucht die UI kompatibel mit `Terminangaben unklar` zu verwerfen und weist in der Statusmeldung darauf hin.
+- Die Bildzuordnung zeigt den `visual_key` zusätzlich als lesbares Label, z. B. `Geführter Spaziergang / Tour (active_route_tour)`.
+- Die Weekly-KI-Suche nutzt einen konfigurierbaren Vorlauf-Guard `MIN_CANDIDATE_LEAD_DAYS` mit Default `2`.
+- Same-day-, next-day- und abgelaufene Kandidaten werden vom normalen `candidates`-Output ausgeschlossen bzw. lokal als `too_short_notice` oder `past_event` verworfen.
+- Inbox-Ablehnungen mit `Termin liegt in der Vergangenheit` werden als Feedbackklasse `rejected_event_past` klassifiziert und gehen als Zeitlogik-Signal in spätere Suchläufe ein.
+
+Validierung im Patch-Artefakt:
+
+- `python3 -m py_compile scripts/weekly-ki-websearch-to-manual-inbox.py` erfolgreich.
+- Inline-JavaScript aus `inbox/index.html` mit `node --check` erfolgreich geprüft.
+
+Offener externer Hinweis:
+
+- Das Google-Apps-Script für Sheet-Writeback liegt nicht im Repo. Wenn der neue Grund dauerhaft exakt im Sheet-Archiv stehen soll, muss dessen Ablehnungsgrund-Whitelist ebenfalls um `Termin liegt in der Vergangenheit` ergänzt werden. Bis dahin verhindert der Kompatibilitäts-Fallback das Blockieren der Verwerfen-Aktion.
+
+<!-- === END BLOCK: TEST_STATUS_INBOX_REJECTION_AND_LEAD_GUARD_2026_07_02 === -->

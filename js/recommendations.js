@@ -12,6 +12,8 @@
     rainRisk: "unknown",
     outdoorFit: "unknown",
     showersLikely: false,
+    temperatureBand: "unknown",
+    maxTemperature: null,
     isHoliday: false,
     isNonBusinessDay: false,
     holidayName: ""
@@ -274,6 +276,8 @@
       rainRisk: asString(input.rainRisk || DEFAULT_CONTEXT.rainRisk) || DEFAULT_CONTEXT.rainRisk,
       outdoorFit: asString(input.outdoorFit || DEFAULT_CONTEXT.outdoorFit) || DEFAULT_CONTEXT.outdoorFit,
       showersLikely: input.showersLikely === true,
+      temperatureBand: asString(input.temperatureBand || DEFAULT_CONTEXT.temperatureBand) || DEFAULT_CONTEXT.temperatureBand,
+      maxTemperature: Number.isFinite(Number(input.maxTemperature)) ? Number(input.maxTemperature) : DEFAULT_CONTEXT.maxTemperature,
       isHoliday: input.isHoliday === true,
       isNonBusinessDay: input.isNonBusinessDay === true,
       holidayName: asString(input.holidayName || DEFAULT_CONTEXT.holidayName)
@@ -282,6 +286,20 @@
 
   function itemKey(item) {
     return `${item.type}:${item.id}`;
+  }
+
+  function heatIntensity(context) {
+    const band = asString(context?.temperatureBand);
+    if (band === "hot") return "hot";
+    if (band === "very_warm") return "very_warm";
+
+    const maxTemperature = Number(context?.maxTemperature);
+    if (Number.isFinite(maxTemperature)) {
+      if (maxTemperature >= 30) return "hot";
+      if (maxTemperature >= 28) return "very_warm";
+    }
+
+    return "none";
   }
 
   function normalizeEvent(event, index) {
@@ -503,16 +521,19 @@
       score += 8;
     }
 
-    /* === BEGIN BLOCK: RECOMMENDATION_WEATHER_SCORING_HOT_COLD_WINDY_V1 | Zweck: nutzt Wetterklassen hot/cold/windy als echten Rankingfaktor fuer Premium-Home; Umfang: erweitert nur scoreItem(), keine DOM-/UI-Aenderung === */
+    /* === BEGIN BLOCK: RECOMMENDATION_WEATHER_SCORING_HOT_COLD_WINDY_V2 | Zweck: nutzt sehr warme und heisse Tage als abgestuften Rankingfaktor fuer Premium-Home; Umfang: erweitert nur scoreItem(), keine DOM-/UI-Aenderung === */
     if (context.weather === "hot") {
+      const heat = heatIntensity(context);
+      const isHotDay = heat === "hot";
+
       if (hasAny(item.interestTags, ["Baden", "Wasser"]) && !hasInactiveConditionSensitiveBathingHighlight(item, context)) {
-        score += 30;
+        score += isHotDay ? 30 : 18;
       } else if (hasInactiveConditionSensitiveBathingHighlight(item, context)) {
-        score -= 6;
+        score -= isHotDay ? 8 : 4;
       } else if (hasAny(item.weatherProfile, ["indoor", "weather_independent", "rain_ok"])) {
-        score += 10;
+        score += isHotDay ? 12 : 6;
       } else if (hasAny(item.interestTags, "Draußen")) {
-        score -= 6;
+        score -= isHotDay ? 10 : 3;
       }
     }
 
@@ -535,7 +556,7 @@
         score += 10;
       }
     }
-    /* === END BLOCK: RECOMMENDATION_WEATHER_SCORING_HOT_COLD_WINDY_V1 === */
+    /* === END BLOCK: RECOMMENDATION_WEATHER_SCORING_HOT_COLD_WINDY_V2 === */
 
     if (item.type === "activity") {
       score += activityHighlightBoost(item, context, "home");

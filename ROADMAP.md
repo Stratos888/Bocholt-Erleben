@@ -1,3 +1,32 @@
+<!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 | Zweck: schaerft Nutzerbindung als Premium-Zielzustand ohne Account-Schwere und ohne Event-Favoriten; Umfang: Activity-Favoriten, lokale Priorisierung, Card-Parity === -->
+## P1 Nutzerbindung Premium – Activity-Favoriten
+
+Status: umgesetzt und auf Staging fachlich/visuell abgenommen.
+
+Zielzustand: Bocholt erleben bietet lokale Aktivitaets-Favoriten als leicht verstaendliches Premium-Nutzerfeature. Nutzer markieren wiederkehrend interessante Aktivitaeten per Herz; die App priorisiert diese Aktivitaeten automatisch oben. Favoriten sind keine Inhaltsfilter, erscheinen nicht als Schnellfilter-Pill und erzeugen keine eigene Feed-Section.
+
+Entscheidungen:
+
+- Begriff und Icon: `Favoriten` mit Herz.
+- Geltung: nur Aktivitaeten, nicht Events. Events bleiben ueber Kalender-/Terminaktionen geloest.
+- Kein Login, kein Konto, kein Sync, kein Backend.
+- Speicherung: lokal im Browser/PWA via bestehendem Nutzerpraeferenz-Speicher.
+- Datenschutz: keine Cookies, keine Serveruebertragung, kein Tracking; Hinweis in `/datenschutz/`.
+- Mobile UI: Activity-Cards werden in der Bildgeometrie an Event-Cards angeglichen, damit Seitenwechsel nicht wie ein Layoutsprung wirken.
+- Mobile Schnellfilter: als einzeilige horizontale Premium-Chip-Rail; Desktop bleibt unveraendert.
+
+Akzeptanzkriterien:
+
+- Herz auf Activity-Cards und im mobilen Detailpanel sichtbar und antippbar.
+- Favoritenzustand bleibt nach Reload im selben Browser/PWA erhalten.
+- Favorisierte Aktivitaeten werden nach oben priorisiert.
+- Bei vorhandenen Favoriten bleibt die Ergebniszeile ruhig; keine `Deine Favoriten`-Section und keine Erklaerzeile.
+- Schnellfilter bleiben echte Inhaltsfilter; kein Favoriten-Pill in der Schnellfilterleiste.
+- Events erhalten keine parallele Favoritenlogik.
+- Browser-Smoke prueft die Favoritenfunktion read-only/lokal.
+- Mobile Schnellfilter brechen nicht mehr mehrzeilig um; Browser-Smoke prueft die Rail.
+<!-- === END BLOCK: ROADMAP_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 === -->
+
 <!-- === BEGIN BLOCK: ROADMAP_BROWSER_SMOKE_SYSTEM_V1_2026_06_29 | Zweck: finalisiert P1 Browser-Smoke als kleines Deploy-/Manual-Sicherheitsnetz statt grosses Testframework; Umfang: Zielzustand, Trigger, Fehlerverhalten, Abgrenzung === -->
 ## P1 Browser-Smoke-System – Zielzustand V1
 
@@ -2267,3 +2296,23 @@ Nächster sinnvoller Wartepunkt:
 - Nach einem vollständigen 28-Tage-/30-Tage-Zeitraum prüfen, ob genug organische Website-, Route-/Maps-, Detail- und CTA-Signale für einen ersten belastbaren Feedbackbericht vorliegen.
 - Bis dahin keine neuen Reporting-Features bauen, sondern Datenqualität beobachten.
 <!-- === END BLOCK: ROADMAP_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 | Zweck: haelt die finale UI-Entscheidung fuer mobile Schnellfilter fest; Umfang: Zielzustand und Nicht-Ziele === -->
+## Aktivitaeten Mobile Schnellfilter-Rail – kontrollierte Premium-Komponente
+
+Status: umgesetzt und per mobiler Staging-Sichtpruefung abgenommen.
+
+Entscheidung:
+- Mobile Schnellfilter werden als horizontale Chip-Rail gefuehrt.
+- Der Filterbutton bleibt fuer die vollstaendige Filterauswahl zustaendig.
+- Desktop bleibt unveraendert.
+
+Nicht-Ziele:
+- Keine Rueckkehr zu drei Chip-Zeilen auf Mobile.
+- Kein reiner Filterdialog ohne sichtbare Schnellfilter.
+- Keine Favoriten als Schnellfilter.
+
+Premium-Kriterium:
+- Die Rail ist nicht nur CSS-Overflow, sondern wird per JS auf einen sauberen Startzustand gebracht: ungefiltert links, aktive Chips nur bei echter Auswahl sichtbar.
+- Abgenommener Startzustand: `Jetzt besonders`, `Mit Kindern`, `Bei Regen` sind initial sichtbar; weitere Chips sind per horizontalem Wischen erreichbar.
+<!-- === END BLOCK: ROADMAP_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 === -->

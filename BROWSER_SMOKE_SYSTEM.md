@@ -1,3 +1,48 @@
+<!-- === BEGIN BLOCK: BROWSER_SMOKE_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 | Zweck: erweitert den Browser-Smoke um lokale Activity-Favoriten als neuen Kernpfad; Umfang: Testmatrix-/Reporting-Ergaenzung === -->
+## Erweiterung: Activity-Favoriten
+
+Der Browser-Smoke prueft zusaetzlich, ob die lokale Activity-Favoritenfunktion im echten Browser nutzbar ist und dem Premium-Zielzustand folgt: Favoriten sind stille persoenliche Sortierprioritaet, kein Schnellfilter und keine eigene Feed-Section.
+
+Pruefung:
+
+- `/aktivitaeten/` laden.
+- Lokalen Favoritenspeicher im Testkontext leeren.
+- Ersten Activity-Herzbutton klicken.
+- Pruefen, ob `activity:<id>` lokal im Nutzerpraeferenzspeicher gespeichert ist.
+- Pruefen, ob der Herzbutton den aktiven Zustand zeigt.
+- Seite neu laden.
+- Pruefen, ob kein `Favoriten`-Schnellfilter-Pill existiert.
+- Pruefen, ob der gespeicherte Favorit priorisiert oben steht, ohne Favoriten-Pill, ohne `Deine Favoriten`-Section und ohne Erklaerzeile.
+
+Abgrenzung:
+
+- Keine Serveruebertragung.
+- Keine echten Nutzerkonten.
+- Keine Event-Favoriten.
+- Keine produktiven Schreibaktionen ausser lokaler Browserzustand im isolierten Testkontext.
+<!-- === END BLOCK: BROWSER_SMOKE_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 === -->
+
+<!-- === BEGIN BLOCK: BROWSER_SMOKE_MOBILE_QUICK_FILTER_RAIL_2026_07_01 | Zweck: dokumentiert die mobile Schnellfilter-Rail als Browser-Smoke-Kerncheck; Umfang: Activities Quick Filters Mobile === -->
+## Erweiterung: Mobile Schnellfilter-Rail
+
+Der Browser-Smoke prueft zusaetzlich, dass die mobilen Schnellfilter auf `/aktivitaeten/` als einzeilige horizontale Chip-Rail gerendert werden.
+
+Pruefung:
+
+- `/aktivitaeten/` im Mobile-Profil laden.
+- `#offer-quick-filters` muss sichtbar sein.
+- Die Schnellfilter muessen als `flex` mit `nowrap` laufen.
+- Sichtbare Schnellfilter duerfen nicht in mehrere Zeilen umbrechen.
+- Die Rail darf nicht deutlich hoeher als eine Chip-Zeile sein.
+- Die Aktivitaetskarten muessen danach weiterhin sichtbar sein.
+
+Abgrenzung:
+
+- Kein Desktop-Scrollpattern; Desktop bleibt beim bestehenden Wrap-/Grid-Layout.
+- Keine Aenderung der Filterlogik.
+- Aktuell ist `/aktivitaeten/` die relevante Seite mit Schnellfilter-Chips; das Pattern gilt kuenftig fuer vergleichbare mobile Schnellfilterleisten.
+<!-- === END BLOCK: BROWSER_SMOKE_MOBILE_QUICK_FILTER_RAIL_2026_07_01 === -->
+
 # Browser-Smoke-System — Bocholt erleben
 
 Stand: 2026-06-29
@@ -114,33 +159,15 @@ Damit gilt:
 - Bottom-Tabbar-Navigation ist strenger: leere Zielcontainer reichen nicht mehr.
 - Echte Konsolenprobleme ausserhalb dieser bekannten Muster bleiben weiterhin sichtbar.
 
-## Reporting-Polish 2026-06-29 V3
+## Mobile Schnellfilter-Rail – kontrollierter Startzustand (2026-07-01)
 
-Der Lauf nach V2 zeigte keinen App-Fehler, sondern einen instabilen Consent-Testpfad:
+Der Browser-Smoke prueft die Activity-Schnellfilter auf Mobile nicht nur als einzeilige Rail, sondern als kontrollierte UI-Komponente:
 
-- Der Test erwartete im Clean-Kontext zwingend einen sichtbaren Consent-Hinweis.
-- In der CI kann der Hinweis je nach Timing/Runtime-Zustand nicht sichtbar werden, obwohl der eigentliche Produktzustand korrekt ist.
-- Dadurch entstand ein False Negative: `locator.waitFor: Timeout ... [data-privacy-consent-banner]`.
+- `/aktivitaeten/` im Mobile-Profil.
+- Rail muss `display:flex` und `flex-wrap:nowrap` nutzen.
+- Schnellfilter duerfen nicht mehrzeilig umbrechen.
+- Die Rail muss im ungefilterten Startzustand links beginnen.
+- Wenn `Jetzt besonders` sichtbar ist, muss dieser Chip initial der erste sichtbare Chip sein.
+- Die Rail darf danach horizontal scrollbar bleiben.
 
-V3 stabilisiert den Test fachlich:
-
-- Wenn der Consent-Hinweis im Clean-Kontext sichtbar ist, wird weiterhin real `Ohne Statistik` geklickt und danach der Bottom-Tabwechsel geprüft.
-- Wenn der Hinweis im CI-Clean-Kontext nicht sichtbar wird, setzt der Test kontrolliert eine gespeicherte Ablehnung und prüft den eigentlichen P1-Sicherheitsfall: Nach gespeicherter Entscheidung darf der Hinweis beim Bottom-Tabwechsel nicht erscheinen.
-- Nach dem Tabwechsel werden weiterhin echte Eventkarten erwartet. Der Test wird dadurch nicht weicher fuer Navigation oder Rendering.
-
-Damit bleibt der urspruengliche Schutz erhalten, aber der Smoke laeuft nicht wegen eines nicht reproduzierbaren Consent-Anzeige-Timings rot.
-
-
-## Reporting-/Robustheits-Polish 2026-06-30 V4
-
-Vor Anwendung von V3 wurde der Consent-Testpfad erneut gegen den urspruenglichen Fehler simuliert. Ergebnis: V3 wuerde zwar den CI-Timeout vermeiden, aber im Fallback durch einen Reload einen Teil des urspruenglichen Risikos abschneiden. Der relevante Fehler war: Eine Seite wurde ohne Consent-Auswahl vorbereitet, danach wurde die Entscheidung getroffen, und erst beim Bottom-Tabwechsel erschien ein alter Hinweis erneut.
-
-V4 bildet diesen Zustand robuster ab:
-
-- Der Test startet weiterhin in einem Clean-Kontext und laesst die App initial booten.
-- Wenn der Consent-Hinweis sichtbar ist, wird real `Ohne Statistik` geklickt.
-- Wenn der Hinweis in der CI nicht sichtbar wird, setzt der Test die Ablehnung ueber die vorhandene `BEPrivacy`-Runtime statt per Reload. Dadurch bleibt der bereits gebootete Seitenzustand erhalten.
-- Erst danach erfolgt der Bottom-Tabwechsel. So bleibt der urspruengliche Reappearing-Fall abgedeckt.
-- Nach dem Tabwechsel muessen echte Eventkarten sichtbar sein, und ein sichtbarer Consent-Hinweis bleibt ein harter Fehler.
-
-Damit ist V4 der bevorzugte Patch gegenueber V3: stabiler als V2, aber naeher am realen Bug als der V3-Fallback mit Reload.
+Zweck: Der Test verhindert Regressionen, bei denen die Rail nach Reload, bfcache oder altem Scrollzustand mitten in der Chip-Liste startet.

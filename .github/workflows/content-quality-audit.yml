@@ -27,6 +27,7 @@ on:
       - "aktivitaeten/index.html"
       - "js/activity-highlights.js"
       - "scripts/audit-activity-highlights.py"
+      - "scripts/audit-event-feed-visual-diversity.py"
       - "data/content_source_suggestions.json"
       - "data/**"
       - "api/events/public.php"
@@ -226,6 +227,20 @@ jobs:
             echo "⚠️ Public DB events snapshot unavailable; audit continues with Sheet/Activities."
           fi
       # === END BLOCK: CONTENT_QUALITY_FETCH_PUBLIC_DB_EVENTS_V1 ===
+
+      # === BEGIN BLOCK: CONTENT_QUALITY_EVENT_FEED_VISUAL_DIVERSITY_AUDIT_V2 | Zweck: simuliert die Feed-Bildauswahl gegen Sheet- und Public-DB-Events und meldet Wiederholungen, Seriencluster und nicht freigegebene Fallbacks ohne Deploy zu blockieren ===
+      - name: Audit event feed visual diversity
+        shell: bash
+        run: |
+          set -e
+          python -u scripts/audit-event-feed-visual-diversity.py \
+            --source data/events.tsv \
+            --source data/public-db-events.json \
+            --visual-pool data/event_visual_pool.json \
+            --window 6 \
+            --days 180 \
+            --warn-only
+      # === END BLOCK: CONTENT_QUALITY_EVENT_FEED_VISUAL_DIVERSITY_AUDIT_V2 ===
 
       # === BEGIN BLOCK: CONTENT_QUALITY_EXPORT_VERIFICATION_CACHE_V1 | Zweck: liest den persistenten KI-Pruefcache aus Google Sheets; Umfang: exportiert Content_Verification_Cache nach data/content-verification-cache.json, ohne fachliche Daten zu ändern ===
       - name: Export verification cache

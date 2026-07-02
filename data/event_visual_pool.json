@@ -1710,7 +1710,8 @@
           "review_status": "accepted_phase1_pilot_2026_06_03",
           "card_asset_format": "16:9_webp_1200x675",
           "phase1_request_id": "phase1_v31_parade_festzug_01",
-          "visual_motif": "neutral_parade"
+          "visual_motif": "neutral_parade",
+          "visual_motif_role": "fallback"
         },
         {
           "id": "parade-festzug-02",
@@ -1722,9 +1723,10 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
+          "review_status": "accepted_visual_inventory_2026_06_08|reclassified_from_neutral_parade_2026_06_30",
           "card_asset_format": "16:9_webp_1200x675",
-          "visual_motif": "neutral_parade"
+          "visual_motif": "marching_band_procession",
+          "visual_motif_role": "specific"
         },
         {
           "id": "parade-festzug-03",
@@ -1736,9 +1738,10 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
+          "review_status": "accepted_visual_inventory_2026_06_08|reclassified_from_neutral_parade_2026_06_30",
           "card_asset_format": "16:9_webp_1200x675",
-          "visual_motif": "neutral_parade"
+          "visual_motif": "marching_band_procession",
+          "visual_motif_role": "specific"
         },
         {
           "id": "parade-festzug-04",
@@ -1760,7 +1763,8 @@
           "is_documentary": false,
           "review_status": "accepted_gap_batch_02_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
-          "visual_motif": "csd_pride_parade"
+          "visual_motif": "csd_pride_parade",
+          "visual_motif_role": "specific"
         }
       ]
     },
