@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-01T08:56:51+00:00",
+  "generated_at": "2026-07-02T08:25:56+00:00",
   "source": "bathing-water-guard-v2",
   "script_version": "BATHING_WATER_GUARD_V2_SAFE_WRITEBACK",
-  "guard_date": "2026-07-01",
+  "guard_date": "2026-07-02",
   "policy": {
     "mode": "safe_writeback_status_file",
     "status_file": "data/bathing_water_status.json",
@@ -14,8 +14,8 @@
     "groups_total": 4,
     "state_counts": {
       "ok": 0,
-      "watch": 3,
-      "blocked": 0,
+      "watch": 2,
+      "blocked": 1,
       "unknown": 1,
       "out_of_season": 0
     },
@@ -29,27 +29,27 @@
     "aasee-erleben:aasee-bathing-status": {
       "activity_id": "aasee-erleben",
       "highlight_id": "aasee-bathing-status",
-      "state": "watch",
-      "label": "Badehinweis prüfen",
+      "state": "blocked",
+      "label": "Baden aktuell nicht empfohlen",
       "source_type": "guard_verified",
       "guard_source": "bathing_water_guard_v2",
-      "source_url": "https://www.bbv-net.de/bocholt/bocholter-aasee-schlamm-geruch-stinkt-keine-badegaeste-seezustand-probleme-w1212295-6000574615/",
+      "source_url": "https://www.bocholt.de/aasee",
       "source_urls": [
         "https://db.badegewaesser.nrw.de/badegewaesser-nrw/48/",
         "https://www.bocholt.de/aasee",
         "https://www.bbv-net.de/bocholt/bocholter-aasee-schlamm-geruch-stinkt-keine-badegaeste-seezustand-probleme-w1212295-6000574615/"
       ],
-      "checked_at": "2026-07-01",
-      "valid_until": "2026-07-03",
-      "reason": "Local suitability warning suppresses an active bathing recommendation.",
-      "public_note": "Die Wasserwerte sind aktuell unauffällig, es gibt aber lokale Hinweise auf Schlamm, Geruch oder Ablagerungen. Deshalb wird Baden hier aktuell nicht als Tipp empfohlen.",
-      "confidence": "local_watch",
+      "checked_at": "2026-07-02",
+      "valid_until": "2026-07-04",
+      "reason": "Local suitability source blocks an active bathing recommendation.",
+      "public_note": "Für diese Badestelle liegt aktuell ein lokales Sperr- oder Warnsignal vor.",
+      "confidence": "local_blocked",
       "water_state": "ok",
       "water_confidence": "all_sources_ok",
-      "local_suitability_state": "watch",
-      "local_suitability_confidence": "watch_source",
+      "local_suitability_state": "blocked",
+      "local_suitability_confidence": "blocked_source",
       "latest_sample_date": "2026-06-17",
-      "latest_sample_age_days": 14,
+      "latest_sample_age_days": 15,
       "group_id": "aasee-bocholt",
       "activity_ids": [
         "aasee-erleben"
@@ -66,8 +66,8 @@
       "source_urls": [
         "https://www.zwemwater.nl/home?id=1750"
       ],
-      "checked_at": "2026-07-01",
-      "valid_until": "2026-07-03",
+      "checked_at": "2026-07-02",
+      "valid_until": "2026-07-04",
       "reason": "Water-quality status is unknown or stale.",
       "public_note": "Der aktuelle Badegewässerstatus konnte nicht eindeutig geprüft werden. Deshalb gibt es keine Badeempfehlung.",
       "confidence": "water_unknown",
@@ -93,8 +93,8 @@
       "source_urls": [
         "https://db.badegewaesser.nrw.de/badegewaesser-nrw/50/"
       ],
-      "checked_at": "2026-07-01",
-      "valid_until": "2026-07-03",
+      "checked_at": "2026-07-02",
+      "valid_until": "2026-07-04",
       "reason": "Water-quality source is only watch-level.",
       "public_note": "Der letzte automatisch ausgelesene Messwert ist nicht frisch genug für eine aktive Badeempfehlung.",
       "confidence": "water_watch",
@@ -103,7 +103,7 @@
       "local_suitability_state": "unknown",
       "local_suitability_confidence": "no_sources",
       "latest_sample_date": "2026-05-20",
-      "latest_sample_age_days": 42,
+      "latest_sample_age_days": 43,
       "group_id": "proebstingsee-borken",
       "activity_ids": [
         "proebstingsee-borken-erleben"
@@ -121,8 +121,8 @@
         "https://db.badegewaesser.nrw.de/badegewaesser-nrw/22/",
         "https://db.badegewaesser.nrw.de/badegewaesser-nrw/23/"
       ],
-      "checked_at": "2026-07-01",
-      "valid_until": "2026-07-03",
+      "checked_at": "2026-07-02",
+      "valid_until": "2026-07-04",
       "reason": "Water status is positive, but local suitability is not positively proven.",
       "public_note": "Die Wasserwerte sind aktuell unauffällig, aber eine positive lokale Badeeignung ist nicht belegt. Deshalb wird Baden hier aktuell nicht als Tipp empfohlen.",
       "confidence": "local_not_proven",
@@ -131,7 +131,7 @@
       "local_suitability_state": "unknown",
       "local_suitability_confidence": "no_sources",
       "latest_sample_date": "2026-06-02",
-      "latest_sample_age_days": 29,
+      "latest_sample_age_days": 30,
       "group_id": "auesee-wesel",
       "activity_ids": [
         "auesee-wesel-erleben"
