@@ -4721,3 +4721,69 @@ Offener externer Hinweis:
 - Das Google-Apps-Script für Sheet-Writeback liegt nicht im Repo. Wenn der neue Grund dauerhaft exakt im Sheet-Archiv stehen soll, muss dessen Ablehnungsgrund-Whitelist ebenfalls um `Termin liegt in der Vergangenheit` ergänzt werden. Bis dahin verhindert der Kompatibilitäts-Fallback das Blockieren der Verwerfen-Aktion.
 
 <!-- === END BLOCK: TEST_STATUS_INBOX_REJECTION_AND_LEAD_GUARD_2026_07_02 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_CONTENT_QUALITY_ROUTING_V2_VALIDATED_2026_07_02 | Zweck: dokumentiert die Live-Validierung des Content-Quality-Routings v2; Umfang: Daily-Audit, Action-Routing, KI-Feedback, Visual-Feedback und Sicherheitsbewertung === -->
+
+## Content Quality Routing v2 – Daily-Audit validiert (2026-07-02)
+
+Status:
+- `scripts/content-quality-audit.py` wurde auf `main` gepatcht.
+- Danach wurde ein Daily Content Quality Audit mit Netzchecks ausgeführt.
+- Ergebnisbericht: `content-quality-report-daily (2).zip`, generiert am `2026-07-02T13:20:38`.
+
+Validierter Report-Stand:
+- `Critical: 0`
+- `Review needed: 0`
+- `Warning: 16`
+- `Auto fixed: 128`
+
+Validiertes Action-Routing:
+- `ai_factcheck_candidate: 3`
+- `guarded_by_runtime: 3`
+- `neutral_observed: 1`
+- `visual_workflow: 9`
+- `auto_fixed: 128`
+
+Bewertung:
+- Die Routing-v2-Semantik ist live wirksam.
+- Warnings werden nicht pauschal reduziert oder versteckt, sondern in fachliche Zielkanäle sortiert.
+- Bade-/Saisonstatus-Fälle bleiben sichtbar als `guarded_by_runtime`; sie werden nicht als `auto_fixed` gezählt.
+- Same-host-Redirects bleiben sichtbar als `neutral_observed` und erzeugen kein negatives KI-Quellenfeedback.
+- Fehlende/unsichere Fakten werden als `ai_factcheck_candidate` geführt; es gibt keine automatische Sheet-Änderung ohne bestätigte Quelle.
+- Visual-Fit-Hinweise laufen weiter in den separaten Visual-Workflow und werden nicht als normale Content-Inbox-Aufgabe behandelt.
+- `auto_fixed` enthält weiterhin nur sicher automatisch erledigte Fälle, hier alte Events, die durch Build/Feed nicht mehr öffentlich ausgespielt werden.
+
+KI-Feedback-Status:
+- `Active feedback rules: 4`
+- `Default context rules: 3`
+- `Feedback signals: 11`
+- Aktive Klassen:
+  - `time_missing_from_source`
+  - `event_source_unreadable_or_uncertain`
+  - `visual_context_preservation`
+  - `visual_specific_motif_context`
+- Der Feedbackvertrag bleibt: `search_prompt_context_only_no_auto_write_no_rulebook_mutation`.
+- Der Bloat-Guard bleibt aktiv: `typed_grouped_class_capped_with_ttl`.
+
+KI-Faktencheck-Status:
+- `AI candidates total: 2`
+- `AI candidates selected: 2`
+- Kandidaten:
+  - `Playfountain - Bocholter Wasserspaß`
+  - `Bewegte Geschichte`
+- Cache-Writeback hat keine bestätigten Zeilen übernommen (`no_confirmed_rows`), also keine automatische Datenänderung ohne bestätigte Fakten.
+
+Visual-Feedback-Status:
+- `Visual signals: 9`
+- `Search-relevant visual signals: 8`
+- `Visual asset gaps: 0`
+- Visual-Hinweise bleiben als `Content_Visual_Feedback` sichtbar und dürfen keine automatische Bildgenerierung, keine automatische `ready`-Setzung und keine blinde Sheet-Änderung auslösen.
+
+Abschlussbewertung:
+- Content Quality Routing v2 erfüllt das Projektziel: mehr Automatisierung und weniger manuelle Sofortarbeit, ohne wichtige Hinweise zu verstecken oder die Datenqualität zu verschlechtern.
+- Kein zusätzlicher STRATO-Deploy nötig, da nur Audit-/Reporting-Logik betroffen ist.
+- Nächster offener Runtime-Proof bleibt der reguläre Weekly-KI-Suchlauf am Dienstag: Dort muss geprüft werden, ob der Vorlauf-Guard und das neue Feedback auch im produktiven Suchlauf greifen.
+
+<!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_ROUTING_V2_VALIDATED_2026_07_02 === -->
+
