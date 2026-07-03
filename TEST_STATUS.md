@@ -4989,3 +4989,22 @@ Prüfung nach Deploy:
 3. Event aus dem normalen Detailpanel teilen. Erwartung: geteilte Nachricht enthält die kanonische Event-URL nur einmal.
 4. Event-Detailseite teilen. Erwartung: geteilte Nachricht enthält die kanonische Event-URL nur einmal.
 5. Eventliste und normales mobiles Detailpanel bleiben unverändert.
+
+## Event-Detailseiten: CSS-Governance Cache-Version korrigiert (2026-07-03)
+
+Status: vorbereitet für `staging`.
+
+Befund:
+- Der Scroll-/Share-Fix erhöhte die generierte Detailseiten-CSS-Version auf `2026-07-03-event-detail-scroll-share-v1`.
+- `tools/audit-css-governance.py` erlaubte für generierte Event-Detailseiten aber noch die vorherige Version `2026-07-03-event-detail-public-panel-v1`.
+- Dadurch schlug der Deploy bei generierten Seiten wie `/events/rosenbergfestival-2026-09-26/index.html` mit `links split CSS directly` fehl, obwohl die direkte `pages.css`-Einbindung für diese generierten Detailseiten bewusst erlaubt ist.
+
+Änderung:
+- `tools/audit-css-governance.py`: erlaubte Event-Detailseiten-CSS-Version auf `2026-07-03-event-detail-scroll-share-v1` synchronisiert.
+
+Lokale Prüfung:
+- `SITE_ORIGIN=https://staging.bocholt-erleben.de python3 scripts/build-event-detail-pages.py` OK: 63 Event-Detailseiten erzeugt.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deploy:
+- Der CSS-Governance-Schritt darf nicht mehr an `/css/pages.css?v=2026-07-03-event-detail-scroll-share-v1` für generierte Event-Detailseiten scheitern.
