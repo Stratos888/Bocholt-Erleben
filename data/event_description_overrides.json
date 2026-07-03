@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "purpose": "Kuratierte Public-Description-Overrides fuer bestehende Events, wenn Sheet-Texte Quellenleaks, KI-Floskeln, Titelwiederholung oder zu lange/duenne Formulierungen enthalten.",
+    "contract": "Overrides ersetzen nur die public description im generierten Runtime-Feed; sie sind kein Ersatz fuer saubere Sheet-Pflege und sollen spaeter ins Sheet zurueckgefuehrt werden.",
+    "updated_at": "2026-07-03"
+  },
+  "overrides": {
+    "quartierfest-im-klostergarten-2026-07-12": {
+      "description": "Offenes Quartiersfest im Rheder Klostergarten. Im Mittelpunkt stehen Begegnung und ein gemeinsamer Tag im Quartier.",
+      "reason": "Entfernt unsichere Geplant-Formulierung."
+    },
+    "bruner-kirmes-2026-10-03": {
+      "description": "Mehrtagige Kirmes in Brünen mit klassischem Volksfestcharakter. Der Termin gehört zu den regionalen Herbstveranstaltungen rund um Hamminkeln.",
+      "reason": "Verdichtet sehr kurze Beschreibung."
+    },
+    "marienthaler-martinsmarkt-2026-11-07": {
+      "description": "Saisonaler Markt in Marienthal mit Kunsthandwerk und Warenangeboten. Der Martinsmarkt eignet sich für einen ruhigen Bummel im Ort.",
+      "reason": "Verdichtet sehr kurze Beschreibung lokal-redaktionell."
+    },
+    "20-sparkassen-munsterlandgiro-profistart-2026-10-03": {
+      "description": "Profiradsport-Start auf dem Borkener Marktplatz zum Sparkassen MünsterlandGiro. Der Termin bringt Rennsport in die Innenstadt.",
+      "reason": "Verdichtet sehr kurze Beschreibung."
+    },
+    "wattextra-open-air-2026-09-05": {
+      "description": "Open-Air-Konzert am Bahia im Rahmen der WattExtra-Reihe. Der Abend richtet sich an Besucherinnen und Besucher mit Interesse an Livemusik in Bocholt.",
+      "reason": "Ersetzt Titelwiederholung und generische KI-Prosa."
+    },
+    "bocholter-kirmes-2026-10-16": {
+      "description": "Großes Volksfest in der Bocholter Innenstadt mit Kirmesbetrieb, Treffpunkten und Programm über mehrere Tage.",
+      "reason": "Entfernt Datumswiederholung aus Beschreibung."
+    },
+    "borken-open-air-abba-gold-the-concert-show-2026-07-17": {
+      "description": "Open-Air-Konzert auf dem Borkener Marktplatz im Jubiläumsjahr Borken 800. Die ABBA-Tribute-Show wird durch ein Warm-up gerahmt.",
+      "reason": "Entfernt Zeitdetails aus Beschreibung; Uhrzeit bleibt im Datenfeld."
+    },
+    "bocholter-kulturtage-2026-08-26": {
+      "description": "Mehrtägiges Kulturfestival auf dem Marktplatz vor dem Historischen Rathaus. Verschiedene Open-Air-Formate richten sich an ein breites Publikum.",
+      "reason": "Ersetzt unsichere Geplant-Formulierung."
+    },
+    "interkultureller-trodelmarkt-2026-09-23": {
+      "description": "Trödelmarkt am Grünstreifen Rosenberg mit interkulturellem Rahmen. Stände und Kulturaktionen machen den Termin zum Quartierstreff.",
+      "reason": "Entfernt Titelwiederholung."
+    },
+    "locked-home-dein-eigenes-escape-game-2026-07-20": {
+      "description": "Dreitägiger Kulturrucksack-Workshop für Jugendliche im MissionHouse. Die Teilnehmenden entwickeln mit Rätseln, Bastelmaterial und Tablets ein eigenes Escape-Game.",
+      "reason": "Kürzt zu lange Beschreibung; Zeiten bleiben im Quell-/Detailkontext."
+    },
+    "summerschool-der-junge-uni-in-bocholt-2026-07-20": {
+      "description": "Kostenlose SummerSchool der JUNGE UNI für Kinder von 8 bis 12 Jahren. Das Ferienangebot bringt junge Teilnehmerinnen und Teilnehmer mit Uni-Themen in Kontakt.",
+      "reason": "Entfernt Quellenherleitung und unsichere Programmdetails."
+    },
+    "weltkindertagsfest-eroffnung-der-interkulturellen-woche-2026-09-18": {
+      "description": "Familienfest in Bocholt zum Auftakt der Interkulturellen Woche. Das Weltkindertagsfest verbindet Kinderangebote mit Begegnung im Stadtleben.",
+      "reason": "Entfernt interne Programmnennungs-Formulierung."
+    },
+    "rosenbergfestival-2026-09-26": {
+      "description": "Stadtteilfest am Rosenberg zum Abschluss der Interkulturellen Woche. Im Mittelpunkt stehen Begegnung, lokale Aktionen und ein gemeinsamer Tag im Quartier.",
+      "reason": "Entfernt PDF-/Quellenhinweis und formuliert lokal-redaktionell."
+    },
+    "bredevoort-leuchtet-2026-2026-09-25": {
+      "description": "Lichtfestival in Bredevoort mit illuminierten Stationen und abendlicher Atmosphäre. Das Format läuft über drei Veranstaltungstage.",
+      "reason": "Entfernt explizite Datumswiederholung."
+    },
+    "der-besondere-film-ticket-ins-leben-2026-07-14": {
+      "description": "Einzelvorführung der Kinoreihe „KINO Bocholt – der besondere Film“. Im Mittelpunkt steht der Film „Ticket ins Leben“ im Kinodrom.",
+      "reason": "Entfernt Datumswiederholung; hält Film und Reihe sichtbar."
+    }
+  }
+}

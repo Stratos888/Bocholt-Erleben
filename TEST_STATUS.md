@@ -4969,42 +4969,35 @@ Nach Deploy prüfen:
 - CTA-Disziplin: Route bleibt über die Ortszeile erreichbar; Eventquelle wird als ruhige Quellenzeile geführt; Kalender/Teilen liegen in einer statischen Detailpanel-Actionbar.
 - Guard: Deploy-Smoke prüft Event-Detailseiten zusätzlich auf Panel-Contract und gegen Rückfall in Sondernavigation/Primär-CTA.
 
-## Event-Detailseiten: Public-Panel Scroll- und Share-Fix (2026-07-03)
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_DESCRIPTION_PREMIUM_GUARD_2026_07_03 | Zweck: dokumentiert Premium-Beschreibungsstandard, Guard-Kette und lokale Validierung; Umfang: KI-Suche, Manual Intake, Inbox-Import, Public-Build, Audit, Overrides === -->
+## Event-Beschreibungen Premium-Guard – 2026-07-03
 
-Status: vorbereitet für `staging`.
+Status: Patch vorbereitet.
 
 Ziel:
-- Die öffentliche Event-Detailseite bleibt eine statische Detailpanel-Ansicht, darf aber kein Scroll-Trap erzeugen.
-- Native Event-Share darf die kanonische Event-URL nicht doppelt an Share-Ziele übergeben.
+- Eventbeschreibungen muessen produktweit im Bocholt-erleben-Ton erscheinen: lokal-redaktionell, serioes, freundlich, kurz und faktenbasiert.
+- Keine Quellenherleitung, keine PDF-/Newsletter-PDF-Hinweise, keine generische KI-Prosa, keine Werbesprache, keine Titelwiederholung als Beschreibung.
 
-Änderungen:
-- `css/pages.css`: Public-Panel-Detailseiten erlauben Touch-/Wheel-Scroll-Chaining wieder explizit (`touch-action: pan-y`, `overscroll-behavior: auto`) und überschreiben die Overlay-Detailpanel-Scrollregeln nur auf `.event-detail-page`.
-- `css/pages.css`: globaler Detailpanel-Drag-Pseudo-Handle wird auf Public-Detailseiten deaktiviert, damit die statische Seite keinen Overlay-Chrome-Rest übernimmt.
-- `scripts/build-event-detail-pages.py`: Detailseiten-CSS-Version erhöht, damit die Scroll-Fixes nach Deploy nicht im Cache hängen bleiben.
-- `js/details.js`: Native Share bekommt `text` und `url` getrennt; der Eventlink wird nicht zusätzlich in `text` dupliziert. Clipboard-Fallback kopiert weiterhin Text + URL.
+Umsetzung:
+- Neuer Standard: `EVENT_DESCRIPTION_STANDARD.md`.
+- Neue zentrale Validierung: `scripts/event_description_quality.py`.
+- Curated Public-Overrides fuer bestehende aktive/future Problemfaelle: `data/event_description_overrides.json`.
+- `scripts/build-events-from-tsv.py` wendet Overrides an und blockiert nicht publikationsfaehige Beschreibungen im Public-Build.
+- `scripts/weekly-ki-websearch-to-manual-inbox.py` fuehrt den Prompt enger und verwirft Kandidaten mit harten Description-Fehlern.
+- `.github/workflows/manual-ki-intake.yml` haengt Manual-KI-Kandidaten mit harten Description-Fehlern nicht in die Inbox.
+- `scripts/inbox-to-events.py` blockiert Uebernahmen mit nicht publikationsfaehiger Beschreibung.
+- `scripts/content-quality-audit.py` erzeugt Description-Issues und Search-Feedback-Regeln.
+- `bocholt-erleben_eventsuche_regelwerk_v3.md`, `MASTER.md` und `ROADMAP.md` dokumentieren den neuen Contract.
 
-Prüfung nach Deploy:
-1. `/events/rosenbergfestival-2026-09-26/` auf Mobile öffnen.
-2. Auf dem Panel-Inhalt selbst scrollen, nicht nur auf der Bottom-Nav. Erwartung: Seite scrollt normal.
-3. Event aus dem normalen Detailpanel teilen. Erwartung: geteilte Nachricht enthält die kanonische Event-URL nur einmal.
-4. Event-Detailseite teilen. Erwartung: geteilte Nachricht enthält die kanonische Event-URL nur einmal.
-5. Eventliste und normales mobiles Detailpanel bleiben unverändert.
+Lokal validiert:
+- Python-Compile fuer geaenderte Scripts.
+- Build aus aktuellem Event-CSV-Teststand erzeugt `data/events.json` ohne blocking Description-Findings im effektiven Public-Feed.
+- Aktive/future Bestandsproblemfaelle wie Rosenbergfestival, WattExtra Open Air, SummerSchool und Weltkindertagsfest werden durch kuratierte Overrides public-seitig bereinigt.
+- Content-Audit laeuft lokal und erzeugt Description-Hinweise fuer rohe Sheet-Texte, damit die Korrektur in den Qualitaetsprozess zurueckfliessen kann.
 
-## Event-Detailseiten: CSS-Governance Cache-Version korrigiert (2026-07-03)
-
-Status: vorbereitet für `staging`.
-
-Befund:
-- Der Scroll-/Share-Fix erhöhte die generierte Detailseiten-CSS-Version auf `2026-07-03-event-detail-scroll-share-v1`.
-- `tools/audit-css-governance.py` erlaubte für generierte Event-Detailseiten aber noch die vorherige Version `2026-07-03-event-detail-public-panel-v1`.
-- Dadurch schlug der Deploy bei generierten Seiten wie `/events/rosenbergfestival-2026-09-26/index.html` mit `links split CSS directly` fehl, obwohl die direkte `pages.css`-Einbindung für diese generierten Detailseiten bewusst erlaubt ist.
-
-Änderung:
-- `tools/audit-css-governance.py`: erlaubte Event-Detailseiten-CSS-Version auf `2026-07-03-event-detail-scroll-share-v1` synchronisiert.
-
-Lokale Prüfung:
-- `SITE_ORIGIN=https://staging.bocholt-erleben.de python3 scripts/build-event-detail-pages.py` OK: 63 Event-Detailseiten erzeugt.
-- `python3 tools/audit-css-governance.py` OK.
-
-Nach Deploy:
-- Der CSS-Governance-Schritt darf nicht mehr an `/css/pages.css?v=2026-07-03-event-detail-scroll-share-v1` für generierte Event-Detailseiten scheitern.
+Nach Deployment pruefen:
+1. `Rosenbergfestival`-Detailseite zeigt keinen PDF-/Newsletter-Hinweis mehr.
+2. `WattExtra Open Air` zeigt keine Atmosphaeren-/KI-Floskel mehr.
+3. Eventliste und Detailpanel bleiben funktionsgleich.
+4. Content-Quality-Report enthaelt Description-Issues nur als echte redaktionelle Korrekturhinweise, nicht als technische Regression.
+<!-- === END BLOCK: TEST_STATUS_EVENT_DESCRIPTION_PREMIUM_GUARD_2026_07_03 === -->

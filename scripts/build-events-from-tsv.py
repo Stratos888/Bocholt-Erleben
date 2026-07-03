@@ -27,6 +27,7 @@ from typing import Dict, List, Tuple, Optional
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key, resolve_event_visual_key, should_prefer_inferred_event_visual_key
 from event_visual_motifs import infer_event_visual_motif, normalize_event_visual_motif
+from event_description_quality import apply_description_override, load_description_overrides
 
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "events.tsv"
@@ -320,6 +321,7 @@ def main() -> None:
         fail(f"TSV Header unvollständig. Fehlende Spalten: {missing}. Erwartet mindestens: {REQUIRED_FIELDS}")
 
        # === BEGIN BLOCK: RANGE_AWARE_PUBLISHING_AND_OCCURRENCE_DEDUPE_V2 | Zweck: abgelaufene Events inkl. Mehrtagesevents entfernen und gleiche URL für verschiedene Instanzen erlauben | Umfang: ersetzt Dedupe-/Publish-Fenster-Validierung ===
+    description_overrides = load_description_overrides()
     events: List[EventRow] = []
     seen_ids = set()
     seen_fingerprints = set()
@@ -400,6 +402,20 @@ def main() -> None:
                 f"Zeile {idx}: kategorie ist nicht canonical: {data['kategorie']!r} -> {cat!r}. "
                 f"Erlaubt: {CANONICAL_CATEGORIES}"
             )
+
+        # === BEGIN BLOCK: EVENT_DESCRIPTION_PUBLIC_QUALITY_GUARD_V1 | Zweck: public descriptions vor Runtime-Feed-Erzeugung auf Bocholt-erleben-Tonalitaet absichern; Umfang: nutzt kuratierte Overrides + harte Stil-/Quellenleak-Guards, keine KI-Umschreibung ===
+        desc_result = apply_description_override({**data, "kategorie": cat, "url": url_raw}, description_overrides)
+        if desc_result.override_applied:
+            warn(f"Zeile {idx}: curated description override angewendet fuer {data['title']!r}: {desc_result.override_reason}")
+        if desc_result.blocking:
+            fail(
+                f"Zeile {idx}: description ist nicht public-faehig fuer {data['title']!r}: "
+                f"{desc_result.summary()}. Bitte Sheet-Text korrigieren oder kuratierten Override ergaenzen."
+            )
+        for finding in desc_result.findings:
+            warn(f"Zeile {idx}: description warning fuer {data['title']!r}: {finding.code} ({finding.detail})")
+        data["description"] = desc_result.description
+        # === END BLOCK: EVENT_DESCRIPTION_PUBLIC_QUALITY_GUARD_V1 ===
 
         # Duplikat-Fingerprint (praktisch gegen Copy/Paste-Doppler)
         fp = (

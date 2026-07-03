@@ -27,6 +27,7 @@ from event_visual_motifs import (
     infer_event_visual_fit,
     normalize_event_visual_motif,
 )
+from event_description_quality import evaluate_event_description
 
 ROOT = Path(__file__).resolve().parents[1]
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -417,6 +418,28 @@ def infer_process_metadata(
             "correction_owner": "audit_retry",
             "workbench_group": "Beobachten / Retry",
             "automation_policy": "retry_before_human_decision",
+        }
+
+    description_quality_codes = {
+        "event_description_missing",
+        "event_description_too_short_hard",
+        "event_description_too_short",
+        "event_description_too_long_hard",
+        "event_description_too_long",
+        "event_description_internal_source_leak",
+        "event_description_generic_ai_prose",
+        "event_description_marketing_language",
+        "event_description_title_repetition",
+        "event_description_linebreak",
+        "event_description_uncertain_wording",
+        "event_description_date_time_redundancy",
+    }
+    if code in description_quality_codes:
+        return {
+            "process_category": "description_quality_candidate",
+            "correction_owner": "content_inbox_editorial_text",
+            "workbench_group": "Beschreibung",
+            "automation_policy": "human_review_before_write",
         }
 
     source_review_codes = {
@@ -1843,6 +1866,35 @@ def audit_event_rows(
                 public_url=public_url,
             ))
 
+        # === BEGIN BLOCK: EVENT_DESCRIPTION_QUALITY_AUDIT_V1 | Zweck: Premium-Beschreibungsstandard als Content-Audit-Kriterium pruefen; Umfang: lokale Stil-/Quellenleak-Pruefung ohne Auto-Umschreibung ===
+        desc_result = evaluate_event_description({
+            "title": title,
+            "description": row.get("description", ""),
+            "date": date_value,
+            "time": time_value,
+            "city": row.get("city", ""),
+            "location": row.get("location", ""),
+            "kategorie": row.get("kategorie", ""),
+        })
+        for finding in desc_result.findings:
+            issues.append(issue(
+                finding.severity,
+                "event",
+                source_system,
+                content_id,
+                title,
+                finding.code,
+                f"Eventbeschreibung verletzt den Bocholt-erleben-Beschreibungsstandard: {finding.detail}",
+                "Beschreibung lokal-redaktionell korrigieren: 1–2 kurze Sätze, freundlich-seriös, faktenbasiert, ohne Quellenherleitung, KI-Floskeln oder Werbesprache.",
+                date_value=date_value,
+                source_url=url,
+                public_url=public_url,
+                evidence_status="description_quality",
+                evidence_summary=desc_result.summary(),
+                evidence_checked_fields="title, description, date, time, city, location, kategorie",
+            ))
+        # === END BLOCK: EVENT_DESCRIPTION_QUALITY_AUDIT_V1 ===
+
         if content_id:
             duplicate_id = seen_ids.get(content_id)
             if duplicate_id:
@@ -3252,6 +3304,30 @@ SEARCH_FEEDBACK_RULES: Dict[str, Dict[str, Any]] = {
         "field": "core_facts",
         "priority": 85,
         "prompt_rule": "Nimm Events nur auf, wenn Titel, Datum, Ort und soweit vorhanden Uhrzeit aus derselben belastbaren Instanzquelle bestätigt sind. Bei teilweiser Bestätigung nicht als FINAL ausgeben.",
+    },
+    "event_description_internal_source_leak": {
+        "feedback_class": "description_source_leak",
+        "field": "description",
+        "priority": 83,
+        "prompt_rule": "Schreibe in description niemals Quellenherleitung oder Recherchehinweise. Begriffe/Formulierungen wie PDF, Newsletter-PDF, laut Quelle, Quelle nennt, Programm nennt oder offiziell nennt gehoeren hoechstens in notes, nicht in die oeffentliche Beschreibung.",
+    },
+    "event_description_generic_ai_prose": {
+        "feedback_class": "description_generic_ai_prose",
+        "field": "description",
+        "priority": 82,
+        "prompt_rule": "Vermeide generische KI-Prosa in description. Keine Floskeln wie Atmosphaere spuerbar, Teil des kulturellen Lebens, bringt Bewegung in die Stadt, bekannte Orte bewusst wahrnehmen. Formuliere konkret lokal-redaktionell anhand belegbarer Fakten.",
+    },
+    "event_description_marketing_language": {
+        "feedback_class": "description_marketing_language",
+        "field": "description",
+        "priority": 81,
+        "prompt_rule": "description darf nicht werblich klingen: keine Superlative, Highlight-Floskeln, fuer Jung und Alt, unvergesslich, laesst keine Wuensche offen oder aehnliche Veranstalterwerbung. Neutral-warm und faktenbasiert schreiben.",
+    },
+    "event_description_title_repetition": {
+        "feedback_class": "description_title_repetition",
+        "field": "description",
+        "priority": 80,
+        "prompt_rule": "description nicht mit dem Titel plus Doppelpunkt beginnen und Titel/Datum/Ort nicht als Fuelltext wiederholen. Beschreibe stattdessen Format, Anlass oder konkreten Nutzerwert in 1-2 kurzen Saetzen.",
     },
     "event_ai_verification_candidate": {
         "feedback_class": "event_source_unreadable_or_uncertain",

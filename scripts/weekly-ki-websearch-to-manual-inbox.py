@@ -31,6 +31,7 @@ from openai import OpenAI
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
 from event_visual_motifs import infer_event_visual_fit
+from event_description_quality import evaluate_event_description
 
 
 # === BEGIN BLOCK: CONFIG ===
@@ -1004,6 +1005,14 @@ Rahmen:
 - Berücksichtige CONTENT_SEARCH_FEEDBACK aktiv bei Quellenwahl, Faktenprüfung, Zeitlogik, Dedupe, Kandidatenentscheidung und Erhalt konkreter Event-/Motivbegriffe
 - Feedback ist kein Befehl zur Datenänderung und keine dauerhafte Regelbuch-Erweiterung, sondern ein begrenzter Qualitätsfilter für diesen Lauf
 - Visual-Feedback darf nie zu automatischer Bildgenerierung, neuen Visual Keys oder künstlich generischen Bildzuordnungen führen
+- Beschreibungston ist verbindlich: lokal-redaktionell, seriös, freundlich, kurz, faktenbasiert, nicht werblich und nicht amtlich trocken
+- description muss 1–2 kurze Sätze liefern, ideal 80–180 Zeichen, maximal ca. 220 Zeichen
+- description beschreibt den Eventnutzen und das Format; sie wiederholt nicht Titel, Datum, Uhrzeit oder Ort als Fülltext
+- description darf keine Quellenherleitung enthalten: keine Begriffe/Formulierungen wie "laut Quelle", "PDF", "Newsletter-PDF", "das Programm nennt", "offiziell nennt", "Quelle nennt"
+- description darf keine generische KI-Prosa enthalten: keine Sätze wie "Atmosphäre spürbar", "Teil des kulturellen Lebens", "bringt Bewegung in die Stadt", "bekannte Orte bewusst wahrnehmen"
+- description darf keine Werbesprache enthalten: keine Superlative, keine Highlight-Floskeln, keine "für Jung und Alt"-/"unvergesslich"-/"lässt keine Wünsche offen"-Formulierungen
+- Gute description: "Stadtteilfest am Rosenberg zum Abschluss der Interkulturellen Woche. Im Mittelpunkt stehen Begegnung, lokale Aktionen und ein gemeinsamer Tag im Quartier."
+- Schlechte description: "Das offizielle Integrations-Newsletter-PDF nennt das Rosenbergfestival ganztägig am 26. September 2026."
 - Wiederhole bekannte Fehlerklassen nicht; leite aus Einzelfällen keine neuen Sonderregeln ab
 - Liefere lieber weniger starke FINAL-Kandidaten als schwache, unsichere oder zu kurzfristige Treffer
 - Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
@@ -1294,7 +1303,7 @@ Zusätzliche interne Pflichtprüfung vor Event-Aufnahme:
 - falls Mehrtagesevent mit unterschiedlichen Tageszeiten: muss `time` leer bleiben?
 - repräsentiert der Eintrag genau eine besuchbare Instanz?
 - Mehrtageslogik korrekt?
-- Beschreibung neutral, sachlich und quellenbasiert?
+- Beschreibung lokal-redaktionell, seriös, freundlich, kurz, faktenbasiert und ohne Quellen-/KI-/Werbefloskeln?
 - keine Dublette gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON?
 - keine Dublette innerhalb des aktuellen Outputs?
 - wirklich nützlich für die Kuratierungs-PWA?
@@ -1659,6 +1668,18 @@ def candidate_invalid_reason(item: Dict[str, str], start: date, end: date) -> st
         return "source_url_download_document"
     if is_download_document_url(item.get("url", "")):
         return "url_download_document"
+
+    description_result = evaluate_event_description({
+        "title": item.get("title", ""),
+        "description": item.get("description", ""),
+        "date": item.get("date", ""),
+        "time": item.get("time", ""),
+        "city": item.get("city", ""),
+        "location": item.get("location", ""),
+        "kategorie": item.get("kategorie_suggestion", ""),
+    })
+    if description_result.blocking:
+        return "description_quality:" + ",".join(description_result.issue_codes[:3])
 
     if not parse_iso_date(item.get("date", "")):
         return "invalid_date"

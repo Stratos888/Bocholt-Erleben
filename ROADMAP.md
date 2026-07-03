@@ -116,6 +116,19 @@ Diese Punkte bleiben wichtig, sind aber nicht die kommerzielle Hauptbaustelle:
 - Browser-Smoke fuer Kernwege gruen halten,
 - keine gefreezten UI-Bereiche ohne konkretes Symptom neu oeffnen.
 
+#### Event-Beschreibungen als Premium-Qualitaetsvertrag
+
+Eventbeschreibungen zahlen direkt auf den kommerziellen Premium-Anspruch ein: Eine teilbare Eventseite wirkt nur hochwertig, wenn der Text lokal-redaktionell, freundlich-serioes und quellenbasiert ist.
+
+Prioritaet im laufenden Commercial-Track:
+
+1. Bestehende aktive/future Events duerfen keine Quellenleaks, PDF-Hinweise, KI-Floskeln oder Werbesprache im Public-Feed zeigen.
+2. Weekly-KI und Manual-Intake muessen schlechte Beschreibungen upstream verhindern.
+3. Content-Quality-Audit muss Description-Issues typisiert in den Search-Feedback-Loop geben.
+4. Kuratierte Overrides sind nur Bruecke fuer Bestandsdaten; Ziel bleibt Korrektur im Sheet bzw. saubere KI-Ausgabe.
+
+Massgeblich: `EVENT_DESCRIPTION_STANDARD.md`.
+
 ### Nicht als naechstes starten
 
 - keine grosse allgemeine UI-Neugestaltung,

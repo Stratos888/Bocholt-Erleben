@@ -29,6 +29,7 @@ from googleapiclient.discovery import build
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
 from event_visual_motifs import infer_event_visual_fit, normalize_event_visual_motif
+from event_description_quality import evaluate_event_description
 
 
 # === BEGIN BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
@@ -332,6 +333,23 @@ def main() -> None:
         )
         description = norm(inb.get("description", ""))
         location = norm(inb.get("location", ""))
+
+        # === BEGIN BLOCK: INBOX_TO_EVENTS_DESCRIPTION_QUALITY_GUARD_V1 | Zweck: verhindert, dass nicht publikationsfaehige KI-/Quellen-/Werbetexte ins Events-Sheet übernommen werden; Umfang: lokale Stilvalidierung vor Sheet-Append ===
+        desc_result = evaluate_event_description({
+            "title": title,
+            "description": description,
+            "date": d,
+            "time": norm(inb.get("time", "")),
+            "city": norm(inb.get("city", "")),
+            "location": location,
+            "kategorie": category,
+        })
+        if desc_result.blocking:
+            fail(
+                f"Inbox: description fuer '{title}' ist nicht publikationsfaehig: {desc_result.summary()}. "
+                "Bitte in der Inbox lokal-redaktionell, kurz und quellenbasiert korrigieren."
+            )
+        # === END BLOCK: INBOX_TO_EVENTS_DESCRIPTION_QUALITY_GUARD_V1 ===
 
         # === BEGIN BLOCK: INBOX_TO_EVENTS_VISUAL_KEY_EDITOR_VALIDATION_V1 | Zweck: macht redaktionell geänderte Bildzuordnung verbindlich und verhindert stilles Re-Inferieren bei Tippfehlern; Umfang: validiert Inbox.visual_key vor Events-Übernahme ===
         raw_visual_key = norm(inb.get("visual_key", ""))
