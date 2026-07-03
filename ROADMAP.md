@@ -1,3 +1,145 @@
+<!-- === BEGIN BLOCK: ROADMAP_COMMERCIAL_PHASE_2026_07_02 | Zweck: priorisiert die naechsten Workpacks fuer Veranstalter-/Anbietergewinnung und zahlungsfaehigen Premium-Mehrwert; Umfang: Free-Basis/Service-Premium, Detailseiten, Tracking, Dashboard-Wirkung, Akquise, Abgrenzung zu aelteren Roadmap-Punkten === -->
+## Kommerzielle Premium-Phase – Veranstalter gewinnen und Anbieterwert beweisen
+
+Status: aktuelle taktische Top-Prioritaet. Aeltere Roadmap-Bloecke bleiben Beweisarchiv und Kontext, sind aber nachrangig, wenn sie nicht direkt auf Veranstalter-/Anbietergewinnung, messbaren Mehrwert oder Plattformvollstaendigkeit einzahlen.
+
+### Ziel in einem Satz
+
+Bocholt erleben soll vom guten lokalen Freizeitprodukt zum kuratierten lokalen Sichtbarkeitskanal werden: Nutzer finden relevante Events/Aktivitaeten schneller, Veranstalter und Anbieter bekommen weniger Pflegeaufwand und nachvollziehbaren Nutzen.
+
+### Produktregeln
+
+- Alle veroeffentlichten Inhalte haben denselben oeffentlichen Qualitaetsstandard.
+- Keine Zwei-Klassen-Optik zwischen kostenlosen und bezahlten Inhalten.
+- Keine gekauften Empfehlungen oder kuenstlichen Top-Platzierungen.
+- Kostenlose Basisbeitraege sind erlaubt, damit die Plattform vollstaendiger wird.
+- Bezahlter Mehrwert entsteht ueber Service, Aufwandersparnis, Messbarkeit, dauerhafte Praesenz und komfortable Pflegewege.
+- Werbung, Affiliate und Ticketprovisionen sind spaetere Zusatzoptionen, nicht das Kernmodell.
+
+### Priorisierte Workpacks
+
+#### 1. Sichtbarkeitsprodukt Einzeltermin definieren und bauen
+
+Ziel: Ein einzelner veroeffentlichter Event wird ein echtes Produktasset, nicht nur eine Feed-Card.
+
+Bestandteile:
+
+- kanonische, teilbare Event-Detailseite,
+- gute OpenGraph-/Share-Vorschau,
+- Website-/Ticket-/Route-Aktionen,
+- strukturierte Daten, sofern passend,
+- eindeutige Zuordnung zu Event, Veranstalter/Submission und Anbieterbereich,
+- keine Regression der bestehenden Mobile-Listen und Detailpanel-Policy.
+
+Akzeptanzkriterium: Ein Veranstalter kann einen sauberen Bocholt-erleben-Link teilen und versteht, dass sein Termin professionell innerhalb der Plattform dargestellt wird.
+
+#### 2. Objektgenaue Nutzwertmessung belastbar machen
+
+Ziel: Wirkung nicht behaupten, sondern einfach und glaubwuerdig messen.
+
+Zu messen:
+
+- Detail-Aufrufe,
+- Website-/Ticket-Klicks,
+- Maps-/Route-Klicks,
+- optional Share-Klicks,
+- Zeitraum 7/30 Tage.
+
+Grenze: Keine Behauptung, dass daraus echte Besucher, Umsatz oder Ticketverkaeufe direkt bewiesen sind.
+
+#### 3. Anbieter-Dashboard zum Wirkungszentrum machen
+
+Ziel: Das Dashboard beantwortet zuerst `Was bringt mir Bocholt erleben?`, nicht nur `Was ist mein Verwaltungsstatus?`.
+
+Bestandteile:
+
+- veroeffentlichte Inhalte,
+- Wirkung letzte 30 Tage,
+- Link ansehen/teilen,
+- Aenderung melden,
+- Absage/Verschiebung melden,
+- naechsten Termin einreichen oder Uebernahme pruefen.
+
+#### 4. Verkaufs-/Sichtbar-werden-Seiten auf Ergebnisversprechen umbauen
+
+Ziel: Die oeffentlichen Anbietertexte verkaufen nicht den Prozess, sondern den Nutzen.
+
+Kernbotschaft:
+
+- lokal sichtbar werden,
+- professionell und einheitlich dargestellt werden,
+- teilbaren Link erhalten,
+- in passenden Uebersichten/Suchen gefunden werden,
+- Wirkung sehen,
+- Pflegeaufwand reduzieren.
+
+Wichtig: Zahlung bleibt keine automatische Veroeffentlichungsgarantie. Redaktionelle Eignung und Plattformqualitaet bleiben fuehrend.
+
+#### 5. Startpartner-/Pilotphase sauber fuehren
+
+Ziel: Mehr Veranstalter und Anbieter gewinnen, ohne das Produkt durch eine harte Paywall zu bremsen.
+
+Regeln:
+
+- kostenlose oder verguenstigte Startpartner sind moeglich,
+- nicht als dauerhaftes `alles gratis` kommunizieren,
+- Ziel ist Beweis: Inhalte, Nutzung, Klicks, Feedback, Zahlungsbereitschaft,
+- Startpartner duerfen als Referenz/Feedbackquelle genutzt werden, wenn sie zustimmen.
+
+#### 6. Aktivitaetspraesenz als Dauerprodukt ableiten
+
+Nach dem Einzeltermin-Referenzpfad folgt die Aktivitaetspraesenz:
+
+- dauerhafte Detailseite,
+- passende Today-/Aktivitaeten-/Filter-Kontexte,
+- Nutzwertmessung,
+- Aenderungsweg,
+- spaeter Location-/Naehe-Modell.
+
+#### 7. Regelmaessige Veranstalter und automatische Uebernahme ausbauen
+
+Spaeterer Haupthebel fuer zahlende Anbieter:
+
+- Quellenprofil je Veranstalter,
+- regelmaessige Uebernahme geeigneter Termine,
+- erkannte/neue/unklare Termine im Dashboard,
+- weniger manuelle Formularpflege,
+- monatlicher Wirkungsbericht.
+
+### Parallel laufende Qualitaetssicherung
+
+Diese Punkte bleiben wichtig, sind aber nicht die kommerzielle Hauptbaustelle:
+
+- naechsten regulaeren Weekly-KI-Proof dokumentieren,
+- Inbox-Visual-Key-Dropdown klein finalisieren,
+- konkrete Visual-Fit-Hinweise aus Reports abarbeiten,
+- Browser-Smoke fuer Kernwege gruen halten,
+- keine gefreezten UI-Bereiche ohne konkretes Symptom neu oeffnen.
+
+### Nicht als naechstes starten
+
+- keine grosse allgemeine UI-Neugestaltung,
+- keine Zwei-Klassen-Darstellung fuer Premium-Inhalte,
+- keine gekauften Today-Empfehlungen,
+- keine harte Paywall fuer einfache Eventvorschlaege,
+- keine Display-Werbung als Kernmodell,
+- keine Ticketing-Plattform bauen,
+- keine SEO-Massenrunde vor Detailseiten und Tracking,
+- keine neue Bildproduktion ohne konkreten Gap,
+- keine grosse CSS-/JS-Sanierung ohne Produktkontext.
+
+### Naechster konkreter Haupt-Workpack
+
+```text
+Workpack 1: Sichtbarkeitsprodukt Einzeltermin
+- kanonische Event-Detailseite
+- objektgenaues Tracking
+- Anbieter-Wirkungsbericht im Dashboard
+- Aenderung/Absage melden
+- Verkaufsseite auf Ergebnisversprechen umstellen
+```
+<!-- === END BLOCK: ROADMAP_COMMERCIAL_PHASE_2026_07_02 === -->
+
 <!-- === BEGIN BLOCK: ROADMAP_WEEKLY_KI_FEEDBACK_LOOP_PROOF_2026_07_02 | Zweck: setzt den aktuellen taktischen Fortsetzungspunkt fuer die selbstlernende KI-Suche; Umfang: erledigte E2E-Punkte, naechster regulärer Proof, keine manuelle Kosten-Ausloesung === -->
 ## Weekly-KI / Self-Learning Search – E2E bestanden, naechster Proof regulär
 
@@ -378,6 +520,7 @@ Es ist keine Produktdefinition und keine Engineering-Regeldatei.
 Kanonische Rollen:
 
 - `Produktvertrag.md` = Produktlogik, Preise, Modelle, Kontingente
+- `COMMERCIAL_STRATEGY.md` = kommerzielle Produktstrategie, Anbieterwert und Premium-Parity
 - `MASTER.md` = strategische Projektsteuerung
 - `ROADMAP.md` = taktische To-do-Liste und Reihenfolge der nächsten Workpacks
 - `ENGINEERING.md` = harte Umsetzungsregeln und Arbeitsmodi
