@@ -342,6 +342,17 @@ jobs:
           echo "=== events.json (head) ==="
           head -n 40 data/events.json || true
 
+      - name: Build canonical event detail pages
+        shell: bash
+        run: |
+          set -e
+          python scripts/build-event-detail-pages.py
+
+          echo "=== event detail pages manifest (head) ==="
+          head -n 80 data/event_detail_pages.json || true
+          echo "=== generated event detail page count ==="
+          find events -name .generated-event-detail | wc -l
+
       - name: Build inbox.json from inbox.tsv
         shell: bash
         run: |
@@ -460,6 +471,8 @@ jobs:
             grep -q '<loc>https://bocholt-erleben.de/fuer-veranstalter/</loc>' deploy/sitemap.xml
             grep -q '<loc>https://bocholt-erleben.de/ueber/</loc>' deploy/sitemap.xml
             grep -q '<loc>https://bocholt-erleben.de/bildnachweise/</loc>' deploy/sitemap.xml
+
+            python3 scripts/augment-sitemap-event-details.py deploy/sitemap.xml data/event_detail_pages.json
           fi
 
           test -s deploy/robots.txt
