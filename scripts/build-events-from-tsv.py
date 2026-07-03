@@ -30,6 +30,7 @@ from event_visual_motifs import infer_event_visual_motif, normalize_event_visual
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "events.tsv"
 OUT_JSON_PATH = ROOT / "data" / "events.json"
+SITE_ORIGIN = "https://bocholt-erleben.de"
 
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{2,120}$")  # slug-like
@@ -413,6 +414,7 @@ def main() -> None:
 
     out = []
     for e in events:
+        detail_path = f"/events/{e.id}/"
         item = {
             "id": e.id,
             "title": e.title,
@@ -421,6 +423,8 @@ def main() -> None:
             "city": e.city,
             "location": e.location,
             "kategorie": e.kategorie,
+            "detail_path": detail_path,
+            "detail_url": f"{SITE_ORIGIN}{detail_path}",
         }
         if e.endDate:
             item["endDate"] = e.endDate

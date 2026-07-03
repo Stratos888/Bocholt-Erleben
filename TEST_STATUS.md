@@ -1,3 +1,47 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_CANONICAL_EVENT_DETAIL_ASSETS_2026_07_03 | Zweck: dokumentiert den Premium-Workpack fuer kanonische, teilbare Event-Detailobjekte; Umfang: Build-Artefakte, Share-Verhalten, Lifecycle und Validierung === -->
+## Kanonische Event-Detailseiten als teilbares Produktasset – Patch vorbereitet
+
+Status: Patch vorbereitet; nach Upload muss der Staging-Deploy zeigen, dass `data/events.json`, Event-Detailseiten und Sitemap im Deploy-Artefakt erzeugt werden.
+
+Umgesetzt im Patch:
+
+- `data/events.json` bleibt ein generiertes Deploy-Artefakt und wird nicht im Repo gepflegt.
+- Der Events-Build ergänzt fuer aktive/laufende Events `detail_path` und `detail_url`.
+- `scripts/build-event-detail-pages.py` erzeugt aus dem generierten Event-Feed kanonische Detailseiten unter `/events/<event-id>/`.
+- Aktive/laufende Events sind indexierbar und erhalten OpenGraph-/Twitter-Metadaten sowie JSON-LD `Event`.
+- Kuerzlich abgelaufene Events bleiben fuer 60 Tage als Linkziel erreichbar, werden aber mit Vergangen-Hinweis und `noindex,follow` ausgespielt.
+- Alte Eventseiten werden bei jedem Build ausgeduennt; generierte Detailseiten werden vor dem Neuaufbau bereinigt.
+- Die Live-Sitemap wird im Deploy um aktive Event-Detailseiten ergänzt; Staging bleibt ueber Robots gesperrt.
+- Der bestehende Event-Teilen-Button im Detailpanel und in Event-Cards teilt künftig die kanonische Event-URL, sofern sie vorhanden ist.
+- Der App-Flow bleibt unveraendert: Mobile Detailpanel bleibt schnelle App-Ansicht, die Detailseite ist der externe Share-/SEO-/Nachweis-Kontext.
+
+Lokal validiert im ZIP-Worktree:
+
+- CSV-Testexport zu `data/events.tsv` gewandelt.
+- `python3 scripts/build-events-from-tsv.py`: OK, erzeugte 63 aktive Events aus dem Teststand.
+- `python3 scripts/build-event-detail-pages.py`: OK, erzeugte 108 Detailseiten, davon 63 aktiv und 45 kuerzlich abgelaufen.
+- `python3 scripts/augment-sitemap-event-details.py`: OK, ergänzte 63 aktive Event-Detailseiten in der Test-Sitemap.
+- `node --check js/events.js`: OK.
+- `node --check js/details.js`: OK.
+- `python3 -m py_compile scripts/build-events-from-tsv.py scripts/build-event-detail-pages.py scripts/augment-sitemap-event-details.py`: OK.
+- `python3 tools/audit-css-governance.py`: OK.
+
+Nicht geaendert:
+
+- Kein zweiter Teilen-Button.
+- Keine Zwei-Klassen-Optik fuer kostenlose/bezahlt veröffentlichte Inhalte.
+- Kein Ersatz des mobilen Detailpanels durch eine neue Navigationspflicht.
+- Kein dauerhaftes Event-Archiv.
+
+Abnahme nach Upload:
+
+1. Staging-Deploy gruen.
+2. In `/data/events.json` ist fuer aktive Events `detail_path`/`detail_url` vorhanden.
+3. Beispielseite `/events/<event-id>/` oeffnet mobil sauber.
+4. Teilen im Detailpanel nutzt die kanonische Event-URL.
+5. Alte Eventseiten ausserhalb der 60-Tage-Karenz bleiben aus dem Deploy verschwunden.
+<!-- === END BLOCK: TEST_STATUS_CANONICAL_EVENT_DETAIL_ASSETS_2026_07_03 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_WEEKLY_KI_SELF_LEARNING_E2E_2026_07_02 | Zweck: dokumentiert den live geprüften Weekly-KI-/Manual-Inbox-/Feedback-Loop-Stand; Umfang: bestandene E2E-Punkte, Apps-Script-Fix, Kostenentscheidung, noch offene Laufzeitbeweise === -->
 ## Weekly-KI-Suche, Manual Inbox und Self-Learning-Feedback – Live-E2E-Stand 2026-07-02
 

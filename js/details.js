@@ -41,6 +41,26 @@
 
   const normalizeHttpUrl = (url) => (isSafeHttpUrl(url) ? trimOrEmpty(url) : "");
 
+  const normalizeEventDetailUrl = (event) => {
+    const e = (event && typeof event === "object") ? event : {};
+    const absolute = trimOrEmpty(e.detail_url || e.detailUrl || "");
+    if (absolute) {
+      try {
+        const parsed = new URL(absolute, window.location.origin);
+        if (parsed.protocol === "http:" || parsed.protocol === "https:") return parsed.href;
+      } catch (_) {}
+    }
+
+    const path = trimOrEmpty(e.detail_path || e.detailPath || "");
+    if (path && path.startsWith("/events/") && path.endsWith("/")) {
+      try {
+        return new URL(path, window.location.origin).href;
+      } catch (_) {}
+    }
+
+    return "";
+  };
+
   const toMapsUrl = (q) => {
     const query = trimOrEmpty(q);
     if (!query) return "";
@@ -272,7 +292,8 @@ const shareParts = [
 ].filter(Boolean);
 
 const shareText = shareParts.join("\n");
-const shareUrl = websiteUrl || sourceUrl || "";
+const detailUrl = normalizeEventDetailUrl(e);
+const shareUrl = detailUrl || websiteUrl || sourceUrl || "";
 const sharePayload = { title, text: shareText, url: shareUrl };
 
 const actions = [

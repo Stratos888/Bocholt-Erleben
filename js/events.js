@@ -668,6 +668,25 @@ function createCard(event, visualUsage = null) {
     };
   };
 
+  const resolveEventDetailUrl = (ev) => {
+    const absolute = String(ev?.detail_url || ev?.detailUrl || "").trim();
+    if (absolute) {
+      try {
+        const parsed = new URL(absolute, window.location.origin);
+        if (parsed.protocol === "http:" || parsed.protocol === "https:") return parsed.href;
+      } catch (_) {}
+    }
+
+    const path = String(ev?.detail_path || ev?.detailPath || "").trim();
+    if (path && path.startsWith("/events/") && path.endsWith("/")) {
+      try {
+        return new URL(path, window.location.origin).href;
+      } catch (_) {}
+    }
+
+    return "";
+  };
+
   const buildGoogleCalendarUrl = (ev) => {
     const date = String(ev?.date || "").trim();
     if (!date) return "";
@@ -705,8 +724,7 @@ function createCard(event, visualUsage = null) {
     const lines = [
       title,
       [datePart, timePart].filter(Boolean).join(" · "),
-      locationPart,
-      fallbackUrl
+      locationPart
     ].filter(Boolean);
 
     return {
@@ -881,7 +899,8 @@ function createCard(event, visualUsage = null) {
     event?.url || event?.website || event?.sourceUrl || event?.source_url || ""
   );
   const calendarUrl = buildGoogleCalendarUrl(event);
-  const sharePayload = buildSharePayload(event, primaryUrl);
+  const canonicalShareUrl = resolveEventDetailUrl(event) || primaryUrl;
+  const sharePayload = buildSharePayload(event, canonicalShareUrl);
   const primaryOutboundPayload = primaryUrl
     ? {
         outboundType: "website",
