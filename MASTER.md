@@ -1,3 +1,52 @@
+<!-- === BEGIN BLOCK: MASTER_COMMERCIAL_STRATEGY_CONTROL_2026_07_02 | Zweck: setzt den aktuellen strategischen Schwerpunkt auf Veranstalter-/Anbietergewinnung, zahlungsfaehigen Mehrwert und Premium-Parity; Umfang: kommerzielles Zielbild, Abgrenzung zu Anzeigenportal/Paywall, Repriorisierung aelterer Roadmap-Punkte === -->
+## Aktueller Steuerungsstand – kommerzielle Premium-Phase 2026-07-02
+
+Status: Bocholt erleben ist nach der Nutzer-/Content-/Visual-/Inbox-Haertung nicht mehr primaer im Modus `mehr UI` oder `mehr Content pruefen`. Der naechste strategische Schwerpunkt ist Veranstalter und Anbieter zu gewinnen, damit mehr hochwertige Events und Aktivitaeten in die Plattform kommen und daraus mehr Nutzerwert entsteht.
+
+### Strategische Leitentscheidung
+
+Bocholt erleben bleibt ein kuratiertes Premium-Produkt und wird **kein offenes Kleinanzeigenportal**.
+
+Kostenlose Basiseintraege duerfen die Plattform vollstaendiger machen, aber oeffentlich nie wie eine minderwertige Eintragsklasse wirken. Alle veroeffentlichten Events und Aktivitaeten muessen denselben redaktionellen und visuellen Qualitaetsstandard erfuellen.
+
+Premium bedeutet daher **nicht**:
+
+- bessere Card-Optik fuer zahlende Inhalte,
+- gekaufte Empfehlungen,
+- kuenstliche Top-Platzierungen,
+- sichtbare Zwei-Klassen-Darstellung,
+- Display-Werbung als Kernmodell.
+
+Premium bedeutet:
+
+- weniger Pflegeaufwand fuer Veranstalter und Anbieter,
+- professionelle Aufbereitung innerhalb des einheitlichen Plattformstandards,
+- teilbare und messbare Produktassets,
+- Wirkungsbericht und nachvollziehbare Nutzungssignale,
+- komfortable Aenderungs-/Absage-/Aktualisierungswege,
+- dauerhafte Praesenz und regelmaessige Uebernahme fuer passende Anbieter.
+
+### Kommerzielles Arbeitsmodell
+
+Der Start erfolgt nicht mit harter Paywall fuer einfache Eventvorschlaege. Empfohlen ist ein kuratierter kostenloser Basisweg plus bezahlte Service-/Premium-Schicht.
+
+- Basis: Event oder Aktivitaet kann vorgeschlagen werden; Veroeffentlichung nur nach redaktioneller Eignung und Qualitaetsstandard.
+- Startpartner: kostenlose oder verguenstigte Pilotphase moeglich, um echte Nutzungs- und Wirkungsdaten zu sammeln.
+- Bezahlt: Service, Aufwandersparnis, Wirkungsbericht, dauerhafte Praesenz, automatische Uebernahme, regelmaessige Veranstalter-/Anbieterbetreuung.
+- Spaeter optional: lokale Sponsoren, Ticket-/Affiliate-Links oder Partnerformate, aber nur wenn sie Premium-Gefuehl und redaktionelles Vertrauen nicht beschaedigen.
+
+### Neue Priorisierung gegenueber aelteren Roadmap-Bloecken
+
+Diese kommerzielle Phase regewichtet aeltere Produktreife-Punkte:
+
+1. Zuerst zahlungsfaehigen Anbieterwert beweisen.
+2. Danach Nutzerbindungs-/Location-/SEO-Ausbau gezielt auf diesen Wert einzahlen lassen.
+3. Content-/KI-/Visual-/Inbox-Prozesse laufen als Qualitaetsschutz weiter, sind aber nicht mehr der Hauptwachstumshebel.
+4. Bestehende gefreezte UI-Bereiche bleiben stabil, solange kein konkretes Verkaufs-/Nutzerproblem bewiesen ist.
+
+Massgebliche Detaildoku: `COMMERCIAL_STRATEGY.md`.
+<!-- === END BLOCK: MASTER_COMMERCIAL_STRATEGY_CONTROL_2026_07_02 === -->
+
 <!-- === BEGIN BLOCK: MASTER_WEEKLY_KI_OPERATING_CONTROL_2026_07_02 | Zweck: aktualisiert den aktuellen Steuerungsstand fuer Weekly-KI, Manual Inbox, Feedback-Loop und kostenbewussten naechsten Proof; Umfang: aktueller Einstiegspunkt vor aelteren MASTER-Bloecken === -->
 ## Aktueller Steuerungsstand – Weekly-KI und Content-Feedback 2026-07-02
 
