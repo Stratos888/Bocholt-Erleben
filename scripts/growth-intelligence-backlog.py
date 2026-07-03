@@ -580,7 +580,7 @@ def build_internal_metric_candidates(rows: list[dict[str, Any]], start: str, end
         b["page"] = str(r.get("page_path") or "")
         if metric in {"event_detail_view", "activity_detail_view"}:
             b["views"] += total
-        elif metric in {"website_click", "location_click"}:
+        elif metric in {"website_click", "location_click", "event_share_click", "event_copy_link"}:
             b["outbound"] += total
         elif metric == "maps_click":
             b["maps"] += total

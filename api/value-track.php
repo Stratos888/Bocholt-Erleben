@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS value_metric_daily (
     reporting_target_id VARCHAR(191) NOT NULL DEFAULT '',
     reporting_target_title VARCHAR(255) NULL,
     page_path VARCHAR(255) NULL,
+    source_context VARCHAR(64) NOT NULL DEFAULT '',
     bucket_hash CHAR(64) NOT NULL,
     count_value INT UNSIGNED NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -120,7 +121,8 @@ CREATE TABLE IF NOT EXISTS value_metric_daily (
     UNIQUE KEY uq_value_metric_daily_bucket (bucket_hash),
     KEY idx_value_metric_daily_date_key (metric_date, metric_key),
     KEY idx_value_metric_daily_entity (metric_date, entity_type, entity_id),
-    KEY idx_value_metric_daily_reporting_target (metric_date, reporting_target_type, reporting_target_id)
+    KEY idx_value_metric_daily_reporting_target (metric_date, reporting_target_type, reporting_target_id),
+    KEY idx_value_metric_daily_source_context (metric_date, metric_key, source_context)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 SQL);
 
@@ -133,8 +135,14 @@ SQL);
     if (!be_value_metrics_table_column_exists($pdo, 'reporting_target_title')) {
         $pdo->exec('ALTER TABLE value_metric_daily ADD COLUMN reporting_target_title VARCHAR(255) NULL AFTER reporting_target_id');
     }
+    if (!be_value_metrics_table_column_exists($pdo, 'source_context')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD COLUMN source_context VARCHAR(64) NOT NULL DEFAULT "" AFTER page_path');
+    }
     if (!be_value_metrics_table_index_exists($pdo, 'idx_value_metric_daily_reporting_target')) {
         $pdo->exec('ALTER TABLE value_metric_daily ADD KEY idx_value_metric_daily_reporting_target (metric_date, reporting_target_type, reporting_target_id)');
+    }
+    if (!be_value_metrics_table_index_exists($pdo, 'idx_value_metric_daily_source_context')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD KEY idx_value_metric_daily_source_context (metric_date, metric_key, source_context)');
     }
 }
 /* === END BLOCK: VALUE_METRICS_REPORTING_TARGET_SCHEMA_V1 === */
@@ -186,6 +194,8 @@ $allowedMetricKeys = [
     'organizer_cta_click',
     'event_detail_view',
     'activity_detail_view',
+    'event_share_click',
+    'event_copy_link',
 ];
 
 $metricKey = be_value_metrics_clean_key((string)($payload['metric_key'] ?? ''));
@@ -204,6 +214,7 @@ $reportingTargetType = be_value_metrics_clean_key((string)($payload['reporting_t
 $reportingTargetId = be_value_metrics_clean_text((string)($payload['reporting_target_id'] ?? ''), 191);
 $reportingTargetTitle = be_value_metrics_clean_text((string)($payload['reporting_target_title'] ?? ''), 255);
 $pagePath = be_value_metrics_normalize_path((string)($payload['page_path'] ?? ''));
+$sourceContext = be_value_metrics_clean_key((string)($payload['source_context'] ?? $payload['sourceContext'] ?? ''), 64);
 $metricDate = gmdate('Y-m-d');
 
 $bucketHash = hash('sha256', implode('|', [
@@ -215,6 +226,7 @@ $bucketHash = hash('sha256', implode('|', [
     $reportingTargetType,
     $reportingTargetId,
     $pagePath,
+    $sourceContext,
 ]));
 
 try {
@@ -233,6 +245,7 @@ INSERT INTO value_metric_daily (
     reporting_target_id,
     reporting_target_title,
     page_path,
+    source_context,
     bucket_hash,
     count_value
 ) VALUES (
@@ -246,6 +259,7 @@ INSERT INTO value_metric_daily (
     :reporting_target_id,
     :reporting_target_title,
     :page_path,
+    :source_context,
     :bucket_hash,
     1
 )
@@ -267,6 +281,7 @@ SQL);
         ':reporting_target_id' => $reportingTargetId,
         ':reporting_target_title' => $reportingTargetTitle !== '' ? $reportingTargetTitle : null,
         ':page_path' => $pagePath !== '' ? $pagePath : null,
+        ':source_context' => $sourceContext,
         ':bucket_hash' => $bucketHash,
     ]);
 

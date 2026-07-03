@@ -566,6 +566,7 @@ const actions = [
           entityType: "event",
           entityId: String(event?.id || "").trim(),
           entityTitle: String(event?.title || "").trim(),
+          sourceContext: "event_panel",
           ...(window.BEAnalytics.buildReportingTargetPayload
             ? window.BEAnalytics.buildReportingTargetPayload(event)
             : {})
@@ -1039,6 +1040,7 @@ const iconSvg = (type, extraClass = "") => {
         entityType: "event",
         entityId: String(event?.id || "").trim(),
         entityTitle: String(vm.title || "").trim(),
+        sourceContext: "event_panel",
         ...(window.BEAnalytics?.buildReportingTargetPayload
           ? window.BEAnalytics.buildReportingTargetPayload(event)
           : {})
@@ -1367,6 +1369,17 @@ if (shareBtn) {
     const clipboardText = [text, url].filter(Boolean).join("\n");
     if (!clipboardText) return;
 
+    const shareAnalyticsPayload = {
+      entityType: "event",
+      entityId: String(event?.id || "").trim(),
+      entityTitle: String(vm.title || title || "").trim(),
+      destinationUrl: url,
+      sourceContext: "event_panel",
+      ...(window.BEAnalytics?.buildReportingTargetPayload
+        ? window.BEAnalytics.buildReportingTargetPayload(event)
+        : {})
+    };
+
     // 1) Native share
     // Wichtig: URL nicht zusaetzlich in text duplizieren. Viele Android-Targets
     // haengen die url selbst an und wuerden sonst denselben Eventlink zweimal senden.
@@ -1377,6 +1390,11 @@ if (shareBtn) {
           text: text || undefined,
           url: url || undefined,
         });
+        if (window.BEAnalytics?.trackShareAction) {
+          window.BEAnalytics.trackShareAction(shareAnalyticsPayload);
+        } else if (window.BEAnalytics?.trackValueMetric) {
+          window.BEAnalytics.trackValueMetric("event_share_click", shareAnalyticsPayload);
+        }
         return;
       }
     } catch (err) {
@@ -1389,6 +1407,9 @@ if (shareBtn) {
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(clipboardText);
+        if (window.BEAnalytics?.trackValueMetric) {
+          window.BEAnalytics.trackValueMetric("event_copy_link", shareAnalyticsPayload);
+        }
         const prev = shareBtn.title;
         shareBtn.title = "Kopiert";
         setTimeout(() => { shareBtn.title = prev; }, 1200);

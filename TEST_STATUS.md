@@ -5001,3 +5001,46 @@ Nach Deployment pruefen:
 3. Eventliste und Detailpanel bleiben funktionsgleich.
 4. Content-Quality-Report enthaelt Description-Issues nur als echte redaktionelle Korrekturhinweise, nicht als technische Regression.
 <!-- === END BLOCK: TEST_STATUS_EVENT_DESCRIPTION_PREMIUM_GUARD_2026_07_03 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_IMPACT_BACKBONE_2026_07_03 | Zweck: dokumentiert lokalen Proof fuer objektgenaues Event-Tracking und Anbieter-Wirkungsbericht; Umfang: PHP/JS/Python/Guard-Checks, Deploy-Smoke === -->
+## Event Impact Backbone + Anbieter-Wirkungsbericht – 2026-07-03
+
+Status: Patch vorbereitet.
+
+Validierter Zielzustand:
+- Kein neues öffentliches Designsystem und keine Zwei-Klassen-Optik.
+- Das bestehende Nutzwerttracking wird zum objektgenauen Event-Impact-Backbone erweitert.
+- Öffentliche Detailseiten, Detailpanel, Event-Cards und Today-Direktaktionen liefern getrennte `source_context`-Werte.
+- Anbieterbericht zeigt gemessene Wirkung verständlich und vorsichtig, inklusive Teilungen und stärkster Inhalte.
+
+Umsetzung:
+- `api/value-track.php`: `source_context`, `event_share_click`, `event_copy_link`, Source-Context-Index und Bucket-Hash-Erweiterung.
+- `config.js`: Source-Context-Payload und `BEAnalytics.trackShareAction()`.
+- `scripts/build-event-detail-pages.py`: Tracking auf öffentlichen Event-Detailseiten für View, Website-/Quelle, Maps und Share/Copy.
+- `js/details.js`: Detailpanel-View und Share mit `source_context=event_panel`.
+- `js/events.js`: Event-Card-CTA und Share mit `source_context=event_card`.
+- `js/today-home.js`: Today-Desktop-Direktaktionen mit `source_context=today_card`.
+- `api/organizer-portal/me.php`: Teilungsmetriken, objektgenaue Top-Inhalte und `impact_metrics` je jüngerer Einreichung.
+- `js/organizer-portal.js`: Wirkungskarte erweitert um Teilungen, stärkste Inhalte und Wirkung in Einreichungsdetails.
+- `scripts/audit-event-impact-tracking.py` und `EVENT_IMPACT_TRACKING.md` ergänzt.
+
+Lokal validiert:
+- `php -l api/value-track.php` OK.
+- `php -l api/organizer-portal/me.php` OK.
+- `php -l intern/seo-dashboard/index.php` OK.
+- `node --check config.js` OK.
+- `node --check js/events.js` OK.
+- `node --check js/details.js` OK.
+- `node --check js/today-home.js` OK.
+- `node --check js/organizer-portal.js` OK.
+- `python3 -m py_compile scripts/build-event-detail-pages.py scripts/growth-intelligence-backlog.py scripts/audit-event-impact-tracking.py` OK.
+- Gerenderter Test-HTML-Auszug aus `build-event-detail-pages.py` enthält `config.js`, `event_detail_view`, `event_share_click`; Inline-JS ohne JSON-LD besteht Syntaxprüfung per `new Function`.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+
+Nach Deployment prüfen:
+1. Auf Live mit Statistik-Zustimmung eine öffentliche Event-Detailseite öffnen; `/api/value-track.php` muss `event_detail_view` mit `source_context=public_detail_page` akzeptieren.
+2. Eventliste öffnen und Detailpanel öffnen; `event_detail_view` mit `source_context=event_panel` prüfen.
+3. Event-Share und Clipboard-Fallback testen; `event_share_click` bzw. `event_copy_link` prüfen.
+4. Website-/Ticket- und Maps-Klicks von Detailseite und Panel testen; Zielnavigation darf unverändert funktionieren.
+5. Anbieter-Dashboard öffnen; Wirkungskarte darf keine Besucher-/Buchungs-/Personenbehauptung enthalten und zeigt Teilungen/Top-Inhalte nur bei vorhandenen Messwerten.
+<!-- === END BLOCK: TEST_STATUS_EVENT_IMPACT_BACKBONE_2026_07_03 === -->

@@ -2521,3 +2521,37 @@ Premium-Kriterium:
 - Die Rail ist nicht nur CSS-Overflow, sondern wird per JS auf einen sauberen Startzustand gebracht: ungefiltert links, aktive Chips nur bei echter Auswahl sichtbar.
 - Abgenommener Startzustand: `Jetzt besonders`, `Mit Kindern`, `Bei Regen` sind initial sichtbar; weitere Chips sind per horizontalem Wischen erreichbar.
 <!-- === END BLOCK: ROADMAP_ACTIVITY_MOBILE_FILTER_RAIL_CONTROLLED_2026_07_01 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_IMPACT_BACKBONE_2026_07_03 | Zweck: setzt den naechsten Premium-Fokus nach oeffentlichen Event-Detailseiten auf objektgenaue Wirkungsmessung und Anbieterbericht; Umfang: Tracking-Backbone, Reporting, Guards, Nicht-Ziele === -->
+## Event Impact Backbone + Anbieter-Wirkungsbericht – 2026-07-03
+
+Status: Patch vorbereitet.
+
+Strategischer Grund:
+- Öffentliche Event-Detailseiten sind jetzt ein teilbares Produktasset. Der nächste Premium-Hebel ist deshalb nicht neue öffentliche Optik, sondern messbare Wirkung.
+- Premium bedeutet Service, Messbarkeit, Pflegeersparnis und dauerhafte Präsenz – nicht bessere öffentliche Darstellung für bezahlte Inhalte.
+
+Umsetzung:
+- `/api/value-track.php` erweitert das bestehende First-Party-Nutzwerttracking um `source_context`, `event_share_click` und `event_copy_link`.
+- `config.js` überträgt `source_context` und stellt `BEAnalytics.trackShareAction()` bereit.
+- `scripts/build-event-detail-pages.py` instrumentiert öffentliche `/events/<slug>/`-Detailseiten für Detailaufruf, Website-/Quellenklick, Maps-Klick und Teilen/Kopieren.
+- `js/details.js`, `js/events.js` und `js/today-home.js` setzen klare Source-Kontexte: `event_panel`, `event_card`, `today_card`.
+- `api/organizer-portal/me.php` aggregiert Anbieterwirkung zusätzlich objektgenau pro Inhalt und ergänzt Teilungsmetriken.
+- `js/organizer-portal.js` macht aus der bisherigen groben Wirkungskarte einen kompakteren Wirkungsbericht mit stärksten Inhalten und Wirkung pro Einreichung.
+- `scripts/audit-event-impact-tracking.py` schützt den Contract statisch.
+- `EVENT_IMPACT_TRACKING.md` dokumentiert Produktvertrag, Metriken, Datenschutzgrenzen und bekannte Grenze für dynamische DB-Event-Detailrouten.
+
+Nicht-Ziele:
+- Keine neue Home-/Today-/Activities-UI-Runde.
+- Keine Zwei-Klassen-Optik zwischen kostenlosen und bezahlten Events.
+- Kein paralleler Analytics-Stack neben `/api/value-track.php`.
+- Keine Besucher-, Ticketverkaufs- oder Umsatzversprechen im Anbieterbereich.
+- Keine `detail_path`-/`detail_url`-Felder für DB-/Anbieter-Events, solange diese URLs nicht real auflösbar sind.
+
+Akzeptanz:
+- Öffentliche Event-Detailseite zählt bei Statistik-Zustimmung `event_detail_view` mit `source_context=public_detail_page`.
+- Detailpanel zählt weiter `event_detail_view`, aber mit `source_context=event_panel`.
+- Website-/Ticket-, Maps- und Share-Aktionen sind objektgenau messbar.
+- Anbieter sehen verständliche, vorsichtige Wirkungswerte ohne personenbezogene oder überzogene Aussagen.
+- Guard `python3 scripts/audit-event-impact-tracking.py` ist grün.
+<!-- === END BLOCK: ROADMAP_EVENT_IMPACT_BACKBONE_2026_07_03 === -->

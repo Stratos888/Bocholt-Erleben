@@ -50,6 +50,9 @@ class DetailEvent:
     category: str
     description: str
     external_url: str
+    reporting_target_type: str
+    reporting_target_id: str
+    reporting_target_title: str
     visual_key: str
     visual_motif: str
     image_src: str
@@ -349,6 +352,9 @@ def build_detail_event(raw: Dict[str, Any], is_past: bool, noindex: bool, visual
         category=normalize_text(raw.get("kategorie") or raw.get("category")),
         description=normalize_text(raw.get("description") or raw.get("beschreibung")),
         external_url=normalize_public_external_url(raw),
+        reporting_target_type=normalize_lookup_key(raw.get("reporting_target_type") or raw.get("reportingTargetType")),
+        reporting_target_id=normalize_text(raw.get("reporting_target_id") or raw.get("reportingTargetId")),
+        reporting_target_title=normalize_text(raw.get("reporting_target_title") or raw.get("reportingTargetTitle")),
         visual_key=normalize_lookup_key(raw.get("visual_key") or raw.get("visualKey")),
         visual_motif=normalize_lookup_key(raw.get("visual_motif") or raw.get("visualMotif")),
         image_src=image_src,
@@ -475,7 +481,7 @@ def render_page(event: DetailEvent) -> str:
     source_link_html = ""
     if event.external_url and not event.is_past:
         source_link_html = f"""
-              <a class="detail-link" href="{escape(event.external_url)}" target="_blank" rel="noopener">
+              <a class="detail-link" href="{escape(event.external_url)}" target="_blank" rel="noopener" data-impact-action="website_click" data-impact-outbound-type="website" data-impact-destination-url="{escape(event.external_url)}">
                 <span class="detail-link-label">Eventquelle</span>
                 <span class="detail-link-value">{escape(host_label(event.external_url))}</span>
                 <span class="detail-link-ext" data-ui-icon="external" aria-hidden="true"></span>
@@ -493,7 +499,7 @@ def render_page(event: DetailEvent) -> str:
     location_meta_html = ""
     if maps_url and not event.is_past:
         location_meta_html = f"""
-                <a class="detail-meta-row is-location" href="{escape(maps_url)}" target="_blank" rel="noopener" aria-label="Ort in Karten öffnen">
+                <a class="detail-meta-row is-location" href="{escape(maps_url)}" target="_blank" rel="noopener" aria-label="Ort in Karten öffnen" data-impact-action="maps_click" data-impact-outbound-type="maps" data-impact-destination-url="{escape(maps_url)}">
                   <span class="detail-meta-icon" data-ui-icon="pin" aria-hidden="true"></span>
                   <span class="detail-meta-text">{escape(place_line)}</span>
                   <span class="detail-meta-ext" data-ui-icon="external" aria-hidden="true"></span>
@@ -537,6 +543,7 @@ def render_page(event: DetailEvent) -> str:
             data-share-title="{escape(event.title)}"
             data-share-text="{escape_attr_multiline(share_text)}"
             data-share-url="{escape(event.detail_url)}"
+            data-impact-action="event_share_click"
           >
             <span data-ui-icon="share" aria-hidden="true"></span>
             <span class="detail-sr-only">Teilen</span>
@@ -598,7 +605,7 @@ def render_page(event: DetailEvent) -> str:
 </header>
 <div id="desktop-section-nav-root"></div>
 <main class="event-detail-main">
-  <section id="event-detail-panel" class="event-detail-public" data-detail-type="event" aria-label="Eventdetails" data-event-id="{escape(event.id)}">
+  <section id="event-detail-panel" class="event-detail-public" data-detail-type="event" aria-label="Eventdetails" data-event-id="{escape(event.id)}" data-impact-object-type="event" data-impact-entity-id="{escape(event.id)}" data-impact-entity-title="{escape(event.title)}" data-impact-source-context="public_detail_page" data-impact-reporting-target-type="{escape(event.reporting_target_type)}" data-impact-reporting-target-id="{escape(event.reporting_target_id)}" data-impact-reporting-target-title="{escape(event.reporting_target_title)}">
     <div class="detail-panel-content event-detail-public-surface">
       <div class="detail-panel-body">
         <div id="detail-content">
@@ -630,6 +637,7 @@ def render_page(event: DetailEvent) -> str:
 </main>
 <footer data-site-footer></footer>
 <div id="bottom-tabbar-root"></div>
+<script src="/config.js?v=2026-07-03-event-impact-v1"></script>
 <script src="/js/icons.js?v=2026-06-15-image-attribution-v7"></script>
 <script src="/js/bottom-tabbar.js?v=2026-05-29-today-nav-v1"></script>
 <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7"></script>
@@ -638,6 +646,49 @@ def render_page(event: DetailEvent) -> str:
   if (window.Icons && typeof window.Icons.hydrate === 'function') {{
     window.Icons.hydrate(document);
   }}
+
+  var impactRoot = document.querySelector('[data-impact-object-type="event"]');
+
+  function impactPayload(extra) {{
+    extra = extra || {{}};
+    if (!impactRoot) return extra;
+    return Object.assign({{
+      entityType: 'event',
+      entityId: impactRoot.getAttribute('data-impact-entity-id') || '',
+      entityTitle: impactRoot.getAttribute('data-impact-entity-title') || document.title,
+      sourceContext: impactRoot.getAttribute('data-impact-source-context') || 'public_detail_page',
+      reportingTargetType: impactRoot.getAttribute('data-impact-reporting-target-type') || '',
+      reportingTargetId: impactRoot.getAttribute('data-impact-reporting-target-id') || '',
+      reportingTargetTitle: impactRoot.getAttribute('data-impact-reporting-target-title') || ''
+    }}, extra);
+  }}
+
+  function trackValueMetric(metricKey, payload) {{
+    if (window.BEAnalytics && typeof window.BEAnalytics.trackValueMetric === 'function') {{
+      window.BEAnalytics.trackValueMetric(metricKey, payload || impactPayload());
+    }}
+  }}
+
+  function trackOutbound(button) {{
+    if (!button) return;
+    var outboundType = button.getAttribute('data-impact-outbound-type') || 'website';
+    var destinationUrl = button.getAttribute('data-impact-destination-url') || button.href || '';
+    var payload = impactPayload({{
+      outboundType: outboundType,
+      destinationUrl: destinationUrl
+    }});
+    if (window.BEAnalytics && typeof window.BEAnalytics.trackOutboundClick === 'function') {{
+      window.BEAnalytics.trackOutboundClick(payload);
+    }} else {{
+      trackValueMetric(outboundType === 'maps' ? 'maps_click' : 'website_click', payload);
+    }}
+  }}
+
+  trackValueMetric('event_detail_view', impactPayload());
+
+  document.querySelectorAll('[data-impact-outbound-type]').forEach(function (button) {{
+    button.addEventListener('click', function () {{ trackOutbound(button); }}, {{ capture: true }});
+  }});
 
   function calendarDateRange(date, time) {{
     var cleanDate = String(date || '').replaceAll('-', '');
@@ -670,16 +721,25 @@ def render_page(event: DetailEvent) -> str:
     var title = shareButton.getAttribute('data-share-title') || document.title;
     var text = shareButton.getAttribute('data-share-text') || '';
     var url = shareButton.getAttribute('data-share-url') || location.href;
+    var sharePayload = impactPayload({{ destinationUrl: url }});
     try {{
       if (navigator.share) {{
         await navigator.share({{ title: title, text: text, url: url }});
+        if (window.BEAnalytics && typeof window.BEAnalytics.trackShareAction === 'function') {{
+          window.BEAnalytics.trackShareAction(sharePayload);
+        }} else {{
+          trackValueMetric('event_share_click', sharePayload);
+        }}
         return;
       }}
     }} catch (error) {{
       if (error && (error.name === 'AbortError' || error.name === 'NotAllowedError')) return;
     }}
     try {{
-      if (navigator.clipboard) await navigator.clipboard.writeText([text, url].filter(Boolean).join('\\n'));
+      if (navigator.clipboard) {{
+        await navigator.clipboard.writeText([text, url].filter(Boolean).join('\\n'));
+        trackValueMetric('event_copy_link', sharePayload);
+      }}
     }} catch (_) {{}}
   }});
 }})();

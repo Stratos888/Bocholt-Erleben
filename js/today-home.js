@@ -169,6 +169,7 @@
           entityId: asString(item?.id || item?.raw?.id),
           entityTitle: asString(item?.title || item?.raw?.title),
           destinationUrl: targetUrl,
+          sourceContext: "today_card",
           ...reportingTargetPayload
         });
       }

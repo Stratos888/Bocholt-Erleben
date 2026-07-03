@@ -165,6 +165,66 @@
     if (start === "–" && end === "–") return "Zeitraum: letzte 28 Tage";
     return `Zeitraum: ${start} – ${end}`;
   }
+  function impactShareTotal(metrics) {
+    return metricValue(metrics, "share_clicks") + metricValue(metrics, "copy_link_clicks");
+  }
+
+  function renderImpactMetricRows(rows) {
+    return rows.map(([label, value]) => `
+      <span class="organizer-tariff-row" role="listitem">
+        <span class="organizer-tariff-label">${escapeHtml(label)}</span>
+        <span class="organizer-tariff-price">${escapeHtml(formatInteger(value))}</span>
+      </span>
+    `).join("");
+  }
+
+  function renderImpactItemRows(items) {
+    const visible = (Array.isArray(items) ? items : [])
+      .filter((item) => metricValue(item?.metrics, "total_interactions") > 0)
+      .slice(0, 4);
+
+    if (!visible.length) return "";
+
+    return `
+      <span class="organizer-tariff-section-title organizer-impact-section-title">Stärkste Inhalte</span>
+      ${visible.map((item) => {
+        const metrics = item?.metrics || {};
+        const title = safeText(item?.entity_title) || safeText(item?.entity_id) || "Veröffentlichter Inhalt";
+        const actionTotal = metricValue(metrics, "website_clicks") +
+          metricValue(metrics, "maps_clicks") +
+          metricValue(metrics, "location_clicks") +
+          impactShareTotal(metrics);
+        return `
+          <span class="organizer-impact-item" role="listitem">
+            <span class="organizer-impact-item__title">${escapeHtml(title)}</span>
+            <span class="organizer-impact-item__meta">
+              ${escapeHtml(formatInteger(metricValue(metrics, "detail_views")))} Aufrufe · ${escapeHtml(formatInteger(actionTotal))} Aktionen
+            </span>
+          </span>
+        `;
+      }).join("")}
+    `;
+  }
+
+  function renderSubmissionImpactHtml(submission) {
+    const metrics = submission?.impact_metrics || {};
+    const total = metricValue(metrics, "total_interactions");
+    if (total <= 0) return "";
+
+    const shares = impactShareTotal(metrics);
+    const directActions = metricValue(metrics, "website_clicks") +
+      metricValue(metrics, "maps_clicks") +
+      metricValue(metrics, "location_clicks") +
+      shares;
+
+    return `
+      <div>
+        <dt>Wirkung</dt>
+        <dd>${escapeHtml(formatInteger(metricValue(metrics, "detail_views")))} Aufrufe · ${escapeHtml(formatInteger(directActions))} Aktionen · ${escapeHtml(formatInteger(shares))} Teilungen</dd>
+      </div>
+    `;
+  }
+
 
   function formatDateTime(value) {
     const text = safeText(value);
@@ -764,7 +824,8 @@ function normalizeExternalUrl(value) {
       metricValue(metrics, "website_clicks") +
       metricValue(metrics, "maps_clicks") +
       metricValue(metrics, "location_clicks") +
-      metricValue(metrics, "organizer_cta_clicks");
+      metricValue(metrics, "organizer_cta_clicks") +
+      impactShareTotal(metrics);
     const previousTotal = metricValue(previous, "total_interactions");
     const totalDelta = total - previousTotal;
     const deltaLabel = totalDelta > 0
@@ -777,17 +838,13 @@ function normalizeExternalUrl(value) {
     card.removeAttribute("hidden");
     periodNode.textContent = formatImpactPeriod(impact?.period);
 
-    metricsNode.innerHTML = [
-      ["Interaktionen gesamt", total],
+    metricsNode.innerHTML = renderImpactMetricRows([
+      ["Gemessene Interaktionen", total],
       ["Detail-Aufrufe", metricValue(metrics, "detail_views")],
       ["Website-/Ticket-Klicks", metricValue(metrics, "website_clicks")],
-      ["Route/Maps", metricValue(metrics, "maps_clicks")]
-    ].map(([label, value]) => `
-      <span class="organizer-tariff-row" role="listitem">
-        <span class="organizer-tariff-label">${escapeHtml(label)}</span>
-        <span class="organizer-tariff-price">${escapeHtml(formatInteger(value))}</span>
-      </span>
-    `).join("");
+      ["Route/Maps", metricValue(metrics, "maps_clicks")],
+      ["Teilungen", impactShareTotal(metrics)]
+    ]) + renderImpactItemRows(impact?.items);
 
     if (impact?.status === "not_configured" || impact?.status === "not_available") {
       noteNode.textContent = impact?.message || "Die Nutzwert-Auswertung ist für diesen Bereich noch nicht verfügbar.";
@@ -795,7 +852,7 @@ function normalizeExternalUrl(value) {
     }
 
     if (total > 0) {
-      noteNode.textContent = `Nutzer haben deine veröffentlichten Inhalte geöffnet oder weiterführende Links genutzt. Direkt erklärbare Klicks: ${formatInteger(directClicks)}; ${deltaLabel}. Keine Besucherzahlen vor Ort, keine Buchungen, keine eindeutigen Personen.`;
+      noteNode.textContent = `Nutzer haben deine veröffentlichten Inhalte geöffnet, geteilt oder weiterführende Links genutzt. Direkt erklärbare Aktionen: ${formatInteger(directClicks)}; ${deltaLabel}. Keine Besucherzahlen vor Ort, keine Buchungen, keine eindeutigen Personen.`;
     } else {
       noteNode.textContent = "Noch keine Nutzsignale im aktuellen Zeitraum. Die Messung läuft; Werte erscheinen, sobald veröffentlichte Inhalte angesehen oder weiterführende Links genutzt werden.";
     }
@@ -1369,6 +1426,7 @@ if (submissionsList && submissionsEmpty) {
         </p>
         <dl class="organizer-submission-detail__facts">
           ${renderSubmissionFactsHtml(submission)}
+          ${renderSubmissionImpactHtml(submission)}
         </dl>
         <div class="organizer-submission-detail__actions">
           <span data-submission-link-slot>

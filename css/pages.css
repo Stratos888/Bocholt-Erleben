@@ -1550,6 +1550,41 @@ select.content-field__control{
 .page--organizers[data-organizer-page="dashboard"] #organizer-quota-change:not([hidden]){
   display: block;
 }
+
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_ITEM_ROWS_V1 | Zweck: stellt objektgenaue Wirkungswerte im Anbieterbereich kompakt dar, ohne eine neue Dashboard-UI-Runde zu eröffnen; Umfang: nur kleine Wirkungslisten im bestehenden Kartenraster === */
+.page--organizers[data-organizer-page="dashboard"] .organizer-impact-section-title{
+  margin-top: 0.7rem;
+  padding-top: 0.72rem;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-impact-item{
+  display: grid;
+  gap: 0.16rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--cmp-divider-strong) 58%, transparent);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-impact-item:first-of-type{
+  border-top: 0;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-impact-item__title{
+  min-width: 0;
+  color: var(--color-text-primary);
+  font-size: 0.84rem;
+  font-weight: 560;
+  line-height: 1.26;
+  overflow-wrap: anywhere;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-impact-item__meta{
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  font-weight: 380;
+  line-height: 1.28;
+}
+/* === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_ITEM_ROWS_V1 === */
 /* === END BLOCK: ORGANIZER_DASHBOARD_TARIFF_TABLE_UI_V1 === */
 @media (max-width: 640px){
   .page--organizers[data-organizer-page="dashboard"] .organizer-tariff-row{
