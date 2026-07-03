@@ -29,6 +29,7 @@ MANIFEST_PATH = ROOT / "data" / "event_detail_pages.json"
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://bocholt-erleben.de").rstrip("/")
 RETENTION_DAYS = 60
 STYLE_VERSION = "2026-06-22-css-governance-v1"
+DETAIL_PAGE_CSS_VERSION = "2026-07-03-event-detail-premium-convergence-v1"
 
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RE_TIME = re.compile(r"\b(\d{1,2})[:.](\d{2})\b")
@@ -398,6 +399,14 @@ def build_maps_url(event: DetailEvent) -> str:
     return f"https://www.google.com/maps/search/?api=1&query={quote_plus(query)}"
 
 
+def event_place_line(event: DetailEvent) -> str:
+    location = normalize_text(event.location)
+    city = normalize_text(event.city)
+    if location and city and city.lower() not in location.lower():
+        return f"{location} · {city}"
+    return location or city
+
+
 def json_ld(event: DetailEvent) -> str:
     payload: Dict[str, Any] = {
         "@context": "https://schema.org",
@@ -432,6 +441,7 @@ def render_page(event: DetailEvent) -> str:
     desc = truncate(event.description or default_desc, 155)
     image_url = absolute_url(event.image_src)
     maps_url = build_maps_url(event)
+    place_line = event_place_line(event)
     noindex = '<meta name="robots" content="noindex,follow">\n' if event.noindex else ""
     expired_notice = ""
     if event.is_past:
@@ -450,6 +460,11 @@ def render_page(event: DetailEvent) -> str:
           <p>{escape(event.description)}</p>
         </section>
         """
+    body_content_html = f"""
+      <div class="event-detail-content event-detail-content--body">
+        {description_html}
+      </div>
+    """ if description_html else ""
 
     source_action = ""
     if event.external_url and not event.is_past:
@@ -462,6 +477,10 @@ def render_page(event: DetailEvent) -> str:
         route_action = f"""
         <a class="event-detail-action" href="{escape(maps_url)}" target="_blank" rel="noopener">Route öffnen</a>
         """
+
+    overview_action = ""
+    if event.is_past:
+        overview_action = '<a class="event-detail-action event-detail-action--primary" href="/events/">Aktuelle Events ansehen</a>'
 
     share_text = f"{event.title}\n{event_date_line(event)}"
 
@@ -490,6 +509,7 @@ def render_page(event: DetailEvent) -> str:
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="/css/style.css?v={STYLE_VERSION}">
+<link rel="stylesheet" href="/css/pages.css?v={DETAIL_PAGE_CSS_VERSION}">
 <script type="application/ld+json">
 {json_ld(event)}
 </script>
@@ -507,26 +527,26 @@ def render_page(event: DetailEvent) -> str:
 <main class="event-detail-main">
   <div class="event-detail-shell" data-event-id="{escape(event.id)}">
     <a class="event-detail-back" href="/events/">← Alle Events</a>
-    {expired_notice}
     <article class="event-detail-card">
-      <figure class="event-detail-hero">
-        <img src="{escape(event.image_src)}" alt="{escape(event.image_alt)}" loading="eager" decoding="async" width="1200" height="675">
-      </figure>
       <div class="event-detail-content">
-      <p class="event-detail-kicker">{escape(event.category or 'Event')}</p>
-      <h1>{escape(event.title)}</h1>
-      <dl class="event-detail-facts">
-        <div><dt>Wann</dt><dd>{escape(event_date_line(event))}</dd></div>
-        <div><dt>Wo</dt><dd>{escape(event.location or event.city)}</dd></div>
-        <div><dt>Ort</dt><dd>{escape(event.city)}</dd></div>
-      </dl>
-      {description_html}
+        <p class="event-detail-kicker">{escape(event.category or 'Event')}</p>
+        <h1>{escape(event.title)}</h1>
+        {expired_notice}
+        <dl class="event-detail-facts" aria-label="Event-Infos">
+          <div class="event-detail-fact"><dt>Wann</dt><dd>{escape(event_date_line(event))}</dd></div>
+          <div class="event-detail-fact"><dt>Wo</dt><dd>{escape(place_line)}</dd></div>
+        </dl>
         <section class="event-detail-actions" aria-label="Aktionen">
+          {overview_action}
           {source_action}
           {route_action}
           <button class="event-detail-action" type="button" data-share-title="{escape(event.title)}" data-share-text="{escape_attr_multiline(share_text)}" data-share-url="{escape(event.detail_url)}">Teilen</button>
         </section>
       </div>
+      <figure class="event-detail-hero">
+        <img src="{escape(event.image_src)}" alt="{escape(event.image_alt)}" loading="eager" decoding="async" width="1200" height="675">
+      </figure>
+      {body_content_html}
     </article>
   </div>
 </main>

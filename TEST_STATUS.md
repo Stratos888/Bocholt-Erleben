@@ -4902,3 +4902,59 @@ Nach Deploy prüfen:
 2. Browser-Konsole prüfen: kein `Uncaught SyntaxError` mehr.
 3. Detailseite visuell gegen App prüfen: Header, Card, Surface, Farben, Buttons und Footer wirken konsistent mit Events/Detailpanel/Today.
 4. Teilen-Button testen: Share-Fallback bzw. Kopieren funktioniert weiterhin.
+
+
+## 2026-07-03 – Event-Detailseiten: Premium-Konvergenz statt Sonderseiten-Optik
+
+Status: Patch vorbereitet.
+
+Auslöser:
+- Staging-Test nach dem Token-Konsistenz-Patch zeigte weiterhin keinen ausreichenden Premium-Gewinn: Die öffentliche Detailseite wirkte noch wie eine Sonderseite statt wie ein Bestandteil des bestehenden App-Systems.
+- Das Hero-Bild dominierte den ersten Viewport zu stark; Titel, Datum, Ort und Handlungsoptionen kamen zu spät.
+- Die Seite muss als externes Produktasset funktionieren, darf aber den bestehenden App-/Detailpanel-Flow nicht visuell oder konzeptionell ersetzen.
+
+Validierter Zielzustand:
+- Detailpanel bleibt der schnelle App-Komfort in der Eventliste.
+- Öffentliche Event-Detailseite ist der teilbare, indexierbare und später messbare Außenlink.
+- Öffentliche Detailseiten zeigen oberhalb des Bildes zuerst die entscheidungsrelevanten Informationen:
+  - Kategorie,
+  - Titel,
+  - Wann,
+  - Wo,
+  - primäre Aktion.
+- Das Eventbild bleibt hochwertig, wird aber kontrolliert als 16:9-Media im Card-System ausgespielt und darf den ersten Screen nicht allein belegen.
+- Keine Zwei-Klassen-Optik: kostenlose, kuratierte und spätere Premium-Inhalte nutzen öffentlich denselben Qualitätsstandard.
+
+Umsetzung:
+- `build-event-detail-pages.py` rendert Event-Detailseiten nun mit Content-first-Struktur:
+  - Kicker/Titel,
+  - kompakte Fakten,
+  - Aktionen,
+  - kontrolliertes Hero-Bild,
+  - Beschreibung.
+- Redundanter dritter Faktenblock `Ort` entfällt; `Wo` bündelt Location und Stadt als eine klare Zeile.
+- Abgelaufene Events bekommen den Vergangen-Hinweis innerhalb der Event-Surface und eine primäre Rückführung zu aktuellen Events.
+- Generierte Event-Detailseiten laden zusätzlich eine cache-gebustete `pages.css`-Detailversion, damit Detailseiten-Änderungen auf Staging/Live zuverlässig sichtbar werden, ohne den globalen CSS-Entrypoint für alle statischen Seiten umzubauen.
+- `css/pages.css` ersetzt den bisherigen Detailseitenblock durch eine kompaktere, app-nahe Surface-/Button-/Media-Struktur auf bestehenden Tokens.
+- `tools/audit-css-governance.py` erlaubt diese zweite cache-gebustete `pages.css` ausschließlich für generierte Event-Detailseiten mit `.generated-event-detail`-Marker und hält für alle normalen Repo-HTML-Seiten weiter den Single-CSS-Entrypoint fest.
+
+Validierung lokal:
+- `python3 -m py_compile scripts/build-event-detail-pages.py tools/audit-css-governance.py` OK.
+- Testbuild aus aktuellem Events-CSV OK.
+- `python3 scripts/build-events-from-tsv.py` OK.
+- `SITE_ORIGIN=https://staging.bocholt-erleben.de python3 scripts/build-event-detail-pages.py` OK.
+- Generierte Rosenbergfestival-Detailseite enthält:
+  - `https://staging.bocholt-erleben.de/events/rosenbergfestival-2026-09-26/`,
+  - keine PDF-/Download-URL,
+  - cache-gebustete `pages.css?v=2026-07-03-event-detail-premium-convergence-v1`,
+  - Content-first-Markup vor dem Hero-Bild.
+- Inline-Share-Script der generierten Seite besteht `node --check`.
+- `python3 tools/audit-css-governance.py` OK.
+- `bash tools/check-js-syntax.sh` OK.
+
+Nach Deploy prüfen:
+1. `/events/rosenbergfestival-2026-09-26/` öffnen.
+2. Oberhalb des Bildes müssen Titel, Datum, Ort und Aktionen sichtbar sein.
+3. Das Bild darf nicht mehr den ersten Screen allein dominieren.
+4. Browser-Konsole: kein `Uncaught SyntaxError`.
+5. Eventliste und mobiles Detailpanel bleiben unverändert nutzbar.

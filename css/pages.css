@@ -3649,12 +3649,12 @@ select.content-field__control{
 }
 /* === END BLOCK: IMAGE_CREDITS_PAGE_PREMIUM_V3 === */
 
-/* === BEGIN BLOCK: EVENT_DETAIL_PUBLIC_PAGE_PREMIUM_TOKENS_V2 | Zweck: bringt öffentliche Event-Detailseiten auf denselben Token-/Surface-/Button-Contract wie App, Cards und Detailpanels; Umfang: nur /events/<slug>/ Detailseiten, kein App-Flow-Change === */
+/* === BEGIN BLOCK: EVENT_DETAIL_PUBLIC_PAGE_PREMIUM_CONVERGENCE_V1 | Zweck: macht generierte Event-Detailseiten zum oeffentlichen Produktasset im bestehenden App-System; Umfang: nur /events/<slug>/ Detailseiten, Detailpanel-Flow bleibt unveraendert === */
 .event-detail-page {
   min-height: 100dvh;
   background:
-    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--color-primary-muted) 54%, transparent) 0, transparent 34%),
-    var(--color-background);
+    radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--color-primary-muted) 68%, transparent) 0, transparent 34%),
+    linear-gradient(180deg, var(--color-background), color-mix(in srgb, var(--color-background) 86%, white));
   color: var(--color-text-primary);
 }
 .event-detail-page .header-left {
@@ -3664,16 +3664,15 @@ select.content-field__control{
 .event-detail-main {
   width: min(calc(100% - (var(--gutter) * 2)), 700px);
   margin: 0 auto;
-  padding: var(--space-lg) 0 44px;
+  padding: var(--space-lg) 0 42px;
 }
 .event-detail-shell {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--space-md);
 }
 .event-detail-back {
-  align-self: flex-start;
-  min-height: 32px;
+  justify-self: start;
+  min-height: 34px;
   display: inline-flex;
   align-items: center;
   padding: 0 var(--space-sm);
@@ -3683,6 +3682,7 @@ select.content-field__control{
   font-weight: var(--ui-font-weight-control);
   line-height: 1;
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 @media (hover: hover){
   .event-detail-back:hover{
@@ -3695,12 +3695,47 @@ select.content-field__control{
   outline: 2px solid var(--cmp-focus-ring-brand);
   outline-offset: var(--cmp-focus-outline-offset);
 }
+.event-detail-card {
+  overflow: hidden;
+  border: 1px solid var(--border-eventcard);
+  border-radius: var(--radius-eventcard);
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--color-surface) 96%, var(--color-primary-muted)),
+      var(--color-surface) 58%);
+  box-shadow: var(--shadow-eventcard);
+}
+.event-detail-content {
+  padding: 19px var(--gutter) 16px;
+}
+.event-detail-content--body{
+  padding-top: 0;
+}
+.event-detail-kicker {
+  margin: 0 0 var(--space-sm);
+  color: color-mix(in srgb, var(--brand-green-700) 72%, var(--color-text-secondary));
+  font-size: 0.74rem;
+  font-weight: 830;
+  letter-spacing: 0.075em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.event-detail-content h1 {
+  margin: 0;
+  max-width: 16ch;
+  color: var(--color-text-primary);
+  font-size: clamp(1.68rem, 8.4vw, 2.55rem);
+  font-weight: 830;
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
 .event-detail-notice {
   display: grid;
   gap: 3px;
+  margin-top: var(--space-md);
   padding: var(--space-md) var(--gutter);
   border: 1px solid color-mix(in srgb, var(--brand-gold-300) 26%, var(--ui-border-weak));
-  border-radius: var(--ui-sheet-radius-lg);
+  border-radius: var(--ui-radius-md);
   background: color-mix(in srgb, var(--brand-gold-200) 24%, var(--color-surface));
   box-shadow: var(--ui-shadow-soft);
   color: var(--color-text-primary);
@@ -3709,63 +3744,23 @@ select.content-field__control{
 .event-detail-notice span {
   color: var(--color-text-secondary);
 }
-.event-detail-card {
-  overflow: hidden;
-  border: 1px solid var(--border-eventcard);
-  border-radius: var(--radius-eventcard);
-  background: var(--cmp-card-bg);
-  box-shadow: var(--shadow-eventcard);
-}
-.event-detail-hero {
-  overflow: hidden;
-  margin: 0;
-  border-bottom: 1px solid var(--ui-border-weak);
-  background: var(--ui-surface-tint);
-}
-.event-detail-hero img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  object-position: center center;
-}
-.event-detail-content {
-  padding: 18px var(--gutter) 20px;
-}
-.event-detail-kicker {
-  margin: 0 0 var(--space-sm);
-  color: color-mix(in srgb, var(--brand-green-700) 72%, var(--color-text-secondary));
-  font-size: 0.76rem;
-  font-weight: 820;
-  letter-spacing: 0.075em;
-  line-height: 1.1;
-  text-transform: uppercase;
-}
-.event-detail-content h1 {
-  margin: 0;
-  max-width: 720px;
-  color: var(--color-text-primary);
-  font-size: clamp(1.62rem, 6vw, 2.62rem);
-  font-weight: 820;
-  line-height: 1.04;
-  letter-spacing: -0.045em;
-}
 .event-detail-facts {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-sm);
   margin: var(--space-lg) 0 0;
 }
 .event-detail-facts div {
-  padding: var(--space-md) var(--gutter);
+  min-width: 0;
+  padding: 11px var(--space-md);
   border: 1px solid var(--border-panel-soft);
-  border-radius: var(--ui-sheet-radius-lg);
+  border-radius: var(--ui-radius-md);
   background: var(--surface-panel-row-info);
 }
 .event-detail-facts dt {
   margin: 0 0 4px;
   color: var(--color-text-muted);
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   font-weight: 820;
   letter-spacing: 0.065em;
   line-height: 1.1;
@@ -3774,31 +3769,16 @@ select.content-field__control{
 .event-detail-facts dd {
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 0.98rem;
+  font-size: 0.96rem;
   font-weight: 740;
-  line-height: 1.34;
-}
-.event-detail-section {
-  margin-top: 22px;
-}
-.event-detail-section h2 {
-  margin: 0 0 var(--space-sm);
-  color: var(--color-text-primary);
-  font-size: 1.02rem;
-  font-weight: 780;
-  letter-spacing: -0.012em;
-}
-.event-detail-section p {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: 1rem;
-  line-height: 1.58;
+  line-height: 1.32;
+  overflow-wrap: break-word;
 }
 .event-detail-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
-  margin-top: 22px;
+  margin-top: var(--space-lg);
 }
 .event-detail-action {
   display: inline-flex;
@@ -3839,12 +3819,45 @@ select.content-field__control{
 .event-detail-action:active{
   transform: translateY(1px);
 }
+.event-detail-hero {
+  display: block;
+  overflow: hidden;
+  height: clamp(184px, 52vw, 310px);
+  margin: 0 var(--gutter) var(--space-lg);
+  border: 1px solid var(--border-panel-soft);
+  border-radius: calc(var(--radius-eventcard) - 2px);
+  background: var(--ui-surface-tint);
+  box-shadow: var(--ui-shadow-soft);
+}
+.event-detail-hero img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+.event-detail-section {
+  margin-top: 0;
+}
+.event-detail-section h2 {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-text-primary);
+  font-size: 1.02rem;
+  font-weight: 780;
+  letter-spacing: -0.012em;
+}
+.event-detail-section p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  line-height: 1.58;
+}
 .event-detail-footer {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px 18px;
-  padding: 20px var(--gutter) 34px;
+  padding: 18px var(--gutter) 34px;
   color: var(--cmp-footer-link-color);
   font-size: 0.9rem;
 }
@@ -3858,15 +3871,37 @@ select.content-field__control{
     color: var(--cmp-footer-link-color-hover);
   }
 }
+@media (max-width: 420px){
+  .event-detail-main{
+    width: min(calc(100% - 20px), 700px);
+    padding-top: 12px;
+  }
+  .event-detail-content h1{
+    max-width: 15ch;
+  }
+  .event-detail-action--primary{
+    flex: 1 1 100%;
+  }
+}
+@media (min-width: 640px){
+  .event-detail-facts{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (min-width: 760px) {
   .event-detail-main {
     padding-top: var(--space-xl);
   }
   .event-detail-content {
-    padding: 26px 28px 28px;
+    padding: 26px 28px 18px;
   }
-  .event-detail-facts {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .event-detail-content--body{
+    padding-top: 0;
+    padding-bottom: 28px;
+  }
+  .event-detail-hero{
+    height: clamp(250px, 36vw, 360px);
+    margin-inline: 28px;
   }
 }
-/* === END BLOCK: EVENT_DETAIL_PUBLIC_PAGE_PREMIUM_TOKENS_V2 === */
+/* === END BLOCK: EVENT_DETAIL_PUBLIC_PAGE_PREMIUM_CONVERGENCE_V1 === */
