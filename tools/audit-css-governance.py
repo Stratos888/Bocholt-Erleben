@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CSS_ENTRY_VERSION = "2026-06-22-css-governance-v1"
 STYLE_HREF = f"/css/style.css?v={CSS_ENTRY_VERSION}"
-EVENT_DETAIL_PAGE_CSS_VERSION = "2026-07-03-event-detail-premium-convergence-v1"
+EVENT_DETAIL_PAGE_CSS_VERSION = "2026-07-03-event-detail-public-panel-v1"
 EVENT_DETAIL_PAGE_HREF = f"/css/pages.css?v={EVENT_DETAIL_PAGE_CSS_VERSION}"
 
 EXPECTED_IMPORTS = [

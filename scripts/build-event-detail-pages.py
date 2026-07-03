@@ -29,7 +29,7 @@ MANIFEST_PATH = ROOT / "data" / "event_detail_pages.json"
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://bocholt-erleben.de").rstrip("/")
 RETENTION_DAYS = 60
 STYLE_VERSION = "2026-06-22-css-governance-v1"
-DETAIL_PAGE_CSS_VERSION = "2026-07-03-event-detail-premium-convergence-v1"
+DETAIL_PAGE_CSS_VERSION = "2026-07-03-event-detail-public-panel-v1"
 
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RE_TIME = re.compile(r"\b(\d{1,2})[:.](\d{2})\b")
@@ -399,6 +399,21 @@ def build_maps_url(event: DetailEvent) -> str:
     return f"https://www.google.com/maps/search/?api=1&query={quote_plus(query)}"
 
 
+def host_label(value: str) -> str:
+    raw = normalize_http_url(value)
+    if not raw:
+        return ""
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(raw)
+        host = (parsed.netloc or "").lower().removeprefix("www.")
+    except Exception:
+        return "Veranstaltungsseite"
+    if host.endswith("bocholt.de"):
+        return "Stadt Bocholt"
+    return host or "Veranstaltungsseite"
+
+
 def event_place_line(event: DetailEvent) -> str:
     location = normalize_text(event.location)
     city = normalize_text(event.city)
@@ -443,46 +458,106 @@ def render_page(event: DetailEvent) -> str:
     maps_url = build_maps_url(event)
     place_line = event_place_line(event)
     noindex = '<meta name="robots" content="noindex,follow">\n' if event.noindex else ""
+
     expired_notice = ""
     if event.is_past:
         expired_notice = """
-        <section class="event-detail-notice" aria-label="Vergangene Veranstaltung">
-          <strong>Diese Veranstaltung ist bereits vorbei.</strong>
-          <span>Aktuelle Termine findest du in der Eventübersicht.</span>
-        </section>
+              <section class="event-detail-notice" aria-label="Vergangene Veranstaltung">
+                <strong>Diese Veranstaltung ist bereits vorbei.</strong>
+                <span>Aktuelle Termine findest du in der Eventübersicht.</span>
+              </section>
         """
 
     description_html = ""
     if event.description:
-        description_html = f"""
-        <section class="event-detail-section">
-          <h2>Worum geht es?</h2>
-          <p>{escape(event.description)}</p>
-        </section>
-        """
-    body_content_html = f"""
-      <div class="event-detail-content event-detail-content--body">
-        {description_html}
-      </div>
-    """ if description_html else ""
+        description_html = f'<div class="detail-description">{escape(event.description)}</div>'
 
-    source_action = ""
+    source_link_html = ""
     if event.external_url and not event.is_past:
-        source_action = f"""
-        <a class="event-detail-action event-detail-action--primary" href="{escape(event.external_url)}" target="_blank" rel="noopener">Zur Veranstaltungsseite</a>
+        source_link_html = f"""
+              <a class="detail-link" href="{escape(event.external_url)}" target="_blank" rel="noopener">
+                <span class="detail-link-label">Eventquelle</span>
+                <span class="detail-link-value">{escape(host_label(event.external_url))}</span>
+                <span class="detail-link-ext" data-ui-icon="external" aria-hidden="true"></span>
+              </a>
         """
 
-    route_action = ""
-    if maps_url and not event.is_past:
-        route_action = f"""
-        <a class="event-detail-action" href="{escape(maps_url)}" target="_blank" rel="noopener">Route öffnen</a>
+    trust_links_html = ""
+    if source_link_html:
+        trust_links_html = f"""
+            <div class="detail-links detail-links--trust" aria-label="Quellen und Nachweise">
+              {source_link_html}
+            </div>
         """
+
+    location_meta_html = ""
+    if maps_url and not event.is_past:
+        location_meta_html = f"""
+                <a class="detail-meta-row is-location" href="{escape(maps_url)}" target="_blank" rel="noopener" aria-label="Ort in Karten öffnen">
+                  <span class="detail-meta-icon" data-ui-icon="pin" aria-hidden="true"></span>
+                  <span class="detail-meta-text">{escape(place_line)}</span>
+                  <span class="detail-meta-ext" data-ui-icon="external" aria-hidden="true"></span>
+                </a>
+        """
+    else:
+        location_meta_html = f"""
+                <div class="detail-meta-row is-location is-static" aria-label="Ort">
+                  <span class="detail-meta-icon" data-ui-icon="pin" aria-hidden="true"></span>
+                  <span class="detail-meta-text">{escape(place_line)}</span>
+                </div>
+        """
+
+    date_line = event_date_line(event)
+    share_text = f"{event.title}\n{date_line}"
+    calendar_action = ""
+    if event.date and not event.is_past:
+        calendar_action = f"""
+          <button
+            class="detail-actionbar-btn is-icon"
+            type="button"
+            title="Kalender"
+            aria-label="Kalender"
+            data-calendar-title="{escape(event.title)}"
+            data-calendar-date="{escape(event.date)}"
+            data-calendar-time="{escape(event.time)}"
+            data-calendar-location="{escape(place_line)}"
+            data-calendar-description="{escape(event.description)}"
+          >
+            <span data-ui-icon="calendar" aria-hidden="true"></span>
+            <span class="detail-sr-only">Kalender</span>
+          </button>
+        """
+
+    share_action = f"""
+          <button
+            class="detail-actionbar-btn is-icon"
+            type="button"
+            title="Teilen"
+            aria-label="Teilen"
+            data-share-title="{escape(event.title)}"
+            data-share-text="{escape_attr_multiline(share_text)}"
+            data-share-url="{escape(event.detail_url)}"
+          >
+            <span data-ui-icon="share" aria-hidden="true"></span>
+            <span class="detail-sr-only">Teilen</span>
+          </button>
+    """
 
     overview_action = ""
     if event.is_past:
-        overview_action = '<a class="event-detail-action event-detail-action--primary" href="/events/">Aktuelle Events ansehen</a>'
+        overview_action = """
+          <a class="detail-actionbar-btn is-icon" href="/events/" title="Events" aria-label="Aktuelle Events ansehen">
+            <span data-ui-icon="calendar-days" aria-hidden="true"></span>
+            <span class="detail-sr-only">Aktuelle Events ansehen</span>
+          </a>
+        """
 
-    share_text = f"{event.title}\n{event_date_line(event)}"
+    actionbar_html = f"""
+        <div id="detail-actionbar-slot" class="event-detail-public-actionbar" aria-label="Aktionen">
+          {overview_action or calendar_action}
+          {share_action}
+        </div>
+    """
 
     return f"""<!DOCTYPE html>
 <html lang="de">
@@ -520,49 +595,81 @@ def render_page(event: DetailEvent) -> str:
     <img src="/icons/app/icon-192.png" alt="Bocholt erleben Logo" class="app-logo">
     <span class="app-title">Bocholt erleben</span>
   </a>
-  <div class="header-right">
-    <a class="pwa-install-button header-info-button" href="/events/">Events</a>
-  </div>
 </header>
+<div id="desktop-section-nav-root"></div>
 <main class="event-detail-main">
-  <div class="event-detail-shell" data-event-id="{escape(event.id)}">
-    <a class="event-detail-back" href="/events/">← Alle Events</a>
-    <article class="event-detail-card">
-      <div class="event-detail-content">
-        <p class="event-detail-kicker">{escape(event.category or 'Event')}</p>
-        <h1>{escape(event.title)}</h1>
-        {expired_notice}
-        <dl class="event-detail-facts" aria-label="Event-Infos">
-          <div class="event-detail-fact"><dt>Wann</dt><dd>{escape(event_date_line(event))}</dd></div>
-          <div class="event-detail-fact"><dt>Wo</dt><dd>{escape(place_line)}</dd></div>
-        </dl>
-        <section class="event-detail-actions" aria-label="Aktionen">
-          {overview_action}
-          {source_action}
-          {route_action}
-          <button class="event-detail-action" type="button" data-share-title="{escape(event.title)}" data-share-text="{escape_attr_multiline(share_text)}" data-share-url="{escape(event.detail_url)}">Teilen</button>
-        </section>
+  <section id="event-detail-panel" class="event-detail-public" data-detail-type="event" aria-label="Eventdetails" data-event-id="{escape(event.id)}">
+    <div class="detail-panel-content event-detail-public-surface">
+      <div class="detail-panel-body">
+        <div id="detail-content">
+          <div class="detail-panel-inner">
+            <figure class="event-detail-media" aria-label="Eventbild">
+              <img class="event-detail-media__img" src="{escape(event.image_src)}" alt="{escape(event.image_alt)}" loading="eager" decoding="async" width="1200" height="675">
+            </figure>
+            <div class="detail-header">
+              <div class="detail-title-row">
+                <h1 class="detail-title">{escape(event.title)}</h1>
+              </div>
+              <div class="detail-meta-rows" aria-label="Event-Infos">
+                {location_meta_html}
+                <div class="detail-meta-row is-datetime" aria-label="Datum und Uhrzeit">
+                  <span class="detail-meta-icon" data-ui-icon="calendar" aria-hidden="true"></span>
+                  <span class="detail-meta-text">{escape(date_line)}</span>
+                </div>
+              </div>
+              {expired_notice}
+            </div>
+            {description_html}
+            {trust_links_html}
+          </div>
+        </div>
       </div>
-      <figure class="event-detail-hero">
-        <img src="{escape(event.image_src)}" alt="{escape(event.image_alt)}" loading="eager" decoding="async" width="1200" height="675">
-      </figure>
-      {body_content_html}
-    </article>
-  </div>
+      {actionbar_html}
+    </div>
+  </section>
 </main>
-<footer class="event-detail-footer">
-  <a href="/events/">Events</a>
-  <a href="/aktivitaeten/">Aktivitäten</a>
-  <a href="/ueber/">Über Bocholt erleben</a>
-</footer>
+<footer data-site-footer></footer>
+<div id="bottom-tabbar-root"></div>
+<script src="/js/icons.js?v=2026-06-15-image-attribution-v7"></script>
+<script src="/js/bottom-tabbar.js?v=2026-05-29-today-nav-v1"></script>
+<script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7"></script>
 <script>
 (function () {{
-  var button = document.querySelector('[data-share-url]');
-  if (!button) return;
-  button.addEventListener('click', async function () {{
-    var title = button.getAttribute('data-share-title') || document.title;
-    var text = button.getAttribute('data-share-text') || '';
-    var url = button.getAttribute('data-share-url') || location.href;
+  if (window.Icons && typeof window.Icons.hydrate === 'function') {{
+    window.Icons.hydrate(document);
+  }}
+
+  function calendarDateRange(date, time) {{
+    var cleanDate = String(date || '').replaceAll('-', '');
+    if (!cleanDate) return '';
+    var match = String(time || '').match(/([0-9]{{1,2}})[:.]([0-9]{{2}})/);
+    if (!match) return cleanDate + '/' + cleanDate;
+    var hour = String(match[1]).padStart(2, '0');
+    var minute = String(match[2]).padStart(2, '0');
+    var start = cleanDate + 'T' + hour + minute + '00';
+    return start + '/' + start;
+  }}
+
+  document.querySelectorAll('[data-calendar-date]').forEach(function (button) {{
+    button.addEventListener('click', function () {{
+      var params = new URLSearchParams();
+      params.set('action', 'TEMPLATE');
+      params.set('text', button.getAttribute('data-calendar-title') || document.title);
+      params.set('dates', calendarDateRange(button.getAttribute('data-calendar-date'), button.getAttribute('data-calendar-time')));
+      var locationText = button.getAttribute('data-calendar-location') || '';
+      var description = button.getAttribute('data-calendar-description') || '';
+      if (locationText) params.set('location', locationText);
+      if (description) params.set('details', description);
+      window.open('https://calendar.google.com/calendar/render?' + params.toString(), '_blank', 'noopener');
+    }});
+  }});
+
+  var shareButton = document.querySelector('[data-share-url]');
+  if (!shareButton) return;
+  shareButton.addEventListener('click', async function () {{
+    var title = shareButton.getAttribute('data-share-title') || document.title;
+    var text = shareButton.getAttribute('data-share-text') || '';
+    var url = shareButton.getAttribute('data-share-url') || location.href;
     try {{
       if (navigator.share) {{
         await navigator.share({{ title: title, text: text, url: url }});

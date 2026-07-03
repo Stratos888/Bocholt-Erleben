@@ -4958,3 +4958,13 @@ Nach Deploy prüfen:
 3. Das Bild darf nicht mehr den ersten Screen allein dominieren.
 4. Browser-Konsole: kein `Uncaught SyntaxError`.
 5. Eventliste und mobiles Detailpanel bleiben unverändert nutzbar.
+
+
+## 2026-07-03 — Event-Detailseiten als öffentliche Detailpanel-Ansicht
+
+- Strategische Validierung: Generierte Event-Detailseiten sind keine neue Landingpage-Designwelt. Im Projektkontext ist der Premium-Zielzustand eine statische, öffentliche Variante des bestehenden Event-Detailpanels: gleicher Detail-View-Contract, gleiche ruhige Link-/Action-Logik, keine grellen CTA-Flächen, keine Sondernavigation.
+- Umsetzung: `scripts/build-event-detail-pages.py` erzeugt jetzt Detailpanel-nahes Markup (`detail-panel-inner`, `event-detail-media`, `detail-header`, `detail-meta-rows`, `detail-description`, `detail-links--trust`) statt eigenem Landingpage-Layout.
+- Entfernt: Top-Rechts-`Events`-Button, `← Alle Events`-Sonderlink, große grüne Primär-CTA-Fläche, eigener Event-Detail-Footer.
+- Navigation: Header-Logo bleibt Home-Einstieg; die bestehende Bottom-/Desktop-Bereichsnavigation ordnet `/events/<slug>/` dem Events-Bereich zu.
+- CTA-Disziplin: Route bleibt über die Ortszeile erreichbar; Eventquelle wird als ruhige Quellenzeile geführt; Kalender/Teilen liegen in einer statischen Detailpanel-Actionbar.
+- Guard: Deploy-Smoke prüft Event-Detailseiten zusätzlich auf Panel-Contract und gegen Rückfall in Sondernavigation/Primär-CTA.

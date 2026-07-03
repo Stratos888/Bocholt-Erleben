@@ -253,10 +253,38 @@ def check_event_feed_details(base_url: str) -> None:
     if not detail_candidates:
         raise AssertionError(f"{label}: kein Event mit detail_path/detail_url gefunden.")
 
-    sample = detail_candidates[0]
-    check_html_page(base_url, str(sample.get("detail_path")), f"Event-Detailseite ({sample.get('id', 'sample')})")
+    sample = next((item for item in detail_candidates if str(item.get("url") or "").strip()), detail_candidates[0])
+    sample_path = str(sample.get("detail_path"))
+    sample_result = request_with_retries(build_url(base_url, sample_path))
+    require_status(sample_result, {200}, f"Event-Detailseite ({sample.get('id', 'sample')})")
+    sample_html = sample_result.body
+    sample_html_lower = sample_html.lower()
+    if "text/html" not in sample_result.headers.get("content-type", "").lower() and "<html" not in sample_html_lower:
+        raise AssertionError(f"Event-Detailseite ({sample.get('id', 'sample')}): Antwort sieht nicht wie HTML aus.")
+    forbidden_fragments = [
+        "event-detail-back",
+        "event-detail-action--primary",
+        "href=\"/events/\">events</a>",
+    ]
+    found_forbidden = [frag for frag in forbidden_fragments if frag in sample_html_lower]
+    if found_forbidden:
+        raise AssertionError(
+            f"Event-Detailseite ({sample.get('id', 'sample')}): alte Sonderseiten-Navigation/CTA gefunden: {found_forbidden}"
+        )
+    required_fragments = [
+        "event-detail-public",
+        "detail-panel-inner",
+        "event-detail-media",
+        "detail-meta-rows",
+        "detail-links--trust",
+    ]
+    missing_fragments = [frag for frag in required_fragments if frag not in sample_html_lower]
+    if missing_fragments:
+        raise AssertionError(
+            f"Event-Detailseite ({sample.get('id', 'sample')}): Detailpanel-Contract unvollstaendig: {missing_fragments}"
+        )
 
-    print(f"✅ {label}: {len(events)} Events, Detailseiten-URL und Source-Link-Guard ok")
+    print(f"✅ {label}: {len(events)} Events, Detailseiten-URL, Panel-Contract und Source-Link-Guard ok")
 
 
 def check_checkout_validation(base_url: str) -> None:
