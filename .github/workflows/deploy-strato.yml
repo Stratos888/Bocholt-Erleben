@@ -221,6 +221,20 @@ jobs:
           echo "Deploy target dir: $TARGET_DIR"
           echo "Environment: $ENV_NAME"
       # === END BLOCK: DEPLOY_ENV_DECISION_V4 ===
+
+      - name: Resolve public site origin for generated event assets
+        shell: bash
+        run: |
+          set -e
+
+          if [ "$DEPLOY_ENV_NAME" = "staging" ]; then
+            SITE_ORIGIN="https://staging.bocholt-erleben.de"
+          else
+            SITE_ORIGIN="https://bocholt-erleben.de"
+          fi
+
+          echo "SITE_ORIGIN=$SITE_ORIGIN" >> "$GITHUB_ENV"
+          echo "Event detail origin: $SITE_ORIGIN"
       - name: Export Inbox tab to data/inbox.tsv (fail-fast, allow empty rows, retry-hardened)
         timeout-minutes: 6
         shell: bash
