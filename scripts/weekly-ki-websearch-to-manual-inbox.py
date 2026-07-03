@@ -156,6 +156,25 @@ def canonical_url(raw: str) -> str:
 # === END BLOCK: URL_CANONICALIZATION_OUTPUT_SAFE_V2 ===
 
 
+# === BEGIN BLOCK: WEEKLY_DOWNLOAD_DOCUMENT_URL_GUARD_V1 | Zweck: KI-Suchergebnisse mit PDF-/Download-URLs nicht in die manuelle Inbox uebernehmen; Umfang: URL-Klassifikation + Validierungs-Drop-Grund ===
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+
+
+def is_download_document_url(value: str) -> bool:
+    url = canonical_url(value).lower()
+    if not url:
+        return False
+    if DOCUMENT_URL_RE.search(url):
+        return True
+    if DOWNLOAD_QUERY_RE.search(url):
+        return True
+    if "/bocholt_media/" in url and any(ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+        return True
+    return False
+# === END BLOCK: WEEKLY_DOWNLOAD_DOCUMENT_URL_GUARD_V1 ===
+
+
 def parse_iso_date(raw: str) -> date | None:
     raw = norm(raw)
     if not raw:
@@ -1255,6 +1274,8 @@ JSON-Strenge:
 - Keine Zeilenumbrüche innerhalb von Stringwerten.
 - Keine sichtbaren Umbrüche in description, notes, url oder source_url.
 - URLs müssen getrimmt sein: keine Leerzeichen, keine Zeilenumbrüche.
+- url und source_url müssen normale HTML-Landingpages oder konkrete Event-/Veranstalterseiten sein. Keine PDF-/Office-Dateien, keine direkten Downloads, keine Links mit download=1, keine Bild-/Mediendateien als primaere Eventquelle.
+- Wenn nur ein PDF/Download gefunden wird und keine HTML-Landingpage existiert, gib den Kandidaten nicht aus.
 - Anführungszeichen innerhalb von Texten müssen korrekt escaped werden.
 - Jeder String muss gültig JSON-escaped sein.
 - Das Ergebnis muss direkt mit JSON.parse parsebar sein.
@@ -1633,6 +1654,11 @@ def candidate_invalid_reason(item: Dict[str, str], start: date, end: date) -> st
     missing_required = [field for field in CANDIDATE_REQUIRED_NON_EMPTY_FIELDS if not norm(item.get(field, ""))]
     if missing_required:
         return "missing_required:" + ",".join(missing_required)
+
+    if is_download_document_url(item.get("source_url", "")):
+        return "source_url_download_document"
+    if is_download_document_url(item.get("url", "")):
+        return "url_download_document"
 
     if not parse_iso_date(item.get("date", "")):
         return "invalid_date"

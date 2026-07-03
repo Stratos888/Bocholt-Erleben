@@ -116,6 +116,25 @@ def is_ticket_portal_url(value: str) -> bool:
     return any(host == portal or host.endswith("." + portal) for portal in TICKET_PORTAL_HOSTS)
 
 
+# === BEGIN BLOCK: DOWNLOAD_DOCUMENT_SOURCE_GUARD_V1 | Zweck: direkte Datei-/Downloadquellen als primaere Event-/Activity-Links erkennen, damit oeffentliche CTAs nie PDF-/Office-Dateien herunterladen | Umfang: reine URL-Klassifikation fuer Audit, Weekly- und Build-Guards spiegeln diese Policy ===
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+
+
+def is_download_document_url(value: str) -> bool:
+    url = norm(value).lower()
+    if not url:
+        return False
+    if DOCUMENT_URL_RE.search(url):
+        return True
+    if DOWNLOAD_QUERY_RE.search(url):
+        return True
+    if "/bocholt_media/" in url and any(ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+        return True
+    return False
+# === END BLOCK: DOWNLOAD_DOCUMENT_SOURCE_GUARD_V1 ===
+
+
 def normalized_url_parts(value: str) -> tuple[str, str, str]:
     parsed = urlparse(norm(value))
     host = (parsed.netloc or "").lower().removeprefix("www.")
@@ -407,6 +426,7 @@ def infer_process_metadata(
         "activity_source_url_invalid",
         "event_source_url_redirect",
         "event_source_url_broken",
+        "event_source_url_download_document",
         "event_source_url_missing",
         "event_source_url_invalid",
     }
@@ -1891,6 +1911,35 @@ def audit_event_rows(
                 "URL in der fachlichen Quelle korrigieren.",
                 date_value=date_value,
                 source_url=url,
+                public_url=public_url,
+            ))
+        elif is_download_document_url(url):
+            suggested_url = source_suggestion.get("suggested_url", "")
+            evidence = {}
+            if suggested_url:
+                evidence = evaluate_event_source_evidence(row, source_system, suggested_url, today=today, network=network)
+                action_text = "Direkte PDF-/Downloadquelle im Events-Sheet durch die vorgeschlagene offizielle HTML-Landingpage ersetzen. Bis dahin wird der Public-Build direkte Download-CTAs unterdruecken bzw. fuer kuratierte Faelle ersetzen."
+            else:
+                action_text = "Direkte PDF-/Downloadquelle nicht als primaere Eventquelle nutzen. Offizielle HTML-Landingpage recherchieren und im Events-Sheet speichern; falls keine HTML-Quelle existiert, oeffentlichen Eventlink leer lassen."
+            issues.append(issue(
+                "review_needed",
+                "event",
+                source_system,
+                content_id,
+                title,
+                "event_source_url_download_document",
+                "Als primaere Eventquelle ist eine direkte Datei-/Download-URL hinterlegt.",
+                action_text,
+                date_value=date_value,
+                source_url=url,
+                suggested_url=suggested_url,
+                suggested_url_label=source_suggestion.get("suggested_url_label", ""),
+                suggestion_reason=source_suggestion.get("suggestion_reason", ""),
+                evidence_status=evidence.get("evidence_status", ""),
+                evidence_summary=evidence.get("evidence_summary", ""),
+                evidence_checked_fields=evidence.get("evidence_checked_fields", ""),
+                evidence_missing_fields=evidence.get("evidence_missing_fields", ""),
+                evidence_field_statuses=evidence.get("evidence_field_statuses", ""),
                 public_url=public_url,
             ))
         elif is_ticket_portal_url(url):

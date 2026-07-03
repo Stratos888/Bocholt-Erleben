@@ -4831,3 +4831,41 @@ Abschlussbewertung:
 
 <!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_ROUTING_V2_VALIDATED_2026_07_02 === -->
 
+
+## 2026-07-03 – Event-Detailseiten: Source-Link- und Staging-Origin-Hardening
+
+Status: Patch vorbereitet.
+
+Auslöser:
+- Beim Test der neuen Event-Detail-Assets zeigte der Share-/Detail-Link auf dem Staging-Stand auf die Live-Origin und konnte dort als 404 landen, solange die Detailseiten noch nicht live deployt sind.
+- Beim Event `rosenbergfestival-2026-09-26` war als Eventquelle eine direkte PDF-/Download-URL (`newsletter-2026-i.pdf?download=1`) hinterlegt. Solche Links dürfen nicht als öffentliche Event-CTA ausgespielt werden, weil sie direkt einen Download auslösen und nicht wie eine normale Event-/Landingpage wirken.
+
+Umsetzung:
+- Generierte Event-Detail-URLs sind künftig deploy-umgebungsbewusst:
+  - `staging` erzeugt `https://staging.bocholt-erleben.de/events/.../`
+  - `main/live` erzeugt `https://bocholt-erleben.de/events/.../`
+- `build-events-from-tsv.py` verhindert direkte PDF-/Office-/Download-URLs als öffentliche `url` im Runtime-Feed.
+- Der bekannte Rosenbergfestival-Fall wird im Public-Build auf die offizielle HTML-Landingpage `https://www.bocholt.de/Interkulturellewoche` normalisiert.
+- `build-event-detail-pages.py` nutzt dieselbe öffentliche Link-Policy für Event-Detailseiten und deren CTA.
+- `content-quality-audit.py` erkennt direkte Datei-/Downloadquellen als `event_source_url_download_document` und schlägt, sofern kuratiert vorhanden, eine HTML-Landingpage vor.
+- `weekly-ki-websearch-to-manual-inbox.py` weist KI-Kandidaten mit PDF-/Download-URLs als `url` oder `source_url` ab und fordert HTML-Landingpages als primäre Quellen.
+- `inbox-to-events.py` verhindert, dass übernommene Inbox-Kandidaten direkte Datei-/Downloadlinks ins Events-Sheet schreiben.
+- `tools/smoke-check-deploy.py` prüft nach Deploy zusätzlich:
+  - `/data/events.json` ist erreichbar,
+  - `detail_url` passt zur aktuellen Deploy-Origin,
+  - kein Event im Public-Feed hat eine direkte PDF-/Download-URL als `url`,
+  - mindestens eine generierte Event-Detailseite liefert HTTP 200 HTML.
+
+Validierung lokal:
+- `python3 -m py_compile` für geänderte Python-Skripte OK.
+- Deploy-YAML parsebar OK.
+- Testbuild aus aktuellem Events-CSV OK: Rosenbergfestival nutzt im generierten `data/events.json` `https://www.bocholt.de/Interkulturellewoche` statt PDF-Download; `detail_url` zeigt mit `SITE_ORIGIN=https://staging.bocholt-erleben.de` auf Staging.
+- Event-Detailseite `events/rosenbergfestival-2026-09-26/index.html` wird generiert und enthält keine PDF-/Download-URL.
+- Content-Quality-Audit erzeugt für Rosenbergfestival `event_source_url_download_document` mit vorgeschlagener HTML-Landingpage.
+
+Nach Deploy prüfen:
+1. `https://staging.bocholt-erleben.de/data/events.json` öffnen und bei `rosenbergfestival-2026-09-26` prüfen:
+   - `detail_url` beginnt mit `https://staging.bocholt-erleben.de/events/`.
+   - `url` ist `https://www.bocholt.de/Interkulturellewoche`.
+2. `https://staging.bocholt-erleben.de/events/rosenbergfestival-2026-09-26/` öffnen: kein 404.
+3. In der Eventliste Detailpanel öffnen: Quelle/Veranstaltungsseite öffnet keine PDF-Datei mehr.

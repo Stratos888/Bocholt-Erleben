@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -30,7 +31,7 @@ from event_visual_motifs import infer_event_visual_motif, normalize_event_visual
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "events.tsv"
 OUT_JSON_PATH = ROOT / "data" / "events.json"
-SITE_ORIGIN = "https://bocholt-erleben.de"
+SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://bocholt-erleben.de").rstrip("/")
 
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{2,120}$")  # slug-like
@@ -163,6 +164,67 @@ def normalize_category(raw: str) -> str:
             return canon
 
     return r  # wird später gegen Canonical geprüft (fail-fast)
+
+
+
+# === BEGIN BLOCK: EVENT_PUBLIC_SOURCE_URL_GUARD_V1 | Zweck: verhindert oeffentliche Download-/PDF-Links als Event-CTA und ersetzt kuratierte Faelle durch HTML-Landingpages; Umfang: Build-time-Normalisierung fuer events.json, keine Sheet-Schreiboperation ===
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+
+CURATED_SAFE_SOURCE_URLS_BY_ID = {
+    "rosenbergfestival-2026-09-26": "https://www.bocholt.de/Interkulturellewoche",
+}
+
+
+def is_download_document_url(value: str) -> bool:
+    url = normalize_text(value)
+    if not url:
+        return False
+    lowered = url.lower()
+    if DOCUMENT_URL_RE.search(lowered):
+        return True
+    if DOWNLOAD_QUERY_RE.search(lowered):
+        return True
+    if "/bocholt_media/" in lowered and any(ext in lowered for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+        return True
+    return False
+
+
+def curated_safe_source_url(data: Dict[str, str]) -> str:
+    ev_id = normalize_text(data.get("id", ""))
+    if ev_id in CURATED_SAFE_SOURCE_URLS_BY_ID:
+        return CURATED_SAFE_SOURCE_URLS_BY_ID[ev_id]
+
+    haystack = " ".join(
+        normalize_text(data.get(key, "")).lower()
+        for key in ("title", "description", "location", "kategorie")
+    )
+    if "rosenbergfestival" in haystack or ("rosenberg" in haystack and "interkulturelle woche" in haystack):
+        return "https://www.bocholt.de/Interkulturellewoche"
+    return ""
+
+
+def normalize_public_event_url(data: Dict[str, str], rowno: int) -> str:
+    url = normalize_text(data.get("url", ""))
+    if not url:
+        return ""
+    if not is_download_document_url(url):
+        return url
+
+    replacement = curated_safe_source_url(data)
+    if replacement:
+        warn(
+            f"Zeile {rowno}: direkte Download-/PDF-Quelle wird oeffentlich durch kuratierte Landingpage ersetzt: "
+            f"{url!r} -> {replacement!r}"
+        )
+        return replacement
+
+    warn(
+        f"Zeile {rowno}: direkte Download-/PDF-Quelle wird nicht als oeffentlicher Event-Link ausgespielt: {url!r}. "
+        "Bitte eine HTML-Landingpage im Events-Sheet hinterlegen."
+    )
+    return ""
+# === END BLOCK: EVENT_PUBLIC_SOURCE_URL_GUARD_V1 ===
 
 
 # === BEGIN BLOCK: EVENT_RECOMMENDATION_OPTIONAL_FIELDS_V1 | Zweck: optionale Recommendation-Spalten aus dem Events-Sheet additiv in events.json übernehmen; Umfang: Normalisierung ohne neue Pflichtfelder ===
@@ -312,7 +374,7 @@ def main() -> None:
 
         # Gleiche URL ist erlaubt, wenn es unterschiedliche Instanzen sind.
         # Verboten bleibt nur dieselbe URL für dieselbe erkennbare Instanz.
-        url_raw = (data.get("url", "") or "").strip()
+        url_raw = normalize_public_event_url(data, idx)
         if url_raw:
             norm_url = url_raw.lower().rstrip("/")
             url_occurrence_key = (
@@ -392,7 +454,7 @@ def main() -> None:
                 city=data["city"],
                 location=data["location"],
                 kategorie=cat,
-                url=data.get("url", ""),
+                url=url_raw,
                 description=data.get("description", ""),
                 situation_tags=optional_list(data, "situation_tags"),
                 weather_profile=optional_list(data, "weather_profile"),

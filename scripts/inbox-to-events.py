@@ -63,6 +63,25 @@ def norm_key(s: str) -> str:
     return re.sub(r"\s+", " ", norm(s)).lower()
 
 
+
+# === BEGIN BLOCK: INBOX_TO_EVENTS_DOWNLOAD_DOCUMENT_GUARD_V1 | Zweck: verhindert, dass uebernommene Inbox-Kandidaten direkte PDF-/Downloadlinks als Event-URL ins Events-Sheet schreiben; Umfang: lokale Validierung vor Sheet-Append ===
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+
+
+def is_download_document_url(value: str) -> bool:
+    url = norm(value).lower()
+    if not url:
+        return False
+    if DOCUMENT_URL_RE.search(url):
+        return True
+    if DOWNLOAD_QUERY_RE.search(url):
+        return True
+    if "/bocholt_media/" in url and any(ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+        return True
+    return False
+# === END BLOCK: INBOX_TO_EVENTS_DOWNLOAD_DOCUMENT_GUARD_V1 ===
+
 def slugify(s: str) -> str:
     s = norm_key(s)
     s = s.replace("–", "-").replace("—", "-")
@@ -341,6 +360,13 @@ def main() -> None:
         final_visual_motif = normalized_visual_motif or visual_fit.get("visual_motif", "")
         # === END BLOCK: INBOX_TO_EVENTS_VISUAL_KEY_EDITOR_VALIDATION_V1 ===
 
+        source_url = norm(inb.get("url", "")) or norm(inb.get("source_url", ""))
+        if is_download_document_url(source_url):
+            fail(
+                f"Inbox: direkte Datei-/Download-URL darf nicht als Eventquelle übernommen werden für '{title}': {source_url}. "
+                "Bitte zuerst eine offizielle HTML-Landingpage eintragen oder die URL leer lassen."
+            )
+
         source_fields = {
             "id": eid,
             "title": title,
@@ -351,7 +377,7 @@ def main() -> None:
             "location": location,
             # Einige Sheets heißen "kategorie" im Events-Tab, Inbox hat "kategorie_suggestion"
             "kategorie": category,
-            "url": norm(inb.get("url", "")) or norm(inb.get("source_url", "")),
+            "url": source_url,
             "description": description,
             "visual_key": final_visual_key,
             "visual_motif": final_visual_motif,

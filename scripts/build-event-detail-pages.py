@@ -11,6 +11,7 @@ from __future__ import annotations
 import csv
 import html
 import json
+import os
 import re
 import shutil
 import unicodedata
@@ -25,7 +26,7 @@ EVENTS_TSV = ROOT / "data" / "events.tsv"
 VISUAL_POOL_JSON = ROOT / "data" / "event_visual_pool.json"
 EVENTS_DIR = ROOT / "events"
 MANIFEST_PATH = ROOT / "data" / "event_detail_pages.json"
-SITE_ORIGIN = "https://bocholt-erleben.de"
+SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://bocholt-erleben.de").rstrip("/")
 RETENTION_DAYS = 60
 STYLE_VERSION = "2026-06-22-css-governance-v1"
 
@@ -156,6 +157,51 @@ def normalize_http_url(value: Any) -> str:
     if raw.startswith("www."):
         return "https://" + raw
     return ""
+
+
+
+# === BEGIN BLOCK: EVENT_DETAIL_PUBLIC_SOURCE_URL_GUARD_V1 | Zweck: verhindert direkte Download-/PDF-Links als CTA auf generierten Event-Detailseiten; Umfang: nur URL-Normalisierung fuer Detailseiten, keine Sheet-Schreiboperation ===
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+CURATED_SAFE_SOURCE_URLS_BY_ID = {
+    "rosenbergfestival-2026-09-26": "https://www.bocholt.de/Interkulturellewoche",
+}
+
+
+def is_download_document_url(value: Any) -> bool:
+    url = normalize_text(value).lower()
+    if not url:
+        return False
+    if DOCUMENT_URL_RE.search(url):
+        return True
+    if DOWNLOAD_QUERY_RE.search(url):
+        return True
+    if "/bocholt_media/" in url and any(ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+        return True
+    return False
+
+
+def curated_safe_source_url(raw: Dict[str, Any]) -> str:
+    event_id = normalize_text(raw.get("id"))
+    if event_id in CURATED_SAFE_SOURCE_URLS_BY_ID:
+        return CURATED_SAFE_SOURCE_URLS_BY_ID[event_id]
+    haystack = " ".join(
+        normalize_text(raw.get(key)).lower()
+        for key in ("title", "description", "beschreibung", "location", "ort", "kategorie", "category")
+    )
+    if "rosenbergfestival" in haystack or ("rosenberg" in haystack and "interkulturelle woche" in haystack):
+        return "https://www.bocholt.de/Interkulturellewoche"
+    return ""
+
+
+def normalize_public_external_url(raw: Dict[str, Any]) -> str:
+    candidate = normalize_http_url(raw.get("url") or raw.get("website") or raw.get("source_url") or raw.get("sourceUrl"))
+    if not candidate:
+        return ""
+    if not is_download_document_url(candidate):
+        return candidate
+    return normalize_http_url(curated_safe_source_url(raw))
+# === END BLOCK: EVENT_DETAIL_PUBLIC_SOURCE_URL_GUARD_V1 ===
 
 
 def absolute_url(path_or_url: str) -> str:
@@ -296,7 +342,7 @@ def build_detail_event(raw: Dict[str, Any], is_past: bool, noindex: bool, visual
         location=normalize_text(raw.get("location") or raw.get("ort")),
         category=normalize_text(raw.get("kategorie") or raw.get("category")),
         description=normalize_text(raw.get("description") or raw.get("beschreibung")),
-        external_url=normalize_http_url(raw.get("url") or raw.get("website") or raw.get("source_url") or raw.get("sourceUrl")),
+        external_url=normalize_public_external_url(raw),
         visual_key=normalize_lookup_key(raw.get("visual_key") or raw.get("visualKey")),
         visual_motif=normalize_lookup_key(raw.get("visual_motif") or raw.get("visualMotif")),
         image_src=image_src,

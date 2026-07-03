@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 from dataclasses import dataclass
@@ -122,6 +123,35 @@ def parse_json(result: HttpResult) -> dict[str, Any]:
     return payload
 
 
+def parse_json_array(result: HttpResult) -> list[Any]:
+    try:
+        payload = json.loads(result.body)
+    except json.JSONDecodeError as error:
+        raise AssertionError(f"{result.url} liefert kein gültiges JSON: {error}") from error
+
+    if not isinstance(payload, list):
+        raise AssertionError(f"{result.url} liefert kein JSON-Array.")
+
+    return payload
+
+
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+
+
+def is_download_document_url(value: Any) -> bool:
+    url = str(value or "").strip().lower()
+    if not url:
+        return False
+    if DOCUMENT_URL_RE.search(url):
+        return True
+    if DOWNLOAD_QUERY_RE.search(url):
+        return True
+    if "/bocholt_media/" in url and any(ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+        return True
+    return False
+
+
 def require_status(result: HttpResult, expected: set[int], label: str) -> None:
     if result.status not in expected:
         excerpt = result.body.strip().replace("\n", " ")[:300]
@@ -188,6 +218,45 @@ def check_public_events_api(base_url: str) -> None:
         raise AssertionError(f"{label}: unerwartete Struktur: {payload}")
 
     print(f"✅ Public-Events-API: {len(data.get('events', []))} DB-Events")
+
+
+def check_event_feed_details(base_url: str) -> None:
+    label = "Generierter Event-Feed + Detailseiten"
+    result = request_with_retries(build_url(base_url, "/data/events.json"))
+    require_status(result, {200}, label)
+    events = parse_json_array(result)
+    if not events:
+        raise AssertionError(f"{label}: events.json ist leer.")
+
+    base_origin = base_url.rstrip("/")
+    detail_candidates: list[dict[str, Any]] = []
+    unsafe_sources: list[str] = []
+    wrong_origin: list[str] = []
+
+    for item in events:
+        if not isinstance(item, dict):
+            continue
+        url = str(item.get("url") or "")
+        if is_download_document_url(url):
+            unsafe_sources.append(f"{item.get('id', '')}: {url}")
+        detail_path = str(item.get("detail_path") or "")
+        detail_url = str(item.get("detail_url") or "")
+        if detail_path.startswith("/events/") and detail_path.endswith("/"):
+            detail_candidates.append(item)
+        if detail_url and not detail_url.startswith(base_origin + "/events/"):
+            wrong_origin.append(f"{item.get('id', '')}: {detail_url}")
+
+    if unsafe_sources:
+        raise AssertionError(f"{label}: direkte Datei-/Download-URLs im Public-Feed: {unsafe_sources[:3]}")
+    if wrong_origin:
+        raise AssertionError(f"{label}: detail_url zeigt nicht auf aktuelle Deploy-Basis {base_origin}: {wrong_origin[:3]}")
+    if not detail_candidates:
+        raise AssertionError(f"{label}: kein Event mit detail_path/detail_url gefunden.")
+
+    sample = detail_candidates[0]
+    check_html_page(base_url, str(sample.get("detail_path")), f"Event-Detailseite ({sample.get('id', 'sample')})")
+
+    print(f"✅ {label}: {len(events)} Events, Detailseiten-URL und Source-Link-Guard ok")
 
 
 def check_checkout_validation(base_url: str) -> None:
@@ -276,6 +345,7 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_build_file(base_url, args.expected_build),
         lambda: check_html_page(base_url, "/", "Startseite"),
         lambda: check_html_page(base_url, "/events/", "Events-Suchseite"),
+        lambda: check_event_feed_details(base_url),
         lambda: check_html_page(base_url, "/aktivitaeten/", "Aktivitäten-Seite"),
         lambda: check_html_page(base_url, "/bildnachweise/", "Bildnachweise-Seite"),
         lambda: check_html_page(base_url, "/events-veroeffentlichen/einreichen/", "Event-Einreichen-Seite"),
