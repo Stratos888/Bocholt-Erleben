@@ -67,6 +67,11 @@ def escape(value: Any) -> str:
     return html.escape(normalize_text(value), quote=True)
 
 
+def escape_attr_multiline(value: Any) -> str:
+    """Escape attribute values and keep line breaks HTML-attribute-safe."""
+    return escape(value).replace("\n", "&#10;")
+
+
 def normalize_slug_part(value: Any) -> str:
     text = normalize_text(value).lower()
     text = unicodedata.normalize("NFKD", text)
@@ -480,7 +485,7 @@ def render_page(event: DetailEvent) -> str:
 <meta name="twitter:description" content="{escape(desc)}">
 <meta name="twitter:image" content="{escape(image_url)}">
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#F3F2E6">
+<meta name="theme-color" content="#EEF1E3">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -489,7 +494,7 @@ def render_page(event: DetailEvent) -> str:
 {json_ld(event)}
 </script>
 </head>
-<body class="event-detail-page">
+<body class="page-route-events event-detail-page">
 <header class="app-header">
   <a class="header-left" href="/" aria-label="Bocholt erleben Startseite">
     <img src="/icons/app/icon-192.png" alt="Bocholt erleben Logo" class="app-logo">
@@ -500,13 +505,14 @@ def render_page(event: DetailEvent) -> str:
   </div>
 </header>
 <main class="event-detail-main">
-  <article class="event-detail-shell" data-event-id="{escape(event.id)}">
+  <div class="event-detail-shell" data-event-id="{escape(event.id)}">
     <a class="event-detail-back" href="/events/">← Alle Events</a>
     {expired_notice}
-    <figure class="event-detail-hero">
-      <img src="{escape(event.image_src)}" alt="{escape(event.image_alt)}" loading="eager" decoding="async" width="1200" height="675">
-    </figure>
-    <div class="event-detail-content">
+    <article class="event-detail-card">
+      <figure class="event-detail-hero">
+        <img src="{escape(event.image_src)}" alt="{escape(event.image_alt)}" loading="eager" decoding="async" width="1200" height="675">
+      </figure>
+      <div class="event-detail-content">
       <p class="event-detail-kicker">{escape(event.category or 'Event')}</p>
       <h1>{escape(event.title)}</h1>
       <dl class="event-detail-facts">
@@ -515,13 +521,14 @@ def render_page(event: DetailEvent) -> str:
         <div><dt>Ort</dt><dd>{escape(event.city)}</dd></div>
       </dl>
       {description_html}
-      <section class="event-detail-actions" aria-label="Aktionen">
-        {source_action}
-        {route_action}
-        <button class="event-detail-action" type="button" data-share-title="{escape(event.title)}" data-share-text="{escape(share_text)}" data-share-url="{escape(event.detail_url)}">Teilen</button>
-      </section>
-    </div>
-  </article>
+        <section class="event-detail-actions" aria-label="Aktionen">
+          {source_action}
+          {route_action}
+          <button class="event-detail-action" type="button" data-share-title="{escape(event.title)}" data-share-text="{escape_attr_multiline(share_text)}" data-share-url="{escape(event.detail_url)}">Teilen</button>
+        </section>
+      </div>
+    </article>
+  </div>
 </main>
 <footer class="event-detail-footer">
   <a href="/events/">Events</a>
@@ -545,7 +552,7 @@ def render_page(event: DetailEvent) -> str:
       if (error && (error.name === 'AbortError' || error.name === 'NotAllowedError')) return;
     }}
     try {{
-      if (navigator.clipboard) await navigator.clipboard.writeText([text, url].filter(Boolean).join('\n'));
+      if (navigator.clipboard) await navigator.clipboard.writeText([text, url].filter(Boolean).join('\\n'));
     }} catch (_) {{}}
   }});
 }})();

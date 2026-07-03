@@ -4869,3 +4869,36 @@ Nach Deploy prüfen:
    - `url` ist `https://www.bocholt.de/Interkulturellewoche`.
 2. `https://staging.bocholt-erleben.de/events/rosenbergfestival-2026-09-26/` öffnen: kein 404.
 3. In der Eventliste Detailpanel öffnen: Quelle/Veranstaltungsseite öffnet keine PDF-Datei mehr.
+
+
+## 2026-07-03 – Event-Detailseiten: Token-Konsistenz und Share-Script-Fix
+
+Status: Patch vorbereitet.
+
+Auslöser:
+- Staging-Test zeigt: Event-Detailseiten laden und Rosenbergfestival nutzt keine PDF-Downloadquelle mehr.
+- Die Detailseite wirkte visuell noch zu eigenständig und nutzte teilweise lokale Hardcodes statt den bestehenden Design-Tokens.
+- In der Browser-Konsole trat auf den generierten Detailseiten ein `Uncaught SyntaxError: Invalid or unexpected token` auf. Ursache war ein generierter Inline-Share-Script-String mit echtem Zeilenumbruch in einem JavaScript-Stringliteral.
+
+Umsetzung:
+- `build-event-detail-pages.py` erzeugt den Share-Fallback jetzt JS-sicher (`\\n` im generierten JavaScript statt echtem Zeilenbruch im Stringliteral).
+- Mehrzeilige Share-Daten im Button werden HTML-Attribut-sicher als `&#10;` erzeugt.
+- Event-Detailseiten erhalten `body.page-route-events`, damit sie semantisch beim Events-Bereich bleiben.
+- Das öffentliche Event-Detailseiten-CSS wurde auf bestehende Tokens/Komponentenverträge umgestellt:
+  - `--color-background`, `--color-surface`, `--color-text-*`
+  - `--border-eventcard`, `--radius-eventcard`, `--shadow-eventcard`
+  - `--surface-panel-row-info`, `--cmp-btn-*`, `--cmp-footer-*`
+- Hero und Inhalt sitzen nun in einer gemeinsamen Card-Surface statt als optisch fremde Einzelblöcke.
+- `tools/audit-css-governance.py` hebt den `pages.css`-Line-Budget bewusst auf `3925`, weil die öffentliche Detailseiten-Optik als Teil des Pages-Owners ausgeliefert wird und keinen neuen CSS-Owner erzeugen soll.
+
+Validierung lokal:
+- `python3 -m py_compile scripts/build-event-detail-pages.py tools/audit-css-governance.py` OK.
+- `python3 scripts/build-event-detail-pages.py` OK: 108 Event-Detailseiten erzeugt.
+- Generierte Rosenbergfestival-Detailseite enthält keine ungültige JS-Zeilenumbruchsequenz mehr; extrahiertes Inline-Script besteht `node --check`.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deploy prüfen:
+1. Eine Event-Detailseite öffnen, z. B. `/events/rosenbergfestival-2026-09-26/`.
+2. Browser-Konsole prüfen: kein `Uncaught SyntaxError` mehr.
+3. Detailseite visuell gegen App prüfen: Header, Card, Surface, Farben, Buttons und Footer wirken konsistent mit Events/Detailpanel/Today.
+4. Teilen-Button testen: Share-Fallback bzw. Kopieren funktioniert weiterhin.

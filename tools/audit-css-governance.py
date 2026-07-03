@@ -30,7 +30,7 @@ EXPECTED_IMPORTS = [
 CSS_LINE_LIMITS = {
     "style.css": 40,
     "base.css": 950,
-    "pages.css": 3850,
+    "pages.css": 3925,
     "components.css": 2200,
     "home.css": 5000,
     "today.css": 1600,
