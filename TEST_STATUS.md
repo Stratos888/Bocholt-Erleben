@@ -4968,3 +4968,24 @@ Nach Deploy prüfen:
 - Navigation: Header-Logo bleibt Home-Einstieg; die bestehende Bottom-/Desktop-Bereichsnavigation ordnet `/events/<slug>/` dem Events-Bereich zu.
 - CTA-Disziplin: Route bleibt über die Ortszeile erreichbar; Eventquelle wird als ruhige Quellenzeile geführt; Kalender/Teilen liegen in einer statischen Detailpanel-Actionbar.
 - Guard: Deploy-Smoke prüft Event-Detailseiten zusätzlich auf Panel-Contract und gegen Rückfall in Sondernavigation/Primär-CTA.
+
+## Event-Detailseiten: Public-Panel Scroll- und Share-Fix (2026-07-03)
+
+Status: vorbereitet für `staging`.
+
+Ziel:
+- Die öffentliche Event-Detailseite bleibt eine statische Detailpanel-Ansicht, darf aber kein Scroll-Trap erzeugen.
+- Native Event-Share darf die kanonische Event-URL nicht doppelt an Share-Ziele übergeben.
+
+Änderungen:
+- `css/pages.css`: Public-Panel-Detailseiten erlauben Touch-/Wheel-Scroll-Chaining wieder explizit (`touch-action: pan-y`, `overscroll-behavior: auto`) und überschreiben die Overlay-Detailpanel-Scrollregeln nur auf `.event-detail-page`.
+- `css/pages.css`: globaler Detailpanel-Drag-Pseudo-Handle wird auf Public-Detailseiten deaktiviert, damit die statische Seite keinen Overlay-Chrome-Rest übernimmt.
+- `scripts/build-event-detail-pages.py`: Detailseiten-CSS-Version erhöht, damit die Scroll-Fixes nach Deploy nicht im Cache hängen bleiben.
+- `js/details.js`: Native Share bekommt `text` und `url` getrennt; der Eventlink wird nicht zusätzlich in `text` dupliziert. Clipboard-Fallback kopiert weiterhin Text + URL.
+
+Prüfung nach Deploy:
+1. `/events/rosenbergfestival-2026-09-26/` auf Mobile öffnen.
+2. Auf dem Panel-Inhalt selbst scrollen, nicht nur auf der Bottom-Nav. Erwartung: Seite scrollt normal.
+3. Event aus dem normalen Detailpanel teilen. Erwartung: geteilte Nachricht enthält die kanonische Event-URL nur einmal.
+4. Event-Detailseite teilen. Erwartung: geteilte Nachricht enthält die kanonische Event-URL nur einmal.
+5. Eventliste und normales mobiles Detailpanel bleiben unverändert.

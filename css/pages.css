@@ -3669,6 +3669,10 @@ select.content-field__control{
   z-index: 20;
 }
 
+html:not(.is-panel-open) .event-detail-page{
+  overflow-y: auto;
+}
+
 .event-detail-main{
   width: min(calc(100% - (var(--gutter) * 2)), 620px);
   margin: 0 auto;
@@ -3701,6 +3705,8 @@ select.content-field__control{
   height: auto;
   padding: 0;
   overflow: hidden;
+  overscroll-behavior: auto;
+  touch-action: pan-y;
   border: 1px solid var(--border-panel);
   border-radius: var(--dp-sheet-radius);
   background-color: var(--surface-panel);
@@ -3713,11 +3719,24 @@ select.content-field__control{
   box-shadow: var(--shadow-eventcard);
 }
 
+.event-detail-page #event-detail-panel .detail-panel-content::before{
+  content: none !important;
+}
+
+.event-detail-page #event-detail-panel,
+.event-detail-page #event-detail-panel .detail-panel-content,
+.event-detail-page #event-detail-panel .detail-panel-body,
+.event-detail-page #event-detail-panel #detail-content,
+.event-detail-page #event-detail-panel .detail-panel-inner{
+  touch-action: pan-y;
+}
+
 .event-detail-page #event-detail-panel .detail-panel-body{
   flex: 0 0 auto;
   min-height: 0;
-  overflow: visible;
-  overscroll-behavior: auto;
+  overflow: visible !important;
+  overscroll-behavior: auto !important;
+  -webkit-overflow-scrolling: auto;
 }
 
 .event-detail-page #event-detail-panel #detail-content{

@@ -29,7 +29,7 @@ MANIFEST_PATH = ROOT / "data" / "event_detail_pages.json"
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://bocholt-erleben.de").rstrip("/")
 RETENTION_DAYS = 60
 STYLE_VERSION = "2026-06-22-css-governance-v1"
-DETAIL_PAGE_CSS_VERSION = "2026-07-03-event-detail-public-panel-v1"
+DETAIL_PAGE_CSS_VERSION = "2026-07-03-event-detail-scroll-share-v1"
 
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RE_TIME = re.compile(r"\b(\d{1,2})[:.](\d{2})\b")
