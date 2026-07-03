@@ -1,3 +1,27 @@
+<!-- === BEGIN BLOCK: MASTER_EVENT_DESCRIPTION_QUALITY_CONTROL_2026_07_03 | Zweck: legt den Premium-Beschreibungsstandard als produktweiten Content-Contract fest; Umfang: KI-Suche, Manual Intake, Inbox-Import, Public-Build, Content-Audit und Feedback-Loop === -->
+## Aktueller Steuerungsstand – Event-Beschreibungen als Premium-Contract 2026-07-03
+
+Event-Beschreibungen sind ab sofort kein nebensächliches Textfeld mehr, sondern Teil des kommerziellen Premium-Produkts. Der verbindliche Ton lautet: lokal-redaktionell, seriös, freundlich, kurz und faktenbasiert.
+
+Nicht publikationsfähig sind insbesondere:
+
+- Quellenherleitungen wie `laut Quelle`, `PDF`, `Newsletter-PDF`, `das Programm nennt`,
+- generische KI-Prosa wie `Atmosphäre spürbar`, `Teil des kulturellen Lebens`,
+- Werbesprache und Superlative wie `Highlight`, `für Jung und Alt`, `unvergesslich`,
+- Titelwiederholung plus Doppelpunkt als Beschreibungseinstieg.
+
+Der Standard wird technisch an mehreren Stellen abgesichert:
+
+1. Weekly-KI-Prompt mit explizitem Ton-/Negativbeispiel-Contract.
+2. Lokaler Weekly-KI-Post-Validator gegen harte Description-Fehler.
+3. Manual-Intake-Guard vor Sheet-Inbox-Append.
+4. Inbox-to-Events-Guard vor Events-Sheet-Append.
+5. Public-Build-Guard mit kuratierten Overrides fuer bekannte Bestandsfaelle.
+6. Content-Quality-Audit mit Description-Issue-Codes und Rueckfuehrung in `content-search-feedback.json`.
+
+Massgeblich: `EVENT_DESCRIPTION_STANDARD.md`. Kuratierte Overrides in `data/event_description_overrides.json` sind Bruecken fuer bestehende Bestandsdaten, nicht Ersatz fuer saubere Sheet- oder KI-Pflege.
+<!-- === END BLOCK: MASTER_EVENT_DESCRIPTION_QUALITY_CONTROL_2026_07_03 === -->
+
 <!-- === BEGIN BLOCK: MASTER_COMMERCIAL_STRATEGY_CONTROL_2026_07_02 | Zweck: setzt den aktuellen strategischen Schwerpunkt auf Veranstalter-/Anbietergewinnung, zahlungsfaehigen Mehrwert und Premium-Parity; Umfang: kommerzielles Zielbild, Abgrenzung zu Anzeigenportal/Paywall, Repriorisierung aelterer Roadmap-Punkte === -->
 ## Aktueller Steuerungsstand – kommerzielle Premium-Phase 2026-07-02
 

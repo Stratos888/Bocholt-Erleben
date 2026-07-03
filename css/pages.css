@@ -3648,3 +3648,194 @@ select.content-field__control{
   }
 }
 /* === END BLOCK: IMAGE_CREDITS_PAGE_PREMIUM_V3 === */
+
+/* === BEGIN BLOCK: EVENT_DETAIL_PUBLIC_PANEL_CONVERGENCE_V1 | Zweck: generierte /events/<slug>/ Seiten sind keine eigene Landingpage-Designwelt, sondern eine statische oeffentliche Detailpanel-Ansicht; Umfang: nur Event-Detailseiten, bestehendes Overlay-Detailpanel bleibt unveraendert === */
+.event-detail-page{
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--color-primary-muted) 58%, transparent) 0, transparent 34%),
+    linear-gradient(180deg, var(--color-background), color-mix(in srgb, var(--color-background) 90%, white));
+  color: var(--color-text-primary);
+}
+
+.event-detail-page .header-left{
+  color: inherit;
+  text-decoration: none;
+}
+
+.event-detail-page .app-header{
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+html:not(.is-panel-open) .event-detail-page{
+  overflow-y: auto;
+}
+
+.event-detail-main{
+  width: min(calc(100% - (var(--gutter) * 2)), 620px);
+  margin: 0 auto;
+  padding: 14px 0 calc(34px + var(--bottom-tabbar-reserve, 0px));
+}
+
+.event-detail-page #event-detail-panel.event-detail-public{
+  position: static;
+  inset: auto;
+  z-index: auto;
+  display: block;
+}
+
+.event-detail-page #event-detail-panel .detail-panel-overlay,
+.event-detail-page #event-detail-panel .detail-panel-grabber,
+.event-detail-page #event-detail-panel .detail-panel-drag-hit,
+.event-detail-page #event-detail-panel .detail-panel-close{
+  display: none !important;
+}
+
+.event-detail-page #event-detail-panel .detail-panel-content{
+  position: static;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  transform: none;
+  width: 100%;
+  max-height: none;
+  min-height: 0;
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+  overscroll-behavior: auto;
+  touch-action: pan-y;
+  border: 1px solid var(--border-panel);
+  border-radius: var(--dp-sheet-radius);
+  background-color: var(--surface-panel);
+  background-image: linear-gradient(
+    to bottom,
+    var(--surface-panel-elevated) 0%,
+    var(--surface-panel) 30%,
+    rgba(255,255,255,0) 128px
+  );
+  box-shadow: var(--shadow-eventcard);
+}
+
+.event-detail-page #event-detail-panel .detail-panel-content::before{
+  content: none !important;
+}
+
+.event-detail-page #event-detail-panel,
+.event-detail-page #event-detail-panel .detail-panel-content,
+.event-detail-page #event-detail-panel .detail-panel-body,
+.event-detail-page #event-detail-panel #detail-content,
+.event-detail-page #event-detail-panel .detail-panel-inner{
+  touch-action: pan-y;
+}
+
+.event-detail-page #event-detail-panel .detail-panel-body{
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: visible !important;
+  overscroll-behavior: auto !important;
+  -webkit-overflow-scrolling: auto;
+}
+
+.event-detail-page #event-detail-panel #detail-content{
+  padding-top: var(--gutter);
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  padding-bottom: 0;
+}
+
+.event-detail-page #event-detail-panel .event-detail-media{
+  margin-bottom: 14px;
+}
+
+.event-detail-page #event-detail-panel .detail-title-row{
+  padding-right: 0;
+}
+
+.event-detail-page #event-detail-panel .detail-title{
+  font-size: clamp(1.14rem, 5.3vw, 1.42rem);
+  line-height: 1.13;
+}
+
+.event-detail-page #event-detail-panel .detail-header{
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+}
+
+.event-detail-page #event-detail-panel .detail-description{
+  margin-top: 0;
+  padding-bottom: 10px;
+}
+
+.event-detail-page #event-detail-panel .event-detail-notice{
+  display: grid;
+  gap: 3px;
+  margin-top: 4px;
+  padding: 12px 13px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 15px;
+  background: var(--surface-panel-row-info);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  line-height: 1.42;
+}
+
+.event-detail-page #event-detail-panel .event-detail-notice span{
+  color: var(--color-text-secondary);
+}
+
+.event-detail-page #event-detail-panel .detail-links{
+  margin-top: 10px;
+  padding-top: 10px;
+  padding-bottom: 12px;
+}
+
+.event-detail-page #detail-actionbar-slot{
+  position: static;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  transform: none;
+  width: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 12px var(--gutter) var(--gutter);
+  display: grid !important;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 10px;
+  background: color-mix(in srgb, var(--surface-panel-footer) 88%, transparent);
+  border-top: 1px solid var(--border-panel);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.72) inset;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  z-index: auto;
+}
+
+.event-detail-page #detail-actionbar-slot .detail-actionbar-btn{
+  height: 52px;
+  min-height: 52px;
+}
+
+.event-detail-page .site-footer,
+.event-detail-page footer[data-site-footer]{
+  margin-top: 24px;
+}
+
+@media (max-width: 420px){
+  .event-detail-main{
+    width: min(calc(100% - 20px), 620px);
+    padding-top: 10px;
+  }
+}
+
+@media (min-width: 760px){
+  .event-detail-main{
+    padding-top: 22px;
+  }
+}
+/* === END BLOCK: EVENT_DETAIL_PUBLIC_PANEL_CONVERGENCE_V1 === */

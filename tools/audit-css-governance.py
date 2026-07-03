@@ -17,6 +17,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CSS_ENTRY_VERSION = "2026-06-22-css-governance-v1"
 STYLE_HREF = f"/css/style.css?v={CSS_ENTRY_VERSION}"
+EVENT_DETAIL_PAGE_CSS_VERSION = "2026-07-03-event-detail-scroll-share-v1"
+EVENT_DETAIL_PAGE_HREF = f"/css/pages.css?v={EVENT_DETAIL_PAGE_CSS_VERSION}"
 
 EXPECTED_IMPORTS = [
     "base.css",
@@ -30,7 +32,7 @@ EXPECTED_IMPORTS = [
 CSS_LINE_LIMITS = {
     "style.css": 40,
     "base.css": 950,
-    "pages.css": 3850,
+    "pages.css": 3950,
     "components.css": 2200,
     "home.css": 5000,
     "today.css": 1600,
@@ -106,6 +108,10 @@ def audit_style_entrypoint(errors: list[str]) -> None:
             )
 
 
+def is_generated_event_detail_page(html: Path) -> bool:
+    return html.name == "index.html" and (html.parent / ".generated-event-detail").exists()
+
+
 def audit_html_stylesheet_links(errors: list[str]) -> None:
     for html in iter_html_files():
         text = html.read_text(encoding="utf-8", errors="ignore")
@@ -115,12 +121,20 @@ def audit_html_stylesheet_links(errors: list[str]) -> None:
             # theme-lab and other deliberate no-style helper pages may exist.
             continue
 
+        if is_generated_event_detail_page(html):
+            expected = [STYLE_HREF, EVENT_DETAIL_PAGE_HREF]
+            if stylesheet_hrefs != expected:
+                errors.append(
+                    f"{rel(html)} must load generated event detail styles {expected}; "
+                    f"found {stylesheet_hrefs}"
+                )
+            continue
+
         if stylesheet_hrefs != [STYLE_HREF]:
             errors.append(
                 f"{rel(html)} must load exactly {STYLE_HREF} as its only stylesheet; "
                 f"found {stylesheet_hrefs}"
             )
-
 
 def audit_css_line_budgets(errors: list[str]) -> None:
     css_dir = ROOT / "css"
@@ -139,15 +153,17 @@ def audit_css_line_budgets(errors: list[str]) -> None:
 
 
 def audit_no_direct_split_css_links(errors: list[str]) -> None:
-    direct_css_link_re = re.compile(r'href=[\"\'](/css/(?!style\.css)[^\"\']+\.css(?:\?v=[^\"\']*)?)[\"\']')
+    direct_css_link_re = re.compile(r"href=[\"'](/css/(?!style\.css)[^\"']+\.css(?:\?v=[^\"']*)?)[\"']")
     for html in iter_html_files():
         text = html.read_text(encoding="utf-8", errors="ignore")
         for match in direct_css_link_re.finditer(text):
+            href = match.group(1)
+            if is_generated_event_detail_page(html) and href == EVENT_DETAIL_PAGE_HREF:
+                continue
             errors.append(
-                f"{rel(html)} links split CSS directly: {match.group(1)}. "
+                f"{rel(html)} links split CSS directly: {href}. "
                 "Public pages must use /css/style.css as the entrypoint."
             )
-
 
 def main() -> int:
     errors: list[str] = []

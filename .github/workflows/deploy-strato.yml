@@ -221,6 +221,20 @@ jobs:
           echo "Deploy target dir: $TARGET_DIR"
           echo "Environment: $ENV_NAME"
       # === END BLOCK: DEPLOY_ENV_DECISION_V4 ===
+
+      - name: Resolve public site origin for generated event assets
+        shell: bash
+        run: |
+          set -e
+
+          if [ "$DEPLOY_ENV_NAME" = "staging" ]; then
+            SITE_ORIGIN="https://staging.bocholt-erleben.de"
+          else
+            SITE_ORIGIN="https://bocholt-erleben.de"
+          fi
+
+          echo "SITE_ORIGIN=$SITE_ORIGIN" >> "$GITHUB_ENV"
+          echo "Event detail origin: $SITE_ORIGIN"
       - name: Export Inbox tab to data/inbox.tsv (fail-fast, allow empty rows, retry-hardened)
         timeout-minutes: 6
         shell: bash
@@ -342,6 +356,17 @@ jobs:
           echo "=== events.json (head) ==="
           head -n 40 data/events.json || true
 
+      - name: Build canonical event detail pages
+        shell: bash
+        run: |
+          set -e
+          python scripts/build-event-detail-pages.py
+
+          echo "=== event detail pages manifest (head) ==="
+          head -n 80 data/event_detail_pages.json || true
+          echo "=== generated event detail page count ==="
+          find events -name .generated-event-detail | wc -l
+
       - name: Build inbox.json from inbox.tsv
         shell: bash
         run: |
@@ -460,6 +485,8 @@ jobs:
             grep -q '<loc>https://bocholt-erleben.de/fuer-veranstalter/</loc>' deploy/sitemap.xml
             grep -q '<loc>https://bocholt-erleben.de/ueber/</loc>' deploy/sitemap.xml
             grep -q '<loc>https://bocholt-erleben.de/bildnachweise/</loc>' deploy/sitemap.xml
+
+            python3 scripts/augment-sitemap-event-details.py deploy/sitemap.xml data/event_detail_pages.json
           fi
 
           test -s deploy/robots.txt

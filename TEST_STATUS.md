@@ -1,3 +1,47 @@
+<!-- === BEGIN BLOCK: TEST_STATUS_CANONICAL_EVENT_DETAIL_ASSETS_2026_07_03 | Zweck: dokumentiert den Premium-Workpack fuer kanonische, teilbare Event-Detailobjekte; Umfang: Build-Artefakte, Share-Verhalten, Lifecycle und Validierung === -->
+## Kanonische Event-Detailseiten als teilbares Produktasset – Patch vorbereitet
+
+Status: Patch vorbereitet; nach Upload muss der Staging-Deploy zeigen, dass `data/events.json`, Event-Detailseiten und Sitemap im Deploy-Artefakt erzeugt werden.
+
+Umgesetzt im Patch:
+
+- `data/events.json` bleibt ein generiertes Deploy-Artefakt und wird nicht im Repo gepflegt.
+- Der Events-Build ergänzt fuer aktive/laufende Events `detail_path` und `detail_url`.
+- `scripts/build-event-detail-pages.py` erzeugt aus dem generierten Event-Feed kanonische Detailseiten unter `/events/<event-id>/`.
+- Aktive/laufende Events sind indexierbar und erhalten OpenGraph-/Twitter-Metadaten sowie JSON-LD `Event`.
+- Kuerzlich abgelaufene Events bleiben fuer 60 Tage als Linkziel erreichbar, werden aber mit Vergangen-Hinweis und `noindex,follow` ausgespielt.
+- Alte Eventseiten werden bei jedem Build ausgeduennt; generierte Detailseiten werden vor dem Neuaufbau bereinigt.
+- Die Live-Sitemap wird im Deploy um aktive Event-Detailseiten ergänzt; Staging bleibt ueber Robots gesperrt.
+- Der bestehende Event-Teilen-Button im Detailpanel und in Event-Cards teilt künftig die kanonische Event-URL, sofern sie vorhanden ist.
+- Der App-Flow bleibt unveraendert: Mobile Detailpanel bleibt schnelle App-Ansicht, die Detailseite ist der externe Share-/SEO-/Nachweis-Kontext.
+
+Lokal validiert im ZIP-Worktree:
+
+- CSV-Testexport zu `data/events.tsv` gewandelt.
+- `python3 scripts/build-events-from-tsv.py`: OK, erzeugte 63 aktive Events aus dem Teststand.
+- `python3 scripts/build-event-detail-pages.py`: OK, erzeugte 108 Detailseiten, davon 63 aktiv und 45 kuerzlich abgelaufen.
+- `python3 scripts/augment-sitemap-event-details.py`: OK, ergänzte 63 aktive Event-Detailseiten in der Test-Sitemap.
+- `node --check js/events.js`: OK.
+- `node --check js/details.js`: OK.
+- `python3 -m py_compile scripts/build-events-from-tsv.py scripts/build-event-detail-pages.py scripts/augment-sitemap-event-details.py`: OK.
+- `python3 tools/audit-css-governance.py`: OK.
+
+Nicht geaendert:
+
+- Kein zweiter Teilen-Button.
+- Keine Zwei-Klassen-Optik fuer kostenlose/bezahlt veröffentlichte Inhalte.
+- Kein Ersatz des mobilen Detailpanels durch eine neue Navigationspflicht.
+- Kein dauerhaftes Event-Archiv.
+
+Abnahme nach Upload:
+
+1. Staging-Deploy gruen.
+2. In `/data/events.json` ist fuer aktive Events `detail_path`/`detail_url` vorhanden.
+3. Beispielseite `/events/<event-id>/` oeffnet mobil sauber.
+4. Teilen im Detailpanel nutzt die kanonische Event-URL.
+5. Alte Eventseiten ausserhalb der 60-Tage-Karenz bleiben aus dem Deploy verschwunden.
+<!-- === END BLOCK: TEST_STATUS_CANONICAL_EVENT_DETAIL_ASSETS_2026_07_03 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_WEEKLY_KI_SELF_LEARNING_E2E_2026_07_02 | Zweck: dokumentiert den live geprüften Weekly-KI-/Manual-Inbox-/Feedback-Loop-Stand; Umfang: bestandene E2E-Punkte, Apps-Script-Fix, Kostenentscheidung, noch offene Laufzeitbeweise === -->
 ## Weekly-KI-Suche, Manual Inbox und Self-Learning-Feedback – Live-E2E-Stand 2026-07-02
 
@@ -4787,3 +4831,173 @@ Abschlussbewertung:
 
 <!-- === END BLOCK: TEST_STATUS_CONTENT_QUALITY_ROUTING_V2_VALIDATED_2026_07_02 === -->
 
+
+## 2026-07-03 – Event-Detailseiten: Source-Link- und Staging-Origin-Hardening
+
+Status: Patch vorbereitet.
+
+Auslöser:
+- Beim Test der neuen Event-Detail-Assets zeigte der Share-/Detail-Link auf dem Staging-Stand auf die Live-Origin und konnte dort als 404 landen, solange die Detailseiten noch nicht live deployt sind.
+- Beim Event `rosenbergfestival-2026-09-26` war als Eventquelle eine direkte PDF-/Download-URL (`newsletter-2026-i.pdf?download=1`) hinterlegt. Solche Links dürfen nicht als öffentliche Event-CTA ausgespielt werden, weil sie direkt einen Download auslösen und nicht wie eine normale Event-/Landingpage wirken.
+
+Umsetzung:
+- Generierte Event-Detail-URLs sind künftig deploy-umgebungsbewusst:
+  - `staging` erzeugt `https://staging.bocholt-erleben.de/events/.../`
+  - `main/live` erzeugt `https://bocholt-erleben.de/events/.../`
+- `build-events-from-tsv.py` verhindert direkte PDF-/Office-/Download-URLs als öffentliche `url` im Runtime-Feed.
+- Der bekannte Rosenbergfestival-Fall wird im Public-Build auf die offizielle HTML-Landingpage `https://www.bocholt.de/Interkulturellewoche` normalisiert.
+- `build-event-detail-pages.py` nutzt dieselbe öffentliche Link-Policy für Event-Detailseiten und deren CTA.
+- `content-quality-audit.py` erkennt direkte Datei-/Downloadquellen als `event_source_url_download_document` und schlägt, sofern kuratiert vorhanden, eine HTML-Landingpage vor.
+- `weekly-ki-websearch-to-manual-inbox.py` weist KI-Kandidaten mit PDF-/Download-URLs als `url` oder `source_url` ab und fordert HTML-Landingpages als primäre Quellen.
+- `inbox-to-events.py` verhindert, dass übernommene Inbox-Kandidaten direkte Datei-/Downloadlinks ins Events-Sheet schreiben.
+- `tools/smoke-check-deploy.py` prüft nach Deploy zusätzlich:
+  - `/data/events.json` ist erreichbar,
+  - `detail_url` passt zur aktuellen Deploy-Origin,
+  - kein Event im Public-Feed hat eine direkte PDF-/Download-URL als `url`,
+  - mindestens eine generierte Event-Detailseite liefert HTTP 200 HTML.
+
+Validierung lokal:
+- `python3 -m py_compile` für geänderte Python-Skripte OK.
+- Deploy-YAML parsebar OK.
+- Testbuild aus aktuellem Events-CSV OK: Rosenbergfestival nutzt im generierten `data/events.json` `https://www.bocholt.de/Interkulturellewoche` statt PDF-Download; `detail_url` zeigt mit `SITE_ORIGIN=https://staging.bocholt-erleben.de` auf Staging.
+- Event-Detailseite `events/rosenbergfestival-2026-09-26/index.html` wird generiert und enthält keine PDF-/Download-URL.
+- Content-Quality-Audit erzeugt für Rosenbergfestival `event_source_url_download_document` mit vorgeschlagener HTML-Landingpage.
+
+Nach Deploy prüfen:
+1. `https://staging.bocholt-erleben.de/data/events.json` öffnen und bei `rosenbergfestival-2026-09-26` prüfen:
+   - `detail_url` beginnt mit `https://staging.bocholt-erleben.de/events/`.
+   - `url` ist `https://www.bocholt.de/Interkulturellewoche`.
+2. `https://staging.bocholt-erleben.de/events/rosenbergfestival-2026-09-26/` öffnen: kein 404.
+3. In der Eventliste Detailpanel öffnen: Quelle/Veranstaltungsseite öffnet keine PDF-Datei mehr.
+
+
+## 2026-07-03 – Event-Detailseiten: Token-Konsistenz und Share-Script-Fix
+
+Status: Patch vorbereitet.
+
+Auslöser:
+- Staging-Test zeigt: Event-Detailseiten laden und Rosenbergfestival nutzt keine PDF-Downloadquelle mehr.
+- Die Detailseite wirkte visuell noch zu eigenständig und nutzte teilweise lokale Hardcodes statt den bestehenden Design-Tokens.
+- In der Browser-Konsole trat auf den generierten Detailseiten ein `Uncaught SyntaxError: Invalid or unexpected token` auf. Ursache war ein generierter Inline-Share-Script-String mit echtem Zeilenumbruch in einem JavaScript-Stringliteral.
+
+Umsetzung:
+- `build-event-detail-pages.py` erzeugt den Share-Fallback jetzt JS-sicher (`\\n` im generierten JavaScript statt echtem Zeilenbruch im Stringliteral).
+- Mehrzeilige Share-Daten im Button werden HTML-Attribut-sicher als `&#10;` erzeugt.
+- Event-Detailseiten erhalten `body.page-route-events`, damit sie semantisch beim Events-Bereich bleiben.
+- Das öffentliche Event-Detailseiten-CSS wurde auf bestehende Tokens/Komponentenverträge umgestellt:
+  - `--color-background`, `--color-surface`, `--color-text-*`
+  - `--border-eventcard`, `--radius-eventcard`, `--shadow-eventcard`
+  - `--surface-panel-row-info`, `--cmp-btn-*`, `--cmp-footer-*`
+- Hero und Inhalt sitzen nun in einer gemeinsamen Card-Surface statt als optisch fremde Einzelblöcke.
+- `tools/audit-css-governance.py` hebt den `pages.css`-Line-Budget bewusst auf `3925`, weil die öffentliche Detailseiten-Optik als Teil des Pages-Owners ausgeliefert wird und keinen neuen CSS-Owner erzeugen soll.
+
+Validierung lokal:
+- `python3 -m py_compile scripts/build-event-detail-pages.py tools/audit-css-governance.py` OK.
+- `python3 scripts/build-event-detail-pages.py` OK: 108 Event-Detailseiten erzeugt.
+- Generierte Rosenbergfestival-Detailseite enthält keine ungültige JS-Zeilenumbruchsequenz mehr; extrahiertes Inline-Script besteht `node --check`.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deploy prüfen:
+1. Eine Event-Detailseite öffnen, z. B. `/events/rosenbergfestival-2026-09-26/`.
+2. Browser-Konsole prüfen: kein `Uncaught SyntaxError` mehr.
+3. Detailseite visuell gegen App prüfen: Header, Card, Surface, Farben, Buttons und Footer wirken konsistent mit Events/Detailpanel/Today.
+4. Teilen-Button testen: Share-Fallback bzw. Kopieren funktioniert weiterhin.
+
+
+## 2026-07-03 – Event-Detailseiten: Premium-Konvergenz statt Sonderseiten-Optik
+
+Status: Patch vorbereitet.
+
+Auslöser:
+- Staging-Test nach dem Token-Konsistenz-Patch zeigte weiterhin keinen ausreichenden Premium-Gewinn: Die öffentliche Detailseite wirkte noch wie eine Sonderseite statt wie ein Bestandteil des bestehenden App-Systems.
+- Das Hero-Bild dominierte den ersten Viewport zu stark; Titel, Datum, Ort und Handlungsoptionen kamen zu spät.
+- Die Seite muss als externes Produktasset funktionieren, darf aber den bestehenden App-/Detailpanel-Flow nicht visuell oder konzeptionell ersetzen.
+
+Validierter Zielzustand:
+- Detailpanel bleibt der schnelle App-Komfort in der Eventliste.
+- Öffentliche Event-Detailseite ist der teilbare, indexierbare und später messbare Außenlink.
+- Öffentliche Detailseiten zeigen oberhalb des Bildes zuerst die entscheidungsrelevanten Informationen:
+  - Kategorie,
+  - Titel,
+  - Wann,
+  - Wo,
+  - primäre Aktion.
+- Das Eventbild bleibt hochwertig, wird aber kontrolliert als 16:9-Media im Card-System ausgespielt und darf den ersten Screen nicht allein belegen.
+- Keine Zwei-Klassen-Optik: kostenlose, kuratierte und spätere Premium-Inhalte nutzen öffentlich denselben Qualitätsstandard.
+
+Umsetzung:
+- `build-event-detail-pages.py` rendert Event-Detailseiten nun mit Content-first-Struktur:
+  - Kicker/Titel,
+  - kompakte Fakten,
+  - Aktionen,
+  - kontrolliertes Hero-Bild,
+  - Beschreibung.
+- Redundanter dritter Faktenblock `Ort` entfällt; `Wo` bündelt Location und Stadt als eine klare Zeile.
+- Abgelaufene Events bekommen den Vergangen-Hinweis innerhalb der Event-Surface und eine primäre Rückführung zu aktuellen Events.
+- Generierte Event-Detailseiten laden zusätzlich eine cache-gebustete `pages.css`-Detailversion, damit Detailseiten-Änderungen auf Staging/Live zuverlässig sichtbar werden, ohne den globalen CSS-Entrypoint für alle statischen Seiten umzubauen.
+- `css/pages.css` ersetzt den bisherigen Detailseitenblock durch eine kompaktere, app-nahe Surface-/Button-/Media-Struktur auf bestehenden Tokens.
+- `tools/audit-css-governance.py` erlaubt diese zweite cache-gebustete `pages.css` ausschließlich für generierte Event-Detailseiten mit `.generated-event-detail`-Marker und hält für alle normalen Repo-HTML-Seiten weiter den Single-CSS-Entrypoint fest.
+
+Validierung lokal:
+- `python3 -m py_compile scripts/build-event-detail-pages.py tools/audit-css-governance.py` OK.
+- Testbuild aus aktuellem Events-CSV OK.
+- `python3 scripts/build-events-from-tsv.py` OK.
+- `SITE_ORIGIN=https://staging.bocholt-erleben.de python3 scripts/build-event-detail-pages.py` OK.
+- Generierte Rosenbergfestival-Detailseite enthält:
+  - `https://staging.bocholt-erleben.de/events/rosenbergfestival-2026-09-26/`,
+  - keine PDF-/Download-URL,
+  - cache-gebustete `pages.css?v=2026-07-03-event-detail-premium-convergence-v1`,
+  - Content-first-Markup vor dem Hero-Bild.
+- Inline-Share-Script der generierten Seite besteht `node --check`.
+- `python3 tools/audit-css-governance.py` OK.
+- `bash tools/check-js-syntax.sh` OK.
+
+Nach Deploy prüfen:
+1. `/events/rosenbergfestival-2026-09-26/` öffnen.
+2. Oberhalb des Bildes müssen Titel, Datum, Ort und Aktionen sichtbar sein.
+3. Das Bild darf nicht mehr den ersten Screen allein dominieren.
+4. Browser-Konsole: kein `Uncaught SyntaxError`.
+5. Eventliste und mobiles Detailpanel bleiben unverändert nutzbar.
+
+
+## 2026-07-03 — Event-Detailseiten als öffentliche Detailpanel-Ansicht
+
+- Strategische Validierung: Generierte Event-Detailseiten sind keine neue Landingpage-Designwelt. Im Projektkontext ist der Premium-Zielzustand eine statische, öffentliche Variante des bestehenden Event-Detailpanels: gleicher Detail-View-Contract, gleiche ruhige Link-/Action-Logik, keine grellen CTA-Flächen, keine Sondernavigation.
+- Umsetzung: `scripts/build-event-detail-pages.py` erzeugt jetzt Detailpanel-nahes Markup (`detail-panel-inner`, `event-detail-media`, `detail-header`, `detail-meta-rows`, `detail-description`, `detail-links--trust`) statt eigenem Landingpage-Layout.
+- Entfernt: Top-Rechts-`Events`-Button, `← Alle Events`-Sonderlink, große grüne Primär-CTA-Fläche, eigener Event-Detail-Footer.
+- Navigation: Header-Logo bleibt Home-Einstieg; die bestehende Bottom-/Desktop-Bereichsnavigation ordnet `/events/<slug>/` dem Events-Bereich zu.
+- CTA-Disziplin: Route bleibt über die Ortszeile erreichbar; Eventquelle wird als ruhige Quellenzeile geführt; Kalender/Teilen liegen in einer statischen Detailpanel-Actionbar.
+- Guard: Deploy-Smoke prüft Event-Detailseiten zusätzlich auf Panel-Contract und gegen Rückfall in Sondernavigation/Primär-CTA.
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_DESCRIPTION_PREMIUM_GUARD_2026_07_03 | Zweck: dokumentiert Premium-Beschreibungsstandard, Guard-Kette und lokale Validierung; Umfang: KI-Suche, Manual Intake, Inbox-Import, Public-Build, Audit, Overrides === -->
+## Event-Beschreibungen Premium-Guard – 2026-07-03
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Eventbeschreibungen muessen produktweit im Bocholt-erleben-Ton erscheinen: lokal-redaktionell, serioes, freundlich, kurz und faktenbasiert.
+- Keine Quellenherleitung, keine PDF-/Newsletter-PDF-Hinweise, keine generische KI-Prosa, keine Werbesprache, keine Titelwiederholung als Beschreibung.
+
+Umsetzung:
+- Neuer Standard: `EVENT_DESCRIPTION_STANDARD.md`.
+- Neue zentrale Validierung: `scripts/event_description_quality.py`.
+- Curated Public-Overrides fuer bestehende aktive/future Problemfaelle: `data/event_description_overrides.json`.
+- `scripts/build-events-from-tsv.py` wendet Overrides an und blockiert nicht publikationsfaehige Beschreibungen im Public-Build.
+- `scripts/weekly-ki-websearch-to-manual-inbox.py` fuehrt den Prompt enger und verwirft Kandidaten mit harten Description-Fehlern.
+- `.github/workflows/manual-ki-intake.yml` haengt Manual-KI-Kandidaten mit harten Description-Fehlern nicht in die Inbox.
+- `scripts/inbox-to-events.py` blockiert Uebernahmen mit nicht publikationsfaehiger Beschreibung.
+- `scripts/content-quality-audit.py` erzeugt Description-Issues und Search-Feedback-Regeln.
+- `bocholt-erleben_eventsuche_regelwerk_v3.md`, `MASTER.md` und `ROADMAP.md` dokumentieren den neuen Contract.
+
+Lokal validiert:
+- Python-Compile fuer geaenderte Scripts.
+- Build aus aktuellem Event-CSV-Teststand erzeugt `data/events.json` ohne blocking Description-Findings im effektiven Public-Feed.
+- Aktive/future Bestandsproblemfaelle wie Rosenbergfestival, WattExtra Open Air, SummerSchool und Weltkindertagsfest werden durch kuratierte Overrides public-seitig bereinigt.
+- Content-Audit laeuft lokal und erzeugt Description-Hinweise fuer rohe Sheet-Texte, damit die Korrektur in den Qualitaetsprozess zurueckfliessen kann.
+
+Nach Deployment pruefen:
+1. `Rosenbergfestival`-Detailseite zeigt keinen PDF-/Newsletter-Hinweis mehr.
+2. `WattExtra Open Air` zeigt keine Atmosphaeren-/KI-Floskel mehr.
+3. Eventliste und Detailpanel bleiben funktionsgleich.
+4. Content-Quality-Report enthaelt Description-Issues nur als echte redaktionelle Korrekturhinweise, nicht als technische Regression.
+<!-- === END BLOCK: TEST_STATUS_EVENT_DESCRIPTION_PREMIUM_GUARD_2026_07_03 === -->

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -26,10 +27,12 @@ from typing import Dict, List, Tuple, Optional
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key, resolve_event_visual_key, should_prefer_inferred_event_visual_key
 from event_visual_motifs import infer_event_visual_motif, normalize_event_visual_motif
+from event_description_quality import apply_description_override, load_description_overrides
 
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "events.tsv"
 OUT_JSON_PATH = ROOT / "data" / "events.json"
+SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://bocholt-erleben.de").rstrip("/")
 
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{2,120}$")  # slug-like
@@ -164,6 +167,67 @@ def normalize_category(raw: str) -> str:
     return r  # wird später gegen Canonical geprüft (fail-fast)
 
 
+
+# === BEGIN BLOCK: EVENT_PUBLIC_SOURCE_URL_GUARD_V1 | Zweck: verhindert oeffentliche Download-/PDF-Links als Event-CTA und ersetzt kuratierte Faelle durch HTML-Landingpages; Umfang: Build-time-Normalisierung fuer events.json, keine Sheet-Schreiboperation ===
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+
+CURATED_SAFE_SOURCE_URLS_BY_ID = {
+    "rosenbergfestival-2026-09-26": "https://www.bocholt.de/Interkulturellewoche",
+}
+
+
+def is_download_document_url(value: str) -> bool:
+    url = normalize_text(value)
+    if not url:
+        return False
+    lowered = url.lower()
+    if DOCUMENT_URL_RE.search(lowered):
+        return True
+    if DOWNLOAD_QUERY_RE.search(lowered):
+        return True
+    if "/bocholt_media/" in lowered and any(ext in lowered for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+        return True
+    return False
+
+
+def curated_safe_source_url(data: Dict[str, str]) -> str:
+    ev_id = normalize_text(data.get("id", ""))
+    if ev_id in CURATED_SAFE_SOURCE_URLS_BY_ID:
+        return CURATED_SAFE_SOURCE_URLS_BY_ID[ev_id]
+
+    haystack = " ".join(
+        normalize_text(data.get(key, "")).lower()
+        for key in ("title", "description", "location", "kategorie")
+    )
+    if "rosenbergfestival" in haystack or ("rosenberg" in haystack and "interkulturelle woche" in haystack):
+        return "https://www.bocholt.de/Interkulturellewoche"
+    return ""
+
+
+def normalize_public_event_url(data: Dict[str, str], rowno: int) -> str:
+    url = normalize_text(data.get("url", ""))
+    if not url:
+        return ""
+    if not is_download_document_url(url):
+        return url
+
+    replacement = curated_safe_source_url(data)
+    if replacement:
+        warn(
+            f"Zeile {rowno}: direkte Download-/PDF-Quelle wird oeffentlich durch kuratierte Landingpage ersetzt: "
+            f"{url!r} -> {replacement!r}"
+        )
+        return replacement
+
+    warn(
+        f"Zeile {rowno}: direkte Download-/PDF-Quelle wird nicht als oeffentlicher Event-Link ausgespielt: {url!r}. "
+        "Bitte eine HTML-Landingpage im Events-Sheet hinterlegen."
+    )
+    return ""
+# === END BLOCK: EVENT_PUBLIC_SOURCE_URL_GUARD_V1 ===
+
+
 # === BEGIN BLOCK: EVENT_RECOMMENDATION_OPTIONAL_FIELDS_V1 | Zweck: optionale Recommendation-Spalten aus dem Events-Sheet additiv in events.json übernehmen; Umfang: Normalisierung ohne neue Pflichtfelder ===
 RECOMMENDATION_LIST_FIELDS = {
     "situation_tags",
@@ -257,6 +321,7 @@ def main() -> None:
         fail(f"TSV Header unvollständig. Fehlende Spalten: {missing}. Erwartet mindestens: {REQUIRED_FIELDS}")
 
        # === BEGIN BLOCK: RANGE_AWARE_PUBLISHING_AND_OCCURRENCE_DEDUPE_V2 | Zweck: abgelaufene Events inkl. Mehrtagesevents entfernen und gleiche URL für verschiedene Instanzen erlauben | Umfang: ersetzt Dedupe-/Publish-Fenster-Validierung ===
+    description_overrides = load_description_overrides()
     events: List[EventRow] = []
     seen_ids = set()
     seen_fingerprints = set()
@@ -311,7 +376,7 @@ def main() -> None:
 
         # Gleiche URL ist erlaubt, wenn es unterschiedliche Instanzen sind.
         # Verboten bleibt nur dieselbe URL für dieselbe erkennbare Instanz.
-        url_raw = (data.get("url", "") or "").strip()
+        url_raw = normalize_public_event_url(data, idx)
         if url_raw:
             norm_url = url_raw.lower().rstrip("/")
             url_occurrence_key = (
@@ -337,6 +402,20 @@ def main() -> None:
                 f"Zeile {idx}: kategorie ist nicht canonical: {data['kategorie']!r} -> {cat!r}. "
                 f"Erlaubt: {CANONICAL_CATEGORIES}"
             )
+
+        # === BEGIN BLOCK: EVENT_DESCRIPTION_PUBLIC_QUALITY_GUARD_V1 | Zweck: public descriptions vor Runtime-Feed-Erzeugung auf Bocholt-erleben-Tonalitaet absichern; Umfang: nutzt kuratierte Overrides + harte Stil-/Quellenleak-Guards, keine KI-Umschreibung ===
+        desc_result = apply_description_override({**data, "kategorie": cat, "url": url_raw}, description_overrides)
+        if desc_result.override_applied:
+            warn(f"Zeile {idx}: curated description override angewendet fuer {data['title']!r}: {desc_result.override_reason}")
+        if desc_result.blocking:
+            fail(
+                f"Zeile {idx}: description ist nicht public-faehig fuer {data['title']!r}: "
+                f"{desc_result.summary()}. Bitte Sheet-Text korrigieren oder kuratierten Override ergaenzen."
+            )
+        for finding in desc_result.findings:
+            warn(f"Zeile {idx}: description warning fuer {data['title']!r}: {finding.code} ({finding.detail})")
+        data["description"] = desc_result.description
+        # === END BLOCK: EVENT_DESCRIPTION_PUBLIC_QUALITY_GUARD_V1 ===
 
         # Duplikat-Fingerprint (praktisch gegen Copy/Paste-Doppler)
         fp = (
@@ -391,7 +470,7 @@ def main() -> None:
                 city=data["city"],
                 location=data["location"],
                 kategorie=cat,
-                url=data.get("url", ""),
+                url=url_raw,
                 description=data.get("description", ""),
                 situation_tags=optional_list(data, "situation_tags"),
                 weather_profile=optional_list(data, "weather_profile"),
@@ -413,6 +492,7 @@ def main() -> None:
 
     out = []
     for e in events:
+        detail_path = f"/events/{e.id}/"
         item = {
             "id": e.id,
             "title": e.title,
@@ -421,6 +501,8 @@ def main() -> None:
             "city": e.city,
             "location": e.location,
             "kategorie": e.kategorie,
+            "detail_path": detail_path,
+            "detail_url": f"{SITE_ORIGIN}{detail_path}",
         }
         if e.endDate:
             item["endDate"] = e.endDate

@@ -31,6 +31,7 @@ from openai import OpenAI
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
 from event_visual_motifs import infer_event_visual_fit
+from event_description_quality import evaluate_event_description
 
 
 # === BEGIN BLOCK: CONFIG ===
@@ -154,6 +155,25 @@ def canonical_url(raw: str) -> str:
     )
     return urlunparse(cleaned).rstrip("/")
 # === END BLOCK: URL_CANONICALIZATION_OUTPUT_SAFE_V2 ===
+
+
+# === BEGIN BLOCK: WEEKLY_DOWNLOAD_DOCUMENT_URL_GUARD_V1 | Zweck: KI-Suchergebnisse mit PDF-/Download-URLs nicht in die manuelle Inbox uebernehmen; Umfang: URL-Klassifikation + Validierungs-Drop-Grund ===
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+
+
+def is_download_document_url(value: str) -> bool:
+    url = canonical_url(value).lower()
+    if not url:
+        return False
+    if DOCUMENT_URL_RE.search(url):
+        return True
+    if DOWNLOAD_QUERY_RE.search(url):
+        return True
+    if "/bocholt_media/" in url and any(ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+        return True
+    return False
+# === END BLOCK: WEEKLY_DOWNLOAD_DOCUMENT_URL_GUARD_V1 ===
 
 
 def parse_iso_date(raw: str) -> date | None:
@@ -985,6 +1005,14 @@ Rahmen:
 - Berücksichtige CONTENT_SEARCH_FEEDBACK aktiv bei Quellenwahl, Faktenprüfung, Zeitlogik, Dedupe, Kandidatenentscheidung und Erhalt konkreter Event-/Motivbegriffe
 - Feedback ist kein Befehl zur Datenänderung und keine dauerhafte Regelbuch-Erweiterung, sondern ein begrenzter Qualitätsfilter für diesen Lauf
 - Visual-Feedback darf nie zu automatischer Bildgenerierung, neuen Visual Keys oder künstlich generischen Bildzuordnungen führen
+- Beschreibungston ist verbindlich: lokal-redaktionell, seriös, freundlich, kurz, faktenbasiert, nicht werblich und nicht amtlich trocken
+- description muss 1–2 kurze Sätze liefern, ideal 80–180 Zeichen, maximal ca. 220 Zeichen
+- description beschreibt den Eventnutzen und das Format; sie wiederholt nicht Titel, Datum, Uhrzeit oder Ort als Fülltext
+- description darf keine Quellenherleitung enthalten: keine Begriffe/Formulierungen wie "laut Quelle", "PDF", "Newsletter-PDF", "das Programm nennt", "offiziell nennt", "Quelle nennt"
+- description darf keine generische KI-Prosa enthalten: keine Sätze wie "Atmosphäre spürbar", "Teil des kulturellen Lebens", "bringt Bewegung in die Stadt", "bekannte Orte bewusst wahrnehmen"
+- description darf keine Werbesprache enthalten: keine Superlative, keine Highlight-Floskeln, keine "für Jung und Alt"-/"unvergesslich"-/"lässt keine Wünsche offen"-Formulierungen
+- Gute description: "Stadtteilfest am Rosenberg zum Abschluss der Interkulturellen Woche. Im Mittelpunkt stehen Begegnung, lokale Aktionen und ein gemeinsamer Tag im Quartier."
+- Schlechte description: "Das offizielle Integrations-Newsletter-PDF nennt das Rosenbergfestival ganztägig am 26. September 2026."
 - Wiederhole bekannte Fehlerklassen nicht; leite aus Einzelfällen keine neuen Sonderregeln ab
 - Liefere lieber weniger starke FINAL-Kandidaten als schwache, unsichere oder zu kurzfristige Treffer
 - Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
@@ -1255,6 +1283,8 @@ JSON-Strenge:
 - Keine Zeilenumbrüche innerhalb von Stringwerten.
 - Keine sichtbaren Umbrüche in description, notes, url oder source_url.
 - URLs müssen getrimmt sein: keine Leerzeichen, keine Zeilenumbrüche.
+- url und source_url müssen normale HTML-Landingpages oder konkrete Event-/Veranstalterseiten sein. Keine PDF-/Office-Dateien, keine direkten Downloads, keine Links mit download=1, keine Bild-/Mediendateien als primaere Eventquelle.
+- Wenn nur ein PDF/Download gefunden wird und keine HTML-Landingpage existiert, gib den Kandidaten nicht aus.
 - Anführungszeichen innerhalb von Texten müssen korrekt escaped werden.
 - Jeder String muss gültig JSON-escaped sein.
 - Das Ergebnis muss direkt mit JSON.parse parsebar sein.
@@ -1273,7 +1303,7 @@ Zusätzliche interne Pflichtprüfung vor Event-Aufnahme:
 - falls Mehrtagesevent mit unterschiedlichen Tageszeiten: muss `time` leer bleiben?
 - repräsentiert der Eintrag genau eine besuchbare Instanz?
 - Mehrtageslogik korrekt?
-- Beschreibung neutral, sachlich und quellenbasiert?
+- Beschreibung lokal-redaktionell, seriös, freundlich, kurz, faktenbasiert und ohne Quellen-/KI-/Werbefloskeln?
 - keine Dublette gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON?
 - keine Dublette innerhalb des aktuellen Outputs?
 - wirklich nützlich für die Kuratierungs-PWA?
@@ -1633,6 +1663,23 @@ def candidate_invalid_reason(item: Dict[str, str], start: date, end: date) -> st
     missing_required = [field for field in CANDIDATE_REQUIRED_NON_EMPTY_FIELDS if not norm(item.get(field, ""))]
     if missing_required:
         return "missing_required:" + ",".join(missing_required)
+
+    if is_download_document_url(item.get("source_url", "")):
+        return "source_url_download_document"
+    if is_download_document_url(item.get("url", "")):
+        return "url_download_document"
+
+    description_result = evaluate_event_description({
+        "title": item.get("title", ""),
+        "description": item.get("description", ""),
+        "date": item.get("date", ""),
+        "time": item.get("time", ""),
+        "city": item.get("city", ""),
+        "location": item.get("location", ""),
+        "kategorie": item.get("kategorie_suggestion", ""),
+    })
+    if description_result.blocking:
+        return "description_quality:" + ",".join(description_result.issue_codes[:3])
 
     if not parse_iso_date(item.get("date", "")):
         return "invalid_date"

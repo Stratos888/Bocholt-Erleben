@@ -29,6 +29,7 @@ from googleapiclient.discovery import build
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
 from event_visual_motifs import infer_event_visual_fit, normalize_event_visual_motif
+from event_description_quality import evaluate_event_description
 
 
 # === BEGIN BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
@@ -62,6 +63,25 @@ def norm(s: str) -> str:
 def norm_key(s: str) -> str:
     return re.sub(r"\s+", " ", norm(s)).lower()
 
+
+
+# === BEGIN BLOCK: INBOX_TO_EVENTS_DOWNLOAD_DOCUMENT_GUARD_V1 | Zweck: verhindert, dass uebernommene Inbox-Kandidaten direkte PDF-/Downloadlinks als Event-URL ins Events-Sheet schreiben; Umfang: lokale Validierung vor Sheet-Append ===
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+
+
+def is_download_document_url(value: str) -> bool:
+    url = norm(value).lower()
+    if not url:
+        return False
+    if DOCUMENT_URL_RE.search(url):
+        return True
+    if DOWNLOAD_QUERY_RE.search(url):
+        return True
+    if "/bocholt_media/" in url and any(ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+        return True
+    return False
+# === END BLOCK: INBOX_TO_EVENTS_DOWNLOAD_DOCUMENT_GUARD_V1 ===
 
 def slugify(s: str) -> str:
     s = norm_key(s)
@@ -314,6 +334,23 @@ def main() -> None:
         description = norm(inb.get("description", ""))
         location = norm(inb.get("location", ""))
 
+        # === BEGIN BLOCK: INBOX_TO_EVENTS_DESCRIPTION_QUALITY_GUARD_V1 | Zweck: verhindert, dass nicht publikationsfaehige KI-/Quellen-/Werbetexte ins Events-Sheet übernommen werden; Umfang: lokale Stilvalidierung vor Sheet-Append ===
+        desc_result = evaluate_event_description({
+            "title": title,
+            "description": description,
+            "date": d,
+            "time": norm(inb.get("time", "")),
+            "city": norm(inb.get("city", "")),
+            "location": location,
+            "kategorie": category,
+        })
+        if desc_result.blocking:
+            fail(
+                f"Inbox: description fuer '{title}' ist nicht publikationsfaehig: {desc_result.summary()}. "
+                "Bitte in der Inbox lokal-redaktionell, kurz und quellenbasiert korrigieren."
+            )
+        # === END BLOCK: INBOX_TO_EVENTS_DESCRIPTION_QUALITY_GUARD_V1 ===
+
         # === BEGIN BLOCK: INBOX_TO_EVENTS_VISUAL_KEY_EDITOR_VALIDATION_V1 | Zweck: macht redaktionell geänderte Bildzuordnung verbindlich und verhindert stilles Re-Inferieren bei Tippfehlern; Umfang: validiert Inbox.visual_key vor Events-Übernahme ===
         raw_visual_key = norm(inb.get("visual_key", ""))
         normalized_visual_key = normalize_event_visual_key(raw_visual_key)
@@ -341,6 +378,13 @@ def main() -> None:
         final_visual_motif = normalized_visual_motif or visual_fit.get("visual_motif", "")
         # === END BLOCK: INBOX_TO_EVENTS_VISUAL_KEY_EDITOR_VALIDATION_V1 ===
 
+        source_url = norm(inb.get("url", "")) or norm(inb.get("source_url", ""))
+        if is_download_document_url(source_url):
+            fail(
+                f"Inbox: direkte Datei-/Download-URL darf nicht als Eventquelle übernommen werden für '{title}': {source_url}. "
+                "Bitte zuerst eine offizielle HTML-Landingpage eintragen oder die URL leer lassen."
+            )
+
         source_fields = {
             "id": eid,
             "title": title,
@@ -351,7 +395,7 @@ def main() -> None:
             "location": location,
             # Einige Sheets heißen "kategorie" im Events-Tab, Inbox hat "kategorie_suggestion"
             "kategorie": category,
-            "url": norm(inb.get("url", "")) or norm(inb.get("source_url", "")),
+            "url": source_url,
             "description": description,
             "visual_key": final_visual_key,
             "visual_motif": final_visual_motif,

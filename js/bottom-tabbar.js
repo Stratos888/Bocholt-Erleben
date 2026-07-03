@@ -25,7 +25,7 @@
       label: "Events",
       icon: "calendar-days",
       prefetch: ["/data/events.json"],
-      match: (path) => path === "/events/"
+      match: (path) => path === "/events/" || path.startsWith("/events/")
     },
     {
       key: "activities",

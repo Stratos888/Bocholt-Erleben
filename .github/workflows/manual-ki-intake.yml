@@ -85,6 +85,7 @@ jobs:
 
           from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
           from event_visual_motifs import infer_event_visual_fit
+          from event_description_quality import evaluate_event_description
           # === END BLOCK: MANUAL_INTAKE_VISUAL_KEY_HELPER_IMPORT_V1 ===
           MANUAL_JSON_PATH = ROOT / "data" / "inbox_manual.json"
 
@@ -363,6 +364,21 @@ jobs:
               end_date_value = norm(normalized.get("endDate", ""))
               if end_date_value and not re.match(r"^\d{4}-\d{2}-\d{2}$", end_date_value):
                   fail(f"Element #{idx}: invalid_endDate_format")
+
+              # === BEGIN BLOCK: MANUAL_INTAKE_DESCRIPTION_QUALITY_GUARD_V1 | Zweck: verhindert Quellenleaks, KI-Prosa und Werbesprache schon vor dem Inbox-Append; Umfang: schlechte Beschreibungen werden nicht angehaengt ===
+              desc_result = evaluate_event_description({
+                  "title": normalized.get("title", ""),
+                  "description": normalized.get("description", ""),
+                  "date": date_value,
+                  "time": normalized.get("time", ""),
+                  "city": normalized.get("city", ""),
+                  "location": normalized.get("location", ""),
+                  "kategorie": normalized.get("kategorie_suggestion", ""),
+              })
+              if desc_result.blocking:
+                  mark_skipped(normalized, "description_quality:" + ",".join(desc_result.issue_codes[:3]))
+                  continue
+              # === END BLOCK: MANUAL_INTAKE_DESCRIPTION_QUALITY_GUARD_V1 ===
 
               source_date_key = "|".join([
                   norm_key(normalized["source_url"]),

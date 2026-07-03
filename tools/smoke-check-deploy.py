@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 from dataclasses import dataclass
@@ -122,6 +123,35 @@ def parse_json(result: HttpResult) -> dict[str, Any]:
     return payload
 
 
+def parse_json_array(result: HttpResult) -> list[Any]:
+    try:
+        payload = json.loads(result.body)
+    except json.JSONDecodeError as error:
+        raise AssertionError(f"{result.url} liefert kein gültiges JSON: {error}") from error
+
+    if not isinstance(payload, list):
+        raise AssertionError(f"{result.url} liefert kein JSON-Array.")
+
+    return payload
+
+
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+
+
+def is_download_document_url(value: Any) -> bool:
+    url = str(value or "").strip().lower()
+    if not url:
+        return False
+    if DOCUMENT_URL_RE.search(url):
+        return True
+    if DOWNLOAD_QUERY_RE.search(url):
+        return True
+    if "/bocholt_media/" in url and any(ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+        return True
+    return False
+
+
 def require_status(result: HttpResult, expected: set[int], label: str) -> None:
     if result.status not in expected:
         excerpt = result.body.strip().replace("\n", " ")[:300]
@@ -188,6 +218,73 @@ def check_public_events_api(base_url: str) -> None:
         raise AssertionError(f"{label}: unerwartete Struktur: {payload}")
 
     print(f"✅ Public-Events-API: {len(data.get('events', []))} DB-Events")
+
+
+def check_event_feed_details(base_url: str) -> None:
+    label = "Generierter Event-Feed + Detailseiten"
+    result = request_with_retries(build_url(base_url, "/data/events.json"))
+    require_status(result, {200}, label)
+    events = parse_json_array(result)
+    if not events:
+        raise AssertionError(f"{label}: events.json ist leer.")
+
+    base_origin = base_url.rstrip("/")
+    detail_candidates: list[dict[str, Any]] = []
+    unsafe_sources: list[str] = []
+    wrong_origin: list[str] = []
+
+    for item in events:
+        if not isinstance(item, dict):
+            continue
+        url = str(item.get("url") or "")
+        if is_download_document_url(url):
+            unsafe_sources.append(f"{item.get('id', '')}: {url}")
+        detail_path = str(item.get("detail_path") or "")
+        detail_url = str(item.get("detail_url") or "")
+        if detail_path.startswith("/events/") and detail_path.endswith("/"):
+            detail_candidates.append(item)
+        if detail_url and not detail_url.startswith(base_origin + "/events/"):
+            wrong_origin.append(f"{item.get('id', '')}: {detail_url}")
+
+    if unsafe_sources:
+        raise AssertionError(f"{label}: direkte Datei-/Download-URLs im Public-Feed: {unsafe_sources[:3]}")
+    if wrong_origin:
+        raise AssertionError(f"{label}: detail_url zeigt nicht auf aktuelle Deploy-Basis {base_origin}: {wrong_origin[:3]}")
+    if not detail_candidates:
+        raise AssertionError(f"{label}: kein Event mit detail_path/detail_url gefunden.")
+
+    sample = next((item for item in detail_candidates if str(item.get("url") or "").strip()), detail_candidates[0])
+    sample_path = str(sample.get("detail_path"))
+    sample_result = request_with_retries(build_url(base_url, sample_path))
+    require_status(sample_result, {200}, f"Event-Detailseite ({sample.get('id', 'sample')})")
+    sample_html = sample_result.body
+    sample_html_lower = sample_html.lower()
+    if "text/html" not in sample_result.headers.get("content-type", "").lower() and "<html" not in sample_html_lower:
+        raise AssertionError(f"Event-Detailseite ({sample.get('id', 'sample')}): Antwort sieht nicht wie HTML aus.")
+    forbidden_fragments = [
+        "event-detail-back",
+        "event-detail-action--primary",
+        "href=\"/events/\">events</a>",
+    ]
+    found_forbidden = [frag for frag in forbidden_fragments if frag in sample_html_lower]
+    if found_forbidden:
+        raise AssertionError(
+            f"Event-Detailseite ({sample.get('id', 'sample')}): alte Sonderseiten-Navigation/CTA gefunden: {found_forbidden}"
+        )
+    required_fragments = [
+        "event-detail-public",
+        "detail-panel-inner",
+        "event-detail-media",
+        "detail-meta-rows",
+        "detail-links--trust",
+    ]
+    missing_fragments = [frag for frag in required_fragments if frag not in sample_html_lower]
+    if missing_fragments:
+        raise AssertionError(
+            f"Event-Detailseite ({sample.get('id', 'sample')}): Detailpanel-Contract unvollstaendig: {missing_fragments}"
+        )
+
+    print(f"✅ {label}: {len(events)} Events, Detailseiten-URL, Panel-Contract und Source-Link-Guard ok")
 
 
 def check_checkout_validation(base_url: str) -> None:
@@ -276,6 +373,7 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_build_file(base_url, args.expected_build),
         lambda: check_html_page(base_url, "/", "Startseite"),
         lambda: check_html_page(base_url, "/events/", "Events-Suchseite"),
+        lambda: check_event_feed_details(base_url),
         lambda: check_html_page(base_url, "/aktivitaeten/", "Aktivitäten-Seite"),
         lambda: check_html_page(base_url, "/bildnachweise/", "Bildnachweise-Seite"),
         lambda: check_html_page(base_url, "/events-veroeffentlichen/einreichen/", "Event-Einreichen-Seite"),

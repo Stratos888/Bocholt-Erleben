@@ -532,46 +532,43 @@ Für FINAL gilt damit:
 - generische Übersichten bleiben unzulässig
 <!-- === END BLOCK: URL_REGEL_DEUTSCHE_NL_PRIORITAET_V1 === -->
 ## 8. Beschreibungs-Regel
-Beschreibungen müssen streng quellenbasiert und sachlich sein.
+
+Beschreibungen sind Teil des Premium-Produkts. Sie duerfen nicht wie Quellen-Notizen, Veranstalterwerbung oder generische KI-Prosa klingen. Ziel ist der Bocholt-erleben-Ton:
+
+**lokal-redaktionell, seriös, freundlich, kurz, faktenbasiert.**
 
 Nicht erlaubt:
-- generische Stimmungsformulierungen
-- frei erfundene Kontextsätze
-- allgemeine Eventprosa ohne klare Quellenbasis
-- Marketing- oder Atmosphärensprache
-- Zitate
-- Werbetexte
-- Copy-Paste aus der Quelle
+- Quellenherleitung in der öffentlichen Beschreibung: `laut Quelle`, `PDF`, `Newsletter-PDF`, `das Programm nennt`, `offiziell nennt`, `Quelle nennt`
+- generische KI-Floskeln: `Atmosphäre spürbar`, `Teil des kulturellen Lebens`, `bringt Bewegung in die Stadt`, `bekannte Orte bewusst wahrnehmen`
+- Werbesprache und Superlative: `Highlight`, `unvergesslich`, `für Jung und Alt`, `lässt keine Wünsche offen`, `ein Muss`
+- längere Originaltexte oder Copy-Paste aus Quellen
+- Ausschmückungen, die nicht aus der Quelle oder sicherem Kontext ableitbar sind
+- Titel, Datum, Uhrzeit oder Ort als reiner Fülltext
 
-Erlaubt:
-- kurze sachliche Zusammenfassung aus den belegbaren Fakten
-- neutral formuliert
-- nur Informationen, die aus Quelle oder eindeutig belastbarer Kontextinfo ableitbar sind
+Erlaubt und gewünscht:
+- 1–2 kurze Sätze
+- ideal 80–180 Zeichen, maximal ca. 220 Zeichen
+- neu formulierte, kurze Zusammenfassung aus belegbaren Fakten
+- lokale Einordnung, wenn sie aus Eventtyp, Ort oder Quelle sicher ableitbar ist
+- ein leicht persönlicher, aber nicht werblicher Ton
+
+Gute Beschreibung:
+
+`Stadtteilfest am Rosenberg zum Abschluss der Interkulturellen Woche. Im Mittelpunkt stehen Begegnung, lokale Aktionen und ein gemeinsamer Tag im Quartier.`
+
+Schlechte Beschreibung:
+
+`Das offizielle Integrations-Newsletter-PDF nennt das Rosenbergfestival ganztägig am 26. September 2026.`
 
 Wenn die Quelle zu wenig Inhalt bietet:
-- lieber eine sehr kurze neutrale Beschreibung
-- niemals halluzinierte Ausschmückung
+- kurz und sicher bleiben
+- keine Details erfinden
+- lieber allgemeiner Eventtyp + sichere lokale Einordnung als künstliche Atmosphäre
+- Unsicherheit nur in `notes`, nicht in `description`
 
-### Stil
-Die Beschreibung muss sein:
-- kurz
-- sachlich
-- neutral
-- faktenbasiert
-- neu formuliert
-- facts-only
+Beschreibungsschablone, wenn passend:
 
-### Länge
-- maximal **1–2 kurze Sätze**
-- ideal **80–180 Zeichen**
-- maximal **200 Zeichen**
-
-### Beschreibungsschablone
-Bevorzugt:
-
-`<Eventtyp> im <Ort>. <Kurze sachliche Einordnung des Formats oder Programms>.`
-
-Nur wenn diese Struktur sachlich nicht passt, darf davon abgewichen werden.
+`<Eventtyp> in/bei <Ort>. <Kurze lokale Einordnung, Programmform oder Nutzerwert>.`
 
 ---
 
@@ -1010,9 +1007,9 @@ Bevorzugt ist `source_url` identisch mit der deutschen `url`, wenn diese die FIN
 <!-- === END BLOCK: FELDREGELN_URL_SOURCE_URL_SPRACHPRIORITAET_V1 === -->
 
 #### `description`
-Kurz, neutral, facts-only.  
-1–2 Sätze, maximal 200 Zeichen.  
-Keine Werbesprache, keine Zitate, keine Halluzinationen, keine Copy-Paste-Formulierungen.
+Lokal-redaktionell, seriös, freundlich, kurz und faktenbasiert.  
+1–2 Sätze, ideal 80–180 Zeichen, maximal ca. 220 Zeichen.  
+Keine Quellenherleitung, keine generische KI-Prosa, keine Werbesprache, keine Zitate, keine Halluzinationen, keine Copy-Paste-Formulierungen.
 
 #### `notes`
 Immer setzen auf:
@@ -1095,7 +1092,7 @@ Vor FINAL jede Zeile gegen diese Checkliste prüfen:
 - [ ] `source_url` ist die beste belastbare Beleg-URL; bevorzugt identisch mit der deutschen `url`, sofern diese die Pflichtdaten selbst belegt
 - [ ] Mehrtages-Event korrekt in `date` / `endDate`
 - [ ] `time` regelkonform
-- [ ] Beschreibung sachlich und quellenbasiert
+- [ ] Beschreibung lokal-redaktionell, seriös, freundlich, kurz, faktenbasiert und ohne Quellen-/KI-/Werbefloskeln
 - [ ] Scope korrekt oder explizite Ausnahme
 - [ ] keine Halluzination
 - [ ] 100% sicher oder sonst Review / Ausschluss
