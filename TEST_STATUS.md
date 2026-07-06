@@ -5076,3 +5076,37 @@ Nach Deployment prüfen:
 4. Reinen Aktivitätsaccount ohne Event-Kontext prüfen, falls vorhanden: Event-Wirkungskarte darf dort weiterhin nicht irritierend erscheinen.
 5. Tarif & Nutzung prüfen: Monatsbetrag, aktive Tarife und Nutzung bleiben korrekt.
 <!-- === END BLOCK: TEST_STATUS_ORGANIZER_PREMIUM_COCKPIT_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_PREMIUM_COCKPIT_POLISH_2026_07_06 | Zweck: dokumentiert finalen visuellen Dashboard-Polish, einklappbare Einreichungen und kommerzielle Funnel-Abgrenzung; Umfang: CSS/JS/HTML/Commercial-Strategy/Guard-Smoke === -->
+## Veranstalter-Dashboard Premium Cockpit Polish – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Das Cockpit bleibt strukturell wie im Premium-Zielzustand: Status, Wirkung, Einreichungen, Tarif, Kontakt.
+- Der Look wird wieder konsistent mit dem restlichen Bocholt-erleben-System: keine harten schwarzen Rahmen, keine Alert-Balkenoptik, ruhigere Akzentkarte.
+- Lange Einreichungslisten sind im Normalfall eingeklappt, damit Mobile nicht wieder zur Verwaltungsseite wird.
+- Kostenlose Vorschläge und Startpartner werden strategisch getrennt: Hinweis-Kanal ohne Anbieterleistung; 90-Tage-Startpartner-Pilot mit Wirkungsmessung als Bindungsinstrument.
+
+Umsetzung:
+- Hero visuell entschärft: dezente Border-/Surface-Optik statt harter Outline.
+- Status im Hero: klare Hauptaussage (`Alles okay` / `Aktion nötig`) plus kompakte Kennzahlen in der Notiz (`keine Zahlung offen`).
+- Wirkungskarte ruhiger gestaltet: keine linke Balkenoptik, keine doppelte Zeitraum-Codierung, große Hauptzahl plus vier kompakte Metriken.
+- `Einreichungen & Veröffentlichungen` bleibt die Überschrift im Dashboard.
+- Einreichungsbereich bekommt `organizer-dashboard-submissions-toggle` und ist ohne Aktionsbedarf standardmäßig eingeklappt.
+- Bei Zahlung/offener Aktion bleibt die Liste automatisch offen.
+- `COMMERCIAL_STRATEGY.md` definiert den kostenlosen Hinweis-Kanal und den finalen 90-Tage-Startpartner-Pilot.
+- `scripts/audit-event-impact-tracking.py` prüft die Toggle-/Cockpit-Verdrahtung mit.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deployment prüfen:
+1. Gemischten Testaccount öffnen: Hero hat keinen schwarzen Rahmen; Wirkungskarte ist sichtbar, aber ruhiger und ohne linken Warnbalken.
+2. Mobile prüfen: Wirkung steht vor Einreichungen; Einreichungsliste ist ohne Aktion nötig standardmäßig eingeklappt.
+3. `Einreichungen anzeigen` öffnen; Gruppen und Detail-Aufklappen funktionieren weiter.
+4. Account mit Zahlung/offener Aktion prüfen, falls vorhanden: Einreichungen sollen automatisch offen sein.
+5. Tarif & Nutzung, Kontakt, Logout und Dashboard-Navigation bleiben unverändert funktionsfähig.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_PREMIUM_COCKPIT_POLISH_2026_07_06 === -->

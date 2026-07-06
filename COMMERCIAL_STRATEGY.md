@@ -33,9 +33,9 @@ Bocholt erleben startet nicht mit einer harten Paywall fuer einfache Eventvorsch
 
 Empfohlenes Modell:
 
-- Kostenlose Basis: Veranstaltungen und Aktivitaeten koennen vorgeschlagen werden. Veroeffentlichung erfolgt nur nach redaktioneller Eignung und Qualitaetsstandard.
+- Kostenloser Hinweis-Kanal: Buerger, Besucher, Vereine, Veranstalter, Locations oder interne Redaktion koennen Veranstaltungen und Aktivitaeten vorschlagen. Das ist kein Anbieterprodukt, sondern ein redaktioneller Eingang fuer fehlende gute Inhalte. Veroeffentlichung erfolgt nur nach redaktioneller Eignung und Qualitaetsstandard.
 - Bezahlte Premium-/Service-Schicht: Aufwandersparnis, dauerhafte Praesenz, Wirkungsbericht, automatische Uebernahme, komfortable Aenderungen und Anbieterbetreuung.
-- Startpartner: kostenlose oder verguenstigte Pilotphase ist moeglich, um echte Wirkung und Zahlungsbereitschaft zu beweisen.
+- Startpartner-Pilot: neue Partner erhalten einmalig 90 Tage volle Anbieterleistung mit Wirkungsmessung. Danach wird anhand der gemessenen Wirkung in einen regulaeren Tarif ueberfuehrt.
 
 Nicht empfohlen als Kernmodell:
 
@@ -138,22 +138,29 @@ Keine SEO-Massenrunde ohne messbare Objektbasis.
 
 ## 6. Startpartner-Logik
 
-Startpartner sind sinnvoll, solange sie als Pilot zum Nutzennachweis verstanden werden.
+Startpartner werden nicht als dauerhaft kostenlose Vollleistung gefuehrt, sondern als einmaliger Wirkungsnachweis mit klarem Uebergang in einen regulaeren Tarif.
 
-Regeln:
-
-- kostenlos oder verguenstigt nur zeitlich oder mengenmaessig begrenzt,
-- Ziel ist Feedback und Wirkung, nicht dauerhaft kostenlose Vollleistung,
-- Anbieter sollen spaeter einen klaren Bericht bekommen,
-- danach folgt ein einfaches Bezahlangebot.
-
-Beispiel:
+Finale Regel:
 
 ```text
-Startpartner testet 60 bis 90 Tage.
-Bocholt erleben zeigt danach Aufrufe, Klicks und Feedback.
-Anschliessend wird entschieden, welches Premium-/Servicepaket passt.
+90 Tage Startpartner-Pilot mit voller Anbieterleistung und Wirkungsmessung.
+Danach Wirkung auswerten und in einen regulaeren Tarif ueberfuehren.
 ```
+
+Enthalten im Pilot:
+
+- oeffentliche Darstellung im normalen Qualitaetsstandard,
+- Anbieterbereich mit Einreichungen und Pflegeweg,
+- Wirkungskarte mit gemessenen Aufrufen, Website-/Ticket-Klicks, Route/Maps und Teilungen,
+- Auswertung nach 90 Tagen als Grundlage fuer die langfristige Bindung.
+
+Nicht enthalten:
+
+- dauerhaft kostenlose Anbieterleistung,
+- oeffentliche Besserstellung gegenueber kostenlosen redaktionellen Inhalten,
+- mehrere parallel beworbene Testmodelle.
+
+Der kostenlose Hinweis-Kanal bleibt davon getrennt. Er dient der Content-Vollstaendigkeit und hat keine Veroeffentlichungsgarantie, keinen Anbieterbereich und keinen Wirkungsbericht.
 
 ## 7. Redaktionelle Vertrauensregeln
 

@@ -93,6 +93,8 @@ CHECKS = [
             "renderSubmissionImpactHtml",
             "organizerHasEventImpactContext",
             "buildOrganizerSubmissionGroups",
+            "setSubmissionsListOpen",
+            "organizer-dashboard-submissions-toggle",
             "hasEventImpactContext",
             "Teilungen",
             "organizer-impact-total",
@@ -103,7 +105,8 @@ CHECKS = [
         [
             "Wirkung auf Bocholt erleben",
             "organizer-dashboard-impact-card",
-            "2026-07-06-organizer-premium-cockpit-v1",
+            "organizer-dashboard-submissions-toggle",
+            "2026-07-06-organizer-premium-cockpit-v2",
         ],
     ),
 ]

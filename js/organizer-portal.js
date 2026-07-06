@@ -160,10 +160,22 @@
   }
 
   function formatImpactPeriod(period) {
-    const start = formatDate(period?.start_date);
-    const end = formatDate(period?.end_date);
-    if (start === "–" && end === "–") return "Zeitraum: letzte 28 Tage";
-    return `Zeitraum: ${start} – ${end}`;
+    const compactDate = (value) => {
+      const text = safeText(value);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+        const [, month, day] = text.split("-");
+        return `${day}.${month}.`;
+      }
+
+      const formatted = formatDate(text);
+      return formatted === "–" ? "" : formatted.replace(/\.\d{4}$/, ".");
+    };
+
+    const start = compactDate(period?.start_date);
+    const end = compactDate(period?.end_date);
+    if (!start && !end) return "Letzte 28 Tage";
+    if (start && end) return `Letzte 28 Tage · ${start}–${end}`;
+    return "Letzte 28 Tage";
   }
   function impactShareTotal(metrics) {
     return metricValue(metrics, "share_clicks") + metricValue(metrics, "copy_link_clicks");
@@ -933,7 +945,6 @@ function normalizeExternalUrl(value) {
 
     metricsNode.innerHTML = `
       <span class="organizer-impact-total" aria-label="Gemessene Aktionen im aktuellen Zeitraum">
-        <span class="organizer-impact-total__label">Letzte 28 Tage</span>
         <strong class="organizer-impact-total__value">${escapeHtml(formatInteger(total))}</strong>
         <span class="organizer-impact-total__suffix">gemessene Aktionen</span>
       </span>
@@ -1034,6 +1045,7 @@ function normalizeExternalUrl(value) {
     const submissionsHead = document.getElementById("organizer-dashboard-submissions-head");
     const submissionsList = document.getElementById("organizer-dashboard-submissions-list");
     const submissionsEmpty = document.getElementById("organizer-dashboard-submissions-empty");
+    const submissionsToggle = document.getElementById("organizer-dashboard-submissions-toggle");
     const dashboardPrimaryCta = document.getElementById("organizer-dashboard-primary-cta");
     const dashboardActions = dashboardPrimaryCta ? dashboardPrimaryCta.parentElement : null;
     /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V4_VALUE_CENTER_COPY | Zweck: richtet den Dashboard-Hero auf Einreichungen, Veröffentlichungsstatus und Mitgliedschaft aus; Umfang: Kicker-, Titel-, Lead- und Note-Texte in renderDashboard === */
@@ -1054,7 +1066,7 @@ function normalizeExternalUrl(value) {
           ? `${latestStatusText} · ${latestDateText}`
           : "Status deiner Einreichung.";
       } else {
-        lead.textContent = `${dashboardStatus.label} · ${formatInteger(dashboardCounts.visible)} sichtbar · ${formatInteger(dashboardCounts.review)} in Prüfung · ${formatInteger(dashboardCounts.paymentOpen)} offen`;
+        lead.textContent = dashboardStatus.label;
       }
     }
 
@@ -1063,7 +1075,10 @@ function normalizeExternalUrl(value) {
         note.textContent = "Hier siehst du den aktuellen Stand deiner Einreichung.";
         note.hidden = false;
       } else {
-        note.textContent = dashboardStatus.detail;
+        const paymentText = Number(dashboardCounts.paymentOpen || 0) > 0
+          ? `${formatInteger(dashboardCounts.paymentOpen)} Zahlung offen`
+          : "keine Zahlung offen";
+        note.textContent = `${formatInteger(dashboardCounts.visible)} sichtbar · ${formatInteger(dashboardCounts.review)} in Prüfung · ${paymentText}. ${dashboardStatus.detail}`;
         note.hidden = false;
       }
     }
@@ -1239,7 +1254,7 @@ function normalizeExternalUrl(value) {
 
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY | Zweck: zeigt Einreichungen mit Status, Details und Änderungsmöglichkeit vor Veröffentlichung; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
-  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Einreichungen";
+  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Einreichungen & Veröffentlichungen";
 }
 
 if (submissionsList && submissionsEmpty) {
@@ -1483,12 +1498,24 @@ if (submissionsList && submissionsEmpty) {
   }
 
   submissionsList.innerHTML = "";
+  submissionsList.hidden = false;
   submissionsEmpty.textContent = isSingleStatusView
     ? "Keine Einreichung gefunden."
     : "Noch keine aktuellen Einreichungen vorhanden.";
 
+  const setSubmissionsListOpen = (isOpen) => {
+    submissionsList.hidden = !isOpen;
+    if (!submissionsToggle) return;
+
+    submissionsToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    submissionsToggle.textContent = isOpen
+      ? "Einreichungen ausblenden"
+      : `${formatInteger(submissions.length)} Einreichung${submissions.length === 1 ? "" : "en"} anzeigen`;
+  };
+
   if (!submissions.length) {
     submissionsEmpty.hidden = false;
+    if (submissionsToggle) submissionsToggle.hidden = true;
   } else {
     submissionsEmpty.hidden = true;
 
@@ -1673,6 +1700,19 @@ if (submissionsList && submissionsEmpty) {
     });
 
     hydrateIcons(submissionsList);
+
+    const hasActionItems = submissions.some((item) => organizerSubmissionGroupKey(item) === "action");
+    const defaultOpen = Boolean(isSingleStatusView || hasActionItems);
+
+    if (submissionsToggle) {
+      submissionsToggle.hidden = Boolean(isSingleStatusView);
+      submissionsToggle.onclick = () => {
+        const isExpanded = submissionsToggle.getAttribute("aria-expanded") === "true";
+        setSubmissionsListOpen(!isExpanded);
+      };
+    }
+
+    setSubmissionsListOpen(defaultOpen);
   }
 }
 /* === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY === */
