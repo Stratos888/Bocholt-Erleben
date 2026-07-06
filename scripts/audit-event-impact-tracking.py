@@ -102,6 +102,9 @@ CHECKS = [
             "Website/Info",
             "Keine Aktion erforderlich",
             "Aktion erforderlich",
+            "Offene Aktionen anzeigen",
+            "organizer-dashboard-new-submission-cta",
+            "dataset.organizerOpenActions",
             "actionRequired",
             "const defaultOpen = Boolean(isSingleStatusView);",
             "published_content",
@@ -129,7 +132,7 @@ CHECKS = [
             "auf Bocholt erleben",
             "organizer-dashboard-impact-card",
             "organizer-dashboard-submissions-toggle",
-            "2026-07-06-organizer-dashboard-final-state-v1",
+            "2026-07-06-organizer-dashboard-final-action-v1",
         ],
     ),
 ]

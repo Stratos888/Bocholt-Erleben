@@ -5297,3 +5297,14 @@ Nach Deployment prüfen:
 5. Wirkungskarte bleibt sichtbar, mit Gesamtwirkung und bei mehreren veröffentlichten Inhalten mit Einzelauswahl.
 6. `Was wird gezählt?` und `Details anzeigen` funktionieren weiter als konsistente Disclosure-Controls.
 <!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_FINAL_STATE_2026_07_06 === -->
+
+
+## Organizer Dashboard Final Action CTA – 2026-07-06
+
+- Finaler Anbieter-Dashboard-Abschluss auf Basis des Premium-Cockpit-Zielzustands.
+- Bei `Aktion erforderlich` ist die primäre Hero-Aktion jetzt `Offene Aktionen anzeigen`; sie öffnet den kompakten Einreichungsbereich gezielt und scrollt dorthin.
+- `Neue Veranstaltung einreichen` bleibt als sekundäre Aktion erreichbar, damit der Anbieter weiterhin direkt neue Inhalte anlegen kann.
+- Einreichungen & Veröffentlichungen bleiben im Grundzustand weiterhin geschlossen; offene Punkte werden nur kompakt markiert.
+- Die Wirkungsauswahl bleibt defensiv: Ein Dropdown erscheint nur, wenn neben der Gesamtwirkung echte veröffentlichte Inhalte auswählbar sind.
+
+Validierung lokal: `php -l api/organizer-portal/me.php`, `node --check js/organizer-portal.js`, `python3 scripts/audit-event-impact-tracking.py`, `python3 tools/audit-css-governance.py`.

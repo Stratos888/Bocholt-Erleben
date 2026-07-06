@@ -811,13 +811,17 @@ function normalizeExternalUrl(value) {
     if (actionRequired > 0) {
       return {
         label: "Aktion erforderlich",
-        detail: `${formatInteger(actionRequired)} Aktion${actionRequired === 1 ? "" : "en"} erforderlich`
+        detail: actionRequired === 1
+          ? "1 offener Punkt wartet auf Bearbeitung."
+          : `${formatInteger(actionRequired)} offene Punkte warten auf Bearbeitung.`,
+        actionText: `${formatInteger(actionRequired)} Aktion${actionRequired === 1 ? "" : "en"} erforderlich`
       };
     }
 
     return {
       label: "Keine Aktion erforderlich",
-      detail: ""
+      detail: "",
+      actionText: ""
     };
   }
 
@@ -933,8 +937,8 @@ function normalizeExternalUrl(value) {
     overview.hidden = true;
     overview.setAttribute("hidden", "");
 
-    if (status.detail) {
-      nextStep.textContent = status.detail;
+    if (status.actionText) {
+      nextStep.textContent = status.actionText;
       nextStep.hidden = false;
       nextStep.removeAttribute("hidden");
     } else {
@@ -1305,17 +1309,55 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V4_VALUE_CENTER_COPY === */
 
-    if (dashboardPrimaryCta) {
+    const actionRequiredCount = Number(dashboardCounts?.actionRequired || 0);
+    const submissionCtaConfig = (() => {
       if (isActivityPlanView && !hasEventPresencePlan) {
-        dashboardPrimaryCta.href = "/aktivitaeten/sichtbar-werden/";
-        dashboardPrimaryCta.textContent = "Weitere Aktivität einreichen";
-      } else {
-        const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
-          ? effectivePlanKey
-          : (hasEventPresencePlan ? "starter" : "single");
+        return {
+          href: "/aktivitaeten/sichtbar-werden/",
+          label: "Weitere Aktivität einreichen"
+        };
+      }
 
-        dashboardPrimaryCta.href = `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`;
-        dashboardPrimaryCta.textContent = isSingleStatusView ? "Weitere Veranstaltung einreichen" : "Neue Veranstaltung einreichen";
+      const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
+        ? effectivePlanKey
+        : (hasEventPresencePlan ? "starter" : "single");
+
+      return {
+        href: `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`,
+        label: isSingleStatusView ? "Weitere Veranstaltung einreichen" : "Neue Veranstaltung einreichen"
+      };
+    })();
+
+    if (dashboardPrimaryCta) {
+      let newSubmissionCta = document.getElementById("organizer-dashboard-new-submission-cta");
+
+      if (actionRequiredCount > 0 && !isSingleStatusView) {
+        dashboardPrimaryCta.href = "#organizer-dashboard-submissions-card";
+        dashboardPrimaryCta.textContent = "Offene Aktionen anzeigen";
+        dashboardPrimaryCta.dataset.organizerOpenActions = "true";
+
+        if (dashboardActions && !newSubmissionCta) {
+          newSubmissionCta = document.createElement("a");
+          newSubmissionCta.id = "organizer-dashboard-new-submission-cta";
+          newSubmissionCta.className = "content-cta organizer-dashboard-secondary-action";
+          dashboardPrimaryCta.insertAdjacentElement("afterend", newSubmissionCta);
+        }
+
+        if (newSubmissionCta) {
+          newSubmissionCta.hidden = false;
+          newSubmissionCta.removeAttribute("hidden");
+          newSubmissionCta.href = submissionCtaConfig.href;
+          newSubmissionCta.textContent = submissionCtaConfig.label;
+        }
+      } else {
+        dashboardPrimaryCta.href = submissionCtaConfig.href;
+        dashboardPrimaryCta.textContent = submissionCtaConfig.label;
+        delete dashboardPrimaryCta.dataset.organizerOpenActions;
+        dashboardPrimaryCta.onclick = null;
+
+        if (newSubmissionCta) {
+          newSubmissionCta.remove();
+        }
       }
     }
 
@@ -1933,6 +1975,16 @@ if (submissionsList && submissionsEmpty) {
       submissionsToggle.onclick = () => {
         const isExpanded = submissionsToggle.getAttribute("aria-expanded") === "true";
         setSubmissionsListOpen(!isExpanded);
+      };
+    }
+
+    if (dashboardPrimaryCta && dashboardPrimaryCta.dataset.organizerOpenActions === "true") {
+      dashboardPrimaryCta.onclick = (event) => {
+        event.preventDefault();
+        setSubmissionsListOpen(true);
+        if (submissionsCard) {
+          submissionsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       };
     }
 
