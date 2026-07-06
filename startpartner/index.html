@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: STARTPARTNER_HEAD_V1 | Zweck: fuehrt den 6-Monats-Startpartner-Funnel als eigenen, klar begrenzten Akquiseweg ein; Umfang: kompletter Head der neuen Route === -->
+  <!-- === BEGIN BLOCK: STARTPARTNER_HEAD_V2 | Zweck: fuehrt den 6-Monats-Startpartner-Funnel als klar begrenzten Akquiseweg ein und nutzt die bestehende Funnel-/Formular-DNA; Umfang: kompletter Head der Route === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Startpartner werden | Bocholt erleben</title>
@@ -42,10 +42,10 @@
   }
   </script>
   <link rel="stylesheet" href="/css/style.css?v=2026-06-22-css-governance-v1">
-  <!-- === END BLOCK: STARTPARTNER_HEAD_V1 === -->
+  <!-- === END BLOCK: STARTPARTNER_HEAD_V2 === -->
 </head>
 <body>
-  <!-- === BEGIN BLOCK: STARTPARTNER_BODY_V1 | Zweck: bildet den Startpartner-Pfad als eigenstaendigen 6-Monats-Wirkungsnachweis ab, ohne ihn als Rabatt-Tarif oder oeffentliche Besserstellung zu kommunizieren; Umfang: kompletter Body === -->
+  <!-- === BEGIN BLOCK: STARTPARTNER_BODY_V2_EXISTING_FORM_DNA | Zweck: fuehrt Startpartner als eigenen Akquiseweg, nutzt aber die bestehende Content-/Funnel-Formularstruktur inklusive eigener JS-Validierung statt nativer Browser-Bubbles; Umfang: kompletter Body === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img src="/icons/app/icon-192.png" alt="Bocholt erleben Logo" class="app-logo">
@@ -59,20 +59,16 @@
     </div>
   </header>
 
-  <main class="page page--publish page--startpartner">
+  <main class="page page--organizers page--startpartner">
     <header class="content-hero content-hero--panel">
-      <div class="publish-hero-layout">
-        <div class="publish-hero-copy">
-          <h1>Startpartner werden</h1>
-          <p class="content-lead">
-            Für passende Veranstalter, Locations und Anbieter: 6 Monate volle Anbieterleistung testen, Wirkung sehen und danach in den passenden Tarif wechseln.
-          </p>
-        </div>
-      </div>
+      <h1>Startpartner werden</h1>
+      <p class="content-lead">
+        Für passende Veranstalter, Locations und Anbieter: 6 Monate volle Anbieterleistung testen, Wirkung sehen und danach in den passenden Tarif wechseln.
+      </p>
     </header>
 
-    <section class="content-card content-card--primary" aria-labelledby="startpartner-model-title">
-      <h2 id="startpartner-model-title">Das Startpartner-Modell</h2>
+    <section class="content-card content-card--primary" aria-labelledby="startpartner-service-head">
+      <h2 id="startpartner-service-head">Was bringt dir die Startpartnerschaft?</h2>
       <ul class="publish-benefits-grid" aria-label="Leistungen fuer Startpartner">
         <li><strong>6 Monate voller Anbieterzugang</strong></li>
         <li><strong>Normale öffentliche Darstellung im Plattformstandard</strong></li>
@@ -80,8 +76,9 @@
         <li><strong>Pflege- und Änderungsweg</strong></li>
         <li><strong>Auswertung vor dem Übergang</strong></li>
       </ul>
+
       <p class="content-note">
-        Startpartner erhalten keine gekaufte Platzierung und keine bessere öffentliche Optik. Der Test beweist Service, Pflegeaufwand und messbare Wirkung.
+        Keine gekaufte Platzierung, keine bessere öffentliche Optik und kein dauerhaft kostenloses Produkt. Der Test soll Service, Pflegeaufwand und messbare Wirkung beweisen.
       </p>
     </section>
 
@@ -96,10 +93,6 @@
           <strong>Dauerhafte Angebote</strong>
           <span>Freizeitangebote, Kurse, Orte oder Anbieter, die längerfristig sichtbar bleiben sollen.</span>
         </li>
-        <li>
-          <strong>Pflegebedarf</strong>
-          <span>Anbieter, die Änderungen, Termine oder Quellen nicht doppelt an vielen Stellen pflegen möchten.</span>
-        </li>
       </ul>
     </section>
 
@@ -109,10 +102,15 @@
         <p class="content-note content-note--form-meta">* Pflichtfelder</p>
       </div>
 
-      <form class="content-form" action="https://formspree.io/f/mrerpwjy" method="POST">
+      <p class="content-note">
+        Die Anfrage ist noch keine Zusage. Bocholt erleben prüft, ob Angebot, Zeitraum und redaktioneller Qualitätsstandard passen.
+      </p>
+
+      <form class="content-form" id="startpartner-request-form" action="https://formspree.io/f/mrerpwjy" method="POST" novalidate>
         <input type="hidden" name="subject" value="[Bocholt erleben] Startpartner-Anfrage">
         <input type="hidden" name="lead_type" value="startpartner_6_months">
         <input type="hidden" name="source_label" value="bocholt-erleben-startpartner">
+        <input type="hidden" name="page_url" value="">
 
         <div class="content-form-grid">
           <label class="content-field content-field--full" for="startpartner-organization">
@@ -143,12 +141,13 @@
 
           <label class="content-field content-field--full" for="startpartner-note">
             <span class="content-field__label">Kurzbeschreibung *</span>
-            <textarea class="content-field__control" id="startpartner-note" name="message" rows="5" required placeholder="Was macht ihr, welche Termine oder Angebote sind relevant, und warum könnte Bocholt erleben für euch passen?"></textarea>
+            <textarea class="content-field__control" id="startpartner-note" name="message" rows="4" required placeholder="Kurz beschreiben, worum es geht. Ein Link reicht oft schon als Einstieg."></textarea>
           </label>
 
           <label class="content-field content-field--full" for="startpartner-source">
             <span class="content-field__label">Website, Kalender oder Social-Link</span>
             <input class="content-field__control" id="startpartner-source" name="source_url" type="url" inputmode="url" placeholder="https://…">
+            <p class="content-field__hint">Optional. Hilft, wenn Termine oder Angebote bereits an anderer Stelle gepflegt werden.</p>
           </label>
         </div>
 
@@ -161,13 +160,17 @@
         </label>
 
         <div class="content-actions content-actions--inline">
-          <button class="content-cta content-cta--primary" type="submit">Startpartner-Anfrage senden</button>
-          <a class="content-cta content-cta--secondary" href="/veroeffentlichung-erklaert/">Erst Ablauf verstehen</a>
+          <button class="content-cta content-cta--primary" id="startpartner-request-submit" type="submit">
+            Startpartner-Anfrage senden
+          </button>
+          <a class="content-cta content-cta--secondary" href="/veroeffentlichung-erklaert/">
+            Erst Ablauf verstehen
+          </a>
         </div>
 
-        <p class="content-note">
-          Die Anfrage ist noch keine Zusage. Bocholt erleben prüft, ob Angebot, Zeitraum und redaktioneller Qualitätsstandard passen.
-        </p>
+        <section class="content-card content-card--primary" id="startpartner-request-result" hidden>
+          <p id="startpartner-request-result-text"></p>
+        </section>
       </form>
     </section>
   </main>
@@ -178,6 +181,7 @@
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/site-footer.js?v=2026-07-06-startpartner-funnel-v1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <!-- === END BLOCK: STARTPARTNER_BODY_V1 === -->
+  <script src="/js/startpartner-funnel.js?v=2026-07-06-startpartner-consistency-v1" defer></script>
+  <!-- === END BLOCK: STARTPARTNER_BODY_V2_EXISTING_FORM_DNA === -->
 </body>
 </html>
