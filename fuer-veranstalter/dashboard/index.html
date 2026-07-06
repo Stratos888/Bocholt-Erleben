@@ -83,21 +83,30 @@
     </section>
     <!-- === END BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 === -->
 
-    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V4_VALUE_CENTER_COPY | Zweck: benennt die Dashboard-Liste als Einreichungen mit Status statt reine Verwaltungsliste; Umfang: statischer Einreichungslisten-Block === -->
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_CARD_V1 | Zweck: bereitet den Anbieterbereich als Wertzentrum mit sicher zugeordneten Nutzwert-Metriken vor; Umfang: neue statische Wirkungskarte === -->
+    <section class="content-card content-card--primary" id="organizer-dashboard-impact-card" aria-labelledby="organizer-dashboard-impact-head" hidden>
+      <h2 id="organizer-dashboard-impact-head">Wirkung auf Bocholt erleben</h2>
+      <p id="organizer-impact-period">Zeitraum wird geladen.</p>
+      <div class="organizer-tariff-table" id="organizer-impact-metrics" role="list"></div>
+      <p class="content-note" id="organizer-impact-note">Die Zahlen zeigen gemessene Aktionen auf Bocholt erleben, keine Besucherzahlen vor Ort.</p>
+    </section>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_CARD_V1 === -->
+
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V5_PREMIUM_COCKPIT | Zweck: ordnet Einreichungen unterhalb der Wirkung als Arbeitsbereich für Veröffentlichungen; Umfang: statischer Einreichungslisten-Block === -->
     <section class="content-card content-card--primary" id="organizer-dashboard-submissions-card" aria-labelledby="organizer-dashboard-submissions-head" hidden>
-      <h2 id="organizer-dashboard-submissions-head">Einreichungen</h2>
+      <h2 id="organizer-dashboard-submissions-head">Einreichungen & Veröffentlichungen</h2>
       <p id="organizer-dashboard-submissions-summary">Status wird geladen.</p>
       <div class="organizer-submission-summary-grid" id="organizer-dashboard-submissions-overview" role="list"></div>
       <p class="content-note" id="organizer-dashboard-next-step">Nächster Schritt wird geladen.</p>
       <div class="content-links" id="organizer-dashboard-submissions-list"></div>
       <p class="content-note" id="organizer-dashboard-submissions-empty" hidden>Noch keine aktuellen Einreichungen vorhanden.</p>
     </section>
-    <!-- === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V4_VALUE_CENTER_COPY === -->
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V5_PREMIUM_COCKPIT === -->
 
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V5_VALUE_CENTER_COPY | Zweck: benennt Stammdaten und Veröffentlichungsübersicht klarer als Wertzentrum ohne neue Datenlogik; Umfang: beide Summary-Karten === -->
     <div class="content-grid content-grid--2" id="organizer-dashboard-summary" hidden>
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-quota-head">
-        <h2 id="organizer-dashboard-quota-head">Tarife & Veröffentlichungen</h2>
+        <h2 id="organizer-dashboard-quota-head">Tarif & Nutzung</h2>
         <p id="organizer-quota-period">–</p>
         <p id="organizer-quota-change" hidden>–</p>
         <p id="organizer-quota-summary">–</p>
@@ -105,7 +114,7 @@
       </section>
 
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-account-head">
-        <h2 id="organizer-dashboard-account-head">Meine Angaben</h2>
+        <h2 id="organizer-dashboard-account-head">Kontakt & Organisation</h2>
         <p id="organizer-account-name">–</p>
         <p id="organizer-account-email">–</p>
         <p id="organizer-account-plan" hidden>–</p>
@@ -113,14 +122,7 @@
     </div>
     <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V5_VALUE_CENTER_COPY === -->
 
-    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_CARD_V1 | Zweck: bereitet den Anbieterbereich als Wertzentrum mit sicher zugeordneten Nutzwert-Metriken vor; Umfang: neue statische Wirkungskarte === -->
-    <section class="content-card content-card--primary" id="organizer-dashboard-impact-card" aria-labelledby="organizer-dashboard-impact-head" hidden>
-      <h2 id="organizer-dashboard-impact-head">Meine Wirkung auf Bocholt erleben</h2>
-      <p id="organizer-impact-period">Zeitraum wird geladen.</p>
-      <div class="organizer-tariff-table" id="organizer-impact-metrics" role="list"></div>
-      <p class="content-note" id="organizer-impact-note">Die Zahlen zeigen Interaktionen auf Bocholt erleben, keine Besucherzahlen vor Ort.</p>
-    </section>
-    <!-- === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_CARD_V1 === -->
+
 
 
 
@@ -143,7 +145,7 @@
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_PORTAL_SCRIPT_CACHE_BUST_V5_VALUE_CENTER_COPY | Zweck: lädt die aktualisierte Dashboard-Copy für Einreichungen, Veröffentlichungsstatus und Mitgliedschaft; Umfang: organizer-portal.js Script-Referenz === -->
-  <script src="/js/organizer-portal.js?v=2026-05-28-dashboard-actions-badges-1" defer></script>
+  <script src="/js/organizer-portal.js?v=2026-07-06-organizer-premium-cockpit-v1" defer></script>
   <!-- === END BLOCK: ORGANIZER_DASHBOARD_PORTAL_SCRIPT_CACHE_BUST_V5_VALUE_CENTER_COPY === -->
   <!-- === END BLOCK: ORGANIZER_DASHBOARD_BODY_V2_AREA_SPLIT === -->
 </body>

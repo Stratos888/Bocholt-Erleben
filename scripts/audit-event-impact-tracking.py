@@ -91,7 +91,19 @@ CHECKS = [
             "impactShareTotal",
             "renderImpactItemRows",
             "renderSubmissionImpactHtml",
+            "organizerHasEventImpactContext",
+            "buildOrganizerSubmissionGroups",
+            "hasEventImpactContext",
             "Teilungen",
+            "organizer-impact-total",
+        ],
+    ),
+    (
+        "fuer-veranstalter/dashboard/index.html",
+        [
+            "Wirkung auf Bocholt erleben",
+            "organizer-dashboard-impact-card",
+            "2026-07-06-organizer-premium-cockpit-v1",
         ],
     ),
 ]

@@ -5044,3 +5044,35 @@ Nach Deployment prüfen:
 4. Website-/Ticket- und Maps-Klicks von Detailseite und Panel testen; Zielnavigation darf unverändert funktionieren.
 5. Anbieter-Dashboard öffnen; Wirkungskarte darf keine Besucher-/Buchungs-/Personenbehauptung enthalten und zeigt Teilungen/Top-Inhalte nur bei vorhandenen Messwerten.
 <!-- === END BLOCK: TEST_STATUS_EVENT_IMPACT_BACKBONE_2026_07_03 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_PREMIUM_COCKPIT_2026_07_06 | Zweck: dokumentiert Premium-Cockpit-Polish fuer den Veranstalterbereich inklusive Wirkungskarten-Sichtbarkeit; Umfang: Dashboard-IA, Mobile-Hierarchie, lokale Guards und Smoke === -->
+## Veranstalter-Dashboard Premium Cockpit – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Der Anbieterbereich beantwortet sofort: Ist alles okay, was ist sichtbar/in Prüfung, welche Wirkung haben veröffentlichte Veranstaltungen, wofür wird gezahlt.
+- Keine Zwei-Klassen-Optik im öffentlichen Produkt; der Premiumwert liegt im privaten Anbieter-Cockpit.
+- Wirkung steht oberhalb der langen Einreichungsliste und ist auch bei gemischten Veranstaltung-/Aktivitätskonten sichtbar.
+
+Umsetzung:
+- Dashboard-Reihenfolge: Hero mit Status, Wirkung, Einreichungen & Veröffentlichungen, Tarif & Nutzung, Kontakt & Organisation.
+- Wirkungskarten-Sichtbarkeit nicht mehr pauschal über Aktivitätstarife ausblenden; Event-Kontext zählt über Veranstaltungstarif, Event-Einreichung, veröffentlichte Events oder vorhandene Event-Wirkungsdaten.
+- Hero verdichtet auf klare Statuszeile wie `Alles okay · 5 sichtbar · 3 in Prüfung · 0 offen`.
+- Wirkungskarte visuell als Akzentkarte mit großer Hauptzahl und vier kompakten Metrikkacheln.
+- Einreichungen werden nach `Aktion nötig`, `In Prüfung`, `Veröffentlicht`, `Abgelehnt`, `Weitere` gruppiert.
+- Tarifkarte benennt sich als `Tarif & Nutzung` und Veranstaltungstarife werden verständlicher als Veranstaltungstarife markiert.
+- `scripts/audit-event-impact-tracking.py` prueft die Cockpit-Verdrahtung mit.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deployment prüfen:
+1. Gemischten Testaccount mit Veranstaltungstarif und Aktivitätstarif öffnen; die Karte `Wirkung auf Bocholt erleben` muss zwischen Hero und Einreichungen sichtbar sein.
+2. Mobile prüfen: Im ersten Scrollbereich müssen Status und Wirkung vor der langen Einreichungsliste erscheinen.
+3. Einreichungsliste prüfen: Gruppenüberschriften erscheinen nur für vorhandene Statusgruppen und Details bleiben aufklappbar.
+4. Reinen Aktivitätsaccount ohne Event-Kontext prüfen, falls vorhanden: Event-Wirkungskarte darf dort weiterhin nicht irritierend erscheinen.
+5. Tarif & Nutzung prüfen: Monatsbetrag, aktive Tarife und Nutzung bleiben korrekt.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_PREMIUM_COCKPIT_2026_07_06 === -->
