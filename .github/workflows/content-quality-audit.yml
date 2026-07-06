@@ -61,7 +61,7 @@ jobs:
         run: |
           set -e
           python -m pip install --upgrade pip
-          pip install google-api-python-client google-auth
+          pip install google-api-python-client google-auth pymysql
       # === END BLOCK: CONTENT_QUALITY_CHECKOUT_AND_PYTHON_V1 ===
 
       # === BEGIN BLOCK: CONTENT_QUALITY_RESOLVE_SCOPE_AND_TARGET_V1 | Zweck: trennt daily/full und live/staging Sheet-/Runtime-Ziele; Umfang: setzt Audit-ENV fuer Folge-Schritte ===
@@ -1199,6 +1199,29 @@ jobs:
           PY
       # === END BLOCK: CONTENT_VISUAL_FEEDBACK_SHEET_WRITE_V1 ===
 
+      # === BEGIN BLOCK: CONTENT_OPS_RECORD_AUDIT_IMPACT_V1 | Zweck: normalisiert Audit-Ergebnisse, routet Folgeaktionen und persistiert messbare Verwaltungs-Metriken; Umfang: keine fachliche Content-Aenderung ===
+      - name: Record Content Ops audit impact
+        if: always()
+        shell: bash
+        env:
+          BE_ENVIRONMENT: ${{ github.ref_name == 'staging' && 'staging' || 'live' }}
+          AUDIT_SCOPE: ${{ env.AUDIT_SCOPE }}
+          GITHUB_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          LIVE_DB_HOST: ${{ secrets.LIVE_DB_HOST }}
+          LIVE_DB_NAME: ${{ secrets.LIVE_DB_NAME }}
+          LIVE_DB_USER: ${{ secrets.LIVE_DB_USER }}
+          LIVE_DB_PASSWORD: ${{ secrets.LIVE_DB_PASSWORD }}
+          LIVE_DB_PORT: ${{ secrets.LIVE_DB_PORT }}
+          STAGING_DB_HOST: ${{ secrets.STAGING_DB_HOST }}
+          STAGING_DB_NAME: ${{ secrets.STAGING_DB_NAME }}
+          STAGING_DB_USER: ${{ secrets.STAGING_DB_USER }}
+          STAGING_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+          STAGING_DB_PORT: ${{ secrets.STAGING_DB_PORT }}
+        run: |
+          set -e
+          python scripts/content-ops-control.py record-audit
+      # === END BLOCK: CONTENT_OPS_RECORD_AUDIT_IMPACT_V1 ===
+
       # === BEGIN BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 | Zweck: macht Reports im Workflow nachvollziehbar; Umfang: Artefakt-Upload ohne Repo-Commit ===
       - name: Upload audit reports
         uses: actions/upload-artifact@v4
@@ -1212,4 +1235,5 @@ jobs:
             data/content-visual-feedback.json
             data/content-verification-cache.json
             data/content-verification-cache-writeback.json
+            data/content-ops/*.json
       # === END BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 ===
