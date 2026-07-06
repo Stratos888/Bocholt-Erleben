@@ -2321,6 +2321,14 @@ def build_weekly_diagnostics(
         "drop_reasons": count_by_key(dropped, "reason"),
         "raw_candidate_titles": candidate_title_list([normalize_candidate(item) for item in raw_candidates if isinstance(item, dict)]),
         "selected_candidate_titles": candidate_title_list(selected_candidates),
+        # === BEGIN BLOCK: WEEKLY_DECISION_IMPACT_CANDIDATE_DIAGNOSTICS_V1 | Zweck: macht Filter-/Auswahlwirkung fuer Content-Ops-Metriken exakt auswertbar; Umfang: fuegt strukturierte Selected-/Drop-Diagnosen hinzu ohne Prompt-/Auswahllogik zu aendern ===
+        "selected_candidate_summaries": [
+            candidate_diag_summary(item, "selected", "selected")
+            for item in selected_candidates[:80]
+            if isinstance(item, dict)
+        ],
+        "candidate_diagnostics": drop_diagnostics[:240],
+        # === END BLOCK: WEEKLY_DECISION_IMPACT_CANDIDATE_DIAGNOSTICS_V1 ===
         "dropped_candidate_titles": [
             f"{item.get('reason', '')} | {item.get('date', '')} | {item.get('title', '')}".strip()
             for item in dropped[:80]

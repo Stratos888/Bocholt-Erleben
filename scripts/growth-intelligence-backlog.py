@@ -760,7 +760,7 @@ def main() -> None:
         time.sleep(0.01)
 
     append_records(sheets, sheet_id, BACKLOG_TAB, BACKLOG_HEADER, created)
-    append_records(sheets, sheet_id, REPORT_TAB, REPORT_HEADER, [{
+    report_row = {
         "generated_at": ts,
         "period_start": start,
         "period_end": end,
@@ -771,7 +771,16 @@ def main() -> None:
         "gsc_rows": len(gsc_rows),
         "ga4_rows": len(ga4_rows),
         "message": " | ".join(messages) if messages else f"Growth-Backlog erfolgreich aktualisiert. Interne Metrik-Zeilen: {len(value_rows)}.",
-    }])
+    }
+    append_records(sheets, sheet_id, REPORT_TAB, REPORT_HEADER, [report_row])
+
+    # === BEGIN BLOCK: GROWTH_INTELLIGENCE_CONTENT_OPS_SUMMARY_V1 | Zweck: macht Growth-Backlog-Wirkung fuer die zentrale Verwaltungs-Metrikschicht maschinenlesbar; Umfang: lokales JSON-Artefakt fuer Folge-Step ===
+    growth_summary = dict(report_row)
+    growth_summary["value_rows"] = len(value_rows)
+    growth_summary["messages"] = messages
+    GROWTH_SUMMARY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    GROWTH_SUMMARY_PATH.write_text(json.dumps(growth_summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    # === END BLOCK: GROWTH_INTELLIGENCE_CONTENT_OPS_SUMMARY_V1 ===
     log(f"Growth Intelligence: created={len(created)} suppressed={suppressed} gsc_rows={len(gsc_rows)} ga4_rows={len(ga4_rows)} value_rows={len(value_rows)} status={status}")
     if messages:
         log("Growth Intelligence diagnostics:")
