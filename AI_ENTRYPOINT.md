@@ -2,139 +2,198 @@
 
 Arbeitsbranch: `staging`.
 
-Diese Datei ist der schnelle Einstieg fuer KI-Arbeit am Repository. Sie macht die GitHub-first-Arbeitsweise auffindbar und ausfuehrbar.
+Diese Datei ist die einzige operative Arbeitsanweisung fuer KI-Arbeit am Repository. Sie beantwortet zuerst: Welche Quelle ist aktuell? Welcher Arbeitsmodus ist passend? Darf direkt geschrieben werden? Wann sind Draft-PR, Codespace oder ZIP sinnvoll?
 
-## Grundregel
+## 1. Grundsatz
 
 Bei jeder Repo-Aufgabe zuerst den aktuellen GitHub-Stand von `Stratos888/Bocholt-Erleben` auf Branch `staging` pruefen, sofern der GitHub-Connector verfuegbar ist.
 
 Nicht aus Memory, alten Chatstaenden oder alten ZIPs als Quelle der Wahrheit arbeiten. Memory und alte Chats sind nur Kontext.
 
-## Quellenhierarchie
+`main` bleibt geschuetzt. Direkte KI-Schreibaktionen auf `main` sind nicht erlaubt.
+
+## 2. Quellenhierarchie
+
+Fuer Repo-Arbeit gilt:
 
 1. GitHub-Connector: aktueller Branch `staging`.
 2. Aktiver Codespace- oder lokaler Git-Stand, wenn der Nutzer Terminalausgaben aus einer laufenden Arbeitskopie liefert.
-3. ZIP-Snapshot nur als Fallback.
+3. ZIP-Snapshot nur als Fallback oder bewusster Vergleichsstand.
 4. Memory, fruehere Chats und alte Artefakte nur als Kontext.
 
-## Arbeitsmodi
+Fuer fachliche Daten gilt weiterhin die jeweilige Source of Truth. Details stehen in `ENGINEERING.md`.
 
-### G1 GitHub Read
+## 3. Start-Gate vor jeder Umsetzung
 
-Standard fuer Analyse, Review, Ursachenpruefung und Planung.
+Vor Umsetzung nennt die KI knapp:
 
-Pflicht:
+- gelesene Quelle und Branch/Ref,
+- gelesene oder betroffene Dateien,
+- Arbeitsmodus: G1, G2, G3, G4 oder G5,
+- Risiko: niedrig, mittel oder hoch,
+- ob eine Schreibfreigabe im aktuellen Chat noetig ist.
 
-- `staging` zuerst lesen.
-- Betroffene Dateien nennen.
-- Unsicherheit offen benennen.
+Keine Umsetzung ohne belegten aktuellen Stand der betroffenen Datei.
 
-### G2 Direkter Staging-Commit
+## 4. Arbeitsmodi
 
-Erlaubt nach ausdruecklicher Nutzerfreigabe fuer kleine, klar begrenzte und reversible Aenderungen.
+### G1 — GitHub Read
 
-Geeignet fuer:
+Standard fuer:
 
-- kleine Doku-Aktualisierungen,
-- kleine Copy-, HTML- oder CSS-Korrekturen,
+- Analyse,
+- Review,
+- Ursachenpruefung,
+- Doku-Abgleich,
+- Planung,
+- Patch-Entscheidung.
+
+Keine Schreibaktion.
+
+### G2 — Direkter Commit auf `staging`
+
+Nur nach ausdruecklicher Nutzerfreigabe im aktuellen Chat.
+
+Geeignet fuer kleine, klar begrenzte und reversible Aenderungen:
+
+- Doku,
+- kleine Copy-/HTML-Korrekturen,
+- kleine CSS-Polishs in klarer Owner-Datei,
 - kleine statische JS-Guards,
-- kleine Konfigurations- oder Audit-Haertungen mit niedrigem Risiko.
+- kleine Audit-/Konfigurationshaertungen ohne Laufzeitkomplexitaet.
 
-Nach einem Direktcommit nennt die KI:
+Nicht geeignet fuer:
 
-- gelesene Baseline,
-- geaenderte Dateien,
+- `main`,
+- Force-Push,
+- Branch-Loeschungen,
+- Datei-Loeschungen ohne ausdrueckliche Spezialfreigabe,
+- Deploy-/Workflow-/Service-Worker-/Cache-Aenderungen,
+- Backend/API/DB/Stripe/Mail,
+- grosse Multi-Datei-Patches,
+- generierte Datenartefakte als fachliche Quelle,
+- automatische fachliche Datenkorrekturen aus KI-/Audit-Ergebnissen.
+
+Nach einem G2-Commit nennt die KI:
+
 - Commit-SHA,
-- Diff-Zusammenfassung,
+- geaenderte Dateien,
+- knappe Diff-Zusammenfassung,
 - erwartete Staging-Pruefung,
-- Ruecknahmeweg per Revert-Commit.
+- Revert-Weg.
 
-### G3 AI-Branch und Draft-PR gegen `staging`
+### G3 — AI-Branch + Draft-PR gegen `staging`
 
-Standard fuer mittlere oder breitere Implementierungen.
+Standard fuer mittlere und groessere Implementierungen.
 
 Geeignet fuer:
 
 - mehrere Dateien,
 - neue Struktur,
-- Dashboard-, Inbox- oder Tracking-Aenderungen,
-- UI- oder JS-Aenderungen mit hoeherem Regressionsrisiko.
+- Dashboard-/Inbox-/Tracking-Aenderungen,
+- UI- oder JS-Aenderungen mit hoeherem Regressionsrisiko,
+- Aenderungen, die vor Merge im GitHub-Diff geprueft werden sollen.
 
-### G4 Codespace oder lokale Ausfuehrung
+Der PR bleibt Review-Flaeche. Merge nach `staging` erfolgt bewusst.
 
-Codespace ist nicht mehr Standard fuer jede Repo-Arbeit. Codespace ist die Ausfuehrungs-, Preview-, Smoke-, Build- und Debug-Umgebung.
+### G4 — Codespace / lokale Ausfuehrung
 
-Nutzen bei:
+Codespace ist nicht mehr Standard fuer jede Repo-Arbeit. Codespace ist Spezialwerkzeug fuer Ausfuehrung, Preview, Smoke, Build und Debug.
 
-- Browser-Smoke oder Playwright,
-- Python-, Node- oder PHP-Ausfuehrung,
-- Build- oder Deploy-Skripten,
-- generierten Artefakten,
-- Backend, API, DB, Stripe oder Mail,
-- Service Worker, Cache oder Deploy-Workflow,
-- grossen Refactorings,
-- Asset- oder Bildverarbeitung.
+Nutzen, wenn eine Aenderung ohne lokale Ausfuehrung nicht ausreichend sicher ist:
 
-### G5 ZIP-Fallback
+- Browser-Smoke / Playwright,
+- Python-/Node-/PHP-Ausfuehrung,
+- Build-/Deploy-Skripte,
+- generierte Artefakte,
+- Backend/API/DB/Stripe/Mail,
+- Service Worker / Cache / Deploy-Workflow,
+- grosse Refactorings,
+- Asset-/Bildverarbeitung.
 
-ZIP ist nur noch Fallback, wenn GitHub nicht verfuegbar ist oder ein bewusster Snapshot-Vergleich gebraucht wird.
+### G5 — ZIP-Fallback
 
-## Visueller Standard-Loop
+Nur wenn GitHub-Connector oder Repo-Zugriff nicht verfuegbar ist oder ein bewusster Snapshot-Vergleich benoetigt wird.
 
-Fuer kleine, owner-file-klare UI-, CSS- oder statische JS-Aenderungen gilt:
+Patch-ZIPs bleiben ohne Wrapper-Dateien und enthalten direkt die Repo-Root-Struktur.
 
-1. GitHub/staging lesen.
-2. Owner-Datei und Risiko nennen.
-3. Nach Nutzerfreigabe direkt auf `staging` committen.
-4. Staging-Deploy als echte visuelle Pruefumgebung nutzen.
-5. Nutzer prueft Screenshot oder Device.
-6. Maximal ein gezielter Polish-Commit.
-7. Wenn danach weitere Korrekturen noetig sind: stoppen, neu bewerten, nicht weiterflicken.
+## 5. Visueller Arbeitsloop
 
-Codespace Preview ist fuer visuelle Arbeit nicht mehr der Standard.
+Fuer kleine visuelle Aenderungen ist Staging selbst die Preview.
 
-## Harte Grenzen
+Standard:
 
-- Keine direkten KI-Schreibaktionen auf `main`.
+```text
+GitHub/staging lesen
+-> Owner-Datei bestimmen
+-> kleiner G2-Commit nach Freigabe
+-> Staging-Deploy abwarten
+-> Nutzer prueft echte Ansicht/Screenshot
+-> maximal ein gezielter Polish-Commit
+-> Freeze oder Stop
+```
+
+Wenn nach einem Hauptcommit und einem Polish-Commit weiter nachgebessert werden muesste, stoppen und neu bewerten. Nicht weiterflicken.
+
+Codespace Preview ist nur fuer komplexere Vorabpruefung oder Ausfuehrungsbedarf gedacht.
+
+## 6. Doku-only-Regel
+
+Doku-only-Aenderungen duerfen nicht in viele kleine Staging-Commits zerfallen, weil jeder Push aktuell den Deploy-Workflow ausloest.
+
+Daher gilt:
+
+- Doku-Prozessumstellungen buendeln.
+- Wenn mehrere Doku-Dateien betroffen sind: ein konsolidierter Doku-Commit oder ein bewusstes Doku-Paket.
+- Keine Runtime-Dateien mit reinen Doku-Workpacks vermischen.
+
+## 7. Ruecknahme
+
+Falsche Staging-Commits werden bevorzugt per Revert-Commit zurueckgenommen.
+
+Kein Force-Reset als Standard.
+
+## 8. Harte Grenzen fuer KI
+
+- Nie direkt auf `main` schreiben.
 - Kein Force-Push.
-- Keine Datei-Loeschung ohne ausdrueckliche Freigabe.
-- Keine stillen Aenderungen an produktiven Zugangsdaten oder externen Deployments.
-- Keine manuellen Aenderungen an generierten Datenartefakten als fachliche Quelle.
-- Keine automatischen fachlichen Datenmutationen aus KI- oder Audit-Ergebnissen.
-- Keine grossen Multi-Datei-Direktcommits auf `staging`.
-- Reverts erfolgen bevorzugt als Revert-Commit.
+- Keine Branch-Loeschung.
+- Keine Datei-Loeschung ohne ausdrueckliche Spezialfreigabe.
+- Keine Secrets oder Credentials anfassen.
+- Keine externen Deployments still aendern.
+- Keine generierten Datenartefakte als fachliche Quelle pflegen.
+- Keine ungeprueften automatischen fachlichen Datenkorrekturen.
+- Keine konkurrierenden parallelen Workpacks auf demselben Branch.
 
-## Wichtige Steuerdateien
+## 9. Wichtige Steuerdateien
 
-- `MASTER.md` – strategische Steuerung.
-- `ROADMAP.md` – taktische Workpacks.
-- `ENGINEERING.md` – technische Regeln, Owner und Sicherheitsgrenzen.
-- `TEST_STATUS.md` – Proof-Archiv.
-- `Produktvertrag.md` – Produktmodell.
-- `VISUAL_WORKFLOW.md` – Bild- und Motivarbeit.
+- `AI_ENTRYPOINT.md` – operative KI-Arbeitsweise und Workflow-Router.
+- `ENGINEERING.md` – technische Guardrails, Owner-Regeln, Datenquellen, Asset-/Deploy-Sicherheit.
+- `MASTER.md` – strategische Produktsteuerung.
+- `ROADMAP.md` – aktuelle taktische Workpacks.
+- `TEST_STATUS.md` – Proofs und Abnahmen.
+- `Produktvertrag.md` – Produktmodell und kommerzielle Logik.
+- `VISUAL_WORKFLOW.md` – Bild-, Motiv- und Asset-Arbeitsweise.
 - `COMMERCIAL_STRATEGY.md` – Anbieter- und Veranstalterstrategie.
 - `EVENT_IMPACT_TRACKING.md` – Nutzwert- und Wirkungsmessung.
-- `KI_WORKFLOW_GITHUB_FIRST.md` – ausfuehrbarer aktueller Arbeitsprozess fuer KI-Arbeit.
 
-## Standardantwort der KI vor Umsetzung
+## 10. Praktische Standardformeln
 
-Vor jeder Umsetzung nennt die KI knapp:
+Wenn der Nutzer sagt:
 
-- Quelle,
-- gelesene Dateien,
-- Arbeitsmodus,
-- Risiko,
-- ob Nutzerfreigabe fuer Schreibaktion erforderlich ist.
+- `Analysiere den aktuellen Stand`: G1.
+- `Mach den kleinen Fix direkt`: G2, wenn niedriges Risiko.
+- `Groesseres Feature`: G3 oder G4 nach Risiko.
+- `Visuell pruefen`: kleiner G2-Staging-Loop, wenn owner-file-klar.
+- `Doku harmonisieren`: buendeln, kein Mikro-Commit.
+- `Ohne GitHub-Zugriff`: G5.
 
-## Dokumentationskonflikte
+## 11. Dokumentationshierarchie
 
-Diese Datei ist der aktuelle Einstiegspunkt fuer die GitHub-first-Arbeitsweise. Aeltere Codespace- oder ZIP-first-Formulierungen in `ENGINEERING.md` bleiben als historische Arbeitsregeln lesbar, duerfen aber nicht mehr als Standardprozess interpretiert werden, wenn der GitHub-Connector verfuegbar ist.
+Fuer Workflow-Routing gilt:
 
-Fuer das Workflow-Routing gilt in dieser Reihenfolge:
-
-1. `AI_ENTRYPOINT.md`,
-2. `KI_WORKFLOW_GITHUB_FIRST.md`,
-3. `ENGINEERING.md` fuer Owner-, Validierungs- und Sicherheitsregeln,
-4. `MASTER.md` fuer strategische Produktsteuerung,
-5. `ROADMAP.md` fuer aktive Workpacks,
-6. `TEST_STATUS.md` fuer Proofs und Abnahmen.
+1. `AI_ENTRYPOINT.md`.
+2. `ENGINEERING.md` fuer technische Sicherheits-, Owner-, Validierungs- und Datenquellenregeln.
+3. `MASTER.md` fuer strategische Produktsteuerung.
+4. `ROADMAP.md` fuer aktive Workpacks.
+5. `TEST_STATUS.md` fuer Proofs und Abnahmen.
