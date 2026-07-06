@@ -97,6 +97,9 @@ CHECKS = [
             "organizer-dashboard-submissions-toggle",
             "hasEventImpactContext",
             "Teilungen",
+            "Website/Info",
+            "Keine Rückmeldung erforderlich",
+            "Wirkung dieses Inhalts",
             "organizer-impact-total",
             "renderImpactExplainerDetails",
             "Was wird gezählt?",
@@ -107,10 +110,10 @@ CHECKS = [
     (
         "fuer-veranstalter/dashboard/index.html",
         [
-            "Wirkung auf Bocholt erleben",
+            "Deine Wirkung auf Bocholt erleben",
             "organizer-dashboard-impact-card",
             "organizer-dashboard-submissions-toggle",
-            "2026-07-06-organizer-dashboard-density-v1",
+            "2026-07-06-organizer-dashboard-impact-drilldown-v1",
         ],
     ),
 ]

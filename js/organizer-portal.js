@@ -195,48 +195,51 @@
   }
 
   function renderImpactItemRows(items) {
-    const visible = (Array.isArray(items) ? items : [])
+    const topItem = (Array.isArray(items) ? items : [])
       .filter((item) => metricValue(item?.metrics, "total_interactions") > 0)
-      .slice(0, 4);
+      .sort((a, b) => metricValue(b?.metrics, "total_interactions") - metricValue(a?.metrics, "total_interactions"))[0];
 
-    if (!visible.length) return "";
+    if (!topItem) return "";
+
+    const metrics = topItem?.metrics || {};
+    const title = safeText(topItem?.entity_title) || safeText(topItem?.entity_id) || "Veröffentlichter Inhalt";
+    const total = metricValue(metrics, "total_interactions");
 
     return `
-      <span class="organizer-tariff-section-title organizer-impact-section-title">Stärkste Inhalte</span>
-      ${visible.map((item) => {
-        const metrics = item?.metrics || {};
-        const title = safeText(item?.entity_title) || safeText(item?.entity_id) || "Veröffentlichter Inhalt";
-        const actionTotal = metricValue(metrics, "website_clicks") +
-          metricValue(metrics, "maps_clicks") +
-          metricValue(metrics, "location_clicks") +
-          impactShareTotal(metrics);
-        return `
-          <span class="organizer-impact-item" role="listitem">
-            <span class="organizer-impact-item__title">${escapeHtml(title)}</span>
-            <span class="organizer-impact-item__meta">
-              ${escapeHtml(formatInteger(metricValue(metrics, "detail_views")))} Aufrufe · ${escapeHtml(formatInteger(actionTotal))} Aktionen
-            </span>
-          </span>
-        `;
-      }).join("")}
+      <span class="organizer-impact-top-item" role="note">
+        <span class="organizer-impact-top-item__label">Stärkster Inhalt</span>
+        <span class="organizer-impact-top-item__title">${escapeHtml(title)}</span>
+        <span class="organizer-impact-top-item__meta">${escapeHtml(formatInteger(total))} gemessene Aktionen</span>
+      </span>
     `;
   }
 
   function renderSubmissionImpactHtml(submission) {
     const metrics = submission?.impact_metrics || {};
     const total = metricValue(metrics, "total_interactions");
-    if (total <= 0) return "";
+    const status = safeText(submission?.status).toLowerCase();
+    if (total <= 0 && status !== "approved") return "";
 
     const shares = impactShareTotal(metrics);
-    const directActions = metricValue(metrics, "website_clicks") +
-      metricValue(metrics, "maps_clicks") +
-      metricValue(metrics, "location_clicks") +
-      shares;
+    const websiteOrInfo = metricValue(metrics, "website_clicks") + metricValue(metrics, "organizer_cta_clicks");
+    const routeOrMaps = metricValue(metrics, "maps_clicks") + metricValue(metrics, "location_clicks");
+    const note = total > 0
+      ? "Gemessene Aktionen in den letzten 28 Tagen."
+      : "Noch keine Aktionen in den letzten 28 Tagen.";
 
     return `
-      <div>
-        <dt>Wirkung</dt>
-        <dd>${escapeHtml(formatInteger(metricValue(metrics, "detail_views")))} Aufrufe · ${escapeHtml(formatInteger(directActions))} Aktionen · ${escapeHtml(formatInteger(shares))} Teilungen</dd>
+      <div class="organizer-submission-impact-fact">
+        <dt>Wirkung dieses Inhalts</dt>
+        <dd>
+          <span class="organizer-submission-impact-total">${escapeHtml(formatInteger(total))} gemessene Aktionen</span>
+          <span class="organizer-submission-impact-note">${escapeHtml(note)}</span>
+          <span class="organizer-submission-impact-grid" role="list">
+            <span role="listitem"><span>Detail-Aufrufe</span><strong>${escapeHtml(formatInteger(metricValue(metrics, "detail_views")))}</strong></span>
+            <span role="listitem"><span>Website/Info</span><strong>${escapeHtml(formatInteger(websiteOrInfo))}</strong></span>
+            <span role="listitem"><span>Route/Maps</span><strong>${escapeHtml(formatInteger(routeOrMaps))}</strong></span>
+            <span role="listitem"><span>Teilungen</span><strong>${escapeHtml(formatInteger(shares))}</strong></span>
+          </span>
+        </dd>
       </div>
     `;
   }
@@ -805,29 +808,46 @@ function normalizeExternalUrl(value) {
   function buildOrganizerDashboardStatus(counts) {
     if (Number(counts?.paymentOpen || 0) > 0) {
       return {
-        label: "Aktion nötig",
-        detail: `${formatInteger(counts.paymentOpen)} Einreichung${counts.paymentOpen === 1 ? "" : "en"} mit offenem Zahlungsschritt.`
+        label: "Rückmeldung erforderlich",
+        detail: `${formatInteger(counts.paymentOpen)} Einreichung${counts.paymentOpen === 1 ? " hat" : "en haben"} einen offenen Zahlungsschritt.`
       };
     }
 
     if (Number(counts?.review || 0) > 0) {
       return {
-        label: "Alles okay",
-        detail: `${formatInteger(counts.review)} Einreichung${counts.review === 1 ? " wird" : "en werden"} bei uns redaktionell geprüft.`
+        label: "Keine Rückmeldung erforderlich",
+        detail: `${formatInteger(counts.review)} Einreichung${counts.review === 1 ? " ist" : "en sind"} bei uns in redaktioneller Prüfung.`
       };
     }
 
     if (Number(counts?.rejected || 0) > 0) {
       return {
-        label: "Alles okay",
+        label: "Keine Rückmeldung erforderlich",
         detail: "Abgelehnte Einreichungen bleiben zur Nachverfolgung sichtbar."
       };
     }
 
     return {
-      label: "Alles okay",
-      detail: "Aktuell ist keine Rückmeldung erforderlich."
+      label: "Keine Rückmeldung erforderlich",
+      detail: "Aktuell ist keine Rückmeldung von dir erforderlich."
     };
+  }
+
+  function formatOrganizerCountsLine(counts) {
+    const parts = [
+      `${formatInteger(counts?.visible || 0)} sichtbar`,
+      `${formatInteger(counts?.review || 0)} in Prüfung`,
+    ];
+
+    if (Number(counts?.rejected || 0) > 0) {
+      parts.push(`${formatInteger(counts.rejected)} abgelehnt`);
+    }
+
+    parts.push(Number(counts?.paymentOpen || 0) > 0
+      ? `${formatInteger(counts.paymentOpen)} Zahlung offen`
+      : "keine Zahlung offen");
+
+    return parts.join(" · ");
   }
 
   function organizerHasEventImpactContext({ activeSubscriptions, subscriptionPlanKey, defaultPlanKey, submissions, impactSummary }) {
@@ -918,21 +938,17 @@ function normalizeExternalUrl(value) {
     const areaLabel = organizerSubmissionAreaLabel(activeSubscriptions, submissions, context?.isActivityPlanView);
     const status = buildOrganizerDashboardStatus(counts);
 
-    summary.textContent = `${areaLabel} · ${formatInteger(counts.visible)} sichtbar · ${formatInteger(counts.review)} in Prüfung`;
+    summary.textContent = `${areaLabel} · ${formatOrganizerCountsLine(counts)}`;
 
-    overview.innerHTML = [
-      ["Sichtbar", formatInteger(counts.visible)],
-      ["In Prüfung", formatInteger(counts.review)],
-      ["Zahlung offen", formatInteger(counts.paymentOpen)],
-      ["Abgelehnt", formatInteger(counts.rejected)]
-    ].map(([label, value]) => `
-      <span class="organizer-submission-summary-item" role="listitem">
-        <span class="organizer-submission-summary-label">${escapeHtml(label)}</span>
-        <span class="organizer-submission-summary-value">${escapeHtml(value)}</span>
-      </span>
-    `).join("");
+    overview.innerHTML = formatOrganizerCountsLine(counts)
+      .split(" · ")
+      .map((label) => `
+        <span class="organizer-submission-summary-item" role="listitem">
+          <span class="organizer-submission-summary-value">${escapeHtml(label)}</span>
+        </span>
+      `).join("");
 
-    nextStep.textContent = `${status.label}. ${status.detail}`;
+    nextStep.textContent = status.detail;
   }
   /* === END BLOCK: ORGANIZER_DASHBOARD_V2_STRUCTURE_HELPERS_V1 === */
 
@@ -941,14 +957,14 @@ function normalizeExternalUrl(value) {
       <details class="organizer-impact-explainer">
         <summary>Was wird gezählt?</summary>
         <div class="organizer-impact-explainer__body">
-          <p>Gezählt werden gemessene Aktionen mit deinen veröffentlichten Veranstaltungen auf Bocholt erleben.</p>
+          <p>Gemessene Aktionen zeigen, wie Nutzer mit deinen veröffentlichten Inhalten auf Bocholt erleben interagieren.</p>
           <dl>
-            <div><dt>Detail-Aufrufe</dt><dd>Nutzer öffnen Veranstaltungsdetails.</dd></div>
-            <div><dt>Website/Ticket</dt><dd>Nutzer klicken zur Veranstaltungs- oder Ticketseite.</dd></div>
-            <div><dt>Route/Maps</dt><dd>Nutzer öffnen die Route zur Veranstaltung.</dd></div>
-            <div><dt>Teilungen</dt><dd>Nutzer teilen den Event-Link oder kopieren ihn.</dd></div>
+            <div><dt>Detail-Aufrufe</dt><dd>Nutzer öffnen Veranstaltungs- oder Aktivitätsdetails.</dd></div>
+            <div><dt>Website/Info</dt><dd>Nutzer klicken zur Website, Veranstaltungsseite oder Ticketseite.</dd></div>
+            <div><dt>Route/Maps</dt><dd>Nutzer öffnen die Route.</dd></div>
+            <div><dt>Teilungen</dt><dd>Nutzer teilen oder kopieren den Link.</dd></div>
           </dl>
-          <p>Die Werte sind keine eindeutigen Personen, keine Ticketverkäufe und keine Besucherzahlen vor Ort.</p>
+          <p>Die Werte sind gemessene Aktionen, keine eindeutigen Personen, keine Ticketverkäufe und keine Besucherzahlen vor Ort.</p>
         </div>
       </details>
     `;
@@ -1002,8 +1018,8 @@ function normalizeExternalUrl(value) {
       </span>
       ${renderImpactMetricRows([
         ["Detail-Aufrufe", metricValue(metrics, "detail_views")],
-        ["Website/Ticket", metricValue(metrics, "website_clicks")],
-        ["Route/Maps", metricValue(metrics, "maps_clicks")],
+        ["Website/Info", metricValue(metrics, "website_clicks") + metricValue(metrics, "organizer_cta_clicks")],
+        ["Route/Maps", metricValue(metrics, "maps_clicks") + metricValue(metrics, "location_clicks")],
         ["Teilungen", shares]
       ])}
       ${renderImpactItemRows(impact?.items)}
@@ -1016,7 +1032,7 @@ function normalizeExternalUrl(value) {
     }
 
     if (total > 0) {
-      noteNode.textContent = `Direkt erklärbare Aktionen: ${formatInteger(directClicks)}; ${deltaLabel}.`;
+      noteNode.textContent = `Direkte Aktionen: ${formatInteger(directClicks)}; ${deltaLabel}.`;
     } else {
       noteNode.textContent = "Noch keine Aktionen im aktuellen Zeitraum.";
     }
@@ -1128,10 +1144,7 @@ function normalizeExternalUrl(value) {
         note.textContent = "Hier siehst du den aktuellen Stand deiner Einreichung.";
         note.hidden = false;
       } else {
-        const paymentText = Number(dashboardCounts.paymentOpen || 0) > 0
-          ? `${formatInteger(dashboardCounts.paymentOpen)} Zahlung offen`
-          : "keine Zahlung offen";
-        note.textContent = `${formatInteger(dashboardCounts.visible)} sichtbar · ${formatInteger(dashboardCounts.review)} in Prüfung · ${paymentText}. ${dashboardStatus.detail}`;
+        note.textContent = `${formatOrganizerCountsLine(dashboardCounts)}. ${dashboardStatus.detail}`;
         note.hidden = false;
       }
     }

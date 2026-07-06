@@ -5144,3 +5144,40 @@ Nach Deployment prüfen:
 4. Tarif & Nutzung prüfen: Monatsbetrag und Nutzung sind sofort sichtbar; `Details anzeigen` öffnet aktive Tarife und enthaltene Kontingente.
 5. Desktop kurz prüfen: Wirkung, Einreichungen und Tarif bleiben lesbar und brechen nicht.
 <!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_MOBILE_DENSITY_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_IMPACT_DRILLDOWN_2026_07_06 | Zweck: dokumentiert finalen Premium-Status, persoenliche Wirkungskarte und Einzelwirkung im jeweiligen Inhalt; Umfang: JS/CSS/HTML/Guard-Smoke === -->
+## Veranstalter-Dashboard Premium Impact Drilldown – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Das Anbieter-Cockpit nutzt professionelle Statussprache statt generischem `Alles okay`.
+- Die Wirkungskarte ist persönlich benannt: `Deine Wirkung auf Bocholt erleben`.
+- Gesamtwirkung bleibt kompakt oben sichtbar.
+- Objektgenaue Wirkung wird nicht als lange zusätzliche Dashboard-Tabelle ausgespielt, sondern im jeweiligen geöffneten Inhalt gezeigt.
+- Mobile bleibt dicht: lange Listen, Tarifdetails und Erklärungen bleiben auf Klick erreichbar.
+
+Umsetzung:
+- Hero-Status auf `Keine Rückmeldung erforderlich` / `Rückmeldung erforderlich` umgestellt.
+- Kennzahlen in Hero und Einreichungsbereich als natürliche Zeile formuliert (`5 sichtbar · 3 in Prüfung · keine Zahlung offen`).
+- Wirkungstitel auf `Deine Wirkung auf Bocholt erleben` geändert.
+- Wirkungsmessung sprachlich auf Events und Aktivitäten erweitert (`Website/Info` statt `Website/Ticket`).
+- Erklärung `Was wird gezählt?` auf veröffentlichte Inhalte bezogen und weiterhin einklappbar gehalten.
+- Stärkster Inhalt wird nur bei vorhandenen Daten kompakt angezeigt.
+- Veröffentlichte Einträge zeigen im geöffneten Detail `Wirkung dieses Inhalts` mit Detail-Aufrufen, Website/Info, Route/Maps und Teilungen; bei 0 Werten sauberer Nullzustand.
+- `scripts/audit-event-impact-tracking.py` prüft die finalen Begriffe und den neuen Cache-Buster.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+- `php -l api/organizer-portal/me.php` OK.
+
+Nach Deployment prüfen:
+1. Dashboard-Hero zeigt nicht mehr `Alles okay`, sondern `Keine Rückmeldung erforderlich` oder bei offenen Punkten `Rückmeldung erforderlich`.
+2. Wirkungskarte heißt `Deine Wirkung auf Bocholt erleben`.
+3. `Was wird gezählt?` erklärt veröffentlichte Inhalte und die Abgrenzung zu Personen, Ticketverkäufen und Vor-Ort-Besuchern.
+4. Einreichungsbereich bleibt eingeklappt, solange keine Rückmeldung erforderlich ist.
+5. Veröffentlichte Einreichung öffnen: `Wirkung dieses Inhalts` erscheint mit 28-Tage-Werten oder sauberem Nullzustand.
+6. Tarifdetails bleiben eingeklappt und öffnen weiter über `Details anzeigen`.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_IMPACT_DRILLDOWN_2026_07_06 === -->
