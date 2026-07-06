@@ -5308,3 +5308,15 @@ Nach Deployment prüfen:
 - Die Wirkungsauswahl bleibt defensiv: Ein Dropdown erscheint nur, wenn neben der Gesamtwirkung echte veröffentlichte Inhalte auswählbar sind.
 
 Validierung lokal: `php -l api/organizer-portal/me.php`, `node --check js/organizer-portal.js`, `python3 scripts/audit-event-impact-tracking.py`, `python3 tools/audit-css-governance.py`.
+
+## 2026-07-06 – Veranstalter-Dashboard Status-Semantik final
+
+- Entwurf wird nicht mehr als harte Aktion gewertet.
+- Hero unterscheidet jetzt sauber zwischen `Keine Aktion erforderlich`, `Entwürfe offen` und blockierender `Aktion erforderlich`.
+- Primäre Hero-CTA folgt dem Zustand: `Entwürfe anzeigen` bei Entwürfen, `Offene Aktionen anzeigen` bei Zahlung/Blocker, sonst neue Einreichung.
+- Einreichungen bleiben initial geschlossen; Entwürfe erscheinen als eigene Gruppe `Entwürfe`, blockierende Zustände als `Aktion erforderlich`.
+- Kompakte Einreichungszeile zeigt aktive Zustände und keine historischen Ablehnungen prominent.
+- Hero-Sekundäraktionen wurden visuell entschärft, damit Wirkung und Status schneller sichtbar bleiben.
+
+Validierung: `php -l api/organizer-portal/me.php`, `node --check js/organizer-portal.js`, `python3 scripts/audit-event-impact-tracking.py`, `python3 tools/audit-css-governance.py`.
+

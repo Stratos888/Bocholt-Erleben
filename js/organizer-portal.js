@@ -791,7 +791,7 @@ function normalizeExternalUrl(value) {
 
   function getOrganizerDashboardCounts(submissions) {
     const rows = Array.isArray(submissions) ? submissions : [];
-    const actionStatuses = new Set(["draft", "checkout_started", "payment_released"]);
+    const blockingStatuses = new Set(["checkout_started", "payment_released"]);
     const paymentStatuses = new Set(["checkout_started", "payment_released"]);
 
     return {
@@ -800,7 +800,8 @@ function normalizeExternalUrl(value) {
         const status = safeText(item?.status).toLowerCase();
         return status === "pending_review" || status === "paid" || status === "in_review";
       }).length,
-      actionRequired: rows.filter((item) => actionStatuses.has(safeText(item?.status).toLowerCase())).length,
+      draftOpen: rows.filter((item) => safeText(item?.status).toLowerCase() === "draft").length,
+      actionRequired: rows.filter((item) => blockingStatuses.has(safeText(item?.status).toLowerCase())).length,
       paymentOpen: rows.filter((item) => paymentStatuses.has(safeText(item?.status).toLowerCase())).length,
       rejected: rows.filter((item) => safeText(item?.status).toLowerCase() === "rejected").length
     };
@@ -808,35 +809,58 @@ function normalizeExternalUrl(value) {
 
   function buildOrganizerDashboardStatus(counts) {
     const actionRequired = Number(counts?.actionRequired || 0);
+    const draftOpen = Number(counts?.draftOpen || 0);
+
     if (actionRequired > 0) {
       return {
+        type: "action",
         label: "Aktion erforderlich",
         detail: actionRequired === 1
           ? "1 offener Punkt wartet auf Bearbeitung."
           : `${formatInteger(actionRequired)} offene Punkte warten auf Bearbeitung.`,
-        actionText: `${formatInteger(actionRequired)} Aktion${actionRequired === 1 ? "" : "en"} erforderlich`
+        actionText: `${formatInteger(actionRequired)} Aktion${actionRequired === 1 ? "" : "en"} erforderlich`,
+        primaryCta: "Offene Aktionen anzeigen"
+      };
+    }
+
+    if (draftOpen > 0) {
+      return {
+        type: "draft",
+        label: draftOpen === 1 ? "1 Entwurf offen" : `${formatInteger(draftOpen)} Entwürfe offen`,
+        detail: draftOpen === 1
+          ? "Eine begonnene Einreichung wurde noch nicht abgeschickt."
+          : "Begonnene Einreichungen wurden noch nicht abgeschickt.",
+        actionText: draftOpen === 1 ? "1 Entwurf offen" : `${formatInteger(draftOpen)} Entwürfe offen`,
+        primaryCta: "Entwürfe anzeigen"
       };
     }
 
     return {
+      type: "ok",
       label: "Keine Aktion erforderlich",
       detail: "",
-      actionText: ""
+      actionText: "",
+      primaryCta: ""
     };
+  }
+
+  function formatOrganizerCountItem(count, singular, plural = singular) {
+    const value = Number(count || 0);
+    return `${formatInteger(value)} ${value === 1 ? singular : plural}`;
   }
 
   function formatOrganizerCountsLine(counts) {
     const parts = [
-      `${formatInteger(counts?.visible || 0)} sichtbar`,
+      formatOrganizerCountItem(counts?.visible || 0, "sichtbar"),
       `${formatInteger(counts?.review || 0)} in Prüfung`,
     ];
 
-    if (Number(counts?.rejected || 0) > 0) {
-      parts.push(`${formatInteger(counts.rejected)} abgelehnt`);
-    }
-
     if (Number(counts?.paymentOpen || 0) > 0) {
       parts.push(`${formatInteger(counts.paymentOpen)} Zahlung offen`);
+    }
+
+    if (Number(counts?.draftOpen || 0) > 0) {
+      parts.push(formatOrganizerCountItem(counts.draftOpen, "Entwurf", "Entwürfe"));
     }
 
     return parts.join(" · ");
@@ -870,7 +894,8 @@ function normalizeExternalUrl(value) {
 
   function organizerSubmissionGroupKey(submission) {
     const status = safeText(submission?.status).toLowerCase();
-    if (status === "payment_released" || status === "checkout_started" || status === "draft") return "action";
+    if (status === "payment_released" || status === "checkout_started") return "action";
+    if (status === "draft") return "draft";
     if (status === "pending_review" || status === "paid" || status === "in_review") return "review";
     if (status === "approved") return "published";
     if (status === "rejected") return "rejected";
@@ -879,7 +904,8 @@ function normalizeExternalUrl(value) {
 
   function buildOrganizerSubmissionGroups(submissions) {
     const order = [
-      ["action", "Aktion nötig"],
+      ["action", "Aktion erforderlich"],
+      ["draft", "Entwürfe"],
       ["review", "In Prüfung"],
       ["published", "Veröffentlicht"],
       ["rejected", "Abgelehnt"],
@@ -937,15 +963,9 @@ function normalizeExternalUrl(value) {
     overview.hidden = true;
     overview.setAttribute("hidden", "");
 
-    if (status.actionText) {
-      nextStep.textContent = status.actionText;
-      nextStep.hidden = false;
-      nextStep.removeAttribute("hidden");
-    } else {
-      nextStep.textContent = "";
-      nextStep.hidden = true;
-      nextStep.setAttribute("hidden", "");
-    }
+    nextStep.textContent = "";
+    nextStep.hidden = true;
+    nextStep.setAttribute("hidden", "");
   }
   /* === END BLOCK: ORGANIZER_DASHBOARD_V2_STRUCTURE_HELPERS_V1 === */
 
@@ -1309,7 +1329,8 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V4_VALUE_CENTER_COPY === */
 
-    const actionRequiredCount = Number(dashboardCounts?.actionRequired || 0);
+    const dashboardStatusType = safeText(dashboardStatus?.type || "ok").toLowerCase();
+    const shouldOpenSubmissionsFromHero = dashboardStatusType === "action" || dashboardStatusType === "draft";
     const submissionCtaConfig = (() => {
       if (isActivityPlanView && !hasEventPresencePlan) {
         return {
@@ -1331,10 +1352,10 @@ function normalizeExternalUrl(value) {
     if (dashboardPrimaryCta) {
       let newSubmissionCta = document.getElementById("organizer-dashboard-new-submission-cta");
 
-      if (actionRequiredCount > 0 && !isSingleStatusView) {
+      if (shouldOpenSubmissionsFromHero && !isSingleStatusView) {
         dashboardPrimaryCta.href = "#organizer-dashboard-submissions-card";
-        dashboardPrimaryCta.textContent = "Offene Aktionen anzeigen";
-        dashboardPrimaryCta.dataset.organizerOpenActions = "true";
+        dashboardPrimaryCta.textContent = dashboardStatus.primaryCta || "Einreichungen anzeigen";
+        dashboardPrimaryCta.dataset.organizerOpenSubmissions = dashboardStatusType;
 
         if (dashboardActions && !newSubmissionCta) {
           newSubmissionCta = document.createElement("a");
@@ -1352,7 +1373,7 @@ function normalizeExternalUrl(value) {
       } else {
         dashboardPrimaryCta.href = submissionCtaConfig.href;
         dashboardPrimaryCta.textContent = submissionCtaConfig.label;
-        delete dashboardPrimaryCta.dataset.organizerOpenActions;
+        delete dashboardPrimaryCta.dataset.organizerOpenSubmissions;
         dashboardPrimaryCta.onclick = null;
 
         if (newSubmissionCta) {
@@ -1369,11 +1390,12 @@ function normalizeExternalUrl(value) {
           manageSubscriptionButton = document.createElement("button");
           manageSubscriptionButton.type = "button";
           manageSubscriptionButton.id = "organizer-dashboard-manage-subscription";
-          manageSubscriptionButton.className = "content-cta";
+          manageSubscriptionButton.className = "content-cta organizer-dashboard-secondary-action";
           manageSubscriptionButton.textContent = "Mitgliedschaft verwalten";
           dashboardActions.appendChild(manageSubscriptionButton);
         }
 
+        manageSubscriptionButton.classList.add("organizer-dashboard-secondary-action");
         manageSubscriptionButton.hidden = false;
         manageSubscriptionButton.disabled = false;
         manageSubscriptionButton.onclick = () => {
@@ -1863,7 +1885,7 @@ if (submissionsList && submissionsEmpty) {
           </span>
           ${canEdit ? `
             <button class="organizer-submission-detail__link organizer-submission-detail__edit-toggle" type="button" aria-expanded="false" aria-controls="${escapeHtml(editFormId)}">
-              Angaben ändern
+              ${safeText(submission.status).toLowerCase() === "draft" ? "Weiterbearbeiten" : "Angaben ändern"}
             </button>
           ` : ""}
         </div>
@@ -1978,7 +2000,7 @@ if (submissionsList && submissionsEmpty) {
       };
     }
 
-    if (dashboardPrimaryCta && dashboardPrimaryCta.dataset.organizerOpenActions === "true") {
+    if (dashboardPrimaryCta && dashboardPrimaryCta.dataset.organizerOpenSubmissions) {
       dashboardPrimaryCta.onclick = (event) => {
         event.preventDefault();
         setSubmissionsListOpen(true);
