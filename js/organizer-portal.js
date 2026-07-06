@@ -721,6 +721,40 @@ function normalizeExternalUrl(value) {
     return rows;
   }
 
+  function buildOrganizerIncludedCompactRows(quotaByPlan) {
+    const buckets = {
+      events: { consumed: 0, included: 0, unlimited: false },
+      activities: { consumed: 0, included: 0, unlimited: false }
+    };
+
+    (Array.isArray(quotaByPlan) ? quotaByPlan : []).forEach((item) => {
+      const planKey = safeText(item?.plan_key).toLowerCase();
+      const bucket = ["activity_basic", "activity_plus"].includes(planKey) ? buckets.activities : buckets.events;
+
+      if (!["starter", "active", "unlimited", "activity_basic", "activity_plus"].includes(planKey)) return;
+
+      bucket.consumed += Number(item?.consumed_total || 0);
+      bucket.included += Number(item?.included_total || 0);
+      bucket.unlimited = bucket.unlimited || Boolean(item?.has_unlimited);
+    });
+
+    const rows = [];
+
+    if (buckets.events.unlimited) {
+      rows.push("Veranstaltungen unbegrenzt");
+    } else if (buckets.events.consumed > 0 || buckets.events.included > 0) {
+      rows.push(`Veranstaltungen ${formatInteger(buckets.events.consumed)}/${formatInteger(buckets.events.included)}`);
+    }
+
+    if (buckets.activities.unlimited) {
+      rows.push("Aktivitäten unbegrenzt");
+    } else if (buckets.activities.consumed > 0 || buckets.activities.included > 0) {
+      rows.push(`Aktivitäten ${formatInteger(buckets.activities.consumed)}/${formatInteger(buckets.activities.included)}`);
+    }
+
+    return rows;
+  }
+
   function isOrganizerPublishedSubmission(submission) {
     return safeText(submission?.status).toLowerCase() === "approved";
   }
@@ -902,7 +936,25 @@ function normalizeExternalUrl(value) {
   }
   /* === END BLOCK: ORGANIZER_DASHBOARD_V2_STRUCTURE_HELPERS_V1 === */
 
-  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V1 | Zweck: rendert sichere Anbieter-Nutzwertzahlen als vorsichtiges Wertzentrum; Umfang: additive Helfer vor renderDashboard === */
+  function renderImpactExplainerDetails() {
+    return `
+      <details class="organizer-impact-explainer">
+        <summary>Was wird gezählt?</summary>
+        <div class="organizer-impact-explainer__body">
+          <p>Gezählt werden gemessene Aktionen mit deinen veröffentlichten Veranstaltungen auf Bocholt erleben.</p>
+          <dl>
+            <div><dt>Detail-Aufrufe</dt><dd>Nutzer öffnen Veranstaltungsdetails.</dd></div>
+            <div><dt>Website/Ticket</dt><dd>Nutzer klicken zur Veranstaltungs- oder Ticketseite.</dd></div>
+            <div><dt>Route/Maps</dt><dd>Nutzer öffnen die Route zur Veranstaltung.</dd></div>
+            <div><dt>Teilungen</dt><dd>Nutzer teilen den Event-Link oder kopieren ihn.</dd></div>
+          </dl>
+          <p>Die Werte sind keine eindeutigen Personen, keine Ticketverkäufe und keine Besucherzahlen vor Ort.</p>
+        </div>
+      </details>
+    `;
+  }
+
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V2_DENSITY_EXPLAINER | Zweck: rendert sichere Anbieter-Nutzwertzahlen kompakt und erklaert sie auf Klick; Umfang: additive Helfer vor renderDashboard === */
   function renderOrganizerImpactCard(data, options = {}) {
     const card = document.getElementById("organizer-dashboard-impact-card");
     const periodNode = document.getElementById("organizer-impact-period");
@@ -955,6 +1007,7 @@ function normalizeExternalUrl(value) {
         ["Teilungen", shares]
       ])}
       ${renderImpactItemRows(impact?.items)}
+      ${renderImpactExplainerDetails()}
     `;
 
     if (impact?.status === "not_configured" || impact?.status === "not_available") {
@@ -963,12 +1016,12 @@ function normalizeExternalUrl(value) {
     }
 
     if (total > 0) {
-      noteNode.textContent = `Nutzer haben deine veröffentlichten Inhalte geöffnet, geteilt oder weiterführende Links genutzt. Direkt erklärbare Aktionen: ${formatInteger(directClicks)}; ${deltaLabel}. Keine Besucherzahlen vor Ort, keine Buchungen, keine eindeutigen Personen.`;
+      noteNode.textContent = `Direkt erklärbare Aktionen: ${formatInteger(directClicks)}; ${deltaLabel}.`;
     } else {
-      noteNode.textContent = "Noch keine gemessenen Aktionen im aktuellen Zeitraum. Sobald Nutzer deine veröffentlichten Veranstaltungen öffnen, klicken oder teilen, erscheint hier die Wirkung.";
+      noteNode.textContent = "Noch keine Aktionen im aktuellen Zeitraum.";
     }
   }
-  /* === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V1 === */
+  /* === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V2_DENSITY_EXPLAINER === */
 
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V2_VALUE_CENTER_COPY | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Einreichungsstatus oder Veranstalter-Wertzentrum ohne neue Datenlogik; Umfang: komplette renderDashboard-Funktion === */
    function renderDashboard(data) {
@@ -1151,9 +1204,10 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V4_VALUE_CENTER_COPY === */
 
-    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY | Zweck: benennt Tarife und Veröffentlichungen verständlicher ohne Kontingent-/Token-Sprache; Umfang: ersetzt komplette Tarif-/Kontingentübersicht in renderDashboard === */
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V4_COMPACT_DETAILS | Zweck: verdichtet Tarif und Nutzung mobil-first und legt Details in ein aufklappbares Segment; Umfang: komplette Tarif-/Kontingentübersicht in renderDashboard === */
     const tariffRows = buildOrganizerTariffRows(activeSubscriptions);
     const includedRows = buildOrganizerIncludedRows(quotaByPlan);
+    const includedCompactRows = buildOrganizerIncludedCompactRows(quotaByPlan);
 
     const monthlyTotal = safeText(billingSummary?.monthly_total_label);
 
@@ -1168,67 +1222,70 @@ function normalizeExternalUrl(value) {
         quotaPeriod.textContent = latestSubmission
           ? `Termin: ${latestDateText}`
           : "Veranstaltung einreichen";
-      } else if (tariffRows.length > 0) {
-        quotaPeriod.innerHTML = `
-          <span class="organizer-tariff-section-title">Aktive Tarife</span>
-          <span class="organizer-tariff-table" role="list">
-            ${tariffRows.map((row) => `
-              <span class="organizer-tariff-row" role="listitem">
-                <span class="organizer-tariff-label">${escapeHtml(row.label)}</span>
-                <span class="organizer-tariff-price">${escapeHtml(row.amount)}</span>
-              </span>
-            `).join("")}
-          </span>
-        `;
       } else {
-        quotaPeriod.textContent = `Tarif: ${formatPlanLabel(subscriptionPlanKey || effectivePlanKey)}`;
+        const compactPrice = monthlyTotal || "–";
+        const compactUsage = includedCompactRows.length > 0
+          ? includedCompactRows.join(" · ")
+          : (quota.has_unlimited ? `${isActivityPlanView ? "Aktivitäten" : "Events"} unbegrenzt` : `${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} genutzt`);
+        quotaPeriod.innerHTML = `
+          <span class="organizer-tariff-compact" aria-label="Tarif und Nutzung kompakt">
+            <span class="organizer-tariff-compact__amount">${escapeHtml(compactPrice)}</span>
+            <span class="organizer-tariff-compact__usage">${escapeHtml(compactUsage)}</span>
+          </span>
+          <details class="organizer-tariff-details">
+            <summary>Details anzeigen</summary>
+            ${tariffRows.length > 0 ? `
+              <span class="organizer-tariff-section-title">Aktive Tarife</span>
+              <span class="organizer-tariff-table" role="list">
+                ${tariffRows.map((row) => `
+                  <span class="organizer-tariff-row" role="listitem">
+                    <span class="organizer-tariff-label">${escapeHtml(row.label)}</span>
+                    <span class="organizer-tariff-price">${escapeHtml(row.amount)}</span>
+                  </span>
+                `).join("")}
+              </span>
+            ` : ""}
+            ${includedRows.length > 0 ? `
+              <span class="organizer-tariff-section-title">Enthalten</span>
+              <span class="organizer-tariff-bullets">
+                ${includedRows.map((line) => `
+                  <span class="organizer-tariff-bullet">${escapeHtml(line)}</span>
+                `).join("")}
+              </span>
+            ` : ""}
+            <span class="organizer-tariff-hint">Gezählt wird erst nach redaktioneller Freigabe.</span>
+          </details>
+        `;
       }
     }
 
     if (quotaChange) {
-      if (isSingleStatusView || !monthlyTotal) {
-        quotaChange.textContent = "";
-        quotaChange.hidden = true;
-      } else {
-        quotaChange.hidden = false;
-        quotaChange.innerHTML = `
-          <span class="organizer-tariff-total" aria-label="Monatliche Gesamtsumme">
-            <span class="organizer-tariff-total-label">Monatlich gesamt</span>
-            <span class="organizer-tariff-total-price">${escapeHtml(monthlyTotal)}</span>
-          </span>
-        `;
-      }
+      quotaChange.textContent = "";
+      quotaChange.hidden = true;
     }
 
     if (quotaSummary) {
       if (isSingleStatusView) {
+        quotaSummary.hidden = false;
         quotaSummary.textContent = latestSubmission
           ? "Einreichung erhalten. Die Veröffentlichung erfolgt nach Prüfung."
           : "Noch keine Einreichung gefunden.";
-      } else if (includedRows.length > 0) {
-        quotaSummary.innerHTML = `
-          <span class="organizer-tariff-section-title">Enthalten</span>
-          <span class="organizer-tariff-bullets">
-            ${includedRows.map((line) => `
-              <span class="organizer-tariff-bullet">${escapeHtml(line)}</span>
-            `).join("")}
-          </span>
-        `;
-      } else if (quota.has_unlimited) {
-        quotaSummary.textContent = `${isActivityPlanView ? "Aktivitäten" : "Events"}: unbegrenzt`;
       } else {
-        quotaSummary.textContent = `${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} genutzt`;
+        quotaSummary.textContent = "";
+        quotaSummary.hidden = true;
       }
     }
 
     if (quotaRemaining) {
       if (isSingleStatusView) {
+        quotaRemaining.hidden = false;
         quotaRemaining.textContent = "Für diese Einreichung ist keine Mitgliedschaft aktiv.";
       } else {
-        quotaRemaining.textContent = "Gezählt wird erst nach redaktioneller Freigabe.";
+        quotaRemaining.textContent = "";
+        quotaRemaining.hidden = true;
       }
     }
-    /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY === */
+    /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V4_COMPACT_DETAILS === */
 
     renderOrganizerSubmissionsSummary({
       isSingleStatusView,

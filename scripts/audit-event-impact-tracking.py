@@ -98,6 +98,10 @@ CHECKS = [
             "hasEventImpactContext",
             "Teilungen",
             "organizer-impact-total",
+            "renderImpactExplainerDetails",
+            "Was wird gezählt?",
+            "organizer-tariff-details",
+            "buildOrganizerIncludedCompactRows",
         ],
     ),
     (
@@ -106,7 +110,7 @@ CHECKS = [
             "Wirkung auf Bocholt erleben",
             "organizer-dashboard-impact-card",
             "organizer-dashboard-submissions-toggle",
-            "2026-07-06-organizer-premium-cockpit-v2",
+            "2026-07-06-organizer-dashboard-density-v1",
         ],
     ),
 ]

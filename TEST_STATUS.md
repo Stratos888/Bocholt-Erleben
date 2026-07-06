@@ -5110,3 +5110,37 @@ Nach Deployment prüfen:
 4. Account mit Zahlung/offener Aktion prüfen, falls vorhanden: Einreichungen sollen automatisch offen sein.
 5. Tarif & Nutzung, Kontakt, Logout und Dashboard-Navigation bleiben unverändert funktionsfähig.
 <!-- === END BLOCK: TEST_STATUS_ORGANIZER_PREMIUM_COCKPIT_POLISH_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_MOBILE_DENSITY_2026_07_06 | Zweck: dokumentiert Mobile-Dichte, einklappbare Wirkungswert-Erklaerung und kompakten Tarifbereich; Umfang: JS/CSS/HTML/Guard-Smoke === -->
+## Veranstalter-Dashboard Mobile Density + Wirkungswerte-Erklärung – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Das Premium-Cockpit bleibt in der Reihenfolge Status, Wirkung, Einreichungen, Tarif, Kontakt.
+- Mobile wird vertikal deutlich verdichtet, ohne Wirkung und Verständlichkeit zu verlieren.
+- Wirkungswerte werden nicht mehr dauerhaft mit langem Fließtext erklärt, sondern über `Was wird gezählt?` direkt in der Wirkungskarte aufklappbar gemacht.
+- Einreichungsstatus und Tarif/Nutzung werden auf Mobile kompakter, damit die Seite nicht wieder zur langen Verwaltungsansicht wird.
+
+Umsetzung:
+- Wirkungskarte verdichtet: kleinere Abstände, flachere Metrikzeilen statt großer 2×2-Kachelwirkung, kurze Nullzustandszeile.
+- Erklärung der Wirkungswerte als aufklappbares Detail `Was wird gezählt?` ergänzt.
+- Erklärung grenzt sauber ab: gemessene Aktionen, keine eindeutigen Personen, keine Ticketverkäufe, keine Besucherzahlen vor Ort.
+- Einreichungs-Zusammenfassung auf Mobile von großen Statusboxen zu kompakter Text-/Chipzeile verdichtet.
+- Tarif & Nutzung zeigt zuerst nur Monatsbetrag und Nutzung (`Veranstaltungen 2/3 · Aktivitäten 5/5`) und legt Einzelposten in `Details anzeigen`.
+- Dashboard-Script-Cache-Buster auf `2026-07-06-organizer-dashboard-density-v1` angehoben.
+- `scripts/audit-event-impact-tracking.py` prüft die neue Erklärung und kompakte Tarif-Verdrahtung.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+- `php -l api/organizer-portal/me.php` OK.
+
+Nach Deployment prüfen:
+1. Mobile öffnen: Status und Wirkung müssen weiterhin vor Einreichungen sichtbar sein, aber mit weniger Scrollhöhe.
+2. Wirkungskarte prüfen: `Was wird gezählt?` öffnet die Erklärung und lässt sich wieder schließen.
+3. Einreichungen prüfen: Standardmäßig kompakt; `Einreichungen anzeigen` öffnet weiterhin die gruppierte Liste.
+4. Tarif & Nutzung prüfen: Monatsbetrag und Nutzung sind sofort sichtbar; `Details anzeigen` öffnet aktive Tarife und enthaltene Kontingente.
+5. Desktop kurz prüfen: Wirkung, Einreichungen und Tarif bleiben lesbar und brechen nicht.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_MOBILE_DENSITY_2026_07_06 === -->
