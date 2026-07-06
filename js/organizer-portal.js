@@ -935,18 +935,13 @@ function normalizeExternalUrl(value) {
     }
 
     const counts = context?.counts || getOrganizerDashboardCounts(submissions);
-    const areaLabel = organizerSubmissionAreaLabel(activeSubscriptions, submissions, context?.isActivityPlanView);
     const status = buildOrganizerDashboardStatus(counts);
 
-    summary.textContent = `${areaLabel} · ${formatOrganizerCountsLine(counts)}`;
+    summary.textContent = formatOrganizerCountsLine(counts);
 
-    overview.innerHTML = formatOrganizerCountsLine(counts)
-      .split(" · ")
-      .map((label) => `
-        <span class="organizer-submission-summary-item" role="listitem">
-          <span class="organizer-submission-summary-value">${escapeHtml(label)}</span>
-        </span>
-      `).join("");
+    overview.innerHTML = "";
+    overview.hidden = true;
+    overview.setAttribute("hidden", "");
 
     nextStep.textContent = status.detail;
   }
@@ -970,7 +965,175 @@ function normalizeExternalUrl(value) {
     `;
   }
 
-  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V2_DENSITY_EXPLAINER | Zweck: rendert sichere Anbieter-Nutzwertzahlen kompakt und erklaert sie auf Klick; Umfang: additive Helfer vor renderDashboard === */
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V3_SCOPE_SELECTOR | Zweck: rendert Gesamtwirkung und objektgenaue Einzelwirkung in einer zentralen Auswahl, ohne zusätzliche Scrolllisten zu erzeugen; Umfang: Impact-Helper und renderOrganizerImpactCard === */
+  function impactTotalInteractions(metrics) {
+    return metricValue(metrics, "total_interactions");
+  }
+
+  function impactWebsiteOrInfo(metrics) {
+    return metricValue(metrics, "website_clicks") + metricValue(metrics, "organizer_cta_clicks");
+  }
+
+  function impactRouteOrMaps(metrics) {
+    return metricValue(metrics, "maps_clicks") + metricValue(metrics, "location_clicks");
+  }
+
+  function createEmptyImpactMetrics() {
+    return {
+      website_clicks: 0,
+      maps_clicks: 0,
+      location_clicks: 0,
+      organizer_cta_clicks: 0,
+      share_clicks: 0,
+      copy_link_clicks: 0,
+      detail_views: 0,
+      total_interactions: 0
+    };
+  }
+
+  function normalizeImpactScopeMetrics(metrics) {
+    return metrics && typeof metrics === "object" ? metrics : createEmptyImpactMetrics();
+  }
+
+  function buildImpactScopeKey(entityType, entityId) {
+    const type = safeText(entityType || "content").toLowerCase() || "content";
+    const id = safeText(entityId);
+    return id ? `${type}:${id}` : "";
+  }
+
+  function formatImpactScopeKindLabel(entityType) {
+    const type = safeText(entityType).toLowerCase();
+    if (type === "activity") return "Aktivität";
+    if (type === "event") return "Veranstaltung";
+    return "Inhalt";
+  }
+
+  function buildOrganizerImpactScopes(data) {
+    const impact = data?.impact_summary || {};
+    const submissions = Array.isArray(data?.recent_submissions) ? data.recent_submissions : [];
+    const items = new Map();
+
+    const addItem = ({ entityType, entityId, title, metrics, sourceIndex = 0 }) => {
+      const key = buildImpactScopeKey(entityType, entityId);
+      if (!key) return;
+
+      const current = items.get(key) || {
+        key,
+        entityType: safeText(entityType).toLowerCase() || "content",
+        entityId: safeText(entityId),
+        title: "",
+        metrics: createEmptyImpactMetrics(),
+        sourceIndex
+      };
+
+      const normalizedTitle = safeText(title);
+      if (normalizedTitle && (!current.title || impactTotalInteractions(metrics) >= impactTotalInteractions(current.metrics))) {
+        current.title = normalizedTitle;
+      }
+
+      const normalizedMetrics = normalizeImpactScopeMetrics(metrics);
+      if (impactTotalInteractions(normalizedMetrics) >= impactTotalInteractions(current.metrics)) {
+        current.metrics = normalizedMetrics;
+      }
+
+      current.sourceIndex = Math.min(current.sourceIndex, sourceIndex);
+      items.set(key, current);
+    };
+
+    (Array.isArray(impact?.items) ? impact.items : []).forEach((item, index) => {
+      addItem({
+        entityType: item?.entity_type,
+        entityId: item?.entity_id,
+        title: item?.entity_title,
+        metrics: item?.metrics,
+        sourceIndex: index
+      });
+    });
+
+    submissions.forEach((submission, index) => {
+      if (!isOrganizerPublishedSubmission(submission)) return;
+
+      const entityType = safeText(submission?.submission_kind || "event").toLowerCase() === "activity" ? "activity" : "event";
+      addItem({
+        entityType,
+        entityId: submission?.impact_entity_id || `submission-${safeText(submission?.id)}`,
+        title: submission?.title,
+        metrics: submission?.impact_metrics,
+        sourceIndex: 1000 + index
+      });
+    });
+
+    const itemScopes = Array.from(items.values())
+      .map((item) => ({
+        key: `item:${item.key}`,
+        label: safeText(item.title) || formatImpactScopeKindLabel(item.entityType),
+        meta: formatImpactScopeKindLabel(item.entityType),
+        metrics: normalizeImpactScopeMetrics(item.metrics),
+        isTotal: false,
+        sourceIndex: item.sourceIndex
+      }))
+      .sort((a, b) => {
+        const totalDiff = impactTotalInteractions(b.metrics) - impactTotalInteractions(a.metrics);
+        if (totalDiff !== 0) return totalDiff;
+        return a.sourceIndex - b.sourceIndex || a.label.localeCompare(b.label, "de");
+      });
+
+    return [
+      {
+        key: "total",
+        label: "Gesamtwirkung deiner Inhalte",
+        meta: "Alle veröffentlichten Inhalte",
+        metrics: normalizeImpactScopeMetrics(impact?.metrics),
+        isTotal: true,
+        sourceIndex: -1
+      },
+      ...itemScopes
+    ];
+  }
+
+  function renderImpactScopeControl(scopes, selectedKey) {
+    if (!Array.isArray(scopes) || scopes.length <= 1) {
+      return `<span class="organizer-impact-scope-static">Gesamtwirkung deiner Inhalte</span>`;
+    }
+
+    return `
+      <label class="organizer-impact-scope" for="organizer-impact-scope-select">
+        <span class="organizer-impact-scope__label">Auswertung</span>
+        <select class="organizer-impact-scope__select" id="organizer-impact-scope-select">
+          ${scopes.map((scope) => `
+            <option value="${escapeHtml(scope.key)}" ${scope.key === selectedKey ? "selected" : ""}>
+              ${escapeHtml(scope.label)}
+            </option>
+          `).join("")}
+        </select>
+      </label>
+    `;
+  }
+
+  function renderImpactScopeMetrics(scope) {
+    const metrics = normalizeImpactScopeMetrics(scope?.metrics);
+    const total = impactTotalInteractions(metrics);
+    const shares = impactShareTotal(metrics);
+    const note = total > 0
+      ? (scope?.isTotal ? "Gemessene Aktionen deiner veröffentlichten Inhalte im aktuellen Zeitraum." : "Gemessene Aktionen dieses Inhalts im aktuellen Zeitraum.")
+      : (scope?.isTotal ? "Messung aktiv. Noch keine Aktionen im aktuellen Zeitraum." : "Messung aktiv. Noch keine Aktionen für diesen Inhalt im aktuellen Zeitraum.");
+
+    return `
+      <span class="organizer-impact-total" aria-label="Gemessene Aktionen im aktuellen Zeitraum">
+        <strong class="organizer-impact-total__value">${escapeHtml(formatInteger(total))}</strong>
+        <span class="organizer-impact-total__suffix">gemessene Aktionen</span>
+      </span>
+      ${renderImpactMetricRows([
+        ["Detail-Aufrufe", metricValue(metrics, "detail_views")],
+        ["Website/Info", impactWebsiteOrInfo(metrics)],
+        ["Route/Maps", impactRouteOrMaps(metrics)],
+        ["Teilungen", shares]
+      ])}
+      <p class="organizer-impact-status-note">${escapeHtml(note)}</p>
+      ${renderImpactExplainerDetails()}
+    `;
+  }
+
   function renderOrganizerImpactCard(data, options = {}) {
     const card = document.getElementById("organizer-dashboard-impact-card");
     const periodNode = document.getElementById("organizer-impact-period");
@@ -989,55 +1152,41 @@ function normalizeExternalUrl(value) {
     }
 
     const impact = data?.impact_summary || {};
-    const metrics = impact?.metrics || {};
-    const previous = impact?.previous_metrics || {};
-    const total = metricValue(metrics, "total_interactions");
-    const shares = impactShareTotal(metrics);
-    const directClicks =
-      metricValue(metrics, "website_clicks") +
-      metricValue(metrics, "maps_clicks") +
-      metricValue(metrics, "location_clicks") +
-      metricValue(metrics, "organizer_cta_clicks") +
-      shares;
-    const previousTotal = metricValue(previous, "total_interactions");
-    const totalDelta = total - previousTotal;
-    const deltaLabel = totalDelta > 0
-      ? `+${formatInteger(totalDelta)} gegenüber dem vorherigen Zeitraum`
-      : totalDelta < 0
-        ? `-${formatInteger(Math.abs(totalDelta))} gegenüber dem vorherigen Zeitraum`
-        : "kein Unterschied zum vorherigen Zeitraum";
+    const scopes = buildOrganizerImpactScopes(data);
+    const initialKey = "total";
 
     card.hidden = false;
     card.removeAttribute("hidden");
-    periodNode.textContent = formatImpactPeriod(impact?.period);
-
-    metricsNode.innerHTML = `
-      <span class="organizer-impact-total" aria-label="Gemessene Aktionen im aktuellen Zeitraum">
-        <strong class="organizer-impact-total__value">${escapeHtml(formatInteger(total))}</strong>
-        <span class="organizer-impact-total__suffix">gemessene Aktionen</span>
-      </span>
-      ${renderImpactMetricRows([
-        ["Detail-Aufrufe", metricValue(metrics, "detail_views")],
-        ["Website/Info", metricValue(metrics, "website_clicks") + metricValue(metrics, "organizer_cta_clicks")],
-        ["Route/Maps", metricValue(metrics, "maps_clicks") + metricValue(metrics, "location_clicks")],
-        ["Teilungen", shares]
-      ])}
-      ${renderImpactItemRows(impact?.items)}
-      ${renderImpactExplainerDetails()}
+    periodNode.innerHTML = `
+      ${renderImpactScopeControl(scopes, initialKey)}
+      <span class="organizer-impact-period-label">${escapeHtml(formatImpactPeriod(impact?.period))}</span>
     `;
+    noteNode.textContent = "";
+    noteNode.hidden = true;
+
+    const renderSelectedScope = (scopeKey) => {
+      const selected = scopes.find((scope) => scope.key === scopeKey) || scopes[0];
+      metricsNode.innerHTML = renderImpactScopeMetrics(selected);
+    };
+
+    const select = periodNode.querySelector("#organizer-impact-scope-select");
+    if (select) {
+      select.addEventListener("change", () => {
+        renderSelectedScope(select.value);
+      });
+    }
 
     if (impact?.status === "not_configured" || impact?.status === "not_available") {
-      noteNode.textContent = impact?.message || "Die Wirkungsauswertung ist für diesen Bereich noch nicht verfügbar.";
+      metricsNode.innerHTML = `
+        <p class="organizer-impact-status-note">${escapeHtml(impact?.message || "Die Wirkungsauswertung ist für diesen Bereich noch nicht verfügbar.")}</p>
+        ${renderImpactExplainerDetails()}
+      `;
       return;
     }
 
-    if (total > 0) {
-      noteNode.textContent = `Direkte Aktionen: ${formatInteger(directClicks)}; ${deltaLabel}.`;
-    } else {
-      noteNode.textContent = "Noch keine Aktionen im aktuellen Zeitraum.";
-    }
+    renderSelectedScope(initialKey);
   }
-  /* === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V2_DENSITY_EXPLAINER === */
+  /* === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V3_SCOPE_SELECTOR === */
 
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V2_VALUE_CENTER_COPY | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Einreichungsstatus oder Veranstalter-Wertzentrum ohne neue Datenlogik; Umfang: komplette renderDashboard-Funktion === */
    function renderDashboard(data) {
@@ -1144,8 +1293,8 @@ function normalizeExternalUrl(value) {
         note.textContent = "Hier siehst du den aktuellen Stand deiner Einreichung.";
         note.hidden = false;
       } else {
-        note.textContent = `${formatOrganizerCountsLine(dashboardCounts)}. ${dashboardStatus.detail}`;
-        note.hidden = false;
+        note.textContent = "";
+        note.hidden = true;
       }
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V4_VALUE_CENTER_COPY === */
@@ -1580,7 +1729,7 @@ if (submissionsList && submissionsEmpty) {
     submissionsToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
     submissionsToggle.textContent = isOpen
       ? "Einreichungen ausblenden"
-      : `${formatInteger(submissions.length)} Einreichung${submissions.length === 1 ? "" : "en"} anzeigen`;
+      : "Einreichungen anzeigen";
   };
 
   if (!submissions.length) {

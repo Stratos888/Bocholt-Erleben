@@ -5181,3 +5181,40 @@ Nach Deployment prüfen:
 5. Veröffentlichte Einreichung öffnen: `Wirkung dieses Inhalts` erscheint mit 28-Tage-Werten oder sauberem Nullzustand.
 6. Tarifdetails bleiben eingeklappt und öffnen weiter über `Details anzeigen`.
 <!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_IMPACT_DRILLDOWN_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_SCOPE_COCKPIT_2026_07_06 | Zweck: dokumentiert final reduzierte Anbieter-Cockpit-Struktur mit zentraler Gesamt-/Einzelwirkungs-Auswahl; Umfang: JS/CSS/HTML/Guard-Smoke === -->
+## Veranstalter-Dashboard Scope Cockpit – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Dashboard beantwortet zuerst die Nutzerfragen: Muss ich etwas tun? Was bringt mir Bocholt erleben? Was ist veröffentlicht oder in Prüfung? Was nutze und zahle ich?
+- Veröffentlichungszahlen werden nicht mehr mehrfach wiederholt.
+- Hero zeigt nur noch den Handlungsstatus, nicht zusätzlich Veröffentlichungsstatistiken.
+- Wirkungskarte wird zur zentralen Auswertung mit `Gesamtwirkung deiner Inhalte` und optionaler Auswahl einzelner veröffentlichter Events/Aktivitäten.
+- Einreichungen und Tarifdetails bleiben kompakt und nutzen ein einheitlicheres Disclosure-Pattern.
+
+Umsetzung:
+- Hero-Note für reguläre Anbieterbereiche entfernt; Zahlen stehen nur noch im passenden Einreichungsbereich.
+- Einreichungsbereich zeigt nur eine Veröffentlichungs-Zusammenfassung (`5 sichtbar · 3 in Prüfung · 2 abgelehnt · keine Zahlung offen`) plus einen erklärenden Statussatz.
+- Doppelte Einreichungs-Statuschips/-Kacheln im Runtime-Rendering entfernt.
+- Wirkungskarte enthält eine zentrale Scope-Auswahl: `Gesamtwirkung deiner Inhalte` plus veröffentlichte Einträge, sofern zuordenbar.
+- Einzelwirkung kann direkt in der Wirkungskarte ausgewählt werden und bleibt zusätzlich im geöffneten Eintrag sichtbar.
+- `Einreichungen anzeigen` ist visuell als Disclosure statt als großer CTA gestaltet; primäre Aktionen bleiben Buttons.
+- Dashboard-Script-Cache-Buster auf `2026-07-06-organizer-dashboard-scope-cockpit-v1` angehoben.
+- `scripts/audit-event-impact-tracking.py` prüft Scope-Auswahl, Begriffe und Cache-Buster.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+- `php -l api/organizer-portal/me.php` OK.
+
+Nach Deployment prüfen:
+1. Hero zeigt nur Organisation und Handlungsstatus; keine sichtbaren/in-Prüfung/abgelehnt-Zahlen im Hero.
+2. Wirkungskarte zeigt `Gesamtwirkung deiner Inhalte`; bei veröffentlichten Einträgen ist eine Auswahl einzelner Inhalte verfügbar.
+3. Wechsel in der Wirkungsauswahl aktualisiert die vier Metriken und den Null-/Statussatz.
+4. Einreichungen zeigen die Statuszahlen nur einmal und öffnen über `Einreichungen anzeigen`.
+5. Tarifdetails öffnen weiterhin über `Details anzeigen`.
+6. Veröffentlichte Einträge zeigen im geöffneten Detail weiterhin `Wirkung dieses Inhalts`.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_SCOPE_COCKPIT_2026_07_06 === -->

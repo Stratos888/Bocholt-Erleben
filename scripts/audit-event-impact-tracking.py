@@ -89,7 +89,9 @@ CHECKS = [
         "js/organizer-portal.js",
         [
             "impactShareTotal",
-            "renderImpactItemRows",
+            "buildOrganizerImpactScopes",
+            "renderImpactScopeControl",
+            "Gesamtwirkung deiner Inhalte",
             "renderSubmissionImpactHtml",
             "organizerHasEventImpactContext",
             "buildOrganizerSubmissionGroups",
@@ -113,7 +115,7 @@ CHECKS = [
             "Deine Wirkung auf Bocholt erleben",
             "organizer-dashboard-impact-card",
             "organizer-dashboard-submissions-toggle",
-            "2026-07-06-organizer-dashboard-impact-drilldown-v1",
+            "2026-07-06-organizer-dashboard-scope-cockpit-v1",
         ],
     ),
 ]
