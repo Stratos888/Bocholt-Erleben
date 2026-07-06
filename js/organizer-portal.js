@@ -791,25 +791,27 @@ function normalizeExternalUrl(value) {
 
   function getOrganizerDashboardCounts(submissions) {
     const rows = Array.isArray(submissions) ? submissions : [];
+    const actionStatuses = new Set(["draft", "checkout_started", "payment_released"]);
+    const paymentStatuses = new Set(["checkout_started", "payment_released"]);
+
     return {
       visible: rows.filter((item) => safeText(item?.status).toLowerCase() === "approved").length,
       review: rows.filter((item) => {
         const status = safeText(item?.status).toLowerCase();
         return status === "pending_review" || status === "paid" || status === "in_review";
       }).length,
-      paymentOpen: rows.filter((item) => {
-        const status = safeText(item?.status).toLowerCase();
-        return status === "payment_released" || status === "checkout_started";
-      }).length,
+      actionRequired: rows.filter((item) => actionStatuses.has(safeText(item?.status).toLowerCase())).length,
+      paymentOpen: rows.filter((item) => paymentStatuses.has(safeText(item?.status).toLowerCase())).length,
       rejected: rows.filter((item) => safeText(item?.status).toLowerCase() === "rejected").length
     };
   }
 
   function buildOrganizerDashboardStatus(counts) {
-    if (Number(counts?.paymentOpen || 0) > 0) {
+    const actionRequired = Number(counts?.actionRequired || 0);
+    if (actionRequired > 0) {
       return {
         label: "Aktion erforderlich",
-        detail: `${formatInteger(counts.paymentOpen)} Einreichung${counts.paymentOpen === 1 ? " hat" : "en haben"} einen offenen Zahlungsschritt.`
+        detail: `${formatInteger(actionRequired)} Aktion${actionRequired === 1 ? "" : "en"} erforderlich`
       };
     }
 
@@ -1924,8 +1926,7 @@ if (submissionsList && submissionsEmpty) {
 
     hydrateIcons(submissionsList);
 
-    const hasActionItems = submissions.some((item) => organizerSubmissionGroupKey(item) === "action");
-    const defaultOpen = Boolean(isSingleStatusView || hasActionItems);
+    const defaultOpen = Boolean(isSingleStatusView);
 
     if (submissionsToggle) {
       submissionsToggle.hidden = Boolean(isSingleStatusView);

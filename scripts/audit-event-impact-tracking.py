@@ -102,6 +102,8 @@ CHECKS = [
             "Website/Info",
             "Keine Aktion erforderlich",
             "Aktion erforderlich",
+            "actionRequired",
+            "const defaultOpen = Boolean(isSingleStatusView);",
             "published_content",
             "Wirkung dieses Inhalts",
             "organizer-impact-total",
@@ -114,9 +116,10 @@ CHECKS = [
     (
         "css/pages.css",
         [
-            "ORGANIZER_DASHBOARD_PREMIUM_CONSOLIDATION_FINAL_V1",
+            "ORGANIZER_DASHBOARD_FINAL_STATE_POLISH_V1",
+            "#organizer-dashboard-submissions-list[hidden]",
             "organizer-impact-scope__select",
-            "#organizer-dashboard-next-step[hidden]",
+            "#organizer-dashboard-next-step:not([hidden])",
         ],
     ),
     (
@@ -126,7 +129,7 @@ CHECKS = [
             "auf Bocholt erleben",
             "organizer-dashboard-impact-card",
             "organizer-dashboard-submissions-toggle",
-            "2026-07-06-organizer-dashboard-premium-consolidation-v1",
+            "2026-07-06-organizer-dashboard-final-state-v1",
         ],
     ),
 ]

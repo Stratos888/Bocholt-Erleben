@@ -5260,3 +5260,40 @@ Nach Deployment prüfen:
 8. Geöffnete veröffentlichte Einträge zeigen weiterhin `Wirkung dieses Inhalts`.
 9. `Was wird gezählt?`, `Einreichungen anzeigen` und `Details anzeigen` wirken als konsistente Aufklappbereiche.
 <!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_PREMIUM_CONSOLIDATION_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_FINAL_STATE_2026_07_06 | Zweck: dokumentiert den finalen Premium-Grundzustand des Veranstalter-Dashboards nach Gesamtkonsolidierung; Umfang: Anbieter-Cockpit, Wirkungsauswahl, Einreichungen, Validierung === -->
+## Veranstalter-Dashboard Final State – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Das Dashboard wird als ruhiges Anbieter-Cockpit verstanden, nicht als Verwaltungsübersicht.
+- Der Grundzustand beantwortet sofort: Muss ich etwas tun? Welche Wirkung erzeugen meine Inhalte? Wo finde ich Einreichungen und Tarifdetails?
+- Lange Verwaltungslisten bleiben grundsätzlich eingeklappt, auch wenn offene Aktionen vorhanden sind.
+- Offene Aktionen werden kompakt sichtbar gemacht, ohne die mobile Startansicht zu dominieren.
+
+Umsetzung:
+- Einreichungen & Veröffentlichungen sind im Dashboard-Grundzustand immer eingeklappt; nur die Einzelstatus-Seite bleibt direkt geöffnet.
+- Entwürfe, Checkout und offene Zahlungsschritte zählen als `actionRequired` und steuern den Hero-Status `Aktion erforderlich`.
+- Bei offenen Aktionen erscheint nur ein kompakter Hinweis wie `2 Aktionen erforderlich`; die lange Liste öffnet erst auf Nutzerklick.
+- Veröffentlichungszahlen stehen weiterhin nur im Bereich `Einreichungen & Veröffentlichungen`; keine Wiederholung im Hero.
+- Der redundante Prüfungssatz bleibt im Normalzustand ausgeblendet.
+- Die Wirkungskarte bleibt das zentrale Verkaufsargument mit Gesamtwirkung und objektgenauer Inhaltsauswahl.
+- Der Nullzustand kommuniziert sauber: `Messung aktiv. Noch keine Aktionen in den letzten 28 Tagen.`
+- Aufklappbereiche bleiben konsistent: `Was wird gezählt?`, `Einreichungen anzeigen`, `Details anzeigen`.
+- Dashboard-Script-Cache-Buster auf `2026-07-06-organizer-dashboard-final-state-v1` angehoben.
+
+Lokal validiert:
+- `php -l api/organizer-portal/me.php` OK.
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deployment prüfen:
+1. Hero zeigt `Keine Aktion erforderlich` oder bei Entwürfen/offenen Zahlungsschritten `Aktion erforderlich`.
+2. Einreichungen & Veröffentlichungen sind beim Laden grundsätzlich geschlossen.
+3. Bei offenen Aktionen erscheint nur eine kompakte Hinweiszeile, keine automatisch geöffnete Liste.
+4. Klick auf `Einreichungen anzeigen` öffnet die gruppierte Liste; erneuter Klick schließt sie.
+5. Wirkungskarte bleibt sichtbar, mit Gesamtwirkung und bei mehreren veröffentlichten Inhalten mit Einzelauswahl.
+6. `Was wird gezählt?` und `Details anzeigen` funktionieren weiter als konsistente Disclosure-Controls.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_FINAL_STATE_2026_07_06 === -->
