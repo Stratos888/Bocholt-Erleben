@@ -114,6 +114,7 @@ Codespace Preview ist fuer visuelle Arbeit nicht mehr der Standard.
 - `VISUAL_WORKFLOW.md` – Bild- und Motivarbeit.
 - `COMMERCIAL_STRATEGY.md` – Anbieter- und Veranstalterstrategie.
 - `EVENT_IMPACT_TRACKING.md` – Nutzwert- und Wirkungsmessung.
+- `KI_WORKFLOW_GITHUB_FIRST.md` – ausfuehrbarer aktueller Arbeitsprozess fuer KI-Arbeit.
 
 ## Standardantwort der KI vor Umsetzung
 
@@ -127,4 +128,13 @@ Vor jeder Umsetzung nennt die KI knapp:
 
 ## Dokumentationskonflikte
 
-Diese Datei ist der aktuelle Einstiegspunkt fuer die neue GitHub-first-Arbeitsweise. Aeltere Codespace- oder ZIP-first-Formulierungen in `ENGINEERING.md` bleiben als historische Arbeitsregeln lesbar, duerfen aber nicht mehr als Standardprozess interpretiert werden, wenn der GitHub-Connector verfuegbar ist.
+Diese Datei ist der aktuelle Einstiegspunkt fuer die GitHub-first-Arbeitsweise. Aeltere Codespace- oder ZIP-first-Formulierungen in `ENGINEERING.md` bleiben als historische Arbeitsregeln lesbar, duerfen aber nicht mehr als Standardprozess interpretiert werden, wenn der GitHub-Connector verfuegbar ist.
+
+Fuer das Workflow-Routing gilt in dieser Reihenfolge:
+
+1. `AI_ENTRYPOINT.md`,
+2. `KI_WORKFLOW_GITHUB_FIRST.md`,
+3. `ENGINEERING.md` fuer Owner-, Validierungs- und Sicherheitsregeln,
+4. `MASTER.md` fuer strategische Produktsteuerung,
+5. `ROADMAP.md` fuer aktive Workpacks,
+6. `TEST_STATUS.md` fuer Proofs und Abnahmen.
