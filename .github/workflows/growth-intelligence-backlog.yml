@@ -92,7 +92,14 @@ jobs:
         run: |
           set -e
           export GSC_SITE_URL="${GSC_SITE_URL:-${SEARCH_METRICS_GOOGLE_SITE_URL:-}}"
-          python scripts/growth-intelligence-backlog.py
+          python - <<'PY'
+          from pathlib import Path
+          import runpy
+
+          ns = runpy.run_path("scripts/growth-intelligence-backlog.py", run_name="__growth_runtime__")
+          ns["GROWTH_SUMMARY_PATH"] = Path("data/growth-intelligence-summary.json")
+          ns["main"]()
+          PY
 
       # === BEGIN BLOCK: CONTENT_OPS_RECORD_GROWTH_IMPACT_V1 | Zweck: persistiert Growth-/Acquisition-Signale in der gemeinsamen Verwaltungs-Metrikschicht; Umfang: keine Aenderung an Backlog-Erzeugung ===
       - name: Record Content Ops growth impact
