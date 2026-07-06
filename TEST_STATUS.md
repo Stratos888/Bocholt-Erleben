@@ -5218,3 +5218,45 @@ Nach Deployment prüfen:
 5. Tarifdetails öffnen weiterhin über `Details anzeigen`.
 6. Veröffentlichte Einträge zeigen im geöffneten Detail weiterhin `Wirkung dieses Inhalts`.
 <!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_SCOPE_COCKPIT_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_PREMIUM_CONSOLIDATION_2026_07_06 | Zweck: dokumentiert die finale Gesamtkonsolidierung des Anbieter-Cockpits ohne Zahlen-Dopplungen und mit robuster Wirkungsauswahl; Umfang: JS/API/CSS/HTML/Guard-Smoke === -->
+## Veranstalter-Dashboard Premium Consolidation Final – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Dashboard als kompaktes Premium-Cockpit statt Summe einzelner Reparaturen.
+- Jede Information erscheint genau einmal an der passenden Stelle.
+- Hero beantwortet nur die Frage, ob der Anbieter handeln muss.
+- Wirkungskarte ist das zentrale Verkaufsargument: Gesamtwirkung und bei vorhandenen veröffentlichten Inhalten objektgenaue Einzelwirkung.
+- Einreichungen, Tarifdetails und Erklärungen bleiben erreichbar, dominieren aber nicht die mobile Startansicht.
+
+Umsetzung:
+- Statussprache auf `Keine Aktion erforderlich` / `Aktion erforderlich` finalisiert.
+- Veröffentlichungszahlen aus dem Hero entfernt und im Bereich `Einreichungen & Veröffentlichungen` belassen.
+- Redundanter Prüfungssatz im Einreichungsbereich entfernt; bei keiner offenen Aktion bleibt nur die kompakte Zusammenfassung.
+- Zahlungshinweis erscheint nur noch, wenn tatsächlich eine Zahlung offen ist.
+- Wirkungstitel bewusst zweizeilig gesetzt: `Deine Wirkung` / `auf Bocholt erleben`.
+- Formularhaftes Label `Auswertung` entfernt; die Wirkungsauswahl wirkt kompakter als Scope-Auswahl.
+- Wirkungsauswahl nutzt `published_content` aus dem API-Payload, damit veröffentlichte Inhalte nicht an die sichtbare Einreichungsliste gekoppelt sind.
+- API liefert `published_content` mit Impact-Metriken für veröffentlichte Events/Aktivitäten zusätzlich zu `recent_submissions`.
+- Einreichungs-Payload auf bis zu 100 relevante Einträge erweitert, damit Statuszahlen und Liste nicht bei 10 Einträgen künstlich abschneiden.
+- Guard prüft Cache-Buster, neue Statussprache, `published_content`, Scope-Auswahl und finale CSS-Override-Markierung.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `php -l api/organizer-portal/me.php` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deployment prüfen:
+1. Hero zeigt nur Organisation und `Keine Aktion erforderlich` bzw. bei offenen Punkten `Aktion erforderlich`.
+2. Im Hero stehen keine sichtbaren/in-Prüfung/abgelehnt-Zahlen.
+3. `Einreichungen & Veröffentlichungen` zeigt nur eine Statuszeile; kein redundanter Prüfungssatz bei keiner offenen Aktion.
+4. Zahlung wird nur erwähnt, wenn tatsächlich Zahlung offen ist.
+5. Wirkungskarte zeigt `Deine Wirkung` / `auf Bocholt erleben` und kein Label `Auswertung`.
+6. Wenn mehrere veröffentlichte Inhalte vorhanden sind, erlaubt die Wirkungsauswahl Gesamtwirkung plus einzelne Inhalte.
+7. Wenn nur Gesamtwirkung verfügbar ist, erscheint kein Fake-Dropdown.
+8. Geöffnete veröffentlichte Einträge zeigen weiterhin `Wirkung dieses Inhalts`.
+9. `Was wird gezählt?`, `Einreichungen anzeigen` und `Details anzeigen` wirken als konsistente Aufklappbereiche.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_PREMIUM_CONSOLIDATION_2026_07_06 === -->

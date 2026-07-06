@@ -460,9 +460,20 @@ function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
                 OR (submission_kind = "event" AND start_date IS NOT NULL AND start_date >= CURRENT_DATE())
            )
          ORDER BY
+            CASE status
+                WHEN "payment_released" THEN 0
+                WHEN "checkout_started" THEN 0
+                WHEN "draft" THEN 1
+                WHEN "pending_review" THEN 2
+                WHEN "paid" THEN 2
+                WHEN "in_review" THEN 2
+                WHEN "approved" THEN 3
+                WHEN "rejected" THEN 4
+                ELSE 5
+            END,
             COALESCE(created_at, updated_at, paid_at, approved_at, rejected_at) DESC,
             id DESC
-         LIMIT 10'
+         LIMIT 100'
     );
 
     $statement->execute([
@@ -754,6 +765,46 @@ function opm_attach_submission_impact(array $submissions, array $impactMap): arr
     }, $submissions);
 }
 
+function opm_fetch_published_content(PDO $pdo, int $organizerId): array
+{
+    $statement = $pdo->prepare(
+        'SELECT
+            id,
+            submission_kind,
+            status,
+            title,
+            start_date,
+            time_text,
+            location_name,
+            event_url,
+            ticket_url,
+            approved_at,
+            created_at,
+            updated_at
+         FROM submissions
+         WHERE organizer_id = :organizer_id
+           AND submission_kind IN ("event", "activity")
+           AND status = "approved"
+           AND (
+                submission_kind = "activity"
+                OR start_date IS NULL
+                OR start_date >= CURRENT_DATE()
+           )
+         ORDER BY
+            CASE submission_kind WHEN "event" THEN 0 WHEN "activity" THEN 1 ELSE 2 END,
+            COALESCE(start_date, approved_at, created_at, updated_at) DESC,
+            id DESC
+         LIMIT 100'
+    );
+
+    $statement->execute([
+        ':organizer_id' => $organizerId,
+    ]);
+
+    $rows = $statement->fetchAll();
+    return is_array($rows) ? $rows : [];
+}
+
 function opm_fetch_impact_summary(PDO $pdo, int $organizerId, string $organizationName): array
 {
     $summary = opm_empty_impact_summary($organizerId, $organizationName);
@@ -814,6 +865,7 @@ try {
     $impactSummary = opm_fetch_impact_summary($pdo, $organizerId, (string)$sessionRow['organization_name']);
     /* === END BLOCK: ORGANIZER_PORTAL_IMPACT_SUMMARY_PAYLOAD_V1 === */
     $recentSubmissions = opm_fetch_recent_submissions($pdo, $organizerId);
+    $publishedContent = opm_fetch_published_content($pdo, $organizerId);
     if (opm_value_metrics_table_exists($pdo)) {
         $recentSubmissions = opm_attach_submission_impact(
             $recentSubmissions,
@@ -825,8 +877,19 @@ try {
                 $recentSubmissions
             )
         );
+        $publishedContent = opm_attach_submission_impact(
+            $publishedContent,
+            opm_fetch_submission_impact_map(
+                $pdo,
+                (string)$impactSummary['reporting_target']['id'],
+                (string)$impactSummary['period']['start_date'],
+                (string)$impactSummary['period']['end_date'],
+                $publishedContent
+            )
+        );
     } else {
         $recentSubmissions = opm_attach_submission_impact($recentSubmissions, []);
+        $publishedContent = opm_attach_submission_impact($publishedContent, []);
     }
 
     be_json_response(200, [
@@ -852,6 +915,7 @@ try {
             'billing_summary' => $billingSummary,
             'impact_summary' => $impactSummary,
             'recent_submissions' => $recentSubmissions,
+            'published_content' => $publishedContent,
         ],
     ]);
 } catch (InvalidArgumentException $error) {

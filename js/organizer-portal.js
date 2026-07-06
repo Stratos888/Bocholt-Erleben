@@ -808,28 +808,14 @@ function normalizeExternalUrl(value) {
   function buildOrganizerDashboardStatus(counts) {
     if (Number(counts?.paymentOpen || 0) > 0) {
       return {
-        label: "Rückmeldung erforderlich",
+        label: "Aktion erforderlich",
         detail: `${formatInteger(counts.paymentOpen)} Einreichung${counts.paymentOpen === 1 ? " hat" : "en haben"} einen offenen Zahlungsschritt.`
       };
     }
 
-    if (Number(counts?.review || 0) > 0) {
-      return {
-        label: "Keine Rückmeldung erforderlich",
-        detail: `${formatInteger(counts.review)} Einreichung${counts.review === 1 ? " ist" : "en sind"} bei uns in redaktioneller Prüfung.`
-      };
-    }
-
-    if (Number(counts?.rejected || 0) > 0) {
-      return {
-        label: "Keine Rückmeldung erforderlich",
-        detail: "Abgelehnte Einreichungen bleiben zur Nachverfolgung sichtbar."
-      };
-    }
-
     return {
-      label: "Keine Rückmeldung erforderlich",
-      detail: "Aktuell ist keine Rückmeldung von dir erforderlich."
+      label: "Keine Aktion erforderlich",
+      detail: ""
     };
   }
 
@@ -843,9 +829,9 @@ function normalizeExternalUrl(value) {
       parts.push(`${formatInteger(counts.rejected)} abgelehnt`);
     }
 
-    parts.push(Number(counts?.paymentOpen || 0) > 0
-      ? `${formatInteger(counts.paymentOpen)} Zahlung offen`
-      : "keine Zahlung offen");
+    if (Number(counts?.paymentOpen || 0) > 0) {
+      parts.push(`${formatInteger(counts.paymentOpen)} Zahlung offen`);
+    }
 
     return parts.join(" · ");
   }
@@ -931,6 +917,8 @@ function normalizeExternalUrl(value) {
       `).join("");
 
       nextStep.textContent = "Öffne unten die Einreichung, um Status, Angaben und mögliche Änderungen zu prüfen.";
+      nextStep.hidden = false;
+      nextStep.removeAttribute("hidden");
       return;
     }
 
@@ -943,7 +931,15 @@ function normalizeExternalUrl(value) {
     overview.hidden = true;
     overview.setAttribute("hidden", "");
 
-    nextStep.textContent = status.detail;
+    if (status.detail) {
+      nextStep.textContent = status.detail;
+      nextStep.hidden = false;
+      nextStep.removeAttribute("hidden");
+    } else {
+      nextStep.textContent = "";
+      nextStep.hidden = true;
+      nextStep.setAttribute("hidden", "");
+    }
   }
   /* === END BLOCK: ORGANIZER_DASHBOARD_V2_STRUCTURE_HELPERS_V1 === */
 
@@ -1010,7 +1006,10 @@ function normalizeExternalUrl(value) {
 
   function buildOrganizerImpactScopes(data) {
     const impact = data?.impact_summary || {};
-    const submissions = Array.isArray(data?.recent_submissions) ? data.recent_submissions : [];
+    const publishedContent = Array.isArray(data?.published_content) ? data.published_content : [];
+    const submissions = publishedContent.length > 0
+      ? publishedContent
+      : (Array.isArray(data?.recent_submissions) ? data.recent_submissions : []);
     const items = new Map();
 
     const addItem = ({ entityType, entityId, title, metrics, sourceIndex = 0 }) => {
@@ -1098,8 +1097,7 @@ function normalizeExternalUrl(value) {
 
     return `
       <label class="organizer-impact-scope" for="organizer-impact-scope-select">
-        <span class="organizer-impact-scope__label">Auswertung</span>
-        <select class="organizer-impact-scope__select" id="organizer-impact-scope-select">
+        <select class="organizer-impact-scope__select" id="organizer-impact-scope-select" aria-label="Wirkung auswählen">
           ${scopes.map((scope) => `
             <option value="${escapeHtml(scope.key)}" ${scope.key === selectedKey ? "selected" : ""}>
               ${escapeHtml(scope.label)}
@@ -1116,7 +1114,7 @@ function normalizeExternalUrl(value) {
     const shares = impactShareTotal(metrics);
     const note = total > 0
       ? (scope?.isTotal ? "Gemessene Aktionen deiner veröffentlichten Inhalte im aktuellen Zeitraum." : "Gemessene Aktionen dieses Inhalts im aktuellen Zeitraum.")
-      : (scope?.isTotal ? "Messung aktiv. Noch keine Aktionen im aktuellen Zeitraum." : "Messung aktiv. Noch keine Aktionen für diesen Inhalt im aktuellen Zeitraum.");
+      : (scope?.isTotal ? "Messung aktiv. Noch keine Aktionen in den letzten 28 Tagen." : "Messung aktiv. Noch keine Aktionen für diesen Inhalt in den letzten 28 Tagen.");
 
     return `
       <span class="organizer-impact-total" aria-label="Gemessene Aktionen im aktuellen Zeitraum">
@@ -1292,9 +1290,15 @@ function normalizeExternalUrl(value) {
       if (isSingleStatusView) {
         note.textContent = "Hier siehst du den aktuellen Stand deiner Einreichung.";
         note.hidden = false;
+        note.removeAttribute("hidden");
+      } else if (dashboardStatus.detail) {
+        note.textContent = dashboardStatus.detail;
+        note.hidden = false;
+        note.removeAttribute("hidden");
       } else {
         note.textContent = "";
         note.hidden = true;
+        note.setAttribute("hidden", "");
       }
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V4_VALUE_CENTER_COPY === */

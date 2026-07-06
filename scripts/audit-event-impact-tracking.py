@@ -100,7 +100,9 @@ CHECKS = [
             "hasEventImpactContext",
             "Teilungen",
             "Website/Info",
-            "Keine Rückmeldung erforderlich",
+            "Keine Aktion erforderlich",
+            "Aktion erforderlich",
+            "published_content",
             "Wirkung dieses Inhalts",
             "organizer-impact-total",
             "renderImpactExplainerDetails",
@@ -110,12 +112,21 @@ CHECKS = [
         ],
     ),
     (
+        "css/pages.css",
+        [
+            "ORGANIZER_DASHBOARD_PREMIUM_CONSOLIDATION_FINAL_V1",
+            "organizer-impact-scope__select",
+            "#organizer-dashboard-next-step[hidden]",
+        ],
+    ),
+    (
         "fuer-veranstalter/dashboard/index.html",
         [
-            "Deine Wirkung auf Bocholt erleben",
+            "Deine Wirkung",
+            "auf Bocholt erleben",
             "organizer-dashboard-impact-card",
             "organizer-dashboard-submissions-toggle",
-            "2026-07-06-organizer-dashboard-scope-cockpit-v1",
+            "2026-07-06-organizer-dashboard-premium-consolidation-v1",
         ],
     ),
 ]
