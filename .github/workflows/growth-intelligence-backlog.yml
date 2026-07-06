@@ -96,8 +96,11 @@ jobs:
           from pathlib import Path
           import runpy
 
-          ns = runpy.run_path("scripts/growth-intelligence-backlog.py", run_name="__growth_runtime__")
-          ns["GROWTH_SUMMARY_PATH"] = Path("data/growth-intelligence-summary.json")
+          ns = runpy.run_path(
+              "scripts/growth-intelligence-backlog.py",
+              run_name="__growth_runtime__",
+              init_globals={"GROWTH_SUMMARY_PATH": Path("data/growth-intelligence-summary.json")},
+          )
           ns["main"]()
           PY
 
