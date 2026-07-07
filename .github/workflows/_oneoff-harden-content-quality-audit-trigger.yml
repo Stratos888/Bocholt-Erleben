@@ -1,4 +1,5 @@
 # === BEGIN TEMP FILE: one-off hardening workflow ===
+# retrigger: 2026-07-07
 name: One-off Harden Content Quality Audit Trigger
 
 on:
