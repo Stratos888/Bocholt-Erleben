@@ -8,12 +8,6 @@ on:
         description: "GitHub Actions Run-ID mit Content-Ops-Artefakt"
         required: true
         type: string
-  push:
-    branches: ["main", "staging"]
-    paths:
-      - ".github/workflows/content-ops-http-ingest.yml"
-      - "scripts/content-ops-http-ingest.py"
-      - "api/content-ops/**"
   workflow_run:
     workflows:
       - "Content Quality Audit"
