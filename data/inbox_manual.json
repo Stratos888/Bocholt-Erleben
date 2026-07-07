@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "title": "Bocholter Puppenspieltage 2026 - \"Schneewittchen\"",
+    "date": "2026-11-04",
+    "endDate": "",
+    "time": "15:00",
+    "city": "Bocholt",
+    "location": "Kulturort Alte Molkerei",
+    "kategorie_suggestion": "Kinder & Familie",
+    "url": "https://www.bocholt.de/veranstaltungskalender/bocholter-puppenspieltage-2026-schneewittchen",
+    "description": "Puppentheater für Kinder ab vier Jahren mit dem Märchenklassiker auf der Bühne. Geeignet für einen Familiennachmittag im Herbstprogramm der Stadt.",
+    "source_name": "Stadt Bocholt",
+    "source_url": "https://www.bocholt.de/veranstaltungskalender/bocholter-puppenspieltage-2026-schneewittchen",
+    "notes": "manual chat search v3",
+    "visual_key": "kids_stage_story",
+    "visual_motif": "puppet_theater",
+    "visual_asset_status": "ok"
+  }
+]
