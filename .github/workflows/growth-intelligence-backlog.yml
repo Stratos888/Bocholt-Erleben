@@ -9,6 +9,7 @@ on:
       - ".github/workflows/growth-intelligence-backlog.yml"
       - "scripts/growth-intelligence-backlog.py"
       - "docs/GROWTH_INTELLIGENCE_BACKLOG.md"
+      - "scripts/content-ops-http-ingest.py"
 
   # Manuell im GitHub UI startbar (Actions → Workflow → Run workflow).
   # Bewusst ohne Inputs, damit GitHub den Button genauso wie bei Deploy to STRATO anzeigt.
@@ -124,6 +125,16 @@ jobs:
         run: |
           set -e
           python scripts/content-ops-control.py record-growth
+
+      - name: Send Content Ops growth impact to HTTP ingest
+        if: always()
+        shell: bash
+        env:
+          CONTENT_OPS_INGEST_URL: ${{ secrets.CONTENT_OPS_INGEST_URL }}
+          CONTENT_OPS_INGEST_TOKEN: ${{ secrets.CONTENT_OPS_INGEST_TOKEN }}
+        run: |
+          set -e
+          python scripts/content-ops-http-ingest.py --input data/content-ops
 
       - name: Upload growth content ops impact
         uses: actions/upload-artifact@v4
