@@ -163,7 +163,7 @@ Bekannter Stand vom 2026-07-07:
 - `Growth Intelligence Backlog` ist von Push-Triggern entkoppelt.
 - `Content Ops HTTP Ingest` ist von Push-Triggern entkoppelt.
 - `Deploy to STRATO` bleibt der schnelle Staging-Push-Pfad.
-- `Content Quality Audit` hat noch einen bekannten verbleibenden Haertungspunkt: aktueller `staging`-Push-Trigger mit breiten Pfaden, insbesondere `data/**`. Ziel bleibt, diesen schweren Audit nicht pauschal an normale Staging-Testcommits zu koppeln.
+- `Content Quality Audit` ist final vom normalen `staging`-Push entkoppelt; er laeuft per `schedule`, `workflow_dispatch` und gezielt bei relevanten `main`-Pfaden.
 
 Vor jeder Workflow-Aenderung konkret pruefen:
 

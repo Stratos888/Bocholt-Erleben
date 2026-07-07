@@ -69,13 +69,13 @@ Nicht gewollt bei normalen Staging-Testcommits:
   - laeuft per `workflow_dispatch`.
   - zusaetzlich produktiver Branch-Guard: echter Intake nur auf `main`.
 
-### Bekannter verbleibender Haertungspunkt
+### Final gehaertet
 
 - `.github/workflows/content-quality-audit.yml`
-  - hat aktuell noch einen `push`-Trigger auf `staging` mit breiten Pfaden, insbesondere `data/**`.
-  - Das ist fuer den finalen schnellen Staging-Zielzustand noch nicht optimal.
-  - Gewollter Zielzustand: kein pauschaler schwerer Audit bei normalen `staging`-Testcommits.
-  - Kuenftige Härtung: `push` dort auf `main` und/oder sehr gezielte Audit-Owner-Dateien begrenzen; schedule und manual beibehalten.
+  - `push` auf `staging` wurde entfernt.
+  - Workflow laeuft weiter per `workflow_dispatch` und `schedule`.
+  - Zusaetzlich laeuft er bei `push` auf `main`, aber nur fuer gezielte Audit-/Content-relevante Pfade.
+  - Breite `data/**`-Ausloesung wurde bewusst entfernt, damit automatische oder kleine Daten-/Testcommits keine schweren Audits mitziehen.
 
 ## Main-Schutz
 

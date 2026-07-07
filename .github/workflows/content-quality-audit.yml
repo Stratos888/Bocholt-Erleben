@@ -20,7 +20,7 @@ on:
           - full
   push:
     branches:
-      - staging
+      - main
     paths:
       - ".github/workflows/content-quality-audit.yml"
       - "scripts/content-quality-audit.py"
@@ -29,7 +29,9 @@ on:
       - "scripts/audit-activity-highlights.py"
       - "scripts/audit-event-feed-visual-diversity.py"
       - "data/content_source_suggestions.json"
-      - "data/**"
+      - "data/event_visual_pool.json"
+      - "data/activities.json"
+      - "data/activity_highlights.json"
       - "api/events/public.php"
   schedule:
     # Taeglich vor dem Dienstag-KI-Suchlauf: zeitnahe Events + Quellen-/Link-Auffaelligkeiten.
