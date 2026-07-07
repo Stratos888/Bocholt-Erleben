@@ -175,6 +175,8 @@ Vor jeder Workflow-Aenderung konkret pruefen:
 - job-level `if`,
 - Downstream-Dispatches und Artefakt-Abhaengigkeiten.
 
+Workflow-Dateien duerfen nicht per selbstmodifizierendem One-off-Workflow geaendert werden. Ein nur auf `staging` liegender `workflow_dispatch`-Workflow bietet keinen verlaesslichen manuellen Run-Button, und `GITHUB_TOKEN` mit `contents: write` reicht in diesem Repo nicht aus, um Dateien unter `.github/workflows/` aus einem Actions-Run heraus zu aendern. Details stehen in `docs/github-actions-trigger-policy.md`.
+
 ## 8. Ruecknahme
 
 Falsche Staging-Commits werden bevorzugt per Revert-Commit zurueckgenommen.
