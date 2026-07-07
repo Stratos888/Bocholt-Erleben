@@ -104,6 +104,29 @@ Bei Workflow-Aenderungen immer konkret pruefen:
 
 Neue oder geaenderte Workflows muessen in diese Policy passen oder die Abweichung explizit begruenden.
 
+## Workflow-Dateien: wichtige Aenderungsgrenzen
+
+Nicht erneut versuchen, Workflow-Dateien durch einen selbstmodifizierenden One-off-Workflow auf `staging` zu aendern.
+
+Validierte Fehlerursachen vom 2026-07-07:
+
+- `workflow_dispatch` ist fuer manuelle Ausloesung nur verlaesslich nutzbar, wenn die Workflow-Datei auf dem Default-Branch vorhanden ist. Ein nur auf `staging` angelegter One-off-Workflow kann zwar Push-Runs zeigen, aber keinen nutzbaren `Run workflow`-Button anbieten.
+- Ein Actions-Run mit `GITHUB_TOKEN` und `contents: write` darf in diesem Repo keine Dateien unter `.github/workflows/` veraendern. Der Push wurde mit fehlender `workflows`-Permission abgelehnt.
+- `permissions: contents: write` reicht fuer normale Repo-Dateien, aber nicht fuer das selbststaendige Erzeugen oder Aendern anderer Workflow-Dateien.
+
+Zulaessige Wege fuer Workflow-Datei-Aenderungen:
+
+1. GitHub-Connector direkt, wenn die Datei klein genug ist oder sicher vollstaendig ersetzt werden kann.
+2. Lokale Arbeitskopie/Codespace mit normalem Git-Push durch den Nutzer.
+3. Bewusstes Patch-Paket, wenn der Connector eine grosse Workflow-Datei nicht risikoarm ersetzen kann.
+4. GitHub UI-Edit durch den Nutzer bei kleinen, klar beschriebenen Zeilenaenderungen.
+
+Nicht zulaessig:
+
+- One-off-Workflow, der `.github/workflows/*.yml` veraendert.
+- Annahme, dass `workflow_dispatch` auf einem nur in `staging` existierenden Workflow manuell per Button startbar ist.
+- Annahme, dass `GITHUB_TOKEN` mit `contents: write` Workflow-Dateien editieren darf.
+
 ## Validierung nach Aenderungen
 
 Sinnvoller Test fuer den schnellen Staging-Pfad:
