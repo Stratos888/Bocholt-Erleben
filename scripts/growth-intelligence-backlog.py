@@ -18,6 +18,8 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from content_ops_decisions import target_effect
+
 BACKLOG_TAB = os.environ.get("GROWTH_BACKLOG_TAB", "Growth_Backlog").strip() or "Growth_Backlog"
 REPORT_TAB = os.environ.get("GROWTH_REPORT_TAB", "Growth_Intelligence_Report").strip() or "Growth_Intelligence_Report"
 DAYS = int(os.environ.get("GROWTH_LOOKBACK_DAYS", "30") or "30")
@@ -265,32 +267,18 @@ def read_records(sheets, spreadsheet_id: str, tab: str) -> List[Dict[str, str]]:
 
 
 
-GROWTH_FEEDBACK_ACTIVE_STATUSES = {
-    "", "open", "neu", "new", "review", "pruefen", "prüfen", "todo", "backlog",
-    "planned", "in-progress", "in_progress", "doing", "bearbeitung",
-}
-GROWTH_FEEDBACK_SUPPRESS_STATUSES = {
-    "closed", "done", "completed", "erledigt", "umgesetzt", "archived", "archiviert",
-    "rejected", "abgelehnt", "verworfen", "dismissed", "irrelevant", "not-relevant",
-    "not_relevant", "duplicate", "doppelt", "snoozed", "zurueckgestellt", "zurückgestellt",
-}
 
+def read_growth_feedback(records: List[Dict[str, str]]) -> Tuple[set[str], set[str], List[Dict[str, Any]]]:
+    """Liest Growth-Backlog-Zeilen ueber die zentrale decision_class-Semantik.
 
-def growth_feedback_status_key(value: str) -> str:
-    raw = str(value or "").strip().lower()
-    raw = raw.translate(str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}))
-    raw = re.sub(r"[^a-z0-9]+", "-", raw).strip("-")
-    return raw
+    Rueckgabe:
+    - active_existing_keys: bestehende offene/geplante Muster, die weiter deduplizieren
+    - suppressed_keys: entschiedene Muster, die kuenftige Kandidaten unterdruecken
+    - feedback_rows: gelesene Betreiberentscheidungen fuer Metrik/Diagnose
 
-
-def read_growth_feedback(records: List[Dict[str, str]]) -> Tuple[set[str], List[Dict[str, Any]]]:
-    """Liest entschiedene Growth-Backlog-Zeilen als Suppression-/Lernsignal.
-
-    Bestehende offene Backlog-Zeilen bleiben normale Dedupe-Basis. Entschiedene,
-    verworfene, erledigte oder zurückgestellte Zeilen werden zusätzlich als
-    explizites Feedback markiert, damit der Growth-Lauf nicht nur zufällig über
-    cluster_key dedupliziert, sondern Betreiberentscheidungen messbar zurückführt.
+    Wichtig: abgelaufene `snoozed`-Eintraege blockieren nicht dauerhaft.
     """
+    active_existing_keys: set[str] = set()
     suppressed_keys: set[str] = set()
     feedback_rows: List[Dict[str, Any]] = []
 
@@ -299,32 +287,54 @@ def read_growth_feedback(records: List[Dict[str, str]]) -> Tuple[set[str], List[
         if not cluster:
             continue
 
-        status_key = growth_feedback_status_key(row.get("status", ""))
+        effect = target_effect(row)
+        decision_class = str(effect.get("decision_class", "")).strip()
         decision_note = str(row.get("decision_note", "")).strip()
         closed_at = str(row.get("closed_at", "")).strip()
+        suppress_until = str(row.get("suppress_until", "")).strip()
+        recheck_at = str(row.get("recheck_at", "")).strip()
 
-        if status_key in GROWTH_FEEDBACK_ACTIVE_STATUSES and not closed_at:
+        has_decision_signal = bool(decision_class or decision_note or closed_at)
+        if not has_decision_signal:
+            active_existing_keys.add(cluster)
             continue
 
-        is_decided = (
-            status_key in GROWTH_FEEDBACK_SUPPRESS_STATUSES
-            or bool(closed_at)
-            or bool(decision_note and status_key not in GROWTH_FEEDBACK_ACTIVE_STATUSES)
-        )
-        if not is_decided:
+        if decision_class == "snoozed" and not effect.get("suppress"):
+            feedback_rows.append({
+                "cluster_key": cluster,
+                "decision_class": decision_class,
+                "default_effect": effect.get("default_effect", ""),
+                "suppressed": False,
+                "decision_note": decision_note,
+                "closed_at": closed_at,
+                "suppress_until": suppress_until,
+                "recheck_at": recheck_at,
+                "title": str(row.get("title", "")).strip(),
+                "source": str(row.get("source", "")).strip(),
+            })
             continue
 
-        suppressed_keys.add(cluster)
+        if effect.get("suppress") or closed_at:
+            suppressed_keys.add(cluster)
+            suppressed = True
+        else:
+            active_existing_keys.add(cluster)
+            suppressed = False
+
         feedback_rows.append({
             "cluster_key": cluster,
-            "status": status_key or "decided",
+            "decision_class": decision_class or "legacy_decision",
+            "default_effect": effect.get("default_effect", ""),
+            "suppressed": suppressed,
             "decision_note": decision_note,
             "closed_at": closed_at,
+            "suppress_until": suppress_until,
+            "recheck_at": recheck_at,
             "title": str(row.get("title", "")).strip(),
             "source": str(row.get("source", "")).strip(),
         })
 
-    return suppressed_keys, feedback_rows
+    return active_existing_keys, suppressed_keys, feedback_rows
 
 def append_records(sheets, spreadsheet_id: str, tab: str, header: List[str], records: List[Dict[str, Any]]) -> None:
     if not records:
@@ -743,10 +753,12 @@ def main() -> None:
     start, end = start_date.isoformat(), end_date.isoformat()
 
     existing = read_records(sheets, sheet_id, BACKLOG_TAB)
-    growth_feedback_keys, growth_feedback = read_growth_feedback(existing)
-    known_cluster_keys = {r.get("cluster_key", "").strip() for r in existing if r.get("cluster_key", "").strip()}
+    growth_existing_keys, growth_feedback_keys, growth_feedback = read_growth_feedback(existing)
+    known_cluster_keys = set(growth_existing_keys)
     known_cluster_keys.update(growth_feedback_keys)
     for r in existing:
+        if r.get("cluster_key", "").strip() not in known_cluster_keys:
+            continue
         existing_text = " ".join([
             str(r.get("title", "")),
             str(r.get("short_reason", "")),
@@ -768,7 +780,7 @@ def main() -> None:
     ga4_rows: List[Dict[str, Any]] = []
     messages = []
     if growth_feedback:
-        messages.append(f"Growth-Feedback angewendet: {len(growth_feedback)} entschiedene Backlog-Muster unterdrueckt.")
+        messages.append(f"Growth-Feedback angewendet: {len(growth_feedback)} Entscheidungen gelesen, {len(growth_feedback_keys)} Muster unterdrueckt.")
     status = "ok"
     try:
         gsc_rows = fetch_gsc(creds, site_url, start, end) if site_url else []
@@ -844,6 +856,7 @@ def main() -> None:
     growth_summary = dict(report_row)
     growth_summary["value_rows"] = len(value_rows)
     growth_summary["growth_feedback_rules"] = len(growth_feedback)
+    growth_summary["growth_feedback_active_existing_keys"] = sorted(growth_existing_keys)[:80]
     growth_summary["growth_feedback_suppressed_keys"] = sorted(growth_feedback_keys)[:80]
     growth_summary["messages"] = messages
     GROWTH_SUMMARY_PATH.parent.mkdir(parents=True, exist_ok=True)

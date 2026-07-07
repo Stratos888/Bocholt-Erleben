@@ -165,7 +165,14 @@
     "snoozed": "snoozed",
     "zurueckgestellt": "snoozed",
     "watch": "watch",
-    "observe": "watch"
+    "observe": "watch",
+    "closed": "done",
+    "archived": "done",
+    "archiviert": "done",
+    "dismissed": "rejected_low_value",
+    "not_relevant": "rejected_low_value",
+    "stale": "rejected_low_value",
+    "closed_as_stale": "rejected_low_value"
   },
   "rule_quality_metrics": [
     "applied_count",
