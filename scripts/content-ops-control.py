@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from content_ops_decisions import resolve_decision_class, target_effect
+from content_ops_visual_feedback import classify_visual_issue
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = ROOT / "data" / "content-ops"
@@ -280,6 +281,9 @@ def normalize_content_audit(report_path: Path) -> RunPayload:
     visual_feedback_summary = report.get("visual_feedback_summary") or {}
     decision_class_counts: Dict[str, int] = {}
     decision_effect_counts: Dict[str, int] = {}
+    visual_problem_counts: Dict[str, int] = {}
+    visual_followup_counts: Dict[str, int] = {}
+    visual_decision_class_counts: Dict[str, int] = {}
 
     payload = RunPayload(source_mode="content_quality_audit")
     payload.summary = {
@@ -326,6 +330,27 @@ def normalize_content_audit(report_path: Path) -> RunPayload:
             decision_class_counts[decision_class] = decision_class_counts.get(decision_class, 0) + 1
         if decision_default_effect:
             decision_effect_counts[decision_default_effect] = decision_effect_counts.get(decision_default_effect, 0) + 1
+
+        visual_effect: Dict[str, Any] = {}
+        is_visual_signal = (
+            safe_action == "write_visual_feedback_or_backlog_signal"
+            or norm(item.get("process_category")).startswith("visual_")
+            or norm(item.get("issue_code")).startswith("event_visual")
+            or norm(item.get("issue_code")).startswith("activity_visual")
+            or bool(norm(item.get("visual_asset_status")))
+        )
+        if is_visual_signal:
+            visual_effect = classify_visual_issue(item)
+            visual_problem = norm(visual_effect.get("problem_type"))
+            visual_followup = norm(visual_effect.get("followup_route"))
+            visual_decision_class = norm(visual_effect.get("decision_class"))
+            if visual_problem:
+                visual_problem_counts[visual_problem] = visual_problem_counts.get(visual_problem, 0) + 1
+            if visual_followup:
+                visual_followup_counts[visual_followup] = visual_followup_counts.get(visual_followup, 0) + 1
+            if visual_decision_class:
+                visual_decision_class_counts[visual_decision_class] = visual_decision_class_counts.get(visual_decision_class, 0) + 1
+
         if user_action_required:
             action_required = True
         payload.findings.append(Finding(
@@ -355,13 +380,35 @@ def normalize_content_audit(report_path: Path) -> RunPayload:
                 "decision_task_state": decision_effect.get("task_state", ""),
                 "decision_suppress": decision_effect.get("suppress", False),
                 "decision_recheck": decision_effect.get("recheck", False),
+                "visual_problem_type": visual_effect.get("problem_type", ""),
+                "visual_followup_route": visual_effect.get("followup_route", ""),
+                "visual_default_effect": visual_effect.get("default_effect", ""),
+                "visual_requires_task": visual_effect.get("requires_task", False),
             },
         ))
 
     payload.summary["decision_class_counts"] = decision_class_counts
     payload.summary["decision_effect_counts"] = decision_effect_counts
+    payload.summary["visual_problem_counts"] = visual_problem_counts
+    payload.summary["visual_followup_counts"] = visual_followup_counts
+    payload.summary["visual_decision_class_counts"] = visual_decision_class_counts
     add_counter_metrics(payload.metrics, "content.audit.decision_class", decision_class_counts, scope="audit_decisions")
     add_counter_metrics(payload.metrics, "content.audit.decision_effect", decision_effect_counts, scope="audit_decisions")
+    add_counter_metrics(payload.metrics, "content.audit.visual_problem", visual_problem_counts, scope="visual_feedback")
+    add_counter_metrics(payload.metrics, "content.audit.visual_followup", visual_followup_counts, scope="visual_feedback")
+    add_counter_metrics(payload.metrics, "content.audit.visual_decision_class", visual_decision_class_counts, scope="visual_feedback")
+
+    for route, count in sorted(visual_followup_counts.items()):
+        payload.rule_effects.append(RuleEffect(
+            rule_key=f"visual_feedback:{route}",
+            rule_type="visual_feedback",
+            rule_class=route,
+            applied_count=count,
+            details={
+                "problem_counts": visual_problem_counts,
+                "decision_class_counts": visual_decision_class_counts,
+            },
+        ))
 
     payload.action_required = action_required
     if safe_int(counts.get("critical")) > 0:

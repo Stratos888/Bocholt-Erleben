@@ -42,7 +42,10 @@ required_files = [
     "scripts/content_ops_decisions.py",
     "scripts/audit-self-learning-semantics.py",
     "scripts/audit-content-ops-run-health.py",
+    "scripts/content_ops_visual_feedback.py",
+    "scripts/audit-content-ops-visual-feedback.py",
     "data/content_ops_decision_classes.json",
+    "data/content_ops_visual_feedback_contract.json",
     "data/content_ops_run_health_targets.json",
     "api/content-ops-health.php",
     ".github/workflows/content-quality-audit.yml",
@@ -73,6 +76,9 @@ target_doc = "docs/content-ops-self-learning-target.md"
 run_health_script = "scripts/audit-content-ops-run-health.py"
 run_health_targets = "data/content_ops_run_health_targets.json"
 run_health_api = "api/content-ops-health.php"
+visual_helper_script = "scripts/content_ops_visual_feedback.py"
+visual_audit_script = "scripts/audit-content-ops-visual-feedback.py"
+visual_contract = "data/content_ops_visual_feedback_contract.json"
 
 action_modes = {
     "audit": (content_wf, "python scripts/content-ops-control.py record-audit"),
@@ -102,6 +108,10 @@ add(checks, "intake_cleanup_metrics", "wirkung", control, ["intake.manual.skip_r
 
 add(checks, "visual_feedback_write", "feedback_visual", content_wf, ["Write Content_Visual_Feedback sheet tab", "Content_Visual_Feedback", "asset_gap"], ok_msg="Visual-Signale werden gesammelt", bad_msg="Visual-Feedback-Writeback fehlt")
 add(checks, "visual_feedback_metrics", "feedback_visual", control, ["write_visual_feedback_or_backlog_signal", "content.audit.visual_feedback_signals", "content.audit.visual_feedback_asset_gaps"], ok_msg="Visual-Signale werden geroutet und gemessen", bad_msg="Visual-Feedback-Messung fehlt")
+add(checks, "visual_feedback_contract_check", "feedback_visual", visual_contract, ["visual_key_wrong", "visual_motif_wrong", "asset_missing", "asset_low_quality", "source_or_rights_issue"], ok_msg="Visual-Feedback-Contract vorhanden", bad_msg="Visual-Feedback-Contract unvollstaendig")
+add(checks, "visual_feedback_reader_check", "feedback_visual", visual_helper_script, ["classify_visual_issue", "load_visual_feedback_contract", "followup_route", "decision_class"], ok_msg="Visual-Feedback-Reader vorhanden", bad_msg="Visual-Feedback-Reader unvollstaendig")
+add(checks, "visual_feedback_audit_check", "feedback_visual", visual_audit_script, ["content_ops_visual_feedback", "asset_gap_routes_to_asset_backlog", "wrong_key_routes_to_resolver_review", "motif_mismatch_routes_to_motif_rule_review"], ok_msg="Visual-Feedback-Audit vorhanden", bad_msg="Visual-Feedback-Audit unvollstaendig")
+add(checks, "visual_feedback_learning_metrics", "feedback_visual", control, ["content.audit.visual_problem", "content.audit.visual_followup", "visual_feedback:"], ok_msg="Visual-Feedback-Lernwirkung wird gemessen", bad_msg="Visual-Feedback-Lernwirkung fehlt")
 
 add(checks, "growth_backlog_basis", "growth", growth_script, ["Growth_Backlog", "decision_note", "items_suppressed", "cluster_key"], ok_msg="Growth-Backlog mit Dedupe-/Entscheidungsfeldern vorhanden", bad_msg="Growth-Backlog-Basis fehlt")
 add(checks, "growth_metrics", "growth", control, ["growth.backlog.items_created", "growth.backlog.items_suppressed", "growth_backlog_items_created"], ok_msg="Growth-Signale werden gemessen", bad_msg="Growth-Messung fehlt")
@@ -115,6 +125,9 @@ add(checks, "decision_taxonomy_reader", "semantik", helper_script, ["resolve_dec
 add(checks, "content_inbox_decision_semantics", "semantik", control, ["content.audit.decision_class", "intake.manual.decision_class", "decision_default_effect"], ok_msg="Content-/Inbox-Entscheidungen werden semantisch gemessen", bad_msg="Content-/Inbox-Decision-Semantik fehlt")
 add(checks, "semantic_fixture_guard", "semantik", semantics_script, ["self_learning_semantics", "search_rejected_not_public_filters_next_run", "growth_snoozed_past_reopens", "false_positive_count"], ok_msg="semantischer Fixture-Guard vorhanden", bad_msg="semantischer Fixture-Guard unvollstaendig")
 add(checks, "self_learning_target_doc", "semantik", target_doc, ["Zentrale Entscheidungstaxonomie", "Pflicht-Fixtures", "recurrence_count", "false_positive_count", "Run Health"], ok_msg="optimaler Selbstlernprozess-Zielzustand dokumentiert", bad_msg="Selbstlernprozess-Zielzustand unvollstaendig")
+add(checks, "run_health_targets_check", "run_health", run_health_targets, ["content_quality_audit", "weekly_ki_websearch", "growth_intelligence", "warn_after_hours", "stale_after_hours"], ok_msg="Run-Health-Ziele vorhanden", bad_msg="Run-Health-Ziele unvollstaendig")
+add(checks, "run_health_audit_check", "run_health", run_health_script, ["content_ops_run_health", "missing_required", "stale", "warn_after_hours", "content_ops_run_health_targets.json"], ok_msg="Run-Health-Audit vorhanden", bad_msg="Run-Health-Audit unvollstaendig")
+add(checks, "run_health_api_check", "run_health", run_health_api, ["be_require_review_access", "content_ops_run", "warn_after_hours", "stale_after_hours", "action_required"], ok_msg="Run-Health-API vorhanden", bad_msg="Run-Health-API unvollstaendig")
 
 fails = [c for c in checks if c["status"] == "fail"]
 warns = [c for c in checks if c["status"] == "warn"]
