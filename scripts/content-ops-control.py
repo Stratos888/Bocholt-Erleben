@@ -636,7 +636,14 @@ def normalize_manual_intake(summary_path: Path) -> RunPayload:
             user_action_required=False,
             source_mode=payload.source_mode,
             source_workflow=norm(os.environ.get("GITHUB_WORKFLOW")) or "Manual KI Event Intake",
-            details={"count": safe_int(count), "raw_reason": reason},
+            details={
+                "count": safe_int(count),
+                "raw_reason": reason,
+                "decision_class": decision_class,
+                "decision_default_effect": decision_default_effect,
+                "decision_task_state": decision_effect.get("task_state", ""),
+                "decision_suppress": decision_effect.get("suppress", False),
+            },
         ))
     payload.summary["decision_class_counts"] = intake_decision_class_counts
     payload.summary["decision_effect_counts"] = intake_decision_effect_counts

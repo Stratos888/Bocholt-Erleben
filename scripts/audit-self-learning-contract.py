@@ -44,6 +44,7 @@ required_files = [
     "scripts/audit-content-ops-run-health.py",
     "scripts/content_ops_visual_feedback.py",
     "scripts/audit-content-ops-visual-feedback.py",
+    "scripts/audit-content-ops-e2e-fixtures.py",
     "data/content_ops_decision_classes.json",
     "data/content_ops_visual_feedback_contract.json",
     "data/content_ops_run_health_targets.json",
@@ -79,6 +80,7 @@ run_health_api = "api/content-ops-health.php"
 visual_helper_script = "scripts/content_ops_visual_feedback.py"
 visual_audit_script = "scripts/audit-content-ops-visual-feedback.py"
 visual_contract = "data/content_ops_visual_feedback_contract.json"
+e2e_fixture_script = "scripts/audit-content-ops-e2e-fixtures.py"
 
 action_modes = {
     "audit": (content_wf, "python scripts/content-ops-control.py record-audit"),
@@ -112,6 +114,7 @@ add(checks, "visual_feedback_contract_check", "feedback_visual", visual_contract
 add(checks, "visual_feedback_reader_check", "feedback_visual", visual_helper_script, ["classify_visual_issue", "load_visual_feedback_contract", "followup_route", "decision_class"], ok_msg="Visual-Feedback-Reader vorhanden", bad_msg="Visual-Feedback-Reader unvollstaendig")
 add(checks, "visual_feedback_audit_check", "feedback_visual", visual_audit_script, ["content_ops_visual_feedback", "asset_gap_routes_to_asset_backlog", "wrong_key_routes_to_resolver_review", "motif_mismatch_routes_to_motif_rule_review"], ok_msg="Visual-Feedback-Audit vorhanden", bad_msg="Visual-Feedback-Audit unvollstaendig")
 add(checks, "visual_feedback_learning_metrics", "feedback_visual", control, ["content.audit.visual_problem", "content.audit.visual_followup", "visual_feedback:"], ok_msg="Visual-Feedback-Lernwirkung wird gemessen", bad_msg="Visual-Feedback-Lernwirkung fehlt")
+add(checks, "content_ops_e2e_fixture_guard", "e2e", e2e_fixture_script, ["content_ops_e2e_fixtures", "normalize_content_audit", "normalize_manual_intake", "normalize_weekly_ki", "normalize_growth", "visual_rule_effect", "missing_source_finding"], ok_msg="funktionaler Content-Ops-E2E-Fixture-Guard vorhanden", bad_msg="Content-Ops-E2E-Fixture-Guard unvollstaendig")
 
 add(checks, "growth_backlog_basis", "growth", growth_script, ["Growth_Backlog", "decision_note", "items_suppressed", "cluster_key"], ok_msg="Growth-Backlog mit Dedupe-/Entscheidungsfeldern vorhanden", bad_msg="Growth-Backlog-Basis fehlt")
 add(checks, "growth_metrics", "growth", control, ["growth.backlog.items_created", "growth.backlog.items_suppressed", "growth_backlog_items_created"], ok_msg="Growth-Signale werden gemessen", bad_msg="Growth-Messung fehlt")
