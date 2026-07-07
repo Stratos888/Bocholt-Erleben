@@ -41,7 +41,10 @@ required_files = [
     "scripts/growth-intelligence-backlog.py",
     "scripts/content_ops_decisions.py",
     "scripts/audit-self-learning-semantics.py",
+    "scripts/audit-content-ops-run-health.py",
     "data/content_ops_decision_classes.json",
+    "data/content_ops_run_health_targets.json",
+    "api/content-ops-health.php",
     ".github/workflows/content-quality-audit.yml",
     ".github/workflows/weekly-ki-websearch-to-manual-inbox.yml",
     ".github/workflows/manual-ki-intake.yml",
@@ -67,6 +70,9 @@ helper_script = "scripts/content_ops_decisions.py"
 semantics_script = "scripts/audit-self-learning-semantics.py"
 decision_contract = "data/content_ops_decision_classes.json"
 target_doc = "docs/content-ops-self-learning-target.md"
+run_health_script = "scripts/audit-content-ops-run-health.py"
+run_health_targets = "data/content_ops_run_health_targets.json"
+run_health_api = "api/content-ops-health.php"
 
 action_modes = {
     "audit": (content_wf, "python scripts/content-ops-control.py record-audit"),
