@@ -1,114 +1,29 @@
-# === BEGIN TEMP FILE: one-off hardening workflow ===
-# retrigger: 2026-07-07
-name: One-off Harden Content Quality Audit Trigger
+# === DISABLED TEMP FILE: .github/workflows/_oneoff-harden-content-quality-audit-trigger.yml ===
+# Zweck:
+# - Dokumentiert einen fehlgeschlagenen One-off-Ansatz vom 2026-07-07.
+# - Nicht erneut verwenden.
+#
+# Warum deaktiviert:
+# - workflow_dispatch-Button ist fuer Workflows, die nur auf staging liegen, nicht verlaesslich sichtbar,
+#   weil GitHub den manuell ausloesbaren Workflow auf dem Default-Branch erwartet.
+# - Ein GitHub-Actions-Run mit GITHUB_TOKEN/contents:write darf in diesem Repo keine Dateien
+#   unter .github/workflows/ veraendern; der Push wurde mit fehlender workflows-Permission abgelehnt.
+#
+# Regel:
+# - Workflow-Dateien nicht durch selbstmodifizierende One-off-Workflows aendern.
+# - Stattdessen GitHub-Connector, lokale Arbeitskopie/Codespace oder bewusstes Patch-Paket nutzen.
+
+name: Disabled One-off Harden Content Quality Audit Trigger
 
 on:
-  push:
-    branches: ["staging"]
-    paths:
-      - ".github/workflows/_oneoff-harden-content-quality-audit-trigger.yml"
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  harden:
+  disabled:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout staging
-        uses: actions/checkout@v4
-        with:
-          ref: staging
-          fetch-depth: 0
-
-      - name: Harden trigger and update documentation
-        shell: bash
+      - name: Explain disabled workflow
         run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          audit = Path('.github/workflows/content-quality-audit.yml')
-          text = audit.read_text(encoding='utf-8')
-          old = '''  push:
-              branches:
-                - staging
-              paths:
-                - ".github/workflows/content-quality-audit.yml"
-                - "scripts/content-quality-audit.py"
-                - "aktivitaeten/index.html"
-                - "js/activity-highlights.js"
-                - "scripts/audit-activity-highlights.py"
-                - "scripts/audit-event-feed-visual-diversity.py"
-                - "data/content_source_suggestions.json"
-                - "data/**"
-                - "api/events/public.php"
-          '''.replace('          ', '')
-          new = '''  push:
-              branches:
-                - main
-              paths:
-                - ".github/workflows/content-quality-audit.yml"
-                - "scripts/content-quality-audit.py"
-                - "aktivitaeten/index.html"
-                - "js/activity-highlights.js"
-                - "scripts/audit-activity-highlights.py"
-                - "scripts/audit-event-feed-visual-diversity.py"
-                - "data/content_source_suggestions.json"
-                - "data/event_visual_pool.json"
-                - "data/activities.json"
-                - "data/activity_highlights.json"
-                - "api/events/public.php"
-          '''.replace('          ', '')
-          if old not in text:
-              raise SystemExit('expected content-quality-audit push trigger block not found')
-          audit.write_text(text.replace(old, new, 1), encoding='utf-8')
-
-          docs = Path('docs/github-actions-trigger-policy.md')
-          text = docs.read_text(encoding='utf-8')
-          old = '''### Bekannter verbleibender Haertungspunkt
-
-          - `.github/workflows/content-quality-audit.yml`
-            - hat aktuell noch einen `push`-Trigger auf `staging` mit breiten Pfaden, insbesondere `data/**`.
-            - Das ist fuer den finalen schnellen Staging-Zielzustand noch nicht optimal.
-            - Gewollter Zielzustand: kein pauschaler schwerer Audit bei normalen `staging`-Testcommits.
-            - Kuenftige Härtung: `push` dort auf `main` und/oder sehr gezielte Audit-Owner-Dateien begrenzen; schedule und manual beibehalten.
-          '''.replace('          ', '')
-          new = '''### Final gehaertet
-
-          - `.github/workflows/content-quality-audit.yml`
-            - `push` auf `staging` wurde entfernt.
-            - Workflow laeuft weiter per `workflow_dispatch` und `schedule`.
-            - Zusaetzlich laeuft er bei `push` auf `main`, aber nur fuer gezielte Audit-/Content-relevante Pfade.
-            - Breite `data/**`-Ausloesung wurde bewusst entfernt, damit automatische oder kleine Daten-/Testcommits keine schweren Audits mitziehen.
-          '''.replace('          ', '')
-          if old not in text:
-              raise SystemExit('expected trigger-policy rest-point block not found')
-          docs.write_text(text.replace(old, new, 1), encoding='utf-8')
-
-          entry = Path('AI_ENTRYPOINT.md')
-          text = entry.read_text(encoding='utf-8')
-          old = '''- `Content Quality Audit` hat noch einen bekannten verbleibenden Haertungspunkt: aktueller `staging`-Push-Trigger mit breiten Pfaden, insbesondere `data/**`. Ziel bleibt, diesen schweren Audit nicht pauschal an normale Staging-Testcommits zu koppeln.'''
-          new = '''- `Content Quality Audit` ist final vom normalen `staging`-Push entkoppelt; er laeuft per `schedule`, `workflow_dispatch` und gezielt bei relevanten `main`-Pfaden.'''
-          if old not in text:
-              raise SystemExit('expected AI_ENTRYPOINT rest-point bullet not found')
-          entry.write_text(text.replace(old, new, 1), encoding='utf-8')
-          PY
-
-          rm .github/workflows/_oneoff-harden-content-quality-audit-trigger.yml
-
-      - name: Commit hardening
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/content-quality-audit.yml docs/github-actions-trigger-policy.md AI_ENTRYPOINT.md .github/workflows/_oneoff-harden-content-quality-audit-trigger.yml
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-          git commit -m "Haerte Content Quality Audit Trigger final"
-          git push origin HEAD:staging
-# === END TEMP FILE: one-off hardening workflow ===
+          echo "This one-off workflow is intentionally disabled and must not be used."
+          echo "See docs/github-actions-trigger-policy.md."
+# === END DISABLED TEMP FILE ===
