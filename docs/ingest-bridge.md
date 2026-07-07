@@ -1,0 +1,3 @@
+# Ingest Bridge
+
+Technische Datenbruecke.
