@@ -39,6 +39,8 @@ required_files = [
     "scripts/weekly-ki-websearch-to-manual-inbox.py",
     "scripts/content-quality-audit.py",
     "scripts/growth-intelligence-backlog.py",
+    "scripts/audit-self-learning-semantics.py",
+    "data/content_ops_decision_classes.json",
     ".github/workflows/content-quality-audit.yml",
     ".github/workflows/weekly-ki-websearch-to-manual-inbox.yml",
     ".github/workflows/manual-ki-intake.yml",
@@ -46,6 +48,7 @@ required_files = [
     ".github/workflows/growth-intelligence-backlog.yml",
     ".github/workflows/content-ops-http-ingest.yml",
     "docs/internal-dashboard-target.md",
+    "docs/content-ops-self-learning-target.md",
 ]
 for rel in required_files:
     checks.append({"id": f"file:{rel}", "area": "basis", "status": "ok" if (ROOT / rel).exists() else "fail", "message": "vorhanden" if (ROOT / rel).exists() else "fehlt", "file": rel})
@@ -59,6 +62,9 @@ cleanup_wf = ".github/workflows/inbox-cleanup.yml"
 growth_wf = ".github/workflows/growth-intelligence-backlog.yml"
 ingest_wf = ".github/workflows/content-ops-http-ingest.yml"
 growth_script = "scripts/growth-intelligence-backlog.py"
+semantics_script = "scripts/audit-self-learning-semantics.py"
+decision_contract = "data/content_ops_decision_classes.json"
+target_doc = "docs/content-ops-self-learning-target.md"
 
 action_modes = {
     "audit": (content_wf, "python scripts/content-ops-control.py record-audit"),
@@ -95,6 +101,10 @@ add(checks, "growth_feedback_reader", "growth", growth_script, ["read_growth_fee
 
 add(checks, "task_lifecycle_minimum", "aufgabenmodell", control, ["user_action_required", "auto_routed", "open"], ok_msg="Mindest-Lifecycle fuer Aufgabe vs. Beobachtung vorhanden", bad_msg="Aufgaben-/Beobachtungs-Lifecycle fehlt")
 add(checks, "dashboard_gate", "dashboard_gate", "docs/internal-dashboard-target.md", ["Dashboard ist nicht der Hauptprozess", "Betreiberentscheidung", "Feedback-Regel", "Erst danach `/intern/dashboard/` final"], ok_msg="Dashboard-Gate dokumentiert", bad_msg="Dashboard-Gate fehlt")
+
+add(checks, "decision_taxonomy_contract", "semantik", decision_contract, ["decision_classes", "required_decision_fields", "rejected_not_public", "needs_visual_fix", "false_positive_count"], ok_msg="zentrale Entscheidungstaxonomie vorhanden", bad_msg="Entscheidungstaxonomie unvollstaendig")
+add(checks, "semantic_fixture_guard", "semantik", semantics_script, ["self_learning_semantics", "search_rejected_not_public_filters_next_run", "growth_snoozed_past_reopens", "false_positive_count"], ok_msg="semantischer Fixture-Guard vorhanden", bad_msg="semantischer Fixture-Guard unvollstaendig")
+add(checks, "self_learning_target_doc", "semantik", target_doc, ["Zentrale Entscheidungstaxonomie", "Pflicht-Fixtures", "recurrence_count", "false_positive_count", "Run Health"], ok_msg="optimaler Selbstlernprozess-Zielzustand dokumentiert", bad_msg="Selbstlernprozess-Zielzustand unvollstaendig")
 
 fails = [c for c in checks if c["status"] == "fail"]
 warns = [c for c in checks if c["status"] == "warn"]
