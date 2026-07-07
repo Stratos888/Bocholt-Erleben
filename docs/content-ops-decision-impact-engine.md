@@ -14,6 +14,14 @@ Prueflauf / Suchlauf / Intake / Cleanup / Growth
 → spaeter zentrale Verwaltungsoberflaeche
 ```
 
+Der detaillierte optimale Zielzustand des Selbstlernprozesses ist verbindlich dokumentiert in:
+
+```text
+docs/content-ops-self-learning-target.md
+```
+
+Diese Detaildokumentation ist fuehrend fuer Entscheidungstaxonomie, Aufgabenmodell, Feedback-Lifecycle, Roboter-Lernkreise, Wirkungsmessung, Sicherheitsgrenzen und die naechste semantische Haertung. Dieses Dokument beschreibt die technische Decision-&-Impact-Engine als darunterliegende Normalisierungs- und Persistenzschicht.
+
 Die Engine nimmt keine fachlichen Live-Aenderungen vor. Sie veroeffentlicht keine Events, aendert keine Termine, loescht keine Inhalte und tauscht keine Bilder aus.
 
 ## Fuehrende Rollen
@@ -24,6 +32,7 @@ Die Engine nimmt keine fachlichen Live-Aenderungen vor. Sie veroeffentlicht kein
 | SQL | Zeitreihen, Wirkungsmetriken und spaeter Dashboard-Aggregate |
 | GitHub Actions | automatische Laeufe und Metrik-Erfassung |
 | `scripts/content-ops-control.py` | Decision-&-Impact-Normalisierung |
+| `scripts/audit-self-learning-contract.py` | statischer Gate-Check fuer den geschlossenen Selbstlernprozess |
 | spaetere Verwaltung | Aufgaben, Entwicklung, Search, Feedback-Wirkung, SEO/Growth, Technik |
 
 ## Angeschlossene Workflows
@@ -102,6 +111,13 @@ Bilder final austauschen
 unsichere Quellen uebernehmen
 ```
 
-## Patch-1-Grenze
+## Aktuelle Grenze
 
-Dieser Patch baut bewusst noch nicht die finale Verwaltungsoberflaeche. Er schafft die belastbare Datenbasis, damit die spaetere UI keine dekorative Report-Ansicht wird, sondern auf echten gemessenen Laeufen, Findings und Folgeaktionen aufbaut.
+Der Selbstlernprozess ist strukturell geschlossen und der Guard steht auf:
+
+```text
+self_learning_contract=pass
+ready_for_final_dashboard=true
+```
+
+Der naechste Prozessschritt ist nicht Dashboard-Optik, sondern die semantische Haertung gemaess `docs/content-ops-self-learning-target.md`: Fixture-Tests, zentrale Entscheidungsklassen, Feedback-Qualitaetsmetriken, praeziser Growth-/Visual-Lifecycle und Run-Health-Freshness.
