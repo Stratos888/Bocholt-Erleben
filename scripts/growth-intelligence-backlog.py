@@ -264,6 +264,68 @@ def read_records(sheets, spreadsheet_id: str, tab: str) -> List[Dict[str, str]]:
     return out
 
 
+
+GROWTH_FEEDBACK_ACTIVE_STATUSES = {
+    "", "open", "neu", "new", "review", "pruefen", "prüfen", "todo", "backlog",
+    "planned", "in-progress", "in_progress", "doing", "bearbeitung",
+}
+GROWTH_FEEDBACK_SUPPRESS_STATUSES = {
+    "closed", "done", "completed", "erledigt", "umgesetzt", "archived", "archiviert",
+    "rejected", "abgelehnt", "verworfen", "dismissed", "irrelevant", "not-relevant",
+    "not_relevant", "duplicate", "doppelt", "snoozed", "zurueckgestellt", "zurückgestellt",
+}
+
+
+def growth_feedback_status_key(value: str) -> str:
+    raw = str(value or "").strip().lower()
+    raw = raw.translate(str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}))
+    raw = re.sub(r"[^a-z0-9]+", "-", raw).strip("-")
+    return raw
+
+
+def read_growth_feedback(records: List[Dict[str, str]]) -> Tuple[set[str], List[Dict[str, Any]]]:
+    """Liest entschiedene Growth-Backlog-Zeilen als Suppression-/Lernsignal.
+
+    Bestehende offene Backlog-Zeilen bleiben normale Dedupe-Basis. Entschiedene,
+    verworfene, erledigte oder zurückgestellte Zeilen werden zusätzlich als
+    explizites Feedback markiert, damit der Growth-Lauf nicht nur zufällig über
+    cluster_key dedupliziert, sondern Betreiberentscheidungen messbar zurückführt.
+    """
+    suppressed_keys: set[str] = set()
+    feedback_rows: List[Dict[str, Any]] = []
+
+    for row in records:
+        cluster = str(row.get("cluster_key", "")).strip()
+        if not cluster:
+            continue
+
+        status_key = growth_feedback_status_key(row.get("status", ""))
+        decision_note = str(row.get("decision_note", "")).strip()
+        closed_at = str(row.get("closed_at", "")).strip()
+
+        if status_key in GROWTH_FEEDBACK_ACTIVE_STATUSES and not closed_at:
+            continue
+
+        is_decided = (
+            status_key in GROWTH_FEEDBACK_SUPPRESS_STATUSES
+            or bool(closed_at)
+            or bool(decision_note and status_key not in GROWTH_FEEDBACK_ACTIVE_STATUSES)
+        )
+        if not is_decided:
+            continue
+
+        suppressed_keys.add(cluster)
+        feedback_rows.append({
+            "cluster_key": cluster,
+            "status": status_key or "decided",
+            "decision_note": decision_note,
+            "closed_at": closed_at,
+            "title": str(row.get("title", "")).strip(),
+            "source": str(row.get("source", "")).strip(),
+        })
+
+    return suppressed_keys, feedback_rows
+
 def append_records(sheets, spreadsheet_id: str, tab: str, header: List[str], records: List[Dict[str, Any]]) -> None:
     if not records:
         return
@@ -681,7 +743,9 @@ def main() -> None:
     start, end = start_date.isoformat(), end_date.isoformat()
 
     existing = read_records(sheets, sheet_id, BACKLOG_TAB)
+    growth_feedback_keys, growth_feedback = read_growth_feedback(existing)
     known_cluster_keys = {r.get("cluster_key", "").strip() for r in existing if r.get("cluster_key", "").strip()}
+    known_cluster_keys.update(growth_feedback_keys)
     for r in existing:
         existing_text = " ".join([
             str(r.get("title", "")),
@@ -703,6 +767,8 @@ def main() -> None:
     gsc_rows: List[Dict[str, Any]] = []
     ga4_rows: List[Dict[str, Any]] = []
     messages = []
+    if growth_feedback:
+        messages.append(f"Growth-Feedback angewendet: {len(growth_feedback)} entschiedene Backlog-Muster unterdrueckt.")
     status = "ok"
     try:
         gsc_rows = fetch_gsc(creds, site_url, start, end) if site_url else []
@@ -765,7 +831,7 @@ def main() -> None:
         "period_start": start,
         "period_end": end,
         "status": status,
-        "source": "gsc+ga4+value_metrics+sheet_history+repo_visual+content_inventory",
+        "source": "gsc+ga4+value_metrics+sheet_history+repo_visual+content_inventory+growth_feedback",
         "items_created": len(created),
         "items_suppressed": suppressed,
         "gsc_rows": len(gsc_rows),
@@ -777,6 +843,8 @@ def main() -> None:
     # === BEGIN BLOCK: GROWTH_INTELLIGENCE_CONTENT_OPS_SUMMARY_V1 | Zweck: macht Growth-Backlog-Wirkung fuer die zentrale Verwaltungs-Metrikschicht maschinenlesbar; Umfang: lokales JSON-Artefakt fuer Folge-Step ===
     growth_summary = dict(report_row)
     growth_summary["value_rows"] = len(value_rows)
+    growth_summary["growth_feedback_rules"] = len(growth_feedback)
+    growth_summary["growth_feedback_suppressed_keys"] = sorted(growth_feedback_keys)[:80]
     growth_summary["messages"] = messages
     GROWTH_SUMMARY_PATH.parent.mkdir(parents=True, exist_ok=True)
     GROWTH_SUMMARY_PATH.write_text(json.dumps(growth_summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

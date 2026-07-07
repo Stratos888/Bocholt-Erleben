@@ -578,6 +578,10 @@ def normalize_growth(summary_path: Path) -> RunPayload:
     payload = RunPayload(source_mode="growth_intelligence")
     created = safe_int(summary.get("items_created", 0))
     suppressed = safe_int(summary.get("items_suppressed", 0))
+    feedback_rules = safe_int(summary.get("growth_feedback_rules", 0))
+    feedback_suppressed_keys = summary.get("growth_feedback_suppressed_keys") or []
+    if not isinstance(feedback_suppressed_keys, list):
+        feedback_suppressed_keys = []
     status = norm(summary.get("status")) or "unknown"
     payload.summary = summary
     payload.metrics.extend([
@@ -586,6 +590,8 @@ def normalize_growth(summary_path: Path) -> RunPayload:
         metric("growth.backlog.gsc_rows", summary.get("gsc_rows", 0), scope="growth_intelligence"),
         metric("growth.backlog.ga4_rows", summary.get("ga4_rows", 0), scope="growth_intelligence"),
         metric("growth.backlog.value_metric_rows", summary.get("value_rows", 0), scope="growth_intelligence"),
+        metric("growth.backlog.feedback_rules", feedback_rules, scope="growth_intelligence"),
+        metric("growth.backlog.feedback_suppressed_keys", len(feedback_suppressed_keys), scope="growth_intelligence"),
     ])
     if created:
         payload.findings.append(Finding(
@@ -601,6 +607,16 @@ def normalize_growth(summary_path: Path) -> RunPayload:
             source_workflow=norm(os.environ.get("GITHUB_WORKFLOW")) or "Growth Intelligence Backlog",
             details=summary,
         ))
+    if feedback_rules:
+        payload.rule_effects.append(RuleEffect(
+            rule_key="growth_feedback:decided_backlog",
+            rule_type="growth_feedback",
+            rule_class="decided_backlog_suppression",
+            applied_count=feedback_rules,
+            prevented_count=len(feedback_suppressed_keys),
+            details={"suppressed_keys": feedback_suppressed_keys[:80]},
+        ))
+
     if status not in {"ok", ""}:
         payload.findings.append(Finding(
             finding_type="growth_intelligence_partial_run",
