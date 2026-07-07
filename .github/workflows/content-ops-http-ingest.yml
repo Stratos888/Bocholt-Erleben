@@ -1,0 +1,89 @@
+# === BEGIN FILE: .github/workflows/content-ops-http-ingest.yml | Zweck: uebertraegt Content-Ops-Artefakte abgeschlossener Roboterlaeufe per HTTPS an Strato-PHP-Ingest; Umfang: zentraler Folgeworkflow ohne direkte MySQL-Verbindung ===
+name: Content Ops HTTP Ingest
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "GitHub Actions Run-ID mit Content-Ops-Artefakt"
+        required: true
+        type: string
+  push:
+    branches: ["main", "staging"]
+    paths:
+      - ".github/workflows/content-ops-http-ingest.yml"
+      - "scripts/content-ops-http-ingest.py"
+      - "api/content-ops/**"
+  workflow_run:
+    workflows:
+      - "Content Quality Audit"
+      - "Inbox Cleanup (Archive)"
+      - "Growth Intelligence Backlog"
+      - "Weekly KI Websearch → Manual Inbox"
+      - "Manual KI Event Intake"
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  content_ops_http_ingest:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_run'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Resolve source run
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+          INPUT_SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          set -e
+          if [ "${EVENT_NAME}" = "workflow_run" ]; then
+            SOURCE_RUN_ID="${WORKFLOW_RUN_ID}"
+          else
+            SOURCE_RUN_ID="${INPUT_SOURCE_RUN_ID}"
+          fi
+          if [ -z "${SOURCE_RUN_ID}" ]; then
+            echo "❌ source_run_id fehlt."
+            exit 1
+          fi
+          echo "SOURCE_RUN_ID=${SOURCE_RUN_ID}" >> "$GITHUB_ENV"
+          echo "Source run id: ${SOURCE_RUN_ID}"
+
+      - name: Download Content Ops artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          mkdir -p .tmp/content-ops-artifacts
+          if gh run download "${SOURCE_RUN_ID}" --pattern "*content-ops*" --dir .tmp/content-ops-artifacts; then
+            echo "✅ Content-Ops-Artefakte geladen."
+          else
+            echo "⚠️ Keine Content-Ops-Artefakte gefunden oder Download nicht möglich."
+          fi
+          find .tmp/content-ops-artifacts -type f -maxdepth 6 | sort || true
+
+      - name: Send Content Ops artifacts to Strato ingest
+        shell: bash
+        env:
+          CONTENT_OPS_INGEST_URL: ${{ secrets.CONTENT_OPS_INGEST_URL }}
+          CONTENT_OPS_INGEST_TOKEN: ${{ secrets.CONTENT_OPS_INGEST_TOKEN }}
+        run: |
+          set -e
+          python scripts/content-ops-http-ingest.py --input .tmp/content-ops-artifacts
+# === END FILE: .github/workflows/content-ops-http-ingest.yml ===
