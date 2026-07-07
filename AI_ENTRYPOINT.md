@@ -147,13 +147,41 @@ Daher gilt:
 - Wenn mehrere Doku-Dateien betroffen sind: ein konsolidierter Doku-Commit oder ein bewusstes Doku-Paket.
 - Keine Runtime-Dateien mit reinen Doku-Workpacks vermischen.
 
-## 7. Ruecknahme
+## 7. GitHub-Actions- und Staging-Testpfad
+
+Fuer Workflow-Trigger gilt zusaetzlich `docs/github-actions-trigger-policy.md`.
+
+Gewollter Zustand:
+
+- Kleine `staging`-Commits sollen primaer `Deploy to STRATO` ausloesen.
+- Schwere Audits, Growth-, KI-, Inbox- und Content-Ops-Laeufe sollen nicht pauschal bei jedem `staging`-Push laufen.
+- Diese Entkopplung ist bewusst und kein Fehler.
+- Qualitaetssicherung bleibt ueber `schedule`, `workflow_dispatch`, `workflow_run`, `main` oder relevante Pfade erhalten.
+
+Bekannter Stand vom 2026-07-07:
+
+- `Growth Intelligence Backlog` ist von Push-Triggern entkoppelt.
+- `Content Ops HTTP Ingest` ist von Push-Triggern entkoppelt.
+- `Deploy to STRATO` bleibt der schnelle Staging-Push-Pfad.
+- `Content Quality Audit` hat noch einen bekannten verbleibenden Haertungspunkt: aktueller `staging`-Push-Trigger mit breiten Pfaden, insbesondere `data/**`. Ziel bleibt, diesen schweren Audit nicht pauschal an normale Staging-Testcommits zu koppeln.
+
+Vor jeder Workflow-Aenderung konkret pruefen:
+
+- `on.push.branches`,
+- `on.push.paths`,
+- `schedule`,
+- `workflow_dispatch`,
+- `workflow_run`,
+- job-level `if`,
+- Downstream-Dispatches und Artefakt-Abhaengigkeiten.
+
+## 8. Ruecknahme
 
 Falsche Staging-Commits werden bevorzugt per Revert-Commit zurueckgenommen.
 
 Kein Force-Reset als Standard.
 
-## 8. Harte Grenzen fuer KI
+## 9. Harte Grenzen fuer KI
 
 - Nie direkt auf `main` schreiben.
 - Kein Force-Push.
@@ -165,7 +193,7 @@ Kein Force-Reset als Standard.
 - Keine ungeprueften automatischen fachlichen Datenkorrekturen.
 - Keine konkurrierenden parallelen Workpacks auf demselben Branch.
 
-## 9. Wichtige Steuerdateien
+## 10. Wichtige Steuerdateien
 
 - `AI_ENTRYPOINT.md` – operative KI-Arbeitsweise und Workflow-Router.
 - `ENGINEERING.md` – technische Guardrails, Owner-Regeln, Datenquellen, Asset-/Deploy-Sicherheit.
@@ -176,8 +204,9 @@ Kein Force-Reset als Standard.
 - `VISUAL_WORKFLOW.md` – Bild-, Motiv- und Asset-Arbeitsweise.
 - `COMMERCIAL_STRATEGY.md` – Anbieter- und Veranstalterstrategie.
 - `EVENT_IMPACT_TRACKING.md` – Nutzwert- und Wirkungsmessung.
+- `docs/github-actions-trigger-policy.md` – gewollte Actions-Trigger-Architektur fuer schnellen Staging-Testpfad und schwere Qualitaetslaeufe.
 
-## 10. Praktische Standardformeln
+## 11. Praktische Standardformeln
 
 Wenn der Nutzer sagt:
 
@@ -188,7 +217,7 @@ Wenn der Nutzer sagt:
 - `Doku harmonisieren`: buendeln, kein Mikro-Commit.
 - `Ohne GitHub-Zugriff`: G5.
 
-## 11. Dokumentationshierarchie
+## 12. Dokumentationshierarchie
 
 Fuer Workflow-Routing gilt:
 
@@ -197,3 +226,4 @@ Fuer Workflow-Routing gilt:
 3. `MASTER.md` fuer strategische Produktsteuerung.
 4. `ROADMAP.md` fuer aktive Workpacks.
 5. `TEST_STATUS.md` fuer Proofs und Abnahmen.
+6. `docs/github-actions-trigger-policy.md` fuer GitHub-Actions-Trigger, schnellen Staging-Testpfad und schwere Qualitaetslaeufe.
