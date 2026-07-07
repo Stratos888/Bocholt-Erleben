@@ -120,3 +120,19 @@ Sortierung erfolgt nach Dringlichkeit und Entscheidungsbedarf, nicht nach Quells
 3. Erst danach `/intern/dashboard/` final als Betreiber-Zentrale bauen.
 
 Ein Dashboard-Patch ohne vorher belastbar geschlossenen Selbstlernprozess ist nicht der Zielzustand.
+
+## Maschineller Gate-Check
+
+Der Selbstlernprozess wird repo-seitig mit folgendem Script geprueft:
+
+```bash
+python scripts/audit-self-learning-contract.py
+```
+
+Das Script schreibt lokal `data/self-learning-contract-report.json` und unterscheidet:
+
+- `fail`: kritischer Anschluss fehlt; Selbstlernprozess ist nicht belastbar.
+- `warn`: Kernanschluss vorhanden, aber bekannte Prozessluecke offen; finales Dashboard bleibt fachlich gesperrt.
+- `ready_for_final_dashboard=true`: keine kritischen Fehler und keine bekannten Prozesswarnungen.
+
+Der finale Dashboard-Bau soll erst starten, wenn dieser Gate-Check fuer den Zielbranch ohne `fail` und ohne relevante `warn` durchlaeuft.
