@@ -167,6 +167,14 @@
     "watch": "watch",
     "observe": "watch"
   },
+  "rule_quality_metrics": [
+    "applied_count",
+    "prevented_count",
+    "recurrence_count",
+    "false_positive_count",
+    "last_seen_at",
+    "expires_at"
+  ],
   "required_decision_fields": [
     "decision_class",
     "decision_note",
