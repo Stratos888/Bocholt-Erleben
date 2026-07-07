@@ -39,6 +39,7 @@ required_files = [
     "scripts/weekly-ki-websearch-to-manual-inbox.py",
     "scripts/content-quality-audit.py",
     "scripts/growth-intelligence-backlog.py",
+    "scripts/content_ops_decisions.py",
     "scripts/audit-self-learning-semantics.py",
     "data/content_ops_decision_classes.json",
     ".github/workflows/content-quality-audit.yml",
@@ -62,6 +63,7 @@ cleanup_wf = ".github/workflows/inbox-cleanup.yml"
 growth_wf = ".github/workflows/growth-intelligence-backlog.yml"
 ingest_wf = ".github/workflows/content-ops-http-ingest.yml"
 growth_script = "scripts/growth-intelligence-backlog.py"
+helper_script = "scripts/content_ops_decisions.py"
 semantics_script = "scripts/audit-self-learning-semantics.py"
 decision_contract = "data/content_ops_decision_classes.json"
 target_doc = "docs/content-ops-self-learning-target.md"
@@ -103,6 +105,8 @@ add(checks, "task_lifecycle_minimum", "aufgabenmodell", control, ["user_action_r
 add(checks, "dashboard_gate", "dashboard_gate", "docs/internal-dashboard-target.md", ["Dashboard ist nicht der Hauptprozess", "Betreiberentscheidung", "Feedback-Regel", "Erst danach `/intern/dashboard/` final"], ok_msg="Dashboard-Gate dokumentiert", bad_msg="Dashboard-Gate fehlt")
 
 add(checks, "decision_taxonomy_contract", "semantik", decision_contract, ["decision_classes", "required_decision_fields", "rejected_not_public", "needs_visual_fix", "false_positive_count"], ok_msg="zentrale Entscheidungstaxonomie vorhanden", bad_msg="Entscheidungstaxonomie unvollstaendig")
+add(checks, "decision_taxonomy_reader", "semantik", helper_script, ["resolve_decision_class", "is_suppression_active", "target_effect", "rule_quality_metric_keys"], ok_msg="operativer Entscheidungsklassen-Reader vorhanden", bad_msg="operativer Entscheidungsklassen-Reader unvollstaendig")
+add(checks, "content_inbox_decision_semantics", "semantik", control, ["content.audit.decision_class", "intake.manual.decision_class", "decision_default_effect"], ok_msg="Content-/Inbox-Entscheidungen werden semantisch gemessen", bad_msg="Content-/Inbox-Decision-Semantik fehlt")
 add(checks, "semantic_fixture_guard", "semantik", semantics_script, ["self_learning_semantics", "search_rejected_not_public_filters_next_run", "growth_snoozed_past_reopens", "false_positive_count"], ok_msg="semantischer Fixture-Guard vorhanden", bad_msg="semantischer Fixture-Guard unvollstaendig")
 add(checks, "self_learning_target_doc", "semantik", target_doc, ["Zentrale Entscheidungstaxonomie", "Pflicht-Fixtures", "recurrence_count", "false_positive_count", "Run Health"], ok_msg="optimaler Selbstlernprozess-Zielzustand dokumentiert", bad_msg="Selbstlernprozess-Zielzustand unvollstaendig")
 

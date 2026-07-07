@@ -12,6 +12,8 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+from content_ops_decisions import resolve_decision_class, target_effect
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = ROOT / "data" / "content-ops"
 
@@ -193,6 +195,33 @@ def add_counter_metrics(metrics: List[Metric], prefix: str, values: Dict[str, An
         metrics.append(metric(f"{prefix}.{clean_key}", safe_int(value), scope=scope, dimension_key=clean_key))
 
 
+def safe_target_effect(row: Dict[str, Any]) -> Dict[str, Any]:
+    try:
+        return target_effect(row)
+    except Exception as exc:
+        return {
+            "decision_class": "",
+            "default_effect": "decision_effect_error",
+            "task_state": "open",
+            "suppress": False,
+            "recheck": False,
+            "watch_effect": False,
+            "needs_task": False,
+            "error": str(exc),
+        }
+
+
+def decision_row_from_manual_skip_reason(reason: str) -> Dict[str, Any]:
+    base = norm(reason).split(":", 1)[0]
+    if base in {"duplicate_source_date", "duplicate_title_date_location"}:
+        return {"decision_class": "duplicate", "decision_note": reason}
+    if base.startswith("description_quality"):
+        return {"decision_class": "rejected_low_value", "decision_note": reason}
+    if base in {"missing_required", "invalid_date_format", "invalid_endDate_format"}:
+        return {"decision_class": "rejected_source_weak", "decision_note": reason}
+    return {"decision_class": "rejected_low_value", "decision_note": reason}
+
+
 def route_content_issue(item: Dict[str, Any]) -> Tuple[str, bool]:
     severity = norm(item.get("severity"))
     category = norm(item.get("process_category"))
@@ -249,6 +278,8 @@ def normalize_content_audit(report_path: Path) -> RunPayload:
     verification = report.get("verification_summary") or {}
     search_feedback_summary = report.get("search_feedback_summary") or {}
     visual_feedback_summary = report.get("visual_feedback_summary") or {}
+    decision_class_counts: Dict[str, int] = {}
+    decision_effect_counts: Dict[str, int] = {}
 
     payload = RunPayload(source_mode="content_quality_audit")
     payload.summary = {
@@ -288,6 +319,13 @@ def normalize_content_audit(report_path: Path) -> RunPayload:
         if not isinstance(item, dict):
             continue
         safe_action, user_action_required = route_content_issue(item)
+        decision_effect = safe_target_effect(item)
+        decision_class = norm(decision_effect.get("decision_class"))
+        decision_default_effect = norm(decision_effect.get("default_effect"))
+        if decision_class:
+            decision_class_counts[decision_class] = decision_class_counts.get(decision_class, 0) + 1
+        if decision_default_effect:
+            decision_effect_counts[decision_default_effect] = decision_effect_counts.get(decision_default_effect, 0) + 1
         if user_action_required:
             action_required = True
         payload.findings.append(Finding(
@@ -312,8 +350,18 @@ def normalize_content_audit(report_path: Path) -> RunPayload:
                 "suggested_url": item.get("suggested_url", ""),
                 "suggested_visual_key": item.get("suggested_visual_key", ""),
                 "visual_asset_status": item.get("visual_asset_status", ""),
+                "decision_class": decision_class,
+                "decision_default_effect": decision_default_effect,
+                "decision_task_state": decision_effect.get("task_state", ""),
+                "decision_suppress": decision_effect.get("suppress", False),
+                "decision_recheck": decision_effect.get("recheck", False),
             },
         ))
+
+    payload.summary["decision_class_counts"] = decision_class_counts
+    payload.summary["decision_effect_counts"] = decision_effect_counts
+    add_counter_metrics(payload.metrics, "content.audit.decision_class", decision_class_counts, scope="audit_decisions")
+    add_counter_metrics(payload.metrics, "content.audit.decision_effect", decision_effect_counts, scope="audit_decisions")
 
     payload.action_required = action_required
     if safe_int(counts.get("critical")) > 0:
@@ -520,7 +568,16 @@ def normalize_manual_intake(summary_path: Path) -> RunPayload:
         metric("intake.manual.reset_commit", 1 if reset_commit == "true" else 0, scope="manual_intake"),
     ])
     add_counter_metrics(payload.metrics, "intake.manual.skip_reason", skip_reasons, scope="manual_intake")
+    intake_decision_class_counts: Dict[str, int] = {}
+    intake_decision_effect_counts: Dict[str, int] = {}
     for reason, count in sorted(skip_reasons.items()):
+        decision_effect = safe_target_effect(decision_row_from_manual_skip_reason(reason))
+        decision_class = norm(decision_effect.get("decision_class"))
+        decision_default_effect = norm(decision_effect.get("default_effect"))
+        if decision_class:
+            intake_decision_class_counts[decision_class] = intake_decision_class_counts.get(decision_class, 0) + safe_int(count)
+        if decision_default_effect:
+            intake_decision_effect_counts[decision_default_effect] = intake_decision_effect_counts.get(decision_default_effect, 0) + safe_int(count)
         payload.findings.append(Finding(
             finding_type=f"manual_intake_skip:{norm(reason).split(':', 1)[0]}",
             entity_type="manual_inbox_candidate_batch",
@@ -534,6 +591,11 @@ def normalize_manual_intake(summary_path: Path) -> RunPayload:
             source_workflow=norm(os.environ.get("GITHUB_WORKFLOW")) or "Manual KI Event Intake",
             details={"count": safe_int(count), "raw_reason": reason},
         ))
+    payload.summary["decision_class_counts"] = intake_decision_class_counts
+    payload.summary["decision_effect_counts"] = intake_decision_effect_counts
+    add_counter_metrics(payload.metrics, "intake.manual.decision_class", intake_decision_class_counts, scope="manual_intake_decisions")
+    add_counter_metrics(payload.metrics, "intake.manual.decision_effect", intake_decision_effect_counts, scope="manual_intake_decisions")
+
     payload.action_required = appended > 0
     payload.status = "inbox_rows_appended" if appended > 0 else "no_rows_appended"
     return payload
