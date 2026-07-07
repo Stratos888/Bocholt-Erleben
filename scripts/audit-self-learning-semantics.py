@@ -3,75 +3,18 @@
 from __future__ import annotations
 
 import json
-import re
 import sys
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from content_ops_decisions import load_decision_contract, target_effect  # noqa: E402
+
 DECISION_PATH = ROOT / "data" / "content_ops_decision_classes.json"
 REPORT_PATH = ROOT / "data" / "self-learning-semantic-report.json"
-
-
-def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-def norm(value: Any) -> str:
-    raw = str(value or "").strip().lower()
-    raw = raw.translate(str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}))
-    raw = re.sub(r"[^a-z0-9]+", "_", raw).strip("_")
-    return raw
-
-
-def parse_day(value: Any) -> date | None:
-    raw = str(value or "").strip()[:10]
-    if not raw:
-        return None
-    try:
-        return datetime.strptime(raw, "%Y-%m-%d").date()
-    except Exception:
-        return None
-
-
-def decision_class(row: dict[str, Any], contract: dict[str, Any]) -> str:
-    classes = contract["decision_classes"]
-    aliases = contract.get("status_aliases", {})
-    explicit = norm(row.get("decision_class"))
-    if explicit in classes:
-        return explicit
-    for field in ("status", "review_status", "action_state", "decision"):
-        token = norm(row.get(field))
-        if token in aliases:
-            return aliases[token]
-    return ""
-
-
-def is_future_or_today(value: Any, today: date) -> bool:
-    parsed = parse_day(value)
-    return bool(parsed and parsed >= today)
-
-
-def target_effect(row: dict[str, Any], contract: dict[str, Any], today: date) -> dict[str, Any]:
-    cls = decision_class(row, contract)
-    meta = contract["decision_classes"].get(cls, {})
-    effect = {
-        "decision_class": cls,
-        "task_state": meta.get("task_state", "open"),
-        "default_effect": meta.get("default_effect", "manual_review"),
-        "suppress": bool(meta.get("suppresses_reopen", False)),
-        "recheck": bool(meta.get("requires_recheck", False)),
-        "watch_effect": bool(meta.get("requires_effect_watch", False)),
-        "needs_task": meta.get("task_state") == "open",
-    }
-    if cls == "snoozed":
-        effect["suppress"] = is_future_or_today(row.get("suppress_until") or row.get("recheck_at"), today)
-        effect["recheck"] = True
-    if cls == "watch":
-        effect["suppress"] = False
-        effect["needs_task"] = False
-    return effect
 
 
 def add(results: list[dict[str, Any]], check_id: str, area: str, ok: bool, message: str, details: dict[str, Any] | None = None) -> None:
@@ -90,7 +33,7 @@ def main() -> None:
         add(checks, "decision_contract_file", "taxonomy", False, "data/content_ops_decision_classes.json fehlt")
         contract = {"decision_classes": {}, "status_aliases": {}, "required_decision_fields": []}
     else:
-        contract = load_json(DECISION_PATH)
+        contract = load_decision_contract(str(DECISION_PATH))
         add(checks, "decision_contract_file", "taxonomy", True, "Entscheidungsklassen-Kontrakt vorhanden")
 
     required_classes = {
@@ -110,6 +53,11 @@ def main() -> None:
     fields = set(contract.get("required_decision_fields") or [])
     missing_fields = sorted(required_fields - fields)
     add(checks, "decision_fields_complete", "taxonomy", not missing_fields, "alle Ziel-Entscheidungsfelder vorhanden" if not missing_fields else "fehlende Entscheidungsfelder", {"missing": missing_fields})
+
+    quality_required = {"applied_count", "prevented_count", "recurrence_count", "false_positive_count", "last_seen_at", "expires_at"}
+    quality_fields = set(contract.get("rule_quality_metrics") or [])
+    missing_quality = sorted(quality_required - quality_fields)
+    add(checks, "rule_quality_metrics_complete", "rule_quality", not missing_quality, "Regel-Qualitaetsmetriken im Contract vorhanden" if not missing_quality else "Regel-Qualitaetsmetriken fehlen", {"missing": missing_quality})
 
     today = date(2026, 7, 7)
     fixtures = [
@@ -170,7 +118,7 @@ def main() -> None:
     ]
 
     for fixture in fixtures:
-        actual = target_effect(fixture["row"], contract, today)
+        actual = target_effect(fixture["row"], today=today, contract=contract)
         failures = {}
         for key, expected in fixture["expect"].items():
             if actual.get(key) != expected:
