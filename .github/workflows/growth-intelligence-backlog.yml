@@ -2,15 +2,6 @@
 name: Growth Intelligence Backlog
 
 on:
-  # Wie bei den bestehenden sichtbaren Workflows: Push registriert den Workflow in GitHub Actions.
-  push:
-    branches: ["main", "staging"]
-    paths:
-      - ".github/workflows/growth-intelligence-backlog.yml"
-      - "scripts/growth-intelligence-backlog.py"
-      - "docs/GROWTH_INTELLIGENCE_BACKLOG.md"
-      - "scripts/content-ops-http-ingest.py"
-
   # Manuell im GitHub UI startbar (Actions → Workflow → Run workflow).
   # Bewusst ohne Inputs, damit GitHub den Button genauso wie bei Deploy to STRATO anzeigt.
   # Branch-Auswahl fuer main/staging kommt automatisch von GitHub.
@@ -25,8 +16,7 @@ permissions:
 
 jobs:
   growth_intelligence_backlog:
-    # Push ist absichtlich nur ein Sichtbarkeits-/Registrierungs-Trigger, damit GitHub den neuen Workflow
-    # wie die bestehenden Workflows im Actions-Menue anzeigt. Echte Backlog-Erzeugung nur manuell oder geplant.
+    # Echte Backlog-Erzeugung nur manuell oder geplant, nicht bei technischen Staging-Testcommits.
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     runs-on: ubuntu-latest
     env:
