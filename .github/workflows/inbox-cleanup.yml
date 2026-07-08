@@ -67,6 +67,16 @@ jobs:
           set -e
           python scripts/content-ops-control.py record-inbox-cleanup
 
+      - name: Send Content Ops inbox cleanup impact to HTTP ingest
+        if: always()
+        shell: bash
+        env:
+          CONTENT_OPS_INGEST_URL: ${{ secrets.CONTENT_OPS_INGEST_URL }}
+          CONTENT_OPS_INGEST_TOKEN: ${{ secrets.CONTENT_OPS_INGEST_TOKEN }}
+        run: |
+          set -e
+          python scripts/content-ops-http-ingest.py --input data/content-ops
+
       - name: Upload inbox cleanup content ops impact
         uses: actions/upload-artifact@v4
         if: always()

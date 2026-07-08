@@ -1224,6 +1224,16 @@ jobs:
           python scripts/content-ops-control.py record-audit
       # === END BLOCK: CONTENT_OPS_RECORD_AUDIT_IMPACT_V1 ===
 
+      - name: Send Content Ops audit impact to HTTP ingest
+        if: always()
+        shell: bash
+        env:
+          CONTENT_OPS_INGEST_URL: ${{ secrets.CONTENT_OPS_INGEST_URL }}
+          CONTENT_OPS_INGEST_TOKEN: ${{ secrets.CONTENT_OPS_INGEST_TOKEN }}
+        run: |
+          set -e
+          python scripts/content-ops-http-ingest.py --input data/content-ops
+
       # === BEGIN BLOCK: CONTENT_QUALITY_UPLOAD_REPORTS_V1 | Zweck: macht Reports im Workflow nachvollziehbar; Umfang: Artefakt-Upload ohne Repo-Commit ===
       - name: Upload audit reports
         uses: actions/upload-artifact@v4
