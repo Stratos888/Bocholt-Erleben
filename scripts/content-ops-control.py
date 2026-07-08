@@ -223,6 +223,58 @@ def decision_row_from_manual_skip_reason(reason: str) -> Dict[str, Any]:
     return {"decision_class": "rejected_low_value", "decision_note": reason}
 
 
+def decision_row_from_content_issue(item: Dict[str, Any], safe_action: str, user_action_required: bool) -> Dict[str, Any]:
+    if norm(item.get("decision_class")):
+        return item
+
+    row = dict(item)
+    severity = norm(row.get("severity"))
+    category = norm(row.get("process_category"))
+    route = norm(row.get("action_route")) or norm(safe_action)
+    policy = norm(row.get("automation_policy"))
+    issue_code = norm(row.get("issue_code"))
+    correction_owner = norm(row.get("correction_owner"))
+    workbench_group = norm(row.get("workbench_group"))
+
+    visual_signal = (
+        route in {"visual_workflow", "write_visual_feedback_or_backlog_signal"}
+        or category.startswith("visual_")
+        or issue_code.startswith("event_visual")
+        or issue_code.startswith("activity_visual")
+        or bool(norm(row.get("visual_asset_status")))
+    )
+
+    source_signal = (
+        route in {"ai_factcheck_candidate", "queue_ai_factcheck_candidate"}
+        or category == "ai_verification_candidate"
+        or correction_owner in {"source", "quelle", "evidence"}
+        or workbench_group in {"source", "quelle", "evidence"}
+        or "source" in issue_code
+        or "quelle" in issue_code
+        or "evidence" in issue_code
+        or "verification" in issue_code
+    )
+
+    if severity == "auto_fixed" or norm(row.get("auto_fix_done")) == "true" or route in {"auto_fixed", "suppress_auto_resolved"}:
+        decision_class = "done"
+    elif visual_signal:
+        decision_class = "needs_visual_fix"
+    elif source_signal:
+        decision_class = "needs_source"
+    elif route in {"manual_warning", "neutral_observed", "guarded_by_runtime", "observe_non_manual", "suppress_runtime_guarded", "suppress_neutral_observation"}:
+        decision_class = "watch"
+    elif route in {"manual_action_required", "create_content_review_task"} or user_action_required:
+        decision_class = "needs_patch"
+    elif policy.startswith("guarded_by_runtime"):
+        decision_class = "watch"
+    else:
+        decision_class = "watch"
+
+    row["decision_class"] = decision_class
+    row["decision_note"] = f"content_audit_inferred:{route or safe_action or category or issue_code}"
+    return row
+
+
 def route_content_issue(item: Dict[str, Any]) -> Tuple[str, bool]:
     severity = norm(item.get("severity"))
     category = norm(item.get("process_category"))
@@ -323,7 +375,9 @@ def normalize_content_audit(report_path: Path) -> RunPayload:
         if not isinstance(item, dict):
             continue
         safe_action, user_action_required = route_content_issue(item)
-        decision_effect = safe_target_effect(item)
+        decision_row = decision_row_from_content_issue(item, safe_action, user_action_required)
+        decision_inferred = not norm(item.get("decision_class")) and bool(norm(decision_row.get("decision_class")))
+        decision_effect = safe_target_effect(decision_row)
         decision_class = norm(decision_effect.get("decision_class"))
         decision_default_effect = norm(decision_effect.get("default_effect"))
         if decision_class:
@@ -380,6 +434,8 @@ def normalize_content_audit(report_path: Path) -> RunPayload:
                 "decision_task_state": decision_effect.get("task_state", ""),
                 "decision_suppress": decision_effect.get("suppress", False),
                 "decision_recheck": decision_effect.get("recheck", False),
+                "decision_inferred": decision_inferred,
+                "decision_note": decision_row.get("decision_note", ""),
                 "visual_problem_type": visual_effect.get("problem_type", ""),
                 "visual_followup_route": visual_effect.get("followup_route", ""),
                 "visual_default_effect": visual_effect.get("default_effect", ""),
@@ -397,6 +453,18 @@ def normalize_content_audit(report_path: Path) -> RunPayload:
     add_counter_metrics(payload.metrics, "content.audit.visual_problem", visual_problem_counts, scope="visual_feedback")
     add_counter_metrics(payload.metrics, "content.audit.visual_followup", visual_followup_counts, scope="visual_feedback")
     add_counter_metrics(payload.metrics, "content.audit.visual_decision_class", visual_decision_class_counts, scope="visual_feedback")
+
+    for decision_class_key, count in sorted(decision_class_counts.items()):
+        payload.rule_effects.append(RuleEffect(
+            rule_key=f"content_audit_decision:{decision_class_key}",
+            rule_type="content_audit_decision",
+            rule_class=decision_class_key,
+            applied_count=count,
+            details={
+                "effect_counts": decision_effect_counts,
+                "visual_decision_class_counts": visual_decision_class_counts,
+            },
+        ))
 
     for route, count in sorted(visual_followup_counts.items()):
         payload.rule_effects.append(RuleEffect(

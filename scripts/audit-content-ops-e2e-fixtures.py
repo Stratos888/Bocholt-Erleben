@@ -150,6 +150,26 @@ def main() -> None:
                 "visual_asset_status": "ready",
                 "recommended_action": "Resolver-Regel pruefen",
             },
+            {
+                "issue_code": "event_source_fact_evidence",
+                "content_type": "event",
+                "content_id": "fixture-event-3",
+                "title": "Fixture Event Quellenprüfung",
+                "severity": "warning",
+                "process_category": "ai_verification_candidate",
+                "action_route": "ai_factcheck_candidate",
+                "recommended_action": "Quelle prüfen",
+            },
+            {
+                "issue_code": "activity_runtime_guarded",
+                "content_type": "activity",
+                "content_id": "fixture-activity-1",
+                "title": "Fixture Activity Laufzeitgeschützt",
+                "severity": "warning",
+                "process_category": "activity_condition_runtime_guarded",
+                "action_route": "guarded_by_runtime",
+                "recommended_action": "Beobachten",
+            },
         ],
     }
     content_path = TMP / "content-quality-report.json"
@@ -160,6 +180,10 @@ def main() -> None:
     add(checks, "content_action_required", "content", bool(content_payload.action_required), "kritisches Content-Issue erzeugt action_required")
     add(checks, "content_decision_metric_needs_patch", "content", has_metric(content_payload, "content.audit.decision_class.needs_patch", "needs_patch", 1), "needs_patch wird als Content-Decision-Metrik gezaehlt")
     add(checks, "content_decision_metric_needs_visual_fix", "content", has_metric(content_payload, "content.audit.decision_class.needs_visual_fix", "needs_visual_fix", 1), "needs_visual_fix wird als Content-Decision-Metrik gezaehlt")
+    add(checks, "content_fallback_metric_needs_source", "content", has_metric(content_payload, "content.audit.decision_class.needs_source", "needs_source", 1), "Content-Audit-Fallback klassifiziert Quellenpruefung als needs_source")
+    add(checks, "content_fallback_metric_watch", "content", has_metric(content_payload, "content.audit.decision_class.watch", "watch", 1), "Content-Audit-Fallback klassifiziert Runtime-Guard als watch")
+    add(checks, "content_fallback_finding_details", "content", has_finding(content_payload, finding_type="event_source_fact_evidence", detail_key="decision_inferred", detail_value=True), "inferierte Content-decision_class wird im Finding markiert")
+    add(checks, "content_decision_rule_effect", "content", has_rule_effect(content_payload, rule_key="content_audit_decision:needs_source", rule_type="content_audit_decision", rule_class="needs_source", applied=1), "Content-Audit-Decision erzeugt RuleEffect")
     add(checks, "visual_problem_metric", "visual", has_metric(content_payload, "content.audit.visual_problem.visual_key_wrong", "visual_key_wrong", 1), "Visual-Key-Problem wird gemessen")
     add(checks, "visual_followup_metric", "visual", has_metric(content_payload, "content.audit.visual_followup.resolver_rule_review", "resolver_rule_review", 1), "Visual-Folgeaktion resolver_rule_review wird gemessen")
     add(checks, "visual_rule_effect", "visual", has_rule_effect(content_payload, rule_key="visual_feedback:resolver_rule_review", rule_type="visual_feedback", rule_class="resolver_rule_review", applied=1), "Visual-Feedback erzeugt RuleEffect")
