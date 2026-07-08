@@ -14,7 +14,11 @@
       "required": true,
       "warn_after_hours": 192,
       "stale_after_hours": 240,
-      "expected_cadence": "weekly"
+      "expected_cadence": "weekly",
+      "required_environments": [
+        "staging",
+        "live"
+      ]
     },
     {
       "source_mode": "weekly_ki_websearch",
@@ -22,7 +26,10 @@
       "required": true,
       "warn_after_hours": 192,
       "stale_after_hours": 240,
-      "expected_cadence": "weekly"
+      "expected_cadence": "weekly",
+      "required_environments": [
+        "live"
+      ]
     },
     {
       "source_mode": "growth_intelligence",
@@ -30,7 +37,11 @@
       "required": true,
       "warn_after_hours": 192,
       "stale_after_hours": 240,
-      "expected_cadence": "weekly"
+      "expected_cadence": "weekly",
+      "required_environments": [
+        "staging",
+        "live"
+      ]
     },
     {
       "source_mode": "inbox_cleanup",
@@ -38,7 +49,11 @@
       "required": true,
       "warn_after_hours": 192,
       "stale_after_hours": 240,
-      "expected_cadence": "weekly"
+      "expected_cadence": "weekly",
+      "required_environments": [
+        "staging",
+        "live"
+      ]
     },
     {
       "source_mode": "manual_ki_intake",
@@ -46,7 +61,8 @@
       "required": false,
       "warn_after_hours": 336,
       "stale_after_hours": 720,
-      "expected_cadence": "event_driven"
+      "expected_cadence": "event_driven",
+      "required_environments": []
     }
   ]
 }

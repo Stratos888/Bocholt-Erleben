@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -41,9 +42,16 @@ def age_hours(value: Any, now: datetime) -> float | None:
     return round(max(0.0, (now - parsed).total_seconds() / 3600.0), 2)
 
 
-def classify(target: dict[str, Any], payload: dict[str, Any] | None, now: datetime) -> dict[str, Any]:
+def target_required(target: dict[str, Any], environment: str) -> bool:
+    required_environments = target.get("required_environments")
+    if isinstance(required_environments, list):
+        return environment in {str(item).strip() for item in required_environments}
+    return bool(target.get("required"))
+
+
+def classify(target: dict[str, Any], payload: dict[str, Any] | None, now: datetime, environment: str) -> dict[str, Any]:
     source = str(target.get("source_mode") or "").strip()
-    required = bool(target.get("required"))
+    required = target_required(target, environment)
     warn_after = float(target.get("warn_after_hours") or 0)
     stale_after = float(target.get("stale_after_hours") or 0)
 
@@ -55,6 +63,8 @@ def classify(target: dict[str, Any], payload: dict[str, Any] | None, now: dateti
             "severity": "error" if required else "info",
             "action_required": required,
             "age_hours": None,
+            "required": required,
+            "required_environments": target.get("required_environments", []),
             "warn_after_hours": warn_after,
             "stale_after_hours": stale_after,
             "message": "Pflichtlauf fehlt." if required else "Optionaler ereignisgetriebener Lauf wurde lokal nicht beobachtet.",
@@ -71,6 +81,8 @@ def classify(target: dict[str, Any], payload: dict[str, Any] | None, now: dateti
             "severity": "error" if required else "warning",
             "action_required": required,
             "age_hours": None,
+            "required": required,
+            "required_environments": target.get("required_environments", []),
             "generated_at_utc": generated,
             "run_status": run_status,
             "message": "Run-Artefakt hat keinen gueltigen Zeitstempel.",
@@ -96,6 +108,8 @@ def classify(target: dict[str, Any], payload: dict[str, Any] | None, now: dateti
     return {
         "source_mode": source,
         "label": target.get("label") or source,
+        "required": required,
+        "required_environments": target.get("required_environments", []),
         "status": health,
         "severity": severity,
         "action_required": action,
@@ -112,6 +126,7 @@ def classify(target: dict[str, Any], payload: dict[str, Any] | None, now: dateti
 def main() -> None:
     parser = argparse.ArgumentParser(description="Bocholt erleben Content-Ops Run-Health Audit")
     parser.add_argument("--input-dir", default=str(DEFAULT_INPUT_DIR.relative_to(ROOT)))
+    parser.add_argument("--environment", default=os.environ.get("BE_ENVIRONMENT") or os.environ.get("GITHUB_REF_NAME") or "staging")
     parser.add_argument("--strict", action="store_true", help="Exit nonzero bei runtime health errors.")
     args = parser.parse_args()
 
@@ -164,7 +179,8 @@ def main() -> None:
                 payload_by_source[source] = payload
 
     now = datetime.now(timezone.utc)
-    health_items = [classify(item, payload_by_source.get(str(item.get("source_mode") or "")), now) for item in targets if isinstance(item, dict)]
+    environment = str(args.environment or "staging").strip() or "staging"
+    health_items = [classify(item, payload_by_source.get(str(item.get("source_mode") or "")), now, environment) for item in targets if isinstance(item, dict)]
 
     errors = [item for item in health_items if item.get("severity") == "error"]
     warnings = [item for item in health_items if item.get("severity") == "warning"]
@@ -174,6 +190,7 @@ def main() -> None:
     report = {
         "status": status,
         "generated_at_utc": now.isoformat().replace("+00:00", "Z"),
+        "environment": environment,
         "observed_artifacts": len(payload_by_source),
         "summary": {
             "checks_total": len(checks),

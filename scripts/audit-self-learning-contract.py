@@ -130,8 +130,10 @@ add(checks, "content_inbox_decision_semantics", "semantik", control, ["content.a
 add(checks, "semantic_fixture_guard", "semantik", semantics_script, ["self_learning_semantics", "search_rejected_not_public_filters_next_run", "growth_snoozed_past_reopens", "false_positive_count"], ok_msg="semantischer Fixture-Guard vorhanden", bad_msg="semantischer Fixture-Guard unvollstaendig")
 add(checks, "self_learning_target_doc", "semantik", target_doc, ["Zentrale Entscheidungstaxonomie", "Pflicht-Fixtures", "recurrence_count", "false_positive_count", "Run Health"], ok_msg="optimaler Selbstlernprozess-Zielzustand dokumentiert", bad_msg="Selbstlernprozess-Zielzustand unvollstaendig")
 add(checks, "run_health_targets_check", "run_health", run_health_targets, ["content_quality_audit", "weekly_ki_websearch", "growth_intelligence", "warn_after_hours", "stale_after_hours"], ok_msg="Run-Health-Ziele vorhanden", bad_msg="Run-Health-Ziele unvollstaendig")
+add(checks, "run_health_environment_required", "run_health", run_health_targets, ["required_environments", "staging", "live"], ok_msg="Run-Health-Pflichtlaeufe sind je Umgebung steuerbar", bad_msg="Run-Health-Umgebungslogik fehlt")
 add(checks, "run_health_audit_check", "run_health", run_health_script, ["content_ops_run_health", "missing_required", "stale", "warn_after_hours", "content_ops_run_health_targets.json"], ok_msg="Run-Health-Audit vorhanden", bad_msg="Run-Health-Audit unvollstaendig")
 add(checks, "run_health_api_check", "run_health", run_health_api, ["be_require_review_access", "content_ops_run", "warn_after_hours", "stale_after_hours", "action_required"], ok_msg="Run-Health-API vorhanden", bad_msg="Run-Health-API unvollstaendig")
+add(checks, "run_health_api_environment_required", "run_health", run_health_api, ["coh_target_required", "required_environments"], ok_msg="Run-Health-API wertet Pflichtlaeufe je Umgebung aus", bad_msg="Run-Health-API-Umgebungslogik fehlt")
 
 fails = [c for c in checks if c["status"] == "fail"]
 warns = [c for c in checks if c["status"] == "warn"]

@@ -52,10 +52,18 @@ function coh_age_hours(?string $generatedAt): ?float {
     }
 }
 
-function coh_classify(array $target, ?array $run): array {
+function coh_target_required(array $target, string $environment): bool {
+    $requiredEnvironments = $target['required_environments'] ?? null;
+    if (is_array($requiredEnvironments)) {
+        return in_array($environment, array_map('strval', $requiredEnvironments), true);
+    }
+    return (bool)($target['required'] ?? false);
+}
+
+function coh_classify(array $target, ?array $run, string $environment): array {
     $sourceMode = coh_key((string)($target['source_mode'] ?? ''), 80);
     $label = trim((string)($target['label'] ?? $sourceMode));
-    $required = (bool)($target['required'] ?? false);
+    $required = coh_target_required($target, $environment);
     $warnAfter = (float)($target['warn_after_hours'] ?? 0);
     $staleAfter = (float)($target['stale_after_hours'] ?? 0);
 
@@ -67,6 +75,8 @@ function coh_classify(array $target, ?array $run): array {
             'severity' => $required ? 'error' : 'info',
             'action_required' => $required,
             'age_hours' => null,
+            'required' => $required,
+            'required_environments' => is_array($target['required_environments'] ?? null) ? $target['required_environments'] : [],
             'warn_after_hours' => $warnAfter,
             'stale_after_hours' => $staleAfter,
             'message' => $required ? 'Pflichtlauf fehlt.' : 'Optionaler ereignisgetriebener Lauf nicht beobachtet.',
@@ -102,6 +112,8 @@ function coh_classify(array $target, ?array $run): array {
     return [
         'source_mode' => $sourceMode,
         'label' => $label,
+        'required' => $required,
+        'required_environments' => is_array($target['required_environments'] ?? null) ? $target['required_environments'] : [],
         'status' => $status,
         'severity' => $severity,
         'action_required' => $actionRequired,
@@ -130,7 +142,7 @@ try {
         if ($sourceMode === '') {
             continue;
         }
-        $items[] = coh_classify($target, coh_latest_run($pdo, $environment, $sourceMode));
+        $items[] = coh_classify($target, coh_latest_run($pdo, $environment, $sourceMode), $environment);
     }
 
     $errors = array_values(array_filter($items, fn($item) => ($item['severity'] ?? '') === 'error'));
