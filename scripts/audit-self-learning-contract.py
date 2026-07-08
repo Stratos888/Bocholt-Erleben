@@ -69,6 +69,7 @@ manual_wf = ".github/workflows/manual-ki-intake.yml"
 cleanup_wf = ".github/workflows/inbox-cleanup.yml"
 growth_wf = ".github/workflows/growth-intelligence-backlog.yml"
 ingest_wf = ".github/workflows/content-ops-http-ingest.yml"
+bootstrap = "api/_bootstrap.php"
 growth_script = "scripts/growth-intelligence-backlog.py"
 helper_script = "scripts/content_ops_decisions.py"
 semantics_script = "scripts/audit-self-learning-semantics.py"
@@ -98,6 +99,7 @@ for key, (rel, cmd) in action_modes.items():
     add(checks, f"workflow:{key}", "roboteranschluss", rel, [cmd, "data/content-ops/*.json"], ok_msg="Roboter schreibt Content-Ops-Artefakte", bad_msg="Roboter nicht vollstaendig angeschlossen")
 
 add(checks, "http_ingest", "persistenz", ingest_wf, ["Content Quality Audit", "Inbox Cleanup (Archive)", "Growth Intelligence Backlog", "Weekly KI Websearch", "Manual KI Event Intake", "gh run download", "scripts/content-ops-http-ingest.py"], ok_msg="Folge-Ingest deckt die Content-Ops-Roboter ab", bad_msg="HTTP-Ingest unvollstaendig")
+add(checks, "local_config_overlay", "persistenz", bootstrap, ["_config.local.php", "be_merge_config", "Private local app config"], ok_msg="lokale Server-Config kann Deploy-Config sicher ergaenzen", bad_msg="lokales Config-Overlay fehlt")
 add(checks, "content_quality_http_ingest", "persistenz", content_wf, ["Send Content Ops audit impact to HTTP ingest", "CONTENT_OPS_INGEST_URL", "CONTENT_OPS_INGEST_TOKEN", "scripts/content-ops-http-ingest.py --input data/content-ops"], ok_msg="Content Quality sendet Content-Ops-Artefakte per HTTP-Ingest", bad_msg="Content Quality HTTP-Ingest fehlt")
 add(checks, "inbox_cleanup_http_ingest", "persistenz", cleanup_wf, ["Send Content Ops inbox cleanup impact to HTTP ingest", "CONTENT_OPS_INGEST_URL", "CONTENT_OPS_INGEST_TOKEN", "scripts/content-ops-http-ingest.py --input data/content-ops"], ok_msg="Inbox Cleanup sendet Content-Ops-Artefakte per HTTP-Ingest", bad_msg="Inbox Cleanup HTTP-Ingest fehlt")
 
