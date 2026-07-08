@@ -974,6 +974,7 @@ jobs:
 
       # === BEGIN BLOCK: STRATO_UPLOAD_V6 | Zweck: main schützt staging vor --delete; staging deployt in staging; Scope: nur Upload-Step, mit einer einzigen stabilen lftp-Session ===
       - name: Upload to STRATO via SFTP
+        timeout-minutes: 12
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
