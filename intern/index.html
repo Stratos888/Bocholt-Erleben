@@ -177,7 +177,7 @@
       font-size:23px;
       letter-spacing:-.035em;
     }
-    .task, .inbox-card {
+    .task, .case-card {
       display:grid;
       gap:10px;
     }
@@ -250,13 +250,13 @@
     }
     .filter-row { margin:0 0 12px; }
     .filter-row .mini-btn.active { background:var(--primary-muted); color:#2E5B19; }
-    .inbox-title {
+    .case-title {
       margin:0;
       font-size:17px;
       font-weight:950;
       letter-spacing:-.025em;
     }
-    .inbox-meta {
+    .case-meta {
       color:var(--muted);
       font-weight:750;
       font-size:13px;
@@ -409,189 +409,115 @@
 
   <script>
     const API_URL = new URL("../api/content-ops-dashboard.php?env=staging", window.location.href).toString();
-    const INBOX_URL = new URL("../api/content-ops-inbox.php", window.location.href).toString();
+    const CASES_URL = new URL("../api/content-ops-cases.php?env=staging", window.location.href).toString();
     const storageKey = "beReviewPassword";
     const $ = (id) => document.getElementById(id);
     let dashboard = null;
-    let inbox = { counts: { open_total: 0 }, items: [] };
+    let cases = { counts: { open_total: 0, inbox: 0, content_audit: 0 }, items: [] };
     let taskMode = "overview";
-    let inboxFilter = "active";
+    let caseFilter = "active";
 
     function showLoginError(message) {
       $("loginError").textContent = message || "Dashboard konnte nicht geladen werden.";
       $("loginError").hidden = false;
     }
-
     function setLoginBusy(isBusy) {
       const button = $("loginButton");
       if (!button) return;
       button.disabled = isBusy;
       button.textContent = isBusy ? "Dashboard wird geladen …" : "Dashboard öffnen";
     }
-
     function esc(value) {
-      return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[ch]));
+      return String(value ?? "").replace(/[&<>"']/g, (ch) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));
     }
-
     async function fetchJson(url, password) {
-      const res = await fetch(url, {
-        headers: { "X-BE-Review-Password": password, "Accept": "application/json" },
-        cache: "no-store"
-      });
+      const res = await fetch(url, { headers: { "X-BE-Review-Password": password, "Accept": "application/json" }, cache: "no-store" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || ("HTTP " + res.status));
       return data;
     }
-
     async function loadDashboard(password) {
       if (!password) throw new Error("Bitte Review-Passwort eingeben.");
       const data = await fetchJson(API_URL, password);
       dashboard = data;
-      try { inbox = await fetchJson(INBOX_URL, password); }
-      catch (error) { inbox = { status: "error", message: error.message, counts: { open_total: 0 }, items: [] }; }
+      try { cases = await fetchJson(CASES_URL, password); }
+      catch (error) { cases = { status: "error", message: error.message, counts: { open_total: 0, inbox: 0, content_audit: 0 }, items: [] }; }
       try { localStorage.setItem(storageKey, password); } catch (e) {}
       $("login").hidden = true;
       $("app").hidden = false;
       $("nav").hidden = false;
       render();
     }
-
     function stateDot(state) {
       if (state === "blocked") return "dot blocked";
       if (state === "warning") return "dot warning";
       return "dot";
     }
-
-    function render() {
-      renderToday();
-      renderTasks();
-      renderQuality();
-      renderGrowth();
-      renderSystem();
-    }
+    function render() { renderToday(); renderTasks(); renderQuality(); renderGrowth(); renderSystem(); }
 
     function renderToday() {
       const o = dashboard.overall;
-      const inboxOpen = Number(inbox?.counts?.open_total || 0);
-      const nextAction = inboxOpen > 0 ? "Inbox-Elemente prüfen" : o.next_action;
-      $("todayHero").innerHTML = `
-        <div class="hero">
-          <div class="state"><span class="${stateDot(o.state)}"></span>${esc(o.headline)}</div>
-          <h2>${esc(o.attention_with_watch_count)} Punkte im Blick</h2>
-          <p>${esc(o.explanation)}</p>
-          <div class="next"><strong>Nächste sinnvolle Aktion</strong><p>${esc(nextAction)}</p></div>
-        </div>
-      `;
+      const openCases = Number(cases?.counts?.open_total || 0);
+      const inboxOpen = Number(cases?.counts?.inbox || 0);
+      const nextAction = inboxOpen > 0 ? "Inbox-Elemente prüfen" : (openCases > 0 ? "Prüffälle ansehen" : o.next_action);
+      $("todayHero").innerHTML = `<div class="hero"><div class="state"><span class="${stateDot(o.state)}"></span>${esc(o.headline)}</div><h2>${esc(o.attention_with_watch_count)} Punkte im Blick</h2><p>${esc(o.explanation)}</p><div class="next"><strong>Nächste sinnvolle Aktion</strong><p>${esc(nextAction)}</p></div></div>`;
       const t = dashboard.today;
-      $("todayCards").innerHTML = `
-        <div class="split">
-          <div class="metric"><small>Inbox offen</small><strong>${esc(inboxOpen)}</strong></div>
-          <div class="metric"><small>Prüfen</small><strong>${esc(o.attention_count)}</strong></div>
-          <div class="metric"><small>Beobachten</small><strong>${esc(t.watch)}</strong></div>
-          <div class="metric"><small>Qualität</small><strong>${t.quality_clear_percent ?? "–"}%</strong></div>
-        </div>
-        <div class="card"><div class="card-head"><div><h3>Content-Qualität</h3><p>${esc(dashboard.quality.evaluation)}</p></div><div class="num">${t.quality_clear_percent ?? "–"}%</div></div><span class="badge">unkritisch / erledigt</span></div>
-        <div class="card"><h3>Zeiträume</h3><p>Heute, 7 Tage, 28 Tage, seit Referenzpunkt, seit Launch und später 6 Monate.</p><span class="badge warn">Referenzpunkt ${esc(dashboard.baseline_date)}</span></div>
-      `;
+      $("todayCards").innerHTML = `<div class="split"><div class="metric"><small>Fälle offen</small><strong>${esc(openCases)}</strong></div><div class="metric"><small>Inbox</small><strong>${esc(inboxOpen)}</strong></div><div class="metric"><small>Beobachten</small><strong>${esc(t.watch)}</strong></div><div class="metric"><small>Qualität</small><strong>${t.quality_clear_percent ?? "–"}%</strong></div></div><div class="card"><div class="card-head"><div><h3>Content-Qualität</h3><p>${esc(dashboard.quality.evaluation)}</p></div><div class="num">${t.quality_clear_percent ?? "–"}%</div></div><span class="badge">unkritisch / erledigt</span></div><div class="card"><h3>Zeiträume</h3><p>Heute, 7 Tage, 28 Tage, seit Referenzpunkt, seit Launch und später 6 Monate.</p><span class="badge warn">Referenzpunkt ${esc(dashboard.baseline_date)}</span></div>`;
     }
 
     function dashboardTasks() {
       const tasks = [...(dashboard.tasks || [])];
-      const inboxOpen = Number(inbox?.counts?.open_total || 0);
-      if (inboxOpen > 0) {
-        tasks.unshift({ id:"inbox_open_items", title:"Inbox-Elemente prüfen", count:inboxOpen, area:"Inbox", priority:"hoch", why:"Hier warten konkrete Einzelentscheidungen. Diese Fälle sind wichtiger als reine Sammelkennzahlen.", next_action:"Inbox im Dashboard öffnen und Fälle einzeln prüfen.", ai_useful:false });
-      }
-      if (inbox?.status === "error") {
-        tasks.unshift({ id:"inbox_load_error", title:"Inbox lädt nicht", count:1, area:"System", priority:"hoch", why:"Die zentrale Bearbeitungsebene ist nicht verfügbar.", next_action:"Inbox-API prüfen.", ai_useful:true });
-      }
+      const inboxOpen = Number(cases?.counts?.inbox || 0);
+      const openCases = Number(cases?.counts?.open_total || 0);
+      if (openCases > 0 && inboxOpen === 0) tasks.unshift({ id:"case_open_items", title:"Prüffälle ansehen", count:openCases, area:"Fälle", priority:"hoch", why:"Es gibt konkrete Einzelfälle aus Content-Prüfung, Quellen-, Bild- oder Beobachtungslogik.", next_action:"Fälle öffnen und die wichtigsten Einzelfälle prüfen.", ai_useful:true });
+      if (inboxOpen > 0) tasks.unshift({ id:"inbox_open_items", title:"Inbox-Elemente prüfen", count:inboxOpen, area:"Inbox", priority:"hoch", why:"Hier warten konkrete Einzelentscheidungen. Diese Fälle sind wichtiger als reine Sammelkennzahlen.", next_action:"Fälle öffnen und Inbox-Einträge einzeln prüfen.", ai_useful:false });
+      if (cases?.status === "error") tasks.unshift({ id:"cases_load_error", title:"Fälle laden nicht", count:1, area:"System", priority:"hoch", why:"Die zentrale Bearbeitungsebene ist nicht verfügbar.", next_action:"Fälle-API prüfen.", ai_useful:true });
       return tasks;
     }
-
     function renderTasks() {
       const tasks = dashboardTasks();
-      $("tasksList").innerHTML = `
-        <div class="segment"><button type="button" class="${taskMode === "overview" ? "active" : ""}" data-task-mode="overview">Überblick</button><button type="button" class="${taskMode === "inbox" ? "active" : ""}" data-task-mode="inbox">Inbox</button></div>
-        <div id="taskOverview" ${taskMode === "overview" ? "" : "hidden"}>${renderTaskOverview(tasks)}</div>
-        <div id="taskInbox" ${taskMode === "inbox" ? "" : "hidden"}>${renderInbox()}</div>
-      `;
+      $("tasksList").innerHTML = `<div class="segment"><button type="button" class="${taskMode === "overview" ? "active" : ""}" data-task-mode="overview">Überblick</button><button type="button" class="${taskMode === "cases" ? "active" : ""}" data-task-mode="cases">Fälle</button></div><div id="taskOverview" ${taskMode === "overview" ? "" : "hidden"}>${renderTaskOverview(tasks)}</div><div id="taskCases" ${taskMode === "cases" ? "" : "hidden"}>${renderCases()}</div>`;
     }
-
     function renderTaskOverview(tasks) {
       if (!tasks.length) return `<div class="empty">Keine manuelle Aufgabe aus den letzten Läufen.</div>`;
-      return `<div class="grid">${tasks.map(task => `
-        <article class="card task"><div class="task-top"><div><div class="task-title">${esc(task.title)}</div><div class="task-meta"><span class="tag">${esc(task.area)}</span><span class="tag">Priorität: ${esc(task.priority)}</span>${task.ai_useful ? `<span class="tag">KI sinnvoll</span>` : ``}</div></div><div class="task-count">${esc(task.count)}</div></div><p><strong>Warum?</strong> ${esc(task.why)}</p><p><strong>Nächster Schritt:</strong> ${esc(task.next_action)}</p>${task.id === "inbox_open_items" ? `<div class="action-row"><button type="button" class="mini-btn primary" data-task-mode="inbox">Inbox anzeigen</button></div>` : ``}</article>
-      `).join("")}</div>`;
+      return `<div class="grid">${tasks.map(task => `<article class="card task"><div class="task-top"><div><div class="task-title">${esc(task.title)}</div><div class="task-meta"><span class="tag">${esc(task.area)}</span><span class="tag">Priorität: ${esc(task.priority)}</span>${task.ai_useful ? `<span class="tag">KI sinnvoll</span>` : ``}</div></div><div class="task-count">${esc(task.count)}</div></div><p><strong>Warum?</strong> ${esc(task.why)}</p><p><strong>Nächster Schritt:</strong> ${esc(task.next_action)}</p>${task.id === "inbox_open_items" || task.id === "case_open_items" ? `<div class="action-row"><button type="button" class="mini-btn primary" data-task-mode="cases">Fälle anzeigen</button></div>` : ``}</article>`).join("")}</div>`;
     }
-
-    function inboxItemsForFilter() {
-      const items = inbox?.items || [];
-      if (inboxFilter === "all") return items;
-      if (inboxFilter === "active") return items.filter(item => item.is_open && item.bucket !== "later");
-      return items.filter(item => item.bucket === inboxFilter);
+    function casesForFilter() {
+      const items = cases?.items || [];
+      if (caseFilter === "all") return items;
+      if (caseFilter === "active") return items.filter(item => item.is_open && item.bucket !== "later");
+      if (caseFilter === "inbox") return items.filter(item => item.origin === "inbox");
+      if (caseFilter === "audit") return items.filter(item => item.origin === "content_audit");
+      return items.filter(item => item.bucket === caseFilter);
     }
-
-    function renderInbox() {
-      const counts = inbox?.counts || {};
-      const filters = [["active","Offen",counts.open_total||0],["source","Quellen",counts.source||0],["visual","Bilder",counts.visual||0],["ki","KI",counts.ki||0],["later","Später",counts.later||0],["done","Erledigt",counts.done||0],["all","Alle",counts.total||0]];
-      const items = inboxItemsForFilter();
-      return `<div class="card"><h3>Inbox bearbeiten</h3><p>Konkrete Einzelfälle bleiben im Dashboard. Schreibaktionen werden erst angebunden, wenn die bestehende Inbox-Entscheidungslogik sicher übernommen ist.</p><span class="badge">${esc(counts.open_total || 0)} offen</span></div><div class="filter-row">${filters.map(([key,label,count]) => `<button type="button" class="mini-btn ${inboxFilter === key ? "active" : ""}" data-inbox-filter="${esc(key)}">${esc(label)} ${esc(count)}</button>`).join("")}</div><div class="grid">${items.length ? items.map(renderInboxCard).join("") : `<div class="empty">Keine Inbox-Elemente in diesem Filter.</div>`}</div>`;
+    function renderCases() {
+      const counts = cases?.counts || {};
+      const filters = [["active","Offen",counts.open_total||0],["inbox","Inbox",counts.inbox||0],["audit","Prüfung",counts.content_audit||0],["content","Inhalte",counts.content||0],["source","Quellen",counts.source||0],["visual","Bilder",counts.visual||0],["ki","KI",counts.ki||0],["watch","Beobachten",counts.watch||0],["done","Erledigt",counts.done||0],["all","Alle",counts.total||0]];
+      const items = casesForFilter();
+      return `<div class="card"><h3>Fälle prüfen</h3><p>Hier stehen Inbox-Einträge und konkrete Prüffälle aus Content-Qualität, Quellen, Bildern und Beobachtung an einer Stelle.</p><span class="badge">${esc(counts.open_total || 0)} offen</span></div><div class="filter-row">${filters.map(([key,label,count]) => `<button type="button" class="mini-btn ${caseFilter === key ? "active" : ""}" data-case-filter="${esc(key)}">${esc(label)} ${esc(count)}</button>`).join("")}</div><div class="grid">${items.length ? items.map(renderCaseCard).join("") : `<div class="empty">Keine Fälle in diesem Filter.</div>`}</div>`;
     }
-
-    function renderInboxCard(item) {
-      const meta = [item.date, item.time, item.location || item.city, item.category].filter(Boolean).join(" · ");
-      return `<article class="card inbox-card"><div class="task-top"><div><h3 class="inbox-title">${esc(item.title)}</h3>${meta ? `<div class="inbox-meta">${esc(meta)}</div>` : ``}<div class="task-meta"><span class="tag">${esc(item.status || item.bucket)}</span><span class="tag">${esc(item.why)}</span></div></div>${item.row_number ? `<div class="task-count">#${esc(item.row_number)}</div>` : ``}</div>${item.description ? `<p>${esc(item.description)}</p>` : ``}${item.notes ? `<p><strong>Notiz:</strong> ${esc(item.notes)}</p>` : ``}${item.visual_key || item.visual_asset_status ? `<p><strong>Visual:</strong> ${esc([item.visual_key, item.visual_asset_status].filter(Boolean).join(" · "))}</p>` : ``}<p><strong>Nächster Schritt:</strong> ${esc(item.next_action)}</p><div class="action-row">${item.source_url ? `<a class="mini-btn primary" href="${esc(item.source_url)}" target="_blank" rel="noopener noreferrer">Quelle öffnen</a>` : ``}<button type="button" class="mini-btn" data-task-mode="overview">Zur Übersicht</button></div></article>`;
+    function renderCaseCard(item) {
+      return `<article class="card case-card"><div class="task-top"><div><h3 class="case-title">${esc(item.title)}</h3>${item.meta ? `<div class="case-meta">${esc(item.meta)}</div>` : ``}<div class="task-meta"><span class="tag">${esc(item.origin === "inbox" ? "Inbox" : "Content-Prüfung")}</span><span class="tag">${esc(item.status || item.bucket)}</span><span class="tag">${esc(item.why)}</span></div></div>${item.row_number ? `<div class="task-count">#${esc(item.row_number)}</div>` : ``}</div>${item.description ? `<p>${esc(item.description)}</p>` : ``}${item.notes ? `<p><strong>Notiz:</strong> ${esc(item.notes)}</p>` : ``}${item.visual ? `<p><strong>Visual:</strong> ${esc(item.visual)}</p>` : ``}<p><strong>Nächster Schritt:</strong> ${esc(item.next_action)}</p><div class="action-row">${item.source_url ? `<a class="mini-btn primary" href="${esc(item.source_url)}" target="_blank" rel="noopener noreferrer">Quelle öffnen</a>` : ``}<button type="button" class="mini-btn" data-task-mode="overview">Zur Übersicht</button></div></article>`;
     }
 
     function renderQuality() {
-      const q = dashboard.quality;
-      const c = q.decision_class_counts || {};
+      const q = dashboard.quality; const c = q.decision_class_counts || {};
       $("qualityCards").innerHTML = `<div class="card"><h3>Prozesswirkung</h3><p>${esc(q.trend)}</p><span class="badge">Bewertung</span></div><div class="split"><div class="metric"><small>Inhalte</small><strong>${esc(c.needs_patch || 0)}</strong></div><div class="metric"><small>Quellen</small><strong>${esc(c.needs_source || 0)}</strong></div><div class="metric"><small>Bilder</small><strong>${esc(c.needs_visual_fix || 0)}</strong></div><div class="metric"><small>Beobachten</small><strong>${esc(c.watch || 0)}</strong></div></div><div class="card"><h3>Einordnung</h3><p>${esc(q.evaluation)}</p></div>`;
     }
-
     function renderGrowth() {
       const g = dashboard.growth;
       $("growthCards").innerHTML = `<div class="card"><h3>Wachstum / SEO</h3><p>${esc(g.evaluation)}</p></div><div class="split"><div class="metric"><small>SEO-Signale</small><strong>${esc(g.growth_items_created)}</strong></div><div class="metric"><small>KI-Funde</small><strong>${esc(g.ki_selected_candidates)}</strong></div><div class="metric"><small>GSC-Zeilen</small><strong>${esc(g.gsc_rows)}</strong></div><div class="metric"><small>GA4-Zeilen</small><strong>${esc(g.ga4_rows)}</strong></div></div><div class="card"><h3>Monatsreview</h3><p>Wenn hier SEO-, KI- oder Qualitätsauffälligkeiten auftauchen, gehört das als kompakter Export in die KI-Validierung.</p><span class="badge ai">für ChatGPT geeignet</span></div>`;
     }
-
     function renderSystem() {
       const states = dashboard.system.run_states || [];
       $("systemCards").innerHTML = `<div class="card"><h3>Vertrauensbasis</h3><p>${esc(dashboard.system.diagnostic_note)}</p><span class="badge">Historie: ${esc(dashboard.system.history_date_count)} Messtage</span></div>${states.map(state => `<article class="card"><div class="card-head"><div><h3>${esc(state.label)}</h3><p>${esc(state.reason)}</p></div><span class="pill">${esc(state.status_label)}</span></div><p style="margin-top:10px">Letzter Lauf: ${esc(state.age_label)}</p>${state.github_run_url ? `<span class="badge">GitHub-Run vorhanden</span>` : ``}</article>`).join("")}`;
     }
 
-    $("loginForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      $("loginError").hidden = true;
-      setLoginBusy(true);
-      try { await loadDashboard($("password").value.trim()); }
-      catch (error) { showLoginError(error && error.message ? error.message : "Dashboard konnte nicht geladen werden."); }
-      finally { setLoginBusy(false); }
-    });
-
-    $("reloadBtn").addEventListener("click", () => {
-      let password = "";
-      try { password = localStorage.getItem(storageKey) || ""; } catch (e) {}
-      if (password) loadDashboard(password).catch(error => alert(error.message));
-    });
-
-    $("tasksList").addEventListener("click", (event) => {
-      const modeButton = event.target.closest("[data-task-mode]");
-      if (modeButton) { taskMode = modeButton.getAttribute("data-task-mode") || "overview"; renderTasks(); return; }
-      const filterButton = event.target.closest("[data-inbox-filter]");
-      if (filterButton) { inboxFilter = filterButton.getAttribute("data-inbox-filter") || "active"; taskMode = "inbox"; renderTasks(); }
-    });
-
-    document.querySelectorAll("[data-tab]").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll("[data-tab]").forEach(b => b.classList.toggle("active", b === button));
-        document.querySelectorAll("[data-section]").forEach(section => { section.classList.toggle("active", section.dataset.section === button.dataset.tab); });
-      });
-    });
-
-    let saved = "";
-    try { saved = localStorage.getItem(storageKey) || ""; } catch (e) {}
-    if (saved) { setLoginBusy(true); loadDashboard(saved).catch(() => { try { localStorage.removeItem(storageKey); } catch (e) {} }).finally(() => setLoginBusy(false)); }
+    $("loginForm").addEventListener("submit", async (event) => { event.preventDefault(); $("loginError").hidden = true; setLoginBusy(true); try { await loadDashboard($("password").value.trim()); } catch (error) { showLoginError(error && error.message ? error.message : "Dashboard konnte nicht geladen werden."); } finally { setLoginBusy(false); } });
+    $("reloadBtn").addEventListener("click", () => { let password = ""; try { password = localStorage.getItem(storageKey) || ""; } catch (e) {} if (password) loadDashboard(password).catch(error => alert(error.message)); });
+    $("tasksList").addEventListener("click", (event) => { const modeButton = event.target.closest("[data-task-mode]"); if (modeButton) { taskMode = modeButton.getAttribute("data-task-mode") || "overview"; renderTasks(); return; } const filterButton = event.target.closest("[data-case-filter]"); if (filterButton) { caseFilter = filterButton.getAttribute("data-case-filter") || "active"; taskMode = "cases"; renderTasks(); } });
+    document.querySelectorAll("[data-tab]").forEach(button => { button.addEventListener("click", () => { document.querySelectorAll("[data-tab]").forEach(b => b.classList.toggle("active", b === button)); document.querySelectorAll("[data-section]").forEach(section => { section.classList.toggle("active", section.dataset.section === button.dataset.tab); }); }); });
+    let saved = ""; try { saved = localStorage.getItem(storageKey) || ""; } catch (e) {} if (saved) { setLoginBusy(true); loadDashboard(saved).catch(() => { try { localStorage.removeItem(storageKey); } catch (e) {} }).finally(() => setLoginBusy(false)); }
   </script>
 </body>
 </html>
