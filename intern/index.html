@@ -308,7 +308,7 @@
       <h1>Bocholt erleben</h1>
       <p class="muted">Geschützte Steuerzentrale für Content, SEO, KI-Suche, Inbox und Systemzustand.</p>
       <input id="password" type="password" autocomplete="current-password" placeholder="Review-Passwort">
-      <button class="primary-btn" type="submit">Dashboard öffnen</button>
+      <button class="primary-btn" id="loginButton" type="submit">Dashboard öffnen</button>
       <div id="loginError" class="error" hidden></div>
     </form>
   </div>
@@ -360,10 +360,22 @@
   </nav>
 
   <script>
-    const API_URL = "/api/content-ops-dashboard.php?env=staging";
+    const API_URL = new URL("../api/content-ops-dashboard.php?env=staging", window.location.href).toString();
     const storageKey = "beReviewPassword";
     const $ = (id) => document.getElementById(id);
     let dashboard = null;
+
+    function showLoginError(message) {
+      $("loginError").textContent = message || "Dashboard konnte nicht geladen werden.";
+      $("loginError").hidden = false;
+    }
+
+    function setLoginBusy(isBusy) {
+      const button = $("loginButton");
+      if (!button) return;
+      button.disabled = isBusy;
+      button.textContent = isBusy ? "Dashboard wird geladen …" : "Dashboard öffnen";
+    }
 
     function esc(value) {
       return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -372,18 +384,37 @@
     }
 
     async function loadDashboard(password) {
-      const res = await fetch(API_URL, {
-        headers: { "X-BE-Review-Password": password, "Accept": "application/json" },
-        cache: "no-store"
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || "Dashboard konnte nicht geladen werden.");
-      dashboard = data;
-      localStorage.setItem(storageKey, password);
-      $("login").hidden = true;
-      $("app").hidden = false;
-      $("nav").hidden = false;
-      render();
+      if (!password) {
+        throw new Error("Bitte Review-Passwort eingeben.");
+      }
+
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 15000);
+
+      try {
+        const res = await fetch(API_URL, {
+          headers: { "X-BE-Review-Password": password, "Accept": "application/json" },
+          cache: "no-store",
+          signal: controller.signal
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.message || ("Dashboard konnte nicht geladen werden. HTTP " + res.status));
+        }
+        dashboard = data;
+        try { localStorage.setItem(storageKey, password); } catch (e) {}
+        $("login").hidden = true;
+        $("app").hidden = false;
+        $("nav").hidden = false;
+        render();
+      } catch (error) {
+        if (error && error.name === "AbortError") {
+          throw new Error("Dashboard lädt zu lange. Bitte Verbindung/API prüfen.");
+        }
+        throw error;
+      } finally {
+        window.clearTimeout(timeout);
+      }
     }
 
     function stateDot(state) {
@@ -529,11 +560,13 @@
     $("loginForm").addEventListener("submit", async (event) => {
       event.preventDefault();
       $("loginError").hidden = true;
+      setLoginBusy(true);
       try {
         await loadDashboard($("password").value.trim());
       } catch (error) {
-        $("loginError").textContent = error.message;
-        $("loginError").hidden = false;
+        showLoginError(error && error.message ? error.message : "Dashboard konnte nicht geladen werden.");
+      } finally {
+        setLoginBusy(false);
       }
     });
 
@@ -551,8 +584,14 @@
       });
     });
 
-    const saved = localStorage.getItem(storageKey);
-    if (saved) loadDashboard(saved).catch(() => localStorage.removeItem(storageKey));
+    let saved = "";
+    try { saved = localStorage.getItem(storageKey) || ""; } catch (e) {}
+    if (saved) {
+      setLoginBusy(true);
+      loadDashboard(saved).catch(() => {
+        try { localStorage.removeItem(storageKey); } catch (e) {}
+      }).finally(() => setLoginBusy(false));
+    }
   </script>
 </body>
 </html>
