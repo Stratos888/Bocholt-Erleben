@@ -10,12 +10,12 @@ Das Dashboard beantwortet zuerst:
 2. Wird die App besser?
 3. Was muss als Nächstes getan werden?
 4. Kann den Daten vertraut werden?
-5. Welche konkreten Inbox-Fälle müssen entschieden werden?
+5. Welche konkreten Fälle müssen geprüft oder entschieden werden?
 
 ## Struktur
 
 - Heute: Gesamtstatus, nächste sinnvolle Aktion, kurze Einordnung.
-- Aufgaben: zentrale Arbeitszentrale mit Überblick und integrierter Inbox-Bearbeitungsebene.
+- Aufgaben: zentrale Arbeitszentrale mit Überblick und integriertem Fälle-Modus.
 - Qualität: Content-Prüfung, Bild-/Quellen-/Inhaltsfälle und Prozesswirkung.
 - Wachstum: SEO/Growth, KI-Suche und Monatsreview-Hinweise.
 - System: technische Vertrauensbasis, Läufe, Datenalter und Diagnose.
@@ -25,9 +25,18 @@ Das Dashboard beantwortet zuerst:
 Der Aufgaben-Tab ist zweistufig:
 
 1. Überblick: priorisierte Aufgaben, Sammelgruppen und KI-sinnvolle Reviews.
-2. Inbox: konkrete Einzelfälle aus `data/inbox.json` mit Filterung nach Offen, Quellen, Bilder, KI, Später, Erledigt und Alle.
+2. Fälle: konkrete Einzelfälle aus Inbox und Content-Ops-Findings.
 
-Wenn offene Inbox-Elemente vorhanden sind, steht `Inbox-Elemente prüfen` ganz oben in der Aufgabenliste. Die Inbox ersetzt dadurch keine vorhandene Entscheidungslogik, sondern wird in der internen App sichtbar und prüfbar. Schreibaktionen werden erst angebunden, wenn die bestehende Inbox-Writeback-Logik sicher übernommen ist.
+Der Fälle-Modus bündelt:
+
+- Inbox-Fälle aus `data/inbox.json`
+- Content-Prüffälle aus dem letzten `content_quality_audit`-Run
+- Quellenfälle
+- Bild-/Visual-Fälle
+- Beobachtungsfälle
+- erledigte Fälle zur Kontrolle
+
+Wenn offene Inbox-Elemente vorhanden sind, steht `Inbox-Elemente prüfen` ganz oben in der Aufgabenliste. Wenn keine Inbox-Elemente offen sind, aber Content-Prüffälle vorhanden sind, steht `Prüffälle ansehen` oben. Schreibaktionen werden erst angebunden, wenn die bestehende Writeback-Logik sicher übernommen ist.
 
 ## Zeiträume
 
@@ -40,4 +49,4 @@ Wenn offene Inbox-Elemente vorhanden sind, steht `Inbox-Elemente prüfen` ganz o
 
 ## Zugriff
 
-Die Seite liegt unter `/intern/`. Dashboard-Daten kommen aus `api/content-ops-dashboard.php`; Inbox-Einzelfälle kommen aus `api/content-ops-inbox.php`. Beide Endpunkte sind durch das Review-Passwort geschützt.
+Die Seite liegt unter `/intern/`. Dashboard-Daten kommen aus `api/content-ops-dashboard.php`; konkrete Aufgabenfälle kommen aus `api/content-ops-cases.php`. Beide Endpunkte sind durch das Review-Passwort geschützt.
