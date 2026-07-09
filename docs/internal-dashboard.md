@@ -6,37 +6,40 @@ Ziel: Eine mobile interne Steuerzentrale für Bocholt erleben.
 
 Das Dashboard beantwortet zuerst:
 
-1. Greift der Prozess?
-2. Wird die App besser?
-3. Was muss als Nächstes getan werden?
-4. Kann den Daten vertraut werden?
-5. Welche konkreten Fälle müssen geprüft oder entschieden werden?
+1. Läuft der Prozess grundsätzlich?
+2. Was muss ich jetzt manuell tun?
+3. Warum ist diese manuelle Aufgabe nötig?
+4. Kann ich den Daten vertrauen?
+5. Wird die App besser und relevanter?
 
 ## Struktur
 
-- Heute: Gesamtstatus, nächste sinnvolle Aktion, kurze Einordnung.
-- Aufgaben: zentrale Arbeitszentrale mit Überblick und integriertem Fälle-Modus.
-- Qualität: Content-Prüfung, Bild-/Quellen-/Inhaltsfälle und Prozesswirkung.
-- Wachstum: SEO/Growth, KI-Suche und Monatsreview-Hinweise.
-- System: technische Vertrauensbasis, Läufe, Datenalter und Diagnose.
+- Heute: kurze Lage, nächste sinnvolle manuelle Aktion, kompakter Status.
+- Aufgaben: zentrale manuelle Arbeitszentrale. Keine technischen Modi als Hauptnavigation.
+- Qualität: Bewertung, ob der Qualitätsprozess greift und wo die größten Hebel liegen.
+- Wachstum: kurzer Überblick zu SEO, KI-Suche, Sichtbarkeit und Monatsreview.
+- System: Vertrauensbasis der Daten und Automatik; optionale Läufe sind keine Blocker.
 
 ## Aufgaben-Tab
 
-Der Aufgaben-Tab ist zweistufig:
+Der Aufgaben-Tab ist aus Nutzersicht aufgebaut und nicht nach internen Datenquellen:
 
-1. Überblick: priorisierte Aufgaben, Sammelgruppen und KI-sinnvolle Reviews.
-2. Fälle: konkrete Einzelfälle aus Inbox und Content-Ops-Findings.
+1. Was muss ich jetzt tun?
+2. Jetzt bearbeiten
+3. Für KI vorbereiten
+4. Nur beobachten
+5. Details ansehen
 
-Der Fälle-Modus bündelt:
+`Jetzt bearbeiten` enthält nur echte manuelle Arbeit, zum Beispiel:
 
-- Inbox-Fälle aus `data/inbox.json`
-- Content-Prüffälle aus dem letzten `content_quality_audit`-Run
-- Quellenfälle
-- Bild-/Visual-Fälle
-- Beobachtungsfälle
-- erledigte Fälle zur Kontrolle
+- neue Inbox-Einträge prüfen
+- Content-Prüffälle bearbeiten
+- Wachstums-/Backlog-Punkte prüfen
+- echte Systemblocker prüfen
 
-Wenn offene Inbox-Elemente vorhanden sind, steht `Inbox-Elemente prüfen` ganz oben in der Aufgabenliste. Wenn keine Inbox-Elemente offen sind, aber Content-Prüffälle vorhanden sind, steht `Prüffälle ansehen` oben. Schreibaktionen werden erst angebunden, wenn die bestehende Writeback-Logik sicher übernommen ist.
+Die Bearbeitung selbst läuft über die bestehende funktionierende Arbeitsansicht unter `/inbox/`. Dadurch bleiben vorhandene Writeback-Aktionen wie Übernehmen, Verwerfen, Zurückstellen, Korrigieren und Backlog-Bearbeitung erhalten, ohne eine parallele neue Schreiblogik im Dashboard aufzubauen.
+
+`Details ansehen` zeigt einzelne Fälle nur zur Orientierung und Priorisierung. Die Hauptaktion bleibt immer klar: Wenn etwas manuell bearbeitet werden muss, führt der Button zur Arbeitsansicht.
 
 ## Zeiträume
 
@@ -49,4 +52,4 @@ Wenn offene Inbox-Elemente vorhanden sind, steht `Inbox-Elemente prüfen` ganz o
 
 ## Zugriff
 
-Die Seite liegt unter `/intern/`. Dashboard-Daten kommen aus `api/content-ops-dashboard.php`; konkrete Aufgabenfälle kommen aus `api/content-ops-cases.php`. Beide Endpunkte sind durch das Review-Passwort geschützt.
+Die Seite liegt unter `/intern/`. Dashboard-Daten kommen aus `api/content-ops-dashboard.php`; konkrete Aufgabenfälle kommen aus `api/content-ops-cases.php`. Beide Endpunkte sind durch das Review-Passwort geschützt. Die bestehende Bearbeitungsansicht liegt unter `/inbox/`.
