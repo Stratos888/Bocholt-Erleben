@@ -37,9 +37,18 @@ Der Aufgaben-Tab ist aus Nutzersicht aufgebaut und nicht nach internen Datenquel
 - Wachstums-/Backlog-Punkte prüfen
 - echte Systemblocker prüfen
 
-Die Bearbeitung selbst läuft über die bestehende funktionierende Arbeitsansicht unter `/inbox/`. Dadurch bleiben vorhandene Writeback-Aktionen wie Übernehmen, Verwerfen, Zurückstellen, Korrigieren und Backlog-Bearbeitung erhalten, ohne eine parallele neue Schreiblogik im Dashboard aufzubauen.
+Die Bearbeitung läuft über `/intern/work.html`. Diese Arbeitsansicht verwendet das bereits im Dashboard eingegebene Review-Passwort aus derselben Browser-Sitzung. Dadurch ist im Normalfall keine zweite Passwortabfrage nötig.
 
-`Details ansehen` zeigt einzelne Fälle nur zur Orientierung und Priorisierung. Die Hauptaktion bleibt immer klar: Wenn etwas manuell bearbeitet werden muss, führt der Button zur Arbeitsansicht.
+Die Arbeitsansicht nutzt die vorhandenen Writeback-Pfade:
+
+- Apps-Script-Writeback für KI-/Sheet-Inbox-Fälle
+- Submission-Review-Endpunkte für eingereichte Events/Aktivitäten
+- `api/content-audit/update.php` für Content-Prüffälle
+- `api/growth-backlog/update.php` für Backlog-Punkte
+
+Die bestehende `/inbox/` bleibt als Fallback erhalten, ist aber nicht mehr der primäre Einstieg aus dem internen Dashboard.
+
+`Details ansehen` zeigt einzelne Fälle nur zur Orientierung und Priorisierung. Die Buttons in `Für KI vorbereiten` öffnen diese Detailansicht direkt mit dem passenden Filter.
 
 ## Zeiträume
 
@@ -52,4 +61,4 @@ Die Bearbeitung selbst läuft über die bestehende funktionierende Arbeitsansich
 
 ## Zugriff
 
-Die Seite liegt unter `/intern/`. Dashboard-Daten kommen aus `api/content-ops-dashboard.php`; konkrete Aufgabenfälle kommen aus `api/content-ops-cases.php`. Beide Endpunkte sind durch das Review-Passwort geschützt. Die bestehende Bearbeitungsansicht liegt unter `/inbox/`.
+Die Seite liegt unter `/intern/`. Dashboard-Daten kommen aus `api/content-ops-dashboard.php`; konkrete Aufgabenfälle kommen aus `api/content-ops-cases.php`. Beide Endpunkte sind durch das Review-Passwort geschützt. Die integrierte Arbeitsansicht liegt unter `/intern/work.html`.
