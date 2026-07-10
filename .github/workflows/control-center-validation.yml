@@ -8,6 +8,7 @@ on:
       - "steuerzentrale/**"
       - "js/control-center.js"
       - "css/control-center.css"
+      - "scripts/audit_control_center_product_contract.py"
       - ".github/workflows/control-center-validation.yml"
   workflow_dispatch:
 
@@ -27,6 +28,10 @@ jobs:
         shell: bash
         run: node --check js/control-center.js
 
+      - name: Validate product contract
+        shell: bash
+        run: python3 scripts/audit_control_center_product_contract.py
+
       - name: Validate required control center files
         shell: bash
         run: |
@@ -34,12 +39,15 @@ jobs:
           test -s steuerzentrale/index.html
           test -s css/control-center.css
           test -s js/control-center.js
+          test -s scripts/audit_control_center_product_contract.py
           test -s api/control-center/overview.php
           test -s api/control-center/cases.php
           test -s api/control-center/action.php
           test -s api/control-center/case.php
+          test -s api/control-center/content.php
           test -s api/control-center/_schema.php
           test -s api/control-center/_domain.php
+          test -s api/control-center/_presentation.php
           test -s api/control-center/_sources.php
           test -s api/control-center/_writeback.php
           test -s api/control-center/_submission_source.php
@@ -56,3 +64,4 @@ jobs:
           grep -q "source_payment_confirmed" api/control-center/_submission_source.php
           grep -q "_domain.php" api/control-center/cases.php
           grep -q "be_cc_list_cases" api/control-center/cases.php
+          grep -q "be_cc_case_presentation" api/control-center/_domain.php
