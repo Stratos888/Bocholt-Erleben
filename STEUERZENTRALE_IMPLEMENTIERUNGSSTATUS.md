@@ -1,7 +1,7 @@
 # Steuerzentrale – Implementierungsstatus
 
-Stand: 2026-07-10
-Status: technisches Fundament vorhanden, Gesamtprodukt noch nicht freigegeben
+Stand: 2026-07-10  
+Status: Workpack `Arbeit konsolidieren` umgesetzt; Gesamtprodukt noch nicht freigegeben
 
 ## 1. Verbindliche Dokumente
 
@@ -40,7 +40,7 @@ Bei Widersprüchen gelten Zielbild, Gesamtprojekt-Integration und Abnahmematrix 
 #### Content-Audit
 
 - nur echte Handlungsfälle in der Queue,
-- Korrigieren, Verifizieren, Ablehnen, Zurückstellen,
+- Korrigieren, Verifizieren, Ablehnen und Zurückstellen,
 - Writeback in den führenden Audit-Tab.
 
 #### Anbieter-Einreichungen
@@ -51,23 +51,28 @@ Bei Widersprüchen gelten Zielbild, Gesamtprojekt-Integration und Abnahmematrix 
 - erneute Vorlage nach Zahlung,
 - finale Veröffentlichung oder Ablehnung.
 
-### Sichtbare Oberfläche
+#### Growth-/Acquisition-Backlog
 
-- verdichtete Übersicht,
-- fokussierter Bereich `Bearbeiten`,
-- Desktop Queue plus Detail,
-- Aufgabenanlage,
-- erste Event-/Aktivitätssuche,
-- erste Ideenerfassung,
-- dauerhaft sichtbare Bottom-Navigation.
+- bestehendes `Growth_Backlog`-Sheet bleibt führende Backlogquelle,
+- offene Punkte werden dedupliziert in die Steuerzentrale synchronisiert,
+- Priorität, Beschreibung, Nutzen und empfohlene Aktion bleiben erhalten,
+- Bearbeiten, Abschließen und Verwerfen schreiben zuerst in das führende Sheet zurück,
+- `Als Aufgabe starten` überführt denselben Vorgang ohne Kopie in eine konkrete Aufgabe,
+- nach der Umwandlung bleibt der Vorgang auch bei erneutem Sync eine Aufgabe.
 
-## 3. Festgestellte Restlücken
+#### Kuratierte Repo-Workpacks
 
-### Navigation und Arbeitsmodell
+- bestätigte Repo-Arbeitspakete liegen in `data/control_center_repo_workpacks.json`,
+- keine automatische Extraktion beliebiger TODOs oder historischer Dokumenttexte,
+- Synchronisation über eindeutige Workpack-ID,
+- Umwandlung in eine konkrete Aufgabe ohne Doppelkarte,
+- zentrale Erledigungs- und Ablehnungszustände verhindern erneutes Öffnen im laufenden System.
 
-Die derzeit sichtbare Navigation `Übersicht / Bearbeiten / Aufgaben / Verwaltung / Mehr` ist noch nicht der korrigierte Endzustand.
+Das Repo-Manifest ist eine kuratierte Importgrenze und kein allgemeiner GitHub-Issue-Ersatz. Änderungen am Manifest erfolgen weiterhin bewusst im Repo.
 
-Verbindlicher Endzustand:
+## 3. Sichtbare Oberfläche
+
+Die Hauptnavigation lautet nun verbindlich:
 
 1. Übersicht
 2. Bearbeiten
@@ -75,124 +80,132 @@ Verbindlicher Endzustand:
 4. Verwaltung
 5. Menü
 
-`Arbeit` vereinigt Aufgaben, Backlog, Ideen und Archiv. `Menü` enthält nur seltene Funktionen.
+### Übersicht
 
-### Backlog und Projektarbeit
+- verdichteter Handlungsbedarf,
+- keine vollständige Wiederholung der Bearbeiten-Queue,
+- konkrete aktive Arbeit wird separat vom Backlog gezählt,
+- Backlog und Ideen erzeugen keine roten Hauptbadges.
 
-Noch nicht integriert:
+### Bearbeiten
 
-- Growth-/Acquisition-Backlog der bisherigen Inbox,
-- kuratierte offene Repo-Workpacks,
-- relevante technische Schulden,
-- geplante Produkt- und Contentverbesserungen.
+- mobile fokussierte Einzelbearbeitung,
+- Desktop Queue plus Detail,
+- fallgerechte Hauptaktionen,
+- technische Details nachrangig.
 
-Der aktuelle Aufgaben-Zähler zeigt deshalb nicht die gesamte reale Projektarbeit.
+### Arbeit
+
+Unteransichten:
+
+- Jetzt,
+- Als Nächstes,
+- Wartet,
+- Blockiert,
+- Backlog,
+- Ideen,
+- Archiv.
+
+Funktionen:
+
+- Aufgabe, Idee und Backlogpunkt anlegen,
+- Aufgabe starten,
+- auf Rückmeldung warten mit sichtbarem Grund,
+- blockieren mit sichtbarem Grund,
+- fortsetzen beziehungsweise Blockade aufheben,
+- zurückstellen,
+- erledigen,
+- Idee oder Backlogpunkt ohne Kopie in Aufgabe umwandeln,
+- Growth-Backlog bearbeiten, abschließen oder verwerfen.
 
 ### Verwaltung
 
-Der Bereich kann derzeit suchen, öffentliche Ansichten öffnen und objektbezogene Aufgaben anlegen. Noch erforderlich:
+Bereits vorhanden:
 
-- stabile Suche ohne Fokusverlust,
-- echte Editoren für Events und Aktivitäten,
-- Validierung,
-- Writeback in die führende Quelle,
-- automatische Datenaufbereitung/Deploy,
-- Bestätigung der öffentlichen Wirkung,
-- Verlauf und Fehlerzustände,
-- Absage-/Änderungsprozess.
+- Event- und Aktivitätsbestand laden,
+- Suche ohne Fokusverlust,
+- öffentliche Ansicht öffnen,
+- offene Vorgänge am Objekt anzeigen,
+- objektbezogene Aufgabe anlegen.
 
-Die aktuelle Verwaltung ist daher funktional begonnen, aber noch nicht vollständig.
+### Menü
 
-### Systemstatus
+Bereits vorhanden:
 
-Der Dialog zeigt derzeit technische Rohwerte wie `seen` und `upserted`. Er muss auf fachliche Alltagssprache umgestellt werden; Rohdaten gehören in eingeklappte technische Details.
+- Anbieterbereich,
+- Systemstatus in Alltagssprache,
+- technische Synchronisationsdaten nur eingeklappt,
+- Abmelden.
 
-### Aufgaben
-
-Noch fehlen vollständige Übergänge und Ansichten für:
-
-- Als Nächstes,
-- wartet,
-- blockiert,
-- Fälligkeit bearbeiten,
-- Backlog,
-- Ideen,
-- Archiv,
-- Umwandlung ohne Doppelkarte.
-
-### Alte Inbox
-
-`/inbox/` bleibt Fallback für noch nicht migrierte Funktionen, insbesondere Growth-Backlog und technische Nebenfunktionen. Noch keine Weiterleitung.
-
-## 4. Bewertung im Gesamtprojektkontext
-
-Die Steuerzentrale ist als zentrales Betreiber-Subsystem sinnvoll und passend, wenn:
-
-- Sheets/MySQL/Repo weiterhin fachlich führend bleiben,
-- die Steuerzentrale menschliche Arbeit und Writebacks orchestriert,
-- keine parallelen Datenkopien entstehen,
-- Änderungen E2E bis zur öffentlichen Darstellung verfolgt werden,
-- automatisierbare Fälle nicht als künstliche Aufgaben erscheinen,
-- Repo-Arbeit nur kuratiert und nicht ungefiltert gespiegelt wird.
-
-Diese Grundrichtung ist bestätigt.
-
-## 5. Verbindliche nächste Workpacks
-
-### Workpack 1 – Arbeit und Backlog konsolidieren
-
-- Navigation `Aufgaben` -> `Arbeit`, `Mehr` -> `Menü`,
-- Growth-Backlog inventarisieren und migrieren,
-- Repo-Workpacks/Schulden kuratieren und deduplizieren,
-- Aufgaben, Backlog, Ideen und Archiv als ein Lebenszyklus,
-- Übergänge ohne Kopien,
-- vollständige Status- und Fälligkeitslogik.
+## 4. Noch erforderlich
 
 ### Workpack 2 – Verwaltung E2E fertigstellen
 
-- Suchfokus reparieren,
-- Event- und Aktivitätseditoren,
-- fachliche Validierung,
-- Writeback in führende Quellen,
-- automatische Datengenerierung/Deploy,
-- öffentliche Wirkung bestätigen,
-- Verlauf, Änderung und Absage,
-- Fehler als wartet/blockiert führen.
+- echte Editoren für Events und Aktivitäten,
+- vollständige fachliche Validierung,
+- Writeback in die jeweilige führende Quelle,
+- automatische Datenaufbereitung beziehungsweise Deploy,
+- Bestätigung der öffentlichen Wirkung,
+- relevante Änderung und Absage,
+- Änderungsverlauf,
+- Fehlerzustände als `wartet` oder `blockiert`.
 
-### Workpack 3 – Systemstatus und Menü
+Die Verwaltung ist erst dann vollständig, wenn Speichern nicht nur eine lokale Anzeige ändert, sondern den öffentlichen Datenprozess nachweislich aktualisiert.
 
-- fachlicher Normalzustand,
-- Störungen nur mit Auswirkung hervorheben,
-- technische Details einklappen,
-- Anbieter, Einstellungen, Abmelden und Diagnose sinnvoll platzieren.
+### Workpack 3 – Menü und Systemstatus vervollständigen
+
+- Störungen nur bei echter fachlicher Auswirkung hervorheben,
+- erneute Ausführung oder klare nächste Aktion anbieten,
+- Einstellungen und gegebenenfalls Diagnose sinnvoll platzieren,
+- technische Begriffe aus der Standardansicht fernhalten.
 
 ### Workpack 4 – Altprozess ablösen
 
-- verbleibende Push-/Deploy-/Backlog-Sonderfunktionen migrieren oder bewusst neu platzieren,
-- `/inbox/` für reguläre Arbeit überflüssig machen,
-- Weiterleitung erst danach.
+`/inbox/` bleibt vorläufig nur noch für:
+
+- Push-Registrierung und Push-Test,
+- Deploy-Sonderaktion,
+- technische Diagnose während der Migration.
+
+Der Growth-Backlog ist fachlich in `Arbeit` integriert und benötigt die alte Inbox nicht mehr als reguläre Arbeitsoberfläche.
 
 ### Workpack 5 – Gesamtvalidierung
 
-- automatisierte Tests erweitern,
-- reale Writeback- und Deploy-Fehlerfälle,
-- Pflicht-Viewports,
-- vollständige Staging-Abnahmematrix,
-- kontrollierter Main-Merge.
+- automatisierte API- und Übergangstests erweitern,
+- reale Growth-Backlog- und Aufgabenübergänge auf Staging prüfen,
+- reale Event-/Audit-/Submission-Writebacks prüfen,
+- Pflicht-Viewports vollständig abnehmen,
+- Abnahmematrix vollständig belegen,
+- danach kontrollierter Main-Merge.
+
+## 5. Automatische Absicherung
+
+`.github/workflows/control-center-validation.yml` prüft:
+
+- PHP-Syntax,
+- JavaScript-Syntax beider Steuerzentralen-Skripte,
+- JSON-Gültigkeit des Repo-Workpack-Manifests,
+- Pflichtdateien,
+- Zugriffsschutz,
+- Growth-Backlog-Sync und Writeback,
+- Repo-Workpack-Sync,
+- Umwandlung ohne Doppelkarte,
+- Warte- und Blockadegründe,
+- verbindliche Navigation und Produktverträge.
 
 ## 6. Freigabestatus
 
 | Bereich | Status |
 |---|---|
 | Vorgangs- und Writeback-Grundlage | tragfähig |
-| Bearbeiten-Queue | funktional begonnen, reale Aktionen weiter prüfen |
-| Übersicht | strukturell verbessert, Gesamtpriorisierung weiter validieren |
-| Arbeit/Backlog/Ideen | nicht vollständig integriert |
-| Verwaltung | begonnen, E2E-Writeback fehlt |
-| Systemstatus | nicht produktreif |
-| Alte Inbox-Ablösung | offen |
+| Bearbeiten-Queue | funktional, reale Aktionen weiter prüfen |
+| Übersicht | strukturell umgesetzt, reale Priorisierung weiter prüfen |
+| Arbeit/Aufgaben/Backlog/Ideen | Workpack umgesetzt, Staging-Laufzeitprüfung ausstehend |
+| Verwaltung | begonnen, E2E-Bearbeitung fehlt |
+| Menü/Systemstatus | Grundzustand umgesetzt, Störungsfälle offen |
+| Alte Inbox-Ablösung | teilweise; Backlog migriert, technische Restfunktionen offen |
 | Main-Merge | nicht zulässig |
 
 ## 7. Nächster Schritt
 
-Als Nächstes wird Workpack 1 umgesetzt: vollständige Konsolidierung von Aufgaben, Backlog, Ideen und kuratierter Projektarbeit unter `Arbeit`. Danach folgt die E2E-Fertigstellung der Verwaltung.
+Nach erfolgreichem Deployment wird Workpack 1 auf Staging mit realen Daten geprüft. Danach folgt ausschließlich Workpack 2: vollständige E2E-Fertigstellung der Verwaltung.
