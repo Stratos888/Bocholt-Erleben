@@ -12,6 +12,7 @@ on:
       - "data/control_center_repo_workpacks.json"
       - "scripts/audit_control_center_product_contract.py"
       - "tests/control_center_contracts_test.php"
+      - "tests/control_center_process_chain_test.php"
       - ".github/workflows/control-center-validation.yml"
   workflow_dispatch:
 
@@ -28,13 +29,16 @@ jobs:
           find api/control-center -type f -name '*.php' -print0 | xargs -0 -n1 php -l
           php -l api/events/public.php
           php -l tests/control_center_contracts_test.php
+          php -l tests/control_center_process_chain_test.php
 
       - name: Simulate control center contracts
         shell: bash
         env:
           BE_ACTIVITY_WRITEBACK_ENABLED: "false"
           BE_GITHUB_REPO_TOKEN: ""
-        run: php tests/control_center_contracts_test.php
+        run: |
+          php tests/control_center_contracts_test.php
+          php tests/control_center_process_chain_test.php
 
       - name: Validate JavaScript syntax
         shell: bash
@@ -68,6 +72,7 @@ jobs:
           test -s data/control_center_repo_workpacks.json
           test -s scripts/audit_control_center_product_contract.py
           test -s tests/control_center_contracts_test.php
+          test -s tests/control_center_process_chain_test.php
           test -s api/control-center/overview.php
           test -s api/control-center/cases.php
           test -s api/control-center/action.php
@@ -79,6 +84,7 @@ jobs:
           test -s api/control-center/_content_source.php
           test -s api/control-center/_content_history.php
           test -s api/control-center/_content_ops.php
+          test -s api/control-center/_process_chain.php
           test -s api/control-center/_sheet_inbox_source.php
           test -s api/control-center/_submission_content.php
           test -s api/control-center/_contracts.php
@@ -107,6 +113,7 @@ jobs:
           grep -q "control_content_changes" api/control-center/_schema.php
           grep -q "control_development_snapshots" api/control-center/_schema.php
           grep -q "be_cc_sync_sheet_inbox" api/control-center/overview.php
+          grep -q "be_cc_integrated_process_health" api/control-center/overview.php
           grep -q "be_cc_content_ops_status" api/control-center/development.php
           grep -q "feedback_rule_effectiveness_daily" api/control-center/_content_ops.php
           grep -q "be_cc_update_submission_event" api/control-center/content.php
