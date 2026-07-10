@@ -13,6 +13,7 @@ css = read('css/control-center.css')
 sources = read('api/control-center/_sources.php')
 writeback = read('api/control-center/_writeback.php')
 domain = read('api/control-center/_domain.php')
+workflow_contracts = read('api/control-center/_workflow_contracts.php')
 presentation = read('api/control-center/_presentation.php')
 content_api = read('api/control-center/content.php')
 publication_api = read('api/control-center/publication.php')
@@ -64,8 +65,9 @@ backend_contracts = {
     'Growth-Backlog-Sync': 'be_cc_sync_growth_backlog',
     'Repo-Workpack-Sync': 'be_cc_sync_repo_workpacks',
     'Growth-Backlog-Writeback': 'be_cc_writeback_growth_backlog',
-    'Umwandlung ohne Doppelkarte': "'open' => 'open'",
-    'Wartegrund-Persistenz': "in_array($action, ['wait', 'block']",
+    'gemeinsamer Workflow-Vertrag': 'be_cc_transition_target',
+    'Umwandlung ohne Doppelkarte': "'convert_to_task' =>",
+    'Wartegrund-Persistenz': "in_array($action, ['wait','block']",
     'Event-Livewriteback': 'be_cc_update_event_fields',
     'atomare Event-Updateplanung': 'be_cc_validate_event_update',
     'Aktivitäts-Repo-Writeback': 'be_cc_update_activity_in_repo',
@@ -78,7 +80,7 @@ backend_contracts = {
     'technische SEO-Prüfung': 'be_cc_technical_seo_metrics',
     'Search-Console-Transparenz': 'search_console_connected',
 }
-backend = sources + writeback + domain + presentation + content_api + publication_api + content_history + contracts + github_repo + development_api + deploy_api + schema
+backend = sources + writeback + domain + workflow_contracts + presentation + content_api + publication_api + content_history + contracts + github_repo + development_api + deploy_api + schema
 for label, marker in backend_contracts.items():
     if marker not in backend:
         errors.append(f'Backendvertrag fehlt: {label}')
