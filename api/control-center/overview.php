@@ -1,11 +1,16 @@
 <?php
 declare(strict_types=1);
 
-require __DIR__ . '/_domain.php';
+require __DIR__ . '/_sources.php';
 
 be_require_review_access();
 
 try {
+    $sync = [
+        'inbox' => be_cc_sync_inbox_feed(),
+        'content_audit' => be_cc_sync_content_audit(),
+    ];
+
     $cases = be_cc_list_cases(['active' => '1']);
     $groups = ['now' => [], 'next' => [], 'inbox' => [], 'information' => []];
     foreach ($cases as $case) {
@@ -21,6 +26,7 @@ try {
         'data' => [
             'groups' => $groups,
             'counts' => array_map('count', $groups),
+            'sync' => $sync,
             'system' => [
                 'status' => 'ok',
                 'message' => 'Automatisierungen laufen – keine bekannte Störung mit Auswirkung.',
