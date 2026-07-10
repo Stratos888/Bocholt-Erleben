@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-require __DIR__ . '/_domain.php';
+require __DIR__ . '/_schema.php';
 
 be_require_review_access();
 
 try {
+    be_cc_ensure_schema();
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
     if ($method === 'GET') {
@@ -17,32 +18,21 @@ try {
 
         be_json_response(200, [
             'status' => 'ok',
-            'data' => [
-                'items' => $cases,
-                'total' => count($cases),
-            ],
+            'data' => ['items' => $cases, 'total' => count($cases)],
         ]);
     }
 
     if ($method === 'POST') {
         $input = json_decode((string)file_get_contents('php://input'), true);
-        if (!is_array($input)) {
-            throw new InvalidArgumentException('Invalid JSON body.');
-        }
+        if (!is_array($input)) throw new InvalidArgumentException('Invalid JSON body.');
 
         $type = be_cc_validate_enum(trim((string)($input['type'] ?? '')), BE_CC_TYPES, 'type');
         $state = be_cc_validate_enum(trim((string)($input['state'] ?? 'new')), BE_CC_STATES, 'state');
         $priority = be_cc_validate_enum(trim((string)($input['priority'] ?? 'normal')), BE_CC_PRIORITIES, 'priority');
         $title = trim((string)($input['title'] ?? ''));
-        $sourceSystem = trim((string)($input['source_system'] ?? 'manual'));
-        $sourceReference = trim((string)($input['source_reference'] ?? ''));
-
-        if ($title === '') {
-            throw new InvalidArgumentException('Title is required.');
-        }
-        if ($sourceReference === '') {
-            $sourceReference = 'manual:' . be_cc_uuid();
-        }
+        $sourceSystem = trim((string)($input['source_system'] ?? 'manual')) ?: 'manual';
+        $sourceReference = trim((string)($input['source_reference'] ?? '')) ?: 'manual:' . be_cc_uuid();
+        if ($title === '') throw new InvalidArgumentException('Title is required.');
 
         $id = be_cc_uuid();
         $pdo = be_db();
@@ -72,7 +62,7 @@ try {
                 'object_type' => trim((string)($input['object_type'] ?? '')) ?: null,
                 'object_id' => trim((string)($input['object_id'] ?? '')) ?: null,
                 'object_title' => trim((string)($input['object_title'] ?? '')) ?: null,
-                'source_system' => $sourceSystem ?: 'manual',
+                'source_system' => $sourceSystem,
                 'source_reference' => $sourceReference,
                 'source_payload_json' => isset($input['source_payload'])
                     ? json_encode($input['source_payload'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)
