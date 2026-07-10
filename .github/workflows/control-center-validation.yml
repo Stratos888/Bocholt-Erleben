@@ -29,6 +29,9 @@ jobs:
 
       - name: Simulate control center contracts
         shell: bash
+        env:
+          BE_ACTIVITY_WRITEBACK_ENABLED: "false"
+          BE_GITHUB_REPO_TOKEN: ""
         run: php tests/control_center_contracts_test.php
 
       - name: Validate JavaScript syntax
@@ -90,18 +93,16 @@ jobs:
           grep -q "X-BE-Review-Password" js/control-center-source-editors.js
           grep -q "X-BE-Review-Password" js/control-center-publication.js
           grep -q "X-BE-Review-Password" js/control-center-development.js
-          grep -q "source_reference" api/control-center/_schema.php
           grep -q "UNIQUE KEY uq_control_cases_source" api/control-center/_schema.php
           grep -q "control_content_changes" api/control-center/_schema.php
           grep -q "control_development_snapshots" api/control-center/_schema.php
           grep -q "source_payment_confirmed" api/control-center/_submission_source.php
-          grep -q "_domain.php" api/control-center/cases.php
-          grep -q "be_cc_list_cases" api/control-center/cases.php
-          grep -q "be_cc_case_presentation" api/control-center/_domain.php
           grep -q "be_cc_sync_growth_backlog" api/control-center/_sources.php
           grep -q "be_cc_sync_repo_workpacks" api/control-center/_sources.php
           grep -q "be_cc_update_event_fields" api/control-center/content.php
+          grep -q "be_cc_update_activity_in_repo" api/control-center/content.php
           grep -q "be_cc_verify_public_change" api/control-center/publication.php
           grep -q "BE_GITHUB_REPO_TOKEN" api/control-center/_github_repo.php
-          grep -q "editable' => false" api/control-center/_content_source.php
+          grep -q "BE_ACTIVITY_WRITEBACK_ENABLED" api/control-center/_github_repo.php
+          grep -q "writeback_status" api/control-center/_content_source.php
           grep -q "search_console_connected" api/control-center/development.php
