@@ -53,8 +53,14 @@ function be_cc_technical_seo_metrics(): array
         $html = is_file($path) ? (string)file_get_contents($path) : '';
         $pageChecks = [
             'title' => $html !== '' && preg_match('/<title>\s*[^<]{8,}\s*<\/title>/i', $html) === 1,
-            'meta_description' => $html !== '' && preg_match('/<meta\s+name=["\']description["\'][^>]+content=["\'][^"\']{40,}["\']/i', $html) === 1,
-            'canonical' => $html !== '' && preg_match('/<link\s+rel=["\']canonical["\'][^>]+href=["\']https:\/\//i', $html) === 1,
+            'meta_description' => $html !== '' && (
+                preg_match('/<meta\s+name=["\']description["\'][^>]+content=["\'][^"\']{40,}["\']/i', $html) === 1
+                || preg_match('/<meta\s+content=["\'][^"\']{40,}["\'][^>]+name=["\']description["\']/i', $html) === 1
+            ),
+            'canonical' => $html !== '' && (
+                preg_match('/<link\s+rel=["\']canonical["\'][^>]+href=["\']https:\/\//i', $html) === 1
+                || preg_match('/<link\s+href=["\']https:\/\/[^"\']+["\'][^>]+rel=["\']canonical["\']/i', $html) === 1
+            ),
         ];
         foreach ($pageChecks as $ok) { $total++; if ($ok) $passed++; }
         $checks[$route] = $pageChecks;
@@ -133,7 +139,11 @@ try {
     ];
     $previous = be_cc_previous_development_snapshot($pdo);
     $previousMetrics = $previous['metrics'] ?? [];
-    $trendAvailable = $previous !== null;
+    $trendAvailable = false;
+    if ($previous) {
+        $previousAt = new DateTimeImmutable($previous['created_at']);
+        $trendAvailable = $previousAt <= new DateTimeImmutable('-1 hour');
+    }
     $assessment = be_cc_development_assessment([
         'missing_description' => (int)$quality['missingDescription'],
         'missing_source' => (int)$quality['missingSource'],
@@ -143,7 +153,7 @@ try {
 
     $trends = [
         'available' => $trendAvailable,
-        'previous_at' => $previous['created_at'] ?? null,
+        'previous_at' => $trendAvailable ? ($previous['created_at'] ?? null) : null,
         'content_coverage_delta' => be_cc_delta($coverage, $previousMetrics, 'content_coverage'),
         'missing_content_delta' => be_cc_delta($snapshotMetrics['missing_content'], $previousMetrics, 'missing_content'),
         'open_quality_reviews_delta' => be_cc_delta($openQuality, $previousMetrics, 'open_quality_reviews'),
@@ -176,7 +186,7 @@ try {
             'completed_cases' => $completedCases,
             'publication_problems' => $publicationProblems,
             'quality_effect_available' => $trendAvailable,
-            'quality_effect_message' => $trendAvailable ? 'Vergleich zum vorherigen Snapshot verfügbar.' : 'Der erste Snapshot bildet die Vergleichsbasis.',
+            'quality_effect_message' => $trendAvailable ? 'Vergleich zu einem zeitlich getrennten Snapshot verfügbar.' : 'Der aktuelle Snapshot bildet zunächst die Vergleichsbasis.',
         ],
         'seo' => [
             'content_basis_percent' => $coverage,
