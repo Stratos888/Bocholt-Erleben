@@ -80,19 +80,34 @@ function be_cc_technical_seo_metrics(): array
     ];
 }
 
-function be_cc_previous_development_snapshot(PDO $pdo): ?array
+function be_cc_snapshot_row_to_array(array|false $row): ?array
 {
-    $row = $pdo->query('SELECT metrics_json, created_at FROM control_development_snapshots ORDER BY created_at DESC, id DESC LIMIT 1')->fetch();
     if (!$row) return null;
     $metrics = json_decode((string)$row['metrics_json'], true);
     if (!is_array($metrics)) return null;
     return ['metrics' => $metrics, 'created_at' => (string)$row['created_at']];
 }
 
-function be_cc_store_development_snapshot(PDO $pdo, array $metrics, ?array $previous): void
+function be_cc_latest_development_snapshot(PDO $pdo): ?array
 {
-    if ($previous) {
-        $last = new DateTimeImmutable($previous['created_at']);
+    return be_cc_snapshot_row_to_array(
+        $pdo->query('SELECT metrics_json, created_at FROM control_development_snapshots ORDER BY created_at DESC, id DESC LIMIT 1')->fetch()
+    );
+}
+
+function be_cc_comparison_development_snapshot(PDO $pdo): ?array
+{
+    $stmt = $pdo->prepare(
+        'SELECT metrics_json, created_at FROM control_development_snapshots WHERE created_at <= :cutoff ORDER BY created_at DESC, id DESC LIMIT 1'
+    );
+    $stmt->execute(['cutoff' => (new DateTimeImmutable('-1 hour'))->format('Y-m-d H:i:s')]);
+    return be_cc_snapshot_row_to_array($stmt->fetch());
+}
+
+function be_cc_store_development_snapshot(PDO $pdo, array $metrics, ?array $latest): void
+{
+    if ($latest) {
+        $last = new DateTimeImmutable($latest['created_at']);
         if ($last > new DateTimeImmutable('-1 hour')) return;
     }
     $stmt = $pdo->prepare('INSERT INTO control_development_snapshots (metrics_json) VALUES (:metrics)');
@@ -137,13 +152,10 @@ try {
         'technical_seo_coverage' => $technicalSeo['coverage_percent'],
         'publication_problems' => $publicationProblems,
     ];
-    $previous = be_cc_previous_development_snapshot($pdo);
-    $previousMetrics = $previous['metrics'] ?? [];
-    $trendAvailable = false;
-    if ($previous) {
-        $previousAt = new DateTimeImmutable($previous['created_at']);
-        $trendAvailable = $previousAt <= new DateTimeImmutable('-1 hour');
-    }
+    $latest = be_cc_latest_development_snapshot($pdo);
+    $comparison = be_cc_comparison_development_snapshot($pdo);
+    $comparisonMetrics = $comparison['metrics'] ?? [];
+    $trendAvailable = $comparison !== null;
     $assessment = be_cc_development_assessment([
         'missing_description' => (int)$quality['missingDescription'],
         'missing_source' => (int)$quality['missingSource'],
@@ -153,16 +165,16 @@ try {
 
     $trends = [
         'available' => $trendAvailable,
-        'previous_at' => $trendAvailable ? ($previous['created_at'] ?? null) : null,
-        'content_coverage_delta' => be_cc_delta($coverage, $previousMetrics, 'content_coverage'),
-        'missing_content_delta' => be_cc_delta($snapshotMetrics['missing_content'], $previousMetrics, 'missing_content'),
-        'open_quality_reviews_delta' => be_cc_delta($openQuality, $previousMetrics, 'open_quality_reviews'),
-        'open_reviews_delta' => be_cc_delta($openReviews, $previousMetrics, 'open_reviews'),
-        'blocked_tasks_delta' => be_cc_delta($blocked, $previousMetrics, 'blocked_tasks'),
-        'technical_seo_delta' => be_cc_delta($technicalSeo['coverage_percent'], $previousMetrics, 'technical_seo_coverage'),
-        'publication_problems_delta' => be_cc_delta($publicationProblems, $previousMetrics, 'publication_problems'),
+        'previous_at' => $comparison['created_at'] ?? null,
+        'content_coverage_delta' => be_cc_delta($coverage, $comparisonMetrics, 'content_coverage'),
+        'missing_content_delta' => be_cc_delta($snapshotMetrics['missing_content'], $comparisonMetrics, 'missing_content'),
+        'open_quality_reviews_delta' => be_cc_delta($openQuality, $comparisonMetrics, 'open_quality_reviews'),
+        'open_reviews_delta' => be_cc_delta($openReviews, $comparisonMetrics, 'open_reviews'),
+        'blocked_tasks_delta' => be_cc_delta($blocked, $comparisonMetrics, 'blocked_tasks'),
+        'technical_seo_delta' => be_cc_delta($technicalSeo['coverage_percent'], $comparisonMetrics, 'technical_seo_coverage'),
+        'publication_problems_delta' => be_cc_delta($publicationProblems, $comparisonMetrics, 'publication_problems'),
     ];
-    be_cc_store_development_snapshot($pdo, $snapshotMetrics, $previous);
+    be_cc_store_development_snapshot($pdo, $snapshotMetrics, $latest);
 
     $seoMessage = 'Technische Onpage-Basissignale werden geprüft. Search-Console-Kennzahlen sind noch nicht angebunden.';
     be_json_response(200, ['status' => 'ok', 'data' => [
@@ -186,7 +198,7 @@ try {
             'completed_cases' => $completedCases,
             'publication_problems' => $publicationProblems,
             'quality_effect_available' => $trendAvailable,
-            'quality_effect_message' => $trendAvailable ? 'Vergleich zu einem zeitlich getrennten Snapshot verfügbar.' : 'Der aktuelle Snapshot bildet zunächst die Vergleichsbasis.',
+            'quality_effect_message' => $trendAvailable ? 'Vergleich zu einem mindestens eine Stunde älteren Snapshot verfügbar.' : 'Der aktuelle Snapshot bildet zunächst die Vergleichsbasis.',
         ],
         'seo' => [
             'content_basis_percent' => $coverage,
