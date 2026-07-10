@@ -72,6 +72,7 @@ jobs:
           test -s api/control-center/_content_source.php
           test -s api/control-center/_content_history.php
           test -s api/control-center/_contracts.php
+          test -s api/control-center/_github_repo.php
           test -s api/control-center/_schema.php
           test -s api/control-center/_domain.php
           test -s api/control-center/_presentation.php
@@ -101,4 +102,6 @@ jobs:
           grep -q "be_cc_sync_repo_workpacks" api/control-center/_sources.php
           grep -q "be_cc_update_event_fields" api/control-center/content.php
           grep -q "be_cc_verify_public_change" api/control-center/publication.php
+          grep -q "BE_GITHUB_REPO_TOKEN" api/control-center/_github_repo.php
+          grep -q "editable' => false" api/control-center/_content_source.php
           grep -q "search_console_connected" api/control-center/development.php
