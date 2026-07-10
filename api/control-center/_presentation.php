@@ -120,7 +120,7 @@ function be_cc_case_presentation(array $row): array
         ];
         $url = trim((string)($payload['suggested_url'] ?? $payload['source_url'] ?? ''));
         if ($url !== '') $links[] = ['label' => 'Quelle', 'url' => $url];
-    } elseif (in_array($source, ['growth_backlog', 'repo_workpack'], true)) {
+    } elseif (in_array($source, ['growth_backlog', 'repo_workpack'], true) && $type !== 'task') {
         $kind = 'backlog_item';
         $group = 'backlog';
         $primary = be_cc_action('convert_to_task', 'Als Aufgabe starten');
