@@ -21,10 +21,7 @@
       <h2>Zugang</h2>
       <p>Die Steuerzentrale ist privat. Das Passwort wird nur für diese Sitzung verwendet.</p>
       <form id="cc-auth-form" class="cc-stack">
-        <label class="cc-field">
-          <span>Review-Passwort</span>
-          <input id="cc-password" type="password" autocomplete="current-password" required>
-        </label>
+        <label class="cc-field"><span>Review-Passwort</span><input id="cc-password" type="password" autocomplete="current-password" required></label>
         <button class="cc-button cc-button--primary" type="submit">Steuerzentrale öffnen</button>
       </form>
     </section>
@@ -38,9 +35,9 @@
   <nav class="cc-nav" aria-label="Steuerzentrale">
     <button type="button" data-view="overview" class="is-active"><span>Übersicht</span></button>
     <button type="button" data-view="work"><span>Bearbeiten</span><b id="cc-badge-work" hidden></b></button>
-    <button type="button" data-view="tasks"><span>Aufgaben</span><b id="cc-badge-tasks" hidden></b></button>
+    <button type="button" data-view="labor"><span>Arbeit</span><b id="cc-badge-labor" hidden></b></button>
     <button type="button" data-view="manage"><span>Verwaltung</span></button>
-    <button type="button" data-view="more"><span>Mehr</span></button>
+    <button type="button" data-view="menu"><span>Menü</span></button>
   </nav>
 
   <dialog id="cc-dialog" class="cc-dialog">
@@ -50,6 +47,6 @@
     </form>
   </dialog>
 
-  <script src="/js/control-center.js?v=2026-07-10-premium-v2" defer></script>
+  <script src="/js/control-center.js?v=2026-07-10-work-v1" defer></script>
 </body>
 </html>
