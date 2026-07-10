@@ -25,9 +25,24 @@ try {
     $case = $lookup->fetch();
     if (!$case) throw new RuntimeException('Case not found.');
 
+    $sourceSystem = (string)$case['source_system'];
     $effectiveAction = $action;
-    if ((string)$case['source_system'] === 'submission_db') {
+    if ($sourceSystem === 'submission_db') {
         $effectiveAction = be_cc_writeback_submission($case, $action, $payload);
+    } elseif ($sourceSystem === 'growth_backlog' && in_array($action, ['edit_source','convert_to_task','complete','reject'], true)) {
+        be_cc_apply_source_writeback($case, $action, $payload);
+        if ($action === 'edit_source') {
+            $title = trim((string)($payload['title'] ?? $case['title']));
+            $reason = trim((string)($payload['description'] ?? $case['reason']));
+            $priority = match (mb_strtolower(trim((string)($payload['priority'] ?? '')), 'UTF-8')) {
+                'hoch' => 'high', 'niedrig' => 'low', 'mittel' => 'normal', default => (string)$case['priority'],
+            };
+            $update = be_db()->prepare('UPDATE control_cases SET title=:title, reason=:reason, priority=:priority, updated_at=NOW() WHERE id=:id');
+            $update->execute(['title' => $title ?: (string)$case['title'], 'reason' => $reason ?: null, 'priority' => $priority, 'id' => $caseId]);
+            be_cc_record_event(be_db(), $caseId, 'edit_source', (string)$case['state'], (string)$case['state'], $payload);
+            $lookup->execute(['id' => $caseId]);
+            be_json_response(200, ['status' => 'ok', 'data' => be_cc_case_from_row($lookup->fetch())]);
+        }
     } elseif (in_array($action, ['approve', 'reject', 'snooze'], true)) {
         be_cc_apply_source_writeback($case, $action, $payload);
     }
