@@ -75,4 +75,14 @@ function be_cc_ensure_schema(): void
           KEY idx_content_changes_state (publication_state, updated_at)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
+
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS control_development_snapshots (
+          id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+          metrics_json JSON NOT NULL,
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (id),
+          KEY idx_development_snapshots_created (created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
 }
