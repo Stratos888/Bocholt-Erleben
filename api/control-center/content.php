@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/_content_source.php';
 require_once __DIR__ . '/_writeback.php';
 require_once __DIR__ . '/_content_history.php';
+require_once __DIR__ . '/_github_repo.php';
 
 be_require_review_access();
 
@@ -36,19 +37,46 @@ try {
     $type = trim((string)($payload['type'] ?? ''));
     $id = trim((string)($payload['id'] ?? ''));
     $updates = is_array($payload['updates'] ?? null) ? $payload['updates'] : [];
-    if ($type !== 'events' || $id === '') {
-        throw new InvalidArgumentException('Nur Veranstaltungen können aktuell dauerhaft live bearbeitet werden.');
-    }
+    if (!in_array($type, ['events','activities'], true) || $id === '') throw new InvalidArgumentException('Inhaltstyp oder ID fehlt.');
     if (!$updates) throw new InvalidArgumentException('Keine Änderungen übergeben.');
 
-    $currentItems = be_cc_event_items(true);
+    if ($type === 'activities') {
+        if (!be_cc_activity_writeback_available()) throw new RuntimeException(be_cc_activity_writeback_status()['message']);
+        $current = null;
+        foreach (be_cc_activity_items(true) as $item) {
+            if ((string)$item['id'] === $id) { $current = $item; break; }
+        }
+        if (!is_array($current)) throw new RuntimeException('Aktivität wurde nicht gefunden.');
+        $normalized = be_cc_normalize_activity_updates($updates);
+        $changeId = be_cc_create_content_change($current, $normalized, 'activity', 'activities_repo');
+        try {
+            $result = be_cc_update_activity_in_repo($id, $normalized);
+            be_cc_update_content_change($changeId, 'deploy_started', ['written_fields' => array_keys($normalized)]);
+            $change = be_cc_get_content_change($changeId);
+            be_cc_upsert_publication_issue($change, 'Die Aktivität wurde versioniert im Repo gespeichert. Die öffentliche Wirkung ist noch nicht bestätigt.', 'waiting');
+        } catch (Throwable $error) {
+            be_cc_update_content_change($changeId, 'deploy_failed', ['error' => $error->getMessage()]);
+            $change = be_cc_get_content_change($changeId);
+            be_cc_upsert_publication_issue($change, 'Die Aktivitätsänderung konnte nicht sicher veröffentlicht werden: ' . $error->getMessage(), 'blocked');
+            throw $error;
+        }
+        be_json_response(200, ['status' => 'ok', 'data' => [
+            'saved' => true,
+            'deploy_started' => true,
+            'publication_state' => 'waiting',
+            'change_id' => $changeId,
+            'commit_sha' => $result['commit_sha'],
+            'message' => 'Aktivität versioniert gespeichert. Die öffentliche Aktualisierung wird geprüft.',
+        ]]);
+    }
+
     $current = null;
-    foreach ($currentItems as $item) {
+    foreach (be_cc_event_items(true) as $item) {
         if ((string)$item['id'] === $id) { $current = $item; break; }
     }
     if (!is_array($current)) throw new RuntimeException('Veranstaltung wurde nicht gefunden.');
 
-    $changeId = be_cc_create_content_change($current, $updates);
+    $changeId = be_cc_create_content_change($current, $updates, 'event', 'events_sheet');
     try {
         $writtenFields = be_cc_update_event_fields($id, $updates);
         be_cc_update_content_change($changeId, 'saved', ['written_fields' => $writtenFields]);
@@ -62,17 +90,11 @@ try {
         try {
             $token = be_cc_inbox_token();
             $result = be_cc_jsonp_request(['action' => 'deploy', 'token' => $token]);
-            if (empty($result['ok'])) {
-                throw new RuntimeException(trim((string)($result['error'] ?? $result['detail'] ?? 'deploy_failed')));
-            }
+            if (empty($result['ok'])) throw new RuntimeException(trim((string)($result['error'] ?? $result['detail'] ?? 'deploy_failed')));
             $deployStarted = true;
             be_cc_update_content_change($changeId, 'deploy_started');
             $change = be_cc_get_content_change($changeId);
-            be_cc_upsert_publication_issue(
-                $change,
-                'Die Änderung ist gespeichert und das Deployment wurde gestartet. Die öffentliche Wirkung ist noch nicht bestätigt.',
-                'waiting'
-            );
+            be_cc_upsert_publication_issue($change, 'Die Änderung ist gespeichert und das Deployment wurde gestartet. Die öffentliche Wirkung ist noch nicht bestätigt.', 'waiting');
         } catch (Throwable $error) {
             be_cc_update_content_change($changeId, 'deploy_failed', ['error' => $error->getMessage()]);
             $change = be_cc_get_content_change($changeId);
