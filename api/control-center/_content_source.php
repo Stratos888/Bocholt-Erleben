@@ -75,7 +75,7 @@ function be_cc_activity_items(bool $full = false): array
     if (!is_file($path)) return [];
     $payload = json_decode((string)file_get_contents($path), true);
     $offers = is_array($payload['offers'] ?? null) ? $payload['offers'] : [];
-    $editable = be_cc_activity_writeback_available();
+    $repoPrepared = be_cc_activity_writeback_available();
     $items = [];
     foreach ($offers as $offer) {
         if (!is_array($offer)) continue;
@@ -91,10 +91,11 @@ function be_cc_activity_items(bool $full = false): array
             'source_url' => trim((string)($offer['url'] ?? '')),
             'public_url' => '/aktivitaeten/?activity=' . rawurlencode($id),
             'updated_at' => trim((string)($offer['opening_status']['checked_at'] ?? $offer['checked_at'] ?? '')),
-            'editable' => $editable,
-            'edit_notice' => $editable
-                ? 'Änderungen werden versioniert in data/offers.json geschrieben und anschließend veröffentlicht.'
-                : 'Aktivitäten sind repo-geführt. Der sichere Repo-Writeback benötigt das serverseitige Secret BE_GITHUB_REPO_TOKEN.',
+            'editable' => false,
+            'repo_writeback_prepared' => $repoPrepared,
+            'edit_notice' => $repoPrepared
+                ? 'Der sichere Repo-Writeback ist vorbereitet. Der Editor bleibt bis zur vollständigen E2E-Verifikation bewusst gesperrt.'
+                : 'Aktivitäten sind repo-geführt. Der sichere Repo-Writeback benötigt zusätzlich das serverseitige Secret BE_GITHUB_REPO_TOKEN und eine E2E-Verifikation.',
         ];
         if ($full) {
             $item['description'] = trim((string)($offer['description'] ?? ''));
