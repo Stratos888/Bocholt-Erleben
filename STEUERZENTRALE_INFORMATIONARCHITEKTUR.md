@@ -5,77 +5,58 @@ Status: verbindlicher Navigations- und Bereichsvertrag
 
 ## 1. Leitentscheidung
 
-Die Steuerzentrale ist eine Betreiberanwendung für Aufmerksamkeit, Arbeit und fachliche Verwaltung. Die Hauptnavigation enthält nur regelmäßig benötigte, vollständig nutzbare Bereiche.
+Die Steuerzentrale ist die zentrale Betreiberanwendung für Aufmerksamkeit, Entscheidungen, geplante Arbeit, Live-Inhalte und messbare Projektentwicklung. Sie ist keine parallele fachliche Datenquelle.
 
 ## 2. Hauptnavigation
 
 1. Übersicht
-2. Bearbeiten
+2. Prüfen
 3. Arbeit
 4. Verwaltung
-5. Menü
+5. Entwicklung
 
-Die Navigation bleibt auf Mobilgerät, Tablet und Desktop dauerhaft erreichbar.
+Seltene Funktionen liegen im Header-Menü und belegen keinen Haupttab.
 
 ## 3. Übersicht
 
-Zweck: in wenigen Sekunden erkennen, ob und wo Handlung nötig ist.
+Zweck: in wenigen Sekunden erkennen, ob Handlung nötig ist und ob sich das Gesamtprojekt stabil entwickelt.
 
 Blöcke:
 
 - Jetzt erforderlich
-- Zu bearbeiten
+- Zu prüfen
 - Arbeit
-- Wartet/Blockiert
-- Zur Kenntnis
-- Systemzustand
+- Entwicklung
 
 Regeln:
 
 - keine vollständigen Vorgangskarten,
 - keine doppelte Arbeitsliste,
 - maximal zwei Beispiele pro verdichtetem Block,
-- CTA öffnet den passenden Bereich mit gesetztem Filter,
+- CTA öffnet den passenden Bereich,
 - Normalzustand ruhig und fachlich formuliert.
 
-## 4. Bearbeiten
+## 4. Prüfen
 
-Zweck: alle ungeklärten und entscheidungsbedürftigen Quellfälle sicher bearbeiten.
+Zweck: alle ungeklärten, entscheidungsbedürftigen oder direkt korrekturbedürftigen Quellfälle bearbeiten.
 
-Filter:
+Typische Fälle:
 
-- Alle
-- Neue Inhalte
-- Änderungen
-- Qualität
-- Anbieter
-- Freigaben
-- Sonstige
+- neue Inhalte,
+- Qualitätsprüfungen,
+- Anbieterentscheidungen,
+- Freigaben,
+- Quellen- und Beschreibungskorrekturen.
 
-Mobil:
-
-- ein fokussierter Vorgang,
-- Fortschritt,
-- Problem/Anlass,
-- erforderlicher Schritt,
-- relevante Daten und Quelle,
-- genau eine dominante Hauptaktion,
-- maximal zwei sichtbare Nebenaktionen,
-- Vorher/Weiter.
-
-Desktop:
-
-- kompakte Queue links,
-- Detail und Aktionen rechts,
-- Auswahl und Scrollzustand bleiben erhalten.
+Mobil wird genau ein Fall fokussiert. Desktop nutzt Queue plus Detail. `Prüfen` ist bewusst von `Arbeit` getrennt: Hier fehlt noch eine Entscheidung; unter `Arbeit` ist die Notwendigkeit bereits entschieden.
 
 ## 5. Arbeit
 
-Zweck: den vollständigen Lebenszyklus geplanter menschlicher Arbeit abbilden.
+Zweck: den Lebenszyklus bereits entschiedener menschlicher Arbeit abbilden.
 
 Unteransichten:
 
-- Aktiv/Jetzt
+- Jetzt
 - Als Nächstes
 - Wartet
 - Blockiert
@@ -83,85 +64,83 @@ Unteransichten:
 - Ideen
 - Archiv
 
-### Aufgabe
+Standarddarstellung sind kompakte Zeilen mit Titel, Art und Kurzbeschreibung. Volltext und Aktionen erscheinen erst nach Aufklappen.
 
-Entschiedene konkrete Arbeit mit nächstem Schritt, optionaler Fälligkeit und Objektbezug.
-
-### Backlog
-
-Bewusst vorgemerkte Arbeit ohne aktive Einplanung. Quellen:
-
-- Growth-/Acquisition-Backlog,
-- kuratierte Repo-Workpacks,
-- Produkt-, Content- und Technikverbesserungen,
-- aus Ideen übernommene Punkte.
-
-### Idee
-
-Ungeprüfter Gedanke ohne Fälligkeit. Kann verworfen, geparkt, als Backlog übernommen oder direkt gestartet werden.
-
-Übergänge ändern den führenden Zustand und erzeugen keine Doppelkarte.
+Neue Einträge werden über einen gemeinsamen Einstieg `+ Neu` als Aufgabe, Backlogpunkt oder Idee angelegt. Übergänge erzeugen keine Doppelkarte.
 
 ## 6. Verwaltung
 
-Zweck: Events und Aktivitäten intern suchen, prüfen und tatsächlich verändern.
+Zweck: fachliche Live-Inhalte suchen, öffnen, bearbeiten und veröffentlichen.
 
-### Objektliste
+### Veranstaltungen
 
-- stabiles Suchfeld ohne Fokusverlust,
-- Filter nach Typ, Status und Handlungsbedarf,
-- Publikationsstatus,
-- Quelle/letzte Aktualisierung,
-- offene Vorgänge,
-- kompakte Ergebnisse.
-
-### Objektdetail
-
+- führende Quelle: Events-Sheet,
+- bearbeitbare Stammdaten,
+- fachliche Validierung,
+- Speichern in der führenden Quelle,
+- automatischer Deploy-Start,
 - öffentliche Vorschau,
-- bearbeitbare fachliche Felder,
-- Quelle,
-- Qualitätsstatus,
-- offene Vorgänge,
-- Verlauf,
-- Änderung/Absage,
-- Speichern mit führendem Writeback und Veröffentlichungswirkung.
+- klare Rückmeldung bei Teilfehlern.
+
+### Aktivitäten
+
+- führende Quelle: versionierte Datei `data/offers.json`,
+- öffentliche Vorschau und Bestandsanzeige vorhanden,
+- dauerhafte Bearbeitung erst mit abgesichertem Repo-Writeback,
+- kein scheinbarer lokaler Dateischreibpfad.
 
 Das Suchfeld bleibt beim Tippen bestehen; nur die Ergebnisliste wird aktualisiert.
 
-## 7. Menü
+## 7. Entwicklung
+
+Zweck: verständlich zeigen, ob Content, Automatisierungen, SEO und Produktentwicklung das Gesamtprojekt verbessern oder verschlechtern.
+
+Enthält:
+
+- Content-Qualität,
+- Automatisierungswirkung,
+- SEO-Onpage-Signale,
+- Search-Console-Datenlage,
+- offene kuratierte Workpacks,
+- Blockaden und Risiken.
+
+Nicht zulässig:
+
+- erfundene Trends,
+- ein künstlicher Gesamtscore ohne belastbare Gewichtung,
+- rohe Commitlisten,
+- technische Laufdaten ohne fachliche Einordnung.
+
+Search-Console-Kennzahlen werden erst angezeigt, wenn die Quelle tatsächlich angebunden ist. Bis dahin wird die Datenlücke ausdrücklich benannt.
+
+## 8. Header-Menü
 
 Enthält nur selten benötigte Funktionen:
 
 - Anbieterbereich,
 - Systemstatus,
-- Einstellungen,
+- Deployment starten,
+- Einstellungen, sobald implementiert,
 - Abmelden,
 - technische Diagnose nachrangig.
 
-Nicht im Menü:
+## 9. Systemstatus
 
-- Ideen und Backlog als versteckte Nebenfunktion,
-- technische Rohwerte in der Standardansicht,
-- leere Funktionsversprechen,
-- reguläre Altansicht.
+Die Standardansicht zeigt:
 
-## 8. Systemstatus
+- fachlichen Normal- oder Störungszustand,
+- offene Prüfungen,
+- aktive und blockierte Arbeit,
+- tatsächliche Auswirkung.
 
-Standardansicht:
+Technische Werte wie `seen` und `upserted` bleiben eingeklappt.
 
-- Synchronisation erfolgreich/gestört,
-- betroffene fachliche Funktion,
-- tatsächliche Auswirkung,
-- genau eine nächste Aktion bei Handlungsbedarf.
+## 10. Badges
 
-Technische Details können `seen`, `upserted`, Fehlerklasse und Logs enthalten, sind aber eingeklappt.
-
-## 9. Badges
-
-- Bearbeiten: aktive entscheidungsbedürftige Fälle.
-- Arbeit: aktive Aufgaben plus tatsächlich fällige/blockierte Arbeit.
+- Prüfen: aktive entscheidungsbedürftige Fälle.
+- Arbeit: aktive konkrete Aufgaben.
 - Keine Badges für Ideen, normalen Backlog, Informationen oder erfolgreiche Läufe.
 
-## 10. Rolle der Altansicht
+## 11. Rolle der Altansicht
 
-`/inbox/` ist bis zur vollständigen Migration ausschließlich Fallback und Diagnose. Sie ist kein Bestandteil der finalen Hauptnavigation.
+`/inbox/` bleibt bis zur vollständigen Migration Fallback für noch nicht überführte Push-, Diagnose- und Sonderfunktionen. Sie ist kein Bestandteil der finalen Hauptnavigation.
