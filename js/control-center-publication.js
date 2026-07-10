@@ -26,7 +26,7 @@
   function eventUpdates() {
     return {
       title: value('#ce-title'), date: value('#ce-date'), end_date: value('#ce-end'), time: value('#ce-time'),
-      location: value('#ce-location'), city: value('#ce-city'), category: value('#ce-category'),
+      location: value('#ce-location'), address: value('#ce-address'), city: value('#ce-city'), category: value('#ce-category'),
       source_url: value('#ce-source'), ticket_url: value('#ce-ticket'), description: value('#ce-description'),
     };
   }
