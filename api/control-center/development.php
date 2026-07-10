@@ -56,6 +56,7 @@ try {
     $blocked = $count("SELECT COUNT(*) FROM control_cases WHERE state='blocked'");
     $openQuality = $count("SELECT COUNT(*) FROM control_cases WHERE source_system='content_audit' AND state NOT IN ('done','rejected','parked')");
     $hasCurrentAttention = $blocked > 0 || $openQuality > 0 || (int)$quality['missingDescription'] > 0 || (int)$quality['missingSource'] > 0 || (int)$quality['missingDate'] > 0;
+    $seoMessage = 'Aktuell wird nur die redaktionelle SEO-Inhaltsbasis gemessen. Technische SEO- und Search-Console-Kennzahlen sind noch nicht angebunden.';
 
     be_json_response(200, ['status' => 'ok', 'data' => [
         'generated_at' => gmdate('c'),
@@ -86,11 +87,13 @@ try {
         ],
         'seo' => [
             'content_basis_percent' => $coverage,
+            'onpage_event_coverage_percent' => $coverage,
             'missing_descriptions' => (int)$quality['missingDescription'],
             'missing_sources' => (int)$quality['missingSource'],
             'technical_seo_available' => false,
             'search_console_connected' => false,
-            'message' => 'Aktuell wird nur die redaktionelle SEO-Inhaltsbasis gemessen. Technische SEO- und Search-Console-Kennzahlen sind noch nicht angebunden.',
+            'message' => $seoMessage,
+            'search_console_message' => $seoMessage,
         ],
         'product' => ['open_repo_workpacks' => $openWorkpacks, 'workpacks' => array_values(array_slice($workpacks, 0, 8))],
     ]]);
