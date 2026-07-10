@@ -19,13 +19,14 @@ Dieser Stand wird nach dem Deployment zunächst praktisch genutzt. Ziel ist, rea
 - `Prüfen` zeigt auf jedem Filter die aktuelle Fallzahl.
 - `Arbeit` verwendet aufklappbare Zeilen als einzige Detailebene.
 - Backlogpunkte werden bearbeitet, abgeschlossen oder verworfen; eine separate Umwandlung zur Aufgabe ist nicht Teil der sichtbaren Bedienung.
-- `Verwaltung` lädt redaktionelle Events und Anbieter-Events getrennt und fehlertolerant.
+- `Verwaltung` lädt redaktionelle Events und Anbieter-Events getrennt, parallel, mit Zeitlimit und Teilfehleranzeige.
 - `Entwicklung` zeigt in der Hauptansicht nur Content, Prozesse und Sichtbarkeit.
+- Weitere Entwicklungswerte sind standardmäßig eingeklappt.
 - Repo-Workpacks erscheinen ausschließlich unter `Arbeit → Backlog`.
 
 ## Technischer Freeze-Vertrag
 
-- Asset-Version: `2026-07-10-control-center-freeze-v1`
+- Asset-Version: `2026-07-10-control-center-freeze-v2`
 - Branch: `staging`
 - führende Inbox: Google-Sheet-Tab `Inbox`
 - Inbox-Fallback: `data/inbox.json` nur bei Sheet-Fehler
