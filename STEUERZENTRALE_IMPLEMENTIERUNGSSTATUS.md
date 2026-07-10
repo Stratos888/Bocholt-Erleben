@@ -1,7 +1,7 @@
 # Steuerzentrale – Implementierungsstatus
 
 Stand: 2026-07-10  
-Status: Gesamtprojekt-Integrationspatch umgesetzt; interne Verträge erweitert, externe Staging-Freigabe ausstehend
+Status: Feedback-Korrekturpatch umgesetzt; Freeze-Stand für praktische Nutzung vorbereitet
 
 ## 1. Verbindliche Hauptnavigation
 
@@ -13,184 +13,196 @@ Status: Gesamtprojekt-Integrationspatch umgesetzt; interne Verträge erweitert, 
 
 Seltene Funktionen liegen im Header-Menü.
 
-## 2. Umgesetzter Produkt- und Prozesskern
+## 2. Nutzerorientierter Freeze-Zustand
 
-### Übersicht und Prüfen
+### Übersicht
 
-- verdichtete Aufmerksamkeit statt vollständiger Kartenwiederholung,
+- zeigt nur aktuelle Aufmerksamkeit, offene Prüfungen, aktive Arbeit und einen verdichteten Entwicklungsstatus,
+- Backlog wird als Zusatzinformation gezeigt, aber nicht als aktive Arbeit gezählt,
+- Entwicklung nennt keine Repo-Workpacks mehr.
+
+### Prüfen
+
 - neue Inhalte, Qualitätsfälle, Anbieterentscheidungen und Freigaben,
-- direkte Synchronisation aus dem führenden Sheet-Tab `Inbox`,
-- `data/inbox.json` nur noch als deduplizierter Fallback,
-- identische Quellreferenzen verhindern Doppelfälle,
-- mobil fokussierter Einzelfall,
-- Desktop Queue plus Detail,
-- fachliche Hauptaktionen und deutsche Statussprache.
-
-Damit ist die Kette `KI-Suche → Manual Intake → Sheet-Inbox → Steuerzentrale` nicht mehr vom erfolgreichen JSON-Export als alleiniger Quelle abhängig.
+- direkte Synchronisation aus der führenden Sheet-Inbox,
+- JSON-Inbox ausschließlich als Fehlerfallback,
+- jeder Filter zeigt seine aktuelle Anzahl:
+  - Alle,
+  - Neue Inhalte,
+  - Qualität,
+  - Anbieter,
+  - Freigaben,
+  - Sonstige,
+- mobil fokussierter Einzelfall, Desktop Queue plus Detail.
 
 ### Arbeit
 
 - Jetzt, Als Nächstes, Wartet, Blockiert, Backlog, Ideen und Archiv,
-- kompakte aufklappbare Zeilen,
-- gemeinsame Neuerfassung über `+ Neu`,
-- Growth-Backlog- und kuratierte Repo-Workpack-Anbindung,
-- Umwandlung ohne Doppelvorgang,
-- Warte- und Blockadegründe,
-- deduplizierte Publikationsprobleme,
-- fehlerhafte Automatisierungsprozesse werden als blockierte Arbeit angelegt,
-- wieder gesunde Prozesse schließen ihren technischen Arbeitsfall automatisch.
+- kompakte, aufklappbare Zeilen,
+- der aufgeklappte Inhalt ist die einzige Detailebene,
+- kein zusätzlicher `Details`-Button,
+- Backlogpunkte werden nicht mehr über `Als Aufgabe starten` in einen zweiten Arbeitsstatus überführt,
+- Backlogaktionen bleiben auf Bearbeiten, Abschließen und Verwerfen reduziert,
+- technische Warte- und Blockadefälle bleiben sichtbar, weil sie für automatisierte Prozesse und Veröffentlichungen erforderlich sind.
 
-Die Statusübergänge liegen in `api/control-center/_workflow_contracts.php`. Laufzeit und Simulation verwenden dieselbe Regelmenge.
+### Verwaltung
 
-### Eventverwaltung
+Die Verwaltung lädt die Quellen getrennt:
 
-Die Verwaltung umfasst jetzt beide öffentlichen Eventquellen:
+1. redaktionelle Events aus dem Events-Sheet,
+2. Anbieter-Events aus der Einreichungsdatenbank,
+3. Aktivitäten aus `data/offers.json`.
 
-1. redaktionelle Events aus dem führenden Events-Sheet,
-2. genehmigte Anbieter-Events aus der Einreichungsdatenbank.
+Für die beiden Eventquellen gilt:
 
-Für Sheet-Events:
+- paralleles Laden mit festem Zeitlimit,
+- Ausfall einer Quelle blockiert die andere Quelle nicht,
+- Teilfehler wird verständlich angezeigt,
+- kein dauerhafter Ladezustand ohne Rückmeldung,
+- Suche ohne Fokusverlust,
+- Quelle je Event sichtbar,
+- Bearbeiten und Vorschau als Hauptaktionen.
 
-- vollständige Vorabvalidierung,
-- Aliasauflösung zur tatsächlichen Sheet-Spalte,
-- gemeinsamer Google-Sheets-Batch,
-- Deploy-Start,
-- öffentliche Verifikation gegen `/data/events.json`.
+Sheet-Events schreiben in das führende Sheet. Anbieter-Events schreiben transaktional in `submissions`. Beide verwenden Änderungsverlauf und öffentliche Wirkungskontrolle.
 
-Für Anbieter-Events:
-
-- direkter, transaktionaler Writeback in `submissions`,
-- Bearbeitung von Titel, Datum, Zeit, Ort, Adresse, Beschreibung, offizieller Quelle und Ticketlink,
-- öffentliche Verifikation gegen `/api/events/public.php`,
-- getrennte öffentliche Felder `source_url`, `ticket_url` und `address`,
-- kompatibles zusammengesetztes Ortslabel.
-
-Für beide Quellen gelten:
-
-- dauerhafter Änderungsverlauf,
-- Abschluss erst nach bestätigter öffentlicher Wirkung,
-- wartende oder blockierte Aufgabe bei Teilfehlern,
-- UI-Text `Speichern und Aktualisierung starten`.
-
-### Aktivitätsverwaltung
-
-Der dauerhafte Repo-Pfad ist vollständig vorbereitet und in denselben Veröffentlichungsprozess integriert:
-
-- GitHub Contents API für `data/offers.json`,
-- aktueller Datei-SHA als Konfliktschutz,
-- erlaubte Feldmenge,
-- Pflichtfeld- und URL-Validierung,
-- versionierter Commit,
-- Änderungsverlauf,
-- wartender Publikationsvorgang,
-- öffentliche Verifikation gegen `/data/offers.json`.
-
-Die Freigabe bleibt bewusst zweistufig:
+Die Aktivitätsbearbeitung bleibt durch das explizite Repo-Gate geschützt:
 
 1. `BE_GITHUB_REPO_TOKEN` und Repository-/Branch-Konfiguration,
-2. explizit `BE_ACTIVITY_WRITEBACK_ENABLED=true`.
+2. `BE_ACTIVITY_WRITEBACK_ENABLED=true`.
 
-### Entwicklung, Lernwirkung und Nutzer-Funnel
+### Entwicklung
 
-Der Bereich `Entwicklung` liest jetzt zusätzlich die bestehende Content-Ops-Betriebsdatenbank:
+Die Hauptansicht ist bewusst auf drei mobile Kernkarten reduziert:
 
-- `content_ops_run`,
-- `content_ops_metric_daily`,
-- `feedback_rule_effectiveness_daily`.
+1. Content,
+2. Prozesse,
+3. Sichtbarkeit.
 
-Dadurch werden sichtbar:
+Zusätzliche Messwerte liegen eingeklappt unter `Weitere Messwerte`.
 
-- letzte erfasste Läufe von KI-Suche, Intake, Content-Audit, Inbox-Bereinigung und Growth-Auswertung,
-- verhinderte Wiederholungen durch Lern- und Deduplizierungsregeln,
-- False Positives,
-- wiederkehrende Probleme,
-- wirksamste Lernregeln,
-- vorhandene Search-Console-, GA4- und Wertsignal-Datensätze,
-- Content-Vollständigkeit, technische SEO und Publikationsprobleme.
+Nicht mehr in der Entwicklungsansicht:
 
-Search Console gilt nur dann als angebunden, wenn reale GSC-Datensätze in der Betriebsdatenbank vorliegen. Fehlende Daten werden weiterhin transparent benannt.
+- aktuelle Repo-Workpacks,
+- ausführliche Lernregellisten,
+- separate Textblöcke zur SEO-Datenlage,
+- dauerhaft ausgeklappte Search-, Intake-, Funnel- und Prozessdetails.
 
-### Systemstatus
+Workpacks und geplante Verbesserungen bleiben ausschließlich unter `Arbeit → Backlog`.
 
-- fachliche Aussage zuerst,
-- technische Details nur eingeklappt,
-- letzter erfasster Zustand der automatisierten Prozesskette,
-- offene Prüfungen, aktive und blockierte Arbeit,
-- Prozessfehler mit Link zum gespeicherten Lauf, soweit vorhanden,
-- manueller Deploy-Start,
-- Anbieterbereich und Abmelden im Header-Menü.
+## 3. Integrierte Prozesskette
 
-## 3. Gesamtprojekt-Integrationspatch
+```text
+Content-Audit
+→ Such- und Visual-Feedback
+→ wöchentliche KI-Eventsuche
+→ KI-Intake
+→ führende Sheet-Inbox
+→ Prüfen
+→ führende Event-/Aktivitätsquelle
+→ Deployment oder öffentliche API
+→ öffentliche Wirkung
+→ Content-Ops-/SEO-/Funnel-Messung
+→ Entwicklung beziehungsweise neue Arbeit
+```
 
-Neu beziehungsweise korrigiert:
+Wesentliche Regeln:
 
-- führende Sheet-Inbox direkt angebunden,
-- JSON-Inbox als deduplizierter Fallback erhalten,
-- Content-Ops- und Lernwirkungsdaten in `Entwicklung` integriert,
-- Growth-/Funnel-Daten nur bei tatsächlicher Datenbasis angezeigt,
-- Prozessgesundheit in Systemstatus und Arbeit verbunden,
-- alle öffentlich sichtbaren Eventquellen in der Verwaltung zusammengeführt,
-- Anbieter-Event-Writeback transaktional umgesetzt,
-- Anbieter-Event-API um verifizierbare Adresse, Quelle und Ticketlink ergänzt,
-- Eventquellen nutzen denselben Änderungs- und Publikationsprozess,
-- CI- und Produktverträge um Gesamtprojektintegration erweitert.
+- kandidaterzeugender Suchlauf benötigt einen nachgelagerten Intake-Lauf,
+- Quellfehler werden einzeln gekapselt und als blockierte Arbeit sichtbar,
+- ein Quellfehler macht nicht die gesamte Steuerzentrale unbenutzbar,
+- Veröffentlichung gilt erst nach bestätigter öffentlicher Wirkung als abgeschlossen,
+- fehlende Search-Console-/GA4-Daten werden nicht als Nullerfolg ausgegeben.
 
-## 4. Interne Simulation und automatische Prüfung
+## 4. Öffentliche Inhaltsquellen
 
-`tests/control_center_contracts_test.php` simuliert zusätzlich:
+### Redaktionelle Events
 
-- öffentliche Anbieter-Events mit getrennten URLs,
-- zusammengesetztes Ortslabel plus separate Adresse,
-- erkannte Adressabweichung,
-- bestehende Event-, Aktivitäts-, Workflow- und Veröffentlichungsverträge.
+```text
+Steuerzentrale
+→ Events-Sheet
+→ Apps-Script-Deployment
+→ /data/events.json
+→ Feldvergleich
+→ Bestätigung
+```
 
-`.github/workflows/control-center-validation.yml` prüft zusätzlich:
+### Anbieter-Events
 
-- Syntax des öffentlichen Anbieter-Event-Endpunkts,
-- neuen Integrationscontroller,
-- Sheet-Inbox-Adapter,
-- Content-Ops-Adapter,
-- Anbieter-Event-Adapter,
-- Lernwirkung, Funnelmetriken und Prozessstatus,
-- Anbieter-Event-Public-Verifikation.
+```text
+Steuerzentrale
+→ transaktionaler submissions-Writeback
+→ /api/events/public.php
+→ Feldvergleich einschließlich Adresse, Quelle und Ticketlink
+→ Bestätigung
+```
 
-Ein grüner GitHub-Actions-Lauf ist über den aktuell verfügbaren Connector weiterhin nicht belegt.
+### Aktivitäten
 
-## 5. Externe Grenzen
+```text
+Steuerzentrale
+→ explizites Repo-Gate
+→ SHA-geschützter GitHub-Commit
+→ /data/offers.json
+→ Feldvergleich
+→ Bestätigung
+```
 
-Intern nicht ersetzbar bleiben reale Nachweise für:
+## 5. Automatische Verträge
+
+Der Produktvertragsaudit prüft zusätzlich:
+
+- Zähler auf allen Prüffiltern,
+- kein redundanter Details-Button in Arbeitszeilen,
+- keine sichtbare Backlog-Umwandlungsaktion,
+- getrennte Verwaltungsquellen,
+- Zeitlimit und Teilfehlerverhalten der Verwaltung,
+- kompakte Entwicklungsansicht mit Content, Prozesse und Sichtbarkeit,
+- keine Workpack-Duplikation in Entwicklung,
+- Cache-Version des Freeze-Stands.
+
+Die GitHub-Validierung prüft weiterhin:
+
+- PHP-Syntax,
+- JavaScript-Syntax,
+- ausführbare Domänen- und Prozesskettensimulation,
+- Produktvertrag,
+- Sicherheits- und Quellenverträge.
+
+## 6. Freeze-Regel
+
+Der aktuelle Stand wird nach erfolgreichem Deployment als Arbeits-Freeze verwendet.
+
+Bis zum nächsten gebündelten Nutzerfeedback gelten folgende Regeln:
+
+- keine neue Navigation,
+- keine zusätzlichen Statusmodelle,
+- keine neuen Hauptkarten oder Workpack-Duplikate,
+- nur Fehlerkorrekturen bei nachweisbaren Funktionsproblemen,
+- Feedback wird gesammelt und anschließend als ein zusammenhängendes Folge-Workpack bewertet.
+
+## 7. Externe Grenzen
+
+Weiterhin real zu bestätigen beziehungsweise zu konfigurieren:
 
 - Google-Sheets-Lese- und Schreibzugriff,
-- Apps-Script-Unlock und Deploy,
-- MySQL-Tabellen und tatsächliche Content-Ops-Daten auf Staging,
-- reale öffentliche Feed- und API-Aktualisierung,
-- serverseitiges GitHub-Secret und dessen Rechte,
-- aktivierter Aktivitätseditor,
-- Browserdarstellung auf Zielgeräten,
-- tatsächlich vorhandene Search-Console-/GA4-Daten.
+- Apps-Script-Deployment,
+- Staging-MySQL und vorhandene Content-Ops-Daten,
+- öffentliche Feed-/API-Aktualisierung,
+- Aktivitäts-GitHub-Secret und Freigabeschalter,
+- reale Search-Console-/GA4-Daten,
+- Browserdarstellung auf den Zielgeräten.
 
-## 6. Alte Inbox
-
-`/inbox/` bleibt nur noch für ausdrücklich nicht migrierte Push- und Diagnosefunktionen. Reguläre Prüfung, Arbeit, Backlog, Eventverwaltung und Entwicklungsbeobachtung gehören in die Steuerzentrale.
-
-## 7. Freigabestatus
+## 8. Freigabestatus
 
 | Bereich | Status |
 |---|---|
-| Informationsarchitektur | umgesetzt |
-| KI-/Sheet-Inbox → Prüfen | direkt integriert; externer Laufzeitnachweis offen |
-| Arbeit | umgesetzt; Prozessfehler integriert |
-| Sheet-Eventverwaltung | technisch vollständig modelliert |
-| Anbieter-Eventverwaltung | technisch vollständig integriert |
-| Aktivitätsverwaltung | vollständig vorbereitet; Aktivierung über Server-Gate |
-| Lernwirkungsanzeige | Content-Ops-Datenvertrag integriert |
-| Prozessstatus | integriert |
-| Search Console/GA4 | wird bei real vorhandenen Betriebsdaten angezeigt |
-| Nutzer-Funnel | vorhandene Growth-Signale integriert; reale Datenbasis extern zu bestätigen |
-| Alte Inbox-Ablösung | Restdiagnose offen |
-| CI-Nachweis | für neuesten Commit noch nicht verfügbar |
-| Main-Merge | erst nach externer Staging-Abnahme |
-
-## 8. Premium-Regel
-
-Der Code gilt intern erst dann als Premium-tauglich, wenn Syntax, Domänensimulation und Produktvertragsaudit grün sind. Der Gesamtprozess gilt erst nach realer Staging-Bestätigung als freigegeben. Ein interner Test ersetzt keine externe Wirkungskontrolle und eine externe Wirkungskontrolle ersetzt keine Domänensimulation.
+| Informationsarchitektur | Freeze-Ziel umgesetzt |
+| Prüfen-Zähler | für alle Filter umgesetzt |
+| Arbeit | vereinfacht; keine zweite Detailebene und keine Backlog-Umwandlung |
+| Verwaltung | getrennte Quellen, Timeout und Teilfehleranzeige umgesetzt |
+| Entwicklung | kompakte mobile Kernansicht umgesetzt |
+| Workpacks | ausschließlich im Backlog |
+| Eventveröffentlichung | technisch integriert; reale Wirkung weiter beobachtbar |
+| Aktivitätsverwaltung | technisch vorbereitet; Server-Gate bleibt maßgeblich |
+| Freeze | nach Deployment für praktische Nutzung vorgesehen |
+| Main-Merge | nicht Bestandteil dieses Freeze; gesonderte Freigabe erforderlich |
