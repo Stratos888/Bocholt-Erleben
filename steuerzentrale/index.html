@@ -13,7 +13,10 @@
       <p class="cc-eyebrow">Bocholt erleben</p>
       <h1 id="cc-title">Übersicht</h1>
     </div>
-    <button class="cc-icon-button" id="cc-refresh" type="button" aria-label="Aktualisieren">↻</button>
+    <div class="cc-header-actions">
+      <button class="cc-icon-button" id="cc-refresh" type="button" aria-label="Aktualisieren">↻</button>
+      <button class="cc-icon-button" id="cc-menu-button" type="button" aria-label="Menü öffnen" aria-expanded="false">⋯</button>
+    </div>
   </header>
 
   <main class="cc-main" id="cc-main">
@@ -34,20 +37,19 @@
 
   <nav class="cc-nav" aria-label="Steuerzentrale">
     <button type="button" data-view="overview" class="is-active"><span>Übersicht</span></button>
-    <button type="button" data-view="work"><span>Bearbeiten</span><b id="cc-badge-work" hidden></b></button>
+    <button type="button" data-view="review"><span>Prüfen</span><b id="cc-badge-review" hidden></b></button>
     <button type="button" data-view="labor"><span>Arbeit</span><b id="cc-badge-labor" hidden></b></button>
     <button type="button" data-view="manage"><span>Verwaltung</span></button>
-    <button type="button" data-view="menu"><span>Menü</span></button>
+    <button type="button" data-view="development"><span>Entwicklung</span></button>
   </nav>
 
   <dialog id="cc-dialog" class="cc-dialog">
-    <form method="dialog" class="cc-dialog__card" id="cc-dialog-form">
-      <button class="cc-dialog__close" value="cancel" aria-label="Schließen">×</button>
+    <form method="dialog" class="cc-dialog__card" id="cc-dialog-form" novalidate>
+      <button class="cc-dialog__close" id="cc-dialog-close" type="button" aria-label="Schließen">×</button>
       <div id="cc-dialog-body"></div>
     </form>
   </dialog>
 
-  <script src="/js/control-center.js?v=2026-07-10-work-v1" defer></script>
-  <script src="/js/control-center-work-actions.js?v=2026-07-10-work-v1" defer></script>
+  <script src="/js/control-center.js?v=2026-07-10-development-v1" defer></script>
 </body>
 </html>
