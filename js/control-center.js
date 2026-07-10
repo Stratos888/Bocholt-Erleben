@@ -6,52 +6,35 @@
     view: 'overview',
     cases: [],
     overview: null,
+    workGroup: 'all',
+    workIndex: 0,
+    taskMode: 'active',
+    managementType: 'events',
+    managementQuery: '',
+    managementItems: { events: [], activities: [] },
+    managementLoaded: false,
   };
 
   const els = {
-    auth: document.querySelector('#cc-auth'),
-    authForm: document.querySelector('#cc-auth-form'),
-    password: document.querySelector('#cc-password'),
-    content: document.querySelector('#cc-content'),
-    view: document.querySelector('#cc-view'),
-    title: document.querySelector('#cc-title'),
-    status: document.querySelector('#cc-status'),
-    refresh: document.querySelector('#cc-refresh'),
-    nav: [...document.querySelectorAll('.cc-nav [data-view]')],
-    badgeInbox: document.querySelector('#cc-badge-inbox'),
-    badgeTasks: document.querySelector('#cc-badge-tasks'),
-    dialog: document.querySelector('#cc-dialog'),
-    dialogBody: document.querySelector('#cc-dialog-body'),
+    auth: document.querySelector('#cc-auth'), authForm: document.querySelector('#cc-auth-form'), password: document.querySelector('#cc-password'),
+    content: document.querySelector('#cc-content'), view: document.querySelector('#cc-view'), title: document.querySelector('#cc-title'),
+    status: document.querySelector('#cc-status'), refresh: document.querySelector('#cc-refresh'), nav: [...document.querySelectorAll('.cc-nav [data-view]')],
+    badgeWork: document.querySelector('#cc-badge-work'), badgeTasks: document.querySelector('#cc-badge-tasks'),
+    dialog: document.querySelector('#cc-dialog'), dialogBody: document.querySelector('#cc-dialog-body'),
   };
 
-  const rejectReasons = [
-    'Termin liegt in der Vergangenheit',
-    'Doppelt / bereits abgedeckt',
-    'Terminangaben unklar',
-    'Nicht öffentlich zugänglich',
-    'Quelle / Angaben reichen nicht',
-    'Nicht lokal genug',
-    'Redaktionell nicht passend',
-  ];
+  const rejectReasons = ['Termin liegt in der Vergangenheit','Doppelt / bereits abgedeckt','Terminangaben unklar','Nicht öffentlich zugänglich','Quelle / Angaben reichen nicht','Nicht lokal genug','Redaktionell nicht passend'];
+  const groupLabels = {all:'Alle',new_content:'Neue Inhalte',quality:'Qualität',provider:'Anbieter',approvals:'Freigaben',other:'Sonstige'};
 
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
-  }
-
-  function formatDate(value) {
-    if (!value) return '';
-    const date = new Date(String(value).replace(' ', 'T'));
-    return Number.isNaN(date.getTime()) ? '' : new Intl.DateTimeFormat('de-DE', {dateStyle:'medium'}).format(date);
-  }
+  const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+  const clean = value => String(value ?? '').trim();
+  const formatDate = value => { if (!value) return ''; const date = new Date(String(value).replace(' ', 'T')); return Number.isNaN(date.getTime()) ? '' : new Intl.DateTimeFormat('de-DE',{dateStyle:'medium'}).format(date); };
+  const setStatus = message => { els.status.textContent = message || ''; };
 
   async function api(path, options = {}) {
     const response = await fetch(path, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-BE-Review-Password': state.password,
-        ...(options.headers || {}),
-      },
+      headers: {'Content-Type':'application/json','X-BE-Review-Password':state.password,...(options.headers || {})},
       cache: 'no-store',
     });
     const payload = await response.json().catch(() => ({}));
@@ -62,8 +45,6 @@
     return payload.data;
   }
 
-  function setStatus(message = '') { els.status.textContent = message; }
-
   function logout() {
     state.password = '';
     sessionStorage.removeItem('be_cc_password');
@@ -71,236 +52,229 @@
     els.auth.hidden = false;
   }
 
-  function pill(label, modifier = '') {
-    return `<span class="cc-pill${modifier ? ` cc-pill--${modifier}` : ''}">${escapeHtml(label)}</span>`;
+  function activeCases() { return state.cases.filter(item => !['done','rejected','parked','information'].includes(item.state)); }
+  function workCases() { return activeCases().filter(item => item.type === 'intake' && (state.workGroup === 'all' || item.queue_group === state.workGroup)); }
+  function taskCases() { return state.cases.filter(item => item.type === 'task' && (state.taskMode === 'archive' ? ['done','rejected','parked'].includes(item.state) : !['done','rejected','parked'].includes(item.state))); }
+
+  function setView(view) {
+    state.view = view;
+    const titles = {overview:'Übersicht',work:'Bearbeiten',tasks:'Aufgaben',manage:'Verwaltung',more:'Mehr'};
+    els.title.textContent = titles[view] || 'Steuerzentrale';
+    els.nav.forEach(button => button.classList.toggle('is-active', button.dataset.view === view));
+    render();
+    window.scrollTo({top:0,behavior:'instant'});
   }
 
-  function actionLabel(item) {
-    if (item.type === 'task') return item.state === 'waiting' ? 'Status prüfen' : 'Erledigen';
-    if (item.source?.system === 'submission_db') return 'Nächsten Schritt ausführen';
-    if (item.state === 'decision_required' || item.decision_ready) return 'Freigeben';
-    return 'Bearbeiten';
-  }
-
-  function caseCard(item) {
-    const meta = [];
-    if (item.object?.title) meta.push(escapeHtml(item.object.title));
-    if (item.due_at) meta.push(`${item.overdue ? 'Überfällig' : 'Fällig'} ${escapeHtml(formatDate(item.due_at))}`);
-    if (item.state === 'blocked' && item.blocked_reason) meta.push(`Blockiert: ${escapeHtml(item.blocked_reason)}`);
-
-    const mainAction = item.type === 'task'
-      ? `<button class="cc-button cc-button--primary" data-action="${item.state === 'waiting' ? 'details' : 'complete'}">${escapeHtml(actionLabel(item))}</button>`
-      : item.state === 'decision_required' || item.decision_ready
-        ? `<button class="cc-button cc-button--primary" data-action="approve">${escapeHtml(actionLabel(item))}</button>`
-        : '<button class="cc-button cc-button--primary" data-action="start">Bearbeiten</button>';
-
-    const secondary = item.type === 'intake' && !item.decision_ready
-      ? '<button class="cc-button cc-button--secondary" data-action="convert_to_task">Als Aufgabe</button>'
-      : '<button class="cc-button cc-button--secondary" data-action="snooze">Zurückstellen</button>';
-    const reject = item.type === 'intake' && (item.state === 'decision_required' || item.decision_ready)
-      ? '<button class="cc-button cc-button--secondary" data-action="reject">Ablehnen</button>'
-      : '';
-
-    return `<article class="cc-card ${item.priority === 'critical' ? 'cc-card--critical' : ''} ${item.state === 'blocked' ? 'cc-card--blocked' : ''}" data-case-id="${escapeHtml(item.id)}">
-      <div class="cc-card__top">
-        <h3>${escapeHtml(item.title)}</h3>
-        ${pill(item.priority === 'critical' ? 'Kritisch' : item.priority === 'high' ? 'Hoch' : item.state.replaceAll('_',' '), item.priority)}
-      </div>
-      ${item.reason ? `<p>${escapeHtml(item.reason)}</p>` : ''}
-      ${item.next_action ? `<p class="cc-next">Nächster Schritt: ${escapeHtml(item.next_action)}</p>` : ''}
-      ${meta.length ? `<div class="cc-meta">${meta.map(value => `<span>${value}</span>`).join('')}</div>` : ''}
-      <div class="cc-actions">${mainAction}${secondary}${reject}<button class="cc-button cc-button--secondary" data-action="details">Details</button></div>
-    </article>`;
-  }
-
-  function section(title, items, emptyText, grid = false) {
-    return `<section class="cc-section">
-      <div class="cc-section__head"><h2>${escapeHtml(title)}</h2><span class="cc-count">${items.length}</span></div>
-      <div class="cc-list ${grid ? 'cc-list--grid' : ''}">
-        ${items.length ? items.map(caseCard).join('') : `<div class="cc-empty">${escapeHtml(emptyText)}</div>`}
-      </div>
-    </section>`;
+  function compactSummary(title, count, detail, actionView, actionLabel) {
+    return `<article class="cc-summary-card"><div><span class="cc-summary-label">${escapeHtml(title)}</span><strong>${count}</strong><p>${escapeHtml(detail)}</p></div>${actionView ? `<button class="cc-button cc-button--primary" data-go-view="${actionView}">${escapeHtml(actionLabel)}</button>` : ''}</article>`;
   }
 
   function renderOverview() {
-    const groups = state.overview?.groups || {now:[],next:[],inbox:[],information:[]};
-    els.view.innerHTML = [
-      section('Jetzt erforderlich', groups.now, 'Aktuell ist nichts dringend.'),
-      section('Neuer Eingang', groups.inbox, 'Keine ungeklärten neuen Fälle.'),
-      section('Als Nächstes', groups.next, 'Keine weiteren aktiven Aufgaben.'),
-      `<section class="cc-section"><div class="cc-section__head"><h2>Systemzustand</h2></div><div class="cc-empty">${escapeHtml(state.overview?.system?.message || 'Keine Statusinformation verfügbar.')}</div></section>`,
-    ].join('');
+    const cases = activeCases();
+    const urgent = cases.filter(item => item.bucket === 'now');
+    const work = cases.filter(item => item.type === 'intake');
+    const tasks = cases.filter(item => item.type === 'task');
+    const waiting = tasks.filter(item => item.state === 'waiting');
+    const groups = work.reduce((acc,item) => { const key=item.queue_group || 'other'; acc[key]=(acc[key]||0)+1; return acc; },{});
+    const groupText = Object.entries(groups).map(([key,count]) => `${count} ${groupLabels[key] || 'Sonstige'}`).join(' · ') || 'Keine offenen Entscheidungen';
+    const urgentText = urgent.length ? urgent.slice(0,2).map(item => item.title).join(' · ') : 'Aktuell ist nichts dringend.';
+
+    els.view.innerHTML = `<section class="cc-overview-grid">
+      ${compactSummary('Jetzt erforderlich', urgent.length, urgentText, urgent.length ? 'work' : '', 'Jetzt bearbeiten')}
+      ${compactSummary('Zu bearbeiten', work.length, groupText, work.length ? 'work' : '', 'Bearbeiten öffnen')}
+      ${compactSummary('Aufgaben', tasks.length, waiting.length ? `${waiting.length} warten auf Rückmeldung` : 'Keine wartenden Aufgaben', tasks.length ? 'tasks' : '', 'Aufgaben öffnen')}
+      <article class="cc-summary-card cc-summary-card--quiet"><div><span class="cc-summary-label">Systemzustand</span><h2>Alles ruhig</h2><p>${escapeHtml(state.overview?.system?.message || 'Keine bekannte Störung mit Auswirkung.')}</p></div></article>
+    </section>`;
+    bindViewLinks();
   }
 
-  function renderFiltered(type, title, emptyText) {
-    const items = state.cases.filter(item => item.type === type && !['done','rejected','parked','information'].includes(item.state));
-    els.view.innerHTML = section(title, items, emptyText, true);
+  function contextRows(item) {
+    const c = item.decision_context || {};
+    const rows = [];
+    const add = (label,value) => { if (clean(value)) rows.push([label,clean(value)]); };
+    add('Datum', c.date); add('Enddatum', c.end_date); add('Uhrzeit', c.time); add('Ort', [c.location,c.city].filter(Boolean).join(' · ')); add('Anbieter', c.organization);
+    return rows;
   }
 
-  function renderContent() {
-    els.view.innerHTML = `<section class="cc-section"><div class="cc-section__head"><h2>Inhalte</h2></div><div class="cc-list">
-      <a class="cc-link-card" href="/events/"><strong>Veranstaltungen</strong><span>Öffentliche Darstellung und Eventbestand öffnen</span></a>
-      <a class="cc-link-card" href="/aktivitaeten/"><strong>Aktivitäten</strong><span>Öffentliche Darstellung und Aktivitätsbestand öffnen</span></a>
-      <a class="cc-link-card" href="/inbox/"><strong>Technische Altansicht</strong><span>Nur noch für Diagnose und noch nicht überführte Sonderfunktionen</span></a>
-    </div></section>`;
+  function renderWorkDetail(item, index, total) {
+    const links = (item.source_links || []).map(link => `<a class="cc-button cc-button--secondary" href="${escapeHtml(link.url)}" target="_blank" rel="noopener">${escapeHtml(link.label)}</a>`).join('');
+    const rows = contextRows(item).map(([label,value]) => `<div class="cc-detail-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('');
+    const context = item.decision_context || {};
+    const problem = clean(context.issue_text || item.reason);
+    const recommended = clean(context.recommended_action || item.next_action);
+    const description = clean(context.current_description || context.description);
+    const primary = item.primary_action;
+    const secondary = item.secondary_actions || [];
+
+    return `<article class="cc-work-detail" data-case-id="${escapeHtml(item.id)}">
+      <header class="cc-work-head"><div><span class="cc-kicker">${escapeHtml(groupLabels[item.queue_group] || 'Vorgang')} · ${index + 1} von ${total}</span><h2>${escapeHtml(item.title)}</h2></div><span class="cc-pill">${escapeHtml(item.display_status)}</span></header>
+      ${problem ? `<section class="cc-detail-section"><h3>Worum es geht</h3><p>${escapeHtml(problem)}</p></section>` : ''}
+      ${recommended ? `<section class="cc-detail-section cc-detail-section--accent"><h3>Erforderlicher Schritt</h3><p>${escapeHtml(recommended)}</p></section>` : ''}
+      ${description ? `<details class="cc-disclosure"><summary>Aktuellen Inhalt anzeigen</summary><div>${escapeHtml(description)}</div></details>` : ''}
+      ${rows ? `<section class="cc-detail-grid">${rows}</section>` : ''}
+      <div class="cc-action-primary">${primary ? `<button class="cc-button cc-button--primary cc-button--large" data-case-action="${escapeHtml(primary.key)}">${escapeHtml(primary.label)}</button>` : `<div class="cc-empty">${escapeHtml(item.waiting_for || 'Aktuell keine Aktion erforderlich.')}</div>`}</div>
+      <div class="cc-actions cc-actions--secondary">${secondary.map(action => `<button class="cc-button ${action.destructive ? 'cc-button--danger' : 'cc-button--secondary'}" data-case-action="${escapeHtml(action.key)}">${escapeHtml(action.label)}</button>`).join('')}${links}<button class="cc-button cc-button--ghost" data-case-action="details">Technische Details</button></div>
+      <footer class="cc-work-nav"><button class="cc-button cc-button--ghost" data-work-move="-1" ${index===0?'disabled':''}>‹ Zurück</button><button class="cc-button cc-button--ghost" data-work-move="1" ${index>=total-1?'disabled':''}>Weiter ›</button></footer>
+    </article>`;
+  }
+
+  function renderWork() {
+    const items = workCases();
+    if (state.workIndex >= items.length) state.workIndex = Math.max(0, items.length - 1);
+    const active = items[state.workIndex];
+    const queue = items.map((item,index) => `<button class="cc-queue-item ${index===state.workIndex?'is-active':''}" data-work-index="${index}"><span>${escapeHtml(item.title)}</span><small>${escapeHtml(groupLabels[item.queue_group] || item.display_status)}</small></button>`).join('');
+    els.view.innerHTML = `<div class="cc-filter-row">${Object.entries(groupLabels).map(([key,label]) => `<button class="cc-filter ${state.workGroup===key?'is-active':''}" data-work-group="${key}">${escapeHtml(label)}${key==='all'?` (${activeCases().filter(i=>i.type==='intake').length})`:''}</button>`).join('')}</div>
+      ${items.length ? `<div class="cc-work-layout"><aside class="cc-queue" aria-label="Vorgänge">${queue}</aside><main>${renderWorkDetail(active,state.workIndex,items.length)}</main></div>` : `<div class="cc-empty cc-empty--large">In diesem Bereich gibt es aktuell nichts zu bearbeiten.</div>`}`;
+    bindWork();
+  }
+
+  function taskCard(item) {
+    const due = item.due_at ? `${item.overdue ? 'Überfällig' : 'Fällig'} ${formatDate(item.due_at)}` : '';
+    return `<article class="cc-task-card" data-case-id="${escapeHtml(item.id)}"><div><span class="cc-pill">${escapeHtml(item.display_status)}</span><h3>${escapeHtml(item.title)}</h3>${item.next_action?`<p>${escapeHtml(item.next_action)}</p>`:''}${due?`<small>${escapeHtml(due)}</small>`:''}${item.waiting_for?`<small>Wartet auf: ${escapeHtml(item.waiting_for)}</small>`:''}</div><div class="cc-actions">${item.primary_action?`<button class="cc-button cc-button--primary" data-task-action="${item.primary_action.key}">${escapeHtml(item.primary_action.label)}</button>`:''}<button class="cc-button cc-button--secondary" data-task-action="details">Details</button></div></article>`;
+  }
+
+  function renderTasks() {
+    const items = taskCases();
+    els.view.innerHTML = `<div class="cc-toolbar"><div class="cc-segment"><button class="${state.taskMode==='active'?'is-active':''}" data-task-mode="active">Aktiv</button><button class="${state.taskMode==='archive'?'is-active':''}" data-task-mode="archive">Archiv</button></div><button class="cc-button cc-button--primary" id="cc-new-task">+ Aufgabe</button></div><div class="cc-task-list">${items.length?items.map(taskCard).join(''):`<div class="cc-empty cc-empty--large">${state.taskMode==='active'?'Keine offenen Aufgaben.':'Noch keine archivierten Aufgaben.'}</div>`}</div>`;
+    bindTasks();
+  }
+
+  function normalizeCollection(payload) { if (Array.isArray(payload)) return payload; if (Array.isArray(payload?.items)) return payload.items; if (Array.isArray(payload?.events)) return payload.events; if (Array.isArray(payload?.offers)) return payload.offers; return []; }
+  async function loadManagement() {
+    if (state.managementLoaded) return;
+    const [events,activities] = await Promise.all([
+      fetch('/data/events.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
+      fetch('/data/offers.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
+    ]);
+    state.managementItems.events = normalizeCollection(events);
+    state.managementItems.activities = normalizeCollection(activities);
+    state.managementLoaded = true;
+  }
+
+  function managementItem(item,type) {
+    const title = clean(item.title || item.name || item.offer_name || 'Ohne Titel');
+    const id = clean(item.id || item.event_id || item.slug || title);
+    const date = clean(item.date || item.startDate || item.start_date || item.opening_status || '');
+    const publicUrl = type==='events' ? (item.url || `/events/${encodeURIComponent(id)}/`) : (item.url || item.detail_url || '/aktivitaeten/');
+    const linked = activeCases().filter(c => c.object?.id && String(c.object.id)===String(id)).length;
+    return `<article class="cc-manage-row"><div><span class="cc-kicker">${type==='events'?'Veranstaltung':'Aktivität'}${linked?` · ${linked} offene Vorgänge`:''}</span><h3>${escapeHtml(title)}</h3>${date?`<p>${escapeHtml(date)}</p>`:''}</div><div class="cc-actions"><a class="cc-button cc-button--secondary" href="${escapeHtml(publicUrl)}" target="_blank" rel="noopener">Öffnen</a><button class="cc-button cc-button--primary" data-create-object-task="${escapeHtml(id)}" data-object-title="${escapeHtml(title)}" data-object-type="${type==='events'?'event':'activity'}">Aufgabe anlegen</button></div></article>`;
+  }
+
+  async function renderManage() {
+    els.view.innerHTML = '<div class="cc-empty">Inhalte werden geladen …</div>';
+    await loadManagement();
+    const source = state.managementItems[state.managementType] || [];
+    const query = state.managementQuery.toLowerCase();
+    const items = source.filter(item => !query || clean(item.title || item.name || item.offer_name).toLowerCase().includes(query)).slice(0,100);
+    els.view.innerHTML = `<div class="cc-toolbar cc-toolbar--manage"><div class="cc-segment"><button class="${state.managementType==='events'?'is-active':''}" data-manage-type="events">Veranstaltungen</button><button class="${state.managementType==='activities'?'is-active':''}" data-manage-type="activities">Aktivitäten</button></div><label class="cc-search"><span class="sr-only">Suchen</span><input id="cc-manage-search" type="search" value="${escapeHtml(state.managementQuery)}" placeholder="Suchen …"></label></div><div class="cc-manage-list">${items.length?items.map(item=>managementItem(item,state.managementType)).join(''):'<div class="cc-empty cc-empty--large">Keine passenden Inhalte gefunden.</div>'}</div>`;
+    bindManage();
   }
 
   function renderMore() {
-    const ideas = state.cases.filter(item => item.type === 'idea' && !['rejected','done'].includes(item.state));
-    els.view.innerHTML = `${section('Ideen', ideas, 'Keine gesammelten Ideen.')}
-      <section class="cc-section"><div class="cc-section__head"><h2>Weitere Bereiche</h2></div><div class="cc-list">
-        <a class="cc-link-card" href="/fuer-veranstalter/dashboard/"><strong>Anbieterbereich</strong><span>Einreichungen und Anbieterwirkung</span></a>
-        <button class="cc-link-card" type="button" id="cc-logout"><strong>Abmelden</strong><span>Sitzungszugang entfernen</span></button>
-      </div></section>`;
-    document.querySelector('#cc-logout')?.addEventListener('click', logout);
+    const ideas = state.cases.filter(item => item.type==='idea' && !['done','rejected'].includes(item.state));
+    els.view.innerHTML = `<section class="cc-section"><div class="cc-section__head"><h2>Ideen</h2><button class="cc-button cc-button--primary" id="cc-new-idea">+ Idee</button></div>${ideas.length?`<div class="cc-task-list">${ideas.map(taskCard).join('')}</div>`:'<div class="cc-empty">Keine gesammelten Ideen.</div>'}</section><section class="cc-section"><div class="cc-section__head"><h2>Weitere Funktionen</h2></div><div class="cc-link-list"><a class="cc-link-card" href="/fuer-veranstalter/dashboard/"><strong>Anbieterbereich</strong><span>Einreichungen und Anbieterwirkung öffnen</span></a><button class="cc-link-card" id="cc-system"><strong>Systemstatus</strong><span>Synchronisation und bekannte Auswirkungen prüfen</span></button><button class="cc-link-card" id="cc-logout"><strong>Abmelden</strong><span>Sitzungszugang entfernen</span></button></div></section>`;
+    document.querySelector('#cc-new-idea')?.addEventListener('click',()=>openCreateDialog('idea'));
+    document.querySelector('#cc-system')?.addEventListener('click',()=>openSystemDialog());
+    document.querySelector('#cc-logout')?.addEventListener('click',logout);
+    bindTaskActions();
   }
 
   function render() {
-    const titles = {overview:'Übersicht',inbox:'Eingang',content:'Inhalte',tasks:'Aufgaben',more:'Mehr'};
-    els.title.textContent = titles[state.view] || 'Steuerzentrale';
-    els.nav.forEach(button => button.classList.toggle('is-active', button.dataset.view === state.view));
-    if (state.view === 'overview') renderOverview();
-    if (state.view === 'inbox') renderFiltered('intake', 'Eingang', 'Keine ungeklärten Fälle.');
-    if (state.view === 'tasks') renderFiltered('task', 'Aufgaben', 'Keine offenen Aufgaben.');
-    if (state.view === 'content') renderContent();
-    if (state.view === 'more') renderMore();
-    bindCaseActions();
+    if (state.view==='overview') renderOverview();
+    if (state.view==='work') renderWork();
+    if (state.view==='tasks') renderTasks();
+    if (state.view==='manage') renderManage();
+    if (state.view==='more') renderMore();
   }
 
   function updateBadges() {
-    const inbox = state.cases.filter(item => item.type === 'intake' && ['new','decision_required'].includes(item.state)).length;
-    const tasks = state.cases.filter(item => item.type === 'task' && !['done','rejected','parked'].includes(item.state)).length;
-    [[els.badgeInbox,inbox],[els.badgeTasks,tasks]].forEach(([element,count]) => {
-      element.hidden = count === 0;
-      element.textContent = count > 99 ? '99+' : String(count);
-    });
+    const work = activeCases().filter(item=>item.type==='intake').length;
+    const tasks = activeCases().filter(item=>item.type==='task').length;
+    [[els.badgeWork,work],[els.badgeTasks,tasks]].forEach(([el,count])=>{el.hidden=count===0;el.textContent=count>99?'99+':String(count);});
   }
 
   async function load() {
     setStatus('Daten werden geladen …');
     try {
-      const [overview, cases] = await Promise.all([
-        api('/api/control-center/overview.php'),
-        api('/api/control-center/cases.php?active=1'),
-      ]);
-      state.overview = overview;
+      state.overview = await api('/api/control-center/overview.php');
+      const cases = await api('/api/control-center/cases.php');
       state.cases = cases.items || [];
-      updateBadges();
-      render();
-      setStatus('');
-    } catch (error) {
-      setStatus(error.message);
-    }
+      updateBadges(); render(); setStatus('');
+    } catch (error) { setStatus(error.message); }
   }
 
-  function auditEditHtml(item) {
-    const p = item.source_payload || {};
-    if (item.source?.system !== 'content_audit' || String(p.content_type || '') !== 'event') return '';
-    const field = (id, label, value, type = 'text') => `<label class="cc-field"><span>${escapeHtml(label)}</span><input id="${id}" type="${type}" value="${escapeHtml(value || '')}"></label>`;
-    return `<div class="cc-stack">
-      <h3>Eventdaten korrigieren</h3>
-      ${field('cc-edit-source','Offizielle Quelle',p.suggested_url || p.source_url,'url')}
-      ${field('cc-edit-title','Titel',p.title)}
-      ${field('cc-edit-date','Startdatum',p.date)}
-      ${field('cc-edit-end','Enddatum',p.endDate || p.end_date)}
-      ${field('cc-edit-time','Uhrzeit',p.time)}
-      ${field('cc-edit-city','Stadt',p.city)}
-      ${field('cc-edit-location','Ort',p.location)}
-      ${field('cc-edit-key','Bildtyp',p.suggested_visual_key || p.visual_key)}
-      ${field('cc-edit-motif','Motiv',p.suggested_visual_motif || p.visual_motif)}
-      <button class="cc-button cc-button--primary" type="button" id="cc-save-audit">Korrigieren und abschließen</button>
-    </div>`;
+  function bindViewLinks() { document.querySelectorAll('[data-go-view]').forEach(button=>button.addEventListener('click',()=>setView(button.dataset.goView))); }
+  function bindWork() {
+    document.querySelectorAll('[data-work-group]').forEach(button=>button.addEventListener('click',()=>{state.workGroup=button.dataset.workGroup;state.workIndex=0;renderWork();}));
+    document.querySelectorAll('[data-work-index]').forEach(button=>button.addEventListener('click',()=>{state.workIndex=Number(button.dataset.workIndex)||0;renderWork();}));
+    document.querySelectorAll('[data-work-move]').forEach(button=>button.addEventListener('click',()=>{state.workIndex+=Number(button.dataset.workMove)||0;renderWork();}));
+    document.querySelectorAll('[data-case-action]').forEach(button=>button.addEventListener('click',()=>handleCaseAction(workCases()[state.workIndex],button.dataset.caseAction)));
+  }
+  function bindTasks() {
+    document.querySelectorAll('[data-task-mode]').forEach(button=>button.addEventListener('click',()=>{state.taskMode=button.dataset.taskMode;renderTasks();}));
+    document.querySelector('#cc-new-task')?.addEventListener('click',()=>openCreateDialog('task'));
+    bindTaskActions();
+  }
+  function bindTaskActions() { document.querySelectorAll('[data-task-action]').forEach(button=>button.addEventListener('click',()=>{const card=button.closest('[data-case-id]');const item=state.cases.find(c=>c.id===card?.dataset.caseId);if(item) handleCaseAction(item,button.dataset.taskAction);})); }
+  function bindManage() {
+    document.querySelectorAll('[data-manage-type]').forEach(button=>button.addEventListener('click',()=>{state.managementType=button.dataset.manageType;state.managementQuery='';renderManage();}));
+    document.querySelector('#cc-manage-search')?.addEventListener('input',event=>{state.managementQuery=event.target.value;renderManage();});
+    document.querySelectorAll('[data-create-object-task]').forEach(button=>button.addEventListener('click',()=>openCreateDialog('task',{object_id:button.dataset.createObjectTask,object_title:button.dataset.objectTitle,object_type:button.dataset.objectType,title:`${button.dataset.objectTitle} bearbeiten`})));
+  }
+
+  function openCreateDialog(type, defaults={}) {
+    const isTask=type==='task';
+    els.dialogBody.innerHTML=`<h2>${isTask?'Aufgabe anlegen':'Idee erfassen'}</h2><div class="cc-stack"><label class="cc-field"><span>Titel</span><input id="cc-create-title" value="${escapeHtml(defaults.title||'')}" required></label><label class="cc-field"><span>${isTask?'Nächster Schritt':'Anlass oder Nutzen'}</span><textarea id="cc-create-note"></textarea></label>${isTask?'<label class="cc-field"><span>Fällig am (optional)</span><input id="cc-create-due" type="date"></label>':''}<button class="cc-button cc-button--primary" id="cc-create-save">Speichern</button></div>`;
+    els.dialog.showModal();
+    document.querySelector('#cc-create-save')?.addEventListener('click',async()=>{
+      const title=clean(document.querySelector('#cc-create-title')?.value); if(!title) return;
+      const note=clean(document.querySelector('#cc-create-note')?.value); const due=clean(document.querySelector('#cc-create-due')?.value);
+      await api('/api/control-center/cases.php',{method:'POST',body:JSON.stringify({type,state:isTask?'open':'new',priority:'normal',title,reason:isTask?'':note,next_action:isTask?note:'',due_at:due?`${due} 17:00:00`:null,source_system:'manual',object_type:defaults.object_type||'',object_id:defaults.object_id||'',object_title:defaults.object_title||''})});
+      els.dialog.close(); await load(); setView(isTask?'tasks':'more');
+    });
+  }
+
+  function openSystemDialog() {
+    const sync=state.overview?.sync||{};
+    els.dialogBody.innerHTML=`<h2>Systemstatus</h2><p>${escapeHtml(state.overview?.system?.message||'Keine bekannte Störung.')}</p><dl>${Object.entries(sync).map(([key,value])=>`<dt>${escapeHtml(key)}</dt><dd>${escapeHtml(JSON.stringify(value))}</dd>`).join('')}</dl>`;
+    els.dialog.showModal();
   }
 
   async function showDetails(item) {
-    try {
-      const detail = await api(`/api/control-center/case.php?id=${encodeURIComponent(item.id)}`);
-      els.dialogBody.innerHTML = `<h2>${escapeHtml(detail.title)}</h2>
-        ${detail.reason ? `<p>${escapeHtml(detail.reason)}</p>` : ''}
-        <dl><dt>Status</dt><dd>${escapeHtml(detail.state)}</dd><dt>Quelle</dt><dd>${escapeHtml(detail.source?.system)} · ${escapeHtml(detail.source?.reference)}</dd>${detail.object?.title ? `<dt>Inhalt</dt><dd>${escapeHtml(detail.object.title)}</dd>` : ''}</dl>
-        ${auditEditHtml(detail)}`;
-      els.dialog.showModal();
-      document.querySelector('#cc-save-audit')?.addEventListener('click', async () => {
-        const value = id => document.querySelector(id)?.value.trim() || '';
-        const event_updates = {
-          source_url: value('#cc-edit-source'), url: value('#cc-edit-source'), event_url: value('#cc-edit-source'),
-          title: value('#cc-edit-title'), date: value('#cc-edit-date'), endDate: value('#cc-edit-end'), end_date: value('#cc-edit-end'),
-          time: value('#cc-edit-time'), city: value('#cc-edit-city'), location: value('#cc-edit-location'),
-          visual_key: value('#cc-edit-key'), visual_motif: value('#cc-edit-motif'),
-        };
-        Object.keys(event_updates).forEach(key => { if (!event_updates[key]) delete event_updates[key]; });
-        els.dialog.close();
-        await performAction(detail, 'approve', {event_updates, note:'Über Steuerzentrale korrigiert und fachlich geprüft.'});
-      });
-    } catch (error) {
-      setStatus(error.message);
-    }
-  }
-
-  function askSnooze(item) {
-    const date = new Date();
-    date.setDate(date.getDate() + 7);
-    els.dialogBody.innerHTML = `<h2>Zurückstellen</h2><p>${escapeHtml(item.title)}</p><label class="cc-field"><span>Wiedervorlage</span><input id="cc-snooze-date" type="date" value="${date.toISOString().slice(0,10)}" required></label><div class="cc-actions"><button class="cc-button cc-button--primary" type="button" id="cc-confirm-snooze">Zurückstellen</button></div>`;
+    const detail=await api(`/api/control-center/case.php?id=${encodeURIComponent(item.id)}`);
+    els.dialogBody.innerHTML=`<h2>${escapeHtml(detail.title)}</h2><p>${escapeHtml(detail.reason||'')}</p><dl><dt>Status</dt><dd>${escapeHtml(detail.display_status)}</dd><dt>Quelle</dt><dd>${escapeHtml(detail.source?.system)} · ${escapeHtml(detail.source?.reference)}</dd></dl>`;
     els.dialog.showModal();
-    document.querySelector('#cc-confirm-snooze')?.addEventListener('click', async () => {
-      const until = document.querySelector('#cc-snooze-date')?.value;
-      els.dialog.close();
-      await performAction(item, 'snooze', {until});
-    });
   }
 
   function askReject(item) {
-    els.dialogBody.innerHTML = `<h2>Ablehnen</h2><p>${escapeHtml(item.title)}</p><label class="cc-field"><span>Grund</span><select id="cc-reject-reason">${rejectReasons.map(reason => `<option>${escapeHtml(reason)}</option>`).join('')}</select></label><div class="cc-actions"><button class="cc-button cc-button--primary" type="button" id="cc-confirm-reject">Ablehnen</button></div>`;
-    els.dialog.showModal();
-    document.querySelector('#cc-confirm-reject')?.addEventListener('click', async () => {
-      const reason = document.querySelector('#cc-reject-reason')?.value || 'Redaktionell nicht passend';
-      els.dialog.close();
-      await performAction(item, 'reject', {reason});
-    });
+    els.dialogBody.innerHTML=`<h2>Ablehnen</h2><p>${escapeHtml(item.title)}</p><label class="cc-field"><span>Grund</span><select id="cc-reject-reason">${rejectReasons.map(reason=>`<option>${escapeHtml(reason)}</option>`).join('')}</select></label><button class="cc-button cc-button--danger" id="cc-confirm-reject">Ablehnen</button>`;
+    els.dialog.showModal(); document.querySelector('#cc-confirm-reject')?.addEventListener('click',()=>{const reason=clean(document.querySelector('#cc-reject-reason')?.value);els.dialog.close();performAction(item,'reject',{reason});});
+  }
+  function askSnooze(item) {
+    const date=new Date();date.setDate(date.getDate()+7);
+    els.dialogBody.innerHTML=`<h2>Zurückstellen</h2><label class="cc-field"><span>Wiedervorlage</span><input id="cc-snooze-date" type="date" value="${date.toISOString().slice(0,10)}"></label><button class="cc-button cc-button--primary" id="cc-confirm-snooze">Zurückstellen</button>`;
+    els.dialog.showModal();document.querySelector('#cc-confirm-snooze')?.addEventListener('click',()=>{const until=clean(document.querySelector('#cc-snooze-date')?.value);els.dialog.close();performAction(item,'snooze',{until});});
   }
 
-  async function performAction(item, action, payload = {}) {
-    setStatus('Änderung wird gespeichert …');
-    try {
-      await api('/api/control-center/action.php', {method:'POST', body:JSON.stringify({case_id:item.id,action,payload})});
-      await load();
-    } catch (error) {
-      setStatus(error.message);
-    }
+  async function handleCaseAction(item,action) {
+    if(!item) return;
+    if(action==='details') return showDetails(item);
+    if(action==='reject') return askReject(item);
+    if(action==='snooze') return askSnooze(item);
+    if(action==='approve' && item.case_kind?.includes('correction')) return showDetails(item);
+    return performAction(item,action,{});
   }
 
-  function bindCaseActions() {
-    els.view.querySelectorAll('[data-case-id]').forEach(card => {
-      const item = state.cases.find(entry => entry.id === card.dataset.caseId);
-      if (!item) return;
-      card.querySelectorAll('[data-action]').forEach(button => button.addEventListener('click', () => {
-        const action = button.dataset.action;
-        if (action === 'details') return showDetails(item);
-        if (action === 'snooze') return askSnooze(item);
-        if (action === 'reject') return askReject(item);
-        return performAction(item, action);
-      }));
-    });
+  async function performAction(item,action,payload) {
+    setStatus('Aktion wird ausgeführt …');
+    try { await api('/api/control-center/action.php',{method:'POST',body:JSON.stringify({case_id:item.id,action,payload})}); await load(); setStatus('Gespeichert.'); }
+    catch(error){setStatus(error.message);}
   }
 
-  els.authForm.addEventListener('submit', async event => {
-    event.preventDefault();
-    state.password = els.password.value;
-    sessionStorage.setItem('be_cc_password', state.password);
-    els.auth.hidden = true;
-    els.content.hidden = false;
-    await load();
-  });
+  els.authForm.addEventListener('submit',async event=>{event.preventDefault();state.password=clean(els.password.value);sessionStorage.setItem('be_cc_password',state.password);els.auth.hidden=true;els.content.hidden=false;await load();});
+  els.refresh.addEventListener('click',load);
+  els.nav.forEach(button=>button.addEventListener('click',()=>setView(button.dataset.view)));
+  els.dialog.addEventListener('click',event=>{if(event.target===els.dialog)els.dialog.close();});
 
-  els.nav.forEach(button => button.addEventListener('click', () => {
-    state.view = button.dataset.view;
-    render();
-  }));
-  els.refresh.addEventListener('click', load);
-
-  if (state.password) {
-    els.auth.hidden = true;
-    els.content.hidden = false;
-    load();
-  }
+  if(state.password){els.auth.hidden=true;els.content.hidden=false;load();}
 })();
