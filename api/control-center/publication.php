@@ -26,7 +26,7 @@ try {
     $verification = be_cc_verify_public_change($change);
     if (!empty($verification['verified'])) {
         be_cc_update_content_change($id, 'confirmed');
-        be_cc_complete_publication_issue((string)$change['object_id']);
+        be_cc_complete_publication_issue((string)$change['object_type'], (string)$change['object_id']);
         $change = be_cc_get_content_change($id);
         be_json_response(200, ['status' => 'ok', 'data' => ['change' => $change, 'verified' => true, 'message' => $verification['reason']]]);
     }
