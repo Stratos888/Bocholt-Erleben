@@ -121,16 +121,29 @@ function be_cc_compare_public_event_change(array $event, array $updates, array $
         if ($written && !isset($written[$canonical])) continue;
         $actual = be_cc_public_event_value($event, $canonical);
         if ($actual !== trim((string)$expected)) {
-            return [
-                'verified' => false,
-                'field' => $canonical,
-                'expected' => trim((string)$expected),
-                'actual' => $actual,
-                'reason' => 'Öffentlicher Wert noch nicht aktuell: ' . $canonical . '.',
-            ];
+            return ['verified' => false, 'field' => $canonical, 'expected' => trim((string)$expected), 'actual' => $actual, 'reason' => 'Öffentlicher Wert noch nicht aktuell: ' . $canonical . '.'];
         }
     }
     return ['verified' => true, 'reason' => 'Öffentliche Eventdaten entsprechen der gespeicherten Änderung.'];
+}
+
+function be_cc_compare_submission_public_event_change(array $event, array $updates, array $writtenFields = []): array
+{
+    $written = array_flip($writtenFields);
+    foreach (be_cc_normalize_event_updates($updates) as $canonical => $expected) {
+        if ($written && !isset($written[$canonical])) continue;
+        $expected = trim((string)$expected);
+        $actual = be_cc_public_event_value($event, $canonical);
+        // Die öffentliche Anbieter-API behält aus Kompatibilitätsgründen ein zusammengesetztes Ortslabel.
+        // Das separate address-Feld wird zusätzlich exakt geprüft.
+        $matches = $canonical === 'location'
+            ? ($actual === $expected || str_starts_with($actual, $expected . ' · '))
+            : $actual === $expected;
+        if (!$matches) {
+            return ['verified' => false, 'field' => $canonical, 'expected' => $expected, 'actual' => $actual, 'reason' => 'Öffentlicher Anbieter-Eventwert noch nicht aktuell: ' . $canonical . '.'];
+        }
+    }
+    return ['verified' => true, 'reason' => 'Öffentliche Anbieter-Eventdaten entsprechen der gespeicherten Änderung.'];
 }
 
 function be_cc_development_assessment(array $quality, array $automation, bool $trendAvailable): array
@@ -142,20 +155,10 @@ function be_cc_development_assessment(array $quality, array $automation, bool $t
         + (int)($automation['blocked_tasks'] ?? 0);
 
     if (!$trendAvailable) {
-        return [
-            'status' => $issues > 0 ? 'attention' : 'baseline',
-            'label' => $issues > 0 ? 'Aktueller Stand mit Handlungsbedarf' : 'Aktueller Basisstand',
-            'trend_available' => false,
-            'message' => 'Noch keine belastbare Zeitreihe vorhanden. Es wird nur der aktuelle Zustand bewertet.',
-        ];
+        return ['status' => $issues > 0 ? 'attention' : 'baseline', 'label' => $issues > 0 ? 'Aktueller Stand mit Handlungsbedarf' : 'Aktueller Basisstand', 'trend_available' => false, 'message' => 'Noch keine belastbare Zeitreihe vorhanden. Es wird nur der aktuelle Zustand bewertet.'];
     }
 
-    return [
-        'status' => $issues > 0 ? 'attention' : 'stable',
-        'label' => $issues > 0 ? 'Entwicklung benötigt Aufmerksamkeit' : 'Entwicklung stabil',
-        'trend_available' => true,
-        'message' => 'Bewertung basiert auf aktuellem Zustand und gespeicherten Vergleichswerten.',
-    ];
+    return ['status' => $issues > 0 ? 'attention' : 'stable', 'label' => $issues > 0 ? 'Entwicklung benötigt Aufmerksamkeit' : 'Entwicklung stabil', 'trend_available' => true, 'message' => 'Bewertung basiert auf aktuellem Zustand und gespeicherten Vergleichswerten.'];
 }
 
 function be_cc_publication_result(bool $sourceSaved, bool $deployStarted, bool $publicVerified): array
