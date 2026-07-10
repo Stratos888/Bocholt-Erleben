@@ -1,211 +1,142 @@
 # Steuerzentrale – Implementierungsstatus
 
 Stand: 2026-07-10  
-Status: Workpack `Arbeit konsolidieren` umgesetzt; Gesamtprodukt noch nicht freigegeben
+Status: Gesamtumbau `Prüfen / Arbeit / Verwaltung / Entwicklung` umgesetzt; Gesamtfreigabe ausstehend
 
-## 1. Verbindliche Dokumente
+## 1. Verbindliche Hauptnavigation
 
-- `STEUERZENTRALE_ZIELBILD.md`
-- `STEUERZENTRALE_GESAMTPROJEKT_INTEGRATION.md`
-- `STEUERZENTRALE_VORGANGSKATALOG.md`
-- `STEUERZENTRALE_INFORMATIONARCHITEKTUR.md`
-- `STEUERZENTRALE_SCREENVERTRAG.md`
-- `STEUERZENTRALE_ABNAHMEMATRIX.md`
-- `STEUERZENTRALE_BACKEND_GAP_ANALYSE.md`
+1. Übersicht
+2. Prüfen
+3. Arbeit
+4. Verwaltung
+5. Entwicklung
 
-Bei Widersprüchen gelten Zielbild, Gesamtprojekt-Integration und Abnahmematrix in dieser Reihenfolge als führend.
+Seltene Funktionen liegen im Header-Menü.
 
 ## 2. Bereits umgesetzt
 
-### Technische Grundlage
+### Zentrale Grundlage
 
-- kanonisches MySQL-Modell `control_cases` und Verlauf,
+- kanonisches Vorgangsmodell und Verlauf,
 - eindeutige Quellreferenzen und Deduplizierung,
-- geschützte APIs für Übersicht, Vorgänge, Details und Aktionen,
 - Quell-Writeback vor zentralem Abschluss,
-- serverseitige Präsentationsnormalisierung,
-- deutsche Status- und fallgerechte Aktionsbezeichnungen,
-- CSS- und Produktvertrags-Governance,
-- mobile Authentifizierung und permanente Navigation.
+- Anbieter-, Content-Audit-, KI-/Sheet-, Growth-Backlog- und Repo-Workpack-Anbindung,
+- dauerhaft sichtbare Navigation,
+- automatische PHP-, JavaScript-, JSON- und Produktvertragsprüfung.
 
-### Angebundene Prozesse
+### Prüfen
 
-#### KI-/Sheet-Kandidaten
-
-- Synchronisation,
-- Übernahme über bestehenden Eventprozess,
-- Ablehnung mit Grund,
-- Zurückstellen mit Wiedervorlage.
-
-#### Content-Audit
-
-- nur echte Handlungsfälle in der Queue,
-- Korrigieren, Verifizieren, Ablehnen und Zurückstellen,
-- Writeback in den führenden Audit-Tab.
-
-#### Anbieter-Einreichungen
-
-- Synchronisation aus MySQL,
-- Zahlungsfreigabe,
-- wartender Zahlungsstatus,
-- erneute Vorlage nach Zahlung,
-- finale Veröffentlichung oder Ablehnung.
-
-#### Growth-/Acquisition-Backlog
-
-- bestehendes `Growth_Backlog`-Sheet bleibt führende Backlogquelle,
-- offene Punkte werden dedupliziert in die Steuerzentrale synchronisiert,
-- Priorität, Beschreibung, Nutzen und empfohlene Aktion bleiben erhalten,
-- Bearbeiten, Abschließen und Verwerfen schreiben zuerst in das führende Sheet zurück,
-- `Als Aufgabe starten` überführt denselben Vorgang ohne Kopie in eine konkrete Aufgabe,
-- nach der Umwandlung bleibt der Vorgang auch bei erneutem Sync eine Aufgabe.
-
-#### Kuratierte Repo-Workpacks
-
-- bestätigte Repo-Arbeitspakete liegen in `data/control_center_repo_workpacks.json`,
-- keine automatische Extraktion beliebiger TODOs oder historischer Dokumenttexte,
-- Synchronisation über eindeutige Workpack-ID,
-- Umwandlung in eine konkrete Aufgabe ohne Doppelkarte,
-- zentrale Erledigungs- und Ablehnungszustände verhindern erneutes Öffnen im laufenden System.
-
-Das Repo-Manifest ist eine kuratierte Importgrenze und kein allgemeiner GitHub-Issue-Ersatz. Änderungen am Manifest erfolgen weiterhin bewusst im Repo.
-
-## 3. Sichtbare Oberfläche
-
-Die Hauptnavigation lautet nun verbindlich:
-
-1. Übersicht
-2. Bearbeiten
-3. Arbeit
-4. Verwaltung
-5. Menü
-
-### Übersicht
-
-- verdichteter Handlungsbedarf,
-- keine vollständige Wiederholung der Bearbeiten-Queue,
-- konkrete aktive Arbeit wird separat vom Backlog gezählt,
-- Backlog und Ideen erzeugen keine roten Hauptbadges.
-
-### Bearbeiten
-
-- mobile fokussierte Einzelbearbeitung,
+- neue Inhalte, Qualitätsfälle, Anbieterentscheidungen und Freigaben,
+- mobil fokussierter Einzelfall,
 - Desktop Queue plus Detail,
 - fallgerechte Hauptaktionen,
-- technische Details nachrangig.
+- Content-Korrekturformular bleibt erhalten,
+- deutsche Statussprache.
 
 ### Arbeit
 
-Unteransichten:
-
-- Jetzt,
-- Als Nächstes,
-- Wartet,
-- Blockiert,
-- Backlog,
-- Ideen,
-- Archiv.
-
-Funktionen:
-
-- Aufgabe, Idee und Backlogpunkt anlegen,
-- Aufgabe starten,
-- auf Rückmeldung warten mit sichtbarem Grund,
-- blockieren mit sichtbarem Grund,
-- fortsetzen beziehungsweise Blockade aufheben,
-- zurückstellen,
-- erledigen,
-- Idee oder Backlogpunkt ohne Kopie in Aufgabe umwandeln,
-- Growth-Backlog bearbeiten, abschließen oder verwerfen.
+- Jetzt, Als Nächstes, Wartet, Blockiert, Backlog, Ideen und Archiv,
+- gemeinsame Neuerfassung über `+ Neu`,
+- kompakte aufklappbare Arbeitszeilen,
+- Aufgaben-, Ideen- und Backlog-Lebenszyklus,
+- Warte- und Blockadegründe,
+- Growth-Backlog-Writeback,
+- Umwandlung ohne Doppelkarte.
 
 ### Verwaltung
 
-Bereits vorhanden:
+#### Veranstaltungen
 
-- Event- und Aktivitätsbestand laden,
 - Suche ohne Fokusverlust,
-- öffentliche Ansicht öffnen,
-- offene Vorgänge am Objekt anzeigen,
-- objektbezogene Aufgabe anlegen.
+- vollständigen Datensatz öffnen,
+- Titel, Beschreibung, Datum, Uhrzeit, Ort, Stadt, Kategorie, Quelle und Ticketlink bearbeiten,
+- Speichern in das führende Events-Sheet,
+- anschließend etablierten Deployprozess automatisch starten,
+- öffentliche Vorschau öffnen,
+- Teilfehler zwischen Speichern und Deploy verständlich melden.
 
-### Menü
+#### Aktivitäten
 
-Bereits vorhanden:
+- Bestand und Vorschau vorhanden,
+- dauerhafte Bearbeitung bewusst noch gesperrt,
+- Grund: führende Quelle ist `data/offers.json`; ein lokaler Webserver-Writeback wäre nicht versionsfest und würde beim nächsten Deploy verloren gehen.
+
+### Entwicklung
+
+- eigener Haupttab,
+- Content-Vollständigkeit aus realen Eventdaten,
+- offene Qualitätsprüfungen,
+- aktive, wartende und blockierte Arbeit,
+- erledigte Vorgänge,
+- SEO-Onpage-Signale,
+- kuratierte offene Repo-Workpacks,
+- Search-Console-Lücke ausdrücklich gekennzeichnet statt Kennzahlen zu erfinden.
+
+### Header-Menü und Systemstatus
 
 - Anbieterbereich,
-- Systemstatus in Alltagssprache,
-- technische Synchronisationsdaten nur eingeklappt,
-- Abmelden.
+- verständlicher Systemstatus,
+- manueller Deploy-Start,
+- Abmelden,
+- technische Synchronisationswerte nur eingeklappt.
 
-## 4. Noch erforderlich
+### Dialoge
 
-### Workpack 2 – Verwaltung E2E fertigstellen
+- Schließen-Button ist `type="button"`,
+- keine Pflichtfeldvalidierung beim Schließen,
+- Escape und Klick auf den Hintergrund funktionieren zusätzlich.
 
-- echte Editoren für Events und Aktivitäten,
-- vollständige fachliche Validierung,
-- Writeback in die jeweilige führende Quelle,
-- automatische Datenaufbereitung beziehungsweise Deploy,
-- Bestätigung der öffentlichen Wirkung,
-- relevante Änderung und Absage,
+## 3. Noch erforderlich
+
+### Aktivitätsverwaltung E2E
+
+- abgesicherten Repo-Writeback für `data/offers.json` bereitstellen,
+- Commit/Deploy atomar beziehungsweise nachvollziehbar orchestrieren,
+- Aktivitätseditor danach freischalten,
+- Fehlerzustände und Versionskonflikte behandeln.
+
+### Entwicklung und SEO vertiefen
+
+- Search Console anbinden,
+- echte Zeitreihen und Vergleichszeiträume speichern,
+- Automatisierungsqualität statt nur Mengen messen,
+- Regressionen gegenüber dem vorherigen Lauf erkennen,
+- negative Signale dedupliziert in Arbeit überführen.
+
+### Verwaltung vervollständigen
+
+- Absage- und Änderungsstatus,
 - Änderungsverlauf,
-- Fehlerzustände als `wartet` oder `blockiert`.
+- öffentliche Wirkung nach Deploy automatisiert bestätigen,
+- fachliche Feldvalidierung weiter härten.
 
-Die Verwaltung ist erst dann vollständig, wenn Speichern nicht nur eine lokale Anzeige ändert, sondern den öffentlichen Datenprozess nachweislich aktualisiert.
+### Altprozess ablösen
 
-### Workpack 3 – Menü und Systemstatus vervollständigen
+`/inbox/` bleibt vorläufig für noch nicht vollständig migrierte Push- und Diagnosefunktionen. Reguläre Prüfung, Arbeit und Backlog liegen in der Steuerzentrale.
 
-- Störungen nur bei echter fachlicher Auswirkung hervorheben,
-- erneute Ausführung oder klare nächste Aktion anbieten,
-- Einstellungen und gegebenenfalls Diagnose sinnvoll platzieren,
-- technische Begriffe aus der Standardansicht fernhalten.
-
-### Workpack 4 – Altprozess ablösen
-
-`/inbox/` bleibt vorläufig nur noch für:
-
-- Push-Registrierung und Push-Test,
-- Deploy-Sonderaktion,
-- technische Diagnose während der Migration.
-
-Der Growth-Backlog ist fachlich in `Arbeit` integriert und benötigt die alte Inbox nicht mehr als reguläre Arbeitsoberfläche.
-
-### Workpack 5 – Gesamtvalidierung
-
-- automatisierte API- und Übergangstests erweitern,
-- reale Growth-Backlog- und Aufgabenübergänge auf Staging prüfen,
-- reale Event-/Audit-/Submission-Writebacks prüfen,
-- Pflicht-Viewports vollständig abnehmen,
-- Abnahmematrix vollständig belegen,
-- danach kontrollierter Main-Merge.
-
-## 5. Automatische Absicherung
-
-`.github/workflows/control-center-validation.yml` prüft:
-
-- PHP-Syntax,
-- JavaScript-Syntax beider Steuerzentralen-Skripte,
-- JSON-Gültigkeit des Repo-Workpack-Manifests,
-- Pflichtdateien,
-- Zugriffsschutz,
-- Growth-Backlog-Sync und Writeback,
-- Repo-Workpack-Sync,
-- Umwandlung ohne Doppelkarte,
-- Warte- und Blockadegründe,
-- verbindliche Navigation und Produktverträge.
-
-## 6. Freigabestatus
+## 4. Freigabestatus
 
 | Bereich | Status |
 |---|---|
-| Vorgangs- und Writeback-Grundlage | tragfähig |
-| Bearbeiten-Queue | funktional, reale Aktionen weiter prüfen |
-| Übersicht | strukturell umgesetzt, reale Priorisierung weiter prüfen |
-| Arbeit/Aufgaben/Backlog/Ideen | Workpack umgesetzt, Staging-Laufzeitprüfung ausstehend |
-| Verwaltung | begonnen, E2E-Bearbeitung fehlt |
-| Menü/Systemstatus | Grundzustand umgesetzt, Störungsfälle offen |
-| Alte Inbox-Ablösung | teilweise; Backlog migriert, technische Restfunktionen offen |
+| Übersicht | strukturell umgesetzt, Laufzeitprüfung offen |
+| Prüfen | funktional, reale Writebacks weiter prüfen |
+| Arbeit | konsolidiert, kompakte Darstellung umgesetzt |
+| Eventverwaltung | führender Writeback plus Deploy umgesetzt, Staging-Test offen |
+| Aktivitätsverwaltung | nur lesend; Repo-Writeback fehlt |
+| Entwicklung | belastbare Grundsicht umgesetzt |
+| Search Console | noch nicht angebunden |
+| Systemstatus | fachliche Grundsicht umgesetzt |
+| Alte Inbox-Ablösung | teilweise |
 | Main-Merge | nicht zulässig |
 
-## 7. Nächster Schritt
+## 5. Nächster Prüfschritt
 
-Nach erfolgreichem Deployment wird Workpack 1 auf Staging mit realen Daten geprüft. Danach folgt ausschließlich Workpack 2: vollständige E2E-Fertigstellung der Verwaltung.
+Nach erfolgreichem Deployment sind auf Staging insbesondere zu prüfen:
+
+1. Navigation `Übersicht / Prüfen / Arbeit / Verwaltung / Entwicklung`.
+2. Dialoge lassen sich jederzeit über `X` schließen.
+3. Backlog erscheint als kompakte Zeilen und klappt kontrolliert auf.
+4. Ein echter Testevent kann bearbeitet, im Sheet gespeichert und mit Deploy gestartet werden.
+5. Aktivitätsbearbeitung erklärt die noch bestehende Repo-Grenze korrekt.
+6. Entwicklung zeigt nur reale Werte und kennzeichnet fehlende Search-Console-Daten.
+7. Systemstatus zeigt zuerst fachliche Informationen und technische Details nur nach Aufklappen.
