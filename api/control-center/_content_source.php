@@ -28,6 +28,26 @@ function be_cc_sheet_value(array $row, array $index, array $names): string
     return '';
 }
 
+function be_cc_parse_iso_date(string $value): ?DateTimeImmutable
+{
+    $value = trim($value);
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) return null;
+    $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value, new DateTimeZone('Europe/Berlin'));
+    $errors = DateTimeImmutable::getLastErrors();
+    if ($date === false || (is_array($errors) && (($errors['warning_count'] ?? 0) > 0 || ($errors['error_count'] ?? 0) > 0))) return null;
+    return $date;
+}
+
+function be_cc_event_is_current_or_future(string $startDate, string $endDate = ''): bool
+{
+    $start = be_cc_parse_iso_date($startDate);
+    if ($start === null) return false;
+    $end = be_cc_parse_iso_date($endDate);
+    $effectiveEnd = $end !== null && $end >= $start ? $end : $start;
+    $today = new DateTimeImmutable('today', new DateTimeZone('Europe/Berlin'));
+    return $effectiveEnd >= $today;
+}
+
 function be_cc_event_items(bool $full = false): array
 {
     $response = be_google_sheets_values_get('Events!A:AZ');
@@ -42,11 +62,14 @@ function be_cc_event_items(bool $full = false): array
         if ($id === '' || $title === '') continue;
         $status = be_cc_sheet_value($row, $index, ['status', 'publication_status']);
         if (in_array(strtolower($status), ['deleted', 'archived'], true)) continue;
+        $date = be_cc_sheet_value($row, $index, ['date', 'start_date']);
+        $endDate = be_cc_sheet_value($row, $index, ['enddate', 'end_date']);
+        if (!be_cc_event_is_current_or_future($date, $endDate)) continue;
         $item = [
             'id' => $id,
             'title' => $title,
-            'date' => be_cc_sheet_value($row, $index, ['date', 'start_date']),
-            'end_date' => be_cc_sheet_value($row, $index, ['enddate', 'end_date']),
+            'date' => $date,
+            'end_date' => $endDate,
             'time' => be_cc_sheet_value($row, $index, ['time']),
             'location' => be_cc_sheet_value($row, $index, ['location', 'venue']),
             'city' => be_cc_sheet_value($row, $index, ['city']),
