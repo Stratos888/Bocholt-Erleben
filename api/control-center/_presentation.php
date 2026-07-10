@@ -29,12 +29,7 @@ function be_cc_display_status(string $state): string
 
 function be_cc_action(string $key, string $label, bool $requiresInput = false, bool $destructive = false): array
 {
-    return [
-        'key' => $key,
-        'label' => $label,
-        'requires_input' => $requiresInput,
-        'destructive' => $destructive,
-    ];
+    return ['key' => $key, 'label' => $label, 'requires_input' => $requiresInput, 'destructive' => $destructive];
 }
 
 function be_cc_case_presentation(array $row): array
@@ -125,6 +120,21 @@ function be_cc_case_presentation(array $row): array
         ];
         $url = trim((string)($payload['suggested_url'] ?? $payload['source_url'] ?? ''));
         if ($url !== '') $links[] = ['label' => 'Quelle', 'url' => $url];
+    } elseif ($source === 'growth_backlog') {
+        $kind = 'backlog_item';
+        $group = 'backlog';
+        $primary = be_cc_action('convert_to_task', 'Als Aufgabe starten');
+        $secondary = [
+            be_cc_action('edit_source', 'Bearbeiten', true),
+            be_cc_action('complete', 'Abschließen'),
+            be_cc_action('reject', 'Verwerfen', true, true),
+        ];
+        $context = [
+            'backlog_type' => (string)($payload['type'] ?? ''),
+            'source' => (string)($payload['source'] ?? ''),
+            'recommended_action' => (string)($payload['recommended_action'] ?? ''),
+            'expected_benefit' => (string)($payload['expected_benefit'] ?? ''),
+        ];
     } elseif ($type === 'task') {
         $kind = 'manual_task';
         $group = 'tasks';
