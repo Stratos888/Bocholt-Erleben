@@ -3,6 +3,17 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_content_ops.php';
 
+function be_cc_parse_process_timestamp(mixed $value): ?DateTimeImmutable
+{
+    $raw = trim((string)$value);
+    if ($raw === '') return null;
+    try {
+        return new DateTimeImmutable($raw);
+    } catch (Throwable) {
+        return null;
+    }
+}
+
 function be_cc_integrated_process_health(array $contentOps): array
 {
     $health = be_cc_process_health($contentOps);
@@ -18,11 +29,11 @@ function be_cc_integrated_process_health(array $contentOps): array
 
     if (!$weeklyCreatedWork) return $health;
 
-    $weeklyAt = null;
-    $intakeAt = null;
-    try { $weeklyAt = new DateTimeImmutable((string)($weekly['generated_at_utc'] ?? '')); } catch (Throwable) {}
-    try { $intakeAt = new DateTimeImmutable((string)($intake['generated_at_utc'] ?? '')); } catch (Throwable) {}
-    $handoffConfirmed = $weeklyAt && $intakeAt && $intakeAt >= $weeklyAt;
+    $weeklyAt = be_cc_parse_process_timestamp($weekly['generated_at_utc'] ?? null);
+    $intakeAt = be_cc_parse_process_timestamp(is_array($intake) ? ($intake['generated_at_utc'] ?? null) : null);
+    $handoffConfirmed = $weeklyAt instanceof DateTimeImmutable
+        && $intakeAt instanceof DateTimeImmutable
+        && $intakeAt >= $weeklyAt;
 
     foreach ($health['items'] as &$item) {
         if (($item['key'] ?? '') !== 'manual_ki_intake') continue;
