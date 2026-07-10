@@ -15,14 +15,28 @@ if (!in_array($method, ['GET', 'POST'], true)) {
     be_json_response(405, ['status' => 'error', 'message' => 'Method not allowed.']);
 }
 
-function be_cc_all_event_items(bool $full = false): array
+function be_cc_sheet_event_items(bool $full = false): array
 {
-    $sheet = array_map(static function(array $item): array {
+    return array_map(static function(array $item): array {
         $item['source_system'] = 'events_sheet';
         $item['source_label'] = 'Redaktionelles Event';
         return $item;
     }, be_cc_event_items($full));
-    return array_merge($sheet, be_cc_submission_event_items($full));
+}
+
+function be_cc_all_event_items(bool $full = false): array
+{
+    return array_merge(be_cc_sheet_event_items($full), be_cc_submission_event_items($full));
+}
+
+function be_cc_event_items_by_source(string $source, bool $full = false): array
+{
+    return match ($source) {
+        'sheet' => be_cc_sheet_event_items($full),
+        'submissions' => be_cc_submission_event_items($full),
+        'all' => be_cc_all_event_items($full),
+        default => throw new InvalidArgumentException('Ungültige Eventquelle.'),
+    };
 }
 
 try {
@@ -30,7 +44,16 @@ try {
         $type = trim((string)($_GET['type'] ?? 'events'));
         if (!in_array($type, ['events', 'activities'], true)) throw new InvalidArgumentException('Ungültiger Inhaltstyp.');
         $id = trim((string)($_GET['id'] ?? ''));
-        $items = $type === 'events' ? be_cc_all_event_items($id !== '') : be_cc_activity_items($id !== '');
+        $source = trim((string)($_GET['source'] ?? 'all'));
+
+        if ($type === 'events' && $id !== '') {
+            $source = str_starts_with($id, 'submission-') ? 'submissions' : 'sheet';
+        }
+
+        $items = $type === 'events'
+            ? be_cc_event_items_by_source($source, $id !== '')
+            : be_cc_activity_items($id !== '');
+
         if ($id !== '') {
             foreach ($items as $item) {
                 if ((string)$item['id'] === $id) {
@@ -40,7 +63,12 @@ try {
             }
             be_json_response(404, ['status' => 'error', 'message' => 'Inhalt wurde nicht gefunden.']);
         }
-        be_json_response(200, ['status' => 'ok', 'data' => ['items' => $items, 'total' => count($items)]]);
+
+        be_json_response(200, ['status' => 'ok', 'data' => [
+            'items' => $items,
+            'total' => count($items),
+            'source' => $type === 'events' ? $source : 'repo',
+        ]]);
     }
 
     $payload = json_decode((string)file_get_contents('php://input'), true);
@@ -73,13 +101,13 @@ try {
     }
 
     $current = null;
-    foreach (be_cc_all_event_items(true) as $item) if ((string)$item['id'] === $id) { $current = $item; break; }
+    $eventSource = str_starts_with($id, 'submission-') ? 'submissions' : 'sheet';
+    foreach (be_cc_event_items_by_source($eventSource, true) as $item) if ((string)$item['id'] === $id) { $current = $item; break; }
     if (!is_array($current)) throw new RuntimeException('Veranstaltung wurde nicht gefunden.');
 
     if (($current['source_system'] ?? '') === 'submission_db') {
         $submissionId = (int)($current['submission_id'] ?? 0);
-        $normalized = be_cc_normalize_submission_event_updates($updates);
-        // Verlauf verwendet die öffentlichen Feldnamen, während der DB-Writeback intern Spaltennamen nutzt.
+        be_cc_normalize_submission_event_updates($updates);
         $changeId = be_cc_create_content_change($current, $updates, 'event', 'submission_db');
         try {
             $writtenColumns = be_cc_update_submission_event($submissionId, $updates);
