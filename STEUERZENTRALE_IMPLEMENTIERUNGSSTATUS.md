@@ -1,9 +1,20 @@
 # Steuerzentrale – Implementierungsstatus
 
 Stand: 2026-07-10  
-Status: Gesamtumbau `Prüfen / Arbeit / Verwaltung / Entwicklung` umgesetzt; Gesamtfreigabe ausstehend
+Status: Härtungs- und Simulationsworkpack umgesetzt; externe Gesamtfreigabe ausstehend
 
-## 1. Verbindliche Hauptnavigation
+## 1. Verbindliche Dokumente
+
+- `STEUERZENTRALE_ZIELBILD.md`
+- `STEUERZENTRALE_GESAMTPROJEKT_INTEGRATION.md`
+- `STEUERZENTRALE_VORGANGSKATALOG.md`
+- `STEUERZENTRALE_INFORMATIONARCHITEKTUR.md`
+- `STEUERZENTRALE_SCREENVERTRAG.md`
+- `STEUERZENTRALE_ABNAHMEMATRIX.md`
+- `STEUERZENTRALE_BACKEND_GAP_ANALYSE.md`
+- `STEUERZENTRALE_SIMULATIONSBERICHT.md`
+
+## 2. Verbindliche Hauptnavigation
 
 1. Übersicht
 2. Prüfen
@@ -13,16 +24,15 @@ Status: Gesamtumbau `Prüfen / Arbeit / Verwaltung / Entwicklung` umgesetzt; Ges
 
 Seltene Funktionen liegen im Header-Menü.
 
-## 2. Bereits umgesetzt
+## 3. Bereits umgesetzt
 
 ### Zentrale Grundlage
 
 - kanonisches Vorgangsmodell und Verlauf,
 - eindeutige Quellreferenzen und Deduplizierung,
-- Quell-Writeback vor zentralem Abschluss,
 - Anbieter-, Content-Audit-, KI-/Sheet-, Growth-Backlog- und Repo-Workpack-Anbindung,
 - dauerhaft sichtbare Navigation,
-- automatische PHP-, JavaScript-, JSON- und Produktvertragsprüfung.
+- automatische PHP-, JavaScript-, JSON-, Simulations- und Produktvertragsprüfung.
 
 ### Prüfen
 
@@ -30,7 +40,7 @@ Seltene Funktionen liegen im Header-Menü.
 - mobil fokussierter Einzelfall,
 - Desktop Queue plus Detail,
 - fallgerechte Hauptaktionen,
-- Content-Korrekturformular bleibt erhalten,
+- Content-Korrekturformular,
 - deutsche Statussprache.
 
 ### Arbeit
@@ -41,36 +51,56 @@ Seltene Funktionen liegen im Header-Menü.
 - Aufgaben-, Ideen- und Backlog-Lebenszyklus,
 - Warte- und Blockadegründe,
 - Growth-Backlog-Writeback,
-- Umwandlung ohne Doppelkarte.
+- Umwandlung ohne Doppelkarte,
+- deduplizierte Publikationsprobleme aus Eventänderungen.
 
-### Verwaltung
+### Eventverwaltung
 
-#### Veranstaltungen
+Umgesetzt:
 
 - Suche ohne Fokusverlust,
-- vollständigen Datensatz öffnen,
-- Titel, Beschreibung, Datum, Uhrzeit, Ort, Stadt, Kategorie, Quelle und Ticketlink bearbeiten,
-- Speichern in das führende Events-Sheet,
-- anschließend etablierten Deployprozess automatisch starten,
-- öffentliche Vorschau öffnen,
-- Teilfehler zwischen Speichern und Deploy verständlich melden.
+- vollständiger Datensatz,
+- Bearbeitung von Titel, Beschreibung, Datum, Uhrzeit, Ort, Stadt, Kategorie, Quelle und Ticketlink,
+- vollständige Vorabvalidierung,
+- Aliasauflösung zur tatsächlichen Sheet-Spalte,
+- gemeinsamer Google-Sheets-Batch statt einzelner Teilupdates,
+- dauerhafter Änderungsverlauf in `control_content_changes`,
+- automatischer Deploy-Start,
+- Polling des öffentlichen `/data/events.json`-Feeds,
+- Vergleich der tatsächlich geschriebenen Felder,
+- bestätigter Abschluss erst nach öffentlicher Datenwirkung,
+- blockierte Arbeit bei Deploy- oder Verifikationsfehlern.
 
-#### Aktivitäten
+Die UI verwendet bewusst `Speichern und Aktualisierung starten` und behauptet keine Veröffentlichung vor der öffentlichen Bestätigung.
 
-- Bestand und Vorschau vorhanden,
-- dauerhafte Bearbeitung bewusst noch gesperrt,
-- Grund: führende Quelle ist `data/offers.json`; ein lokaler Webserver-Writeback wäre nicht versionsfest und würde beim nächsten Deploy verloren gehen.
+### Aktivitätsverwaltung
+
+Umgesetzt beziehungsweise vorbereitet:
+
+- Bestand und Vorschau,
+- GitHub-Contents-API-Writeback für `data/offers.json`,
+- SHA-Konfliktschutz,
+- erlaubte Feldmenge und URL-Validierung,
+- Commit auf konfigurierten Branch,
+- serverseitiger Secret-Vertrag `BE_GITHUB_REPO_TOKEN`.
+
+Der Editor bleibt bewusst gesperrt, bis Secret, Commit, Deploy und öffentliche Wirkung auf Staging vollständig E2E bestätigt wurden.
 
 ### Entwicklung
 
-- eigener Haupttab,
-- Content-Vollständigkeit aus realen Eventdaten,
+Umgesetzt:
+
+- realer Content-Basisstand aus dem Events-Sheet,
 - offene Qualitätsprüfungen,
 - aktive, wartende und blockierte Arbeit,
-- erledigte Vorgänge,
-- SEO-Onpage-Signale,
-- kuratierte offene Repo-Workpacks,
-- Search-Console-Lücke ausdrücklich gekennzeichnet statt Kennzahlen zu erfinden.
+- Publikationsprobleme,
+- stündlich begrenzte Entwicklungssnapshots,
+- Trends nur mit zeitlich getrenntem Snapshot,
+- Deltas für Content-Vollständigkeit, fehlende Angaben, Prüfungen, Blockaden, technische SEO und Publikationsprobleme,
+- technische SEO-Basis für Startseite, Veranstaltungen und Aktivitäten,
+- Prüfung von Title, Meta-Description, Canonical, Sitemap, robots.txt und Eventfeed,
+- kuratierte Repo-Workpacks,
+- Search-Console-Lücke ausdrücklich gekennzeichnet.
 
 ### Header-Menü und Systemstatus
 
@@ -82,61 +112,99 @@ Seltene Funktionen liegen im Header-Menü.
 
 ### Dialoge
 
-- Schließen-Button ist `type="button"`,
+- Schließen-Button `type="button"`,
 - keine Pflichtfeldvalidierung beim Schließen,
-- Escape und Klick auf den Hintergrund funktionieren zusätzlich.
+- Escape und Hintergrundklick.
 
-## 3. Noch erforderlich
+## 4. Interne Simulation
+
+Ausgeführt und erfolgreich:
+
+- Eventaliasse,
+- Pflichtfeld-, Datums- und URL-Validierung,
+- nicht zuordenbare Sheet-Spalten,
+- öffentliche Eventfeed-Aliasse,
+- bestätigte und abweichende öffentliche Werte,
+- nur tatsächlich geschriebene Felder,
+- Entwicklungsbewertung ohne Zeitreihe,
+- aktueller Handlungsbedarf,
+- vier Veröffentlichungszustände.
+
+Ergebnis:
+
+```text
+=== Control Center Contract Simulation: OK ===
+```
+
+Details: `STEUERZENTRALE_SIMULATIONSBERICHT.md`.
+
+## 5. Noch erforderlich
+
+### Externer Event-E2E-Nachweis
+
+- realer Google-Sheets-Writeback,
+- Apps-Script-Deploy,
+- öffentlicher Feed nach Deployment,
+- bestätigter Änderungsverlauf und automatisch abgeschlossene Publikationsaufgabe.
 
 ### Aktivitätsverwaltung E2E
 
-- abgesicherten Repo-Writeback für `data/offers.json` bereitstellen,
-- Commit/Deploy atomar beziehungsweise nachvollziehbar orchestrieren,
-- Aktivitätseditor danach freischalten,
-- Fehlerzustände und Versionskonflikte behandeln.
+- serverseitiges Repository-Secret konfigurieren,
+- Testcommit mit SHA-Konfliktschutz,
+- Deploy aus Repo-Änderung,
+- öffentliche Aktivitätswirkung verifizieren,
+- erst danach Editor freischalten.
 
-### Entwicklung und SEO vertiefen
+### Entwicklung und SEO
 
-- Search Console anbinden,
-- echte Zeitreihen und Vergleichszeiträume speichern,
-- Automatisierungsqualität statt nur Mengen messen,
-- Regressionen gegenüber dem vorherigen Lauf erkennen,
-- negative Signale dedupliziert in Arbeit überführen.
+- mindestens einen zeitlich getrennten Folgesnapshot erzeugen,
+- Automatisierungsqualität um echte Treffer-/Fehlerquoten erweitern,
+- negative Signale dedupliziert in Arbeit überführen,
+- Search Console anbinden oder ausdrücklich als späteren nicht blockierenden Ausbau entscheiden.
 
 ### Verwaltung vervollständigen
 
 - Absage- und Änderungsstatus,
-- Änderungsverlauf,
-- öffentliche Wirkung nach Deploy automatisiert bestätigen,
-- fachliche Feldvalidierung weiter härten.
+- Objektverlauf sichtbar im Editor darstellen,
+- Aktivitätseditor nach E2E-Freigabe.
 
 ### Altprozess ablösen
 
-`/inbox/` bleibt vorläufig für noch nicht vollständig migrierte Push- und Diagnosefunktionen. Reguläre Prüfung, Arbeit und Backlog liegen in der Steuerzentrale.
+`/inbox/` bleibt vorläufig für noch nicht vollständig migrierte Push- und Diagnosefunktionen.
 
-## 4. Freigabestatus
+## 6. Automatische Absicherung
+
+`.github/workflows/control-center-validation.yml` prüft:
+
+- PHP-Syntax aller Control-Center-Dateien,
+- JavaScript-Syntax aller vier UI-Skripte,
+- ausführbare Domänensimulation,
+- Produktvertragsaudit,
+- JSON-Gültigkeit,
+- Pflichtdateien,
+- Zugriffsschutz,
+- Quell-, Verlaufs-, Snapshot- und Publikationsverträge,
+- Aktivitäts-Repo-Writeback und bewusstes Editor-Gate.
+
+Ein erfolgreicher GitHub-Actions-Lauf ist über den aktuell verfügbaren Connector noch nicht belegt.
+
+## 7. Freigabestatus
 
 | Bereich | Status |
 |---|---|
-| Übersicht | strukturell umgesetzt, Laufzeitprüfung offen |
-| Prüfen | funktional, reale Writebacks weiter prüfen |
-| Arbeit | konsolidiert, kompakte Darstellung umgesetzt |
-| Eventverwaltung | führender Writeback plus Deploy umgesetzt, Staging-Test offen |
-| Aktivitätsverwaltung | nur lesend; Repo-Writeback fehlt |
-| Entwicklung | belastbare Grundsicht umgesetzt |
-| Search Console | noch nicht angebunden |
+| Informationsarchitektur | umgesetzt |
+| Prüfen | funktional; externe Quellaktionen noch real zu belegen |
+| Arbeit | konsolidiert und intern simuliert |
+| Eventverwaltung | technisch E2E modelliert; realer Staging-Nachweis offen |
+| Event-Veröffentlichungsbestätigung | implementiert; externer Nachweis offen |
+| Aktivitätsverwaltung | Writeback vorbereitet, Editor sicher gesperrt |
+| Entwicklung | Snapshots und technische SEO umgesetzt; erster Folgevergleich offen |
+| Search Console | nicht angebunden |
 | Systemstatus | fachliche Grundsicht umgesetzt |
 | Alte Inbox-Ablösung | teilweise |
+| CI-Nachweis | noch nicht verfügbar |
 | Main-Merge | nicht zulässig |
 
-## 5. Nächster Prüfschritt
+## 8. Nächste Entscheidung
 
-Nach erfolgreichem Deployment sind auf Staging insbesondere zu prüfen:
-
-1. Navigation `Übersicht / Prüfen / Arbeit / Verwaltung / Entwicklung`.
-2. Dialoge lassen sich jederzeit über `X` schließen.
-3. Backlog erscheint als kompakte Zeilen und klappt kontrolliert auf.
-4. Ein echter Testevent kann bearbeitet, im Sheet gespeichert und mit Deploy gestartet werden.
-5. Aktivitätsbearbeitung erklärt die noch bestehende Repo-Grenze korrekt.
-6. Entwicklung zeigt nur reale Werte und kennzeichnet fehlende Search-Console-Daten.
-7. Systemstatus zeigt zuerst fachliche Informationen und technische Details nur nach Aufklappen.
+Es werden noch keine Benutzer-Prüfschritte als Freigabe ausgegeben. Zuerst müssen CI-Status und die externen Staging-Systeme soweit erreichbar sein, dass die implementierten Abläufe real gegen Google Sheets, Apps Script, MySQL, GitHub und den öffentlichen Feed nachgewiesen werden können.
