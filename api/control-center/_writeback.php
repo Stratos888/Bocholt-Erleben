@@ -76,29 +76,90 @@ function be_cc_update_sheet_row_by_header(string $tab, int $headerRow, int $rowN
 function be_cc_find_event_row(string $contentId): array
 {
     $response = be_google_sheets_values_get('Events!A:ZZ');
-    $values = $response['values'] ?? [];
-    $header = array_map(static fn($value) => trim((string)$value), is_array($values[0] ?? null) ? $values[0] : []);
-    $index = array_flip($header);
-    if (!isset($index['id'])) throw new RuntimeException('Events id column is missing.');
-    for ($i = 1; $i < count($values); $i++) {
+    $values = is_array($response['values'] ?? null) ? $response['values'] : [];
+    [$headerOffset, $index] = be_cc_find_header_row($values);
+    if ($headerOffset < 0) throw new RuntimeException('Events header row was not found.');
+    $idColumn = $index['id'] ?? $index['event_id'] ?? null;
+    if (!is_int($idColumn)) throw new RuntimeException('Events id column is missing.');
+    for ($i = $headerOffset + 1; $i < count($values); $i++) {
         $row = is_array($values[$i] ?? null) ? $values[$i] : [];
-        if (trim((string)($row[$index['id']] ?? '')) === $contentId) return ['row_number' => $i + 1, 'index' => $index];
+        if (trim((string)($row[$idColumn] ?? '')) === $contentId) {
+            return ['row_number' => $i + 1, 'header_row' => $headerOffset + 1, 'index' => $index, 'row' => $row];
+        }
     }
     throw new RuntimeException('Matching event row was not found.');
 }
 
-function be_cc_update_event_fields(string $contentId, array $updates): void
+function be_cc_event_target_column(array $index, array $aliases): ?string
 {
-    $allowed = ['title','date','endDate','end_date','time','city','location','address','kategorie','tags','source_url','url','event_url','ticket_url','description','visual_key','visual_motif','image_visual_motif'];
-    $target = be_cc_find_event_row($contentId);
-    foreach ($updates as $field => $value) {
-        if (!in_array($field, $allowed, true) || !isset($target['index'][$field])) continue;
-        $clean = trim((string)$value);
-        if (in_array($field, ['source_url','url','event_url','ticket_url'], true) && $clean !== '' && (!filter_var($clean, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//i', $clean))) throw new InvalidArgumentException('Invalid URL for ' . $field . '.');
-        if (in_array($field, ['date','endDate','end_date'], true) && $clean !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $clean)) throw new InvalidArgumentException('Invalid date for ' . $field . '.');
-        $column = be_cc_column_letter((int)$target['index'][$field]);
-        be_google_sheets_values_update('Events!' . $column . $target['row_number'] . ':' . $column . $target['row_number'], [[$clean]]);
+    foreach ($aliases as $alias) {
+        if (isset($index[strtolower($alias)])) return strtolower($alias);
     }
+    return null;
+}
+
+function be_cc_update_event_fields(string $contentId, array $updates): array
+{
+    $target = be_cc_find_event_row($contentId);
+    $aliases = [
+        'title' => ['title'],
+        'date' => ['date', 'start_date'],
+        'end_date' => ['enddate', 'end_date'],
+        'time' => ['time'],
+        'city' => ['city'],
+        'location' => ['location', 'venue'],
+        'address' => ['address'],
+        'category' => ['kategorie', 'category'],
+        'tags' => ['tags'],
+        'source_url' => ['source_url', 'url', 'event_url'],
+        'ticket_url' => ['ticket_url'],
+        'description' => ['description'],
+        'visual_key' => ['visual_key'],
+        'visual_motif' => ['visual_motif', 'image_visual_motif'],
+    ];
+    $incomingAliases = [
+        'endDate' => 'end_date', 'end_date' => 'end_date',
+        'kategorie' => 'category', 'category' => 'category',
+        'url' => 'source_url', 'event_url' => 'source_url', 'source_url' => 'source_url',
+        'image_visual_motif' => 'visual_motif', 'visual_motif' => 'visual_motif',
+    ];
+    $normalized = [];
+    foreach ($updates as $field => $value) {
+        $canonical = $incomingAliases[$field] ?? $field;
+        if (isset($aliases[$canonical])) $normalized[$canonical] = trim((string)$value);
+    }
+    if (!$normalized) throw new InvalidArgumentException('Keine unterstützten Eventfelder übergeben.');
+
+    $currentTitleColumn = be_cc_event_target_column($target['index'], $aliases['title']);
+    $currentDateColumn = be_cc_event_target_column($target['index'], $aliases['date']);
+    $currentTitle = $currentTitleColumn !== null ? trim((string)($target['row'][$target['index'][$currentTitleColumn]] ?? '')) : '';
+    $currentDate = $currentDateColumn !== null ? trim((string)($target['row'][$target['index'][$currentDateColumn]] ?? '')) : '';
+    $finalTitle = array_key_exists('title', $normalized) ? $normalized['title'] : $currentTitle;
+    $finalDate = array_key_exists('date', $normalized) ? $normalized['date'] : $currentDate;
+    if ($finalTitle === '') throw new InvalidArgumentException('Titel darf nicht leer sein.');
+    if ($finalDate === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $finalDate)) throw new InvalidArgumentException('Ein gültiges Startdatum ist erforderlich.');
+
+    $data = [];
+    $written = [];
+    foreach ($normalized as $canonical => $clean) {
+        if (in_array($canonical, ['source_url','ticket_url'], true) && $clean !== '' && (!filter_var($clean, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//i', $clean))) {
+            throw new InvalidArgumentException('Ungültige URL für ' . $canonical . '.');
+        }
+        if (in_array($canonical, ['date','end_date'], true) && $clean !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $clean)) {
+            throw new InvalidArgumentException('Ungültiges Datum für ' . $canonical . '.');
+        }
+        $columnName = be_cc_event_target_column($target['index'], $aliases[$canonical]);
+        if ($columnName === null) continue;
+        $column = be_cc_column_letter((int)$target['index'][$columnName]);
+        $data[] = ['range' => 'Events!' . $column . $target['row_number'] . ':' . $column . $target['row_number'], 'values' => [[$clean]]];
+        $written[] = $canonical;
+    }
+    if (!$data) throw new RuntimeException('Keine der übergebenen Eventänderungen konnte einer Sheet-Spalte zugeordnet werden.');
+
+    $google = be_google_config();
+    $url = sprintf('https://sheets.googleapis.com/v4/spreadsheets/%s/values:batchUpdate', rawurlencode($google['sheet_id']));
+    be_google_sheets_request('POST', $url, ['valueInputOption' => 'USER_ENTERED', 'data' => $data]);
+    return $written;
 }
 
 function be_cc_writeback_content_audit(array $case, string $action, array $payload): void
