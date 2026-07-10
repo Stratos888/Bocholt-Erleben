@@ -55,11 +55,7 @@
     const priority = detail.priority === 'high' ? 'hoch' : detail.priority === 'low' ? 'niedrig' : 'mittel';
     open(`<h2>Backlog bearbeiten</h2><div class="cc-stack">${field('bl-title','Titel',detail.title)}<label class="cc-field"><span>Beschreibung</span><textarea id="bl-description">${esc(detail.reason || '')}</textarea></label><label class="cc-field"><span>Priorität</span><select id="bl-priority"><option value="hoch" ${priority === 'hoch' ? 'selected' : ''}>Hoch</option><option value="mittel" ${priority === 'mittel' ? 'selected' : ''}>Mittel</option><option value="niedrig" ${priority === 'niedrig' ? 'selected' : ''}>Niedrig</option></select></label><button type="button" class="cc-button cc-button--primary" id="bl-save">Speichern</button></div>`);
     document.querySelector('#bl-save').addEventListener('click', async () => {
-      const payload = {
-        title: clean(document.querySelector('#bl-title')?.value),
-        description: clean(document.querySelector('#bl-description')?.value),
-        priority: clean(document.querySelector('#bl-priority')?.value),
-      };
+      const payload = { title:clean(document.querySelector('#bl-title')?.value), description:clean(document.querySelector('#bl-description')?.value), priority:clean(document.querySelector('#bl-priority')?.value) };
       close(); status.textContent = 'Backlog wird gespeichert …';
       try {
         await api('/api/control-center/action.php', { method:'POST', body:JSON.stringify({ case_id:caseId, action:'edit_source', payload }) });
@@ -68,7 +64,26 @@
     });
   }
 
+  async function handleActivityEdit(button) {
+    const id = clean(button.dataset.manageEdit);
+    const data = await api(`/api/control-center/content.php?type=activities&id=${encodeURIComponent(id)}`);
+    const item = data.item || {};
+    if (!item.editable) {
+      open(`<h2>${esc(item.title || 'Aktivität')}</h2><p>${esc(item.edit_notice || 'Die Aktivitätsbearbeitung ist noch nicht freigeschaltet.')}</p><a class="cc-button cc-button--secondary" href="${esc(item.public_url || '/aktivitaeten/')}" target="_blank" rel="noopener">Vorschau öffnen</a>`);
+      return;
+    }
+    open(`<h2>Aktivität bearbeiten</h2><div class="cc-stack">${field('ca-title','Titel',item.title)}${field('ca-category','Kategorie',item.category)}${field('ca-location','Ort',item.location)}${field('ca-address','Adresse / Kartenabfrage',item.address)}${field('ca-source','Offizielle Quelle',item.source_url,'url')}${field('ca-duration','Dauer',item.duration)}${field('ca-mode','Modus',item.mode)}${field('ca-price','Preis',item.price)}${field('ca-season','Saison',item.season)}${field('ca-visual','Visual Key',item.visual_key)}<label class="cc-field"><span>Beschreibung</span><textarea id="ca-description">${esc(item.description || '')}</textarea></label><button type="button" class="cc-button cc-button--primary" id="ca-save" data-content-type="activities" data-content-id="${esc(item.id)}">Speichern und Aktualisierung starten</button></div>`);
+  }
+
   document.addEventListener('click', event => {
+    const activityEdit = event.target.closest('[data-manage-edit]');
+    const activitiesActive = document.querySelector('[data-manage-type="activities"].is-active');
+    if (activityEdit && activitiesActive) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      handleActivityEdit(activityEdit).catch(error => { status.textContent = error.message; });
+      return;
+    }
     const approve = event.target.closest('[data-review-action="approve"]');
     const edit = event.target.closest('[data-labor-action="edit_source"]');
     if (!approve && !edit) return;
