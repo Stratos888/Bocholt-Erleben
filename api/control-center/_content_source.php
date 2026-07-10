@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/_bootstrap.php';
+require_once __DIR__ . '/_github_repo.php';
 
 function be_cc_find_header_row(array $values): array
 {
@@ -55,6 +56,7 @@ function be_cc_event_items(bool $full = false): array
             'ticket_url' => be_cc_sheet_value($row, $index, ['ticket_url']),
             'public_url' => '/events/?event=' . rawurlencode($id),
             'updated_at' => be_cc_sheet_value($row, $index, ['updated_at', 'last_modified']),
+            'editable' => true,
         ];
         if ($full) {
             $item['description'] = be_cc_sheet_value($row, $index, ['description']);
@@ -73,6 +75,7 @@ function be_cc_activity_items(bool $full = false): array
     if (!is_file($path)) return [];
     $payload = json_decode((string)file_get_contents($path), true);
     $offers = is_array($payload['offers'] ?? null) ? $payload['offers'] : [];
+    $editable = be_cc_activity_writeback_available();
     $items = [];
     foreach ($offers as $offer) {
         if (!is_array($offer)) continue;
@@ -87,14 +90,20 @@ function be_cc_activity_items(bool $full = false): array
             'status' => 'published',
             'source_url' => trim((string)($offer['url'] ?? '')),
             'public_url' => '/aktivitaeten/?activity=' . rawurlencode($id),
-            'updated_at' => trim((string)($offer['checked_at'] ?? '')),
-            'editable' => false,
-            'edit_notice' => 'Aktivitäten sind derzeit repo-geführt. Ein dauerhafter Repo-Writeback wird noch eingerichtet.',
+            'updated_at' => trim((string)($offer['opening_status']['checked_at'] ?? $offer['checked_at'] ?? '')),
+            'editable' => $editable,
+            'edit_notice' => $editable
+                ? 'Änderungen werden versioniert in data/offers.json geschrieben und anschließend veröffentlicht.'
+                : 'Aktivitäten sind repo-geführt. Der sichere Repo-Writeback benötigt das serverseitige Secret BE_GITHUB_REPO_TOKEN.',
         ];
         if ($full) {
             $item['description'] = trim((string)($offer['description'] ?? ''));
             $item['address'] = trim((string)($offer['maps_query'] ?? ''));
             $item['visual_key'] = trim((string)($offer['visual_key'] ?? ''));
+            $item['duration'] = trim((string)($offer['duration'] ?? ''));
+            $item['mode'] = trim((string)($offer['mode'] ?? ''));
+            $item['price'] = trim((string)($offer['price'] ?? ''));
+            $item['season'] = trim((string)($offer['season'] ?? ''));
         }
         $items[] = $item;
     }
