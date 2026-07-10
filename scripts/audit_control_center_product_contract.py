@@ -50,19 +50,21 @@ combined_js = js + source_js + publication_js + development_js + integration_js
 contracts_ui = {
     'verdichtete Übersicht': 'cc-summary-card',
     'fokussierter Prüfbereich': 'renderReviewDetail',
+    'Zähler auf allen Prüffiltern': 'reviewGroupCount',
     'Desktop Queue': 'cc-queue',
     'gemeinsame Neuerfassung': 'openNewWorkMenu',
     'kompakte Arbeitszeilen': 'cc-labor-row',
-    'Arbeitslebenszyklus': 'laborLabels',
+    'vereinfachte Backlogaktionen': "item.primary_action.key !== 'convert_to_task'",
     'Live-Verwaltung': 'openContentEditor',
+    'getrennte Verwaltungsquellen': 'Promise.allSettled',
+    'Verwaltungs-Timeout': 'timeoutMs: 15000',
     'ehrlicher Speichervorgang': 'Speichern und Aktualisierung starten',
     'öffentliche Feed-Verifikation': 'verifyPublication',
     'Aktivitätseditor': 'ca-save',
-    'Entwicklungsbereich': 'renderDevelopment',
-    'Suchlaufwirkung': 'Gefundene Kandidaten',
-    'Lernwirkungsanzeige': 'Verhinderte Wiederholungen',
-    'Prozesskettenanzeige': 'Automatisierte Prozesskette',
-    'Funnelanzeige': 'Nutzer-Funnel und SEO-Wirkung',
+    'kompakte Entwicklung Content': "metricCard('Content'",
+    'kompakte Entwicklung Prozesse': "metricCard('Prozesse'",
+    'kompakte Entwicklung Sichtbarkeit': "metricCard('Sichtbarkeit'",
+    'mobile Zusatzwerte eingeklappt': 'Weitere Messwerte',
     'Header-Menü': 'openHeaderMenu',
     'verständlicher Systemstatus': 'cc-system-list',
 }
@@ -71,6 +73,10 @@ for label, marker in contracts_ui.items():
         errors.append(f'Produktvertrag fehlt: {label}')
 if 'Speichern und veröffentlichen' in combined_js:
     errors.append('UI behauptet eine Veröffentlichung, bevor die öffentliche Wirkung bestätigt ist.')
+if 'Aktuelle Workpacks' in combined_js:
+    errors.append('Entwicklung dupliziert Arbeits- und Backloginhalte.')
+if 'data-labor-action="details"' in js:
+    errors.append('Arbeitszeilen enthalten weiterhin einen redundanten Details-Button.')
 
 backend_contracts = {
     'führende Sheet-Inbox': 'be_cc_sync_sheet_inbox',
@@ -82,6 +88,7 @@ backend_contracts = {
     'gemeinsamer Workflow-Vertrag': 'be_cc_transition_target',
     'abhängige KI-Prozesskette': 'be_cc_integrated_process_health',
     'Event-Livewriteback': 'be_cc_update_event_fields',
+    'getrennte Eventlistenquellen': 'be_cc_event_items_by_source',
     'Aktivitäts-Repo-Writeback': 'be_cc_update_activity_in_repo',
     'explizites Aktivitäts-Gate': 'BE_ACTIVITY_WRITEBACK_ENABLED',
     'Anbieter-Event-Verwaltung': 'be_cc_update_submission_event',
@@ -93,7 +100,7 @@ backend_contracts = {
     'Teilfehler als Arbeit': 'be_cc_upsert_publication_issue',
     'Entwicklungs-Snapshots': 'control_development_snapshots',
     'Content-Ops-Wirkung': 'feedback_rule_effectiveness_daily',
-    'Prozessstatus': 'be_cc_process_health',
+    'integrierter Prozessstatus': 'be_cc_integrated_process_health',
     'Funnelmetriken': 'growth.gsc_rows',
     'Suchlaufmetriken': 'search.weekly.raw_candidates',
     'kombinierte Eventqualität': 'be_cc_sum_quality',
@@ -122,8 +129,6 @@ for marker, message in [
 ]:
     if marker not in public_events:
         errors.append(message)
-if 'Promise.all' not in integration_js or "api('/api/control-center/overview.php')" not in integration_js:
-    errors.append('Entwicklung verwendet nicht denselben integrierten Prozessstatus wie der Systemstatus.')
 
 if errors:
     print('=== Control Center Product Contract: FAILED ===')
