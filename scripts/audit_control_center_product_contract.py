@@ -3,35 +3,34 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-html = (ROOT / 'steuerzentrale/index.html').read_text(encoding='utf-8')
-js = (ROOT / 'js/control-center.js').read_text(encoding='utf-8')
-source_js = (ROOT / 'js/control-center-source-editors.js').read_text(encoding='utf-8')
-publication_js = (ROOT / 'js/control-center-publication.js').read_text(encoding='utf-8')
-development_js = (ROOT / 'js/control-center-development.js').read_text(encoding='utf-8')
-css = (ROOT / 'css/control-center.css').read_text(encoding='utf-8')
-sources = (ROOT / 'api/control-center/_sources.php').read_text(encoding='utf-8')
-writeback = (ROOT / 'api/control-center/_writeback.php').read_text(encoding='utf-8')
-domain = (ROOT / 'api/control-center/_domain.php').read_text(encoding='utf-8')
-presentation = (ROOT / 'api/control-center/_presentation.php').read_text(encoding='utf-8')
-content_api = (ROOT / 'api/control-center/content.php').read_text(encoding='utf-8')
-publication_api = (ROOT / 'api/control-center/publication.php').read_text(encoding='utf-8')
-content_history = (ROOT / 'api/control-center/_content_history.php').read_text(encoding='utf-8')
-contracts = (ROOT / 'api/control-center/_contracts.php').read_text(encoding='utf-8')
-development_api = (ROOT / 'api/control-center/development.php').read_text(encoding='utf-8')
-deploy_api = (ROOT / 'api/control-center/deploy.php').read_text(encoding='utf-8')
-schema = (ROOT / 'api/control-center/_schema.php').read_text(encoding='utf-8')
-manifest = (ROOT / 'data/control_center_repo_workpacks.json').read_text(encoding='utf-8')
+read = lambda path: (ROOT / path).read_text(encoding='utf-8')
+html = read('steuerzentrale/index.html')
+js = read('js/control-center.js')
+source_js = read('js/control-center-source-editors.js')
+publication_js = read('js/control-center-publication.js')
+development_js = read('js/control-center-development.js')
+css = read('css/control-center.css')
+sources = read('api/control-center/_sources.php')
+writeback = read('api/control-center/_writeback.php')
+domain = read('api/control-center/_domain.php')
+presentation = read('api/control-center/_presentation.php')
+content_api = read('api/control-center/content.php')
+publication_api = read('api/control-center/publication.php')
+content_history = read('api/control-center/_content_history.php')
+contracts = read('api/control-center/_contracts.php')
+github_repo = read('api/control-center/_github_repo.php')
+development_api = read('api/control-center/development.php')
+deploy_api = read('api/control-center/deploy.php')
+schema = read('api/control-center/_schema.php')
+manifest = read('data/control_center_repo_workpacks.json')
 errors = []
 
-required_nav = ['Übersicht', 'Prüfen', 'Arbeit', 'Verwaltung', 'Entwicklung']
-for label in required_nav:
+for label in ['Übersicht', 'Prüfen', 'Arbeit', 'Verwaltung', 'Entwicklung']:
     if f'<span>{label}</span>' not in html:
         errors.append(f'Navigation fehlt: {label}')
-
 for forbidden in ['<span>Eingang</span>', '<span>Inhalte</span>', '<span>Aufgaben</span>', '<span>Mehr</span>', '<span>Menü</span>', '<span>Bearbeiten</span>']:
     if forbidden in html:
         errors.append(f'Veralteter Haupttab vorhanden: {forbidden}')
-
 if '.cc-nav{' not in css or 'position:fixed' not in css:
     errors.append('Bottom-Navigation ist nicht dauerhaft fixed.')
 if 'id="cc-dialog-close" type="button"' not in html:
@@ -48,6 +47,7 @@ contracts_ui = {
     'Live-Verwaltung': 'openContentEditor',
     'ehrlicher Speichervorgang': 'Speichern und Aktualisierung starten',
     'öffentliche Feed-Verifikation': 'verifyPublication',
+    'Aktivitätseditor': 'ca-save',
     'Entwicklungsbereich': 'renderDevelopment',
     'Entwicklungstrends': 'content_coverage_delta',
     'technische SEO-Basis': 'Technische SEO-Basis',
@@ -57,6 +57,8 @@ contracts_ui = {
 for label, marker in contracts_ui.items():
     if marker not in combined_js and marker not in css:
         errors.append(f'Produktvertrag fehlt: {label}')
+if 'Speichern und veröffentlichen' in combined_js:
+    errors.append('UI behauptet eine Veröffentlichung, bevor die öffentliche Wirkung bestätigt ist.')
 
 backend_contracts = {
     'Growth-Backlog-Sync': 'be_cc_sync_growth_backlog',
@@ -66,15 +68,17 @@ backend_contracts = {
     'Wartegrund-Persistenz': "in_array($action, ['wait', 'block']",
     'Event-Livewriteback': 'be_cc_update_event_fields',
     'atomare Event-Updateplanung': 'be_cc_validate_event_update',
-    'Deploy nach Speichern': "'action' => 'deploy'",
+    'Aktivitäts-Repo-Writeback': 'be_cc_update_activity_in_repo',
+    'explizites Aktivitäts-Gate': 'BE_ACTIVITY_WRITEBACK_ENABLED',
     'dauerhafter Änderungsverlauf': 'control_content_changes',
     'öffentliche Wirkung': 'be_cc_verify_public_change',
     'Teilfehler als Arbeit': 'be_cc_upsert_publication_issue',
+    'objektartspezifischer Abschluss': "be_cc_complete_publication_issue((string)$change['object_type']",
     'Entwicklungs-Snapshots': 'control_development_snapshots',
     'technische SEO-Prüfung': 'be_cc_technical_seo_metrics',
     'Search-Console-Transparenz': 'search_console_connected',
 }
-backend = sources + writeback + domain + presentation + content_api + publication_api + content_history + contracts + development_api + deploy_api + schema
+backend = sources + writeback + domain + presentation + content_api + publication_api + content_history + contracts + github_repo + development_api + deploy_api + schema
 for label, marker in backend_contracts.items():
     if marker not in backend:
         errors.append(f'Backendvertrag fehlt: {label}')
@@ -85,15 +89,16 @@ if '/data/events.json' in js:
     errors.append('Verwaltung verwendet direkt den öffentlichen Eventfeed statt der führenden Quelle.')
 if 'decision required' in combined_js.lower():
     errors.append('Technischer englischer Status ist sichtbar codiert.')
+if "'available' => $enabled" not in github_repo or "'configured' =>" not in github_repo:
+    errors.append('Aktivitätseditor unterscheidet Konfiguration und bewusste Freigabe nicht.')
+if "type === 'activities'" not in publication_js or '#ca-save' not in publication_js:
+    errors.append('Aktivitätsveröffentlichung ist nicht in den gemeinsamen Verifikationscontroller eingebunden.')
 if 'search_console_connected' not in development_api or 'false' not in development_api:
     errors.append('Nicht angebundene Search-Console-Daten werden nicht transparent markiert.')
-if 'Speichern und veröffentlichen' in combined_js:
-    errors.append('UI behauptet eine Veröffentlichung, bevor die öffentliche Wirkung bestätigt ist.')
 
 if errors:
     print('=== Control Center Product Contract: FAILED ===')
     for error in errors:
         print('-', error)
     sys.exit(1)
-
 print('=== Control Center Product Contract: OK ===')
