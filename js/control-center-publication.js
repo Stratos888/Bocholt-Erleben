@@ -57,7 +57,9 @@
       try {
         const data = await api(`/api/control-center/publication.php?id=${encodeURIComponent(changeId)}`, {}, true);
         if (data.verified) {
-          status.textContent = 'Änderung ist im öffentlichen Eventbestand bestätigt.';
+          status.textContent = 'Änderung ist im öffentlichen Eventbestand bestätigt. Ansicht wird aktualisiert …';
+          await sleep(900);
+          window.location.reload();
           return true;
         }
       } catch (error) {
