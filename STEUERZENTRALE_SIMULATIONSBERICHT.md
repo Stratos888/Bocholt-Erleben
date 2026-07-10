@@ -1,197 +1,186 @@
 # Steuerzentrale – Simulations- und Validierungsbericht
 
 Stand: 2026-07-10  
-Status: interne Verträge simuliert; externe Laufzeitnachweise teilweise offen
+Status: finaler Härtungspatch intern simuliert; externe Laufzeitnachweise separat offen
 
-## 1. Zweck
+## 1. Prüfprinzip
 
-Dieser Bericht trennt verbindlich zwischen:
+Der Bericht trennt verbindlich:
 
-1. statisch geprüftem Code,
-2. tatsächlich ausgeführten internen Simulationen,
-3. noch nicht beweisbaren externen Laufzeitpfaden.
+1. statische Syntax- und Vertragsprüfung,
+2. tatsächlich ausgeführte interne Domänensimulation,
+3. externe Laufzeitnachweise gegen Google Sheets, Apps Script, MySQL, GitHub und öffentliche Feeds.
 
-Ein erfolgreicher Syntax- oder Vertragstest wird nicht als Beweis für Google Sheets, Apps Script, GitHub, Deployment oder öffentliche Erreichbarkeit ausgegeben.
+Keine dieser Ebenen wird als Ersatz für eine andere ausgegeben.
 
-## 2. Tatsächlich ausgeführte interne Simulation
+## 2. Tatsächlich ausgeführte Simulation
 
-Ausgeführt wurde `tests/control_center_contracts_test.php` gegen die reinen Domänenverträge aus `api/control-center/_contracts.php`.
+Ausgeführt wurden die reinen Laufzeitverträge für:
 
-Simulierte Szenarien:
+### Eventverwaltung
 
-- Eventfeld-Aliasse `date/start_date`, `location/venue`, `kategorie/category` und `source_url/url/event_url`,
-- vollständige Event-Updateplanung vor dem ersten Schreibzugriff,
-- leerer Pflicht-Titel,
-- ungültiges Startdatum,
+- Aliasauflösung `date/start_date`, `location/venue`, `kategorie/category`, `source_url/url/event_url`,
+- vollständige Updateplanung vor dem ersten Schreibzugriff,
+- leerer Titel,
+- ungültiges Datum,
 - unsichere URL,
-- nicht vorhandene Zielspalte ohne falschen Erfolgsstatus,
-- öffentlicher Eventfeed mit abweichenden Feldnamen,
-- erfolgreich bestätigte öffentliche Änderung,
-- erkannte Abweichung zwischen erwartetem und öffentlichem Wert,
-- bewusst nicht geschriebene optionale Felder,
-- Entwicklungsbewertung ohne Zeitreihe,
-- Entwicklungsbewertung mit aktuellem Handlungsbedarf,
-- Veröffentlichungskette `Quelle fehlgeschlagen`, `Deploy blockiert`, `wartet auf öffentliche Bestätigung`, `öffentlich bestätigt`.
+- fehlende Zielspalte ohne falschen Erfolg,
+- öffentliche Werte mit abweichenden Feldnamen,
+- bestätigte öffentliche Änderung,
+- erkannte öffentliche Abweichung,
+- bewusst nicht geschriebene optionale Felder.
 
-Ergebnis nach Korrektur des Testvertrags:
+### Aktivitätsverwaltung
+
+- erlaubte Feldmenge,
+- Verwerfen unbekannter Felder,
+- leerer Titel,
+- unsichere URL,
+- Standardsperre ohne explizite Serverfreigabe,
+- unterscheidbare Zustände `nicht konfiguriert`, `nicht freigeschaltet`, `bereit`.
+
+### Arbeitslebenszyklus
+
+Geprüft wurden unter anderem:
 
 ```text
+open → in_progress → waiting → open
+open → blocked → open
+open → snoozed → open
+open → done → open
+new → task/open
+decision_required → done
+new → rejected
+```
+
+Zusätzlich:
+
+- unzulässige Aktion für aktuellen Status,
+- unbekannte Aktion.
+
+Laufzeit und Test verwenden denselben Vertrag aus `api/control-center/_workflow_contracts.php`.
+
+### Entwicklung und Veröffentlichung
+
+- Basisstand ohne erfundenen Trend,
+- aktueller Handlungsbedarf,
+- Quelle fehlgeschlagen,
+- Deploy blockiert,
+- wartet auf öffentliche Bestätigung,
+- öffentlich bestätigt.
+
+## 3. Ausführungsergebnis
+
+Lokal ausgeführt:
+
+```text
+No syntax errors detected in api/control-center/_contracts.php
+No syntax errors detected in api/control-center/_github_repo.php
+No syntax errors detected in api/control-center/_workflow_contracts.php
+No syntax errors detected in tests/control_center_contracts_test.php
 === Control Center Contract Simulation: OK ===
 ```
 
-Der erste Durchlauf fand einen falsch formulierten Erwartungstext im Test. Dieser wurde korrigiert und die Simulation erneut erfolgreich ausgeführt.
+Zusätzlich wurden die beiden im finalen Patch geänderten Browsercontroller mit `node --check` geprüft:
 
-## 3. Durch die Gesamtprüfung gefundene und behobene Fehler
+- `js/control-center-source-editors.js`,
+- `js/control-center-publication.js`.
 
-### 3.1 Doppelte PHP-Funktion
+Beide Syntaxprüfungen waren erfolgreich.
 
-`be_cc_public_event_value()` war gleichzeitig in Vertrags- und Veröffentlichungsmodul definiert. Das hätte zur Laufzeit eine fatale Funktions-Neudeklaration verursacht.
+## 4. Gehärteter Veröffentlichungsprozess
 
-Behoben durch eine einzige führende Definition in `_contracts.php`.
-
-### 3.2 Partieller Event-Writeback
-
-Eventfelder wurden zuvor einzeln geschrieben. Ein später Fehler konnte einen teilweise geänderten Datensatz hinterlassen.
-
-Behoben durch:
-
-- vollständige Vorabvalidierung,
-- Aliasauflösung,
-- gemeinsamen Google-Sheets-Batch,
-- Fehler bei nicht zuordenbaren Feldern statt stillem Überspringen.
-
-### 3.3 Falsches Veröffentlichungsversprechen
-
-Der UI-Text behauptete `Speichern und veröffentlichen`, obwohl nur ein Deploy gestartet wurde.
-
-Behoben durch:
-
-- `Speichern und Aktualisierung starten`,
-- dauerhaften Änderungsdatensatz,
-- Polling des öffentlichen Eventfeeds,
-- Abschluss erst nach bestätigten öffentlichen Werten.
-
-### 3.4 Verlorene Teilfehler
-
-Ein fehlgeschlagener Deploy oder eine nach fünf Minuten nicht bestätigte öffentliche Wirkung konnte bislang nur als kurzlebige Meldung erscheinen.
-
-Behoben durch deduplizierte Aufgaben aus `publication_pipeline` unter `Arbeit`.
-
-### 3.5 Unbelegte Entwicklungsbewertung
-
-Ohne Zeitreihe wurde ein stabiler Projektzustand behauptet.
-
-Behoben durch:
-
-- stündlich begrenzte Snapshots,
-- Trend erst mit zeitlich getrenntem Vergleich,
-- ausdrücklichen Basisstand beim ersten Snapshot,
-- Deltas für Content, Prüfungen, Blockaden, technische SEO und Veröffentlichungsprobleme.
-
-### 3.6 Zu schmale SEO-Sicht
-
-SEO bestand nur aus vorhandener Beschreibung und Quelle.
-
-Ergänzt wurden statische technische Basissignale für zentrale Seiten:
-
-- Title,
-- Meta-Description,
-- Canonical,
-- Sitemap,
-- robots.txt,
-- öffentlicher Eventfeed.
-
-Search Console bleibt transparent als nicht angebunden gekennzeichnet.
-
-## 4. Veröffentlichungsprozess nach Härtung
+### Veranstaltung
 
 ```text
 Editor
 → vollständige Vorabvalidierung
-→ gemeinsamer Writeback in das Events-Sheet
+→ gemeinsamer Sheet-Batch
 → dauerhafter Änderungsverlauf
-→ Deploy starten
-→ öffentlichen /data/events.json-Feed pollen
+→ Apps-Script-Deploy
+→ wartender Arbeitsvorgang
+→ /data/events.json prüfen
 → geänderte Felder vergleichen
-→ erst danach bestätigt
+→ erst danach bestätigen
 ```
 
-Fehlerzustände:
+### Aktivität
 
-- Quelle nicht geschrieben: Fehler, keine Veröffentlichung,
-- Deploy nicht gestartet: blockierte Aufgabe,
-- öffentliche Wirkung noch ausstehend: wartender Zustand,
-- nach fünf Minuten nicht bestätigt: blockierte Aufgabe,
-- bestätigt: eventuelle Publikationsaufgabe wird abgeschlossen.
+```text
+Editor-Gate
+→ explizite Serverfreigabe prüfen
+→ aktuelle offers.json samt SHA laden
+→ Felder validieren
+→ versionierten GitHub-Commit schreiben
+→ wartender Arbeitsvorgang
+→ /data/offers.json prüfen
+→ geänderte Felder vergleichen
+→ erst danach bestätigen
+```
 
-## 5. Automatische CI-Prüfung
+Fehler bleiben als deduplizierte Arbeit sichtbar.
 
-Der Workflow `.github/workflows/control-center-validation.yml` führt nun aus:
+## 5. Aktivitäts-Sicherheitsgate
+
+Für eine Aktivierung sind gleichzeitig erforderlich:
+
+- gültiges `BE_GITHUB_REPO_TOKEN`,
+- gültige Repository- und Branch-Konfiguration,
+- `BE_ACTIVITY_WRITEBACK_ENABLED=true`.
+
+Ein Token allein reicht nicht. GitHub-Konflikte erzeugen eine verständliche Meldung; ein API-Erfolg ohne bestätigte Commit-SHA gilt als Fehler.
+
+## 6. Automatische CI-Prüfung
+
+`.github/workflows/control-center-validation.yml` prüft:
 
 - PHP-Syntax aller Control-Center-Endpunkte,
 - JavaScript-Syntax aller vier UI-Skripte,
 - ausführbare Domänensimulation,
 - Produktvertragsaudit,
-- JSON-Validierung,
-- Sicherheits- und Quellverträge,
-- Pflichtprüfung für Verlauf, Snapshots, öffentliche Verifikation und Aktivitäts-Gate.
+- JSON-Gültigkeit,
+- Pflichtdateien,
+- Zugriffsschutz,
+- gemeinsamen Workflow-Vertrag,
+- Event- und Aktivitätswriteback,
+- explizites Aktivitäts-Gate,
+- Änderungsverlauf, Snapshots und öffentliche Verifikation.
 
-Ein grüner GitHub-Actions-Lauf ist über den aktuell verfügbaren Connector noch nicht belegt. Dieser Bericht behauptet ihn daher nicht.
+Über den aktuell verfügbaren Connector wird für den jüngsten Commit noch kein GitHub-Statuscheck geliefert. Ein grüner Actions-Lauf wird daher nicht behauptet.
 
-## 6. Aktivitätsverwaltung
+## 7. Gegen den Premium-Zielzustand
 
-Ein GitHub-Contents-API-Writeback mit SHA-Konfliktschutz ist vorbereitet.
-
-Voraussetzungen:
-
-- serverseitiges Secret `BE_GITHUB_REPO_TOKEN`,
-- Schreibrecht nur auf das benötigte Repository,
-- konfigurierter Branch,
-- reale Commit-, Deploy- und öffentliche Verifikationsprüfung.
-
-Der Aktivitätseditor bleibt bis zu diesem E2E-Nachweis bewusst gesperrt. Ein vorhandener Token allein aktiviert ihn nicht automatisch.
-
-## 7. Noch nicht intern vollständig beweisbar
-
-Die folgenden realen Integrationen benötigen die Staging-Laufzeit und externe Systeme:
-
-- Google-Sheets-Schreibzugriff,
-- Apps-Script-Unlock und Deploy,
-- tatsächliche Dauer des Deployments,
-- öffentlicher Feed nach Deployment,
-- MySQL-Schemaerweiterung auf Staging,
-- GitHub-Repo-Secret und Activity-Commit,
-- Search-Console-Daten,
-- Browserdarstellung auf den Zielgeräten.
-
-Die internen Simulationen stellen sicher, dass die Entscheidungen und Fehlerzustände korrekt modelliert sind. Sie ersetzen diese externen Nachweise nicht.
-
-## 8. Premium-Abgleich
-
-| Zielkriterium | Stand |
+| Zielkriterium | Intern geprüft |
 |---|---|
-| klare Informationsarchitektur | umgesetzt |
-| Prüfen und Arbeit getrennt | umgesetzt |
-| kompakter Arbeitsbereich | umgesetzt |
-| Event-Writeback vorvalidiert und gebündelt | umgesetzt |
-| dauerhafter Änderungsverlauf | umgesetzt |
-| öffentliche Eventwirkung technisch verifizierbar | umgesetzt, externer Laufzeitnachweis offen |
-| Teilfehler bleiben als Arbeit sichtbar | umgesetzt |
-| Entwicklung mit echter Vergleichsbasis | umgesetzt; erster zeitlich getrennter Folgesnapshot erforderlich |
-| technische SEO-Basis | umgesetzt |
-| Search Console | offen |
-| Aktivitätsverwaltung E2E | vorbereitet, bewusst gesperrt |
-| alte Inbox vollständig abgelöst | offen |
-| kompletter externer E2E-Nachweis | offen |
-| Main-Merge | nicht freigegeben |
+| klare Informationsarchitektur | ja |
+| Prüfen und Arbeit getrennt | ja |
+| kompakte Arbeitsansicht | ja |
+| einheitlicher Arbeitslebenszyklus | ja |
+| Eventvalidierung und gebündelter Writeback | ja |
+| dauerhafter Änderungsverlauf | ja |
+| öffentliche Eventverifikation | ja, als Domänen- und Datenvergleich |
+| Aktivitäts-Repo-Writeback | ja, einschließlich Sicherheitsgate |
+| öffentliche Aktivitätsverifikation | ja, als Datenvergleich |
+| Teilfehler bleiben als Arbeit sichtbar | ja |
+| Entwicklung ohne erfundene Kennzahlen | ja |
+| technische SEO-Basis | ja |
+| Search Console | nicht angebunden |
+| alte Inbox vollständig abgelöst | nein, Diagnose-/Push-Restfunktionen |
+| reale externe Gesamtkette | noch auf Staging nachzuweisen |
 
-## 9. Freigaberegel
+## 8. Externe Nachweise
 
-Die Steuerzentrale darf erst als Premium-Zielzustand und Main-Merge-Kandidat gelten, wenn zusätzlich:
+Nicht intern simulierbar sind:
 
-- CI nachweislich grün ist,
-- Eventänderung auf Staging bis in den öffentlichen Feed bestätigt wurde,
-- Aktivitäts-Repo-Writeback sicher konfiguriert und E2E bestätigt ist,
-- mindestens ein zeitlich getrennter Entwicklungssnapshot vorliegt,
-- Search Console entweder angebunden oder bewusst als späterer, nicht blockierender Datenbaustein entschieden ist,
-- verbleibende Funktionen der alten Inbox migriert oder bewusst dauerhaft abgegrenzt sind.
+- reale Google-Sheets-Berechtigung,
+- Apps-Script-Unlock und Deployment,
+- Staging-MySQL-Schema,
+- Dauer des realen Deployments,
+- tatsächliche öffentliche Feed-Aktualisierung,
+- GitHub-Secret und dessen konkrete Rechte,
+- Browserdarstellung auf Zielgeräten,
+- Search-Console-Daten.
+
+## 9. Ergebnis
+
+Der finale Härtungspatch ist intern konsistent modelliert und die kritischen Domänenprozesse sind erfolgreich simuliert. Weitere Codehärtung ist vor dem nächsten Staging-Nachweis nicht erforderlich. Eine Main-Freigabe folgt daraus noch nicht; sie setzt den realen externen E2E-Nachweis voraus.
