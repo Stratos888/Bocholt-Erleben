@@ -5,14 +5,21 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 html = (ROOT / 'steuerzentrale/index.html').read_text(encoding='utf-8')
 js = (ROOT / 'js/control-center.js').read_text(encoding='utf-8')
+source_js = (ROOT / 'js/control-center-source-editors.js').read_text(encoding='utf-8')
+publication_js = (ROOT / 'js/control-center-publication.js').read_text(encoding='utf-8')
+development_js = (ROOT / 'js/control-center-development.js').read_text(encoding='utf-8')
 css = (ROOT / 'css/control-center.css').read_text(encoding='utf-8')
 sources = (ROOT / 'api/control-center/_sources.php').read_text(encoding='utf-8')
 writeback = (ROOT / 'api/control-center/_writeback.php').read_text(encoding='utf-8')
 domain = (ROOT / 'api/control-center/_domain.php').read_text(encoding='utf-8')
 presentation = (ROOT / 'api/control-center/_presentation.php').read_text(encoding='utf-8')
 content_api = (ROOT / 'api/control-center/content.php').read_text(encoding='utf-8')
+publication_api = (ROOT / 'api/control-center/publication.php').read_text(encoding='utf-8')
+content_history = (ROOT / 'api/control-center/_content_history.php').read_text(encoding='utf-8')
+contracts = (ROOT / 'api/control-center/_contracts.php').read_text(encoding='utf-8')
 development_api = (ROOT / 'api/control-center/development.php').read_text(encoding='utf-8')
 deploy_api = (ROOT / 'api/control-center/deploy.php').read_text(encoding='utf-8')
+schema = (ROOT / 'api/control-center/_schema.php').read_text(encoding='utf-8')
 manifest = (ROOT / 'data/control_center_repo_workpacks.json').read_text(encoding='utf-8')
 errors = []
 
@@ -30,7 +37,8 @@ if '.cc-nav{' not in css or 'position:fixed' not in css:
 if 'id="cc-dialog-close" type="button"' not in html:
     errors.append('Dialog-Schließen ist nicht von Pflichtfeldvalidierung entkoppelt.')
 
-contracts = {
+combined_js = js + source_js + publication_js + development_js
+contracts_ui = {
     'verdichtete Übersicht': 'cc-summary-card',
     'fokussierter Prüfbereich': 'renderReviewDetail',
     'Desktop Queue': 'cc-queue',
@@ -38,14 +46,16 @@ contracts = {
     'kompakte Arbeitszeilen': 'cc-labor-row',
     'Arbeitslebenszyklus': 'laborLabels',
     'Live-Verwaltung': 'openContentEditor',
-    'Event Speichern und Veröffentlichen': 'Speichern und veröffentlichen',
+    'ehrlicher Speichervorgang': 'Speichern und Aktualisierung starten',
+    'öffentliche Feed-Verifikation': 'verifyPublication',
     'Entwicklungsbereich': 'renderDevelopment',
-    'SEO-Datenlage': 'SEO-Datenlage',
+    'Entwicklungstrends': 'content_coverage_delta',
+    'technische SEO-Basis': 'Technische SEO-Basis',
     'Header-Menü': 'openHeaderMenu',
     'verständlicher Systemstatus': 'cc-system-list',
 }
-for label, marker in contracts.items():
-    if marker not in js and marker not in css:
+for label, marker in contracts_ui.items():
+    if marker not in combined_js and marker not in css:
         errors.append(f'Produktvertrag fehlt: {label}')
 
 backend_contracts = {
@@ -55,10 +65,16 @@ backend_contracts = {
     'Umwandlung ohne Doppelkarte': "'open' => 'open'",
     'Wartegrund-Persistenz': "in_array($action, ['wait', 'block']",
     'Event-Livewriteback': 'be_cc_update_event_fields',
+    'atomare Event-Updateplanung': 'be_cc_validate_event_update',
     'Deploy nach Speichern': "'action' => 'deploy'",
-    'Entwicklungsmetriken': 'search_console_connected',
+    'dauerhafter Änderungsverlauf': 'control_content_changes',
+    'öffentliche Wirkung': 'be_cc_verify_public_change',
+    'Teilfehler als Arbeit': 'be_cc_upsert_publication_issue',
+    'Entwicklungs-Snapshots': 'control_development_snapshots',
+    'technische SEO-Prüfung': 'be_cc_technical_seo_metrics',
+    'Search-Console-Transparenz': 'search_console_connected',
 }
-backend = sources + writeback + domain + presentation + content_api + development_api + deploy_api
+backend = sources + writeback + domain + presentation + content_api + publication_api + content_history + contracts + development_api + deploy_api + schema
 for label, marker in backend_contracts.items():
     if marker not in backend:
         errors.append(f'Backendvertrag fehlt: {label}')
@@ -66,11 +82,13 @@ for label, marker in backend_contracts.items():
 if 'no_automatic_doc_scraping' not in manifest:
     errors.append('Repo-Workpack-Manifest dokumentiert keine kuratierte Importgrenze.')
 if '/data/events.json' in js:
-    errors.append('Verwaltung verwendet nicht vorhandenen statischen Eventpfad.')
-if 'decision required' in js.lower():
+    errors.append('Verwaltung verwendet direkt den öffentlichen Eventfeed statt der führenden Quelle.')
+if 'decision required' in combined_js.lower():
     errors.append('Technischer englischer Status ist sichtbar codiert.')
 if 'search_console_connected' not in development_api or 'false' not in development_api:
     errors.append('Nicht angebundene Search-Console-Daten werden nicht transparent markiert.')
+if 'Speichern und veröffentlichen' in combined_js:
+    errors.append('UI behauptet eine Veröffentlichung, bevor die öffentliche Wirkung bestätigt ist.')
 
 if errors:
     print('=== Control Center Product Contract: FAILED ===')
