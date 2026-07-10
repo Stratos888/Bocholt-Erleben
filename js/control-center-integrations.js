@@ -17,7 +17,16 @@
   function processList(processHealth) {
     const items = processHealth?.items || [];
     if (!items.length) return '<div class="cc-empty">Noch keine belastbaren Prozessläufe vorhanden.</div>';
-    return `<div class="cc-link-list">${items.map(item => `<div class="cc-link-card"><strong>${esc(item.label)}</strong><span>${esc(item.message || '')}${item.last_run_at ? ` · ${esc(item.last_run_at)}` : ''}</span></div>`).join('')}</div>`;
+    return `<div class="cc-link-list">${items.map(item => {
+      const content = `<strong>${esc(item.label)}</strong><span>${esc(item.message || '')}${item.last_run_at ? ` · ${esc(item.last_run_at)}` : ''}</span>`;
+      return item.run_url
+        ? `<a class="cc-link-card" href="${esc(item.run_url)}" target="_blank" rel="noopener">${content}</a>`
+        : `<div class="cc-link-card">${content}</div>`;
+    }).join('')}</div>`;
+  }
+
+  function metricValue(value, suffix = '') {
+    return value === null || value === undefined ? '–' : `${value}${suffix}`;
   }
 
   function enhanceDevelopment() {
@@ -26,6 +35,7 @@
     if (view.querySelector('#cc-development-integrations')) return;
     const automation = developmentData.automation || {};
     const learning = automation.learning || {};
+    const search = automation.search || {};
     const seo = developmentData.seo || {};
     const funnel = seo.funnel || {};
     const rules = learning.rules || [];
@@ -33,6 +43,13 @@
     section.id = 'cc-development-integrations';
     section.className = 'cc-section';
     section.innerHTML = `
+      <h2>Suchlauf und Intake</h2>
+      <div class="cc-metric-grid">
+        <article class="cc-metric"><span>Gefundene Kandidaten</span><strong>${esc(metricValue(search.raw_candidates))}</strong><p>Rohkandidaten des letzten erfassten KI-Suchlaufs.</p></article>
+        <article class="cc-metric"><span>Für Prüfung ausgewählt</span><strong>${esc(metricValue(search.selected_candidates))}</strong><p>${esc(metricValue(search.selected_rate_percent, ' %'))} der Rohkandidaten.</p></article>
+        <article class="cc-metric"><span>Automatisch verhindert</span><strong>${esc(metricValue(search.prevented_candidates))}</strong><p>Dubletten, unzulässige oder ungeeignete Kandidaten.</p></article>
+        <article class="cc-metric"><span>In Inbox übernommen</span><strong>${esc(metricValue(search.intake_appended))}</strong><p>${esc(metricValue(search.intake_skipped))} beim Intake übersprungen.</p></article>
+      </div>
       <h2>Automatisierungswirkung</h2>
       <div class="cc-metric-grid">
         <article class="cc-metric"><span>Verhinderte Wiederholungen</span><strong>${esc(learning.prevented_total_35d || 0)}</strong><p>Durch Lern- und Deduplizierungsregeln in den letzten 35 Tagen.</p></article>
@@ -45,9 +62,9 @@
       <h2>Nutzer-Funnel und SEO-Wirkung</h2>
       <p>${esc(funnel.message || seo.search_console_message || '')}</p>
       <div class="cc-metric-grid">
-        <article class="cc-metric"><span>Search-Console-Datensätze</span><strong>${esc(funnel.gsc_rows ?? '–')}</strong><p>Zuletzt erfasste Growth-Auswertung.</p></article>
-        <article class="cc-metric"><span>GA4-Datensätze</span><strong>${esc(funnel.ga4_rows ?? '–')}</strong><p>Zuletzt erfasste Nutzungsdaten.</p></article>
-        <article class="cc-metric"><span>Wertsignale</span><strong>${esc(funnel.value_metric_rows ?? '–')}</strong><p>Messbare Funnel- beziehungsweise Nutzensignale.</p></article>
+        <article class="cc-metric"><span>Search-Console-Datensätze</span><strong>${esc(metricValue(funnel.gsc_rows))}</strong><p>Zuletzt erfasste Growth-Auswertung.</p></article>
+        <article class="cc-metric"><span>GA4-Datensätze</span><strong>${esc(metricValue(funnel.ga4_rows))}</strong><p>Zuletzt erfasste Nutzungsdaten.</p></article>
+        <article class="cc-metric"><span>Wertsignale</span><strong>${esc(metricValue(funnel.value_metric_rows))}</strong><p>Messbare Funnel- beziehungsweise Nutzensignale.</p></article>
       </div>`;
     view.appendChild(section);
   }
@@ -59,6 +76,17 @@
     } catch (_) {
       // Der bestehende Entwicklungsbereich zeigt seinen eigenen Fehlerzustand.
     }
+  }
+
+  function labelManagementSources() {
+    document.querySelectorAll('[data-manage-edit]').forEach(button => {
+      const row = button.closest('.cc-manage-row');
+      const kicker = row?.querySelector('.cc-kicker');
+      if (!kicker) return;
+      kicker.textContent = clean(button.dataset.manageEdit).startsWith('submission-')
+        ? 'Anbieter-Event · veröffentlicht'
+        : (kicker.textContent.includes('Aktivität') ? kicker.textContent : 'Redaktionelles Event · veröffentlicht');
+    });
   }
 
   async function enhanceEventEditor(id) {
@@ -83,12 +111,26 @@
         label.innerHTML = `<span>Adresse</span><input id="ce-address" type="text" value="${esc(item.address || '')}">`;
         location.after(label);
       }
+      if (item.source_system === 'submission_db') {
+        ['#ce-end', '#ce-city', '#ce-category'].forEach(selector => {
+          const field = dialogBody.querySelector(selector);
+          if (!field) return;
+          field.disabled = true;
+          field.closest('label')?.classList.add('is-disabled');
+        });
+        const note = document.createElement('p');
+        note.className = 'cc-hint';
+        note.textContent = 'Enddatum wird für Anbieter-Events noch nicht separat geführt. Stadt und Kategorie werden aus Adresse und Inhalt abgeleitet.';
+        dialogBody.querySelector('#ce-category')?.closest('label')?.after(note);
+      }
     } catch (_) {}
   }
 
   document.addEventListener('click', event => {
     const viewButton = event.target.closest('[data-view="development"], [data-go-view="development"]');
     if (viewButton) setTimeout(loadDevelopmentIntegration, 100);
+    const manageButton = event.target.closest('[data-view="manage"], [data-manage-type]');
+    if (manageButton) setTimeout(labelManagementSources, 180);
     const edit = event.target.closest('[data-manage-edit]');
     if (edit) {
       selectedManagementId = clean(edit.dataset.manageEdit);
@@ -110,7 +152,10 @@
     }
   }, true);
 
-  const observer = new MutationObserver(() => enhanceDevelopment());
+  const observer = new MutationObserver(() => {
+    enhanceDevelopment();
+    labelManagementSources();
+  });
   const view = document.querySelector('#cc-view');
   if (view) observer.observe(view, { childList: true, subtree: true });
 })();
