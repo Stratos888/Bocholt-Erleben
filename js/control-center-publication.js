@@ -6,6 +6,7 @@
   const status = document.querySelector('#cc-status');
   const dialog = document.querySelector('#cc-dialog');
   const dialogBody = document.querySelector('#cc-dialog-body');
+  let selectedEventId = '';
 
   async function api(path, options = {}, allowAccepted = false) {
     const response = await fetch(path, {
@@ -70,7 +71,7 @@
   }
 
   async function saveEvent(button) {
-    const eventId = clean(button.dataset.eventId);
+    const eventId = clean(button.dataset.eventId || selectedEventId);
     if (!eventId) throw new Error('Event-ID fehlt.');
     const updates = collectUpdates();
     closeDialog();
@@ -84,6 +85,9 @@
   }
 
   document.addEventListener('click', event => {
+    const edit = event.target.closest('[data-manage-edit]');
+    if (edit) selectedEventId = clean(edit.dataset.manageEdit);
+
     const button = event.target.closest('#ce-save');
     if (!button) return;
     event.preventDefault();
@@ -98,15 +102,8 @@
     const button = document.querySelector('#ce-save');
     if (!button || button.dataset.publicationEnhanced === '1') return;
     button.dataset.publicationEnhanced = '1';
+    button.dataset.eventId = selectedEventId;
     button.textContent = 'Speichern und Aktualisierung starten';
-    const title = document.querySelector('#ce-title');
-    const eventId = new URLSearchParams(button.dataset.context || '').get('id');
-    if (eventId) button.dataset.eventId = eventId;
-    if (!button.dataset.eventId) {
-      const heading = dialogBody?.querySelector('[data-event-id]');
-      if (heading) button.dataset.eventId = heading.dataset.eventId;
-    }
-    if (title && !button.dataset.eventId) button.dataset.eventId = title.dataset.eventId || '';
   });
   if (dialogBody) observer.observe(dialogBody, { childList: true, subtree: true });
 })();
