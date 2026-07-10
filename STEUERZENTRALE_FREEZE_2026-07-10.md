@@ -26,7 +26,8 @@ Dieser Stand wird nach dem Deployment zunächst praktisch genutzt. Ziel ist, rea
 
 ## Technischer Freeze-Vertrag
 
-- Asset-Version: `2026-07-10-control-center-freeze-v2`
+- JavaScript-Asset-Version: `2026-07-10-control-center-freeze-v2`
+- CSS-Governance-Version: `2026-06-22-css-governance-v1`
 - Branch: `staging`
 - führende Inbox: Google-Sheet-Tab `Inbox`
 - Inbox-Fallback: `data/inbox.json` nur bei Sheet-Fehler
