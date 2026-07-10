@@ -1,380 +1,219 @@
 # Steuerzentrale – verbindlicher Screen- und Interaktionsvertrag
 
 Stand: 2026-07-10
-Status: verbindlicher Produktvertrag vor weiterer UI-Umsetzung
+Status: verbindlicher UI-Vertrag
 
-## 1. Zweck
-
-Dieses Dokument übersetzt Vorgangskatalog und Informationsarchitektur in konkrete Bildschirm- und Interaktionszustände. Kein sichtbarer Bereich darf umgesetzt werden, ohne diesen Vertrag vollständig zu erfüllen.
-
-## 2. Globale Shell
+## 1. Globale Shell
 
 ### Header
 
-- kompakte Produktkennung `Bocholt erleben`
-- aktueller Bereichstitel
-- Aktualisieren nur als nachrangige Aktion
-- keine dekorative Höhe
+- kompakte Produktkennung,
+- aktueller Bereichstitel,
+- Aktualisieren nachrangig,
+- keine dekorative Höhe.
 
 ### Hauptnavigation
 
-Mobil und Tablet:
+Dauerhaft erreichbar mit fünf Zielen:
 
-- dauerhaft fixierte Bottom-Bar
-- fünf Ziele: Übersicht, Bearbeiten, Aufgaben, Verwaltung, Mehr
-- bei jeder Scrollposition sichtbar
-- Safe-Area berücksichtigt
-- mindestens 44 px Touchziel
+- Übersicht
+- Bearbeiten
+- Arbeit
+- Verwaltung
+- Menü
 
-Desktop:
+Mobil/Tablet als fixierte Bottom-Bar, Desktop als fixierte Bottom-Bar oder feste Seitenleiste. Safe Area und ausreichender Inhaltsabstand sind Pflicht.
 
-- feste linke Navigation oder dauerhaft fixierte Bottom-Bar
-- niemals erst am Seitenende
+### Rückmeldung
 
-### Rückmeldungen
+Nach jeder Aktion:
 
-Nach jeder Aktion erscheint eine kurze Rückmeldung:
+- was geändert wurde,
+- ob Quell-Writeback erfolgreich war,
+- ob Veröffentlichung noch läuft oder fehlschlug,
+- wohin der Vorgang gewechselt ist.
 
-- was geändert wurde
-- ob weitere Arbeit nötig ist
-- wohin der Vorgang gewechselt ist
+## 2. Übersicht
 
-Leicht reversible Aktionen verwenden bevorzugt Undo.
-
-## 3. Screen: Übersicht mobil
-
-### Ziel
-
-Innerhalb weniger Sekunden erfassen, ob und wo Handlung nötig ist.
-
-### Aufbau
+Darstellung ausschließlich als verdichtete Zusammenfassung:
 
 ```text
-Bocholt erleben
-Übersicht
-
 Jetzt erforderlich
-2 Vorgänge
-1 bezahlte Einreichung · 1 kritische Quellenkorrektur
+2
+1 kritische Korrektur · 1 überfällige Aufgabe
 [Jetzt bearbeiten]
 
-Neuer Eingang
-12 Vorgänge
-8 Qualitätsprüfungen · 3 neue Inhalte · 1 Anbieterfall
-[Eingang öffnen]
+Zu bearbeiten
+12
+8 Qualität · 4 Anbieter
+[Bearbeiten öffnen]
 
-Als Nächstes
-1 wartender Vorgang
-Zahlungsbestätigung für Pilotmail Test
-[Aufgaben öffnen]
-
-Zur Kenntnis
-3 automatische Prüfungen erfolgreich
+Arbeit
+3 aktiv · 1 wartet
+[Arbeit öffnen]
 
 System
-Alles läuft ohne bekannte Auswirkung
+Keine bekannte Störung mit Auswirkung
 ```
 
-### Regeln
+Keine vollständigen Arbeitskarten.
 
-- keine vollständige Arbeitskarte
-- höchstens zwei priorisierte Beispiele
-- pro Block genau ein Einstieg
-- leere Blöcke werden kompakt dargestellt oder ausgeblendet
-- Systemnormalzustand ruhig und kurz
+## 3. Bearbeiten
 
-## 4. Screen: Übersicht Desktop
+### Mobil
 
-- dieselben verdichteten Blöcke
-- maximal zweispaltige Anordnung von Zusammenfassungen
-- keine vollständigen Vorgangskarten
-- oberster sichtbarer Bereich beantwortet die Handlungsfrage ohne Scrollen
+- Filterleiste,
+- genau ein Vorgang,
+- Position in Queue,
+- fachlicher Typ und deutscher Status,
+- Problem/Anlass,
+- erforderlicher Schritt,
+- aktuelle Daten beziehungsweise Vorher/Nachher,
+- Quelle,
+- eine dominante Hauptaktion,
+- maximal zwei sichtbare Nebenaktionen,
+- weitere Details eingeklappt,
+- Vorher/Weiter.
 
-## 5. Screen: Bearbeiten mobil
+### Desktop
 
-### Ziel
+- kompakte Queue links,
+- vollständiger Vorgang rechts,
+- kein Kartenraster,
+- Queue-Scrollposition und Auswahl bleiben erhalten.
 
-Einen Vorgang sicher, schnell und ohne Ablenkung bearbeiten.
-
-### Aufbau
-
-```text
-Bearbeiten
-[Alle] [Neue Inhalte] [Änderungen] [Qualität] [Anbieter] [Freigaben]
-
-Qualitätsprüfung · 3 von 8
-
-SummerSchool der JUNGE UNI
-
-Problem
-Die Beschreibung enthält eine Quellenherleitung.
-
-Aktueller Text
-...
-
-Erforderliche Korrektur
-Beschreibung lokal-redaktionell formulieren.
-
-Quelle öffnen
-
-[Korrigieren und übernehmen]
-
-[Zurückstellen] [Ablehnen]
-
-Weitere Details
-
-‹ Vorheriger                      Nächster ›
-```
-
-### Regeln
-
-- genau ein fokussierter Vorgang
-- Hauptaktion entspricht dem konkreten Fall
-- maximal zwei sichtbare Nebenaktionen
-- technische Details eingeklappt
-- Fortschritt sichtbar
-- nach Aktion automatisch nächster Fall
-- Filterzustand bleibt erhalten
-- kein vertikales Kartenarchiv
-
-## 6. Screen: Bearbeiten Desktop
-
-### Aufbau
-
-```text
-Filterleiste
-
-Kompakte Queue                 Geöffneter Vorgang
------------------              ------------------
-Titel · Typ · Kurzstatus       Titel
-Titel · Typ · Kurzstatus       Anlass / Problem
-Titel · Typ · Kurzstatus       Quelle / Vorher-Nachher
-                               Bearbeitbare Felder
-                               Hauptaktion
-                               Nebenaktionen
-```
-
-### Queue-Regeln
-
-- kompakte Zeilen statt vollständiger Karten
-- ausgewählter Vorgang markiert
-- Titel, Typ, Status, Kurzgrund
-- kein langer Beschreibungstext
-
-### Detail-Regeln
-
-- vollständiger Kontext nur rechts
-- primäre Aktion visuell dominant
-- destruktive Aktion räumlich getrennt
-- Auswahl und Scrollposition bleiben nach Aktionen erhalten
-
-## 7. Fallspezifische Hauptaktionen
+### Fallspezifische Hauptaktionen
 
 | Fall | Hauptaktion |
 |---|---|
-| neuer Eventkandidat | Übernehmen |
+| neuer Kandidat | Übernehmen |
 | Anbieter vor Zahlung | Zahlung freigeben |
-| bezahlte Anbieter-Einreichung | Veröffentlichen |
-| Beschreibungsfehler | Korrigieren und übernehmen |
-| Quellenfehler | Quelle korrigieren/übernehmen |
-| Faktenprüfung ohne Fehlerbeleg | Als korrekt bestätigen |
-| Eventänderung | Änderung übernehmen |
+| bezahlt | Veröffentlichen |
+| Beschreibung fehlerhaft | Korrigieren und übernehmen |
+| Quelle fehlerhaft | Quelle korrigieren |
+| Änderung | Änderung übernehmen |
 | Absage | Absage übernehmen |
-| Bildentscheidung | Bildzuordnung übernehmen |
+| Faktenprüfung | Als korrekt bestätigen |
 
-Allgemeines `Freigeben` ist nur zulässig, wenn der Vorgang tatsächlich entscheidungsreif ist und keine Korrektur mehr verlangt.
+## 4. Arbeit
 
-## 8. Screen: Aufgaben mobil
+### Hauptscreen
 
-### Übersicht
+Segmentierte Unteransichten:
 
-Tabs oder Filter:
-
-- Jetzt
+- Aktiv
 - Als Nächstes
 - Wartet
 - Blockiert
+- Backlog
+- Ideen
+- Archiv
 
-Kompakte Aufgabenzeile:
+### Aufgabenzeile
 
-- Titel
-- nächster Schritt
-- Fälligkeit oder Wartegrund
-- Objektbezug
+- Titel,
+- nächster Schritt,
+- Status,
+- Fälligkeit oder Warte-/Blockadegrund,
+- Objektbezug,
+- passende Hauptaktion.
 
-### Detail
+### Backlogzeile
 
-- Beschreibung
-- Herkunft
-- Status
-- Fälligkeit
-- Warte-/Blockadegrund
-- Verlauf
-- Aktionen
+- Titel,
+- Kategorie,
+- Priorität,
+- Nutzen/Risiko,
+- Herkunft,
+- letzte Aktualisierung,
+- Aktionen: bearbeiten, starten, verwerfen.
 
-### Aktionen
+### Idee
 
-- Starten
-- Erledigen
-- Warten
-- Blockieren
-- Zurückstellen
-- Bearbeiten
+- schnelle Erfassung,
+- Anlass/Nutzen,
+- optional Kategorie,
+- Aktionen: parken, verwerfen, in Backlog, direkt starten.
 
-Ein Button `Status prüfen` ist nur zulässig, wenn er eine reale Quellprüfung ausführt und das Ergebnis sichtbar zurückmeldet.
+Übergänge erzeugen keine Kopien.
 
-## 9. Screen: Aufgabe anlegen
-
-Pflichtfelder:
-
-- Titel
-- nächster Schritt
-
-Optional:
-
-- Beschreibung
-- Fälligkeit
-- Priorität
-- Objektbezug
-
-Regeln:
-
-- mobil in weniger als einer Minute erfassbar
-- keine unnötigen Pflichtfelder
-- nach Speichern klare Rückmeldung
-
-## 10. Screen: Verwaltung – Liste
-
-### Aufbau
-
-- Suche prominent
-- Segment Events/Aktivitäten
-- Filter: publiziert, geplant, geändert, mit offenem Vorgang
-- kompakte Ergebnisliste
-
-Jede Zeile zeigt:
-
-- Titel
-- Typ
-- Publikationsstatus
-- Datum/Ort beziehungsweise Aktivitätsart
-- offenen Handlungsbedarf, falls vorhanden
-
-## 11. Screen: Verwaltung – Objektdetail
-
-Abschnitte:
-
-1. öffentliche Vorschau
-2. Stammdaten
-3. Quelle und letzte Aktualisierung
-4. Qualitätsstatus
-5. offene zentrale Vorgänge
-6. relevanter Verlauf
-
-Aktionen:
-
-- Bearbeiten
-- öffentliche Vorschau öffnen
-- Änderung/Absage durchführen
-- Aufgabe anlegen
-
-Technische Rohdaten bleiben eingeklappt.
-
-## 12. Screen: Ideen
+## 5. Verwaltung
 
 ### Liste
 
-- Titel
-- Kategorie
-- kurzer Nutzen/Anlass
-- Status gesammelt/geparkt
+- Umschaltung Events/Aktivitäten,
+- Suchfeld mit stabilem Fokus,
+- Debounce oder lokale Filterung,
+- nur Ergebnisliste wird beim Tippen aktualisiert,
+- Filter nach Publikationsstatus und offenem Handlungsbedarf,
+- Quelle/letzte Aktualisierung,
+- offene Vorgänge.
 
-### Erfassung
+### Detail/Editor
 
-Pflicht:
+- öffentliche Vorschau,
+- bearbeitbare fachliche Felder,
+- klare Gruppierung,
+- Speichern und Verwerfen,
+- Validierungsfehler direkt am Feld,
+- Quellen- und Qualitätskontext,
+- Verlauf.
 
-- Titel
-
-Optional:
-
-- Notiz
-- Kategorie
-- erwarteter Nutzen
-
-Aktionen:
-
-- Bearbeiten
-- Parken
-- Verwerfen
-- In Aufgabe umwandeln
-
-Keine Fälligkeitspflicht, keine roten Warnungen.
-
-## 13. Screen: Systemstatus
-
-Normalzustand:
+### Speichern
 
 ```text
-Automatisierungen laufen
-Keine bekannte Störung mit Auswirkung.
-Letzte relevante Aktualisierung: heute 14:20
+Validieren
+-> führende Quelle aktualisieren
+-> Verlauf schreiben
+-> Daten erzeugen/Deploy anstoßen
+-> öffentliche Wirkung bestätigen
 ```
 
-Störung:
+Bei Fehler bleibt der Editor geöffnet. Der konkrete fehlgeschlagene Schritt wird angezeigt.
 
-- betroffene Funktion
-- fachliche Auswirkung
-- genau eine nächste Aktion
-- technische Details nachrangig
+## 6. Menü
 
-Keine Rohlogs in der Standardansicht.
+Nur selten benötigte Funktionen:
 
-## 14. Screen: Archiv
+- Anbieterbereich,
+- Systemstatus,
+- Einstellungen,
+- Abmelden,
+- technische Diagnose eingeklappt.
 
-- Suche
-- Filter erledigt/abgelehnt/archiviert
-- Zeitraum
-- Vorgangsdetail und Verlauf
-- keine aktiven Badges
+Ideen und Backlog gehören nicht in das Menü.
 
-## 15. Leer-, Lade- und Fehlerzustände
+## 7. Systemstatus
 
-### Leer
+Normalansicht:
 
-- konkret benennen, was leer ist
-- keine falsche Erfolgsmeldung
-- optional passende Erfassungsaktion
+```text
+Alle relevanten Quellen sind synchronisiert.
+Keine bekannte Störung mit Auswirkung.
+```
 
-### Laden
+Bei Störung:
 
-- Inhalt bleibt strukturell stabil
-- keine springende Navigation
+```text
+Content-Prüfung konnte nicht aktualisiert werden.
+Neue Prüffälle können fehlen.
+[Erneut versuchen]
+[Technische Details]
+```
 
-### Fehler
+Rohwerte wie JSON, `seen` und `upserted` erscheinen nur in technischen Details.
 
-- verständliche Aussage
-- betroffener Bereich
-- erneuter Versuch
-- technische Details nur bei Bedarf
+## 8. Suche und Fokus
 
-## 16. Sprachvertrag
+- Eingabefeld wird beim Filtern nicht neu erzeugt,
+- Fokus und Cursorposition bleiben erhalten,
+- Suchbegriff bleibt beim Öffnen und Zurückkehren erhalten,
+- keine vollständige Seiten-Neurenderung pro Zeichen.
 
-Sichtbare Statusbezeichnungen:
+## 9. Dialoge
 
-- Neu
-- Entscheidung erforderlich
-- Offen
-- In Arbeit
-- Wartet
-- Blockiert
-- Zurückgestellt
-- Erledigt
-- Abgelehnt
-
-Nicht sichtbar in Standardansichten:
-
-- `decision_required`
-- `waiting`
-- `source_system`
-- Auditcodes
-- Guard-/Runtime-Begriffe
+- mobil vollständig nutzbar,
+- sichtbarer Fokus,
+- Schließen eindeutig,
+- Fehler zerstören keine Eingaben,
+- destruktive Aktionen verlangen Grund oder Undo.
