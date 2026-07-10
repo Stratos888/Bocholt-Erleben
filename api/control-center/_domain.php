@@ -31,9 +31,7 @@ function be_cc_require_schema(): void
 
 function be_cc_validate_enum(string $value, array $allowed, string $field): string
 {
-    if (!in_array($value, $allowed, true)) {
-        throw new InvalidArgumentException("Invalid {$field}.");
-    }
+    if (!in_array($value, $allowed, true)) throw new InvalidArgumentException("Invalid {$field}.");
     return $value;
 }
 
@@ -49,13 +47,9 @@ function be_cc_case_from_row(array $row): array
 
     $bucket = 'information';
     if ($active && !$isSnoozed) {
-        if ($overdue || $state === 'blocked' || (string)$row['priority'] === 'critical') {
-            $bucket = 'now';
-        } elseif ($state === 'new' || $state === 'decision_required') {
-            $bucket = 'inbox';
-        } else {
-            $bucket = 'next';
-        }
+        if ($overdue || $state === 'blocked' || (string)$row['priority'] === 'critical') $bucket = 'now';
+        elseif ($state === 'new' || $state === 'decision_required') $bucket = 'inbox';
+        else $bucket = 'next';
     }
 
     $case = [
@@ -94,7 +88,6 @@ function be_cc_list_cases(array $filters = []): array
     be_cc_require_schema();
     $where = [];
     $params = [];
-
     if (!empty($filters['type'])) {
         $where[] = 'case_type = :type';
         $params['type'] = be_cc_validate_enum((string)$filters['type'], BE_CC_TYPES, 'type');
@@ -103,16 +96,11 @@ function be_cc_list_cases(array $filters = []): array
         $where[] = 'state = :state';
         $params['state'] = be_cc_validate_enum((string)$filters['state'], BE_CC_STATES, 'state');
     }
-    if (!empty($filters['active'])) {
-        $where[] = "state NOT IN ('done','rejected','information','parked')";
-    }
+    if (!empty($filters['active'])) $where[] = "state NOT IN ('done','rejected','information','parked')";
 
     $sql = 'SELECT * FROM control_cases';
-    if ($where) {
-        $sql .= ' WHERE ' . implode(' AND ', $where);
-    }
+    if ($where) $sql .= ' WHERE ' . implode(' AND ', $where);
     $sql .= " ORDER BY FIELD(priority,'critical','high','normal','low'), COALESCE(due_at,'9999-12-31'), updated_at DESC LIMIT 500";
-
     $stmt = be_db()->prepare($sql);
     $stmt->execute($params);
     return array_map('be_cc_case_from_row', $stmt->fetchAll());
@@ -141,16 +129,13 @@ function be_cc_apply_action(string $caseId, string $action, array $payload): arr
         'complete' => ['open' => 'done', 'in_progress' => 'done', 'waiting' => 'done', 'blocked' => 'done'],
         'reopen' => ['done' => 'open', 'rejected' => 'open', 'parked' => 'open'],
         'park' => ['new' => 'parked', 'open' => 'parked'],
-        'convert_to_task' => ['new' => 'open', 'decision_required' => 'open'],
+        'convert_to_task' => ['new' => 'open', 'decision_required' => 'open', 'open' => 'open'],
         'wait' => ['open' => 'waiting', 'in_progress' => 'waiting'],
         'block' => ['open' => 'blocked', 'in_progress' => 'blocked', 'waiting' => 'blocked'],
         'snooze' => ['new' => 'snoozed', 'decision_required' => 'snoozed', 'open' => 'snoozed', 'waiting' => 'snoozed'],
         'resume' => ['snoozed' => 'open', 'waiting' => 'open', 'blocked' => 'open'],
     ];
-
-    if (!isset($transitions[$action])) {
-        throw new InvalidArgumentException('Unknown action.');
-    }
+    if (!isset($transitions[$action])) throw new InvalidArgumentException('Unknown action.');
 
     $pdo = be_db();
     $pdo->beginTransaction();
@@ -158,15 +143,10 @@ function be_cc_apply_action(string $caseId, string $action, array $payload): arr
         $stmt = $pdo->prepare('SELECT * FROM control_cases WHERE id = :id FOR UPDATE');
         $stmt->execute(['id' => $caseId]);
         $row = $stmt->fetch();
-        if (!$row) {
-            throw new RuntimeException('Case not found.');
-        }
-
+        if (!$row) throw new RuntimeException('Case not found.');
         $from = (string)$row['state'];
         $to = $transitions[$action][$from] ?? null;
-        if ($to === null) {
-            throw new DomainException('Action is not allowed for the current state.');
-        }
+        if ($to === null) throw new DomainException('Action is not allowed for the current state.');
 
         $fields = ['state = :state', 'updated_at = NOW()'];
         $params = ['state' => $to, 'id' => $caseId];
@@ -174,37 +154,25 @@ function be_cc_apply_action(string $caseId, string $action, array $payload): arr
             $fields[] = "case_type = 'task'";
             $fields[] = 'decision_ready = 0';
         }
-        if (in_array($to, ['done', 'rejected'], true)) {
-            $fields[] = 'completed_at = NOW()';
-        } else {
-            $fields[] = 'completed_at = NULL';
-        }
+        if (in_array($to, ['done', 'rejected'], true)) $fields[] = 'completed_at = NOW()';
+        else $fields[] = 'completed_at = NULL';
         if ($action === 'snooze') {
             $until = trim((string)($payload['until'] ?? ''));
-            if ($until === '') {
-                throw new InvalidArgumentException('Snooze date is required.');
-            }
+            if ($until === '') throw new InvalidArgumentException('Snooze date is required.');
             $fields[] = 'snoozed_until = :snoozed_until';
             $params['snoozed_until'] = (new DateTimeImmutable($until))->format('Y-m-d H:i:s');
-        } elseif ($to !== 'snoozed') {
-            $fields[] = 'snoozed_until = NULL';
-        }
+        } elseif ($to !== 'snoozed') $fields[] = 'snoozed_until = NULL';
         if ($action === 'block') {
             $reason = trim((string)($payload['reason'] ?? ''));
-            if ($reason === '') {
-                throw new InvalidArgumentException('Block reason is required.');
-            }
+            if ($reason === '') throw new InvalidArgumentException('Block reason is required.');
             $fields[] = 'blocked_reason = :blocked_reason';
             $params['blocked_reason'] = $reason;
-        } elseif ($to !== 'blocked') {
-            $fields[] = 'blocked_reason = NULL';
-        }
+        } elseif ($to !== 'blocked') $fields[] = 'blocked_reason = NULL';
 
         $update = $pdo->prepare('UPDATE control_cases SET ' . implode(', ', $fields) . ' WHERE id = :id');
         $update->execute($params);
         be_cc_record_event($pdo, $caseId, $action, $from, $to, $payload);
         $pdo->commit();
-
         $stmt = $pdo->prepare('SELECT * FROM control_cases WHERE id = :id');
         $stmt->execute(['id' => $caseId]);
         return be_cc_case_from_row($stmt->fetch());
