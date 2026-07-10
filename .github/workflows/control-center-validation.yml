@@ -75,6 +75,7 @@ jobs:
           test -s api/control-center/_content_source.php
           test -s api/control-center/_content_history.php
           test -s api/control-center/_contracts.php
+          test -s api/control-center/_workflow_contracts.php
           test -s api/control-center/_github_repo.php
           test -s api/control-center/_schema.php
           test -s api/control-center/_domain.php
@@ -97,6 +98,7 @@ jobs:
           grep -q "control_content_changes" api/control-center/_schema.php
           grep -q "control_development_snapshots" api/control-center/_schema.php
           grep -q "source_payment_confirmed" api/control-center/_submission_source.php
+          grep -q "be_cc_transition_target" api/control-center/_domain.php
           grep -q "be_cc_sync_growth_backlog" api/control-center/_sources.php
           grep -q "be_cc_sync_repo_workpacks" api/control-center/_sources.php
           grep -q "be_cc_update_event_fields" api/control-center/content.php
