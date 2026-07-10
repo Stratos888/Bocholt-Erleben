@@ -6,7 +6,7 @@ on:
     paths:
       - "api/control-center/**"
       - "steuerzentrale/**"
-      - "js/control-center*.js"
+      - "js/control-center.js"
       - "css/control-center.css"
       - "data/control_center_repo_workpacks.json"
       - "scripts/audit_control_center_product_contract.py"
@@ -27,10 +27,7 @@ jobs:
 
       - name: Validate JavaScript syntax
         shell: bash
-        run: |
-          set -euo pipefail
-          node --check js/control-center.js
-          node --check js/control-center-work-actions.js
+        run: node --check js/control-center.js
 
       - name: Validate JSON manifests
         shell: bash
@@ -47,7 +44,6 @@ jobs:
           test -s steuerzentrale/index.html
           test -s css/control-center.css
           test -s js/control-center.js
-          test -s js/control-center-work-actions.js
           test -s data/control_center_repo_workpacks.json
           test -s scripts/audit_control_center_product_contract.py
           test -s api/control-center/overview.php
@@ -55,6 +51,9 @@ jobs:
           test -s api/control-center/action.php
           test -s api/control-center/case.php
           test -s api/control-center/content.php
+          test -s api/control-center/development.php
+          test -s api/control-center/deploy.php
+          test -s api/control-center/_content_source.php
           test -s api/control-center/_schema.php
           test -s api/control-center/_domain.php
           test -s api/control-center/_presentation.php
@@ -69,7 +68,6 @@ jobs:
           set -euo pipefail
           grep -R "be_require_review_access" api/control-center/*.php >/dev/null
           grep -q "X-BE-Review-Password" js/control-center.js
-          grep -q "X-BE-Review-Password" js/control-center-work-actions.js
           grep -q "source_reference" api/control-center/_schema.php
           grep -q "UNIQUE KEY uq_control_cases_source" api/control-center/_schema.php
           grep -q "source_payment_confirmed" api/control-center/_submission_source.php
@@ -78,3 +76,5 @@ jobs:
           grep -q "be_cc_case_presentation" api/control-center/_domain.php
           grep -q "be_cc_sync_growth_backlog" api/control-center/_sources.php
           grep -q "be_cc_sync_repo_workpacks" api/control-center/_sources.php
+          grep -q "be_cc_update_event_fields" api/control-center/content.php
+          grep -q "search_console_connected" api/control-center/development.php
