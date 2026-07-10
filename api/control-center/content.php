@@ -1,112 +1,67 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/_bootstrap.php';
+require_once __DIR__ . '/_content_source.php';
+require_once __DIR__ . '/_writeback.php';
 
 be_require_review_access();
 
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
-    header('Allow: GET');
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+if (!in_array($method, ['GET', 'POST'], true)) {
+    header('Allow: GET, POST');
     be_json_response(405, ['status' => 'error', 'message' => 'Method not allowed.']);
 }
 
-function be_cc_find_header_row(array $values): array
-{
-    foreach ($values as $offset => $row) {
-        if (!is_array($row)) continue;
-        $normalized = array_map(static fn($value) => strtolower(trim((string)$value)), $row);
-        if (in_array('title', $normalized, true) && (in_array('id', $normalized, true) || in_array('event_id', $normalized, true))) {
-            return [$offset, array_flip($normalized)];
-        }
-    }
-    return [-1, []];
-}
-
-function be_cc_sheet_value(array $row, array $index, array $names): string
-{
-    foreach ($names as $name) {
-        $position = $index[strtolower($name)] ?? null;
-        if (is_int($position) && isset($row[$position])) {
-            $value = trim((string)$row[$position]);
-            if ($value !== '') return $value;
-        }
-    }
-    return '';
-}
-
-function be_cc_event_items(): array
-{
-    $response = be_google_sheets_values_get('Events!A:AZ');
-    $values = is_array($response['values'] ?? null) ? $response['values'] : [];
-    [$headerOffset, $index] = be_cc_find_header_row($values);
-    if ($headerOffset < 0) return [];
-
-    $items = [];
-    for ($i = $headerOffset + 1; $i < count($values); $i++) {
-        $row = is_array($values[$i] ?? null) ? $values[$i] : [];
-        $id = be_cc_sheet_value($row, $index, ['id', 'event_id']);
-        $title = be_cc_sheet_value($row, $index, ['title']);
-        if ($id === '' || $title === '') continue;
-        $status = be_cc_sheet_value($row, $index, ['status', 'publication_status']);
-        if (in_array(strtolower($status), ['deleted', 'archived'], true)) continue;
-        $items[] = [
-            'id' => $id,
-            'title' => $title,
-            'date' => be_cc_sheet_value($row, $index, ['date', 'start_date']),
-            'end_date' => be_cc_sheet_value($row, $index, ['enddate', 'end_date']),
-            'location' => be_cc_sheet_value($row, $index, ['location', 'venue']),
-            'city' => be_cc_sheet_value($row, $index, ['city']),
-            'status' => $status !== '' ? $status : 'published',
-            'source_url' => be_cc_sheet_value($row, $index, ['source_url', 'url', 'event_url']),
-            'public_url' => '/events/?event=' . rawurlencode($id),
-            'updated_at' => be_cc_sheet_value($row, $index, ['updated_at', 'last_modified']),
-        ];
-    }
-    return $items;
-}
-
-function be_cc_activity_items(): array
-{
-    $path = dirname(__DIR__, 2) . '/data/offers.json';
-    if (!is_file($path)) return [];
-    $payload = json_decode((string)file_get_contents($path), true);
-    $offers = is_array($payload['offers'] ?? null) ? $payload['offers'] : [];
-    $items = [];
-    foreach ($offers as $offer) {
-        if (!is_array($offer)) continue;
-        $id = trim((string)($offer['id'] ?? ''));
-        $title = trim((string)($offer['title'] ?? ''));
-        if ($id === '' || $title === '') continue;
-        $items[] = [
-            'id' => $id,
-            'title' => $title,
-            'category' => trim((string)($offer['kategorie'] ?? '')),
-            'location' => trim((string)($offer['location'] ?? '')),
-            'status' => 'published',
-            'source_url' => trim((string)($offer['url'] ?? '')),
-            'public_url' => '/aktivitaeten/?activity=' . rawurlencode($id),
-            'updated_at' => trim((string)($offer['checked_at'] ?? '')),
-        ];
-    }
-    return $items;
-}
-
 try {
-    $type = trim((string)($_GET['type'] ?? 'events'));
-    if (!in_array($type, ['events', 'activities'], true)) {
-        throw new InvalidArgumentException('Ungültiger Inhaltstyp.');
+    if ($method === 'GET') {
+        $type = trim((string)($_GET['type'] ?? 'events'));
+        if (!in_array($type, ['events', 'activities'], true)) throw new InvalidArgumentException('Ungültiger Inhaltstyp.');
+        $id = trim((string)($_GET['id'] ?? ''));
+        $items = $type === 'events' ? be_cc_event_items($id !== '') : be_cc_activity_items($id !== '');
+        if ($id !== '') {
+            foreach ($items as $item) {
+                if ((string)$item['id'] === $id) {
+                    be_json_response(200, ['status' => 'ok', 'data' => ['item' => $item]]);
+                }
+            }
+            be_json_response(404, ['status' => 'error', 'message' => 'Inhalt wurde nicht gefunden.']);
+        }
+        be_json_response(200, ['status' => 'ok', 'data' => ['items' => $items, 'total' => count($items)]]);
     }
-    $items = $type === 'events' ? be_cc_event_items() : be_cc_activity_items();
-    be_json_response(200, [
-        'status' => 'ok',
-        'data' => ['items' => $items, 'total' => count($items)],
-    ]);
+
+    $payload = json_decode((string)file_get_contents('php://input'), true);
+    if (!is_array($payload)) throw new InvalidArgumentException('Ungültige Anfrage.');
+    $type = trim((string)($payload['type'] ?? ''));
+    $id = trim((string)($payload['id'] ?? ''));
+    $updates = is_array($payload['updates'] ?? null) ? $payload['updates'] : [];
+    if ($type !== 'events' || $id === '') {
+        throw new InvalidArgumentException('Nur Veranstaltungen können aktuell dauerhaft live bearbeitet werden.');
+    }
+    if (!$updates) throw new InvalidArgumentException('Keine Änderungen übergeben.');
+
+    be_cc_update_event_fields($id, $updates);
+
+    $deployStarted = false;
+    $deployMessage = 'Änderung wurde in der führenden Quelle gespeichert.';
+    if (!empty($payload['deploy'])) {
+        $token = be_cc_inbox_token();
+        $result = be_cc_jsonp_request(['action' => 'deploy', 'token' => $token]);
+        if (empty($result['ok'])) {
+            throw new RuntimeException('Änderung gespeichert, Deployment aber fehlgeschlagen: ' . trim((string)($result['error'] ?? $result['detail'] ?? 'deploy_failed')));
+        }
+        $deployStarted = true;
+        $deployMessage = 'Änderung gespeichert und Deployment gestartet.';
+    }
+
+    be_json_response(200, ['status' => 'ok', 'data' => [
+        'saved' => true,
+        'deploy_started' => $deployStarted,
+        'message' => $deployMessage,
+    ]]);
 } catch (InvalidArgumentException $error) {
     be_json_response(422, ['status' => 'error', 'message' => $error->getMessage()]);
+} catch (RuntimeException $error) {
+    be_json_response(409, ['status' => 'error', 'message' => $error->getMessage()]);
 } catch (Throwable $error) {
-    be_json_response(500, [
-        'status' => 'error',
-        'message' => 'Der Verwaltungsbestand konnte nicht geladen werden.',
-        'error_message' => $error->getMessage(),
-    ]);
+    be_json_response(500, ['status' => 'error', 'message' => 'Inhalt konnte nicht verarbeitet werden.', 'error_message' => $error->getMessage()]);
 }
