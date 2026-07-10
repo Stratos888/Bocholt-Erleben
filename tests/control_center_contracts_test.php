@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/api/control-center/_contracts.php';
 require_once dirname(__DIR__) . '/api/control-center/_github_repo.php';
 require_once dirname(__DIR__) . '/api/control-center/_workflow_contracts.php';
+require_once dirname(__DIR__) . '/api/control-center/_content_ops.php';
 
 $failures = [];
 $assert = static function(bool $condition, string $label) use (&$failures): void { if (!$condition) $failures[] = $label; };
@@ -81,6 +82,29 @@ $assert($baseline['status'] === 'baseline', 'Ohne Zeitreihe kein erfundener Stab
 $assert($baseline['trend_available'] === false, 'Trenddaten ehrlich als fehlend markiert');
 $attention = be_cc_development_assessment(['missing_description'=>2,'missing_source'=>1,'missing_date'=>0,'open_quality_reviews'=>3], ['blocked_tasks'=>1], false);
 $assert($attention['status'] === 'attention', 'Aktuelle Qualitätsprobleme erzeugen Aufmerksamkeit');
+
+$now = gmdate('Y-m-d H:i:s');
+$healthyGeneratedWork = be_cc_process_health([
+    'available' => true,
+    'processes' => [
+        'weekly_ki_websearch' => ['status'=>'manual_candidates_created','action_required'=>1,'generated_at_utc'=>$now,'github_run_url'=>''],
+        'content_quality_audit' => ['status'=>'manual_content_action_required','action_required'=>1,'generated_at_utc'=>$now,'github_run_url'=>''],
+        'growth_intelligence' => ['status'=>'growth_ok','action_required'=>0,'generated_at_utc'=>$now,'github_run_url'=>''],
+    ],
+]);
+$assert($healthyGeneratedWork['status'] === 'ok', 'Erfolgreich erzeugte Folgearbeit gilt nicht als technischer Prozessfehler');
+$weeklyStatus = array_values(array_filter($healthyGeneratedWork['items'], static fn(array $item): bool => $item['key'] === 'weekly_ki_websearch'))[0] ?? [];
+$assert(($weeklyStatus['work_generated'] ?? false) === true, 'Erfolgreicher KI-Lauf kennzeichnet erzeugte Folgearbeit');
+
+$failedProcess = be_cc_process_health([
+    'available' => true,
+    'processes' => [
+        'weekly_ki_websearch' => ['status'=>'source_artifact_missing','action_required'=>0,'generated_at_utc'=>$now,'github_run_url'=>''],
+        'content_quality_audit' => ['status'=>'no_manual_action_from_audit','action_required'=>0,'generated_at_utc'=>$now,'github_run_url'=>''],
+        'growth_intelligence' => ['status'=>'growth_ok','action_required'=>0,'generated_at_utc'=>$now,'github_run_url'=>''],
+    ],
+]);
+$assert($failedProcess['status'] === 'attention', 'Fehlgeschlagener Kernprozess erzeugt technische Aufmerksamkeit');
 
 $assert(be_cc_publication_result(false,false,false)['state'] === 'failed', 'Quellfehler bleibt Fehler');
 $assert(be_cc_publication_result(true,false,false)['state'] === 'blocked', 'Deployfehler wird blockiert');
