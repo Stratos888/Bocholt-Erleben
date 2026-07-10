@@ -13,7 +13,11 @@ function be_cc_submission_event_items(bool $full = false): array
          WHERE submission_kind='event'
            AND status='approved'
            AND approved_at IS NOT NULL
+           AND start_date IS NOT NULL
            AND start_date >= CURRENT_DATE()
+           AND title IS NOT NULL AND title <> ''
+           AND location_name IS NOT NULL AND location_name <> ''
+           AND location_public_confirmed=1
          ORDER BY start_date ASC, time_text ASC, id ASC
          LIMIT 500"
     );
@@ -87,9 +91,9 @@ function be_cc_update_submission_event(int $submissionId, array $updates): array
     $pdo = be_db();
     $pdo->beginTransaction();
     try {
-        $check = $pdo->prepare("SELECT id FROM submissions WHERE id=:id AND submission_kind='event' AND status='approved' FOR UPDATE");
+        $check = $pdo->prepare("SELECT id FROM submissions WHERE id=:id AND submission_kind='event' AND status='approved' AND approved_at IS NOT NULL AND location_public_confirmed=1 FOR UPDATE");
         $check->execute(['id' => $submissionId]);
-        if (!$check->fetchColumn()) throw new RuntimeException('Genehmigtes Anbieter-Event wurde nicht gefunden.');
+        if (!$check->fetchColumn()) throw new RuntimeException('Öffentliches Anbieter-Event wurde nicht gefunden.');
         $fields = [];
         $params = ['id' => $submissionId];
         foreach ($normalized as $column => $value) {
