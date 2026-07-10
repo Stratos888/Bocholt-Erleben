@@ -14,6 +14,7 @@ try {
         'submissions' => be_cc_sync_submissions(),
         'content_audit' => be_cc_sync_content_audit(),
         'growth_backlog' => be_cc_sync_growth_backlog(),
+        'repo_workpacks' => be_cc_sync_repo_workpacks(),
     ];
 
     $cases = be_cc_list_cases(['active' => '1']);
