@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/_schema.php';
-require __DIR__ . '/_sources.php';
+require __DIR__ . '/_submission_source.php';
 
 be_require_review_access();
 
@@ -11,6 +11,7 @@ try {
 
     $sync = [
         'inbox' => be_cc_sync_inbox_feed(),
+        'submissions' => be_cc_sync_submissions(),
         'content_audit' => be_cc_sync_content_audit(),
     ];
 
@@ -18,9 +19,7 @@ try {
     $groups = ['now' => [], 'next' => [], 'inbox' => [], 'information' => []];
     foreach ($cases as $case) {
         $bucket = $case['bucket'] ?? 'information';
-        if (!isset($groups[$bucket])) {
-            $bucket = 'information';
-        }
+        if (!isset($groups[$bucket])) $bucket = 'information';
         $groups[$bucket][] = $case;
     }
 
@@ -32,7 +31,7 @@ try {
             'sync' => $sync,
             'system' => [
                 'status' => 'ok',
-                'message' => 'Automatisierungen laufen – keine bekannte Störung mit Auswirkung.',
+                'message' => 'Quellen synchronisiert – nur Vorgänge mit Handlungsbedarf werden hervorgehoben.',
             ],
         ],
     ]);
