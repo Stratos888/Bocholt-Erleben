@@ -33,6 +33,31 @@ $assert(($publicMismatch['field'] ?? '') === 'title', 'Abweichendes Feld wird be
 $writtenOnly = be_cc_compare_public_event_change($publicEvent, ['title'=>'Neuer Titel','ticket_url'=>'https://tickets.example.org'], ['title']);
 $assert($writtenOnly['verified'] === true, 'Nicht geschriebene optionale Felder blockieren die Bestätigung nicht');
 
+$providerEvent = [
+    'id' => 'submission-7',
+    'title' => 'Anbieter-Event',
+    'date' => '2026-09-01',
+    'time' => '19:00',
+    'location' => 'TextilWerk · Industriestraße 5, 46395 Bocholt',
+    'address' => 'Industriestraße 5, 46395 Bocholt',
+    'source_url' => 'https://example.org/event',
+    'ticket_url' => 'https://tickets.example.org/event',
+    'description' => 'Beschreibung',
+];
+$providerOk = be_cc_compare_submission_public_event_change($providerEvent, [
+    'title' => 'Anbieter-Event',
+    'date' => '2026-09-01',
+    'time' => '19:00',
+    'location' => 'TextilWerk',
+    'address' => 'Industriestraße 5, 46395 Bocholt',
+    'source_url' => 'https://example.org/event',
+    'ticket_url' => 'https://tickets.example.org/event',
+    'description' => 'Beschreibung',
+], ['title','date','time','location','address','source_url','ticket_url','description']);
+$assert($providerOk['verified'] === true, 'Anbieter-Event mit getrennten URLs und zusammengesetztem Ortslabel wird bestätigt');
+$providerMismatch = be_cc_compare_submission_public_event_change($providerEvent, ['address'=>'Andere Straße 1'], ['address']);
+$assert($providerMismatch['verified'] === false && ($providerMismatch['field'] ?? '') === 'address', 'Abweichende Anbieter-Adresse wird erkannt');
+
 $activity = be_cc_normalize_activity_updates(['title'=>'Aasee erleben','description'=>'Aktualisiert','url'=>'https://www.bocholt.de/aasee','unsupported'=>'ignorieren']);
 $assert(($activity['title'] ?? '') === 'Aasee erleben', 'Aktivitätstitel wird normalisiert');
 $assert(!array_key_exists('unsupported', $activity), 'Nicht erlaubte Aktivitätsfelder werden verworfen');
@@ -47,9 +72,7 @@ $lifecycle = [
     ['resume','snoozed','open'], ['complete','open','done'], ['reopen','done','open'],
     ['convert_to_task','new','open'], ['approve','decision_required','done'], ['reject','new','rejected'],
 ];
-foreach ($lifecycle as [$action,$from,$expected]) {
-    $assert(be_cc_transition_target($action, $from) === $expected, "Übergang {$action}: {$from} -> {$expected}");
-}
+foreach ($lifecycle as [$action,$from,$expected]) $assert(be_cc_transition_target($action, $from) === $expected, "Übergang {$action}: {$from} -> {$expected}");
 $throws(static fn() => be_cc_transition_target('approve','blocked'), 'not allowed', 'Unzulässiger Übergang wird verhindert');
 $throws(static fn() => be_cc_transition_target('unknown','open'), 'Unknown action', 'Unbekannte Aktion wird verhindert');
 
