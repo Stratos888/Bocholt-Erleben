@@ -12,6 +12,7 @@ development_js = read('js/control-center-development.js')
 integration_js = read('js/control-center-integrations.js')
 css = read('css/control-center.css')
 sources = read('api/control-center/_sources.php')
+content_source = read('api/control-center/_content_source.php')
 sheet_inbox = read('api/control-center/_sheet_inbox_source.php')
 content_ops = read('api/control-center/_content_ops.php')
 process_chain = read('api/control-center/_process_chain.php')
@@ -77,6 +78,8 @@ if 'Aktuelle Workpacks' in combined_js:
     errors.append('Entwicklung dupliziert Arbeits- und Backloginhalte.')
 if 'data-labor-action="details"' in js:
     errors.append('Arbeitszeilen enthalten weiterhin einen redundanten Details-Button.')
+if 'be_cc_event_is_current_or_future' not in content_source or 'if (!be_cc_event_is_current_or_future($date, $endDate)) continue;' not in content_source:
+    errors.append('Verwaltung filtert vergangene redaktionelle Events nicht aus der Standardliste.')
 
 backend_contracts = {
     'führende Sheet-Inbox': 'be_cc_sync_sheet_inbox',
@@ -107,7 +110,7 @@ backend_contracts = {
     'Aktivitätsqualität': 'activity_coverage_percent',
     'technische SEO-Prüfung': 'be_cc_technical_seo_metrics',
 }
-backend = sources + sheet_inbox + content_ops + process_chain + submission_content + writeback + domain + workflow_contracts + presentation + content_api + publication_api + content_history + contracts + github_repo + development_api + overview_api + deploy_api + schema + public_events
+backend = sources + content_source + sheet_inbox + content_ops + process_chain + submission_content + writeback + domain + workflow_contracts + presentation + content_api + publication_api + content_history + contracts + github_repo + development_api + overview_api + deploy_api + schema + public_events
 for label, marker in backend_contracts.items():
     if marker not in backend:
         errors.append(f'Backendvertrag fehlt: {label}')
