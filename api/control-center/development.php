@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_schema.php';
 require_once __DIR__ . '/_content_source.php';
+require_once __DIR__ . '/_contracts.php';
 
 be_require_review_access();
 
@@ -37,11 +38,72 @@ function be_cc_event_quality_metrics(): array
     return compact('total', 'complete', 'missingDescription', 'missingSource', 'missingDate');
 }
 
+function be_cc_technical_seo_metrics(): array
+{
+    $root = dirname(__DIR__, 2);
+    $pages = [
+        '/' => $root . '/index.html',
+        '/events/' => $root . '/events/index.html',
+        '/aktivitaeten/' => $root . '/aktivitaeten/index.html',
+    ];
+    $checks = [];
+    $passed = 0;
+    $total = 0;
+    foreach ($pages as $route => $path) {
+        $html = is_file($path) ? (string)file_get_contents($path) : '';
+        $pageChecks = [
+            'title' => $html !== '' && preg_match('/<title>\s*[^<]{8,}\s*<\/title>/i', $html) === 1,
+            'meta_description' => $html !== '' && preg_match('/<meta\s+name=["\']description["\'][^>]+content=["\'][^"\']{40,}["\']/i', $html) === 1,
+            'canonical' => $html !== '' && preg_match('/<link\s+rel=["\']canonical["\'][^>]+href=["\']https:\/\//i', $html) === 1,
+        ];
+        foreach ($pageChecks as $ok) { $total++; if ($ok) $passed++; }
+        $checks[$route] = $pageChecks;
+    }
+    $infrastructure = [
+        'sitemap' => is_file($root . '/sitemap.xml'),
+        'robots' => is_file($root . '/robots.txt'),
+        'event_feed' => is_file($root . '/data/events.json'),
+    ];
+    foreach ($infrastructure as $ok) { $total++; if ($ok) $passed++; }
+    return [
+        'passed' => $passed,
+        'total' => $total,
+        'coverage_percent' => $total > 0 ? round(($passed / $total) * 100, 1) : 0.0,
+        'pages' => $checks,
+        'infrastructure' => $infrastructure,
+    ];
+}
+
+function be_cc_previous_development_snapshot(PDO $pdo): ?array
+{
+    $row = $pdo->query('SELECT metrics_json, created_at FROM control_development_snapshots ORDER BY created_at DESC, id DESC LIMIT 1')->fetch();
+    if (!$row) return null;
+    $metrics = json_decode((string)$row['metrics_json'], true);
+    if (!is_array($metrics)) return null;
+    return ['metrics' => $metrics, 'created_at' => (string)$row['created_at']];
+}
+
+function be_cc_store_development_snapshot(PDO $pdo, array $metrics, ?array $previous): void
+{
+    if ($previous) {
+        $last = new DateTimeImmutable($previous['created_at']);
+        if ($last > new DateTimeImmutable('-1 hour')) return;
+    }
+    $stmt = $pdo->prepare('INSERT INTO control_development_snapshots (metrics_json) VALUES (:metrics)');
+    $stmt->execute(['metrics' => json_encode($metrics, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)]);
+}
+
+function be_cc_delta(float|int $current, array $previous, string $key): float
+{
+    return round((float)$current - (float)($previous[$key] ?? $current), 1);
+}
+
 try {
     be_cc_ensure_schema();
     $pdo = be_db();
     $count = static fn(string $sql): int => (int)$pdo->query($sql)->fetchColumn();
     $quality = be_cc_event_quality_metrics();
+    $technicalSeo = be_cc_technical_seo_metrics();
     $activityCount = count(be_cc_activity_items());
     $workpackPath = dirname(__DIR__, 2) . '/data/control_center_repo_workpacks.json';
     $workpacks = [];
@@ -55,17 +117,48 @@ try {
     $coverage = $total > 0 ? round(($complete / $total) * 100, 1) : 0.0;
     $blocked = $count("SELECT COUNT(*) FROM control_cases WHERE state='blocked'");
     $openQuality = $count("SELECT COUNT(*) FROM control_cases WHERE source_system='content_audit' AND state NOT IN ('done','rejected','parked')");
-    $hasCurrentAttention = $blocked > 0 || $openQuality > 0 || (int)$quality['missingDescription'] > 0 || (int)$quality['missingSource'] > 0 || (int)$quality['missingDate'] > 0;
-    $seoMessage = 'Aktuell wird nur die redaktionelle SEO-Inhaltsbasis gemessen. Technische SEO- und Search-Console-Kennzahlen sind noch nicht angebunden.';
+    $openReviews = $count("SELECT COUNT(*) FROM control_cases WHERE case_type='intake' AND state NOT IN ('done','rejected','parked')");
+    $waitingTasks = $count("SELECT COUNT(*) FROM control_cases WHERE case_type='task' AND state IN ('waiting','snoozed')");
+    $completedCases = $count("SELECT COUNT(*) FROM control_cases WHERE state='done'");
+    $publicationProblems = $count("SELECT COUNT(*) FROM control_content_changes WHERE publication_state IN ('deploy_failed','verification_failed')");
 
+    $snapshotMetrics = [
+        'content_coverage' => $coverage,
+        'missing_content' => (int)$quality['missingDescription'] + (int)$quality['missingSource'] + (int)$quality['missingDate'],
+        'open_quality_reviews' => $openQuality,
+        'open_reviews' => $openReviews,
+        'blocked_tasks' => $blocked,
+        'technical_seo_coverage' => $technicalSeo['coverage_percent'],
+        'publication_problems' => $publicationProblems,
+    ];
+    $previous = be_cc_previous_development_snapshot($pdo);
+    $previousMetrics = $previous['metrics'] ?? [];
+    $trendAvailable = $previous !== null;
+    $assessment = be_cc_development_assessment([
+        'missing_description' => (int)$quality['missingDescription'],
+        'missing_source' => (int)$quality['missingSource'],
+        'missing_date' => (int)$quality['missingDate'],
+        'open_quality_reviews' => $openQuality,
+    ], ['blocked_tasks' => $blocked], $trendAvailable);
+
+    $trends = [
+        'available' => $trendAvailable,
+        'previous_at' => $previous['created_at'] ?? null,
+        'content_coverage_delta' => be_cc_delta($coverage, $previousMetrics, 'content_coverage'),
+        'missing_content_delta' => be_cc_delta($snapshotMetrics['missing_content'], $previousMetrics, 'missing_content'),
+        'open_quality_reviews_delta' => be_cc_delta($openQuality, $previousMetrics, 'open_quality_reviews'),
+        'open_reviews_delta' => be_cc_delta($openReviews, $previousMetrics, 'open_reviews'),
+        'blocked_tasks_delta' => be_cc_delta($blocked, $previousMetrics, 'blocked_tasks'),
+        'technical_seo_delta' => be_cc_delta($technicalSeo['coverage_percent'], $previousMetrics, 'technical_seo_coverage'),
+        'publication_problems_delta' => be_cc_delta($publicationProblems, $previousMetrics, 'publication_problems'),
+    ];
+    be_cc_store_development_snapshot($pdo, $snapshotMetrics, $previous);
+
+    $seoMessage = 'Technische Onpage-Basissignale werden geprüft. Search-Console-Kennzahlen sind noch nicht angebunden.';
     be_json_response(200, ['status' => 'ok', 'data' => [
         'generated_at' => gmdate('c'),
-        'summary' => [
-            'status' => $hasCurrentAttention ? 'attention' : 'baseline_ok',
-            'label' => $hasCurrentAttention ? 'Aktueller Stand mit Handlungsbedarf' : 'Aktueller Basisstand ohne erkannten Handlungsbedarf',
-            'trend_available' => false,
-            'trend_message' => 'Eine Verbesserung oder Verschlechterung ist noch nicht belastbar messbar, weil historische Vergleichswerte fehlen.',
-        ],
+        'summary' => $assessment,
+        'trends' => $trends,
         'content_quality' => [
             'events_total' => $total,
             'activities_total' => $activityCount,
@@ -75,22 +168,23 @@ try {
             'missing_source' => (int)$quality['missingSource'],
             'missing_date' => (int)$quality['missingDate'],
             'open_quality_reviews' => $openQuality,
-            'trend_available' => false,
         ],
         'automation' => [
-            'open_reviews' => $count("SELECT COUNT(*) FROM control_cases WHERE case_type='intake' AND state NOT IN ('done','rejected','parked')"),
-            'waiting_tasks' => $count("SELECT COUNT(*) FROM control_cases WHERE case_type='task' AND state IN ('waiting','snoozed')"),
+            'open_reviews' => $openReviews,
+            'waiting_tasks' => $waitingTasks,
             'blocked_tasks' => $blocked,
-            'completed_cases' => $count("SELECT COUNT(*) FROM control_cases WHERE state='done'"),
-            'quality_effect_available' => false,
-            'quality_effect_message' => 'Die Wirkung der Automatisierungen ist noch nicht als Zeitreihe und Fehlerquote erfasst.',
+            'completed_cases' => $completedCases,
+            'publication_problems' => $publicationProblems,
+            'quality_effect_available' => $trendAvailable,
+            'quality_effect_message' => $trendAvailable ? 'Vergleich zum vorherigen Snapshot verfügbar.' : 'Der erste Snapshot bildet die Vergleichsbasis.',
         ],
         'seo' => [
             'content_basis_percent' => $coverage,
             'onpage_event_coverage_percent' => $coverage,
             'missing_descriptions' => (int)$quality['missingDescription'],
             'missing_sources' => (int)$quality['missingSource'],
-            'technical_seo_available' => false,
+            'technical_seo_available' => true,
+            'technical_seo' => $technicalSeo,
             'search_console_connected' => false,
             'message' => $seoMessage,
             'search_console_message' => $seoMessage,
