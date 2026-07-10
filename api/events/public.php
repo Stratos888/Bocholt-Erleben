@@ -59,8 +59,9 @@ function public_events_reporting_target(array $row): array
 
 function public_events_normalize_row(array $row): array
 {
-    $url = trim((string)($row['ticket_url'] ?? ''));
-    if ($url === '') $url = trim((string)($row['event_url'] ?? ''));
+    $sourceUrl = trim((string)($row['event_url'] ?? ''));
+    $ticketUrl = trim((string)($row['ticket_url'] ?? ''));
+    $url = $ticketUrl !== '' ? $ticketUrl : $sourceUrl;
     $address = trim((string)($row['location_address'] ?? ''));
     $event = [
         'id' => 'submission-' . (string)$row['id'],
@@ -74,6 +75,8 @@ function public_events_normalize_row(array $row): array
         'address' => $address,
         'kategorie' => public_events_category_for_submission($row),
         'description' => trim((string)($row['description_text'] ?? '')),
+        'source_url' => $sourceUrl,
+        'ticket_url' => $ticketUrl,
     ];
     if ($url !== '') $event['url'] = $url;
     $visualFields = public_events_visual_fields_for_submission($row);
