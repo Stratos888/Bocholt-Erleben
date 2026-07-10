@@ -3,11 +3,19 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/_bootstrap.php';
 
+function be_cc_runtime_environment(): string
+{
+    $explicit = strtolower(trim((string)getenv('BE_ENVIRONMENT')));
+    if (in_array($explicit, ['live','staging'], true)) return $explicit;
+    $host = strtolower(trim((string)($_SERVER['HTTP_HOST'] ?? '')));
+    return str_contains($host, 'staging') ? 'staging' : 'live';
+}
+
 function be_cc_table_exists(PDO $pdo, string $table): bool
 {
-    $stmt = $pdo->prepare('SHOW TABLES LIKE :table_name');
+    $stmt = $pdo->prepare('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = :table_name');
     $stmt->execute(['table_name' => $table]);
-    return (bool)$stmt->fetchColumn();
+    return (int)$stmt->fetchColumn() > 0;
 }
 
 function be_cc_content_ops_status(PDO $pdo): array
@@ -17,6 +25,7 @@ function be_cc_content_ops_status(PDO $pdo): array
         if (!be_cc_table_exists($pdo, $table)) {
             return [
                 'available' => false,
+                'environment' => be_cc_runtime_environment(),
                 'message' => 'Content-Ops-Metriken sind in dieser Laufzeit noch nicht initialisiert.',
                 'processes' => [],
                 'metrics' => [],
@@ -26,25 +35,31 @@ function be_cc_content_ops_status(PDO $pdo): array
         }
     }
 
-    $runs = $pdo->query(
-        "SELECT source_mode, status, action_required, generated_at_utc, github_run_url
+    $environment = be_cc_runtime_environment();
+    $stmt = $pdo->prepare(
+        'SELECT source_mode, status, action_required, generated_at_utc, github_run_url
          FROM content_ops_run
-         WHERE environment IN ('live','staging')
+         WHERE environment = :environment
          ORDER BY generated_at_utc DESC, id DESC
-         LIMIT 100"
-    )->fetchAll(PDO::FETCH_ASSOC);
+         LIMIT 100'
+    );
+    $stmt->execute(['environment' => $environment]);
+    $runs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $latestByMode = [];
     foreach ($runs as $row) {
         $mode = (string)$row['source_mode'];
         if ($mode !== '' && !isset($latestByMode[$mode])) $latestByMode[$mode] = $row;
     }
 
-    $metricRows = $pdo->query(
-        "SELECT metric_key, metric_value, metric_date, source_mode, metric_scope, dimension_key
+    $stmt = $pdo->prepare(
+        'SELECT metric_key, metric_value, metric_date, source_mode, metric_scope, dimension_key
          FROM content_ops_metric_daily
-         WHERE metric_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 35 DAY)
-         ORDER BY metric_date DESC, id DESC"
-    )->fetchAll(PDO::FETCH_ASSOC);
+         WHERE environment = :environment
+           AND metric_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 35 DAY)
+         ORDER BY metric_date DESC, id DESC'
+    );
+    $stmt->execute(['environment' => $environment]);
+    $metricRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $latestMetrics = [];
     foreach ($metricRows as $row) {
         $key = (string)$row['metric_key'];
@@ -59,34 +74,35 @@ function be_cc_content_ops_status(PDO $pdo): array
         }
     }
 
-    $learningRows = $pdo->query(
-        "SELECT rule_key, rule_type, rule_class,
+    $stmt = $pdo->prepare(
+        'SELECT rule_key, rule_type, rule_class,
                 SUM(applied_count) AS applied_count,
                 SUM(prevented_count) AS prevented_count,
                 SUM(recurrence_count) AS recurrence_count,
                 SUM(false_positive_count) AS false_positive_count,
                 MAX(metric_date) AS last_date
          FROM feedback_rule_effectiveness_daily
-         WHERE metric_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 35 DAY)
+         WHERE environment = :environment
+           AND metric_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 35 DAY)
          GROUP BY rule_key, rule_type, rule_class
          ORDER BY prevented_count DESC, applied_count DESC
-         LIMIT 20"
-    )->fetchAll(PDO::FETCH_ASSOC);
+         LIMIT 20'
+    );
+    $stmt->execute(['environment' => $environment]);
+    $learningRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $value = static fn(string $key): ?float => isset($latestMetrics[$key]) ? (float)$latestMetrics[$key]['value'] : null;
     $funnelKeys = [
         'growth.gsc_rows', 'growth.ga4_rows', 'growth.value_metric_rows',
-        'weekly.candidates.generated', 'weekly.candidates.accepted', 'weekly.candidates.rejected',
-        'intake.manual.appended_items', 'intake.manual.skipped_items',
+        'search.weekly.raw_candidates', 'search.weekly.selected_candidates',
+        'search.weekly.dropped_candidates', 'search.weekly.prevented_candidates',
+        'search.weekly.selected_rate_percent', 'search.weekly.dropped_rate_percent',
+        'intake.manual.input_items', 'intake.manual.appended_items', 'intake.manual.skipped_items',
     ];
     $funnelMetrics = [];
-    foreach ($funnelKeys as $key) {
-        if (isset($latestMetrics[$key])) $funnelMetrics[$key] = $latestMetrics[$key];
-    }
+    foreach ($funnelKeys as $key) if (isset($latestMetrics[$key])) $funnelMetrics[$key] = $latestMetrics[$key];
 
-    $prevented = 0;
-    $falsePositives = 0;
-    $recurrences = 0;
+    $prevented = $falsePositives = $recurrences = 0;
     foreach ($learningRows as $row) {
         $prevented += (int)$row['prevented_count'];
         $falsePositives += (int)$row['false_positive_count'];
@@ -95,6 +111,7 @@ function be_cc_content_ops_status(PDO $pdo): array
 
     return [
         'available' => true,
+        'environment' => $environment,
         'message' => 'Content-Ops-Läufe und Lernwirkung werden aus der gemeinsamen Betriebsdatenbank gelesen.',
         'processes' => $latestByMode,
         'metrics' => $latestMetrics,
@@ -104,6 +121,16 @@ function be_cc_content_ops_status(PDO $pdo): array
             'false_positive_total_35d' => $falsePositives,
             'recurrence_total_35d' => $recurrences,
         ],
+        'search' => [
+            'raw_candidates' => $value('search.weekly.raw_candidates'),
+            'selected_candidates' => $value('search.weekly.selected_candidates'),
+            'dropped_candidates' => $value('search.weekly.dropped_candidates'),
+            'prevented_candidates' => $value('search.weekly.prevented_candidates'),
+            'selected_rate_percent' => $value('search.weekly.selected_rate_percent'),
+            'dropped_rate_percent' => $value('search.weekly.dropped_rate_percent'),
+            'intake_appended' => $value('intake.manual.appended_items'),
+            'intake_skipped' => $value('intake.manual.skipped_items'),
+        ],
         'funnel' => [
             'available' => count($funnelMetrics) > 0,
             'metrics' => $funnelMetrics,
@@ -111,8 +138,8 @@ function be_cc_content_ops_status(PDO $pdo): array
             'ga4_rows' => $value('growth.ga4_rows'),
             'value_metric_rows' => $value('growth.value_metric_rows'),
             'message' => count($funnelMetrics) > 0
-                ? 'Vorhandene Search-Console-/GA4-/Intake-Signale sind angebunden.'
-                : 'Noch keine belastbaren Growth-/Funnel-Metriken in der Betriebsdatenbank.',
+                ? 'Vorhandene Search-, Intake-, Search-Console- und GA4-Signale sind angebunden.'
+                : 'Noch keine belastbaren Search-/Growth-/Funnel-Metriken in der Betriebsdatenbank.',
         ],
     ];
 }
@@ -123,37 +150,55 @@ function be_cc_process_health(array $contentOps): array
         return ['status' => 'unknown', 'message' => (string)($contentOps['message'] ?? 'Prozesszustand unbekannt.'), 'items' => []];
     }
     $expected = [
-        'weekly_ki_websearch' => 'KI-Eventsuche',
-        'manual_ki_intake' => 'KI-Intake',
-        'content_quality_audit' => 'Content-Prüfung',
-        'inbox_cleanup' => 'Inbox-Bereinigung',
-        'growth_intelligence' => 'Growth-/SEO-Auswertung',
+        'weekly_ki_websearch' => ['label' => 'KI-Eventsuche', 'max_age_hours' => 24 * 9, 'required' => true],
+        'manual_ki_intake' => ['label' => 'KI-Intake', 'max_age_hours' => 24 * 9, 'required' => false],
+        'content_quality_audit' => ['label' => 'Content-Prüfung', 'max_age_hours' => 50, 'required' => true],
+        'inbox_cleanup' => ['label' => 'Inbox-Bereinigung', 'max_age_hours' => 50, 'required' => false],
+        'growth_intelligence' => ['label' => 'Growth-/SEO-Auswertung', 'max_age_hours' => 24 * 9, 'required' => true],
     ];
     $items = [];
-    $attention = 0;
-    foreach ($expected as $mode => $label) {
+    $attention = $unknown = 0;
+    foreach ($expected as $mode => $config) {
         $run = $contentOps['processes'][$mode] ?? null;
         if (!$run) {
-            $items[] = ['key' => $mode, 'label' => $label, 'status' => 'unknown', 'message' => 'Noch kein Lauf nachgewiesen.'];
-            $attention++;
+            $status = !empty($config['required']) ? 'unknown' : 'optional';
+            if ($status === 'unknown') $unknown++;
+            $items[] = ['key' => $mode, 'label' => $config['label'], 'status' => $status, 'message' => !empty($config['required']) ? 'Noch kein Lauf nachgewiesen.' : 'Kein Lauf erforderlich, solange kein entsprechender Input vorlag.'];
             continue;
         }
-        $status = strtolower((string)($run['status'] ?? 'unknown'));
-        $ok = !str_contains($status, 'fail') && !str_contains($status, 'error') && empty($run['action_required']);
-        if (!$ok) $attention++;
+        $runStatus = strtolower((string)($run['status'] ?? 'unknown'));
+        $failed = str_contains($runStatus, 'fail')
+            || str_contains($runStatus, 'error')
+            || str_contains($runStatus, 'missing')
+            || str_contains($runStatus, 'partial_run');
+        $lastRun = null;
+        try { $lastRun = new DateTimeImmutable((string)$run['generated_at_utc']); } catch (Throwable) {}
+        $stale = !$lastRun || $lastRun < new DateTimeImmutable('-' . (int)$config['max_age_hours'] . ' hours');
+        $status = $failed || $stale ? 'attention' : 'ok';
+        if ($status === 'attention') $attention++;
+        $workGenerated = !empty($run['action_required']) && !$failed;
+        $message = $failed
+            ? 'Der letzte Lauf meldet einen technischen oder unvollständigen Zustand.'
+            : ($stale
+                ? 'Der letzte erfolgreiche Lauf ist älter als erwartet.'
+                : ($workGenerated ? 'Lauf erfolgreich; fachliche Folgearbeit wurde erzeugt.' : 'Letzter erfasster Lauf ohne bekannten Handlungsbedarf.'));
         $items[] = [
             'key' => $mode,
-            'label' => $label,
-            'status' => $ok ? 'ok' : 'attention',
-            'run_status' => $status,
+            'label' => $config['label'],
+            'status' => $status,
+            'run_status' => $runStatus,
             'last_run_at' => (string)($run['generated_at_utc'] ?? ''),
             'run_url' => (string)($run['github_run_url'] ?? ''),
-            'message' => $ok ? 'Letzter erfasster Lauf ohne bekannten Handlungsbedarf.' : 'Letzter Lauf benötigt Aufmerksamkeit.',
+            'work_generated' => $workGenerated,
+            'message' => $message,
         ];
     }
+    $overall = $attention > 0 ? 'attention' : ($unknown > 0 ? 'unknown' : 'ok');
     return [
-        'status' => $attention > 0 ? 'attention' : 'ok',
-        'message' => $attention > 0 ? $attention . ' Prozessbereiche sind nicht vollständig bestätigt.' : 'Alle erfassten Kernprozesse melden einen unauffälligen letzten Lauf.',
+        'status' => $overall,
+        'message' => $attention > 0
+            ? $attention . ' Prozessbereiche benötigen technische Aufmerksamkeit.'
+            : ($unknown > 0 ? $unknown . ' erforderliche Prozessbereiche sind noch nicht durch einen aktuellen Lauf bestätigt.' : 'Alle erforderlichen Kernprozesse melden einen aktuellen, technisch unauffälligen Lauf.'),
         'items' => $items,
     ];
 }
