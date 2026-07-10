@@ -53,4 +53,26 @@ function be_cc_ensure_schema(): void
             ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
+
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS control_content_changes (
+          id CHAR(36) NOT NULL,
+          object_type VARCHAR(64) NOT NULL,
+          object_id VARCHAR(191) NOT NULL,
+          object_title VARCHAR(240) NOT NULL,
+          source_system VARCHAR(96) NOT NULL,
+          before_json JSON NULL,
+          updates_json JSON NOT NULL,
+          written_fields_json JSON NULL,
+          publication_state ENUM('saved','deploy_started','deploy_failed','waiting','confirmed','verification_failed') NOT NULL DEFAULT 'saved',
+          publication_error TEXT NULL,
+          public_url VARCHAR(500) NULL,
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          confirmed_at DATETIME NULL,
+          PRIMARY KEY (id),
+          KEY idx_content_changes_object (object_type, object_id, created_at),
+          KEY idx_content_changes_state (publication_state, updated_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
 }
