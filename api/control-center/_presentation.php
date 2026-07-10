@@ -120,19 +120,18 @@ function be_cc_case_presentation(array $row): array
         ];
         $url = trim((string)($payload['suggested_url'] ?? $payload['source_url'] ?? ''));
         if ($url !== '') $links[] = ['label' => 'Quelle', 'url' => $url];
-    } elseif ($source === 'growth_backlog') {
+    } elseif (in_array($source, ['growth_backlog', 'repo_workpack'], true)) {
         $kind = 'backlog_item';
         $group = 'backlog';
         $primary = be_cc_action('convert_to_task', 'Als Aufgabe starten');
-        $secondary = [
-            be_cc_action('edit_source', 'Bearbeiten', true),
-            be_cc_action('complete', 'Abschließen'),
-            be_cc_action('reject', 'Verwerfen', true, true),
-        ];
+        $secondary = [];
+        if ($source === 'growth_backlog') $secondary[] = be_cc_action('edit_source', 'Bearbeiten', true);
+        $secondary[] = be_cc_action('complete', 'Abschließen');
+        $secondary[] = be_cc_action('reject', 'Verwerfen', true, true);
         $context = [
             'backlog_type' => (string)($payload['type'] ?? ''),
-            'source' => (string)($payload['source'] ?? ''),
-            'recommended_action' => (string)($payload['recommended_action'] ?? ''),
+            'source' => (string)($payload['source'] ?? $payload['source_document'] ?? ''),
+            'recommended_action' => (string)($payload['recommended_action'] ?? $payload['next_action'] ?? ''),
             'expected_benefit' => (string)($payload['expected_benefit'] ?? ''),
         ];
     } elseif ($type === 'task') {
