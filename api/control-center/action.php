@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require __DIR__ . '/_domain.php';
+require __DIR__ . '/_writeback.php';
 
 be_require_review_access();
 
@@ -25,12 +25,15 @@ try {
     }
 
     be_cc_require_schema();
-    $lookup = be_db()->prepare('SELECT source_system FROM control_cases WHERE id = :id');
+    $lookup = be_db()->prepare('SELECT * FROM control_cases WHERE id = :id');
     $lookup->execute(['id' => $caseId]);
-    $sourceSystem = (string)($lookup->fetchColumn() ?: '');
+    $case = $lookup->fetch();
+    if (!$case) {
+        throw new RuntimeException('Case not found.');
+    }
 
-    if (in_array($sourceSystem, ['inbox_feed', 'content_audit'], true)) {
-        throw new DomainException('Dieser Quellfall wird bis zur abgeschlossenen Writeback-Migration weiterhin in der bestehenden Review-Arbeitsansicht bearbeitet.');
+    if (in_array($action, ['approve', 'reject', 'snooze'], true)) {
+        be_cc_apply_source_writeback($case, $action, $payload);
     }
 
     be_json_response(200, [
@@ -40,7 +43,7 @@ try {
 } catch (InvalidArgumentException|DomainException $error) {
     be_json_response(422, ['status' => 'error', 'message' => $error->getMessage()]);
 } catch (RuntimeException $error) {
-    be_json_response(404, ['status' => 'error', 'message' => $error->getMessage()]);
+    be_json_response(409, ['status' => 'error', 'message' => $error->getMessage()]);
 } catch (Throwable $error) {
     be_json_response(500, [
         'status' => 'error',
