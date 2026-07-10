@@ -3,14 +3,20 @@ declare(strict_types=1);
 
 require __DIR__ . '/_schema.php';
 require __DIR__ . '/_submission_source.php';
+require __DIR__ . '/_sheet_inbox_source.php';
+require __DIR__ . '/_content_ops.php';
 
 be_require_review_access();
 
 try {
     be_cc_ensure_schema();
 
+    // Das führende Sheet wird zuerst gelesen. Der JSON-Feed bleibt nur als
+    // kompatibler, deduplizierter Fallback und erzeugt wegen identischer
+    // Quellidentität keine Doppelvorgänge.
     $sync = [
-        'inbox' => be_cc_sync_inbox_feed(),
+        'sheet_inbox' => be_cc_sync_sheet_inbox(),
+        'inbox_feed_fallback' => be_cc_sync_inbox_feed(),
         'submissions' => be_cc_sync_submissions(),
         'content_audit' => be_cc_sync_content_audit(),
         'growth_backlog' => be_cc_sync_growth_backlog(),
@@ -25,6 +31,9 @@ try {
         $groups[$bucket][] = $case;
     }
 
+    $contentOps = be_cc_content_ops_status(be_db());
+    $processHealth = be_cc_process_health($contentOps);
+
     be_json_response(200, [
         'status' => 'ok',
         'data' => [
@@ -32,8 +41,10 @@ try {
             'counts' => array_map('count', $groups),
             'sync' => $sync,
             'system' => [
-                'status' => 'ok',
-                'message' => 'Alle relevanten Quellen sind synchronisiert. Keine bekannte Störung mit Auswirkung.',
+                'status' => $processHealth['status'],
+                'message' => $processHealth['message'],
+                'processes' => $processHealth['items'],
+                'content_ops_available' => (bool)$contentOps['available'],
             ],
         ],
     ]);
