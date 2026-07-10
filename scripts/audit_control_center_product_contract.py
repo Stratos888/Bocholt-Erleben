@@ -9,8 +9,12 @@ js = read('js/control-center.js')
 source_js = read('js/control-center-source-editors.js')
 publication_js = read('js/control-center-publication.js')
 development_js = read('js/control-center-development.js')
+integration_js = read('js/control-center-integrations.js')
 css = read('css/control-center.css')
 sources = read('api/control-center/_sources.php')
+sheet_inbox = read('api/control-center/_sheet_inbox_source.php')
+content_ops = read('api/control-center/_content_ops.php')
+submission_content = read('api/control-center/_submission_content.php')
 writeback = read('api/control-center/_writeback.php')
 domain = read('api/control-center/_domain.php')
 workflow_contracts = read('api/control-center/_workflow_contracts.php')
@@ -21,8 +25,10 @@ content_history = read('api/control-center/_content_history.php')
 contracts = read('api/control-center/_contracts.php')
 github_repo = read('api/control-center/_github_repo.php')
 development_api = read('api/control-center/development.php')
+overview_api = read('api/control-center/overview.php')
 deploy_api = read('api/control-center/deploy.php')
 schema = read('api/control-center/_schema.php')
+public_events = read('api/events/public.php')
 manifest = read('data/control_center_repo_workpacks.json')
 errors = []
 
@@ -36,8 +42,10 @@ if '.cc-nav{' not in css or 'position:fixed' not in css:
     errors.append('Bottom-Navigation ist nicht dauerhaft fixed.')
 if 'id="cc-dialog-close" type="button"' not in html:
     errors.append('Dialog-Schließen ist nicht von Pflichtfeldvalidierung entkoppelt.')
+if 'control-center-integrations.js' not in html:
+    errors.append('Gesamtprojekt-Integrationscontroller wird nicht geladen.')
 
-combined_js = js + source_js + publication_js + development_js
+combined_js = js + source_js + publication_js + development_js + integration_js
 contracts_ui = {
     'verdichtete Übersicht': 'cc-summary-card',
     'fokussierter Prüfbereich': 'renderReviewDetail',
@@ -50,8 +58,9 @@ contracts_ui = {
     'öffentliche Feed-Verifikation': 'verifyPublication',
     'Aktivitätseditor': 'ca-save',
     'Entwicklungsbereich': 'renderDevelopment',
-    'Entwicklungstrends': 'content_coverage_delta',
-    'technische SEO-Basis': 'Technische SEO-Basis',
+    'Lernwirkungsanzeige': 'Verhinderte Wiederholungen',
+    'Prozesskettenanzeige': 'Automatisierte Prozesskette',
+    'Funnelanzeige': 'Nutzer-Funnel und SEO-Wirkung',
     'Header-Menü': 'openHeaderMenu',
     'verständlicher Systemstatus': 'cc-system-list',
 }
@@ -62,25 +71,28 @@ if 'Speichern und veröffentlichen' in combined_js:
     errors.append('UI behauptet eine Veröffentlichung, bevor die öffentliche Wirkung bestätigt ist.')
 
 backend_contracts = {
+    'führende Sheet-Inbox': 'be_cc_sync_sheet_inbox',
+    'deduplizierter Inbox-Fallback': "'source_system' => 'inbox_feed'",
     'Growth-Backlog-Sync': 'be_cc_sync_growth_backlog',
     'Repo-Workpack-Sync': 'be_cc_sync_repo_workpacks',
     'Growth-Backlog-Writeback': 'be_cc_writeback_growth_backlog',
     'gemeinsamer Workflow-Vertrag': 'be_cc_transition_target',
-    'Umwandlung ohne Doppelkarte': "'convert_to_task' =>",
-    'Wartegrund-Persistenz': "in_array($action, ['wait','block']",
     'Event-Livewriteback': 'be_cc_update_event_fields',
-    'atomare Event-Updateplanung': 'be_cc_validate_event_update',
     'Aktivitäts-Repo-Writeback': 'be_cc_update_activity_in_repo',
     'explizites Aktivitäts-Gate': 'BE_ACTIVITY_WRITEBACK_ENABLED',
+    'Anbieter-Event-Verwaltung': 'be_cc_update_submission_event',
+    'Anbieter-Event-Quelle': 'be_cc_submission_event_items',
+    'Anbieter-Event-Public-Verifikation': "sourceSystem === 'submission_db'",
     'dauerhafter Änderungsverlauf': 'control_content_changes',
     'öffentliche Wirkung': 'be_cc_verify_public_change',
     'Teilfehler als Arbeit': 'be_cc_upsert_publication_issue',
-    'objektartspezifischer Abschluss': "be_cc_complete_publication_issue((string)$change['object_type']",
     'Entwicklungs-Snapshots': 'control_development_snapshots',
+    'Content-Ops-Wirkung': 'feedback_rule_effectiveness_daily',
+    'Prozessstatus': 'be_cc_process_health',
+    'Funnelmetriken': 'growth.gsc_rows',
     'technische SEO-Prüfung': 'be_cc_technical_seo_metrics',
-    'Search-Console-Transparenz': 'search_console_connected',
 }
-backend = sources + writeback + domain + workflow_contracts + presentation + content_api + publication_api + content_history + contracts + github_repo + development_api + deploy_api + schema
+backend = sources + sheet_inbox + content_ops + submission_content + writeback + domain + workflow_contracts + presentation + content_api + publication_api + content_history + contracts + github_repo + development_api + overview_api + deploy_api + schema + public_events
 for label, marker in backend_contracts.items():
     if marker not in backend:
         errors.append(f'Backendvertrag fehlt: {label}')
@@ -95,8 +107,8 @@ if "'available' => $enabled" not in github_repo or "'configured' =>" not in gith
     errors.append('Aktivitätseditor unterscheidet Konfiguration und bewusste Freigabe nicht.')
 if "type === 'activities'" not in publication_js or '#ca-save' not in publication_js:
     errors.append('Aktivitätsveröffentlichung ist nicht in den gemeinsamen Verifikationscontroller eingebunden.')
-if 'search_console_connected' not in development_api or 'false' not in development_api:
-    errors.append('Nicht angebundene Search-Console-Daten werden nicht transparent markiert.')
+if "'address' => $address" not in public_events:
+    errors.append('Öffentliche Anbieter-Events geben die bearbeitbare Adresse nicht verifizierbar aus.')
 
 if errors:
     print('=== Control Center Product Contract: FAILED ===')
