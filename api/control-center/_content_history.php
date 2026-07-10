@@ -123,36 +123,7 @@ function be_cc_public_feed_url(): string
 {
     $host = trim((string)($_SERVER['HTTP_HOST'] ?? ''));
     if ($host === '') throw new RuntimeException('Öffentlicher Host ist nicht bekannt.');
-    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'https';
-    return $scheme . '://' . $host . '/data/events.json?verify=' . rawurlencode((string)microtime(true));
-}
-
-function be_cc_public_event_value(array $event, string $canonical): string
-{
-    $aliases = [
-        'title' => ['title','eventName'],
-        'date' => ['date','datum','start_date'],
-        'end_date' => ['endDate','end_date','enddate'],
-        'time' => ['time','uhrzeit','startzeit'],
-        'city' => ['city','stadt'],
-        'location' => ['location','ort','venue'],
-        'address' => ['address','adresse'],
-        'category' => ['kategorie','category'],
-        'source_url' => ['source_url','url','event_url'],
-        'ticket_url' => ['ticket_url'],
-        'description' => ['description','beschreibung'],
-        'visual_key' => ['visual_key'],
-        'visual_motif' => ['visual_motif','image_visual_motif'],
-        'tags' => ['tags'],
-    ];
-    foreach ($aliases[$canonical] ?? [$canonical] as $alias) {
-        if (array_key_exists($alias, $event)) {
-            $value = $event[$alias];
-            if (is_array($value)) return implode(',', array_map('strval', $value));
-            return trim((string)$value);
-        }
-    }
-    return '';
+    return 'https://' . $host . '/data/events.json?verify=' . rawurlencode((string)microtime(true));
 }
 
 function be_cc_verify_public_change(array $change): array
@@ -172,14 +143,9 @@ function be_cc_verify_public_change(array $change): array
     }
     if (!is_array($event)) return ['verified' => false, 'reason' => 'Die Veranstaltung ist im öffentlichen Feed noch nicht vorhanden.'];
 
-    $updates = (array)$change['updates_json'];
-    $written = array_flip((array)$change['written_fields_json']);
-    foreach (be_cc_normalize_event_updates($updates) as $canonical => $expected) {
-        if ($written && !isset($written[$canonical])) continue;
-        $actual = be_cc_public_event_value($event, $canonical);
-        if ($actual !== trim((string)$expected)) {
-            return ['verified' => false, 'reason' => 'Öffentlicher Wert noch nicht aktuell: ' . $canonical . '.'];
-        }
-    }
-    return ['verified' => true, 'reason' => 'Öffentliche Eventdaten entsprechen der gespeicherten Änderung.'];
+    return be_cc_compare_public_event_change(
+        $event,
+        (array)$change['updates_json'],
+        (array)$change['written_fields_json']
+    );
 }
