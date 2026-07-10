@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/_bootstrap.php';
+require_once __DIR__ . '/_presentation.php';
 
 const BE_CC_TYPES = ['intake', 'task', 'idea', 'information'];
 const BE_CC_STATES = ['new', 'decision_required', 'open', 'in_progress', 'waiting', 'blocked', 'snoozed', 'done', 'rejected', 'information', 'parked'];
@@ -57,7 +58,7 @@ function be_cc_case_from_row(array $row): array
         }
     }
 
-    return [
+    $case = [
         'id' => (string)$row['id'],
         'type' => (string)$row['case_type'],
         'state' => $state,
@@ -84,6 +85,8 @@ function be_cc_case_from_row(array $row): array
         'updated_at' => $row['updated_at'] ?? null,
         'completed_at' => $row['completed_at'] ?? null,
     ];
+
+    return array_merge($case, be_cc_case_presentation($row));
 }
 
 function be_cc_list_cases(array $filters = []): array
