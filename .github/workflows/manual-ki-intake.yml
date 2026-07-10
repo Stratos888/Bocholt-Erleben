@@ -46,7 +46,7 @@ jobs:
         run: |
           set -e
           python -m pip install --upgrade pip
-          pip install google-api-python-client google-auth
+          pip install google-api-python-client google-auth pymysql
 
       # === BEGIN BLOCK: MANUAL_KI_INTAKE_PRODUCTION_BRANCH_GUARD_V1 | Zweck: verhindert, dass echte KI-Kandidaten aus staging in die Review-Kette laufen; Umfang: bricht Manual-KI-Intake außerhalb main hart ab ===
       - name: Guard production KI intake branch
@@ -88,6 +88,7 @@ jobs:
           from event_description_quality import evaluate_event_description
           # === END BLOCK: MANUAL_INTAKE_VISUAL_KEY_HELPER_IMPORT_V1 ===
           MANUAL_JSON_PATH = ROOT / "data" / "inbox_manual.json"
+          MANUAL_INTAKE_SUMMARY_PATH = ROOT / "data" / "manual-ki-intake-summary.json"
 
           INBOX_COLUMNS = [
               "status",
@@ -136,6 +137,18 @@ jobs:
               if output_path:
                   with open(output_path, "a", encoding="utf-8") as f:
                       f.write(f"{name}={value}\n")
+
+          # === BEGIN BLOCK: MANUAL_INTAKE_CONTENT_OPS_SUMMARY_V1 | Zweck: stellt Append-/Skip-Wirkung fuer Content-Ops-Impact-Metriken maschinenlesbar bereit; Umfang: schreibt nur lokales JSON-Artefakt fuer Folge-Step, keine fachlichen Daten ===
+          def write_intake_summary(**kwargs) -> None:
+              payload = {
+                  "generated_at_utc": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+                  "source": "manual-ki-intake",
+                  **kwargs,
+              }
+              MANUAL_INTAKE_SUMMARY_PATH.parent.mkdir(parents=True, exist_ok=True)
+              MANUAL_INTAKE_SUMMARY_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          # === END BLOCK: MANUAL_INTAKE_CONTENT_OPS_SUMMARY_V1 ===
+
           def norm(s: str) -> str:
               return (s or "").strip()
 
@@ -184,6 +197,7 @@ jobs:
 
           if not raw:
               info("data/inbox_manual.json ist leer. Nichts zu importieren.")
+              write_intake_summary(input_count=0, appended_count=0, skipped_count=0, skip_reasons={}, skipped_details=[])
               set_output("appended_count", "0")
               sys.exit(0)
 
@@ -420,6 +434,13 @@ jobs:
 
           if not rows_to_append:
               info(f"Keine neuen Zeilen zum Appenden. skipped={skipped}")
+              write_intake_summary(
+                  input_count=len(raw),
+                  appended_count=0,
+                  skipped_count=skipped,
+                  skip_reasons=skip_reasons,
+                  skipped_details=skipped_details[:80],
+              )
               set_output("appended_count", "0")
               sys.exit(0)
 
@@ -432,6 +453,13 @@ jobs:
           ).execute()
 
           info(f"Append OK: appended={len(rows_to_append)} skipped={skipped}")
+          write_intake_summary(
+              input_count=len(raw),
+              appended_count=len(rows_to_append),
+              skipped_count=skipped,
+              skip_reasons=skip_reasons,
+              skipped_details=skipped_details[:80],
+          )
           set_output("appended_count", str(len(rows_to_append)))
           # === END BLOCK: MANUAL_INTAKE_SOURCE_DATE_DEDUPE_AND_SKIP_DIAGNOSTICS_V2 ===
           PY
@@ -498,6 +526,35 @@ jobs:
             git push
             echo "did_commit=true" >> "$GITHUB_OUTPUT"
           fi
+
+      # === BEGIN BLOCK: CONTENT_OPS_RECORD_MANUAL_INTAKE_IMPACT_V1 | Zweck: persistiert Append-/Skip-/Reset-Wirkung des KI-Intake fuer Verwaltungs-Metriken; Umfang: keine Aenderung am Deploy-Trigger ===
+      - name: Record Content Ops manual intake impact
+        if: always()
+        shell: bash
+        env:
+          BE_ENVIRONMENT: live
+          GITHUB_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          APPENDED_COUNT: ${{ steps.append_inbox_sheet.outputs.appended_count }}
+          RESET_DID_COMMIT: ${{ steps.reset_manual_buffer.outputs.did_commit }}
+          LIVE_DB_HOST: ${{ secrets.LIVE_DB_HOST }}
+          LIVE_DB_NAME: ${{ secrets.LIVE_DB_NAME }}
+          LIVE_DB_USER: ${{ secrets.LIVE_DB_USER }}
+          LIVE_DB_PASSWORD: ${{ secrets.LIVE_DB_PASSWORD }}
+          LIVE_DB_PORT: ${{ secrets.LIVE_DB_PORT }}
+        run: |
+          set -e
+          python scripts/content-ops-control.py record-manual-intake
+
+      - name: Upload manual intake content ops impact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: manual-intake-content-ops-impact
+          path: |
+            data/manual-ki-intake-summary.json
+            data/content-ops/*.json
+          if-no-files-found: ignore
+      # === END BLOCK: CONTENT_OPS_RECORD_MANUAL_INTAKE_IMPACT_V1 ===
 
       # === BEGIN BLOCK: TRIGGER DEPLOY TO STRATO AFTER SUCCESSFUL SHEET APPEND ===
       # Zweck:

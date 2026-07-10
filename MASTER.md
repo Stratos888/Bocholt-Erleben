@@ -349,6 +349,21 @@ Bewusst geparkt:
 
 ---
 
+
+<!-- === BEGIN BLOCK: MASTER_EVENT_IMPACT_TRACKING_CONTRACT_2026_07_03 | Zweck: verankert objektgenaue Event-Wirkungsmessung als Premium-Backbone ohne Zwei-Klassen-Optik; Umfang: Produkt- und Technikvertrag === -->
+### Event impact tracking contract
+
+- Public event detail pages under `/events/<slug>/` are measurable product assets, not a replacement for the in-app detail panel.
+- The existing first-party value metric system `/api/value-track.php` remains the only internal impact backbone; do not create a parallel tracking stack.
+- Event impact signals are object-exact: `event_detail_view`, `website_click`, `maps_click`, `event_share_click`, `event_copy_link`.
+- `source_context` separates `public_detail_page`, `event_panel`, `event_card` and `today_card` internally while provider reports may aggregate them into simple impact language.
+- Provider reports must use cautious wording: measured views, measured interactions, actions. No claims about on-site visitors, ticket sales, revenue or unique people.
+- Public presentation stays equally premium for all events. Paid value is reporting, service, maintenance effort reduction and stable presence, not better visible UI.
+- Dynamic DB/provider events may only receive canonical `detail_path`/`detail_url` once those URLs are technically resolvable. No broken canonical share links.
+- Static guard: `python3 scripts/audit-event-impact-tracking.py`.
+
+<!-- === END BLOCK: MASTER_EVENT_IMPACT_TRACKING_CONTRACT_2026_07_03 === -->
+
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.

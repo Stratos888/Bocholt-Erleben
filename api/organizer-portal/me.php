@@ -460,9 +460,20 @@ function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
                 OR (submission_kind = "event" AND start_date IS NOT NULL AND start_date >= CURRENT_DATE())
            )
          ORDER BY
+            CASE status
+                WHEN "payment_released" THEN 0
+                WHEN "checkout_started" THEN 0
+                WHEN "draft" THEN 1
+                WHEN "pending_review" THEN 2
+                WHEN "paid" THEN 2
+                WHEN "in_review" THEN 2
+                WHEN "approved" THEN 3
+                WHEN "rejected" THEN 4
+                ELSE 5
+            END,
             COALESCE(created_at, updated_at, paid_at, approved_at, rejected_at) DESC,
             id DESC
-         LIMIT 10'
+         LIMIT 100'
     );
 
     $statement->execute([
@@ -506,6 +517,8 @@ function opm_empty_impact_metrics(): array
         'maps_clicks' => 0,
         'location_clicks' => 0,
         'organizer_cta_clicks' => 0,
+        'share_clicks' => 0,
+        'copy_link_clicks' => 0,
         'detail_views' => 0,
         'total_interactions' => 0,
         'item_count' => 0,
@@ -546,6 +559,7 @@ function opm_empty_impact_summary(int $organizerId, string $organizationName, st
         ],
         'metrics' => opm_empty_impact_metrics(),
         'previous_metrics' => opm_empty_impact_metrics(),
+        'items' => [],
         'message' => $message,
     ];
 }
@@ -559,6 +573,8 @@ SELECT
     COALESCE(SUM(CASE WHEN metric_key = 'maps_click' THEN count_value ELSE 0 END), 0) AS maps_clicks,
     COALESCE(SUM(CASE WHEN metric_key = 'location_click' THEN count_value ELSE 0 END), 0) AS location_clicks,
     COALESCE(SUM(CASE WHEN metric_key = 'organizer_cta_click' THEN count_value ELSE 0 END), 0) AS organizer_cta_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'event_share_click' THEN count_value ELSE 0 END), 0) AS share_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'event_copy_link' THEN count_value ELSE 0 END), 0) AS copy_link_clicks,
     COALESCE(SUM(count_value), 0) AS total_interactions,
     COUNT(DISTINCT CASE WHEN entity_type <> '' AND entity_id <> '' THEN CONCAT(entity_type, ':', entity_id) ELSE NULL END) AS item_count
 FROM value_metric_daily
@@ -583,10 +599,210 @@ SQL);
         'maps_clicks' => (int)($row['maps_clicks'] ?? 0),
         'location_clicks' => (int)($row['location_clicks'] ?? 0),
         'organizer_cta_clicks' => (int)($row['organizer_cta_clicks'] ?? 0),
+        'share_clicks' => (int)($row['share_clicks'] ?? 0),
+        'copy_link_clicks' => (int)($row['copy_link_clicks'] ?? 0),
         'detail_views' => (int)($row['detail_views'] ?? 0),
         'total_interactions' => (int)($row['total_interactions'] ?? 0),
         'item_count' => (int)($row['item_count'] ?? 0),
     ];
+}
+
+
+function opm_build_impact_metric_row(array $row): array
+{
+    return [
+        'detail_views' => (int)($row['detail_views'] ?? 0),
+        'website_clicks' => (int)($row['website_clicks'] ?? 0),
+        'maps_clicks' => (int)($row['maps_clicks'] ?? 0),
+        'location_clicks' => (int)($row['location_clicks'] ?? 0),
+        'organizer_cta_clicks' => (int)($row['organizer_cta_clicks'] ?? 0),
+        'share_clicks' => (int)($row['share_clicks'] ?? 0),
+        'copy_link_clicks' => (int)($row['copy_link_clicks'] ?? 0),
+        'total_interactions' => (int)($row['total_interactions'] ?? 0),
+    ];
+}
+
+function opm_fetch_impact_items(PDO $pdo, string $targetId, string $startDate, string $endDate, int $limit = 8): array
+{
+    $limit = max(1, min(20, $limit));
+    $statement = $pdo->prepare(sprintf(<<<'SQL'
+SELECT
+    entity_type,
+    entity_id,
+    COALESCE(MAX(NULLIF(entity_title, '')), '') AS entity_title,
+    COALESCE(SUM(CASE WHEN metric_key IN ('event_detail_view', 'activity_detail_view') THEN count_value ELSE 0 END), 0) AS detail_views,
+    COALESCE(SUM(CASE WHEN metric_key = 'website_click' THEN count_value ELSE 0 END), 0) AS website_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'maps_click' THEN count_value ELSE 0 END), 0) AS maps_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'location_click' THEN count_value ELSE 0 END), 0) AS location_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'organizer_cta_click' THEN count_value ELSE 0 END), 0) AS organizer_cta_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'event_share_click' THEN count_value ELSE 0 END), 0) AS share_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'event_copy_link' THEN count_value ELSE 0 END), 0) AS copy_link_clicks,
+    COALESCE(SUM(count_value), 0) AS total_interactions,
+    MAX(updated_at) AS last_interaction_at
+FROM value_metric_daily
+WHERE metric_date BETWEEN :start_date AND :end_date
+  AND reporting_target_type = 'organizer'
+  AND reporting_target_id = :target_id
+  AND entity_type IN ('event', 'activity')
+  AND entity_id <> ''
+GROUP BY entity_type, entity_id
+ORDER BY total_interactions DESC, last_interaction_at DESC
+LIMIT %d
+SQL, $limit));
+
+    $statement->execute([
+        ':start_date' => $startDate,
+        ':end_date' => $endDate,
+        ':target_id' => $targetId,
+    ]);
+
+    $rows = $statement->fetchAll();
+    if (!is_array($rows)) {
+        return [];
+    }
+
+    return array_map(static function (array $row): array {
+        return [
+            'entity_type' => (string)($row['entity_type'] ?? ''),
+            'entity_id' => (string)($row['entity_id'] ?? ''),
+            'entity_title' => (string)($row['entity_title'] ?? ''),
+            'metrics' => opm_build_impact_metric_row($row),
+            'last_interaction_at' => $row['last_interaction_at'] !== null ? (string)$row['last_interaction_at'] : null,
+        ];
+    }, $rows);
+}
+
+function opm_submission_impact_entity_id(array $submission): string
+{
+    $id = (int)($submission['id'] ?? 0);
+    return $id > 0 ? 'submission-' . $id : '';
+}
+
+function opm_fetch_submission_impact_map(PDO $pdo, string $targetId, string $startDate, string $endDate, array $submissions): array
+{
+    $entityIds = [];
+    foreach ($submissions as $submission) {
+        if (!is_array($submission)) {
+            continue;
+        }
+        $entityId = opm_submission_impact_entity_id($submission);
+        if ($entityId !== '') {
+            $entityIds[$entityId] = true;
+        }
+    }
+
+    $entityIds = array_keys($entityIds);
+    if ($entityIds === []) {
+        return [];
+    }
+
+    $placeholders = [];
+    $params = [
+        ':start_date' => $startDate,
+        ':end_date' => $endDate,
+        ':target_id' => $targetId,
+    ];
+
+    foreach ($entityIds as $index => $entityId) {
+        $placeholder = ':entity_id_' . $index;
+        $placeholders[] = $placeholder;
+        $params[$placeholder] = $entityId;
+    }
+
+    $statement = $pdo->prepare(sprintf(<<<'SQL'
+SELECT
+    entity_id,
+    COALESCE(SUM(CASE WHEN metric_key IN ('event_detail_view', 'activity_detail_view') THEN count_value ELSE 0 END), 0) AS detail_views,
+    COALESCE(SUM(CASE WHEN metric_key = 'website_click' THEN count_value ELSE 0 END), 0) AS website_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'maps_click' THEN count_value ELSE 0 END), 0) AS maps_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'location_click' THEN count_value ELSE 0 END), 0) AS location_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'organizer_cta_click' THEN count_value ELSE 0 END), 0) AS organizer_cta_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'event_share_click' THEN count_value ELSE 0 END), 0) AS share_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'event_copy_link' THEN count_value ELSE 0 END), 0) AS copy_link_clicks,
+    COALESCE(SUM(count_value), 0) AS total_interactions,
+    MAX(updated_at) AS last_interaction_at
+FROM value_metric_daily
+WHERE metric_date BETWEEN :start_date AND :end_date
+  AND reporting_target_type = 'organizer'
+  AND reporting_target_id = :target_id
+  AND entity_id IN (%s)
+GROUP BY entity_id
+SQL, implode(', ', $placeholders)));
+
+    $statement->execute($params);
+    $rows = $statement->fetchAll();
+    if (!is_array($rows)) {
+        return [];
+    }
+
+    $map = [];
+    foreach ($rows as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $entityId = (string)($row['entity_id'] ?? '');
+        if ($entityId === '') {
+            continue;
+        }
+        $map[$entityId] = [
+            'metrics' => opm_build_impact_metric_row($row),
+            'last_interaction_at' => $row['last_interaction_at'] !== null ? (string)$row['last_interaction_at'] : null,
+        ];
+    }
+
+    return $map;
+}
+
+function opm_attach_submission_impact(array $submissions, array $impactMap): array
+{
+    return array_map(static function (array $submission) use ($impactMap): array {
+        $entityId = opm_submission_impact_entity_id($submission);
+        $impact = $entityId !== '' ? ($impactMap[$entityId] ?? null) : null;
+        $submission['impact_entity_id'] = $entityId;
+        $submission['impact_metrics'] = is_array($impact) ? ($impact['metrics'] ?? opm_empty_impact_metrics()) : opm_empty_impact_metrics();
+        $submission['impact_last_interaction_at'] = is_array($impact) ? ($impact['last_interaction_at'] ?? null) : null;
+        return $submission;
+    }, $submissions);
+}
+
+function opm_fetch_published_content(PDO $pdo, int $organizerId): array
+{
+    $statement = $pdo->prepare(
+        'SELECT
+            id,
+            submission_kind,
+            status,
+            title,
+            start_date,
+            time_text,
+            location_name,
+            event_url,
+            ticket_url,
+            approved_at,
+            created_at,
+            updated_at
+         FROM submissions
+         WHERE organizer_id = :organizer_id
+           AND submission_kind IN ("event", "activity")
+           AND status = "approved"
+           AND (
+                submission_kind = "activity"
+                OR start_date IS NULL
+                OR start_date >= CURRENT_DATE()
+           )
+         ORDER BY
+            CASE submission_kind WHEN "event" THEN 0 WHEN "activity" THEN 1 ELSE 2 END,
+            COALESCE(start_date, approved_at, created_at, updated_at) DESC,
+            id DESC
+         LIMIT 100'
+    );
+
+    $statement->execute([
+        ':organizer_id' => $organizerId,
+    ]);
+
+    $rows = $statement->fetchAll();
+    return is_array($rows) ? $rows : [];
 }
 
 function opm_fetch_impact_summary(PDO $pdo, int $organizerId, string $organizationName): array
@@ -617,6 +833,13 @@ function opm_fetch_impact_summary(PDO $pdo, int $organizerId, string $organizati
         (string)$summary['previous_period']['end_date']
     );
 
+    $summary['items'] = opm_fetch_impact_items(
+        $pdo,
+        $targetId,
+        (string)$summary['period']['start_date'],
+        (string)$summary['period']['end_date']
+    );
+
     return $summary;
 }
 /* === END BLOCK: ORGANIZER_PORTAL_IMPACT_SUMMARY_V1 === */
@@ -642,6 +865,32 @@ try {
     $impactSummary = opm_fetch_impact_summary($pdo, $organizerId, (string)$sessionRow['organization_name']);
     /* === END BLOCK: ORGANIZER_PORTAL_IMPACT_SUMMARY_PAYLOAD_V1 === */
     $recentSubmissions = opm_fetch_recent_submissions($pdo, $organizerId);
+    $publishedContent = opm_fetch_published_content($pdo, $organizerId);
+    if (opm_value_metrics_table_exists($pdo)) {
+        $recentSubmissions = opm_attach_submission_impact(
+            $recentSubmissions,
+            opm_fetch_submission_impact_map(
+                $pdo,
+                (string)$impactSummary['reporting_target']['id'],
+                (string)$impactSummary['period']['start_date'],
+                (string)$impactSummary['period']['end_date'],
+                $recentSubmissions
+            )
+        );
+        $publishedContent = opm_attach_submission_impact(
+            $publishedContent,
+            opm_fetch_submission_impact_map(
+                $pdo,
+                (string)$impactSummary['reporting_target']['id'],
+                (string)$impactSummary['period']['start_date'],
+                (string)$impactSummary['period']['end_date'],
+                $publishedContent
+            )
+        );
+    } else {
+        $recentSubmissions = opm_attach_submission_impact($recentSubmissions, []);
+        $publishedContent = opm_attach_submission_impact($publishedContent, []);
+    }
 
     be_json_response(200, [
         'status' => 'ok',
@@ -666,6 +915,7 @@ try {
             'billing_summary' => $billingSummary,
             'impact_summary' => $impactSummary,
             'recent_submissions' => $recentSubmissions,
+            'published_content' => $publishedContent,
         ],
     ]);
 } catch (InvalidArgumentException $error) {

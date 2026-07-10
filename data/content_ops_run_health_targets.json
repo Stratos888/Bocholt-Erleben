@@ -1,0 +1,68 @@
+{
+  "version": "content_ops_run_health_targets_v1",
+  "updated_at": "2026-07-07",
+  "principles": [
+    "Ein still ausgefallener Roboter darf nicht wie ein gruener Zustand wirken.",
+    "Datenfrische ist Teil der Produktqualitaet.",
+    "Fehlende oder ueberfaellige Pflichtlaeufe werden als Run-Health-Risiko sichtbar.",
+    "Optionale Laeufe duerfen fehlen, muessen aber als nicht beobachtet kenntlich bleiben."
+  ],
+  "targets": [
+    {
+      "source_mode": "content_quality_audit",
+      "label": "Content Quality Audit",
+      "required": true,
+      "warn_after_hours": 192,
+      "stale_after_hours": 240,
+      "expected_cadence": "weekly",
+      "required_environments": [
+        "staging",
+        "live"
+      ]
+    },
+    {
+      "source_mode": "weekly_ki_websearch",
+      "label": "Weekly KI Websearch",
+      "required": true,
+      "warn_after_hours": 192,
+      "stale_after_hours": 240,
+      "expected_cadence": "weekly",
+      "required_environments": [
+        "live"
+      ]
+    },
+    {
+      "source_mode": "growth_intelligence",
+      "label": "Growth Intelligence",
+      "required": true,
+      "warn_after_hours": 192,
+      "stale_after_hours": 240,
+      "expected_cadence": "weekly",
+      "required_environments": [
+        "staging",
+        "live"
+      ]
+    },
+    {
+      "source_mode": "inbox_cleanup",
+      "label": "Inbox Cleanup",
+      "required": true,
+      "warn_after_hours": 192,
+      "stale_after_hours": 240,
+      "expected_cadence": "weekly",
+      "required_environments": [
+        "staging",
+        "live"
+      ]
+    },
+    {
+      "source_mode": "manual_ki_intake",
+      "label": "Manual KI Intake",
+      "required": false,
+      "warn_after_hours": 336,
+      "stale_after_hours": 720,
+      "expected_cadence": "event_driven",
+      "required_environments": []
+    }
+  ]
+}

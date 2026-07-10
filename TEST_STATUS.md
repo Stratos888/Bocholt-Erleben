@@ -5001,3 +5001,322 @@ Nach Deployment pruefen:
 3. Eventliste und Detailpanel bleiben funktionsgleich.
 4. Content-Quality-Report enthaelt Description-Issues nur als echte redaktionelle Korrekturhinweise, nicht als technische Regression.
 <!-- === END BLOCK: TEST_STATUS_EVENT_DESCRIPTION_PREMIUM_GUARD_2026_07_03 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_IMPACT_BACKBONE_2026_07_03 | Zweck: dokumentiert lokalen Proof fuer objektgenaues Event-Tracking und Anbieter-Wirkungsbericht; Umfang: PHP/JS/Python/Guard-Checks, Deploy-Smoke === -->
+## Event Impact Backbone + Anbieter-Wirkungsbericht – 2026-07-03
+
+Status: Patch vorbereitet.
+
+Validierter Zielzustand:
+- Kein neues öffentliches Designsystem und keine Zwei-Klassen-Optik.
+- Das bestehende Nutzwerttracking wird zum objektgenauen Event-Impact-Backbone erweitert.
+- Öffentliche Detailseiten, Detailpanel, Event-Cards und Today-Direktaktionen liefern getrennte `source_context`-Werte.
+- Anbieterbericht zeigt gemessene Wirkung verständlich und vorsichtig, inklusive Teilungen und stärkster Inhalte.
+
+Umsetzung:
+- `api/value-track.php`: `source_context`, `event_share_click`, `event_copy_link`, Source-Context-Index und Bucket-Hash-Erweiterung.
+- `config.js`: Source-Context-Payload und `BEAnalytics.trackShareAction()`.
+- `scripts/build-event-detail-pages.py`: Tracking auf öffentlichen Event-Detailseiten für View, Website-/Quelle, Maps und Share/Copy.
+- `js/details.js`: Detailpanel-View und Share mit `source_context=event_panel`.
+- `js/events.js`: Event-Card-CTA und Share mit `source_context=event_card`.
+- `js/today-home.js`: Today-Desktop-Direktaktionen mit `source_context=today_card`.
+- `api/organizer-portal/me.php`: Teilungsmetriken, objektgenaue Top-Inhalte und `impact_metrics` je jüngerer Einreichung.
+- `js/organizer-portal.js`: Wirkungskarte erweitert um Teilungen, stärkste Inhalte und Wirkung in Einreichungsdetails.
+- `scripts/audit-event-impact-tracking.py` und `EVENT_IMPACT_TRACKING.md` ergänzt.
+
+Lokal validiert:
+- `php -l api/value-track.php` OK.
+- `php -l api/organizer-portal/me.php` OK.
+- `php -l intern/seo-dashboard/index.php` OK.
+- `node --check config.js` OK.
+- `node --check js/events.js` OK.
+- `node --check js/details.js` OK.
+- `node --check js/today-home.js` OK.
+- `node --check js/organizer-portal.js` OK.
+- `python3 -m py_compile scripts/build-event-detail-pages.py scripts/growth-intelligence-backlog.py scripts/audit-event-impact-tracking.py` OK.
+- Gerenderter Test-HTML-Auszug aus `build-event-detail-pages.py` enthält `config.js`, `event_detail_view`, `event_share_click`; Inline-JS ohne JSON-LD besteht Syntaxprüfung per `new Function`.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+
+Nach Deployment prüfen:
+1. Auf Live mit Statistik-Zustimmung eine öffentliche Event-Detailseite öffnen; `/api/value-track.php` muss `event_detail_view` mit `source_context=public_detail_page` akzeptieren.
+2. Eventliste öffnen und Detailpanel öffnen; `event_detail_view` mit `source_context=event_panel` prüfen.
+3. Event-Share und Clipboard-Fallback testen; `event_share_click` bzw. `event_copy_link` prüfen.
+4. Website-/Ticket- und Maps-Klicks von Detailseite und Panel testen; Zielnavigation darf unverändert funktionieren.
+5. Anbieter-Dashboard öffnen; Wirkungskarte darf keine Besucher-/Buchungs-/Personenbehauptung enthalten und zeigt Teilungen/Top-Inhalte nur bei vorhandenen Messwerten.
+<!-- === END BLOCK: TEST_STATUS_EVENT_IMPACT_BACKBONE_2026_07_03 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_PREMIUM_COCKPIT_2026_07_06 | Zweck: dokumentiert Premium-Cockpit-Polish fuer den Veranstalterbereich inklusive Wirkungskarten-Sichtbarkeit; Umfang: Dashboard-IA, Mobile-Hierarchie, lokale Guards und Smoke === -->
+## Veranstalter-Dashboard Premium Cockpit – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Der Anbieterbereich beantwortet sofort: Ist alles okay, was ist sichtbar/in Prüfung, welche Wirkung haben veröffentlichte Veranstaltungen, wofür wird gezahlt.
+- Keine Zwei-Klassen-Optik im öffentlichen Produkt; der Premiumwert liegt im privaten Anbieter-Cockpit.
+- Wirkung steht oberhalb der langen Einreichungsliste und ist auch bei gemischten Veranstaltung-/Aktivitätskonten sichtbar.
+
+Umsetzung:
+- Dashboard-Reihenfolge: Hero mit Status, Wirkung, Einreichungen & Veröffentlichungen, Tarif & Nutzung, Kontakt & Organisation.
+- Wirkungskarten-Sichtbarkeit nicht mehr pauschal über Aktivitätstarife ausblenden; Event-Kontext zählt über Veranstaltungstarif, Event-Einreichung, veröffentlichte Events oder vorhandene Event-Wirkungsdaten.
+- Hero verdichtet auf klare Statuszeile wie `Alles okay · 5 sichtbar · 3 in Prüfung · 0 offen`.
+- Wirkungskarte visuell als Akzentkarte mit großer Hauptzahl und vier kompakten Metrikkacheln.
+- Einreichungen werden nach `Aktion nötig`, `In Prüfung`, `Veröffentlicht`, `Abgelehnt`, `Weitere` gruppiert.
+- Tarifkarte benennt sich als `Tarif & Nutzung` und Veranstaltungstarife werden verständlicher als Veranstaltungstarife markiert.
+- `scripts/audit-event-impact-tracking.py` prueft die Cockpit-Verdrahtung mit.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deployment prüfen:
+1. Gemischten Testaccount mit Veranstaltungstarif und Aktivitätstarif öffnen; die Karte `Wirkung auf Bocholt erleben` muss zwischen Hero und Einreichungen sichtbar sein.
+2. Mobile prüfen: Im ersten Scrollbereich müssen Status und Wirkung vor der langen Einreichungsliste erscheinen.
+3. Einreichungsliste prüfen: Gruppenüberschriften erscheinen nur für vorhandene Statusgruppen und Details bleiben aufklappbar.
+4. Reinen Aktivitätsaccount ohne Event-Kontext prüfen, falls vorhanden: Event-Wirkungskarte darf dort weiterhin nicht irritierend erscheinen.
+5. Tarif & Nutzung prüfen: Monatsbetrag, aktive Tarife und Nutzung bleiben korrekt.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_PREMIUM_COCKPIT_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_PREMIUM_COCKPIT_POLISH_2026_07_06 | Zweck: dokumentiert finalen visuellen Dashboard-Polish, einklappbare Einreichungen und kommerzielle Funnel-Abgrenzung; Umfang: CSS/JS/HTML/Commercial-Strategy/Guard-Smoke === -->
+## Veranstalter-Dashboard Premium Cockpit Polish – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Das Cockpit bleibt strukturell wie im Premium-Zielzustand: Status, Wirkung, Einreichungen, Tarif, Kontakt.
+- Der Look wird wieder konsistent mit dem restlichen Bocholt-erleben-System: keine harten schwarzen Rahmen, keine Alert-Balkenoptik, ruhigere Akzentkarte.
+- Lange Einreichungslisten sind im Normalfall eingeklappt, damit Mobile nicht wieder zur Verwaltungsseite wird.
+- Kostenlose Vorschläge und Startpartner werden strategisch getrennt: Hinweis-Kanal ohne Anbieterleistung; 90-Tage-Startpartner-Pilot mit Wirkungsmessung als Bindungsinstrument.
+
+Umsetzung:
+- Hero visuell entschärft: dezente Border-/Surface-Optik statt harter Outline.
+- Status im Hero: klare Hauptaussage (`Alles okay` / `Aktion nötig`) plus kompakte Kennzahlen in der Notiz (`keine Zahlung offen`).
+- Wirkungskarte ruhiger gestaltet: keine linke Balkenoptik, keine doppelte Zeitraum-Codierung, große Hauptzahl plus vier kompakte Metriken.
+- `Einreichungen & Veröffentlichungen` bleibt die Überschrift im Dashboard.
+- Einreichungsbereich bekommt `organizer-dashboard-submissions-toggle` und ist ohne Aktionsbedarf standardmäßig eingeklappt.
+- Bei Zahlung/offener Aktion bleibt die Liste automatisch offen.
+- `COMMERCIAL_STRATEGY.md` definiert den kostenlosen Hinweis-Kanal und den finalen 90-Tage-Startpartner-Pilot.
+- `scripts/audit-event-impact-tracking.py` prüft die Toggle-/Cockpit-Verdrahtung mit.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deployment prüfen:
+1. Gemischten Testaccount öffnen: Hero hat keinen schwarzen Rahmen; Wirkungskarte ist sichtbar, aber ruhiger und ohne linken Warnbalken.
+2. Mobile prüfen: Wirkung steht vor Einreichungen; Einreichungsliste ist ohne Aktion nötig standardmäßig eingeklappt.
+3. `Einreichungen anzeigen` öffnen; Gruppen und Detail-Aufklappen funktionieren weiter.
+4. Account mit Zahlung/offener Aktion prüfen, falls vorhanden: Einreichungen sollen automatisch offen sein.
+5. Tarif & Nutzung, Kontakt, Logout und Dashboard-Navigation bleiben unverändert funktionsfähig.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_PREMIUM_COCKPIT_POLISH_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_MOBILE_DENSITY_2026_07_06 | Zweck: dokumentiert Mobile-Dichte, einklappbare Wirkungswert-Erklaerung und kompakten Tarifbereich; Umfang: JS/CSS/HTML/Guard-Smoke === -->
+## Veranstalter-Dashboard Mobile Density + Wirkungswerte-Erklärung – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Das Premium-Cockpit bleibt in der Reihenfolge Status, Wirkung, Einreichungen, Tarif, Kontakt.
+- Mobile wird vertikal deutlich verdichtet, ohne Wirkung und Verständlichkeit zu verlieren.
+- Wirkungswerte werden nicht mehr dauerhaft mit langem Fließtext erklärt, sondern über `Was wird gezählt?` direkt in der Wirkungskarte aufklappbar gemacht.
+- Einreichungsstatus und Tarif/Nutzung werden auf Mobile kompakter, damit die Seite nicht wieder zur langen Verwaltungsansicht wird.
+
+Umsetzung:
+- Wirkungskarte verdichtet: kleinere Abstände, flachere Metrikzeilen statt großer 2×2-Kachelwirkung, kurze Nullzustandszeile.
+- Erklärung der Wirkungswerte als aufklappbares Detail `Was wird gezählt?` ergänzt.
+- Erklärung grenzt sauber ab: gemessene Aktionen, keine eindeutigen Personen, keine Ticketverkäufe, keine Besucherzahlen vor Ort.
+- Einreichungs-Zusammenfassung auf Mobile von großen Statusboxen zu kompakter Text-/Chipzeile verdichtet.
+- Tarif & Nutzung zeigt zuerst nur Monatsbetrag und Nutzung (`Veranstaltungen 2/3 · Aktivitäten 5/5`) und legt Einzelposten in `Details anzeigen`.
+- Dashboard-Script-Cache-Buster auf `2026-07-06-organizer-dashboard-density-v1` angehoben.
+- `scripts/audit-event-impact-tracking.py` prüft die neue Erklärung und kompakte Tarif-Verdrahtung.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+- `php -l api/organizer-portal/me.php` OK.
+
+Nach Deployment prüfen:
+1. Mobile öffnen: Status und Wirkung müssen weiterhin vor Einreichungen sichtbar sein, aber mit weniger Scrollhöhe.
+2. Wirkungskarte prüfen: `Was wird gezählt?` öffnet die Erklärung und lässt sich wieder schließen.
+3. Einreichungen prüfen: Standardmäßig kompakt; `Einreichungen anzeigen` öffnet weiterhin die gruppierte Liste.
+4. Tarif & Nutzung prüfen: Monatsbetrag und Nutzung sind sofort sichtbar; `Details anzeigen` öffnet aktive Tarife und enthaltene Kontingente.
+5. Desktop kurz prüfen: Wirkung, Einreichungen und Tarif bleiben lesbar und brechen nicht.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_MOBILE_DENSITY_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_IMPACT_DRILLDOWN_2026_07_06 | Zweck: dokumentiert finalen Premium-Status, persoenliche Wirkungskarte und Einzelwirkung im jeweiligen Inhalt; Umfang: JS/CSS/HTML/Guard-Smoke === -->
+## Veranstalter-Dashboard Premium Impact Drilldown – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Das Anbieter-Cockpit nutzt professionelle Statussprache statt generischem `Alles okay`.
+- Die Wirkungskarte ist persönlich benannt: `Deine Wirkung auf Bocholt erleben`.
+- Gesamtwirkung bleibt kompakt oben sichtbar.
+- Objektgenaue Wirkung wird nicht als lange zusätzliche Dashboard-Tabelle ausgespielt, sondern im jeweiligen geöffneten Inhalt gezeigt.
+- Mobile bleibt dicht: lange Listen, Tarifdetails und Erklärungen bleiben auf Klick erreichbar.
+
+Umsetzung:
+- Hero-Status auf `Keine Rückmeldung erforderlich` / `Rückmeldung erforderlich` umgestellt.
+- Kennzahlen in Hero und Einreichungsbereich als natürliche Zeile formuliert (`5 sichtbar · 3 in Prüfung · keine Zahlung offen`).
+- Wirkungstitel auf `Deine Wirkung auf Bocholt erleben` geändert.
+- Wirkungsmessung sprachlich auf Events und Aktivitäten erweitert (`Website/Info` statt `Website/Ticket`).
+- Erklärung `Was wird gezählt?` auf veröffentlichte Inhalte bezogen und weiterhin einklappbar gehalten.
+- Stärkster Inhalt wird nur bei vorhandenen Daten kompakt angezeigt.
+- Veröffentlichte Einträge zeigen im geöffneten Detail `Wirkung dieses Inhalts` mit Detail-Aufrufen, Website/Info, Route/Maps und Teilungen; bei 0 Werten sauberer Nullzustand.
+- `scripts/audit-event-impact-tracking.py` prüft die finalen Begriffe und den neuen Cache-Buster.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+- `php -l api/organizer-portal/me.php` OK.
+
+Nach Deployment prüfen:
+1. Dashboard-Hero zeigt nicht mehr `Alles okay`, sondern `Keine Rückmeldung erforderlich` oder bei offenen Punkten `Rückmeldung erforderlich`.
+2. Wirkungskarte heißt `Deine Wirkung auf Bocholt erleben`.
+3. `Was wird gezählt?` erklärt veröffentlichte Inhalte und die Abgrenzung zu Personen, Ticketverkäufen und Vor-Ort-Besuchern.
+4. Einreichungsbereich bleibt eingeklappt, solange keine Rückmeldung erforderlich ist.
+5. Veröffentlichte Einreichung öffnen: `Wirkung dieses Inhalts` erscheint mit 28-Tage-Werten oder sauberem Nullzustand.
+6. Tarifdetails bleiben eingeklappt und öffnen weiter über `Details anzeigen`.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_IMPACT_DRILLDOWN_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_SCOPE_COCKPIT_2026_07_06 | Zweck: dokumentiert final reduzierte Anbieter-Cockpit-Struktur mit zentraler Gesamt-/Einzelwirkungs-Auswahl; Umfang: JS/CSS/HTML/Guard-Smoke === -->
+## Veranstalter-Dashboard Scope Cockpit – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Dashboard beantwortet zuerst die Nutzerfragen: Muss ich etwas tun? Was bringt mir Bocholt erleben? Was ist veröffentlicht oder in Prüfung? Was nutze und zahle ich?
+- Veröffentlichungszahlen werden nicht mehr mehrfach wiederholt.
+- Hero zeigt nur noch den Handlungsstatus, nicht zusätzlich Veröffentlichungsstatistiken.
+- Wirkungskarte wird zur zentralen Auswertung mit `Gesamtwirkung deiner Inhalte` und optionaler Auswahl einzelner veröffentlichter Events/Aktivitäten.
+- Einreichungen und Tarifdetails bleiben kompakt und nutzen ein einheitlicheres Disclosure-Pattern.
+
+Umsetzung:
+- Hero-Note für reguläre Anbieterbereiche entfernt; Zahlen stehen nur noch im passenden Einreichungsbereich.
+- Einreichungsbereich zeigt nur eine Veröffentlichungs-Zusammenfassung (`5 sichtbar · 3 in Prüfung · 2 abgelehnt · keine Zahlung offen`) plus einen erklärenden Statussatz.
+- Doppelte Einreichungs-Statuschips/-Kacheln im Runtime-Rendering entfernt.
+- Wirkungskarte enthält eine zentrale Scope-Auswahl: `Gesamtwirkung deiner Inhalte` plus veröffentlichte Einträge, sofern zuordenbar.
+- Einzelwirkung kann direkt in der Wirkungskarte ausgewählt werden und bleibt zusätzlich im geöffneten Eintrag sichtbar.
+- `Einreichungen anzeigen` ist visuell als Disclosure statt als großer CTA gestaltet; primäre Aktionen bleiben Buttons.
+- Dashboard-Script-Cache-Buster auf `2026-07-06-organizer-dashboard-scope-cockpit-v1` angehoben.
+- `scripts/audit-event-impact-tracking.py` prüft Scope-Auswahl, Begriffe und Cache-Buster.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+- `php -l api/organizer-portal/me.php` OK.
+
+Nach Deployment prüfen:
+1. Hero zeigt nur Organisation und Handlungsstatus; keine sichtbaren/in-Prüfung/abgelehnt-Zahlen im Hero.
+2. Wirkungskarte zeigt `Gesamtwirkung deiner Inhalte`; bei veröffentlichten Einträgen ist eine Auswahl einzelner Inhalte verfügbar.
+3. Wechsel in der Wirkungsauswahl aktualisiert die vier Metriken und den Null-/Statussatz.
+4. Einreichungen zeigen die Statuszahlen nur einmal und öffnen über `Einreichungen anzeigen`.
+5. Tarifdetails öffnen weiterhin über `Details anzeigen`.
+6. Veröffentlichte Einträge zeigen im geöffneten Detail weiterhin `Wirkung dieses Inhalts`.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_SCOPE_COCKPIT_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_PREMIUM_CONSOLIDATION_2026_07_06 | Zweck: dokumentiert die finale Gesamtkonsolidierung des Anbieter-Cockpits ohne Zahlen-Dopplungen und mit robuster Wirkungsauswahl; Umfang: JS/API/CSS/HTML/Guard-Smoke === -->
+## Veranstalter-Dashboard Premium Consolidation Final – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Dashboard als kompaktes Premium-Cockpit statt Summe einzelner Reparaturen.
+- Jede Information erscheint genau einmal an der passenden Stelle.
+- Hero beantwortet nur die Frage, ob der Anbieter handeln muss.
+- Wirkungskarte ist das zentrale Verkaufsargument: Gesamtwirkung und bei vorhandenen veröffentlichten Inhalten objektgenaue Einzelwirkung.
+- Einreichungen, Tarifdetails und Erklärungen bleiben erreichbar, dominieren aber nicht die mobile Startansicht.
+
+Umsetzung:
+- Statussprache auf `Keine Aktion erforderlich` / `Aktion erforderlich` finalisiert.
+- Veröffentlichungszahlen aus dem Hero entfernt und im Bereich `Einreichungen & Veröffentlichungen` belassen.
+- Redundanter Prüfungssatz im Einreichungsbereich entfernt; bei keiner offenen Aktion bleibt nur die kompakte Zusammenfassung.
+- Zahlungshinweis erscheint nur noch, wenn tatsächlich eine Zahlung offen ist.
+- Wirkungstitel bewusst zweizeilig gesetzt: `Deine Wirkung` / `auf Bocholt erleben`.
+- Formularhaftes Label `Auswertung` entfernt; die Wirkungsauswahl wirkt kompakter als Scope-Auswahl.
+- Wirkungsauswahl nutzt `published_content` aus dem API-Payload, damit veröffentlichte Inhalte nicht an die sichtbare Einreichungsliste gekoppelt sind.
+- API liefert `published_content` mit Impact-Metriken für veröffentlichte Events/Aktivitäten zusätzlich zu `recent_submissions`.
+- Einreichungs-Payload auf bis zu 100 relevante Einträge erweitert, damit Statuszahlen und Liste nicht bei 10 Einträgen künstlich abschneiden.
+- Guard prüft Cache-Buster, neue Statussprache, `published_content`, Scope-Auswahl und finale CSS-Override-Markierung.
+
+Lokal validiert:
+- `node --check js/organizer-portal.js` OK.
+- `php -l api/organizer-portal/me.php` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deployment prüfen:
+1. Hero zeigt nur Organisation und `Keine Aktion erforderlich` bzw. bei offenen Punkten `Aktion erforderlich`.
+2. Im Hero stehen keine sichtbaren/in-Prüfung/abgelehnt-Zahlen.
+3. `Einreichungen & Veröffentlichungen` zeigt nur eine Statuszeile; kein redundanter Prüfungssatz bei keiner offenen Aktion.
+4. Zahlung wird nur erwähnt, wenn tatsächlich Zahlung offen ist.
+5. Wirkungskarte zeigt `Deine Wirkung` / `auf Bocholt erleben` und kein Label `Auswertung`.
+6. Wenn mehrere veröffentlichte Inhalte vorhanden sind, erlaubt die Wirkungsauswahl Gesamtwirkung plus einzelne Inhalte.
+7. Wenn nur Gesamtwirkung verfügbar ist, erscheint kein Fake-Dropdown.
+8. Geöffnete veröffentlichte Einträge zeigen weiterhin `Wirkung dieses Inhalts`.
+9. `Was wird gezählt?`, `Einreichungen anzeigen` und `Details anzeigen` wirken als konsistente Aufklappbereiche.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_PREMIUM_CONSOLIDATION_2026_07_06 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_FINAL_STATE_2026_07_06 | Zweck: dokumentiert den finalen Premium-Grundzustand des Veranstalter-Dashboards nach Gesamtkonsolidierung; Umfang: Anbieter-Cockpit, Wirkungsauswahl, Einreichungen, Validierung === -->
+## Veranstalter-Dashboard Final State – 2026-07-06
+
+Status: Patch vorbereitet.
+
+Ziel:
+- Das Dashboard wird als ruhiges Anbieter-Cockpit verstanden, nicht als Verwaltungsübersicht.
+- Der Grundzustand beantwortet sofort: Muss ich etwas tun? Welche Wirkung erzeugen meine Inhalte? Wo finde ich Einreichungen und Tarifdetails?
+- Lange Verwaltungslisten bleiben grundsätzlich eingeklappt, auch wenn offene Aktionen vorhanden sind.
+- Offene Aktionen werden kompakt sichtbar gemacht, ohne die mobile Startansicht zu dominieren.
+
+Umsetzung:
+- Einreichungen & Veröffentlichungen sind im Dashboard-Grundzustand immer eingeklappt; nur die Einzelstatus-Seite bleibt direkt geöffnet.
+- Entwürfe, Checkout und offene Zahlungsschritte zählen als `actionRequired` und steuern den Hero-Status `Aktion erforderlich`.
+- Bei offenen Aktionen erscheint nur ein kompakter Hinweis wie `2 Aktionen erforderlich`; die lange Liste öffnet erst auf Nutzerklick.
+- Veröffentlichungszahlen stehen weiterhin nur im Bereich `Einreichungen & Veröffentlichungen`; keine Wiederholung im Hero.
+- Der redundante Prüfungssatz bleibt im Normalzustand ausgeblendet.
+- Die Wirkungskarte bleibt das zentrale Verkaufsargument mit Gesamtwirkung und objektgenauer Inhaltsauswahl.
+- Der Nullzustand kommuniziert sauber: `Messung aktiv. Noch keine Aktionen in den letzten 28 Tagen.`
+- Aufklappbereiche bleiben konsistent: `Was wird gezählt?`, `Einreichungen anzeigen`, `Details anzeigen`.
+- Dashboard-Script-Cache-Buster auf `2026-07-06-organizer-dashboard-final-state-v1` angehoben.
+
+Lokal validiert:
+- `php -l api/organizer-portal/me.php` OK.
+- `node --check js/organizer-portal.js` OK.
+- `python3 scripts/audit-event-impact-tracking.py` OK.
+- `python3 tools/audit-css-governance.py` OK.
+
+Nach Deployment prüfen:
+1. Hero zeigt `Keine Aktion erforderlich` oder bei Entwürfen/offenen Zahlungsschritten `Aktion erforderlich`.
+2. Einreichungen & Veröffentlichungen sind beim Laden grundsätzlich geschlossen.
+3. Bei offenen Aktionen erscheint nur eine kompakte Hinweiszeile, keine automatisch geöffnete Liste.
+4. Klick auf `Einreichungen anzeigen` öffnet die gruppierte Liste; erneuter Klick schließt sie.
+5. Wirkungskarte bleibt sichtbar, mit Gesamtwirkung und bei mehreren veröffentlichten Inhalten mit Einzelauswahl.
+6. `Was wird gezählt?` und `Details anzeigen` funktionieren weiter als konsistente Disclosure-Controls.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_FINAL_STATE_2026_07_06 === -->
+
+
+## Organizer Dashboard Final Action CTA – 2026-07-06
+
+- Finaler Anbieter-Dashboard-Abschluss auf Basis des Premium-Cockpit-Zielzustands.
+- Bei `Aktion erforderlich` ist die primäre Hero-Aktion jetzt `Offene Aktionen anzeigen`; sie öffnet den kompakten Einreichungsbereich gezielt und scrollt dorthin.
+- `Neue Veranstaltung einreichen` bleibt als sekundäre Aktion erreichbar, damit der Anbieter weiterhin direkt neue Inhalte anlegen kann.
+- Einreichungen & Veröffentlichungen bleiben im Grundzustand weiterhin geschlossen; offene Punkte werden nur kompakt markiert.
+- Die Wirkungsauswahl bleibt defensiv: Ein Dropdown erscheint nur, wenn neben der Gesamtwirkung echte veröffentlichte Inhalte auswählbar sind.
+
+Validierung lokal: `php -l api/organizer-portal/me.php`, `node --check js/organizer-portal.js`, `python3 scripts/audit-event-impact-tracking.py`, `python3 tools/audit-css-governance.py`.
+
+## 2026-07-06 – Veranstalter-Dashboard Status-Semantik final
+
+- Entwurf wird nicht mehr als harte Aktion gewertet.
+- Hero unterscheidet jetzt sauber zwischen `Keine Aktion erforderlich`, `Entwürfe offen` und blockierender `Aktion erforderlich`.
+- Primäre Hero-CTA folgt dem Zustand: `Entwürfe anzeigen` bei Entwürfen, `Offene Aktionen anzeigen` bei Zahlung/Blocker, sonst neue Einreichung.
+- Einreichungen bleiben initial geschlossen; Entwürfe erscheinen als eigene Gruppe `Entwürfe`, blockierende Zustände als `Aktion erforderlich`.
+- Kompakte Einreichungszeile zeigt aktive Zustände und keine historischen Ablehnungen prominent.
+- Hero-Sekundäraktionen wurden visuell entschärft, damit Wirkung und Status schneller sichtbar bleiben.
+
+Validierung: `php -l api/organizer-portal/me.php`, `node --check js/organizer-portal.js`, `python3 scripts/audit-event-impact-tracking.py`, `python3 tools/audit-css-governance.py`.
+

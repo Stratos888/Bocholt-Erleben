@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS value_metric_daily (
     reporting_target_id VARCHAR(191) NOT NULL DEFAULT '',
     reporting_target_title VARCHAR(255) NULL,
     page_path VARCHAR(255) NULL,
+    source_context VARCHAR(64) NOT NULL DEFAULT '',
     bucket_hash CHAR(64) NOT NULL,
     count_value INT UNSIGNED NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -103,7 +104,8 @@ CREATE TABLE IF NOT EXISTS value_metric_daily (
     UNIQUE KEY uq_value_metric_daily_bucket (bucket_hash),
     KEY idx_value_metric_daily_date_key (metric_date, metric_key),
     KEY idx_value_metric_daily_entity (metric_date, entity_type, entity_id),
-    KEY idx_value_metric_daily_reporting_target (metric_date, reporting_target_type, reporting_target_id)
+    KEY idx_value_metric_daily_reporting_target (metric_date, reporting_target_type, reporting_target_id),
+    KEY idx_value_metric_daily_source_context (metric_date, metric_key, source_context)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 SQL);
 
@@ -116,8 +118,14 @@ SQL);
     if (!be_seo_dashboard_value_metrics_column_exists($pdo, 'reporting_target_title')) {
         $pdo->exec('ALTER TABLE value_metric_daily ADD COLUMN reporting_target_title VARCHAR(255) NULL AFTER reporting_target_id');
     }
+    if (!be_seo_dashboard_value_metrics_column_exists($pdo, 'source_context')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD COLUMN source_context VARCHAR(64) NOT NULL DEFAULT "" AFTER page_path');
+    }
     if (!be_seo_dashboard_value_metrics_index_exists($pdo, 'idx_value_metric_daily_reporting_target')) {
         $pdo->exec('ALTER TABLE value_metric_daily ADD KEY idx_value_metric_daily_reporting_target (metric_date, reporting_target_type, reporting_target_id)');
+    }
+    if (!be_seo_dashboard_value_metrics_index_exists($pdo, 'idx_value_metric_daily_source_context')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD KEY idx_value_metric_daily_source_context (metric_date, metric_key, source_context)');
     }
 }
 /* === END BLOCK: INTERNAL_SEO_DASHBOARD_REPORTING_TARGET_SCHEMA_V1 === */
@@ -148,6 +156,8 @@ function be_seo_dashboard_empty_metrics(): array
         'maps_clicks' => 0,
         'location_clicks' => 0,
         'organizer_cta_clicks' => 0,
+        'share_clicks' => 0,
+        'copy_link_clicks' => 0,
         'detail_views' => 0,
         'performing_events' => 0,
         'performing_locations' => 0,
@@ -206,7 +216,7 @@ FROM (
     WHERE metric_date BETWEEN :start_date AND :end_date
       AND entity_type = 'event'
       AND entity_id <> ''
-      AND metric_key IN ('event_detail_view', 'website_click', 'maps_click', 'location_click')
+      AND metric_key IN ('event_detail_view', 'website_click', 'maps_click', 'location_click', 'event_share_click', 'event_copy_link')
     GROUP BY entity_id
     HAVING SUM(count_value) > 0
 ) AS event_metrics
@@ -223,7 +233,7 @@ FROM (
     SELECT COALESCE(NULLIF(destination_url, ''), NULLIF(entity_title, ''), NULLIF(entity_id, '')) AS location_key
     FROM value_metric_daily
     WHERE metric_date BETWEEN :start_date AND :end_date
-      AND metric_key IN ('website_click', 'maps_click', 'location_click')
+      AND metric_key IN ('website_click', 'maps_click', 'location_click', 'event_share_click', 'event_copy_link')
     GROUP BY location_key
     HAVING location_key IS NOT NULL AND location_key <> '' AND SUM(count_value) > 0
 ) AS location_metrics
@@ -239,6 +249,8 @@ SQL);
         'maps_clicks' => (int)($totals['maps_click'] ?? 0),
         'location_clicks' => (int)($totals['location_click'] ?? 0),
         'organizer_cta_clicks' => (int)($totals['organizer_cta_click'] ?? 0),
+        'share_clicks' => (int)($totals['event_share_click'] ?? 0),
+        'copy_link_clicks' => (int)($totals['event_copy_link'] ?? 0),
         'detail_views' => (int)(($totals['event_detail_view'] ?? 0) + ($totals['activity_detail_view'] ?? 0)),
         'performing_events' => $performingEvents,
         'performing_locations' => $performingLocations,
@@ -267,6 +279,8 @@ SELECT
     COALESCE(SUM(CASE WHEN metric_key = 'maps_click' THEN count_value ELSE 0 END), 0) AS maps_clicks,
     COALESCE(SUM(CASE WHEN metric_key = 'location_click' THEN count_value ELSE 0 END), 0) AS location_clicks,
     COALESCE(SUM(CASE WHEN metric_key = 'organizer_cta_click' THEN count_value ELSE 0 END), 0) AS organizer_cta_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'event_share_click' THEN count_value ELSE 0 END), 0) AS share_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'event_copy_link' THEN count_value ELSE 0 END), 0) AS copy_link_clicks,
     COALESCE(SUM(count_value), 0) AS total_interactions,
     COUNT(DISTINCT CASE WHEN entity_type <> '' AND entity_id <> '' THEN CONCAT(entity_type, ':', entity_id) ELSE NULL END) AS item_count
 FROM value_metric_daily
@@ -299,6 +313,8 @@ SQL);
             'maps_clicks' => (int)($row['maps_clicks'] ?? 0),
             'location_clicks' => (int)($row['location_clicks'] ?? 0),
             'organizer_cta_clicks' => (int)($row['organizer_cta_clicks'] ?? 0),
+            'share_clicks' => (int)($row['share_clicks'] ?? 0),
+            'copy_link_clicks' => (int)($row['copy_link_clicks'] ?? 0),
             'total_interactions' => (int)($row['total_interactions'] ?? 0),
             'item_count' => (int)($row['item_count'] ?? 0),
         ];
@@ -347,6 +363,8 @@ function be_seo_dashboard_read_configured_reporting_targets(): array
                 'maps_clicks' => 0,
                 'location_clicks' => 0,
                 'organizer_cta_clicks' => 0,
+                'share_clicks' => 0,
+                'copy_link_clicks' => 0,
                 'total_interactions' => 0,
                 'item_count' => 0,
                 'item_titles' => [],

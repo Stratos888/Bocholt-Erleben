@@ -160,11 +160,90 @@
   }
 
   function formatImpactPeriod(period) {
-    const start = formatDate(period?.start_date);
-    const end = formatDate(period?.end_date);
-    if (start === "–" && end === "–") return "Zeitraum: letzte 28 Tage";
-    return `Zeitraum: ${start} – ${end}`;
+    const compactDate = (value) => {
+      const text = safeText(value);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+        const [, month, day] = text.split("-");
+        return `${day}.${month}.`;
+      }
+
+      const formatted = formatDate(text);
+      return formatted === "–" ? "" : formatted.replace(/\.\d{4}$/, ".");
+    };
+
+    const start = compactDate(period?.start_date);
+    const end = compactDate(period?.end_date);
+    if (!start && !end) return "Letzte 28 Tage";
+    if (start && end) return `Letzte 28 Tage · ${start}–${end}`;
+    return "Letzte 28 Tage";
   }
+  function impactShareTotal(metrics) {
+    return metricValue(metrics, "share_clicks") + metricValue(metrics, "copy_link_clicks");
+  }
+
+  function renderImpactMetricRows(rows) {
+    return `
+      <span class="organizer-impact-metric-grid" role="list">
+        ${rows.map(([label, value]) => `
+          <span class="organizer-impact-metric" role="listitem">
+            <span class="organizer-impact-metric__label">${escapeHtml(label)}</span>
+            <span class="organizer-impact-metric__value">${escapeHtml(formatInteger(value))}</span>
+          </span>
+        `).join("")}
+      </span>
+    `;
+  }
+
+  function renderImpactItemRows(items) {
+    const topItem = (Array.isArray(items) ? items : [])
+      .filter((item) => metricValue(item?.metrics, "total_interactions") > 0)
+      .sort((a, b) => metricValue(b?.metrics, "total_interactions") - metricValue(a?.metrics, "total_interactions"))[0];
+
+    if (!topItem) return "";
+
+    const metrics = topItem?.metrics || {};
+    const title = safeText(topItem?.entity_title) || safeText(topItem?.entity_id) || "Veröffentlichter Inhalt";
+    const total = metricValue(metrics, "total_interactions");
+
+    return `
+      <span class="organizer-impact-top-item" role="note">
+        <span class="organizer-impact-top-item__label">Stärkster Inhalt</span>
+        <span class="organizer-impact-top-item__title">${escapeHtml(title)}</span>
+        <span class="organizer-impact-top-item__meta">${escapeHtml(formatInteger(total))} gemessene Aktionen</span>
+      </span>
+    `;
+  }
+
+  function renderSubmissionImpactHtml(submission) {
+    const metrics = submission?.impact_metrics || {};
+    const total = metricValue(metrics, "total_interactions");
+    const status = safeText(submission?.status).toLowerCase();
+    if (total <= 0 && status !== "approved") return "";
+
+    const shares = impactShareTotal(metrics);
+    const websiteOrInfo = metricValue(metrics, "website_clicks") + metricValue(metrics, "organizer_cta_clicks");
+    const routeOrMaps = metricValue(metrics, "maps_clicks") + metricValue(metrics, "location_clicks");
+    const note = total > 0
+      ? "Gemessene Aktionen in den letzten 28 Tagen."
+      : "Noch keine Aktionen in den letzten 28 Tagen.";
+
+    return `
+      <div class="organizer-submission-impact-fact">
+        <dt>Wirkung dieses Inhalts</dt>
+        <dd>
+          <span class="organizer-submission-impact-total">${escapeHtml(formatInteger(total))} gemessene Aktionen</span>
+          <span class="organizer-submission-impact-note">${escapeHtml(note)}</span>
+          <span class="organizer-submission-impact-grid" role="list">
+            <span role="listitem"><span>Detail-Aufrufe</span><strong>${escapeHtml(formatInteger(metricValue(metrics, "detail_views")))}</strong></span>
+            <span role="listitem"><span>Website/Info</span><strong>${escapeHtml(formatInteger(websiteOrInfo))}</strong></span>
+            <span role="listitem"><span>Route/Maps</span><strong>${escapeHtml(formatInteger(routeOrMaps))}</strong></span>
+            <span role="listitem"><span>Teilungen</span><strong>${escapeHtml(formatInteger(shares))}</strong></span>
+          </span>
+        </dd>
+      </div>
+    `;
+  }
+
 
   function formatDateTime(value) {
     const text = safeText(value);
@@ -591,8 +670,12 @@ function normalizeExternalUrl(value) {
     const grouped = new Map();
 
     (Array.isArray(activeSubscriptions) ? activeSubscriptions : []).forEach((item) => {
-      const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
+      const planKey = safeText(item?.plan_key).toLowerCase();
+      let label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
       const amount = safeText(item?.monthly_amount_label) || "–";
+      if (["starter", "active", "unlimited"].includes(planKey) && !/veranstaltung/i.test(label)) {
+        label = `${label} – Veranstaltungen`;
+      }
       if (!label) return;
 
       const key = `${label}||${amount}`;
@@ -629,13 +712,47 @@ function normalizeExternalUrl(value) {
     if (buckets.events.unlimited) {
       rows.push("Veranstaltungen: unbegrenzt veröffentlichte Termine");
     } else if (buckets.events.consumed > 0 || buckets.events.included > 0) {
-      rows.push(`Veranstaltungen: ${formatInteger(buckets.events.consumed)} von ${formatInteger(buckets.events.included)} veröffentlichten Terminen genutzt`);
+      rows.push(`Veranstaltungen: ${formatInteger(buckets.events.consumed)} von ${formatInteger(buckets.events.included)} Terminen genutzt`);
     }
 
     if (buckets.activities.unlimited) {
       rows.push("Aktivitäten: unbegrenzt veröffentlichte Aktivitäten");
     } else if (buckets.activities.consumed > 0 || buckets.activities.included > 0) {
-      rows.push(`Aktivitäten: ${formatInteger(buckets.activities.consumed)} von ${formatInteger(buckets.activities.included)} veröffentlichten Aktivitäten genutzt`);
+      rows.push(`Aktivitäten: ${formatInteger(buckets.activities.consumed)} von ${formatInteger(buckets.activities.included)} Aktivitäten genutzt`);
+    }
+
+    return rows;
+  }
+
+  function buildOrganizerIncludedCompactRows(quotaByPlan) {
+    const buckets = {
+      events: { consumed: 0, included: 0, unlimited: false },
+      activities: { consumed: 0, included: 0, unlimited: false }
+    };
+
+    (Array.isArray(quotaByPlan) ? quotaByPlan : []).forEach((item) => {
+      const planKey = safeText(item?.plan_key).toLowerCase();
+      const bucket = ["activity_basic", "activity_plus"].includes(planKey) ? buckets.activities : buckets.events;
+
+      if (!["starter", "active", "unlimited", "activity_basic", "activity_plus"].includes(planKey)) return;
+
+      bucket.consumed += Number(item?.consumed_total || 0);
+      bucket.included += Number(item?.included_total || 0);
+      bucket.unlimited = bucket.unlimited || Boolean(item?.has_unlimited);
+    });
+
+    const rows = [];
+
+    if (buckets.events.unlimited) {
+      rows.push("Veranstaltungen unbegrenzt");
+    } else if (buckets.events.consumed > 0 || buckets.events.included > 0) {
+      rows.push(`Veranstaltungen ${formatInteger(buckets.events.consumed)}/${formatInteger(buckets.events.included)}`);
+    }
+
+    if (buckets.activities.unlimited) {
+      rows.push("Aktivitäten unbegrenzt");
+    } else if (buckets.activities.consumed > 0 || buckets.activities.included > 0) {
+      rows.push(`Aktivitäten ${formatInteger(buckets.activities.consumed)}/${formatInteger(buckets.activities.included)}`);
     }
 
     return rows;
@@ -672,6 +789,138 @@ function normalizeExternalUrl(value) {
     return "Veranstaltungen";
   }
 
+  function getOrganizerDashboardCounts(submissions) {
+    const rows = Array.isArray(submissions) ? submissions : [];
+    const blockingStatuses = new Set(["checkout_started", "payment_released"]);
+    const paymentStatuses = new Set(["checkout_started", "payment_released"]);
+
+    return {
+      visible: rows.filter((item) => safeText(item?.status).toLowerCase() === "approved").length,
+      review: rows.filter((item) => {
+        const status = safeText(item?.status).toLowerCase();
+        return status === "pending_review" || status === "paid" || status === "in_review";
+      }).length,
+      draftOpen: rows.filter((item) => safeText(item?.status).toLowerCase() === "draft").length,
+      actionRequired: rows.filter((item) => blockingStatuses.has(safeText(item?.status).toLowerCase())).length,
+      paymentOpen: rows.filter((item) => paymentStatuses.has(safeText(item?.status).toLowerCase())).length,
+      rejected: rows.filter((item) => safeText(item?.status).toLowerCase() === "rejected").length
+    };
+  }
+
+  function buildOrganizerDashboardStatus(counts) {
+    const actionRequired = Number(counts?.actionRequired || 0);
+    const draftOpen = Number(counts?.draftOpen || 0);
+
+    if (actionRequired > 0) {
+      return {
+        type: "action",
+        label: "Aktion erforderlich",
+        detail: actionRequired === 1
+          ? "1 offener Punkt wartet auf Bearbeitung."
+          : `${formatInteger(actionRequired)} offene Punkte warten auf Bearbeitung.`,
+        actionText: `${formatInteger(actionRequired)} Aktion${actionRequired === 1 ? "" : "en"} erforderlich`,
+        primaryCta: "Offene Aktionen anzeigen"
+      };
+    }
+
+    if (draftOpen > 0) {
+      return {
+        type: "draft",
+        label: draftOpen === 1 ? "1 Entwurf offen" : `${formatInteger(draftOpen)} Entwürfe offen`,
+        detail: draftOpen === 1
+          ? "Eine begonnene Einreichung wurde noch nicht abgeschickt."
+          : "Begonnene Einreichungen wurden noch nicht abgeschickt.",
+        actionText: draftOpen === 1 ? "1 Entwurf offen" : `${formatInteger(draftOpen)} Entwürfe offen`,
+        primaryCta: "Entwürfe anzeigen"
+      };
+    }
+
+    return {
+      type: "ok",
+      label: "Keine Aktion erforderlich",
+      detail: "",
+      actionText: "",
+      primaryCta: ""
+    };
+  }
+
+  function formatOrganizerCountItem(count, singular, plural = singular) {
+    const value = Number(count || 0);
+    return `${formatInteger(value)} ${value === 1 ? singular : plural}`;
+  }
+
+  function formatOrganizerCountsLine(counts) {
+    const parts = [
+      formatOrganizerCountItem(counts?.visible || 0, "sichtbar"),
+      `${formatInteger(counts?.review || 0)} in Prüfung`,
+    ];
+
+    if (Number(counts?.paymentOpen || 0) > 0) {
+      parts.push(`${formatInteger(counts.paymentOpen)} Zahlung offen`);
+    }
+
+    if (Number(counts?.draftOpen || 0) > 0) {
+      parts.push(formatOrganizerCountItem(counts.draftOpen, "Entwurf", "Entwürfe"));
+    }
+
+    return parts.join(" · ");
+  }
+
+  function organizerHasEventImpactContext({ activeSubscriptions, subscriptionPlanKey, defaultPlanKey, submissions, impactSummary }) {
+    const planKeys = new Set(
+      (Array.isArray(activeSubscriptions) ? activeSubscriptions : [])
+        .map((item) => safeText(item?.plan_key).toLowerCase())
+        .filter(Boolean)
+    );
+    [subscriptionPlanKey, defaultPlanKey].forEach((key) => {
+      const normalized = safeText(key).toLowerCase();
+      if (normalized) planKeys.add(normalized);
+    });
+
+    const hasEventPlan = ["starter", "active", "unlimited"].some((key) => planKeys.has(key));
+    const hasEventSubmission = (Array.isArray(submissions) ? submissions : [])
+      .some((item) => safeText(item?.submission_kind || "event").toLowerCase() !== "activity");
+    const metrics = impactSummary?.metrics || {};
+    const hasImpactMetrics = metricValue(metrics, "total_interactions") > 0 ||
+      metricValue(metrics, "detail_views") > 0 ||
+      metricValue(metrics, "website_clicks") > 0 ||
+      metricValue(metrics, "maps_clicks") > 0 ||
+      impactShareTotal(metrics) > 0;
+    const hasImpactItems = (Array.isArray(impactSummary?.items) ? impactSummary.items : [])
+      .some((item) => metricValue(item?.metrics, "total_interactions") > 0);
+
+    return hasEventPlan || hasEventSubmission || hasImpactMetrics || hasImpactItems;
+  }
+
+  function organizerSubmissionGroupKey(submission) {
+    const status = safeText(submission?.status).toLowerCase();
+    if (status === "payment_released" || status === "checkout_started") return "action";
+    if (status === "draft") return "draft";
+    if (status === "pending_review" || status === "paid" || status === "in_review") return "review";
+    if (status === "approved") return "published";
+    if (status === "rejected") return "rejected";
+    return "other";
+  }
+
+  function buildOrganizerSubmissionGroups(submissions) {
+    const order = [
+      ["action", "Aktion erforderlich"],
+      ["draft", "Entwürfe"],
+      ["review", "In Prüfung"],
+      ["published", "Veröffentlicht"],
+      ["rejected", "Abgelehnt"],
+      ["other", "Weitere"]
+    ];
+    const buckets = new Map(order.map(([key, label]) => [key, { key, label, items: [] }]));
+
+    (Array.isArray(submissions) ? submissions : []).forEach((item) => {
+      const key = organizerSubmissionGroupKey(item);
+      (buckets.get(key) || buckets.get("other")).items.push(item);
+    });
+
+    return order.map(([key]) => buckets.get(key)).filter((group) => group.items.length > 0);
+  }
+
   function renderOrganizerSubmissionsSummary(context) {
     const summary = document.getElementById("organizer-dashboard-submissions-summary");
     const overview = document.getElementById("organizer-dashboard-submissions-overview");
@@ -700,49 +949,216 @@ function normalizeExternalUrl(value) {
       `).join("");
 
       nextStep.textContent = "Öffne unten die Einreichung, um Status, Angaben und mögliche Änderungen zu prüfen.";
+      nextStep.hidden = false;
+      nextStep.removeAttribute("hidden");
       return;
     }
 
-    const visibleCount = submissions.filter((item) => safeText(item?.status).toLowerCase() === "approved").length;
-    const reviewCount = submissions.filter((item) => {
-      const status = safeText(item?.status).toLowerCase();
-      return status === "pending_review" || status === "paid" || status === "in_review";
-    }).length;
-    const paymentOpenCount = submissions.filter((item) => {
-      const status = safeText(item?.status).toLowerCase();
-      return status === "payment_released" || status === "checkout_started";
-    }).length;
-    const rejectedCount = submissions.filter((item) => safeText(item?.status).toLowerCase() === "rejected").length;
-    const areaLabel = organizerSubmissionAreaLabel(activeSubscriptions, submissions, context?.isActivityPlanView);
+    const counts = context?.counts || getOrganizerDashboardCounts(submissions);
+    const status = buildOrganizerDashboardStatus(counts);
 
-    summary.textContent = `${areaLabel} · ${formatInteger(visibleCount)} sichtbar · ${formatInteger(reviewCount)} in Prüfung`;
+    summary.textContent = formatOrganizerCountsLine(counts);
 
-    overview.innerHTML = [
-      ["Sichtbar", formatInteger(visibleCount)],
-      ["In Prüfung", formatInteger(reviewCount)],
-      ["Zahlung offen", formatInteger(paymentOpenCount)],
-      ["Abgelehnt", formatInteger(rejectedCount)]
-    ].map(([label, value]) => `
-      <span class="organizer-submission-summary-item" role="listitem">
-        <span class="organizer-submission-summary-label">${escapeHtml(label)}</span>
-        <span class="organizer-submission-summary-value">${escapeHtml(value)}</span>
-      </span>
-    `).join("");
+    overview.innerHTML = "";
+    overview.hidden = true;
+    overview.setAttribute("hidden", "");
 
-    if (paymentOpenCount > 0) {
-      nextStep.textContent = `Handlungsbedarf: ${formatInteger(paymentOpenCount)} Einreichung${paymentOpenCount === 1 ? "" : "en"} mit offenem Zahlungsschritt.`;
-    } else if (reviewCount > 0) {
-      nextStep.textContent = `Kein Handlungsbedarf: ${formatInteger(reviewCount)} Einreichung${reviewCount === 1 ? "" : "en"} ${reviewCount === 1 ? "ist" : "sind"} in Prüfung.`;
-    } else if (rejectedCount > 0) {
-      nextStep.textContent = "Kein akuter Handlungsbedarf. Abgelehnte Einreichungen bleiben zur Nachverfolgung sichtbar.";
-    } else {
-      nextStep.textContent = "Kein Handlungsbedarf. Du kannst neue Inhalte einreichen oder bestehende Einreichungen unten prüfen.";
-    }
+    nextStep.textContent = "";
+    nextStep.hidden = true;
+    nextStep.setAttribute("hidden", "");
   }
   /* === END BLOCK: ORGANIZER_DASHBOARD_V2_STRUCTURE_HELPERS_V1 === */
 
-  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V1 | Zweck: rendert sichere Anbieter-Nutzwertzahlen als vorsichtiges Wertzentrum; Umfang: additive Helfer vor renderDashboard === */
-  function renderOrganizerImpactCard(data, isSingleStatusView, isActivityPlanView = false) {
+  function renderImpactExplainerDetails() {
+    return `
+      <details class="organizer-impact-explainer">
+        <summary>Was wird gezählt?</summary>
+        <div class="organizer-impact-explainer__body">
+          <p>Gemessene Aktionen zeigen, wie Nutzer mit deinen veröffentlichten Inhalten auf Bocholt erleben interagieren.</p>
+          <dl>
+            <div><dt>Detail-Aufrufe</dt><dd>Nutzer öffnen Veranstaltungs- oder Aktivitätsdetails.</dd></div>
+            <div><dt>Website/Info</dt><dd>Nutzer klicken zur Website, Veranstaltungsseite oder Ticketseite.</dd></div>
+            <div><dt>Route/Maps</dt><dd>Nutzer öffnen die Route.</dd></div>
+            <div><dt>Teilungen</dt><dd>Nutzer teilen oder kopieren den Link.</dd></div>
+          </dl>
+          <p>Die Werte sind gemessene Aktionen, keine eindeutigen Personen, keine Ticketverkäufe und keine Besucherzahlen vor Ort.</p>
+        </div>
+      </details>
+    `;
+  }
+
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V3_SCOPE_SELECTOR | Zweck: rendert Gesamtwirkung und objektgenaue Einzelwirkung in einer zentralen Auswahl, ohne zusätzliche Scrolllisten zu erzeugen; Umfang: Impact-Helper und renderOrganizerImpactCard === */
+  function impactTotalInteractions(metrics) {
+    return metricValue(metrics, "total_interactions");
+  }
+
+  function impactWebsiteOrInfo(metrics) {
+    return metricValue(metrics, "website_clicks") + metricValue(metrics, "organizer_cta_clicks");
+  }
+
+  function impactRouteOrMaps(metrics) {
+    return metricValue(metrics, "maps_clicks") + metricValue(metrics, "location_clicks");
+  }
+
+  function createEmptyImpactMetrics() {
+    return {
+      website_clicks: 0,
+      maps_clicks: 0,
+      location_clicks: 0,
+      organizer_cta_clicks: 0,
+      share_clicks: 0,
+      copy_link_clicks: 0,
+      detail_views: 0,
+      total_interactions: 0
+    };
+  }
+
+  function normalizeImpactScopeMetrics(metrics) {
+    return metrics && typeof metrics === "object" ? metrics : createEmptyImpactMetrics();
+  }
+
+  function buildImpactScopeKey(entityType, entityId) {
+    const type = safeText(entityType || "content").toLowerCase() || "content";
+    const id = safeText(entityId);
+    return id ? `${type}:${id}` : "";
+  }
+
+  function formatImpactScopeKindLabel(entityType) {
+    const type = safeText(entityType).toLowerCase();
+    if (type === "activity") return "Aktivität";
+    if (type === "event") return "Veranstaltung";
+    return "Inhalt";
+  }
+
+  function buildOrganizerImpactScopes(data) {
+    const impact = data?.impact_summary || {};
+    const publishedContent = Array.isArray(data?.published_content) ? data.published_content : [];
+    const submissions = publishedContent.length > 0
+      ? publishedContent
+      : (Array.isArray(data?.recent_submissions) ? data.recent_submissions : []);
+    const items = new Map();
+
+    const addItem = ({ entityType, entityId, title, metrics, sourceIndex = 0 }) => {
+      const key = buildImpactScopeKey(entityType, entityId);
+      if (!key) return;
+
+      const current = items.get(key) || {
+        key,
+        entityType: safeText(entityType).toLowerCase() || "content",
+        entityId: safeText(entityId),
+        title: "",
+        metrics: createEmptyImpactMetrics(),
+        sourceIndex
+      };
+
+      const normalizedTitle = safeText(title);
+      if (normalizedTitle && (!current.title || impactTotalInteractions(metrics) >= impactTotalInteractions(current.metrics))) {
+        current.title = normalizedTitle;
+      }
+
+      const normalizedMetrics = normalizeImpactScopeMetrics(metrics);
+      if (impactTotalInteractions(normalizedMetrics) >= impactTotalInteractions(current.metrics)) {
+        current.metrics = normalizedMetrics;
+      }
+
+      current.sourceIndex = Math.min(current.sourceIndex, sourceIndex);
+      items.set(key, current);
+    };
+
+    (Array.isArray(impact?.items) ? impact.items : []).forEach((item, index) => {
+      addItem({
+        entityType: item?.entity_type,
+        entityId: item?.entity_id,
+        title: item?.entity_title,
+        metrics: item?.metrics,
+        sourceIndex: index
+      });
+    });
+
+    submissions.forEach((submission, index) => {
+      if (!isOrganizerPublishedSubmission(submission)) return;
+
+      const entityType = safeText(submission?.submission_kind || "event").toLowerCase() === "activity" ? "activity" : "event";
+      addItem({
+        entityType,
+        entityId: submission?.impact_entity_id || `submission-${safeText(submission?.id)}`,
+        title: submission?.title,
+        metrics: submission?.impact_metrics,
+        sourceIndex: 1000 + index
+      });
+    });
+
+    const itemScopes = Array.from(items.values())
+      .map((item) => ({
+        key: `item:${item.key}`,
+        label: safeText(item.title) || formatImpactScopeKindLabel(item.entityType),
+        meta: formatImpactScopeKindLabel(item.entityType),
+        metrics: normalizeImpactScopeMetrics(item.metrics),
+        isTotal: false,
+        sourceIndex: item.sourceIndex
+      }))
+      .sort((a, b) => {
+        const totalDiff = impactTotalInteractions(b.metrics) - impactTotalInteractions(a.metrics);
+        if (totalDiff !== 0) return totalDiff;
+        return a.sourceIndex - b.sourceIndex || a.label.localeCompare(b.label, "de");
+      });
+
+    return [
+      {
+        key: "total",
+        label: "Gesamtwirkung deiner Inhalte",
+        meta: "Alle veröffentlichten Inhalte",
+        metrics: normalizeImpactScopeMetrics(impact?.metrics),
+        isTotal: true,
+        sourceIndex: -1
+      },
+      ...itemScopes
+    ];
+  }
+
+  function renderImpactScopeControl(scopes, selectedKey) {
+    if (!Array.isArray(scopes) || scopes.length <= 1) {
+      return `<span class="organizer-impact-scope-static">Gesamtwirkung deiner Inhalte</span>`;
+    }
+
+    return `
+      <label class="organizer-impact-scope" for="organizer-impact-scope-select">
+        <select class="organizer-impact-scope__select" id="organizer-impact-scope-select" aria-label="Wirkung auswählen">
+          ${scopes.map((scope) => `
+            <option value="${escapeHtml(scope.key)}" ${scope.key === selectedKey ? "selected" : ""}>
+              ${escapeHtml(scope.label)}
+            </option>
+          `).join("")}
+        </select>
+      </label>
+    `;
+  }
+
+  function renderImpactScopeMetrics(scope) {
+    const metrics = normalizeImpactScopeMetrics(scope?.metrics);
+    const total = impactTotalInteractions(metrics);
+    const shares = impactShareTotal(metrics);
+    const note = total > 0
+      ? (scope?.isTotal ? "Gemessene Aktionen deiner veröffentlichten Inhalte im aktuellen Zeitraum." : "Gemessene Aktionen dieses Inhalts im aktuellen Zeitraum.")
+      : (scope?.isTotal ? "Messung aktiv. Noch keine Aktionen in den letzten 28 Tagen." : "Messung aktiv. Noch keine Aktionen für diesen Inhalt in den letzten 28 Tagen.");
+
+    return `
+      <span class="organizer-impact-total" aria-label="Gemessene Aktionen im aktuellen Zeitraum">
+        <strong class="organizer-impact-total__value">${escapeHtml(formatInteger(total))}</strong>
+        <span class="organizer-impact-total__suffix">gemessene Aktionen</span>
+      </span>
+      ${renderImpactMetricRows([
+        ["Detail-Aufrufe", metricValue(metrics, "detail_views")],
+        ["Website/Info", impactWebsiteOrInfo(metrics)],
+        ["Route/Maps", impactRouteOrMaps(metrics)],
+        ["Teilungen", shares]
+      ])}
+      <p class="organizer-impact-status-note">${escapeHtml(note)}</p>
+      ${renderImpactExplainerDetails()}
+    `;
+  }
+
+  function renderOrganizerImpactCard(data, options = {}) {
     const card = document.getElementById("organizer-dashboard-impact-card");
     const periodNode = document.getElementById("organizer-impact-period");
     const metricsNode = document.getElementById("organizer-impact-metrics");
@@ -750,57 +1166,51 @@ function normalizeExternalUrl(value) {
 
     if (!card || !periodNode || !metricsNode || !noteNode) return;
 
-    if (isSingleStatusView || isActivityPlanView) {
+    const isSingleStatusView = Boolean(options?.isSingleStatusView);
+    const hasEventImpactContext = Boolean(options?.hasEventImpactContext);
+
+    if (isSingleStatusView || !hasEventImpactContext) {
       card.hidden = true;
       card.setAttribute("hidden", "");
       return;
     }
 
     const impact = data?.impact_summary || {};
-    const metrics = impact?.metrics || {};
-    const previous = impact?.previous_metrics || {};
-    const total = metricValue(metrics, "total_interactions");
-    const directClicks =
-      metricValue(metrics, "website_clicks") +
-      metricValue(metrics, "maps_clicks") +
-      metricValue(metrics, "location_clicks") +
-      metricValue(metrics, "organizer_cta_clicks");
-    const previousTotal = metricValue(previous, "total_interactions");
-    const totalDelta = total - previousTotal;
-    const deltaLabel = totalDelta > 0
-      ? `+${formatInteger(totalDelta)} gegenüber dem vorherigen Zeitraum`
-      : totalDelta < 0
-        ? `-${formatInteger(Math.abs(totalDelta))} gegenüber dem vorherigen Zeitraum`
-        : "kein Unterschied zum vorherigen Zeitraum";
+    const scopes = buildOrganizerImpactScopes(data);
+    const initialKey = "total";
 
     card.hidden = false;
     card.removeAttribute("hidden");
-    periodNode.textContent = formatImpactPeriod(impact?.period);
+    periodNode.innerHTML = `
+      ${renderImpactScopeControl(scopes, initialKey)}
+      <span class="organizer-impact-period-label">${escapeHtml(formatImpactPeriod(impact?.period))}</span>
+    `;
+    noteNode.textContent = "";
+    noteNode.hidden = true;
 
-    metricsNode.innerHTML = [
-      ["Interaktionen gesamt", total],
-      ["Detail-Aufrufe", metricValue(metrics, "detail_views")],
-      ["Website-/Ticket-Klicks", metricValue(metrics, "website_clicks")],
-      ["Route/Maps", metricValue(metrics, "maps_clicks")]
-    ].map(([label, value]) => `
-      <span class="organizer-tariff-row" role="listitem">
-        <span class="organizer-tariff-label">${escapeHtml(label)}</span>
-        <span class="organizer-tariff-price">${escapeHtml(formatInteger(value))}</span>
-      </span>
-    `).join("");
+    const renderSelectedScope = (scopeKey) => {
+      const selected = scopes.find((scope) => scope.key === scopeKey) || scopes[0];
+      metricsNode.innerHTML = renderImpactScopeMetrics(selected);
+    };
+
+    const select = periodNode.querySelector("#organizer-impact-scope-select");
+    if (select) {
+      select.addEventListener("change", () => {
+        renderSelectedScope(select.value);
+      });
+    }
 
     if (impact?.status === "not_configured" || impact?.status === "not_available") {
-      noteNode.textContent = impact?.message || "Die Nutzwert-Auswertung ist für diesen Bereich noch nicht verfügbar.";
+      metricsNode.innerHTML = `
+        <p class="organizer-impact-status-note">${escapeHtml(impact?.message || "Die Wirkungsauswertung ist für diesen Bereich noch nicht verfügbar.")}</p>
+        ${renderImpactExplainerDetails()}
+      `;
       return;
     }
 
-    if (total > 0) {
-      noteNode.textContent = `Nutzer haben deine veröffentlichten Inhalte geöffnet oder weiterführende Links genutzt. Direkt erklärbare Klicks: ${formatInteger(directClicks)}; ${deltaLabel}. Keine Besucherzahlen vor Ort, keine Buchungen, keine eindeutigen Personen.`;
-    } else {
-      noteNode.textContent = "Noch keine Nutzsignale im aktuellen Zeitraum. Die Messung läuft; Werte erscheinen, sobald veröffentlichte Inhalte angesehen oder weiterführende Links genutzt werden.";
-    }
+    renderSelectedScope(initialKey);
   }
-  /* === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V1 === */
+  /* === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V3_SCOPE_SELECTOR === */
 
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V2_VALUE_CENTER_COPY | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Einreichungsstatus oder Veranstalter-Wertzentrum ohne neue Datenlogik; Umfang: komplette renderDashboard-Funktion === */
    function renderDashboard(data) {
@@ -827,6 +1237,8 @@ function normalizeExternalUrl(value) {
     const quotaByPlan = Array.isArray(data?.quota_by_plan) ? data.quota_by_plan : [];
     const billingSummary = data?.billing_summary || {};
     const submissions = Array.isArray(data?.recent_submissions) ? data.recent_submissions : [];
+    const dashboardCounts = getOrganizerDashboardCounts(submissions);
+    const dashboardStatus = buildOrganizerDashboardStatus(dashboardCounts);
 
     const latestSubmission = submissions[0] || null;
     const defaultPlanKey = safeText(organizer.default_plan_key).toLowerCase();
@@ -834,6 +1246,14 @@ function normalizeExternalUrl(value) {
     const hasManageableSubscription = ["starter", "active", "unlimited", "activity_basic", "activity_plus"].includes(subscriptionPlanKey);
     const effectivePlanKey = hasManageableSubscription ? subscriptionPlanKey : (defaultPlanKey || "single");
     const isActivityPlanView = ["activity_basic", "activity_plus"].includes(effectivePlanKey);
+    const activePlanKeys = (Array.isArray(activeSubscriptions) ? activeSubscriptions : [])
+      .map((item) => safeText(item?.plan_key).toLowerCase());
+    const hasEventPresencePlan = activePlanKeys.some((key) => ["starter", "active", "unlimited"].includes(key)) ||
+      ["starter", "active", "unlimited"].includes(subscriptionPlanKey) ||
+      ["starter", "active", "unlimited"].includes(defaultPlanKey);
+    const hasActivityPresencePlan = activePlanKeys.some((key) => key === "activity_basic" || key === "activity_plus") ||
+      ["activity_basic", "activity_plus"].includes(subscriptionPlanKey) ||
+      ["activity_basic", "activity_plus"].includes(defaultPlanKey);
     const latestTitleText = latestSubmission
       ? safeText(latestSubmission.title) || "Ohne Titel"
       : "Noch keine Einreichung";
@@ -867,6 +1287,7 @@ function normalizeExternalUrl(value) {
     const submissionsHead = document.getElementById("organizer-dashboard-submissions-head");
     const submissionsList = document.getElementById("organizer-dashboard-submissions-list");
     const submissionsEmpty = document.getElementById("organizer-dashboard-submissions-empty");
+    const submissionsToggle = document.getElementById("organizer-dashboard-submissions-toggle");
     const dashboardPrimaryCta = document.getElementById("organizer-dashboard-primary-cta");
     const dashboardActions = dashboardPrimaryCta ? dashboardPrimaryCta.parentElement : null;
     /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V4_VALUE_CENTER_COPY | Zweck: richtet den Dashboard-Hero auf Einreichungen, Veröffentlichungsstatus und Mitgliedschaft aus; Umfang: Kicker-, Titel-, Lead- und Note-Texte in renderDashboard === */
@@ -887,9 +1308,7 @@ function normalizeExternalUrl(value) {
           ? `${latestStatusText} · ${latestDateText}`
           : "Status deiner Einreichung.";
       } else {
-        lead.textContent = isActivityPlanView
-          ? "Hier siehst du deine Aktivitätspräsenz, Einreichungen und Veröffentlichungsstatus an einem Ort."
-          : "Hier siehst du deine Einreichungen, Veröffentlichungsstatus und Mitgliedschaft an einem Ort.";
+        lead.textContent = dashboardStatus.label;
       }
     }
 
@@ -897,24 +1316,69 @@ function normalizeExternalUrl(value) {
       if (isSingleStatusView) {
         note.textContent = "Hier siehst du den aktuellen Stand deiner Einreichung.";
         note.hidden = false;
+        note.removeAttribute("hidden");
+      } else if (dashboardStatus.detail) {
+        note.textContent = dashboardStatus.detail;
+        note.hidden = false;
+        note.removeAttribute("hidden");
       } else {
         note.textContent = "";
         note.hidden = true;
+        note.setAttribute("hidden", "");
       }
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V4_VALUE_CENTER_COPY === */
 
-    if (dashboardPrimaryCta) {
-      if (isActivityPlanView) {
-        dashboardPrimaryCta.href = "/aktivitaeten/sichtbar-werden/";
-        dashboardPrimaryCta.textContent = "Weitere Aktivität einreichen";
-      } else {
-        const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
-          ? effectivePlanKey
-          : "single";
+    const dashboardStatusType = safeText(dashboardStatus?.type || "ok").toLowerCase();
+    const shouldOpenSubmissionsFromHero = dashboardStatusType === "action" || dashboardStatusType === "draft";
+    const submissionCtaConfig = (() => {
+      if (isActivityPlanView && !hasEventPresencePlan) {
+        return {
+          href: "/aktivitaeten/sichtbar-werden/",
+          label: "Weitere Aktivität einreichen"
+        };
+      }
 
-        dashboardPrimaryCta.href = `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`;
-        dashboardPrimaryCta.textContent = isSingleStatusView ? "Weitere Veranstaltung einreichen" : "Neue Veranstaltung einreichen";
+      const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
+        ? effectivePlanKey
+        : (hasEventPresencePlan ? "starter" : "single");
+
+      return {
+        href: `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`,
+        label: isSingleStatusView ? "Weitere Veranstaltung einreichen" : "Neue Veranstaltung einreichen"
+      };
+    })();
+
+    if (dashboardPrimaryCta) {
+      let newSubmissionCta = document.getElementById("organizer-dashboard-new-submission-cta");
+
+      if (shouldOpenSubmissionsFromHero && !isSingleStatusView) {
+        dashboardPrimaryCta.href = "#organizer-dashboard-submissions-card";
+        dashboardPrimaryCta.textContent = dashboardStatus.primaryCta || "Einreichungen anzeigen";
+        dashboardPrimaryCta.dataset.organizerOpenSubmissions = dashboardStatusType;
+
+        if (dashboardActions && !newSubmissionCta) {
+          newSubmissionCta = document.createElement("a");
+          newSubmissionCta.id = "organizer-dashboard-new-submission-cta";
+          newSubmissionCta.className = "content-cta organizer-dashboard-secondary-action";
+          dashboardPrimaryCta.insertAdjacentElement("afterend", newSubmissionCta);
+        }
+
+        if (newSubmissionCta) {
+          newSubmissionCta.hidden = false;
+          newSubmissionCta.removeAttribute("hidden");
+          newSubmissionCta.href = submissionCtaConfig.href;
+          newSubmissionCta.textContent = submissionCtaConfig.label;
+        }
+      } else {
+        dashboardPrimaryCta.href = submissionCtaConfig.href;
+        dashboardPrimaryCta.textContent = submissionCtaConfig.label;
+        delete dashboardPrimaryCta.dataset.organizerOpenSubmissions;
+        dashboardPrimaryCta.onclick = null;
+
+        if (newSubmissionCta) {
+          newSubmissionCta.remove();
+        }
       }
     }
 
@@ -926,11 +1390,12 @@ function normalizeExternalUrl(value) {
           manageSubscriptionButton = document.createElement("button");
           manageSubscriptionButton.type = "button";
           manageSubscriptionButton.id = "organizer-dashboard-manage-subscription";
-          manageSubscriptionButton.className = "content-cta";
+          manageSubscriptionButton.className = "content-cta organizer-dashboard-secondary-action";
           manageSubscriptionButton.textContent = "Mitgliedschaft verwalten";
           dashboardActions.appendChild(manageSubscriptionButton);
         }
 
+        manageSubscriptionButton.classList.add("organizer-dashboard-secondary-action");
         manageSubscriptionButton.hidden = false;
         manageSubscriptionButton.disabled = false;
         manageSubscriptionButton.onclick = () => {
@@ -971,14 +1436,15 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V4_VALUE_CENTER_COPY === */
 
-    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY | Zweck: benennt Tarife und Veröffentlichungen verständlicher ohne Kontingent-/Token-Sprache; Umfang: ersetzt komplette Tarif-/Kontingentübersicht in renderDashboard === */
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V4_COMPACT_DETAILS | Zweck: verdichtet Tarif und Nutzung mobil-first und legt Details in ein aufklappbares Segment; Umfang: komplette Tarif-/Kontingentübersicht in renderDashboard === */
     const tariffRows = buildOrganizerTariffRows(activeSubscriptions);
     const includedRows = buildOrganizerIncludedRows(quotaByPlan);
+    const includedCompactRows = buildOrganizerIncludedCompactRows(quotaByPlan);
 
     const monthlyTotal = safeText(billingSummary?.monthly_total_label);
 
     if (quotaHead) {
-      quotaHead.textContent = isSingleStatusView ? "Status" : "Tarife & Veröffentlichungen";
+      quotaHead.textContent = isSingleStatusView ? "Status" : "Tarif & Nutzung";
     }
 
     if (quotaPeriod) {
@@ -988,86 +1454,96 @@ function normalizeExternalUrl(value) {
         quotaPeriod.textContent = latestSubmission
           ? `Termin: ${latestDateText}`
           : "Veranstaltung einreichen";
-      } else if (tariffRows.length > 0) {
-        quotaPeriod.innerHTML = `
-          <span class="organizer-tariff-section-title">Aktive Tarife</span>
-          <span class="organizer-tariff-table" role="list">
-            ${tariffRows.map((row) => `
-              <span class="organizer-tariff-row" role="listitem">
-                <span class="organizer-tariff-label">${escapeHtml(row.label)}</span>
-                <span class="organizer-tariff-price">${escapeHtml(row.amount)}</span>
-              </span>
-            `).join("")}
-          </span>
-        `;
       } else {
-        quotaPeriod.textContent = `Tarif: ${formatPlanLabel(subscriptionPlanKey || effectivePlanKey)}`;
+        const compactPrice = monthlyTotal || "–";
+        const compactUsage = includedCompactRows.length > 0
+          ? includedCompactRows.join(" · ")
+          : (quota.has_unlimited ? `${isActivityPlanView ? "Aktivitäten" : "Events"} unbegrenzt` : `${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} genutzt`);
+        quotaPeriod.innerHTML = `
+          <span class="organizer-tariff-compact" aria-label="Tarif und Nutzung kompakt">
+            <span class="organizer-tariff-compact__amount">${escapeHtml(compactPrice)}</span>
+            <span class="organizer-tariff-compact__usage">${escapeHtml(compactUsage)}</span>
+          </span>
+          <details class="organizer-tariff-details">
+            <summary>Details anzeigen</summary>
+            ${tariffRows.length > 0 ? `
+              <span class="organizer-tariff-section-title">Aktive Tarife</span>
+              <span class="organizer-tariff-table" role="list">
+                ${tariffRows.map((row) => `
+                  <span class="organizer-tariff-row" role="listitem">
+                    <span class="organizer-tariff-label">${escapeHtml(row.label)}</span>
+                    <span class="organizer-tariff-price">${escapeHtml(row.amount)}</span>
+                  </span>
+                `).join("")}
+              </span>
+            ` : ""}
+            ${includedRows.length > 0 ? `
+              <span class="organizer-tariff-section-title">Enthalten</span>
+              <span class="organizer-tariff-bullets">
+                ${includedRows.map((line) => `
+                  <span class="organizer-tariff-bullet">${escapeHtml(line)}</span>
+                `).join("")}
+              </span>
+            ` : ""}
+            <span class="organizer-tariff-hint">Gezählt wird erst nach redaktioneller Freigabe.</span>
+          </details>
+        `;
       }
     }
 
     if (quotaChange) {
-      if (isSingleStatusView || !monthlyTotal) {
-        quotaChange.textContent = "";
-        quotaChange.hidden = true;
-      } else {
-        quotaChange.hidden = false;
-        quotaChange.innerHTML = `
-          <span class="organizer-tariff-total" aria-label="Monatliche Gesamtsumme">
-            <span class="organizer-tariff-total-label">Monatlich gesamt</span>
-            <span class="organizer-tariff-total-price">${escapeHtml(monthlyTotal)}</span>
-          </span>
-        `;
-      }
+      quotaChange.textContent = "";
+      quotaChange.hidden = true;
     }
 
     if (quotaSummary) {
       if (isSingleStatusView) {
+        quotaSummary.hidden = false;
         quotaSummary.textContent = latestSubmission
           ? "Einreichung erhalten. Die Veröffentlichung erfolgt nach Prüfung."
           : "Noch keine Einreichung gefunden.";
-      } else if (includedRows.length > 0) {
-        quotaSummary.innerHTML = `
-          <span class="organizer-tariff-section-title">Enthalten</span>
-          <span class="organizer-tariff-bullets">
-            ${includedRows.map((line) => `
-              <span class="organizer-tariff-bullet">${escapeHtml(line)}</span>
-            `).join("")}
-          </span>
-        `;
-      } else if (quota.has_unlimited) {
-        quotaSummary.textContent = `${isActivityPlanView ? "Aktivitäten" : "Events"}: unbegrenzt`;
       } else {
-        quotaSummary.textContent = `${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} genutzt`;
+        quotaSummary.textContent = "";
+        quotaSummary.hidden = true;
       }
     }
 
     if (quotaRemaining) {
       if (isSingleStatusView) {
+        quotaRemaining.hidden = false;
         quotaRemaining.textContent = "Für diese Einreichung ist keine Mitgliedschaft aktiv.";
       } else {
-        quotaRemaining.textContent = "Gezählt wird erst nach redaktioneller Freigabe.";
+        quotaRemaining.textContent = "";
+        quotaRemaining.hidden = true;
       }
     }
-    /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY === */
+    /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V4_COMPACT_DETAILS === */
 
     renderOrganizerSubmissionsSummary({
       isSingleStatusView,
       isActivityPlanView,
       activeSubscriptions,
       submissions,
-      latestSubmission
+      latestSubmission,
+      counts: dashboardCounts
     });
 
-    const hasActivityPresencePlan = activeSubscriptions.some((item) => {
-      const planKey = safeText(item?.plan_key).toLowerCase();
-      return planKey === "activity_basic" || planKey === "activity_plus";
+    const hasEventImpactContext = organizerHasEventImpactContext({
+      activeSubscriptions,
+      subscriptionPlanKey,
+      defaultPlanKey,
+      submissions,
+      impactSummary: data?.impact_summary || {}
     });
 
-    renderOrganizerImpactCard(data, isSingleStatusView, isActivityPlanView || hasActivityPresencePlan);
+    renderOrganizerImpactCard(data, {
+      isSingleStatusView,
+      hasEventImpactContext
+    });
 
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY | Zweck: zeigt Einreichungen mit Status, Details und Änderungsmöglichkeit vor Veröffentlichung; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
-  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Einreichungen";
+  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Einreichungen & Veröffentlichungen";
 }
 
 if (submissionsList && submissionsEmpty) {
@@ -1311,16 +1787,43 @@ if (submissionsList && submissionsEmpty) {
   }
 
   submissionsList.innerHTML = "";
+  submissionsList.hidden = false;
   submissionsEmpty.textContent = isSingleStatusView
     ? "Keine Einreichung gefunden."
     : "Noch keine aktuellen Einreichungen vorhanden.";
 
+  const setSubmissionsListOpen = (isOpen) => {
+    submissionsList.hidden = !isOpen;
+    if (!submissionsToggle) return;
+
+    submissionsToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    submissionsToggle.textContent = isOpen
+      ? "Einreichungen ausblenden"
+      : "Einreichungen anzeigen";
+  };
+
   if (!submissions.length) {
     submissionsEmpty.hidden = false;
+    if (submissionsToggle) submissionsToggle.hidden = true;
   } else {
     submissionsEmpty.hidden = true;
 
-    submissions.slice(0, 10).forEach((submission, index) => {
+    const visibleSubmissions = submissions.slice(0, 10);
+    const submissionGroups = isSingleStatusView
+      ? [{ key: "single", label: "", items: visibleSubmissions }]
+      : buildOrganizerSubmissionGroups(visibleSubmissions);
+    let renderedSubmissionIndex = 0;
+
+    submissionGroups.forEach((group) => {
+      if (safeText(group.label)) {
+        const heading = document.createElement("h3");
+        heading.className = "organizer-submission-group-title";
+        heading.textContent = group.label;
+        submissionsList.appendChild(heading);
+      }
+
+      group.items.forEach((submission) => {
+        const index = renderedSubmissionIndex++;
       const titleText = safeText(submission.title) || "Ohne Titel";
       const statusText = formatSubmissionStatusLabel(submission);
       const metaDateText = formatSubmissionMetaDate(submission);
@@ -1369,6 +1872,7 @@ if (submissionsList && submissionsEmpty) {
         </p>
         <dl class="organizer-submission-detail__facts">
           ${renderSubmissionFactsHtml(submission)}
+          ${renderSubmissionImpactHtml(submission)}
         </dl>
         <div class="organizer-submission-detail__actions">
           <span data-submission-link-slot>
@@ -1381,7 +1885,7 @@ if (submissionsList && submissionsEmpty) {
           </span>
           ${canEdit ? `
             <button class="organizer-submission-detail__link organizer-submission-detail__edit-toggle" type="button" aria-expanded="false" aria-controls="${escapeHtml(editFormId)}">
-              Angaben ändern
+              ${safeText(submission.status).toLowerCase() === "draft" ? "Weiterbearbeiten" : "Angaben ändern"}
             </button>
           ` : ""}
         </div>
@@ -1479,11 +1983,34 @@ if (submissionsList && submissionsEmpty) {
         }
       }
 
-      submissionsList.appendChild(row);
-      submissionsList.appendChild(detail);
+        submissionsList.appendChild(row);
+        submissionsList.appendChild(detail);
+      });
     });
 
     hydrateIcons(submissionsList);
+
+    const defaultOpen = Boolean(isSingleStatusView);
+
+    if (submissionsToggle) {
+      submissionsToggle.hidden = Boolean(isSingleStatusView);
+      submissionsToggle.onclick = () => {
+        const isExpanded = submissionsToggle.getAttribute("aria-expanded") === "true";
+        setSubmissionsListOpen(!isExpanded);
+      };
+    }
+
+    if (dashboardPrimaryCta && dashboardPrimaryCta.dataset.organizerOpenSubmissions) {
+      dashboardPrimaryCta.onclick = (event) => {
+        event.preventDefault();
+        setSubmissionsListOpen(true);
+        if (submissionsCard) {
+          submissionsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      };
+    }
+
+    setSubmissionsListOpen(defaultOpen);
   }
 }
 /* === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY === */

@@ -444,6 +444,9 @@ jobs:
           LIVE_PUSH_VAPID_PUBLIC_KEY: ${{ secrets.LIVE_PUSH_VAPID_PUBLIC_KEY }}
           LIVE_PUSH_VAPID_PRIVATE_KEY_PEM: ${{ secrets.LIVE_PUSH_VAPID_PRIVATE_KEY_PEM }}
           LIVE_PUSH_SECRET: ${{ secrets.LIVE_PUSH_SECRET }}
+          # === BEGIN BLOCK: CONTENT_OPS_INGEST_TOKEN_DEPLOY_ENV_V1 | Zweck: macht den Content-Ops-Ingest-Token fuer die generierte private api/_config.php verfuegbar; Umfang: GitHub Secret nur im Deploy-Artefakt, kein Klartext im Repo ===
+          CONTENT_OPS_INGEST_TOKEN: ${{ secrets.CONTENT_OPS_INGEST_TOKEN }}
+          # === END BLOCK: CONTENT_OPS_INGEST_TOKEN_DEPLOY_ENV_V1 ===
           # === END BLOCK: INBOX_PUSH_SECRETS_ENV_V1 === 
           # === END BLOCK: SEARCH_METRICS_AND_REVIEW_SECRETS_ENV_V1 ===
         run: |
@@ -670,6 +673,12 @@ jobs:
           [ -n "$APP_MAIL_SMTP_USERNAME" ] || { echo "❌ Missing required secret/value: APP_MAIL_SMTP_USERNAME"; exit 1; }
           [ -n "$APP_MAIL_SMTP_PASSWORD" ] || { echo "❌ Missing required secret/value: APP_MAIL_SMTP_PASSWORD"; exit 1; }
           [ -n "$APP_REVIEW_PASSWORD" ] || { echo "❌ Missing required secret/value: APP_REVIEW_PASSWORD"; exit 1; }
+
+          # === BEGIN BLOCK: CONTENT_OPS_INGEST_TOKEN_REQUIRED_V1 | Zweck: verhindert Deploys ohne persistierbaren HTTP-Ingest-Token; Umfang: setzt APP_CONTENT_OPS_INGEST_TOKEN aus GitHub Secret und prueft fail-fast ===
+          APP_CONTENT_OPS_INGEST_TOKEN="${CONTENT_OPS_INGEST_TOKEN:-}"
+          [ -n "$APP_CONTENT_OPS_INGEST_TOKEN" ] || { echo "❌ Missing required secret/value: CONTENT_OPS_INGEST_TOKEN"; exit 1; }
+          echo "Content Ops ingest token configured: yes"
+          # === END BLOCK: CONTENT_OPS_INGEST_TOKEN_REQUIRED_V1 ===
           # === END BLOCK: EXPLICIT_REQUIRED_ENV_CHECKS_V1 ===
 
           # === BEGIN BLOCK: SEARCH_METRICS_EXPORT_AND_CONFIG_ENV_V2 | Zweck: erzeugt data/search-metrics.json mit aktuellem 28-Tage-Zeitraum plus vorherigem Vergleichszeitraum für Dashboard-V3.1; Umfang: ersetzt Search-Metrics-Export im Prepare-deploy-Step ===
@@ -858,7 +867,7 @@ jobs:
           print(f"=== search-metrics.json status: {result['status']} ===")
           PY
 
-          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_STRIPE_PRICE_ACTIVITY_BASIC APP_STRIPE_PRICE_ACTIVITY_PLUS APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_REVIEW_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL APP_PUSH_VAPID_PUBLIC_KEY APP_PUSH_VAPID_PRIVATE_KEY_PEM APP_PUSH_SECRET BE_SHEET_ID GOOGLE_SERVICE_ACCOUNT_JSON
+          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_STRIPE_PRICE_ACTIVITY_BASIC APP_STRIPE_PRICE_ACTIVITY_PLUS APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_REVIEW_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL APP_PUSH_VAPID_PUBLIC_KEY APP_PUSH_VAPID_PRIVATE_KEY_PEM APP_PUSH_SECRET APP_CONTENT_OPS_INGEST_TOKEN BE_SHEET_ID GOOGLE_SERVICE_ACCOUNT_JSON
           # === END BLOCK: SEARCH_METRICS_EXPORT_AND_CONFIG_ENV_V2 ===
 
           python - <<'PY'
@@ -908,6 +917,11 @@ jobs:
               "review": {
                   "password": os.environ["APP_REVIEW_PASSWORD"],
               },
+              # === BEGIN BLOCK: PRIVATE_CONFIG_CONTENT_OPS_PAYLOAD_V1 | Zweck: persistiert den HTTP-Ingest-Token in der generierten privaten api/_config.php; Umfang: nur Deploy-Artefakt, kein Klartext im Repo ===
+              "content_ops": {
+                  "ingest_token": os.environ["APP_CONTENT_OPS_INGEST_TOKEN"],
+              },
+              # === END BLOCK: PRIVATE_CONFIG_CONTENT_OPS_PAYLOAD_V1 ===
               # === BEGIN BLOCK: PRIVATE_CONFIG_GOOGLE_SHEET_PAYLOAD_V1 | Zweck: stellt geschuetzten internen APIs Zugriff auf das kanonische Google Sheet bereit; Umfang: ergaenzt Sheet-ID und Service-Account nur in api/_config.php des Deploy-Artefakts ===
               "google": {
                   "sheet_id": os.environ.get("BE_SHEET_ID", ""),
@@ -960,6 +974,7 @@ jobs:
 
       # === BEGIN BLOCK: STRATO_UPLOAD_V6 | Zweck: main schützt staging vor --delete; staging deployt in staging; Scope: nur Upload-Step, mit einer einzigen stabilen lftp-Session ===
       - name: Upload to STRATO via SFTP
+        timeout-minutes: 12
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}

@@ -22,6 +22,8 @@ import json
 import os
 import re
 import sys
+from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Tuple
 
 from google.oauth2 import service_account
@@ -33,6 +35,10 @@ TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox").strip() or "Inbox"
 TAB_ARCHIVE = os.environ.get("TAB_ARCHIVE", "Inbox_Archive").strip() or "Inbox_Archive"
 # === END BLOCK: INBOX_CLEANUP_TAB_ENV_V1 ===
 
+# === BEGIN BLOCK: INBOX_CLEANUP_CONTENT_OPS_SUMMARY_V1 | Zweck: schreibt Archivierungswirkung fuer Content-Ops-Impact-Metriken als lokales JSON; Umfang: keine Sheet-Logik-Aenderung ===
+SUMMARY_PATH = Path(os.environ.get("INBOX_CLEANUP_SUMMARY_PATH", "data/inbox-cleanup-summary.json"))
+# === END BLOCK: INBOX_CLEANUP_CONTENT_OPS_SUMMARY_V1 ===
+
 FINAL_STATUSES = {"übernommen", "verworfen"}
 
 
@@ -43,6 +49,16 @@ def fail(msg: str) -> None:
 
 def info(msg: str) -> None:
     print(f"ℹ️  {msg}")
+
+
+def write_summary(**kwargs: object) -> None:
+    payload = {
+        "generated_at_utc": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+        "source": "inbox-archive-cleanup",
+        **kwargs,
+    }
+    SUMMARY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    SUMMARY_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def norm(s: str) -> str:
@@ -172,6 +188,8 @@ def main() -> None:
     rows_to_delete_1based: List[int] = []  # Sheet row numbers (1-based)
 
     status_key = "status"
+    remaining_open_count = 0
+    remaining_finalized_count = 0
 
     for i, row in enumerate(inbox_rows):
         # i ist 0-based innerhalb inbox_rows (ohne Header)
@@ -182,11 +200,22 @@ def main() -> None:
             # Zeile in originaler Spaltenreihenfolge (Inbox-Header) archivieren
             rows_to_append.append([row.get(col, "") for col in inbox_header])
             rows_to_delete_1based.append(sheet_row_number)
+            remaining_finalized_count += 1
+        elif status:
+            remaining_open_count += 1
 
     info(f"Archiv-Kandidaten: {len(rows_to_append)}")
 
     if not rows_to_append:
         info("✅ Nichts zu archivieren.")
+        write_summary(
+            tab_inbox=TAB_INBOX,
+            tab_archive=TAB_ARCHIVE,
+            archived_count=0,
+            remaining_open_count=remaining_open_count,
+            remaining_finalized_count=remaining_finalized_count,
+            inbox_rows_before=len(inbox_rows),
+        )
         return
 
     # 1) Archive append (Header ggf. zuerst)
@@ -201,6 +230,15 @@ def main() -> None:
     inbox_sheet_id = get_sheet_id_by_title(service, spreadsheet_id, TAB_INBOX)
     delete_rows(service, spreadsheet_id, inbox_sheet_id, rows_to_delete_1based)
     info("✅ Inbox: archivierte Zeilen gelöscht (Header bleibt).")
+    write_summary(
+        tab_inbox=TAB_INBOX,
+        tab_archive=TAB_ARCHIVE,
+        archived_count=len(rows_to_append),
+        remaining_open_count=remaining_open_count,
+        remaining_finalized_count=max(0, remaining_finalized_count - len(rows_to_append)),
+        inbox_rows_before=len(inbox_rows),
+        inbox_rows_after=max(0, len(inbox_rows) - len(rows_to_append)),
+    )
 
 
 if __name__ == "__main__":

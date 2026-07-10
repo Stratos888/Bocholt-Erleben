@@ -1,0 +1,75 @@
+{
+  "version": "content_ops_visual_feedback_contract_v1",
+  "updated_at": "2026-07-07",
+  "principles": [
+    "Visual-Feedback ist ein Lernsignal, nicht nur ein Backlog-Hinweis.",
+    "Jedes Visual-Problem muss in Problemtyp, Entscheidungsklasse und Folgeaktion uebersetzbar sein.",
+    "Asset-Luecken, falsche Motivregeln und falsche Resolver-Zuordnungen werden getrennt gemessen.",
+    "Keine finalen Bildaustausche ohne Betreiberfreigabe."
+  ],
+  "problem_types": {
+    "visual_key_wrong": {
+      "label": "Visual-Key falsch",
+      "decision_class": "needs_patch",
+      "default_effect": "resolver_rule_followup",
+      "followup_route": "resolver_rule_review",
+      "requires_task": true
+    },
+    "visual_motif_wrong": {
+      "label": "Motiv passt nicht",
+      "decision_class": "needs_visual_fix",
+      "default_effect": "motif_rule_followup",
+      "followup_route": "motif_rule_review",
+      "requires_task": true
+    },
+    "asset_missing": {
+      "label": "Asset fehlt",
+      "decision_class": "needs_visual_fix",
+      "default_effect": "asset_gap_backlog",
+      "followup_route": "asset_production_backlog",
+      "requires_task": true
+    },
+    "asset_low_quality": {
+      "label": "Asset Qualitaet zu niedrig",
+      "decision_class": "needs_visual_fix",
+      "default_effect": "remaster_backlog",
+      "followup_route": "asset_remaster_backlog",
+      "requires_task": true
+    },
+    "source_or_rights_issue": {
+      "label": "Quelle oder Rechte unklar",
+      "decision_class": "needs_source",
+      "default_effect": "source_rights_review",
+      "followup_route": "source_rights_review",
+      "requires_task": true
+    },
+    "accepted": {
+      "label": "Visual akzeptiert",
+      "decision_class": "accepted",
+      "default_effect": "allow_or_keep",
+      "followup_route": "none",
+      "requires_task": false
+    },
+    "remaster_needed": {
+      "label": "Remaster noetig",
+      "decision_class": "needs_visual_fix",
+      "default_effect": "remaster_backlog",
+      "followup_route": "asset_remaster_backlog",
+      "requires_task": true
+    },
+    "visual_review": {
+      "label": "Visual pruefen",
+      "decision_class": "needs_visual_fix",
+      "default_effect": "visual_review_task",
+      "followup_route": "visual_review",
+      "requires_task": true
+    }
+  },
+  "required_result_fields": [
+    "problem_type",
+    "decision_class",
+    "default_effect",
+    "followup_route",
+    "requires_task"
+  ]
+}

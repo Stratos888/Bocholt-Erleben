@@ -27,6 +27,7 @@ EXPECTED_IMPORTS = [
     "home.css",
     "today.css",
     "overlays.css",
+    "control-center.css",
 ]
 
 CSS_LINE_LIMITS = {
@@ -37,6 +38,7 @@ CSS_LINE_LIMITS = {
     "home.css": 5000,
     "today.css": 1600,
     "overlays.css": 3600,
+    "control-center.css": 1200,
     "legacy.css": 50,
 }
 
@@ -51,7 +53,7 @@ STYLESHEET_LINK_RE = re.compile(
 )
 
 IMPORT_RE = re.compile(
-    r'^@import\s+url\(\"/css/([^\"]+)\?v=([^\"]+)\"\);$'
+    r'^@import\s+url\("/css/([^\"]+)\?v=([^\"]+)"\);$'
 )
 
 
@@ -136,6 +138,7 @@ def audit_html_stylesheet_links(errors: list[str]) -> None:
                 f"found {stylesheet_hrefs}"
             )
 
+
 def audit_css_line_budgets(errors: list[str]) -> None:
     css_dir = ROOT / "css"
     for name, max_lines in CSS_LINE_LIMITS.items():
@@ -164,6 +167,7 @@ def audit_no_direct_split_css_links(errors: list[str]) -> None:
                 f"{rel(html)} links split CSS directly: {href}. "
                 "Public pages must use /css/style.css as the entrypoint."
             )
+
 
 def main() -> int:
     errors: list[str] = []

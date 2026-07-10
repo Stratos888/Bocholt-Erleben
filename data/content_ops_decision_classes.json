@@ -1,0 +1,197 @@
+{
+  "version": "content_ops_decision_classes_v1",
+  "updated_at": "2026-07-07",
+  "principles": [
+    "Freitext begruendet Entscheidungen, fuehrt aber nicht die Prozesslogik.",
+    "Neue Prozesslogik soll decision_class nutzen; Status-Aliase bleiben Kompatibilitaetsschicht.",
+    "Jede Suppression muss befristbar, messbar und spaeter korrigierbar sein.",
+    "Keine fachliche Live-Aenderung ohne Betreiberfreigabe."
+  ],
+  "decision_classes": {
+    "accepted": {
+      "label": "Akzeptiert",
+      "task_state": "resolved",
+      "default_effect": "allow_or_keep",
+      "suppresses_reopen": false,
+      "requires_recheck": false,
+      "requires_effect_watch": false
+    },
+    "confirmed": {
+      "label": "Bestaetigt",
+      "task_state": "resolved",
+      "default_effect": "verification_cache",
+      "suppresses_reopen": true,
+      "requires_recheck": true,
+      "requires_effect_watch": false
+    },
+    "corrected": {
+      "label": "Korrigiert",
+      "task_state": "resolved",
+      "default_effect": "next_audit_recheck",
+      "suppresses_reopen": true,
+      "requires_recheck": true,
+      "requires_effect_watch": true
+    },
+    "done": {
+      "label": "Erledigt",
+      "task_state": "resolved",
+      "default_effect": "effect_watch",
+      "suppresses_reopen": true,
+      "requires_recheck": false,
+      "requires_effect_watch": true
+    },
+    "duplicate": {
+      "label": "Dublette",
+      "task_state": "resolved",
+      "default_effect": "dedupe_suppression",
+      "suppresses_reopen": true,
+      "requires_recheck": false,
+      "requires_effect_watch": false
+    },
+    "rejected_not_event": {
+      "label": "Kein konkreter Event",
+      "task_state": "resolved",
+      "default_effect": "search_intake_filter",
+      "suppresses_reopen": true,
+      "requires_recheck": false,
+      "requires_effect_watch": false
+    },
+    "rejected_not_public": {
+      "label": "Nicht oeffentlich",
+      "task_state": "resolved",
+      "default_effect": "search_intake_filter",
+      "suppresses_reopen": true,
+      "requires_recheck": false,
+      "requires_effect_watch": false
+    },
+    "rejected_not_local": {
+      "label": "Nicht lokal genug",
+      "task_state": "resolved",
+      "default_effect": "radius_source_filter",
+      "suppresses_reopen": true,
+      "requires_recheck": false,
+      "requires_effect_watch": false
+    },
+    "rejected_source_weak": {
+      "label": "Quelle zu schwach",
+      "task_state": "resolved",
+      "default_effect": "source_quality_filter",
+      "suppresses_reopen": true,
+      "requires_recheck": false,
+      "requires_effect_watch": false
+    },
+    "rejected_low_value": {
+      "label": "Redaktionell zu schwach",
+      "task_state": "resolved",
+      "default_effect": "quality_filter",
+      "suppresses_reopen": true,
+      "requires_recheck": false,
+      "requires_effect_watch": false
+    },
+    "rejected_commercial": {
+      "label": "Primaer Werbung",
+      "task_state": "resolved",
+      "default_effect": "commercial_filter",
+      "suppresses_reopen": true,
+      "requires_recheck": false,
+      "requires_effect_watch": false
+    },
+    "needs_patch": {
+      "label": "Patch noetig",
+      "task_state": "open",
+      "default_effect": "technical_or_content_task",
+      "suppresses_reopen": false,
+      "requires_recheck": true,
+      "requires_effect_watch": true
+    },
+    "needs_source": {
+      "label": "Quelle noetig",
+      "task_state": "open",
+      "default_effect": "source_task",
+      "suppresses_reopen": false,
+      "requires_recheck": true,
+      "requires_effect_watch": false
+    },
+    "needs_visual_fix": {
+      "label": "Visual-Korrektur noetig",
+      "task_state": "open",
+      "default_effect": "visual_followup",
+      "suppresses_reopen": false,
+      "requires_recheck": true,
+      "requires_effect_watch": true
+    },
+    "snoozed": {
+      "label": "Zurueckgestellt",
+      "task_state": "snoozed",
+      "default_effect": "temporary_suppression",
+      "suppresses_reopen": true,
+      "requires_recheck": true,
+      "requires_effect_watch": false
+    },
+    "watch": {
+      "label": "Beobachten",
+      "task_state": "auto_routed",
+      "default_effect": "watch_recheck",
+      "suppresses_reopen": false,
+      "requires_recheck": true,
+      "requires_effect_watch": false
+    }
+  },
+  "status_aliases": {
+    "accepted": "accepted",
+    "ok": "accepted",
+    "confirmed": "confirmed",
+    "verified": "confirmed",
+    "corrected": "corrected",
+    "fixed": "corrected",
+    "done": "done",
+    "completed": "done",
+    "erledigt": "done",
+    "umgesetzt": "done",
+    "duplicate": "duplicate",
+    "doppelt": "duplicate",
+    "rejected": "rejected_low_value",
+    "abgelehnt": "rejected_low_value",
+    "verworfen": "rejected_low_value",
+    "irrelevant": "rejected_low_value",
+    "not_public": "rejected_not_public",
+    "not_local": "rejected_not_local",
+    "source_weak": "rejected_source_weak",
+    "commercial": "rejected_commercial",
+    "needs_patch": "needs_patch",
+    "patch_needed": "needs_patch",
+    "needs_source": "needs_source",
+    "needs_visual_fix": "needs_visual_fix",
+    "snoozed": "snoozed",
+    "zurueckgestellt": "snoozed",
+    "watch": "watch",
+    "observe": "watch",
+    "closed": "done",
+    "archived": "done",
+    "archiviert": "done",
+    "dismissed": "rejected_low_value",
+    "not_relevant": "rejected_low_value",
+    "stale": "rejected_low_value",
+    "closed_as_stale": "rejected_low_value"
+  },
+  "rule_quality_metrics": [
+    "applied_count",
+    "prevented_count",
+    "recurrence_count",
+    "false_positive_count",
+    "last_seen_at",
+    "expires_at"
+  ],
+  "required_decision_fields": [
+    "decision_class",
+    "decision_note",
+    "resolved_by",
+    "resolved_at",
+    "suppress_until",
+    "recheck_at",
+    "reopen_policy",
+    "expected_effect_window_days",
+    "source_fingerprint",
+    "content_fingerprint"
+  ]
+}

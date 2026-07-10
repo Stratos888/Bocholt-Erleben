@@ -13,6 +13,24 @@ function be_base_path(string ...$segments): string
     return $path;
 }
 
+function be_merge_config(array $base, array $override): array
+{
+    foreach ($override as $key => $value) {
+        if (
+            is_array($value) &&
+            isset($base[$key]) &&
+            is_array($base[$key])
+        ) {
+            $base[$key] = be_merge_config($base[$key], $value);
+        } else {
+            $base[$key] = $value;
+        }
+    }
+
+    return $base;
+}
+
+
 function be_get_config(): array
 {
     static $config = null;
@@ -32,6 +50,16 @@ function be_get_config(): array
     }
 
     $config = $loaded;
+
+    $localConfigPath = be_base_path('_config.local.php');
+    if (is_file($localConfigPath)) {
+        $localConfig = require $localConfigPath;
+        if (!is_array($localConfig)) {
+            throw new RuntimeException('Private local app config is invalid.');
+        }
+        $config = be_merge_config($config, $localConfig);
+    }
+
     return $config;
 }
 

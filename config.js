@@ -291,6 +291,7 @@ function sendValueMetric(metricKey, payload = {}) {
   const endpoint = CONFIG.analytics.valueMetricsEndpoint || "/api/value-track.php";
   const destinationUrl = sanitizeAnalyticsValue(payload.destinationUrl || payload.url, 500);
   const reportingTarget = normalizeReportingTargetPayload(payload);
+  const sourceContext = sanitizeMetricKey(payload.sourceContext || payload.source_context);
 
   const body = JSON.stringify({
     metric_key: cleanMetricKey,
@@ -301,6 +302,7 @@ function sendValueMetric(metricKey, payload = {}) {
     reporting_target_type: reportingTarget.reportingTargetType,
     reporting_target_id: reportingTarget.reportingTargetId,
     reporting_target_title: reportingTarget.reportingTargetTitle,
+    source_context: sourceContext,
     page_path: sanitizeAnalyticsValue(
       typeof window !== "undefined" ? window.location.pathname : "",
       255
@@ -356,6 +358,7 @@ function trackOutboundClick(payload = {}) {
   const entityId = sanitizeAnalyticsValue(payload.entityId, 120) || "";
   const entityTitle = sanitizeAnalyticsValue(payload.entityTitle, 150) || "";
   const reportingTarget = normalizeReportingTargetPayload(payload);
+  const sourceContext = sanitizeMetricKey(payload.sourceContext || payload.source_context);
   const pagePath = sanitizeAnalyticsValue(
     typeof window !== "undefined" ? window.location.pathname : "",
     200
@@ -370,6 +373,7 @@ function trackOutboundClick(payload = {}) {
     reporting_target_type: reportingTarget.reportingTargetType,
     reporting_target_id: reportingTarget.reportingTargetId,
     reporting_target_title: reportingTarget.reportingTargetTitle,
+    source_context: sourceContext,
     destination_domain: destinationDomain,
     destination_url: destinationUrl,
     page_path: pagePath
@@ -383,6 +387,7 @@ function trackOutboundClick(payload = {}) {
     reporting_target_type: reportingTarget.reportingTargetType,
     reporting_target_id: reportingTarget.reportingTargetId,
     reporting_target_title: reportingTarget.reportingTargetTitle,
+    source_context: sourceContext,
     destination_domain: destinationDomain,
     page_path: pagePath
   });
@@ -393,6 +398,7 @@ function trackOutboundClick(payload = {}) {
     entityType,
     entityId,
     entityTitle,
+    sourceContext,
     ...reportingTarget
   });
 }
@@ -402,6 +408,7 @@ function trackValueMetric(metricKey, payload = {}) {
   if (!cleanMetricKey) return;
 
   const reportingTarget = normalizeReportingTargetPayload(payload);
+  const sourceContext = sanitizeMetricKey(payload.sourceContext || payload.source_context);
 
   emitGa4Event(`be_${cleanMetricKey}`, {
     entity_type: sanitizeAnalyticsValue(payload.entityType || payload.entity_type, 40),
@@ -410,6 +417,7 @@ function trackValueMetric(metricKey, payload = {}) {
     reporting_target_type: reportingTarget.reportingTargetType,
     reporting_target_id: reportingTarget.reportingTargetId,
     reporting_target_title: reportingTarget.reportingTargetTitle,
+    source_context: sourceContext,
     page_path: sanitizeAnalyticsValue(
       typeof window !== "undefined" ? window.location.pathname : "",
       200
@@ -418,7 +426,19 @@ function trackValueMetric(metricKey, payload = {}) {
 
   sendValueMetric(cleanMetricKey, {
     ...payload,
+    sourceContext,
     ...reportingTarget
+  });
+}
+
+function trackShareAction(payload = {}) {
+  trackValueMetric("event_share_click", {
+    entityType: payload.entityType || payload.entity_type || "event",
+    entityId: payload.entityId || payload.entity_id,
+    entityTitle: payload.entityTitle || payload.entity_title,
+    destinationUrl: payload.destinationUrl || payload.url,
+    sourceContext: payload.sourceContext || payload.source_context || "unknown",
+    ...normalizeReportingTargetPayload(payload)
   });
 }
 
@@ -586,6 +606,7 @@ function initAnalytics() {
   window.BEAnalytics = window.BEAnalytics || {};
   window.BEAnalytics.trackOutboundClick = trackOutboundClick;
   window.BEAnalytics.trackValueMetric = trackValueMetric;
+  window.BEAnalytics.trackShareAction = trackShareAction;
   window.BEAnalytics.buildReportingTargetPayload = buildReportingTargetPayload;
   window.BEAnalytics.setValueMetricsOptOut = setValueMetricsOptOut;
   window.BEAnalytics.isValueMetricsOptedOut = isValueMetricsOptedOut;

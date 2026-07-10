@@ -1,6 +1,6 @@
 # COMMERCIAL_STRATEGY — BOCHOLT ERLEBEN
 
-Stand: 2026-07-02
+Stand: 2026-07-06
 
 Status: strategische Arbeitsgrundlage, kein Vertrag und keine juristische Leistungsbeschreibung. `Produktvertrag.md` bleibt fuer Vertragslogik massgeblich. Diese Datei steuert die kommerzielle Produktausrichtung und die naechsten Workpacks.
 
@@ -27,19 +27,21 @@ mehr gute Veranstalter/Anbieter
 -> noch bessere Inhalte
 ```
 
-## 2. Grundentscheidung: Free-Basis plus bezahlter Service
+## 2. Grundentscheidung: Tipp-Kanal plus bezahlter Service
 
-Bocholt erleben startet nicht mit einer harten Paywall fuer einfache Eventvorschlaege.
+Bocholt erleben startet nicht mit einer harten Paywall fuer einfache redaktionelle Hinweise. Gleichzeitig wird kein kostenloser Parallel-Funnel fuer vollstaendige Einreichungen gebaut.
 
-Empfohlenes Modell:
+Finales Modell:
 
-- Kostenlose Basis: Veranstaltungen und Aktivitaeten koennen vorgeschlagen werden. Veroeffentlichung erfolgt nur nach redaktioneller Eignung und Qualitaetsstandard.
+- Kostenloser Tipp-Kanal: Buerger, Besucher, Vereine, Veranstalter, Locations oder interne Redaktion koennen fehlende Veranstaltungen, Aktivitaeten oder Orte ueber das bestehende Feedback-Formular vorschlagen. Ein Link oder kurzer Hinweis reicht. Das ist kein Anbieterprodukt, keine Einreichung und kein Statusprozess.
+- Redaktionelle Auswahl: Ein Tipp ist nur ein Eingangssignal. Veroeffentlichung erfolgt nur nach redaktioneller Eignung, Quellenlage und Plattformqualitaet. Es gibt keine Veroeffentlichungsgarantie, keinen Anbieterbereich, keine Prioritaet und keinen Wirkungsbericht.
 - Bezahlte Premium-/Service-Schicht: Aufwandersparnis, dauerhafte Praesenz, Wirkungsbericht, automatische Uebernahme, komfortable Aenderungen und Anbieterbetreuung.
-- Startpartner: kostenlose oder verguenstigte Pilotphase ist moeglich, um echte Wirkung und Zahlungsbereitschaft zu beweisen.
+- Startpartner-Pilot: passende neue Partner erhalten einmalig 6 Monate volle Anbieterleistung mit Wirkungsmessung. Danach wird anhand der gemessenen Wirkung in einen regulaeren Tarif ueberfuehrt.
 
 Nicht empfohlen als Kernmodell:
 
-- harte Paywall fuer einfache Eintraege,
+- harte Paywall fuer einfache Tipps,
+- neues kostenloses Vorschlagsformular mit Anbieter-/Einreichungslogik,
 - dauerhaft alles kostenlos und nur Werbung,
 - Display-Werbung als Hauptumsatz,
 - gekaufte Empfehlungen,
@@ -50,7 +52,7 @@ Nicht empfohlen als Kernmodell:
 
 Alle veroeffentlichten Inhalte muessen denselben oeffentlichen Qualitaetsstandard haben.
 
-Kostenlose und bezahlte Inhalte duerfen sich oeffentlich nicht wie `billig` und `premium` anfuehlen.
+Kostenlose redaktionell uebernommene Inhalte und bezahlte Inhalte duerfen sich oeffentlich nicht wie `billig` und `premium` anfuehlen.
 
 Nicht verkaufen:
 
@@ -138,28 +140,43 @@ Keine SEO-Massenrunde ohne messbare Objektbasis.
 
 ## 6. Startpartner-Logik
 
-Startpartner sind sinnvoll, solange sie als Pilot zum Nutzennachweis verstanden werden.
+Startpartner werden nicht als dauerhaft kostenlose Vollleistung gefuehrt, sondern als einmaliger Wirkungsnachweis mit klarem Uebergang in einen regulaeren Tarif.
 
-Regeln:
-
-- kostenlos oder verguenstigt nur zeitlich oder mengenmaessig begrenzt,
-- Ziel ist Feedback und Wirkung, nicht dauerhaft kostenlose Vollleistung,
-- Anbieter sollen spaeter einen klaren Bericht bekommen,
-- danach folgt ein einfaches Bezahlangebot.
-
-Beispiel:
+Finale Regel:
 
 ```text
-Startpartner testet 60 bis 90 Tage.
-Bocholt erleben zeigt danach Aufrufe, Klicks und Feedback.
-Anschliessend wird entschieden, welches Premium-/Servicepaket passt.
+6 Monate Startpartner-Pilot mit voller Anbieterleistung und Wirkungsmessung.
+Danach Wirkung auswerten und in einen regulaeren Tarif ueberfuehren.
 ```
+
+Warum 6 Monate:
+
+- 90 Tage sind fuer viele Aktivitaeten, Orte und saisonale Angebote zu knapp, weil Sichtbarkeit, Wetter, Ferien und Nutzungsschwankungen die Messung verzerren koennen.
+- 6 Monate reichen fuer Einrichtung, redaktionelle Optimierung, wiederholte Nutzung, erste Wirkung und eine belastbarere Auswertung.
+- 12 Monate waeren als Beweiszeitraum zwar lang, wirken aber zu stark wie dauerhaft kostenlose Anbieterleistung.
+
+Enthalten im Pilot:
+
+- oeffentliche Darstellung im normalen Qualitaetsstandard,
+- Anbieterbereich mit Einreichungen und Pflegeweg,
+- Wirkungskarte mit gemessenen Aufrufen, Website-/Ticket-Klicks, Route/Maps und Teilungen,
+- Auswertung nach 6 Monaten als Grundlage fuer die langfristige Bindung.
+
+Nicht enthalten:
+
+- dauerhaft kostenlose Anbieterleistung,
+- oeffentliche Besserstellung gegenueber kostenlosen redaktionellen Inhalten,
+- mehrere parallel beworbene Testmodelle,
+- garantierte Veroeffentlichung ungeeigneter Inhalte.
+
+Der kostenlose Tipp-Kanal bleibt davon getrennt. Er dient der Content-Vollstaendigkeit und hat keine Veroeffentlichungsgarantie, keinen Anbieterbereich und keinen Wirkungsbericht.
 
 ## 7. Redaktionelle Vertrauensregeln
 
 Redaktionelle Qualitaet bleibt fuehrend.
 
 - Zahlung garantiert keine automatische Veroeffentlichung.
+- Tipps garantieren keine Pruefung in bestimmter Frist und keine Uebernahme.
 - Empfehlungen und Today-Auswahl bleiben redaktionell/algorithmisch vertrauensbasiert.
 - Bezahlte Inhalte duerfen nicht den Nutzerwert verschlechtern.
 - Sponsoring oder Partnerformate muessen spaeter klar gekennzeichnet sein.
@@ -167,15 +184,13 @@ Redaktionelle Qualitaet bleibt fuehrend.
 
 ## 8. Naechste Massnahmen
 
-1. `ROADMAP.md` auf kommerzielle Premium-Phase umstellen.
-2. Einzeltermin-Referenzpfad planen:
-   - Detailseite,
-   - Tracking,
-   - Dashboard-Wirkung,
-   - Aenderung/Absage,
-   - Verkaufsseite.
-3. Bestehende Anbieter-/Sichtbar-werden-Seiten danach auf Ergebnisversprechen pruefen.
-4. Startpartner-Ansprache erst mit klarer Nutzenstory und Testlogik starten.
+1. Feedback-Formular als Tipp-Kanal sichtbar machen, aber kein neues Vorschlagsformular bauen.
+2. Verkaufs-/Sichtbar-werden-Seiten auf drei sauber getrennte Nutzerintentionen pruefen:
+   - nur Tipp senden,
+   - konkret sichtbar werden,
+   - Startpartner anfragen.
+3. Startpartner-Route als 6-Monats-Anfrageweg fuehren, nicht als weiterer Tarif in der normalen Tarifliste.
+4. Bestehende Anbieter-/Sichtbar-werden-Seiten weiter auf Ergebnisversprechen pruefen.
 5. Content-/Visual-/Inbox-Prozess parallel als Qualitaetsschutz weiterfuehren.
 
 ## 9. Harte Entscheidungsfrage fuer jedes neue Workpack

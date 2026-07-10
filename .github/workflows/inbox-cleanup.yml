@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install google-api-python-client google-auth
+          pip install google-api-python-client google-auth pymysql
 
       - name: Archive + cleanup Inbox
         env:
@@ -45,4 +45,46 @@ jobs:
           fi
           echo "Inbox cleanup tabs: ${TAB_INBOX} -> ${TAB_ARCHIVE}"
           python scripts/inbox-archive-cleanup.py
+
+      # === BEGIN BLOCK: CONTENT_OPS_RECORD_INBOX_CLEANUP_IMPACT_V1 | Zweck: persistiert Archivierungswirkung und offene Inbox-Restmenge fuer Verwaltungs-Metriken; Umfang: keine Aenderung der Archivierungslogik ===
+      - name: Record Content Ops inbox cleanup impact
+        if: always()
+        shell: bash
+        env:
+          BE_ENVIRONMENT: ${{ github.ref_name == 'staging' && 'staging' || 'live' }}
+          GITHUB_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          LIVE_DB_HOST: ${{ secrets.LIVE_DB_HOST }}
+          LIVE_DB_NAME: ${{ secrets.LIVE_DB_NAME }}
+          LIVE_DB_USER: ${{ secrets.LIVE_DB_USER }}
+          LIVE_DB_PASSWORD: ${{ secrets.LIVE_DB_PASSWORD }}
+          LIVE_DB_PORT: ${{ secrets.LIVE_DB_PORT }}
+          STAGING_DB_HOST: ${{ secrets.STAGING_DB_HOST }}
+          STAGING_DB_NAME: ${{ secrets.STAGING_DB_NAME }}
+          STAGING_DB_USER: ${{ secrets.STAGING_DB_USER }}
+          STAGING_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+          STAGING_DB_PORT: ${{ secrets.STAGING_DB_PORT }}
+        run: |
+          set -e
+          python scripts/content-ops-control.py record-inbox-cleanup
+
+      - name: Send Content Ops inbox cleanup impact to HTTP ingest
+        if: always()
+        shell: bash
+        env:
+          CONTENT_OPS_INGEST_URL: ${{ secrets.CONTENT_OPS_INGEST_URL }}
+          CONTENT_OPS_INGEST_TOKEN: ${{ secrets.CONTENT_OPS_INGEST_TOKEN }}
+        run: |
+          set -e
+          python scripts/content-ops-http-ingest.py --input data/content-ops
+
+      - name: Upload inbox cleanup content ops impact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: inbox-cleanup-content-ops-impact
+          path: |
+            data/inbox-cleanup-summary.json
+            data/content-ops/*.json
+          if-no-files-found: ignore
+      # === END BLOCK: CONTENT_OPS_RECORD_INBOX_CLEANUP_IMPACT_V1 ===
 # === END BLOCK: INBOX CLEANUP WORKFLOW (archive + delete finalized rows) ===

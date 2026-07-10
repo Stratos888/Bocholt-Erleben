@@ -908,6 +908,7 @@ function createCard(event, visualUsage = null) {
         entityId: String(event?.id || "").trim(),
         entityTitle: String(event?.title || "").trim(),
         destinationUrl: primaryUrl,
+        sourceContext: "event_card",
         ...(window.BEAnalytics?.buildReportingTargetPayload
           ? window.BEAnalytics.buildReportingTargetPayload(event)
           : {})
@@ -966,6 +967,17 @@ function createCard(event, visualUsage = null) {
     e.preventDefault();
     e.stopPropagation();
 
+    const shareAnalyticsPayload = {
+      entityType: "event",
+      entityId: String(event?.id || "").trim(),
+      entityTitle: String(event?.title || "").trim(),
+      destinationUrl: sharePayload.url || "",
+      sourceContext: "event_card",
+      ...(window.BEAnalytics?.buildReportingTargetPayload
+        ? window.BEAnalytics.buildReportingTargetPayload(event)
+        : {})
+    };
+
     try {
       if (navigator.share) {
         await navigator.share({
@@ -973,6 +985,11 @@ function createCard(event, visualUsage = null) {
           text: sharePayload.text,
           url: sharePayload.url || undefined
         });
+        if (window.BEAnalytics?.trackShareAction) {
+          window.BEAnalytics.trackShareAction(shareAnalyticsPayload);
+        } else if (window.BEAnalytics?.trackValueMetric) {
+          window.BEAnalytics.trackValueMetric("event_share_click", shareAnalyticsPayload);
+        }
         return;
       }
     } catch (_) {}
@@ -982,6 +999,9 @@ function createCard(event, visualUsage = null) {
         await navigator.clipboard.writeText(
           [sharePayload.text, sharePayload.url].filter(Boolean).join("\n")
         );
+        if (window.BEAnalytics?.trackValueMetric) {
+          window.BEAnalytics.trackValueMetric("event_copy_link", shareAnalyticsPayload);
+        }
       }
     } catch (_) {}
   });
