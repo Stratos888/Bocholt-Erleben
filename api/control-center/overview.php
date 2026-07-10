@@ -75,11 +75,17 @@ function be_cc_safe_source_sync(string $key, string $label, callable $callback):
 try {
     be_cc_ensure_schema();
 
-    // Jede Quelle ist einzeln gekapselt. Die führende Sheet-Inbox wird zuerst
-    // gelesen; der JSON-Feed bleibt ein deduplizierter Fallback.
+    // Die führende Sheet-Inbox wird zuerst gelesen. Der JSON-Bestand wird nur
+    // bei einem echten Sheet-Fehler verwendet und kann daher keine parallelen
+    // Doppelvorgänge erzeugen.
+    $sheetInbox = be_cc_safe_source_sync('sheet_inbox', 'Führende Sheet-Inbox', 'be_cc_sync_sheet_inbox');
+    $inboxFallback = ($sheetInbox['status'] ?? '') === 'error'
+        ? be_cc_safe_source_sync('inbox_feed', 'Inbox-JSON-Fallback', 'be_cc_sync_inbox_feed')
+        : ['status' => 'standby', 'label' => 'Inbox-JSON-Fallback', 'seen' => 0, 'upserted' => 0, 'message' => 'Nicht benötigt, weil die führende Sheet-Inbox verfügbar ist.'];
+
     $sync = [
-        'sheet_inbox' => be_cc_safe_source_sync('sheet_inbox', 'Führende Sheet-Inbox', 'be_cc_sync_sheet_inbox'),
-        'inbox_feed_fallback' => be_cc_safe_source_sync('inbox_feed', 'Inbox-JSON-Fallback', 'be_cc_sync_inbox_feed'),
+        'sheet_inbox' => $sheetInbox,
+        'inbox_feed_fallback' => $inboxFallback,
         'submissions' => be_cc_safe_source_sync('submissions', 'Anbieter-Einreichungen', 'be_cc_sync_submissions'),
         'content_audit' => be_cc_safe_source_sync('content_audit', 'Content-Prüfung', 'be_cc_sync_content_audit'),
         'growth_backlog' => be_cc_safe_source_sync('growth_backlog', 'Growth-Backlog', 'be_cc_sync_growth_backlog'),
