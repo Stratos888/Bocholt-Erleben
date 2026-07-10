@@ -28,7 +28,7 @@ function be_cc_sync_submissions(): array
             'payment_released', 'checkout_started' => 'Zahlungsbestätigung abwarten.',
             default => 'Einreichung prüfen.',
         };
-        be_cc_upsert_source_case([
+        $caseId = be_cc_upsert_source_case([
             'type' => $isDecision ? 'intake' : 'task',
             'state' => $state,
             'priority' => $status === 'paid' ? 'high' : 'normal',
@@ -43,6 +43,20 @@ function be_cc_sync_submissions(): array
             'source_payload' => $row,
             'decision_ready' => $isDecision,
         ]);
+
+        // Eine zuvor wartende Einreichung muss nach bestätigter Zahlung wieder
+        // als echte Entscheidung sichtbar werden. Bewusste Snoozes/Blockaden bleiben erhalten.
+        if (in_array($status, ['paid', 'in_review'], true)) {
+            $advance = $pdo->prepare(
+                "UPDATE control_cases
+                 SET case_type='intake', state='decision_required', decision_ready=1, priority=:priority, updated_at=NOW()
+                 WHERE id=:id AND state='waiting'"
+            );
+            $advance->execute(['id' => $caseId, 'priority' => $status === 'paid' ? 'high' : 'normal']);
+            if ($advance->rowCount() === 1) {
+                be_cc_record_event($pdo, $caseId, 'source_payment_confirmed', 'waiting', 'decision_required', ['submission_status' => $status], 'system');
+            }
+        }
         $count++;
     }
     return ['seen' => count($items), 'upserted' => $count];
