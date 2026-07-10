@@ -13,6 +13,7 @@ try {
         'inbox' => be_cc_sync_inbox_feed(),
         'submissions' => be_cc_sync_submissions(),
         'content_audit' => be_cc_sync_content_audit(),
+        'growth_backlog' => be_cc_sync_growth_backlog(),
     ];
 
     $cases = be_cc_list_cases(['active' => '1']);
@@ -31,7 +32,7 @@ try {
             'sync' => $sync,
             'system' => [
                 'status' => 'ok',
-                'message' => 'Quellen synchronisiert – nur Vorgänge mit Handlungsbedarf werden hervorgehoben.',
+                'message' => 'Alle relevanten Quellen sind synchronisiert. Keine bekannte Störung mit Auswirkung.',
             ],
         ],
     ]);
