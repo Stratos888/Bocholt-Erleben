@@ -1,153 +1,91 @@
 # Steuerzentrale – Simulations- und Validierungsbericht
 
 Stand: 2026-07-10  
-Status: Gesamtprojektintegration plus Feedback-Korrekturpatch dokumentiert; Freeze-Nutzung vorbereitet
+Status: Feedback-Korrekturpatch umgesetzt; Freeze-Nutzung vorbereitet
 
-## 1. Prüfprinzip
-
-Der Bericht trennt verbindlich:
-
-1. statische Syntax- und Vertragsprüfung,
-2. ausgeführte interne Domänensimulation,
-3. reale Laufzeitnachweise gegen Google Sheets, Apps Script, MySQL, GitHub, öffentliche Feeds und Browser.
-
-Keine Ebene ersetzt eine andere.
-
-## 2. Integrierte Gesamtkette
+## Integrierte Gesamtkette
 
 ```text
 Content-Audit
-→ Such- und Visual-Feedback
-→ wöchentliche KI-Eventsuche
+→ Suchfeedback
+→ KI-Eventsuche
 → KI-Intake
 → führende Sheet-Inbox
-→ Steuerzentrale / Prüfen
-→ Events-Sheet oder Anbieter-Datenbank
-→ Deployment beziehungsweise öffentliche API
-→ öffentlicher Event-/Aktivitätsbestand
-→ Nutzer-Funnel
-→ Content-Ops-, Search-Console- und GA4-Wirkung
-→ Entwicklung beziehungsweise neue Arbeit
+→ Prüfen
+→ führende Inhaltsquelle
+→ öffentliche Wirkung
+→ Entwicklungs- und Prozesssignale
 ```
 
-## 3. Bereits ausgeführte Domänensimulationen
+## Bereits simulierte Kernverträge
 
-Geprüft wurden:
-
-- Eventfeld-Aliasse und vollständige Updateplanung,
-- Pflichtfeld-, Datums- und URL-Schutz,
-- öffentliche Eventwerte und Abweichungen,
-- Anbieter-Events mit separater Adresse, Quelle und Ticketlink,
-- Aktivitätsfeld-Whitelist und Sicherheitsgate,
-- Veröffentlichungszustände `failed`, `blocked`, `waiting`, `confirmed`,
+- Event- und Aktivitätsvalidierung,
+- Anbieter-Event-Verifikation,
+- Veröffentlichungszustände,
 - Arbeitsstatusübergänge,
-- technischer Fehler gegenüber erfolgreichem Lauf mit fachlicher Folgearbeit,
-- abhängige Suchlauf→Intake-Kette,
-- fehlender, älterer und bestätigter Intake.
+- technische Prozessfehler gegenüber fachlicher Folgearbeit,
+- Suchlauf→Intake-Abhängigkeit.
 
-Die Simulation fand und bestätigte die Korrektur des PHP-Zeitstempelfalls, bei dem ein leerer Intake-Zeitstempel zuvor als aktueller Zeitpunkt interpretiert werden konnte.
-
-## 4. Feedback-Korrekturpatch
-
-Der Freeze-Patch korrigiert die auf Staging beobachteten Punkte.
+## Feedback-Korrekturpatch
 
 ### Prüfen
 
-- alle Filter zeigen ihre eigene Anzahl,
-- die Zahl basiert immer auf allen aktuell offenen Prüffällen und nicht nur auf dem gerade ausgewählten Filter.
+Jeder Filter zeigt seine eigene aktuelle Anzahl. Leere Gruppen werden mit `(0)` ausgewiesen.
 
 ### Arbeit
 
-- kein `Als Aufgabe starten` für Backlogpunkte,
+- kein sichtbares `Als Aufgabe starten` für Backlogpunkte,
 - kein redundanter `Details`-Button,
-- aufgeklappte Zeile ist die vollständige Detailebene,
-- technische Zustände `Wartet` und `Blockiert` bleiben für reale Prozess- und Veröffentlichungsfälle erhalten.
+- aufgeklappte Zeile ist die vollständige Detailebene.
 
 ### Verwaltung
 
-Die vorher beobachtete Endlosanzeige `Inhalte werden geladen …` wird durch einen fehlertoleranten Ladevertrag ersetzt:
-
-```text
-Redaktionelle Events ─┐
-                      ├─ parallel, jeweils mit Zeitlimit
-Anbieter-Events ──────┘
-→ verfügbare Quellen sofort anzeigen
-→ Teilfehler verständlich melden
-→ nur bei Ausfall aller Eventquellen Gesamtfehler anzeigen
-```
-
-Aktivitäten besitzen einen eigenen Ladepfad mit Zeitlimit.
+Redaktionelle Events und Anbieter-Events werden getrennt und parallel geladen. Jede Anfrage besitzt ein Zeitlimit von 15 Sekunden. Eine verfügbare Quelle bleibt sichtbar, wenn die andere Quelle ausfällt. Nur beim Ausfall beider Eventquellen erscheint ein Gesamtfehler.
 
 ### Entwicklung
 
-Die sichtbare Hauptansicht besteht nur noch aus:
+Die Hauptansicht besteht nur aus:
 
 1. Content,
 2. Prozesse,
 3. Sichtbarkeit.
 
-Weitere Werte sind standardmäßig eingeklappt. Repo-Workpacks werden nicht mehr in Entwicklung wiederholt.
+Weitere Werte liegen eingeklappt. Repo-Workpacks werden nicht wiederholt. Frühere Erweiterungscontroller hängen keine zusätzlichen Entwicklungsblöcke mehr an.
 
-## 5. Automatische Produktverträge des Freeze-Stands
+## Automatische Produktverträge
 
-Der Produktvertragsaudit verlangt nun:
+Der Audit verlangt jetzt:
 
 - Zähler auf allen Prüffiltern,
-- Filterung der Backlog-Umwandlungsaktion,
+- keine sichtbare Backlog-Umwandlungsaktion,
 - keinen Details-Button in Arbeitszeilen,
-- getrennte Eventquellen in der Verwaltung,
-- paralleles Laden mit Zeitlimit,
-- Teilfehleranzeige,
-- kompakte Entwicklungsansicht,
-- keine Workpack-Duplikation in Entwicklung,
-- ehrlichen Veröffentlichungsstatus.
+- getrennte Verwaltungsquellen,
+- Zeitlimit und Teilfehleranzeige,
+- kompakte Entwicklung,
+- keine Workpack-Duplikation.
 
-Der Workflow prüft weiterhin PHP-/JavaScript-Syntax, beide Prozesssimulationen, Produktvertrag, Pflichtdateien und Sicherheitsverträge.
+Der Workflow prüft weiterhin PHP- und JavaScript-Syntax, Domänensimulationen, Produktvertrag, Pflichtdateien und Quellenverträge. Für die jüngsten Commits wurde über den verfügbaren Connector kein Statuscheck geliefert; ein grüner Lauf wird deshalb nicht behauptet.
 
-## 6. Cache- und Auslieferungsvertrag
+## Cache-Vertrag
 
-Der Freeze verwendet eine eigene Asset-Version:
+Asset-Version:
 
 ```text
-2026-07-10-control-center-freeze-v1
+2026-07-10-control-center-freeze-v2
 ```
 
-Die Version gilt für:
+Sie gilt für JavaScript, CSS-Entry-Point und `control-center.css`.
 
-- Steuerzentralen-JavaScript,
-- Integrationscontroller,
-- den CSS-Entry-Point,
-- den Import von `control-center.css`.
+## Freeze-Beobachtung
 
-Damit soll verhindert werden, dass der Browser die zuvor beobachtete Oberfläche aus dem Cache weiterverwendet.
+Während der Nutzung werden insbesondere gesammelt:
 
-## 7. Reale Nachweise während der Freeze-Nutzung
+- Lade- und Speicherfehler,
+- unplausible Zähler,
+- mobile Darstellungsprobleme,
+- falsche Prozessbewertungen,
+- Abweichungen zwischen führender Quelle und öffentlicher Seite.
 
-Während der praktischen Nutzung werden insbesondere beobachtet:
+## Ergebnis
 
-- Verwaltung lädt redaktionelle Events und Anbieter-Events,
-- Teilfehler einer Quelle blockiert die andere nicht,
-- Suche behält den Fokus,
-- Speichern startet die Aktualisierung und bestätigt später die öffentliche Wirkung,
-- Prüffilter zeigen plausible Zähler,
-- Backlog ist ohne unnötige Statusumwandlung bedienbar,
-- Entwicklung bleibt auf Mobilgeräten kompakt,
-- Prozessfehler erscheinen als Arbeit und verschwinden nach erfolgreichem Folgelauf.
-
-## 8. Weiterhin externe Grenzen
-
-Nicht allein durch den Repository-Code beweisbar sind:
-
-- reale Google-Sheets-Berechtigungen,
-- tatsächlicher Apps-Script-Deploy,
-- Staging-MySQL und vorhandene Content-Ops-Daten,
-- öffentliche Feed-/API-Aktualisierung,
-- GitHub-Secret für Aktivitäten,
-- reale Search-Console-/GA4-Daten,
-- Browser- und Geräteverhalten.
-
-## 9. Freeze-Ergebnis
-
-Der Stand wird nach Deployment bewusst nicht weiter konzeptionell erweitert. Er dient zunächst als praktischer Arbeitsstand. Neue Beobachtungen werden gesammelt und erst danach als gebündeltes Folge-Workpack analysiert.
-
-Eine Main-Freigabe ist nicht automatisch Bestandteil dieses Freeze-Stands.
+Der Stand wird nach Deployment zunächst praktisch genutzt und nicht weiter konzeptionell verändert. Neue Rückmeldungen werden gesammelt und später als ein gemeinsames Folge-Workpack bewertet. Eine Main-Freigabe ist nicht automatisch Teil dieses Freeze-Stands.
