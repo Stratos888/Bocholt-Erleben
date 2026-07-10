@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Steuerzentrale · Bocholt erleben</title>
+  <link rel="stylesheet" href="/css/control-center.css?v=2026-07-10-1">
+</head>
+<body class="cc-page">
+  <header class="cc-header">
+    <div>
+      <p class="cc-eyebrow">Bocholt erleben</p>
+      <h1 id="cc-title">Übersicht</h1>
+    </div>
+    <button class="cc-icon-button" id="cc-refresh" type="button" aria-label="Aktualisieren">↻</button>
+  </header>
+
+  <main class="cc-main" id="cc-main">
+    <section class="cc-auth" id="cc-auth">
+      <h2>Zugang</h2>
+      <p>Die Steuerzentrale ist privat. Das Passwort wird nur für diese Sitzung verwendet.</p>
+      <form id="cc-auth-form" class="cc-stack">
+        <label class="cc-field">
+          <span>Review-Passwort</span>
+          <input id="cc-password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="cc-button cc-button--primary" type="submit">Steuerzentrale öffnen</button>
+      </form>
+    </section>
+
+    <section id="cc-content" hidden>
+      <div class="cc-status" id="cc-status" role="status" aria-live="polite"></div>
+      <div id="cc-view"></div>
+    </section>
+  </main>
+
+  <nav class="cc-nav" aria-label="Steuerzentrale">
+    <button type="button" data-view="overview" class="is-active"><span>Übersicht</span></button>
+    <button type="button" data-view="inbox"><span>Eingang</span><b id="cc-badge-inbox" hidden></b></button>
+    <button type="button" data-view="content"><span>Inhalte</span></button>
+    <button type="button" data-view="tasks"><span>Aufgaben</span><b id="cc-badge-tasks" hidden></b></button>
+    <button type="button" data-view="more"><span>Mehr</span></button>
+  </nav>
+
+  <dialog id="cc-dialog" class="cc-dialog">
+    <form method="dialog" class="cc-dialog__card" id="cc-dialog-form">
+      <button class="cc-dialog__close" value="cancel" aria-label="Schließen">×</button>
+      <div id="cc-dialog-body"></div>
+    </form>
+  </dialog>
+
+  <script src="/js/control-center.js?v=2026-07-10-1" defer></script>
+</body>
+</html>
