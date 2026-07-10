@@ -156,18 +156,24 @@ function be_cc_apply_action(string $caseId, string $action, array $payload): arr
         }
         if (in_array($to, ['done', 'rejected'], true)) $fields[] = 'completed_at = NOW()';
         else $fields[] = 'completed_at = NULL';
+
         if ($action === 'snooze') {
             $until = trim((string)($payload['until'] ?? ''));
             if ($until === '') throw new InvalidArgumentException('Snooze date is required.');
             $fields[] = 'snoozed_until = :snoozed_until';
             $params['snoozed_until'] = (new DateTimeImmutable($until))->format('Y-m-d H:i:s');
-        } elseif ($to !== 'snoozed') $fields[] = 'snoozed_until = NULL';
-        if ($action === 'block') {
+        } elseif ($to !== 'snoozed') {
+            $fields[] = 'snoozed_until = NULL';
+        }
+
+        if (in_array($action, ['wait', 'block'], true)) {
             $reason = trim((string)($payload['reason'] ?? ''));
-            if ($reason === '') throw new InvalidArgumentException('Block reason is required.');
+            if ($reason === '') throw new InvalidArgumentException($action === 'wait' ? 'Waiting reason is required.' : 'Block reason is required.');
             $fields[] = 'blocked_reason = :blocked_reason';
             $params['blocked_reason'] = $reason;
-        } elseif ($to !== 'blocked') $fields[] = 'blocked_reason = NULL';
+        } elseif (!in_array($to, ['waiting', 'blocked'], true)) {
+            $fields[] = 'blocked_reason = NULL';
+        }
 
         $update = $pdo->prepare('UPDATE control_cases SET ' . implode(', ', $fields) . ' WHERE id = :id');
         $update->execute($params);
