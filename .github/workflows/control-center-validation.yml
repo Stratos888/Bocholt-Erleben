@@ -1,0 +1,56 @@
+name: Control Center Validation
+
+on:
+  push:
+    branches: ["staging", "main"]
+    paths:
+      - "api/control-center/**"
+      - "steuerzentrale/**"
+      - "js/control-center.js"
+      - "css/control-center.css"
+      - ".github/workflows/control-center-validation.yml"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate PHP syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          find api/control-center -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: node --check js/control-center.js
+
+      - name: Validate required control center files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s steuerzentrale/index.html
+          test -s css/control-center.css
+          test -s js/control-center.js
+          test -s api/control-center/overview.php
+          test -s api/control-center/cases.php
+          test -s api/control-center/action.php
+          test -s api/control-center/case.php
+          test -s api/control-center/_schema.php
+          test -s api/control-center/_domain.php
+          test -s api/control-center/_sources.php
+          test -s api/control-center/_writeback.php
+          test -s api/control-center/_submission_source.php
+          test -s api/control-center/_submission_writeback.php
+
+      - name: Validate security and source contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -R "be_require_review_access" api/control-center/*.php >/dev/null
+          grep -q "X-BE-Review-Password" js/control-center.js
+          grep -q "source_reference" api/control-center/_schema.php
+          grep -q "UNIQUE KEY uq_control_cases_source" api/control-center/_schema.php
+          grep -q "source_payment_confirmed" api/control-center/_submission_source.php
