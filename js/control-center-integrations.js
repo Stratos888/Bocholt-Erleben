@@ -74,7 +74,17 @@
 
   async function loadDevelopmentIntegration() {
     try {
-      developmentData = await api('/api/control-center/development.php');
+      const [development, overview] = await Promise.all([
+        api('/api/control-center/development.php'),
+        api('/api/control-center/overview.php'),
+      ]);
+      developmentData = development;
+      developmentData.automation = developmentData.automation || {};
+      developmentData.automation.process_health = {
+        status: overview.system?.status || 'unknown',
+        message: overview.system?.message || '',
+        items: overview.system?.processes || [],
+      };
       enhanceDevelopment();
     } catch (_) {
       // Der bestehende Entwicklungsbereich zeigt seinen eigenen Fehlerzustand.
