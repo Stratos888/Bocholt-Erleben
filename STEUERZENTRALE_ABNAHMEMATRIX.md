@@ -3,182 +3,145 @@
 Stand: 2026-07-10
 Status: verbindliche Definition of Done
 
-## 1. Bewertungsregel
+## 1. Regel
 
-Jedes Kriterium wird ausschließlich mit `BESTANDEN` oder `NICHT BESTANDEN` bewertet.
+Jedes Muss-Kriterium wird nur mit `BESTANDEN` oder `NICHT BESTANDEN` bewertet. Ein Main-Merge ist ausgeschlossen, solange ein Muss-Kriterium offen ist.
 
-Ein Bereich gilt nur dann als fertig, wenn alle Muss-Kriterien bestanden sind. Ein technisch funktionierender Teilbereich mit offenen Muss-Kriterien ist kein abnahmefähiger Produktzustand.
+## 2. Navigation und Shell
 
-## 2. Globale Shell und Navigation
-
-| ID | Muss-Kriterium | BESTANDEN, wenn |
+| ID | Kriterium | BESTANDEN, wenn |
 |---|---|---|
-| NAV-01 | Navigation dauerhaft sichtbar | Hauptnavigation bei jeder Scrollposition sichtbar bleibt |
-| NAV-02 | Mobile Fixierung | Bottom-Bar auf Mobil- und Tabletbreite am Viewport fixiert ist |
-| NAV-03 | Safe Area | Inhalte und Navigation auf Geräten mit Safe Area nicht überdeckt werden |
-| NAV-04 | Zielstruktur | Navigation exakt Übersicht, Bearbeiten, Aufgaben, Verwaltung, Mehr enthält |
-| NAV-05 | Keine Platzhalter | Jeder sichtbare Hauptbereich eine echte Funktion besitzt |
-| NAV-06 | Badges | Nur Bearbeiten und Aufgaben handlungsrelevante aktive Fälle zählen |
-| NAV-07 | Touchziele | alle primären Navigationselemente mindestens 44 px bedienbare Fläche besitzen |
-| NAV-08 | Desktop | Navigation auch auf Desktop dauerhaft erreichbar ist |
+| NAV-01 | Zielstruktur | exakt Übersicht, Bearbeiten, Arbeit, Verwaltung, Menü sichtbar sind |
+| NAV-02 | Dauerhaft erreichbar | Navigation bei jeder Scrollposition sichtbar bleibt |
+| NAV-03 | Responsive | Mobil, Tablet und Desktop ohne Überdeckung funktionieren |
+| NAV-04 | Keine Platzhalter | jeder Hauptbereich echte Funktionen besitzt |
+| NAV-05 | Badges | nur aktive Bearbeiten-Fälle und fällige/aktive Arbeit zählen |
+| NAV-06 | Safe Area/Touch | Safe Area berücksichtigt und Touchziele mindestens 44 px sind |
 
 ## 3. Übersicht
 
-| ID | Muss-Kriterium | BESTANDEN, wenn |
+| ID | Kriterium | BESTANDEN, wenn |
 |---|---|---|
-| OVR-01 | Sofortverständlichkeit | innerhalb weniger Sekunden erkennbar ist, ob jetzt Handlung nötig ist |
-| OVR-02 | Verdichtung | keine vollständige Wiederholung aller Bearbeiten-Karten erfolgt |
-| OVR-03 | Jetzt erforderlich | nur dringende, überfällige, blockierende oder kritische Fälle enthält |
-| OVR-04 | Neuer Eingang | Vorgänge nach Typ verdichtet zusammenfasst |
-| OVR-05 | Als Nächstes | nächste Aufgaben, Wiedervorlagen und wartende relevante Fälle zeigt |
-| OVR-06 | Zur Kenntnis | Informationen ohne Handlungsdruck ruhig verdichtet |
-| OVR-07 | Systemzustand | Normalzustand knapp und nicht alarmistisch darstellt |
-| OVR-08 | Keine Doppelzählung | derselbe Vorgang nicht mehrfach als vollständiges Element erscheint |
-| OVR-09 | Mobile Above-the-fold | wichtigster Handlungsblock ohne Scrollen verständlich ist |
+| OVR-01 | Verdichtung | keine vollständigen Arbeitskarten wiederholt werden |
+| OVR-02 | Priorisierung | dringend, Bearbeiten und Arbeit fachlich korrekt getrennt sind |
+| OVR-03 | Keine Doppelzählung | ein Vorgang nur einmal führend gezählt wird |
+| OVR-04 | Systemwirkung | nur Störungen mit fachlicher Auswirkung auffallen |
+| OVR-05 | Direkter Einstieg | jeder Handlungsblock den richtigen Bereich/Filter öffnet |
 
 ## 4. Bearbeiten
 
-| ID | Muss-Kriterium | BESTANDEN, wenn |
+| ID | Kriterium | BESTANDEN, wenn |
 |---|---|---|
-| WRK-01 | Fachliche Filter | Neue Inhalte, Änderungen, Qualität, Anbieter, Freigaben unterscheidbar sind |
-| WRK-02 | Fokus mobil | mobil genau ein Vorgang fokussiert bearbeitet wird |
-| WRK-03 | Master-Detail Desktop | Desktop kompakte Queue und Detailansicht nutzt |
-| WRK-04 | Keine Kartenwand | keine mehrspaltige Darstellung vollständiger Entscheidungskarten existiert |
-| WRK-05 | Hauptaktion | primäre Aktion exakt dem fachlich nächsten Schritt entspricht |
-| WRK-06 | Statussprache | keine englischen internen Statuswerte sichtbar sind |
-| WRK-07 | Kontext | Grund, Objekt, Quelle und relevante Daten verständlich sichtbar sind |
-| WRK-08 | Technische Details | IDs, Auditcodes und Rohdaten standardmäßig eingeklappt sind |
-| WRK-09 | Navigation | Vorher/Weiter beziehungsweise nächste Auswahl zuverlässig funktioniert |
-| WRK-10 | Aktionsergebnis | nach erfolgreicher Aktion der nächste passende Fall erscheint |
-| WRK-11 | Filtererhalt | Filter- und Auswahlzustand nach Aktion erhalten bleiben |
-| WRK-12 | Ablehnung | Ablehnungsgrund verlangt und Wirkung klar bestätigt wird |
-| WRK-13 | Zurückstellen | Fall bis Wiedervorlage aus normaler Arbeitsmenge verschwindet |
-| WRK-14 | Quellkonsistenz | zentraler Abschluss erst nach erfolgreichem Quell-Writeback erfolgt |
-| WRK-15 | Keine Scheinf­reigabe | korrekturbedürftige Fälle nicht mit allgemeinem Freigeben abgeschlossen werden |
+| WRK-01 | Fachliche Filter | Neue Inhalte, Änderungen, Qualität, Anbieter und Freigaben unterscheidbar sind |
+| WRK-02 | Fokus mobil | genau ein Vorgang bearbeitet wird |
+| WRK-03 | Master-Detail | Desktop Queue plus Detail verwendet |
+| WRK-04 | Hauptaktion | Aktion exakt dem fachlichen nächsten Schritt entspricht |
+| WRK-05 | Kontext | Problem, Objekt, Quelle und relevante Daten verständlich sind |
+| WRK-06 | Statussprache | keine internen englischen Statuswerte sichtbar sind |
+| WRK-07 | Quellkonsistenz | Abschluss erst nach erfolgreichem Quell-Writeback erfolgt |
+| WRK-08 | Nächster Fall | nach Erfolg der nächste passende Fall geöffnet wird |
+| WRK-09 | Zustanderhalt | Filter, Auswahl und Queue-Scrollposition erhalten bleiben |
+| WRK-10 | Ablehnung/Zurückstellen | Grund beziehungsweise Wiedervorlage korrekt verarbeitet werden |
 
-## 5. Aufgaben
+## 5. Arbeit
 
-| ID | Muss-Kriterium | BESTANDEN, wenn |
+| ID | Kriterium | BESTANDEN, wenn |
 |---|---|---|
-| TSK-01 | Manuelle Erfassung | Aufgabe mit Titel und nächstem Schritt angelegt werden kann |
-| TSK-02 | Umwandlung | Eingang ohne Doppelkarte in Aufgabe überführt werden kann |
-| TSK-03 | Gruppen | Jetzt, Als Nächstes, Wartet und Blockiert vorhanden sind |
-| TSK-04 | Fälligkeit | Fälligkeit verständlich dargestellt und bearbeitbar ist |
-| TSK-05 | Wartegrund | wartende Aufgabe sichtbar benennt, worauf gewartet wird |
-| TSK-06 | Blockadegrund | blockierte Aufgabe Grund und nächsten Entblockungsschritt zeigt |
-| TSK-07 | Statusübergänge | Starten, Warten, Blockieren, Zurückstellen und Erledigen funktionieren |
-| TSK-08 | Objektbezug | Aufgabe mit Event, Aktivität oder Anbieterfall verknüpft werden kann |
-| TSK-09 | Keine falsche Aktion | Status prüfen nur erscheint, wenn echte Quellprüfung erfolgt |
-| TSK-10 | Aktive Menge | erledigte Aufgaben keine aktive Ansicht oder Badge belasten |
+| JOB-01 | Gemeinsamer Bereich | Aufgaben, Backlog, Ideen und Archiv unter Arbeit liegen |
+| JOB-02 | Aufgabe anlegen | Titel und nächster Schritt gespeichert werden können |
+| JOB-03 | Aufgabenstatus | aktiv, wartet, blockiert, zurückgestellt und erledigt funktionieren |
+| JOB-04 | Fälligkeit | Fälligkeit bearbeitbar und verständlich ist |
+| JOB-05 | Backlogmigration | Growth-/Acquisition-Backlog vollständig und dedupliziert übernommen ist |
+| JOB-06 | Repo-Kuratierung | relevante Workpacks/Schulden nur kuratiert und dedupliziert übernommen werden |
+| JOB-07 | Idee erfassen | Idee mit wenigen Feldern angelegt werden kann |
+| JOB-08 | Zustandsübergänge | Idee -> Backlog -> Aufgabe ohne Kopien funktioniert |
+| JOB-09 | Archiv | erledigte, verworfene und abgeschlossene Punkte auffindbar sind |
+| JOB-10 | Badge-Regel | Ideen und normaler Backlog keine rote Hauptbadge erzeugen |
 
 ## 6. Verwaltung
 
-| ID | Muss-Kriterium | BESTANDEN, wenn |
+| ID | Kriterium | BESTANDEN, wenn |
 |---|---|---|
 | ADM-01 | Suche | Events und Aktivitäten gesucht werden können |
-| ADM-02 | Filter | nach Typ, Publikationsstatus und offenem Handlungsbedarf gefiltert werden kann |
-| ADM-03 | Status | Publikationsstatus in der Liste erkennbar ist |
-| ADM-04 | Vorschau | öffentliche Darstellung direkt geöffnet werden kann |
-| ADM-05 | Bearbeitung | fachliche Stammdaten gezielt bearbeitet werden können |
-| ADM-06 | Quelle | Quelle und letzte relevante Aktualisierung sichtbar sind |
-| ADM-07 | Vorgangsbezug | offene zentrale Vorgänge am Objekt sichtbar sind |
-| ADM-08 | Änderung/Absage | relevante Änderung oder Absage nachvollziehbar durchgeführt werden kann |
-| ADM-09 | Verlauf | relevante Änderungen nachvollziehbar sind |
-| ADM-10 | Keine Scheinverwaltung | Bereich nicht nur Links auf öffentliche Seiten enthält |
+| ADM-02 | Fokus | Suchfeld beim Tippen Fokus und Cursor behält |
+| ADM-03 | Filter | Typ, Publikationsstatus und Handlungsbedarf filterbar sind |
+| ADM-04 | Status/Quelle | Status, Quelle und letzte Aktualisierung sichtbar sind |
+| ADM-05 | Vorgangsbezug | offene zentrale Vorgänge am Objekt sichtbar sind |
+| ADM-06 | Bearbeitung | relevante fachliche Felder editierbar sind |
+| ADM-07 | Validierung | fehlerhafte Eingaben Speichern verhindern und am Feld erklärt werden |
+| ADM-08 | Führender Writeback | Speichern die tatsächliche führende Quelle aktualisiert |
+| ADM-09 | Veröffentlichung | notwendige Datengenerierung/Deploy automatisch angestoßen wird |
+| ADM-10 | Wirkung | Erfolg öffentlich bestätigt oder Fehler als wartet/blockiert sichtbar wird |
+| ADM-11 | Verlauf | relevante Änderungen protokolliert sind |
+| ADM-12 | Kein Datenverlust | Fehler Editor und Eingaben erhalten |
 
-## 7. Ideen und Mehr
+## 7. Menü und Systemstatus
 
-| ID | Muss-Kriterium | BESTANDEN, wenn |
+| ID | Kriterium | BESTANDEN, wenn |
 |---|---|---|
-| MOR-01 | Idee erfassen | neue Idee mit sehr wenigen Feldern gespeichert werden kann |
-| MOR-02 | Ideenstatus | Parken, Verwerfen und Bearbeiten funktionieren |
-| MOR-03 | Umwandlung | Idee bewusst in Aufgabe überführt werden kann |
-| MOR-04 | Keine Badgebelastung | Ideen keine roten Hauptbadges erzeugen |
-| MOR-05 | Systemstatus | fachliche Auswirkung und nächste Aktion verständlich zeigt |
-| MOR-06 | Archiv | erledigte und abgelehnte Vorgänge suchbar sind |
-| MOR-07 | Anbieterzugang | separater Anbieterbereich erreichbar ist |
-| MOR-08 | Abmelden | Sitzungszugang zuverlässig entfernt wird |
-| MOR-09 | Keine leeren Punkte | nur tatsächlich implementierte Funktionen angezeigt werden |
+| MNU-01 | Nur seltene Funktionen | Anbieter, System, Einstellungen und Abmelden enthalten sind |
+| MNU-02 | Keine Arbeit versteckt | Ideen und Backlog nicht im Menü liegen |
+| SYS-01 | Alltagssprache | Normalzustand ohne technische Rohwerte formuliert ist |
+| SYS-02 | Auswirkung | Störung betroffene Funktion und Auswirkung benennt |
+| SYS-03 | Nächste Aktion | bei Handlungsbedarf genau eine sinnvolle Aktion existiert |
+| SYS-04 | Technische Details | `seen`, `upserted`, JSON und Logs nur eingeklappt erscheinen |
 
-## 8. Daten- und Prozesskonsistenz
+## 8. Daten- und E2E-Konsistenz
 
-| ID | Muss-Kriterium | BESTANDEN, wenn |
+| ID | Kriterium | BESTANDEN, wenn |
 |---|---|---|
 | DAT-01 | Eindeutigkeit | pro Quellsachverhalt höchstens ein aktiver Vorgang existiert |
-| DAT-02 | Kein Wiederöffnen | erledigte/abgelehnte Fälle durch Sync nicht wieder aktiv werden |
-| DAT-03 | Lokaler Status | in Arbeit, wartet, blockiert und aktive Wiedervorlage beim Sync erhalten bleiben |
-| DAT-04 | Zahlungsverlauf | derselbe Submission-Vorgang von Prüfung über Warten bis Veröffentlichung geführt wird |
-| DAT-05 | Verlauf | jeder relevante Übergang protokolliert ist |
-| DAT-06 | Atomare Wirkung | Quellfehler zentralen Abschluss verhindern |
-| DAT-07 | Keine Informationskarten | Routineerfolge nicht als einzelne aktive Vorgänge gespeichert werden |
+| DAT-02 | Kein Wiederöffnen | erledigte/abgelehnte Fälle durch Sync nicht erneut aktiv werden |
+| DAT-03 | Lokaler Zustand | wartet, blockiert und Wiedervorlage beim Sync erhalten bleiben |
+| DAT-04 | Anbieterlebenszyklus | derselbe Vorgang Prüfung, Zahlung und Veröffentlichung durchläuft |
+| DAT-05 | Verlauf | alle relevanten Übergänge protokolliert sind |
+| DAT-06 | Fehlerverhalten | Quell-, Build- oder Deployfehler Abschluss verhindern |
+| DAT-07 | Führende Quelle | Steuerzentrale keine unabhängige Fachkopie pflegt |
+| DAT-08 | Öffentliche Wirkung | fachliche Änderung bis zur öffentlichen Darstellung nachweisbar ist |
 
-## 9. Sprache und Barrierearmut
+## 9. UX und Responsive
 
-| ID | Muss-Kriterium | BESTANDEN, wenn |
+| ID | Kriterium | BESTANDEN, wenn |
 |---|---|---|
-| UX-01 | Fachsprache | sichtbare Begriffe verständlich deutsch und konsistent sind |
-| UX-02 | Farbe nicht allein | Status nicht ausschließlich über Farbe vermittelt wird |
-| UX-03 | Tastatur | zentrale Funktionen per Tastatur erreichbar sind |
-| UX-04 | Fokus | sichtbarer Fokus vorhanden ist |
-| UX-05 | Dialoge | Dialoge fokussiert, schließbar und mobil nutzbar sind |
-| UX-06 | Fehlermeldungen | betroffenen Bereich und sinnvolle nächste Aktion benennen |
-| UX-07 | Rückmeldung | jede Aktion klare Ergebnisrückmeldung liefert |
+| UX-01 | Fachsprache | Begriffe verständlich deutsch sind |
+| UX-02 | Fokus | sichtbarer Tastaturfokus vorhanden ist |
+| UX-03 | Dialoge | mobil nutzbar und schließbar sind |
+| UX-04 | Fehler | konkrete nächste Aktion benannt wird |
+| UX-05 | Rückmeldung | Wirkung jeder Aktion klar bestätigt wird |
+| RSP-01 | Pflichtbreiten | 360, 390, S24-nah, 768–900 und >=1280 px funktionieren |
+| RSP-02 | Kein Überlauf | keine unbeabsichtigte horizontale Scrollfläche entsteht |
+| RSP-03 | Hauptaktion | nicht von Navigation überdeckt wird |
 
-## 10. Responsive Abnahme
+## 10. Automatisierte Prüfungen
 
-Pflicht-Viewports:
+Vor Staging-Abnahme:
 
-- 360 px
-- 390 px
-- Samsung-S24-nahe Breite
-- Tablet 768–900 px
-- Desktop ab 1280 px
+- PHP- und JavaScript-Syntax,
+- CSS-Governance,
+- Produktvertragsprüfung,
+- API-Verträge,
+- Statusübergänge,
+- Deduplizierung,
+- Quell-Writeback-Fehlerfälle,
+- Suchfokus-Test,
+- Backlog-Migrations- und Übergangstests,
+- Verwaltungs-Writeback und Deploy-Fehlerfall.
 
-| ID | Muss-Kriterium | BESTANDEN, wenn |
-|---|---|---|
-| RSP-01 | Kein Überlauf | keine horizontale Scrollfläche durch UI entsteht |
-| RSP-02 | Navigation | Navigation in allen Pflicht-Viewports sichtbar bleibt |
-| RSP-03 | Hauptaktion | primäre Aktion ohne verdeckten Inhalt erreichbar ist |
-| RSP-04 | Mobile Fokus | mobil keine parallelen vollständigen Vorgänge konkurrieren |
-| RSP-05 | Desktop Nutzung | Desktop verfügbare Breite sinnvoll für Master-Detail verwendet |
+## 11. Reale Staging-Szenarien
 
-## 11. Automatisierte Prüfungen
-
-Vor Staging-Abnahme müssen automatisiert bestanden sein:
-
-- PHP-Syntax
-- JavaScript-Syntax
-- CSS-Governance
-- API-Verträge
-- Statusübergänge
-- Deduplizierung
-- Quell-Writeback-Fehlerfälle
-- Sichtbare Statusübersetzungen
-- Navigation-Fixierung in den Pflicht-Viewports
-- keine vollständigen Vorgangskarten auf der Übersicht
-
-## 12. Staging-Abnahmeszenarien
-
-1. Qualitätsfall öffnen, korrigieren und abschließen.
+1. Qualitätsfall korrigieren und öffentliche Wirkung prüfen.
 2. Eventkandidat übernehmen.
-3. Fall mit Grund ablehnen.
-4. Fall sieben Tage zurückstellen und Neuladen prüfen.
-5. Anbieterfall zur Zahlung freigeben.
-6. Wartenden Anbieterfall prüfen.
-7. Bezahlte Einreichung veröffentlichen.
-8. Manuelle Aufgabe anlegen und erledigen.
-9. Aufgabe blockieren und entblocken.
-10. Event in Verwaltung suchen, Vorschau öffnen und bearbeiten.
-11. Idee erfassen und in Aufgabe umwandeln.
-12. Archivierten Vorgang finden.
-13. Navigation auf langem Inhalt in allen Pflicht-Viewports prüfen.
+3. Anbieterfall über Zahlung bis Veröffentlichung führen.
+4. Fall ablehnen und zurückstellen.
+5. Aufgabe anlegen, warten, blockieren und erledigen.
+6. Growth-Backlogpunkt finden und als Aufgabe starten.
+7. Idee anlegen, in Backlog und Aufgabe überführen.
+8. Event suchen, mehrere Buchstaben tippen und stabilen Fokus prüfen.
+9. Event/ Aktivität bearbeiten, speichern und öffentliche Änderung bestätigen.
+10. simulierten Writeback-/Deployfehler als offenen wartet/blockiert-Zustand prüfen.
+11. Systemstatus normal und gestört prüfen.
+12. alte Inbox für keinen regulären Arbeitsfall mehr benötigen.
 
-## 13. Freigaberegel
+## 12. Freigabe
 
-Ein Main-Merge ist nur zulässig, wenn:
-
-- alle Muss-Kriterien bestanden sind,
-- alle automatisierten Prüfungen grün sind,
-- alle Staging-Abnahmeszenarien erfolgreich waren,
-- keine Altansicht mehr für reguläre tägliche Arbeit benötigt wird,
-- Dokumentation und tatsächliche Oberfläche übereinstimmen.
+Main-Merge nur, wenn alle Muss-Kriterien, automatisierten Prüfungen und Staging-Szenarien bestanden sind und Dokumentation, führende Quellen und tatsächliche Oberfläche übereinstimmen.
