@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/_domain.php';
+require_once __DIR__ . '/_content_source.php';
 require_once dirname(__DIR__) . '/growth-backlog-lib.php';
 
 const BE_CC_INBOX_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxU3MYnINbhk-1XFehzGRYeto3f4BH9fyL6RmMlQPwmTt_wciHoESRo27nx1-KSIAos/exec';
