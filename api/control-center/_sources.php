@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/_domain.php';
+require_once dirname(__DIR__) . '/growth-backlog-lib.php';
 
 function be_cc_upsert_source_case(array $case): string
 {
@@ -24,14 +25,12 @@ function be_cc_upsert_source_case(array $case): string
         $id = (string)$existing['id'];
         $existingState = (string)$existing['state'];
         if (in_array($existingState, ['done', 'rejected'], true)) return $id;
-
         $preserveState = in_array($existingState, ['in_progress','waiting','blocked'], true);
         if ($existingState === 'snoozed' && !empty($existing['snoozed_until'])) {
             $preserveState = new DateTimeImmutable((string)$existing['snoozed_until']) > new DateTimeImmutable('now');
         }
         $effectiveState = $preserveState ? $existingState : $state;
         $effectiveType = ((string)$existing['case_type'] === 'task' && $preserveState) ? 'task' : $type;
-
         $stmt = $pdo->prepare(
             'UPDATE control_cases SET case_type=:case_type,state=:state,priority=:priority,title=:title,reason=:reason,next_action=:next_action,
              object_type=:object_type,object_id=:object_id,object_title=:object_title,source_payload_json=:payload,decision_ready=:decision_ready,updated_at=NOW()
@@ -95,6 +94,47 @@ function be_cc_sync_inbox_feed(): array
         $count++;
     }
     return ['seen' => count($items), 'upserted' => $count];
+}
+
+function be_cc_sync_growth_backlog(): array
+{
+    [, , $rows] = gbl_read_table();
+    $seen = [];
+    $count = 0;
+    foreach ($rows as $row) {
+        $status = strtolower(trim((string)($row['status'] ?? 'open')));
+        if (!gbl_status_is_open($status)) continue;
+        $cluster = trim((string)($row['cluster_key'] ?? ''));
+        if ($cluster !== '' && isset($seen[$cluster])) continue;
+        if ($cluster !== '') $seen[$cluster] = true;
+        $id = trim((string)($row['id'] ?? ''));
+        $reference = $id !== '' ? $id : ($cluster !== '' ? $cluster : 'row-' . (string)($row['_sheet_row'] ?? $count));
+        $priority = match (mb_strtolower(trim((string)($row['priority'] ?? 'mittel')), 'UTF-8')) {
+            'hoch' => 'high', 'niedrig' => 'low', default => 'normal',
+        };
+        $reasonParts = array_values(array_filter([
+            trim((string)($row['short_reason'] ?? '')),
+            trim((string)($row['why_relevant'] ?? '')),
+            trim((string)($row['expected_benefit'] ?? '')),
+        ]));
+        be_cc_upsert_source_case([
+            'type' => 'idea',
+            'state' => 'open',
+            'priority' => $priority,
+            'title' => trim((string)($row['title'] ?? 'Backlog-Punkt')),
+            'reason' => implode("\n\n", array_unique($reasonParts)),
+            'next_action' => trim((string)($row['recommended_action'] ?? '')) ?: 'Priorisieren oder als konkrete Aufgabe starten.',
+            'object_type' => 'backlog_item',
+            'object_id' => $reference,
+            'object_title' => trim((string)($row['title'] ?? '')),
+            'source_system' => 'growth_backlog',
+            'source_reference' => $reference,
+            'source_payload' => gbl_public_item($row),
+            'decision_ready' => false,
+        ]);
+        $count++;
+    }
+    return ['seen' => count($rows), 'upserted' => $count];
 }
 
 function be_cc_sync_content_audit(): array
