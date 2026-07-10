@@ -10,6 +10,7 @@ source_js = read('js/control-center-source-editors.js')
 publication_js = read('js/control-center-publication.js')
 development_js = read('js/control-center-development.js')
 integration_js = read('js/control-center-integrations.js')
+mobile_js = read('js/control-center-mobile-feedback.js')
 css = read('css/control-center.css')
 sources = read('api/control-center/_sources.php')
 content_source = read('api/control-center/_content_source.php')
@@ -22,6 +23,7 @@ domain = read('api/control-center/_domain.php')
 workflow_contracts = read('api/control-center/_workflow_contracts.php')
 presentation = read('api/control-center/_presentation.php')
 content_api = read('api/control-center/content.php')
+case_api = read('api/control-center/case.php')
 publication_api = read('api/control-center/publication.php')
 content_history = read('api/control-center/_content_history.php')
 contracts = read('api/control-center/_contracts.php')
@@ -46,8 +48,10 @@ if 'id="cc-dialog-close" type="button"' not in html:
     errors.append('Dialog-Schließen ist nicht von Pflichtfeldvalidierung entkoppelt.')
 if 'control-center-integrations.js' not in html:
     errors.append('Gesamtprojekt-Integrationscontroller wird nicht geladen.')
+if 'control-center-mobile-feedback.js' not in html:
+    errors.append('Mobile Feedback-Controller wird nicht geladen.')
 
-combined_js = js + source_js + publication_js + development_js + integration_js
+combined_js = js + source_js + publication_js + development_js + integration_js + mobile_js
 contracts_ui = {
     'verdichtete Übersicht': 'cc-summary-card',
     'fokussierter Prüfbereich': 'renderReviewDetail',
@@ -56,12 +60,16 @@ contracts_ui = {
     'gemeinsame Neuerfassung': 'openNewWorkMenu',
     'kompakte Arbeitszeilen': 'cc-labor-row',
     'vereinfachte Backlogaktionen': "item.primary_action.key !== 'convert_to_task'",
+    'Arbeitsfilter als Dropdown mit Zahlen': 'cc-labor-select',
+    'Ideenbedienung aus Arbeit entfernt': 'data-new-kind="idea"',
     'Live-Verwaltung': 'openContentEditor',
     'getrennte Verwaltungsquellen': 'Promise.allSettled',
     'Verwaltungs-Timeout': 'timeoutMs: 15000',
     'ehrlicher Speichervorgang': 'Speichern und Aktualisierung starten',
     'öffentliche Feed-Verifikation': 'verifyPublication',
     'Aktivitätseditor': 'ca-save',
+    'Qualitätsvergleich aktuell gegen Vorschlag': 'cc-copy-compare',
+    'direkte Vorschlagsübernahme': 'Vorschlag übernehmen',
     'kompakte Entwicklung Content': "metricCard('Content'",
     'kompakte Entwicklung Prozesse': "metricCard('Prozesse'",
     'kompakte Entwicklung Sichtbarkeit': "metricCard('Sichtbarkeit'",
@@ -80,6 +88,10 @@ if 'data-labor-action="details"' in js:
     errors.append('Arbeitszeilen enthalten weiterhin einen redundanten Details-Button.')
 if 'be_cc_event_is_current_or_future' not in content_source or 'if (!be_cc_event_is_current_or_future($date, $endDate)) continue;' not in content_source:
     errors.append('Verwaltung filtert vergangene redaktionelle Events nicht aus der Standardliste.')
+if 'be_cc_content_audit_row' not in writeback:
+    errors.append('Qualitätsaktionen verwenden keine stabile Audit-Zeilenauflösung.')
+if 'suggested_description' not in case_api or 'current_description' not in case_api:
+    errors.append('Qualitätsfälle liefern keinen aktuellen Text und keinen Vorschlag.')
 
 backend_contracts = {
     'führende Sheet-Inbox': 'be_cc_sync_sheet_inbox',
@@ -110,7 +122,7 @@ backend_contracts = {
     'Aktivitätsqualität': 'activity_coverage_percent',
     'technische SEO-Prüfung': 'be_cc_technical_seo_metrics',
 }
-backend = sources + content_source + sheet_inbox + content_ops + process_chain + submission_content + writeback + domain + workflow_contracts + presentation + content_api + publication_api + content_history + contracts + github_repo + development_api + overview_api + deploy_api + schema + public_events
+backend = sources + content_source + sheet_inbox + content_ops + process_chain + submission_content + writeback + domain + workflow_contracts + presentation + content_api + case_api + publication_api + content_history + contracts + github_repo + development_api + overview_api + deploy_api + schema + public_events
 for label, marker in backend_contracts.items():
     if marker not in backend:
         errors.append(f'Backendvertrag fehlt: {label}')
