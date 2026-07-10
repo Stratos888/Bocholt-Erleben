@@ -54,10 +54,17 @@ try {
     $complete = (int)$quality['complete'];
     $coverage = $total > 0 ? round(($complete / $total) * 100, 1) : 0.0;
     $blocked = $count("SELECT COUNT(*) FROM control_cases WHERE state='blocked'");
+    $openQuality = $count("SELECT COUNT(*) FROM control_cases WHERE source_system='content_audit' AND state NOT IN ('done','rejected','parked')");
+    $hasCurrentAttention = $blocked > 0 || $openQuality > 0 || (int)$quality['missingDescription'] > 0 || (int)$quality['missingSource'] > 0 || (int)$quality['missingDate'] > 0;
 
     be_json_response(200, ['status' => 'ok', 'data' => [
         'generated_at' => gmdate('c'),
-        'summary' => ['status' => $blocked > 0 ? 'attention' : 'stable', 'label' => $blocked > 0 ? 'Aufmerksamkeit erforderlich' : 'Projektentwicklung stabil'],
+        'summary' => [
+            'status' => $hasCurrentAttention ? 'attention' : 'baseline_ok',
+            'label' => $hasCurrentAttention ? 'Aktueller Stand mit Handlungsbedarf' : 'Aktueller Basisstand ohne erkannten Handlungsbedarf',
+            'trend_available' => false,
+            'trend_message' => 'Eine Verbesserung oder Verschlechterung ist noch nicht belastbar messbar, weil historische Vergleichswerte fehlen.',
+        ],
         'content_quality' => [
             'events_total' => $total,
             'activities_total' => $activityCount,
@@ -66,20 +73,24 @@ try {
             'missing_description' => (int)$quality['missingDescription'],
             'missing_source' => (int)$quality['missingSource'],
             'missing_date' => (int)$quality['missingDate'],
-            'open_quality_reviews' => $count("SELECT COUNT(*) FROM control_cases WHERE source_system='content_audit' AND state NOT IN ('done','rejected','parked')"),
+            'open_quality_reviews' => $openQuality,
+            'trend_available' => false,
         ],
         'automation' => [
             'open_reviews' => $count("SELECT COUNT(*) FROM control_cases WHERE case_type='intake' AND state NOT IN ('done','rejected','parked')"),
             'waiting_tasks' => $count("SELECT COUNT(*) FROM control_cases WHERE case_type='task' AND state IN ('waiting','snoozed')"),
             'blocked_tasks' => $blocked,
             'completed_cases' => $count("SELECT COUNT(*) FROM control_cases WHERE state='done'"),
+            'quality_effect_available' => false,
+            'quality_effect_message' => 'Die Wirkung der Automatisierungen ist noch nicht als Zeitreihe und Fehlerquote erfasst.',
         ],
         'seo' => [
-            'onpage_event_coverage_percent' => $coverage,
+            'content_basis_percent' => $coverage,
             'missing_descriptions' => (int)$quality['missingDescription'],
             'missing_sources' => (int)$quality['missingSource'],
+            'technical_seo_available' => false,
             'search_console_connected' => false,
-            'search_console_message' => 'Search-Console-Kennzahlen sind noch nicht angebunden. Es werden ausschließlich belastbare Onpage-Signale angezeigt.',
+            'message' => 'Aktuell wird nur die redaktionelle SEO-Inhaltsbasis gemessen. Technische SEO- und Search-Console-Kennzahlen sind noch nicht angebunden.',
         ],
         'product' => ['open_repo_workpacks' => $openWorkpacks, 'workpacks' => array_values(array_slice($workpacks, 0, 8))],
     ]]);
