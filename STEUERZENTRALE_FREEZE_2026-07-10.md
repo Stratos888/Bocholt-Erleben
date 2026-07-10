@@ -26,7 +26,7 @@ Dieser Stand wird nach dem Deployment zunächst praktisch genutzt. Ziel ist, rea
 
 ## Technischer Freeze-Vertrag
 
-- JavaScript-Asset-Version: `2026-07-10-control-center-freeze-v2`
+- JavaScript-Asset-Version: `2026-07-10-control-center-feedback-v1`
 - CSS-Governance-Version: `2026-06-22-css-governance-v1`
 - Branch: `staging`
 - führende Inbox: Google-Sheet-Tab `Inbox`
@@ -36,6 +36,19 @@ Dieser Stand wird nach dem Deployment zunächst praktisch genutzt. Ziel ist, rea
 - Aktivitäten: `data/offers.json` mit explizitem Repo-Gate
 - Veröffentlichung gilt erst nach öffentlicher Bestätigung als abgeschlossen
 - Quell- und Prozessfehler bleiben als deduplizierte Arbeit sichtbar
+
+## Erstes gebündeltes Nutzungsfeedback
+
+Das erste praktische Feedback wird als gemeinsames Mobile- und Workflow-Workpack umgesetzt:
+
+- `Prüfen`: Qualitätsfälle zeigen aktuellen Text und einen direkt übernehmbaren, faktenbasierten Vorschlag.
+- `Prüfen`: Ablehnen löst den aktuellen Audit-Datensatz über `content_id + issue_code` auf und ist nicht mehr von einer veralteten Zeilennummer abhängig.
+- `Arbeit`: sichtbare Ideen-Erfassung entfällt; Ideen werden außerhalb der Steuerzentrale über SpecDoc geführt.
+- `Arbeit`: die mobile Filterleiste wird durch ein Dropdown mit Fallzahlen ersetzt.
+- `Verwaltung`: mobile Karten, Aktionen und Suchbereich werden deutlich verdichtet.
+- `Prüfen`, `Arbeit` und Dialoge erhalten eine konsequent kompakte Mobile-Darstellung.
+
+Die Hauptnavigation und die fachliche Grundtrennung bleiben unverändert.
 
 ## Während des Freeze zu sammeln
 
@@ -64,7 +77,7 @@ Ausnahme: belegte Funktionsfehler mit unmittelbarer Auswirkung dürfen als klein
 - Aktivitätseditor benötigt Server-Secret und explizite Freigabe.
 - Search Console und GA4 werden nur bei tatsächlich vorhandenen Betriebsdaten angezeigt.
 - Google Sheets, Apps Script, MySQL und öffentliche Feeds müssen zur Laufzeit verfügbar sein.
-- Main-Merge ist nicht Bestandteil dieses Freeze-Beschlusses.
+- Änderungen werden zuerst auf `staging` geprüft und erst danach kontrolliert nach `main` übernommen.
 
 ## Fortsetzung nach dem Freeze
 
