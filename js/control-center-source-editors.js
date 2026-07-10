@@ -55,9 +55,14 @@
     const priority = detail.priority === 'high' ? 'hoch' : detail.priority === 'low' ? 'niedrig' : 'mittel';
     open(`<h2>Backlog bearbeiten</h2><div class="cc-stack">${field('bl-title','Titel',detail.title)}<label class="cc-field"><span>Beschreibung</span><textarea id="bl-description">${esc(detail.reason || '')}</textarea></label><label class="cc-field"><span>Priorität</span><select id="bl-priority"><option value="hoch" ${priority === 'hoch' ? 'selected' : ''}>Hoch</option><option value="mittel" ${priority === 'mittel' ? 'selected' : ''}>Mittel</option><option value="niedrig" ${priority === 'niedrig' ? 'selected' : ''}>Niedrig</option></select></label><button type="button" class="cc-button cc-button--primary" id="bl-save">Speichern</button></div>`);
     document.querySelector('#bl-save').addEventListener('click', async () => {
+      const payload = {
+        title: clean(document.querySelector('#bl-title')?.value),
+        description: clean(document.querySelector('#bl-description')?.value),
+        priority: clean(document.querySelector('#bl-priority')?.value),
+      };
       close(); status.textContent = 'Backlog wird gespeichert …';
       try {
-        await api('/api/control-center/action.php', { method:'POST', body:JSON.stringify({ case_id:caseId, action:'edit_source', payload:{ title:clean(document.querySelector('#bl-title')?.value), description:clean(document.querySelector('#bl-description')?.value), priority:clean(document.querySelector('#bl-priority')?.value) } }) });
+        await api('/api/control-center/action.php', { method:'POST', body:JSON.stringify({ case_id:caseId, action:'edit_source', payload }) });
         window.location.reload();
       } catch (error) { status.textContent = error.message; }
     });
