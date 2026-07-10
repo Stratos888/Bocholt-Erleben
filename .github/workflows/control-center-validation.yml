@@ -5,6 +5,7 @@ on:
     branches: ["staging", "main"]
     paths:
       - "api/control-center/**"
+      - "api/events/public.php"
       - "steuerzentrale/**"
       - "js/control-center*.js"
       - "css/control-center.css"
@@ -25,6 +26,7 @@ jobs:
         run: |
           set -euo pipefail
           find api/control-center -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+          php -l api/events/public.php
           php -l tests/control_center_contracts_test.php
 
       - name: Simulate control center contracts
@@ -42,6 +44,7 @@ jobs:
           node --check js/control-center-source-editors.js
           node --check js/control-center-publication.js
           node --check js/control-center-development.js
+          node --check js/control-center-integrations.js
 
       - name: Validate JSON manifests
         shell: bash
@@ -61,6 +64,7 @@ jobs:
           test -s js/control-center-source-editors.js
           test -s js/control-center-publication.js
           test -s js/control-center-development.js
+          test -s js/control-center-integrations.js
           test -s data/control_center_repo_workpacks.json
           test -s scripts/audit_control_center_product_contract.py
           test -s tests/control_center_contracts_test.php
@@ -74,6 +78,9 @@ jobs:
           test -s api/control-center/deploy.php
           test -s api/control-center/_content_source.php
           test -s api/control-center/_content_history.php
+          test -s api/control-center/_content_ops.php
+          test -s api/control-center/_sheet_inbox_source.php
+          test -s api/control-center/_submission_content.php
           test -s api/control-center/_contracts.php
           test -s api/control-center/_workflow_contracts.php
           test -s api/control-center/_github_repo.php
@@ -84,8 +91,9 @@ jobs:
           test -s api/control-center/_writeback.php
           test -s api/control-center/_submission_source.php
           test -s api/control-center/_submission_writeback.php
+          test -s api/events/public.php
 
-      - name: Validate security and source contracts
+      - name: Validate security and integration contracts
         shell: bash
         run: |
           set -euo pipefail
@@ -94,17 +102,17 @@ jobs:
           grep -q "X-BE-Review-Password" js/control-center-source-editors.js
           grep -q "X-BE-Review-Password" js/control-center-publication.js
           grep -q "X-BE-Review-Password" js/control-center-development.js
+          grep -q "X-BE-Review-Password" js/control-center-integrations.js
           grep -q "UNIQUE KEY uq_control_cases_source" api/control-center/_schema.php
           grep -q "control_content_changes" api/control-center/_schema.php
           grep -q "control_development_snapshots" api/control-center/_schema.php
-          grep -q "source_payment_confirmed" api/control-center/_submission_source.php
+          grep -q "be_cc_sync_sheet_inbox" api/control-center/overview.php
+          grep -q "be_cc_content_ops_status" api/control-center/development.php
+          grep -q "feedback_rule_effectiveness_daily" api/control-center/_content_ops.php
+          grep -q "be_cc_update_submission_event" api/control-center/content.php
+          grep -q "submission_db" api/control-center/_content_history.php
+          grep -q "'address' => \$address" api/events/public.php
           grep -q "be_cc_transition_target" api/control-center/_domain.php
           grep -q "be_cc_sync_growth_backlog" api/control-center/_sources.php
-          grep -q "be_cc_sync_repo_workpacks" api/control-center/_sources.php
-          grep -q "be_cc_update_event_fields" api/control-center/content.php
           grep -q "be_cc_update_activity_in_repo" api/control-center/content.php
-          grep -q "be_cc_verify_public_change" api/control-center/publication.php
-          grep -q "BE_GITHUB_REPO_TOKEN" api/control-center/_github_repo.php
           grep -q "BE_ACTIVITY_WRITEBACK_ENABLED" api/control-center/_github_repo.php
-          grep -q "writeback_status" api/control-center/_content_source.php
-          grep -q "search_console_connected" api/control-center/development.php
