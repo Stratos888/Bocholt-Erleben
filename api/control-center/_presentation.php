@@ -137,12 +137,23 @@ function be_cc_case_presentation(array $row): array
     } elseif ($type === 'task') {
         $kind = 'manual_task';
         $group = 'tasks';
-        if ($state === 'waiting') {
-            $waitingFor = (string)($row['blocked_reason'] ?? '') ?: 'Externe Rückmeldung oder Ergebnis';
-        } elseif (!in_array($state, ['done', 'rejected', 'parked'], true)) {
+        if ($state === 'open' || $state === 'new') {
+            $primary = be_cc_action('start', 'Starten');
+            $secondary = [be_cc_action('wait', 'Auf Rückmeldung warten', true), be_cc_action('block', 'Blockieren', true), be_cc_action('snooze', 'Zurückstellen', true)];
+        } elseif ($state === 'in_progress') {
             $primary = be_cc_action('complete', 'Erledigen');
+            $secondary = [be_cc_action('wait', 'Auf Rückmeldung warten', true), be_cc_action('block', 'Blockieren', true), be_cc_action('snooze', 'Zurückstellen', true)];
+        } elseif ($state === 'waiting') {
+            $waitingFor = (string)($row['blocked_reason'] ?? '') ?: 'Externe Rückmeldung oder Ergebnis';
+            $primary = be_cc_action('resume', 'Fortsetzen');
+            $secondary = [be_cc_action('block', 'Blockieren', true), be_cc_action('snooze', 'Zurückstellen', true)];
+        } elseif ($state === 'blocked') {
+            $waitingFor = (string)($row['blocked_reason'] ?? '') ?: 'Blockade muss geklärt werden';
+            $primary = be_cc_action('resume', 'Blockade aufheben');
+            $secondary = [be_cc_action('wait', 'Auf Rückmeldung warten', true), be_cc_action('snooze', 'Zurückstellen', true)];
+        } elseif ($state === 'snoozed') {
+            $primary = be_cc_action('resume', 'Jetzt fortsetzen');
         }
-        $secondary = [be_cc_action('snooze', 'Zurückstellen', true)];
     } elseif ($type === 'idea') {
         $kind = 'manual_idea';
         $group = 'ideas';
