@@ -1,19 +1,20 @@
 # Steuerzentrale – kanonischer Premium-Zielzustand
 
-Stand: 2026-07-10
+Stand: 2026-07-10  
 Status: verbindlicher Produkt-, UX-, Daten- und E2E-Prozessvertrag
 
 ## 1. Zweck
 
-Die Steuerzentrale ist die zentrale private Betreiberoberfläche von Bocholt erleben. Sie bündelt Aufmerksamkeit und menschliche Arbeit, ohne eine zweite unabhängige Datenwelt neben den führenden Quellen aufzubauen.
+Die Steuerzentrale ist die zentrale private Betreiberoberfläche von Bocholt erleben. Sie bündelt Aufmerksamkeit, Entscheidungen, geplante Arbeit, Live-Verwaltung und messbare Projektentwicklung, ohne eine zweite unabhängige Datenwelt neben den führenden Quellen aufzubauen.
 
 Sie beantwortet zuerst:
 
 1. Was benötigt jetzt Aufmerksamkeit?
-2. Welche konkrete Entscheidung oder Handlung ist erforderlich?
-3. Was ist bereits entschieden und als Arbeit vorgemerkt?
-4. Welche fachlichen Objekte sind betroffen?
-5. Welche Automatisierung ist gestört und welche Auswirkung hat das?
+2. Was muss geprüft, entschieden oder korrigiert werden?
+3. Welche Arbeit ist bereits beschlossen oder vorgemerkt?
+4. Welche Live-Inhalte müssen verändert werden?
+5. Verbessert oder verschlechtert sich das Gesamtprojekt?
+6. Welche Automatisierung ist gestört und welche fachliche Auswirkung hat das?
 
 ## 2. Gesamtprojektprinzipien
 
@@ -23,11 +24,11 @@ Events, Aktivitäten, Anbieter-Einreichungen, Content-Audit und Backlogs werden 
 
 ### 2.2 Ein Sachverhalt, ein Arbeitsstatus
 
-Ein Sachverhalt darf nicht gleichzeitig als unabhängiger Eingang, Aufgabe, Backlogpunkt und Freigabe existieren. Bereiche sind Ansichten desselben Vorgangsmodells.
+Ein Sachverhalt darf nicht gleichzeitig als unabhängiger Prüffall, Aufgabe, Backlogpunkt und Freigabe existieren. Bereiche sind Ansichten desselben Vorgangsmodells.
 
 ### 2.3 Objekt und Arbeit bleiben getrennt
 
-Events, Aktivitäten und Anbieter sind fachliche Objekte. Bearbeiten-Fälle, Aufgaben, Backlogpunkte und Ideen sind Arbeitszustände mit optionalem Objektbezug.
+Events, Aktivitäten und Anbieter sind fachliche Objekte. Prüffälle, Aufgaben, Backlogpunkte und Ideen sind Arbeitszustände mit optionalem Objektbezug.
 
 ### 2.4 Automatisierung vor Handarbeit
 
@@ -35,7 +36,7 @@ Reihenfolge:
 
 1. sicher automatisch beheben,
 2. sicher automatisch verwerfen oder verdichten,
-3. nur echte Unsicherheit unter `Bearbeiten`,
+3. nur echte Unsicherheit unter `Prüfen`,
 4. entschiedene Arbeit unter `Arbeit`,
 5. mögliche spätere Arbeit als Backlog oder Idee.
 
@@ -45,7 +46,7 @@ Fachliche Änderung:
 
 `Aktion -> Validierung -> führende Quelle -> Verlauf -> Datenaufbereitung/Deploy -> öffentliche Wirkung`
 
-Ein Vorgang wird nicht als erledigt markiert, solange ein notwendiger Writeback oder Veröffentlichungsschritt fehlgeschlagen ist.
+Ein Vorgang wird nicht als vollständig erledigt bewertet, solange ein notwendiger Writeback oder Veröffentlichungsschritt fehlgeschlagen ist.
 
 ### 2.6 Mobile first
 
@@ -58,9 +59,9 @@ Ein Vorgang wird nicht als erledigt markiert, solange ein notwendiger Writeback 
 
 ## 3. Kanonische Arbeitszustände
 
-### Bearbeiten-Fall
+### Prüffall
 
-Noch ungeklärter oder entscheidungsbedürftiger Sachverhalt aus einem Quellsystem.
+Noch ungeklärter, entscheidungsbedürftiger oder unmittelbar korrekturbedürftiger Sachverhalt aus einem Quellsystem.
 
 Beispiele:
 
@@ -94,30 +95,30 @@ Direkte Übergänge sind möglich. Es entstehen keine Kopien. Ein Punkt wechselt
 
 Quellfälle folgen:
 
-`neu/erneut relevant -> Bearbeiten -> übernehmen / ablehnen / zurückstellen / Aufgabe erzeugen -> aus aktiver Queue verschwinden`
+`neu/erneut relevant -> Prüfen -> übernehmen / ablehnen / zurückstellen / Aufgabe erzeugen -> aus aktiver Queue verschwinden`
 
 ## 5. Verbindliche Hauptnavigation
 
 1. **Übersicht**
-2. **Bearbeiten**
+2. **Prüfen**
 3. **Arbeit**
 4. **Verwaltung**
-5. **Menü**
+5. **Entwicklung**
+
+Seltene Funktionen liegen im Header-Menü.
 
 ### Übersicht
 
 Verdichtete Aufmerksamkeitszentrale:
 
 - jetzt erforderlich,
-- zu bearbeiten,
+- zu prüfen,
 - nächste aktive Arbeit,
-- wartet/blockiert,
-- relevante Information,
-- Systemauswirkung.
+- Projektentwicklung und Risiken.
 
 Keine vollständige Wiederholung aller Vorgänge.
 
-### Bearbeiten
+### Prüfen
 
 Fokussierte Queue für:
 
@@ -134,13 +135,15 @@ Mobil ein Vorgang; Desktop Queue plus Detail.
 
 Gemeinsamer Arbeitsbereich mit Unteransichten:
 
-- Aktiv/Jetzt,
+- Jetzt,
 - Als Nächstes,
 - Wartet,
 - Blockiert,
 - Backlog,
 - Ideen,
 - Archiv.
+
+Standarddarstellung sind kompakte Zeilen; Volltext und Aktionen erscheinen erst nach dem Aufklappen.
 
 ### Verwaltung
 
@@ -150,46 +153,36 @@ Interne Objektverwaltung für Events und Aktivitäten:
 - Status erkennen,
 - öffnen und bearbeiten,
 - Quelle und Aktualisierung sehen,
-- offene Vorgänge verknüpfen,
 - speichern mit Writeback,
-- Veröffentlichung anstoßen und Ergebnis sehen,
+- Veröffentlichung anstoßen,
+- öffentliche Wirkung bestätigen,
 - Verlauf nachvollziehen.
 
-### Menü
+Eine Such- oder Linkliste allein ist keine Verwaltung.
+
+### Entwicklung
+
+Verständliche Sicht auf:
+
+- Content-Qualität,
+- Automatisierungswirkung,
+- SEO-Inhaltsbasis und technische SEO,
+- Search-Console-Daten,
+- Produktfortschritt,
+- Regressionen und Risiken.
+
+Nicht zulässig sind erfundene Trends, künstliche Gesamtscores ohne belastbare Gewichtung oder rohe technische Laufdaten ohne fachliche Einordnung.
+
+## 6. Header-Menü
 
 Seltene Funktionen:
 
 - Anbieterbereich,
 - Systemstatus,
-- Einstellungen,
+- Deployment,
+- Einstellungen, sobald implementiert,
 - Abmelden,
 - technische Diagnose nur nachrangig.
-
-## 6. Priorisierung der Übersicht
-
-### Jetzt erforderlich
-
-Nur überfällige, heute notwendige, blockierende, kritische oder dringende Fälle.
-
-### Zu bearbeiten
-
-Verdichtete Anzahl und Typverteilung der aktiven Bearbeiten-Fälle.
-
-### Arbeit
-
-Nächste Aufgabe, wartet/blockiert und relevante Fälligkeiten.
-
-### Zur Kenntnis
-
-Wenige verdichtete Informationen ohne Handlungsdruck.
-
-### Systemzustand
-
-Normalzustand:
-
-`Alle relevanten Quellen sind synchronisiert. Keine bekannte Störung mit Auswirkung.`
-
-Rohwerte und Logs nur unter technischen Details.
 
 ## 7. Verwaltung als verbindlicher E2E-Bereich
 
@@ -197,13 +190,31 @@ Eine Verwaltung ist nur fertig, wenn Speichern tatsächlich:
 
 1. fachliche Eingaben validiert,
 2. die führende Quelle aktualisiert,
-3. den zentralen Verlauf ergänzt,
-4. notwendige Datenaufbereitung/Deploy auslöst oder zuverlässig anstößt,
-5. die öffentliche Wirkung bestätigt oder einen wartenden/blockierten Vorgang erzeugt.
+3. den Verlauf ergänzt,
+4. notwendige Datenaufbereitung oder Deploy auslöst,
+5. die öffentliche Wirkung bestätigt oder einen wartenden beziehungsweise blockierten Vorgang erzeugt.
 
-Eine Such- oder Linkliste allein ist keine Verwaltung.
+## 8. Entwicklung als Wirkungsnachweis
 
-## 8. Backlog- und Projektintegration
+Die Steuerzentrale darf nur dann von Verbesserung oder Verschlechterung sprechen, wenn historische Vergleichswerte vorhanden sind.
+
+Bis dahin sind zulässig:
+
+- aktueller Basisstand,
+- aktuelle Handlungsbedarfe,
+- ausdrücklich gekennzeichnete Datenlücken.
+
+Für einen vollständigen Entwicklungsnachweis sind erforderlich:
+
+- gespeicherte Zeitreihen,
+- Vergleichszeiträume,
+- Qualitäts- und Fehlerquoten der Automatisierungen,
+- technische SEO-Signale,
+- Search-Console-Kennzahlen,
+- erkennbare Regressionen,
+- deduplizierte Überführung negativer Signale in `Arbeit`.
+
+## 9. Backlog- und Projektintegration
 
 Zu integrieren sind:
 
@@ -213,16 +224,18 @@ Zu integrieren sind:
 - kuratierte technische Schulden,
 - geplante Content- und Produktverbesserungen.
 
-Repo-Inhalte werden nicht ungefiltert gespiegelt. Nur deduplizierte, handlungsrelevante Punkte mit Nutzen/Risiko und klarer Zuordnung werden übernommen.
+Repo-Inhalte werden nicht ungefiltert gespiegelt. Nur deduplizierte, handlungsrelevante Punkte mit Nutzen oder Risiko und klarer Zuordnung werden übernommen.
 
-## 9. Freigaberegel
+## 10. Freigaberegel
 
 Der Zielzustand ist erst erreicht, wenn:
 
 - alle führenden Quellen korrekt angebunden sind,
-- Verwaltung echte Bearbeitung und Veröffentlichungswirkung besitzt,
+- Event- und Aktivitätsverwaltung echte Bearbeitung und Veröffentlichungswirkung besitzen,
 - Aufgaben, Backlog und Ideen als ein Lebenszyklus funktionieren,
 - Such- und Fokuszustände stabil bleiben,
 - Systemstatus fachlich statt technisch formuliert ist,
+- Entwicklung echte Trends und Regressionen belegen kann,
+- technische SEO und Search Console angebunden sind,
 - alte Inbox für reguläre Arbeit nicht mehr erforderlich ist,
-- alle automatisierten und realen Staging-Abnahmen bestanden sind.
+- automatisierte und reale Staging-Abnahmen bestanden sind.
