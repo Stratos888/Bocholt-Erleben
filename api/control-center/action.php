@@ -24,6 +24,15 @@ try {
         throw new InvalidArgumentException('Case and action are required.');
     }
 
+    be_cc_require_schema();
+    $lookup = be_db()->prepare('SELECT source_system FROM control_cases WHERE id = :id');
+    $lookup->execute(['id' => $caseId]);
+    $sourceSystem = (string)($lookup->fetchColumn() ?: '');
+
+    if (in_array($sourceSystem, ['inbox_feed', 'content_audit'], true)) {
+        throw new DomainException('Dieser Quellfall wird bis zur abgeschlossenen Writeback-Migration weiterhin in der bestehenden Review-Arbeitsansicht bearbeitet.');
+    }
+
     be_json_response(200, [
         'status' => 'ok',
         'data' => be_cc_apply_action($caseId, $action, $payload),
