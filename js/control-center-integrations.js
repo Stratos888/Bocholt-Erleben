@@ -4,8 +4,11 @@
   const password = () => sessionStorage.getItem('be_cc_password') || '';
   const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[c]));
   const clean = value => String(value ?? '').trim();
+  const dialogBody = document.querySelector('#cc-dialog-body');
   let developmentData = null;
   let selectedManagementId = '';
+  let enhancedEditorId = '';
+  let enhancementPending = false;
 
   async function api(path) {
     const response = await fetch(path, { headers: { 'X-BE-Review-Password': password() }, cache: 'no-store' });
@@ -90,13 +93,15 @@
   }
 
   async function enhanceEventEditor(id) {
-    if (!id) return;
+    if (!id || enhancedEditorId === id || enhancementPending) return;
+    if (!dialogBody?.querySelector('#ce-location')) return;
+    enhancementPending = true;
     try {
       const data = await api(`/api/control-center/content.php?type=events&id=${encodeURIComponent(id)}`);
+      if (selectedManagementId !== id || !dialogBody.querySelector('#ce-location')) return;
       const item = data.item || {};
-      const dialogBody = document.querySelector('#cc-dialog-body');
-      const location = dialogBody?.querySelector('#ce-location')?.closest('label');
-      if (!dialogBody || !location) return;
+      const location = dialogBody.querySelector('#ce-location')?.closest('label');
+      if (!location) return;
       const heading = dialogBody.querySelector('h2');
       if (heading) heading.textContent = item.source_label ? `${item.source_label} bearbeiten` : 'Veranstaltung bearbeiten';
       if (item.source_label && !dialogBody.querySelector('[data-content-source-label]')) {
@@ -111,7 +116,7 @@
         label.innerHTML = `<span>Adresse</span><input id="ce-address" type="text" value="${esc(item.address || '')}">`;
         location.after(label);
       }
-      if (item.source_system === 'submission_db') {
+      if (item.source_system === 'submission_db' && !dialogBody.querySelector('[data-provider-field-note]')) {
         ['#ce-end', '#ce-city', '#ce-category'].forEach(selector => {
           const field = dialogBody.querySelector(selector);
           if (!field) return;
@@ -120,10 +125,21 @@
         });
         const note = document.createElement('p');
         note.className = 'cc-hint';
+        note.dataset.providerFieldNote = '1';
         note.textContent = 'Enddatum wird für Anbieter-Events noch nicht separat geführt. Stadt und Kategorie werden aus Adresse und Inhalt abgeleitet.';
         dialogBody.querySelector('#ce-category')?.closest('label')?.after(note);
       }
-    } catch (_) {}
+      enhancedEditorId = id;
+    } catch (_) {
+      // Der Basiseditor bleibt nutzbar; der Quellhinweis wird beim nächsten Öffnen erneut versucht.
+    } finally {
+      enhancementPending = false;
+    }
+  }
+
+  function maybeEnhanceCurrentEditor() {
+    if (!selectedManagementId || !dialogBody?.querySelector('#ce-location')) return;
+    enhanceEventEditor(selectedManagementId);
   }
 
   document.addEventListener('click', event => {
@@ -134,14 +150,14 @@
     const edit = event.target.closest('[data-manage-edit]');
     if (edit) {
       selectedManagementId = clean(edit.dataset.manageEdit);
-      setTimeout(() => enhanceEventEditor(selectedManagementId), 100);
+      enhancedEditorId = '';
+      setTimeout(maybeEnhanceCurrentEditor, 0);
     }
     const system = event.target.closest('#cc-system');
     if (system) {
       setTimeout(async () => {
         try {
           const overview = await api('/api/control-center/overview.php');
-          const dialogBody = document.querySelector('#cc-dialog-body');
           if (!dialogBody || dialogBody.querySelector('#cc-process-health')) return;
           const section = document.createElement('section');
           section.id = 'cc-process-health';
@@ -152,10 +168,19 @@
     }
   }, true);
 
-  const observer = new MutationObserver(() => {
+  const viewObserver = new MutationObserver(() => {
     enhanceDevelopment();
     labelManagementSources();
   });
   const view = document.querySelector('#cc-view');
-  if (view) observer.observe(view, { childList: true, subtree: true });
+  if (view) viewObserver.observe(view, { childList: true, subtree: true });
+
+  const dialogObserver = new MutationObserver(() => {
+    if (!dialogBody?.querySelector('#ce-location')) {
+      enhancedEditorId = '';
+      return;
+    }
+    maybeEnhanceCurrentEditor();
+  });
+  if (dialogBody) dialogObserver.observe(dialogBody, { childList: true, subtree: true });
 })();
