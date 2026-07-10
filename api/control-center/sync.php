@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require __DIR__ . '/_sources.php';
+require __DIR__ . '/_submission_source.php';
 
 be_require_review_access();
 
@@ -15,6 +15,7 @@ try {
         'status' => 'ok',
         'data' => [
             'inbox' => be_cc_sync_inbox_feed(),
+            'submissions' => be_cc_sync_submissions(),
             'content_audit' => be_cc_sync_content_audit(),
         ],
     ]);
