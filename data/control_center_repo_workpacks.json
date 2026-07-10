@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-07-10",
+  "rules": {
+    "purpose": "Kuratierte Übergabe bestätigter Repo-Arbeitspakete an die Steuerzentrale.",
+    "no_automatic_doc_scraping": true,
+    "dedupe_key": "id"
+  },
+  "items": [
+    {
+      "id": "steuerzentrale-verwaltung-e2e",
+      "status": "open",
+      "priority": "high",
+      "type": "Produkt/Verwaltung",
+      "title": "Verwaltung E2E vollständig abschließen",
+      "reason": "Events und Aktivitäten müssen direkt bearbeitbar sein. Speichern muss die führende Quelle aktualisieren und die öffentliche Wirkung zuverlässig nachführen.",
+      "next_action": "Event- und Aktivitätseditoren, Writeback, Generierung/Deploy und Wirkungsprüfung geschlossen umsetzen.",
+      "source_document": "STEUERZENTRALE_GESAMTPROJEKT_INTEGRATION.md"
+    },
+    {
+      "id": "steuerzentrale-menu-systemstatus",
+      "status": "open",
+      "priority": "normal",
+      "type": "Produkt/Betrieb",
+      "title": "Menü und betreibergerechten Systemstatus abschließen",
+      "reason": "Technische Synchronisationswerte dürfen den normalen Betreiberzustand nicht dominieren.",
+      "next_action": "Auswirkungen, nächste Aktion und eingeklappte technische Details vollständig umsetzen.",
+      "source_document": "STEUERZENTRALE_GESAMTPROJEKT_INTEGRATION.md"
+    },
+    {
+      "id": "steuerzentrale-alte-inbox-abloesen",
+      "status": "open",
+      "priority": "normal",
+      "type": "Technik/Migration",
+      "title": "Alte Inbox vollständig ablösen",
+      "reason": "Die Altansicht bleibt derzeit für Push, Deploy-Sonderaktionen und Diagnose erforderlich.",
+      "next_action": "Restfunktionen neu platzieren, reguläre Abhängigkeiten entfernen und danach weiterleiten.",
+      "source_document": "STEUERZENTRALE_IMPLEMENTIERUNGSSTATUS.md"
+    },
+    {
+      "id": "steuerzentrale-gesamtfreigabe",
+      "status": "open",
+      "priority": "high",
+      "type": "Qualität/Freigabe",
+      "title": "Steuerzentrale vollständig validieren und freigeben",
+      "reason": "Ein Main-Merge ist erst nach bestandenen automatisierten Prüfungen, realen Writebacks und responsiver Staging-Abnahme zulässig.",
+      "next_action": "Abnahmematrix vollständig durchlaufen und alle Muss-Kriterien belegen.",
+      "source_document": "STEUERZENTRALE_ABNAHMEMATRIX.md"
+    }
+  ]
+}
