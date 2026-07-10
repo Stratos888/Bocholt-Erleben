@@ -87,6 +87,52 @@ function be_cc_validate_event_update(array $index, array $currentRow, array $upd
     return $resolved;
 }
 
+function be_cc_public_event_value(array $event, string $canonical): string
+{
+    $aliases = [
+        'title' => ['title', 'eventName'],
+        'date' => ['date', 'datum', 'start_date'],
+        'end_date' => ['endDate', 'end_date', 'enddate'],
+        'time' => ['time', 'uhrzeit', 'startzeit'],
+        'city' => ['city', 'stadt'],
+        'location' => ['location', 'ort', 'venue'],
+        'address' => ['address', 'adresse'],
+        'category' => ['kategorie', 'category'],
+        'source_url' => ['source_url', 'url', 'event_url'],
+        'ticket_url' => ['ticket_url'],
+        'description' => ['description', 'beschreibung'],
+        'visual_key' => ['visual_key'],
+        'visual_motif' => ['visual_motif', 'image_visual_motif'],
+        'tags' => ['tags'],
+    ];
+    foreach ($aliases[$canonical] ?? [$canonical] as $alias) {
+        if (!array_key_exists($alias, $event)) continue;
+        $value = $event[$alias];
+        if (is_array($value)) return implode(',', array_map('strval', $value));
+        return trim((string)$value);
+    }
+    return '';
+}
+
+function be_cc_compare_public_event_change(array $event, array $updates, array $writtenFields = []): array
+{
+    $written = array_flip($writtenFields);
+    foreach (be_cc_normalize_event_updates($updates) as $canonical => $expected) {
+        if ($written && !isset($written[$canonical])) continue;
+        $actual = be_cc_public_event_value($event, $canonical);
+        if ($actual !== trim((string)$expected)) {
+            return [
+                'verified' => false,
+                'field' => $canonical,
+                'expected' => trim((string)$expected),
+                'actual' => $actual,
+                'reason' => 'Öffentlicher Wert noch nicht aktuell: ' . $canonical . '.',
+            ];
+        }
+    }
+    return ['verified' => true, 'reason' => 'Öffentliche Eventdaten entsprechen der gespeicherten Änderung.'];
+}
+
 function be_cc_development_assessment(array $quality, array $automation, bool $trendAvailable): array
 {
     $issues = (int)($quality['missing_description'] ?? 0)
