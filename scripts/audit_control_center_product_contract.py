@@ -5,10 +5,13 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 html = (ROOT / 'steuerzentrale/index.html').read_text(encoding='utf-8')
 js = (ROOT / 'js/control-center.js').read_text(encoding='utf-8')
+work_js = (ROOT / 'js/control-center-work-actions.js').read_text(encoding='utf-8')
 css = (ROOT / 'css/control-center.css').read_text(encoding='utf-8')
 sources = (ROOT / 'api/control-center/_sources.php').read_text(encoding='utf-8')
 writeback = (ROOT / 'api/control-center/_writeback.php').read_text(encoding='utf-8')
 domain = (ROOT / 'api/control-center/_domain.php').read_text(encoding='utf-8')
+presentation = (ROOT / 'api/control-center/_presentation.php').read_text(encoding='utf-8')
+manifest = (ROOT / 'data/control_center_repo_workpacks.json').read_text(encoding='utf-8')
 errors = []
 
 required_nav = ['Übersicht', 'Bearbeiten', 'Arbeit', 'Verwaltung', 'Menü']
@@ -32,26 +35,34 @@ contracts = {
     'manuelle Aufgabe': "openCreateDialog('task')",
     'Ideenerfassung': "openCreateDialog('idea')",
     'Backlog-Erfassung': 'openBacklogCreateDialog',
-    'Arbeitslebenszyklus': 'laborModes' if 'laborModes' in js else 'laborLabels',
+    'Arbeitslebenszyklus': 'laborLabels',
     'Verwaltungs-API': '/api/control-center/content.php',
     'Korrekturformular': 'cc-save-correction',
     'deutscher Präsentationsvertrag': 'display_status',
+    'Warte-/Blockadegrund': 'data-labor-action="wait"',
 }
+combined_js = js + work_js
 for label, marker in contracts.items():
-    if marker not in js:
+    if marker not in combined_js:
         errors.append(f'Produktvertrag fehlt: {label}')
 
 backend_contracts = {
     'Growth-Backlog-Sync': 'be_cc_sync_growth_backlog',
+    'Repo-Workpack-Sync': 'be_cc_sync_repo_workpacks',
     'Growth-Backlog-Quelle': "'source_system' => 'growth_backlog'",
+    'Repo-Workpack-Quelle': "'source_system' => 'repo_workpack'",
     'Growth-Backlog-Writeback': 'be_cc_writeback_growth_backlog',
     'Umwandlung ohne Doppelkarte': "'open' => 'open'",
+    'Wartegrund-Persistenz': "in_array($action, ['wait', 'block']",
+    'Task-Fortsetzen': "be_cc_action('resume'",
 }
+backend = sources + writeback + domain + presentation
 for label, marker in backend_contracts.items():
-    haystack = sources + writeback + domain
-    if marker not in haystack:
+    if marker not in backend:
         errors.append(f'Backendvertrag fehlt: {label}')
 
+if 'no_automatic_doc_scraping' not in manifest:
+    errors.append('Repo-Workpack-Manifest dokumentiert keine kuratierte Importgrenze.')
 if '/data/events.json' in js:
     errors.append('Verwaltung verwendet nicht vorhandenen statischen Eventpfad.')
 if 'decision required' in js.lower():
