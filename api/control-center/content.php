@@ -67,6 +67,12 @@ try {
             }
             $deployStarted = true;
             be_cc_update_content_change($changeId, 'deploy_started');
+            $change = be_cc_get_content_change($changeId);
+            be_cc_upsert_publication_issue(
+                $change,
+                'Die Änderung ist gespeichert und das Deployment wurde gestartet. Die öffentliche Wirkung ist noch nicht bestätigt.',
+                'waiting'
+            );
         } catch (Throwable $error) {
             be_cc_update_content_change($changeId, 'deploy_failed', ['error' => $error->getMessage()]);
             $change = be_cc_get_content_change($changeId);
