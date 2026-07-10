@@ -10,8 +10,9 @@ function be_cc_json_encode(array $value): string
     return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
 }
 
-function be_cc_create_content_change(array $item, array $updates): string
+function be_cc_create_content_change(array $item, array $updates, string $objectType = 'event', string $sourceSystem = 'events_sheet'): string
 {
+    if (!in_array($objectType, ['event','activity'], true)) throw new InvalidArgumentException('Ungültiger Inhaltstyp für den Änderungsverlauf.');
     be_cc_ensure_schema();
     $id = be_cc_uuid();
     $stmt = be_db()->prepare(
@@ -21,10 +22,10 @@ function be_cc_create_content_change(array $item, array $updates): string
     );
     $stmt->execute([
         'id' => $id,
-        'object_type' => 'event',
+        'object_type' => $objectType,
         'object_id' => (string)$item['id'],
         'object_title' => (string)$item['title'],
-        'source_system' => 'events_sheet',
+        'source_system' => $sourceSystem,
         'before_json' => be_cc_json_encode($item),
         'updates_json' => be_cc_json_encode($updates),
         'state' => 'saved',
@@ -70,9 +71,7 @@ function be_cc_list_content_changes(string $objectType, string $objectId, int $l
 {
     be_cc_ensure_schema();
     $limit = max(1, min(50, $limit));
-    $stmt = be_db()->prepare(
-        'SELECT * FROM control_content_changes WHERE object_type = :object_type AND object_id = :object_id ORDER BY created_at DESC LIMIT ' . $limit
-    );
+    $stmt = be_db()->prepare('SELECT * FROM control_content_changes WHERE object_type = :object_type AND object_id = :object_id ORDER BY created_at DESC LIMIT ' . $limit);
     $stmt->execute(['object_type' => $objectType, 'object_id' => $objectId]);
     return array_map(static function(array $row): array {
         foreach (['before_json','updates_json','written_fields_json'] as $field) {
@@ -85,16 +84,16 @@ function be_cc_list_content_changes(string $objectType, string $objectId, int $l
 
 function be_cc_upsert_publication_issue(array $change, string $reason, string $state = 'blocked'): void
 {
-    $pdo = be_db();
-    $sourceReference = 'event:' . (string)$change['object_id'];
+    $objectType = in_array((string)($change['object_type'] ?? ''), ['event','activity'], true) ? (string)$change['object_type'] : 'event';
+    $sourceReference = $objectType . ':' . (string)$change['object_id'];
     $id = be_cc_uuid();
-    $stmt = $pdo->prepare(
+    $stmt = be_db()->prepare(
         "INSERT INTO control_cases
          (id, case_type, state, priority, title, reason, next_action, object_type, object_id, object_title, source_system, source_reference, source_payload_json, decision_ready)
-         VALUES (:id,'task',:state,'high',:title,:reason,:next_action,'event',:object_id,:object_title,'publication_pipeline',:source_reference,:payload,0)
+         VALUES (:id,'task',:state,'high',:title,:reason,:next_action,:object_type,:object_id,:object_title,'publication_pipeline',:source_reference,:payload,0)
          ON DUPLICATE KEY UPDATE
            case_type='task', state=VALUES(state), priority='high', title=VALUES(title), reason=VALUES(reason), next_action=VALUES(next_action),
-           object_type='event', object_id=VALUES(object_id), object_title=VALUES(object_title), source_payload_json=VALUES(source_payload_json),
+           object_type=VALUES(object_type), object_id=VALUES(object_id), object_title=VALUES(object_title), source_payload_json=VALUES(source_payload_json),
            completed_at=NULL, updated_at=NOW()"
     );
     $stmt->execute([
@@ -103,6 +102,7 @@ function be_cc_upsert_publication_issue(array $change, string $reason, string $s
         'title' => 'Veröffentlichung prüfen: ' . (string)$change['object_title'],
         'reason' => $reason,
         'next_action' => 'Deployment beziehungsweise öffentliche Datenwirkung erneut prüfen und abschließen.',
+        'object_type' => $objectType,
         'object_id' => (string)$change['object_id'],
         'object_title' => (string)$change['object_title'],
         'source_reference' => $sourceReference,
@@ -110,42 +110,46 @@ function be_cc_upsert_publication_issue(array $change, string $reason, string $s
     ]);
 }
 
-function be_cc_complete_publication_issue(string $objectId): void
+function be_cc_complete_publication_issue(string $objectType, string $objectId): void
 {
     $stmt = be_db()->prepare(
         "UPDATE control_cases SET state='done', completed_at=NOW(), updated_at=NOW()
          WHERE source_system='publication_pipeline' AND source_reference=:source_reference AND state NOT IN ('done','rejected','parked')"
     );
-    $stmt->execute(['source_reference' => 'event:' . $objectId]);
+    $stmt->execute(['source_reference' => $objectType . ':' . $objectId]);
 }
 
-function be_cc_public_feed_url(): string
+function be_cc_public_feed_url(string $objectType): string
 {
     $host = trim((string)($_SERVER['HTTP_HOST'] ?? ''));
     if ($host === '') throw new RuntimeException('Öffentlicher Host ist nicht bekannt.');
-    return 'https://' . $host . '/data/events.json?verify=' . rawurlencode((string)microtime(true));
+    $path = $objectType === 'activity' ? '/data/offers.json' : '/data/events.json';
+    return 'https://' . $host . $path . '?verify=' . rawurlencode((string)microtime(true));
 }
 
 function be_cc_verify_public_change(array $change): array
 {
+    $objectType = (string)($change['object_type'] ?? 'event');
     $context = stream_context_create(['http' => ['method' => 'GET', 'timeout' => 15, 'ignore_errors' => true, 'header' => "Cache-Control: no-cache\r\n"]]);
-    $raw = file_get_contents(be_cc_public_feed_url(), false, $context);
-    if (!is_string($raw) || trim($raw) === '') return ['verified' => false, 'reason' => 'Der öffentliche Eventfeed konnte nicht geladen werden.'];
+    $raw = file_get_contents(be_cc_public_feed_url($objectType), false, $context);
+    if (!is_string($raw) || trim($raw) === '') return ['verified' => false, 'reason' => 'Der öffentliche Datenbestand konnte nicht geladen werden.'];
     $payload = json_decode($raw, true);
-    if (!is_array($payload)) return ['verified' => false, 'reason' => 'Der öffentliche Eventfeed enthält kein gültiges JSON.'];
-    $events = is_array($payload['events'] ?? null) ? $payload['events'] : (array_is_list($payload) ? $payload : []);
-    $event = null;
-    foreach ($events as $candidate) {
-        if (is_array($candidate) && trim((string)($candidate['id'] ?? '')) === (string)$change['object_id']) {
-            $event = $candidate;
-            break;
-        }
+    if (!is_array($payload)) return ['verified' => false, 'reason' => 'Der öffentliche Datenbestand enthält kein gültiges JSON.'];
+    $items = $objectType === 'activity'
+        ? (is_array($payload['offers'] ?? null) ? $payload['offers'] : [])
+        : (is_array($payload['events'] ?? null) ? $payload['events'] : (array_is_list($payload) ? $payload : []));
+    $item = null;
+    foreach ($items as $candidate) {
+        if (is_array($candidate) && trim((string)($candidate['id'] ?? '')) === (string)$change['object_id']) { $item = $candidate; break; }
     }
-    if (!is_array($event)) return ['verified' => false, 'reason' => 'Die Veranstaltung ist im öffentlichen Feed noch nicht vorhanden.'];
-
-    return be_cc_compare_public_event_change(
-        $event,
-        (array)$change['updates_json'],
-        (array)$change['written_fields_json']
-    );
+    if (!is_array($item)) return ['verified' => false, 'reason' => 'Der Inhalt ist im öffentlichen Datenbestand noch nicht vorhanden.'];
+    if ($objectType === 'activity') {
+        foreach ((array)$change['updates_json'] as $field => $expected) {
+            if (!array_key_exists($field, $item) || trim((string)$item[$field]) !== trim((string)$expected)) {
+                return ['verified' => false, 'reason' => 'Öffentlicher Aktivitätswert noch nicht aktuell: ' . $field . '.'];
+            }
+        }
+        return ['verified' => true, 'reason' => 'Öffentliche Aktivitätsdaten entsprechen der gespeicherten Änderung.'];
+    }
+    return be_cc_compare_public_event_change($item, (array)$change['updates_json'], (array)$change['written_fields_json']);
 }
