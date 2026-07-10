@@ -30,7 +30,7 @@ function be_cc_upsert_source_case(array $case): string
             $preserveState = new DateTimeImmutable((string)$existing['snoozed_until']) > new DateTimeImmutable('now');
         }
         $effectiveState = $preserveState ? $existingState : $state;
-        $effectiveType = ((string)$existing['case_type'] === 'task' && $preserveState) ? 'task' : $type;
+        $effectiveType = (string)$existing['case_type'] === 'task' ? 'task' : $type;
         $stmt = $pdo->prepare(
             'UPDATE control_cases SET case_type=:case_type,state=:state,priority=:priority,title=:title,reason=:reason,next_action=:next_action,
              object_type=:object_type,object_id=:object_id,object_title=:object_title,source_payload_json=:payload,decision_ready=:decision_ready,updated_at=NOW()
@@ -135,6 +135,40 @@ function be_cc_sync_growth_backlog(): array
         $count++;
     }
     return ['seen' => count($rows), 'upserted' => $count];
+}
+
+function be_cc_sync_repo_workpacks(): array
+{
+    $path = dirname(__DIR__, 2) . '/data/control_center_repo_workpacks.json';
+    if (!is_file($path)) return ['seen' => 0, 'upserted' => 0];
+    $payload = json_decode((string)file_get_contents($path), true);
+    $items = is_array($payload['items'] ?? null) ? $payload['items'] : [];
+    $count = 0;
+    foreach ($items as $item) {
+        if (!is_array($item) || strtolower(trim((string)($item['status'] ?? 'open'))) !== 'open') continue;
+        $reference = trim((string)($item['id'] ?? ''));
+        if ($reference === '') continue;
+        $priority = match (strtolower(trim((string)($item['priority'] ?? 'normal')))) {
+            'critical' => 'critical', 'high' => 'high', 'low' => 'low', default => 'normal',
+        };
+        be_cc_upsert_source_case([
+            'type' => 'idea',
+            'state' => 'open',
+            'priority' => $priority,
+            'title' => trim((string)($item['title'] ?? 'Repo-Workpack')),
+            'reason' => trim((string)($item['reason'] ?? '')),
+            'next_action' => trim((string)($item['next_action'] ?? '')) ?: 'Workpack priorisieren oder als Aufgabe starten.',
+            'object_type' => 'repo_workpack',
+            'object_id' => $reference,
+            'object_title' => trim((string)($item['title'] ?? '')),
+            'source_system' => 'repo_workpack',
+            'source_reference' => $reference,
+            'source_payload' => $item,
+            'decision_ready' => false,
+        ]);
+        $count++;
+    }
+    return ['seen' => count($items), 'upserted' => $count];
 }
 
 function be_cc_sync_content_audit(): array
