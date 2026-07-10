@@ -1,7 +1,7 @@
 # Steuerzentrale – Simulations- und Validierungsbericht
 
 Stand: 2026-07-10  
-Status: finaler Härtungspatch intern simuliert; externe Laufzeitnachweise separat offen
+Status: Gesamtprojekt-Integrationspatch intern simuliert; externe Laufzeitnachweise separat offen
 
 ## 1. Prüfprinzip
 
@@ -9,37 +9,58 @@ Der Bericht trennt verbindlich:
 
 1. statische Syntax- und Vertragsprüfung,
 2. tatsächlich ausgeführte interne Domänensimulation,
-3. externe Laufzeitnachweise gegen Google Sheets, Apps Script, MySQL, GitHub und öffentliche Feeds.
+3. externe Laufzeitnachweise gegen Google Sheets, Apps Script, MySQL, GitHub, Search Console, GA4 und öffentliche Feeds.
 
 Keine dieser Ebenen wird als Ersatz für eine andere ausgegeben.
 
-## 2. Tatsächlich ausgeführte Simulation
+## 2. Integrierte Gesamtkette
 
-Ausgeführt wurden die reinen Laufzeitverträge für:
+Der aktuelle technische Zielpfad lautet:
 
-### Eventverwaltung
+```text
+Content-Audit
+→ Such- und Visual-Feedback
+→ wöchentliche KI-Eventsuche
+→ Manual-Puffer
+→ KI-Intake
+→ führende Sheet-Inbox
+→ Steuerzentrale / Prüfen
+→ Events-Sheet oder Anbieter-Datenbank
+→ Deployment beziehungsweise öffentliche API
+→ öffentlicher Event-/Aktivitätsbestand
+→ Nutzer-Funnel
+→ Content-Ops-, Search-Console- und GA4-Wirkung
+→ Entwicklung und neue Arbeit
+```
 
-- Aliasauflösung `date/start_date`, `location/venue`, `kategorie/category`, `source_url/url/event_url`,
-- vollständige Updateplanung vor dem ersten Schreibzugriff,
-- leerer Titel,
-- ungültiges Datum,
-- unsichere URL,
-- fehlende Zielspalte ohne falschen Erfolg,
-- öffentliche Werte mit abweichenden Feldnamen,
-- bestätigte öffentliche Änderung,
-- erkannte öffentliche Abweichung,
-- bewusst nicht geschriebene optionale Felder.
+Wesentliche Integrationsregeln:
 
-### Aktivitätsverwaltung
+- Die Steuerzentrale liest die führende Sheet-Inbox direkt.
+- `data/inbox.json` wird nur bei einem Fehler der Sheet-Inbox als Fallback verwendet.
+- Jede Quellsynchronisation ist einzeln gekapselt; ein Quellfehler legt Arbeit an, blockiert aber nicht die gesamte Steuerzentrale.
+- Sheet-Events und öffentlich sichtbare Anbieter-Events sind gemeinsam verwaltbar, behalten aber ihre jeweilige führende Quelle.
+- Aktivitätsänderungen bleiben durch das explizite Repo-Gate geschützt.
+- Content-Ops-, Lern-, Search-, Intake-, Search-Console- und GA4-Signale werden nur bei real vorhandener Datenbasis angezeigt.
 
-- erlaubte Feldmenge,
-- Verwerfen unbekannter Felder,
-- leerer Titel,
-- unsichere URL,
-- Standardsperre ohne explizite Serverfreigabe,
-- unterscheidbare Zustände `nicht konfiguriert`, `nicht freigeschaltet`, `bereit`.
+## 3. Tatsächlich ausgeführte interne Simulationen
 
-### Arbeitslebenszyklus
+### 3.1 Event- und Aktivitätsverträge
+
+Ausgeführt wurden:
+
+- Eventfeld-Aliasse,
+- vollständige Updateplanung vor dem Schreiben,
+- Pflichtfeld-, Datums- und URL-Schutz,
+- nicht vorhandene Zielspalten ohne falschen Erfolg,
+- öffentliche Eventwerte mit abweichenden Feldnamen,
+- Anbieter-Events mit zusammengesetztem Ortslabel,
+- separate Verifikation von Adresse, offizieller Quelle und Ticketlink,
+- erkannte Adressabweichung,
+- Aktivitätsfeld-Whitelist,
+- sichere Standardsperre des Aktivitätseditors,
+- Veröffentlichungszustände `failed`, `blocked`, `waiting`, `confirmed`.
+
+### 3.2 Arbeitslebenszyklus
 
 Geprüft wurden unter anderem:
 
@@ -58,129 +79,185 @@ Zusätzlich:
 - unzulässige Aktion für aktuellen Status,
 - unbekannte Aktion.
 
-Laufzeit und Test verwenden denselben Vertrag aus `api/control-center/_workflow_contracts.php`.
+### 3.3 Prozessgesundheit
 
-### Entwicklung und Veröffentlichung
+Geprüft wurde die Unterscheidung zwischen:
 
-- Basisstand ohne erfundenen Trend,
-- aktueller Handlungsbedarf,
-- Quelle fehlgeschlagen,
-- Deploy blockiert,
-- wartet auf öffentliche Bestätigung,
-- öffentlich bestätigt.
+- erfolgreichem Lauf ohne Folgearbeit,
+- erfolgreichem Lauf mit fachlicher Folgearbeit,
+- technischem Fehler,
+- fehlendem beziehungsweise veraltetem Lauf.
 
-## 3. Ausführungsergebnis
+`action_required=true` gilt nicht als technischer Fehler, wenn ein Lauf erfolgreich Prüffälle oder Aufgaben erzeugt hat.
 
-Lokal ausgeführt:
+### 3.4 Abhängige KI-Suchkette
+
+Ein eigener Test simuliert:
+
+- Suchlauf erzeugt Kandidaten, aber Intake fehlt → Aufmerksamkeit,
+- Intake ist älter als der Suchlauf → Aufmerksamkeit,
+- Intake ist neuer als der Suchlauf → Kette bestätigt,
+- Suchlauf erzeugt keine Kandidaten → Intake ist nicht erforderlich.
+
+Die erste Ausführung fand einen realen Fehler:
+
+```text
+new DateTimeImmutable('')
+```
+
+liefert den aktuellen Zeitpunkt statt eines Fehlers. Ein fehlender Intake-Zeitstempel wurde dadurch fälschlich als aktueller Intake erkannt. Der Vertrag prüft nun vor dem Parsen ausdrücklich auf einen nichtleeren Zeitstempel.
+
+## 4. Ausführungsergebnis
+
+Lokal tatsächlich ausgeführt:
 
 ```text
 No syntax errors detected in api/control-center/_contracts.php
 No syntax errors detected in api/control-center/_github_repo.php
 No syntax errors detected in api/control-center/_workflow_contracts.php
+No syntax errors detected in api/control-center/_content_ops.php
+No syntax errors detected in api/control-center/_process_chain.php
 No syntax errors detected in tests/control_center_contracts_test.php
+No syntax errors detected in tests/control_center_process_chain_test.php
 === Control Center Contract Simulation: OK ===
+=== Control Center Process Chain Simulation: OK ===
 ```
 
-Zusätzlich wurden die beiden im finalen Patch geänderten Browsercontroller mit `node --check` geprüft:
+Zusätzlich wurde der aktuelle Integrationscontroller mit `node --check` geprüft. Die JavaScript-Syntaxprüfung war erfolgreich.
 
-- `js/control-center-source-editors.js`,
-- `js/control-center-publication.js`.
+Die lokale Ausführung verwendet rekonstruierten Code derselben reinen Verträge. Die vollständige Repository-Syntax- und Produktvertragsprüfung ist zusätzlich im GitHub-Workflow hinterlegt; ein grüner Actions-Lauf ist über den verfügbaren Connector noch nicht belegt.
 
-Beide Syntaxprüfungen waren erfolgreich.
+## 5. Qualitäts- und Entwicklungsberechnung
 
-## 4. Gehärteter Veröffentlichungsprozess
+Der Entwicklungsbereich berechnet die Eventqualität jetzt gemeinsam über:
 
-### Veranstaltung
+1. veröffentlichte redaktionelle Sheet-Events,
+2. tatsächlich öffentlich sichtbare Anbieter-Events.
+
+Für Anbieter-Events werden dieselben Sichtbarkeitsbedingungen wie im öffentlichen API-Endpunkt verwendet:
+
+- genehmigt,
+- Freigabezeitpunkt vorhanden,
+- zukünftiges Datum,
+- Titel vorhanden,
+- bestätigter und benannter Ort.
+
+Aktivitäten besitzen eine separate Vollständigkeitsquote. Dadurch werden Event- und Aktivitätsqualität nicht mehr vermischt.
+
+## 6. Fehler- und Degradationsverhalten
+
+### Quellfehler
+
+Eine gestörte Quelle:
+
+- erzeugt einen deduplizierten blockierten Arbeitsfall,
+- wird im Systemstatus sichtbar,
+- verhindert nicht die Nutzung anderer Quellen und Bereiche.
+
+### Sheet-Inbox
+
+- verfügbar → JSON-Fallback bleibt im Standby,
+- nicht verfügbar → JSON-Fallback wird aktiviert,
+- paralleler Import beider Quellen wird verhindert.
+
+### Prozessfehler
+
+- technische Fehler oder überfällige Kernläufe → blockierte Arbeit,
+- erfolgreicher Folgelauf → technischer Arbeitsfall wird automatisch abgeschlossen,
+- fehlender Suchlauf→Intake-Handoff → technische Aufmerksamkeit.
+
+## 7. Öffentliche Inhaltsquellen
+
+### Redaktionelle Events
 
 ```text
-Editor
-→ vollständige Vorabvalidierung
-→ gemeinsamer Sheet-Batch
-→ dauerhafter Änderungsverlauf
-→ Apps-Script-Deploy
-→ wartender Arbeitsvorgang
-→ /data/events.json prüfen
-→ geänderte Felder vergleichen
-→ erst danach bestätigen
+Steuerzentrale
+→ Events-Sheet
+→ Apps-Script-Deployment
+→ /data/events.json
+→ Feldvergleich
+→ Bestätigung
 ```
 
-### Aktivität
+### Anbieter-Events
 
 ```text
-Editor-Gate
-→ explizite Serverfreigabe prüfen
-→ aktuelle offers.json samt SHA laden
-→ Felder validieren
-→ versionierten GitHub-Commit schreiben
-→ wartender Arbeitsvorgang
-→ /data/offers.json prüfen
-→ geänderte Felder vergleichen
-→ erst danach bestätigen
+Steuerzentrale
+→ transaktionaler submissions-Writeback
+→ /api/events/public.php
+→ Feldvergleich einschließlich Adresse, Quelle und Ticketlink
+→ Bestätigung
 ```
 
-Fehler bleiben als deduplizierte Arbeit sichtbar.
+### Aktivitäten
 
-## 5. Aktivitäts-Sicherheitsgate
+```text
+Steuerzentrale
+→ explizites Repo-Gate
+→ SHA-geschützter GitHub-Commit
+→ /data/offers.json
+→ Feldvergleich
+→ Bestätigung
+```
 
-Für eine Aktivierung sind gleichzeitig erforderlich:
+## 8. Automatische CI-Prüfung
 
-- gültiges `BE_GITHUB_REPO_TOKEN`,
-- gültige Repository- und Branch-Konfiguration,
-- `BE_ACTIVITY_WRITEBACK_ENABLED=true`.
+`.github/workflows/control-center-validation.yml` prüft nun:
 
-Ein Token allein reicht nicht. GitHub-Konflikte erzeugen eine verständliche Meldung; ein API-Erfolg ohne bestätigte Commit-SHA gilt als Fehler.
-
-## 6. Automatische CI-Prüfung
-
-`.github/workflows/control-center-validation.yml` prüft:
-
-- PHP-Syntax aller Control-Center-Endpunkte,
-- JavaScript-Syntax aller vier UI-Skripte,
-- ausführbare Domänensimulation,
+- PHP-Syntax aller Control-Center-Endpunkte und des öffentlichen Anbieter-Event-Endpunkts,
+- JavaScript-Syntax aller fünf UI-Skripte,
+- beide ausführbaren Domänensimulationen,
 - Produktvertragsaudit,
 - JSON-Gültigkeit,
 - Pflichtdateien,
 - Zugriffsschutz,
-- gemeinsamen Workflow-Vertrag,
-- Event- und Aktivitätswriteback,
-- explizites Aktivitäts-Gate,
-- Änderungsverlauf, Snapshots und öffentliche Verifikation.
+- direkte Sheet-Inbox und echten Fallback,
+- abhängige KI-Suchlauf→Intake-Kette,
+- Content-Ops-/Lern-/Funnel-Verträge,
+- alle drei öffentlichen Inhaltspfade.
 
-Über den aktuell verfügbaren Connector wird für den jüngsten Commit noch kein GitHub-Statuscheck geliefert. Ein grüner Actions-Lauf wird daher nicht behauptet.
+Ein grüner GitHub-Actions-Lauf ist über den aktuell verfügbaren Connector noch nicht belegt und wird daher nicht behauptet.
 
-## 7. Gegen den Premium-Zielzustand
+## 9. Gegen den Premium-Zielzustand
 
-| Zielkriterium | Intern geprüft |
+| Zielkriterium | Interner Stand |
 |---|---|
-| klare Informationsarchitektur | ja |
-| Prüfen und Arbeit getrennt | ja |
-| kompakte Arbeitsansicht | ja |
-| einheitlicher Arbeitslebenszyklus | ja |
-| Eventvalidierung und gebündelter Writeback | ja |
-| dauerhafter Änderungsverlauf | ja |
-| öffentliche Eventverifikation | ja, als Domänen- und Datenvergleich |
-| Aktivitäts-Repo-Writeback | ja, einschließlich Sicherheitsgate |
-| öffentliche Aktivitätsverifikation | ja, als Datenvergleich |
-| Teilfehler bleiben als Arbeit sichtbar | ja |
-| Entwicklung ohne erfundene Kennzahlen | ja |
-| technische SEO-Basis | ja |
-| Search Console | nicht angebunden |
-| alte Inbox vollständig abgelöst | nein, Diagnose-/Push-Restfunktionen |
-| reale externe Gesamtkette | noch auf Staging nachzuweisen |
+| klare Informationsarchitektur | umgesetzt |
+| direkte KI-/Sheet-Inbox-Integration | umgesetzt |
+| echter, nicht paralleler JSON-Fallback | umgesetzt |
+| Quellfehlertoleranz | umgesetzt |
+| abhängige Suchlauf→Intake-Prüfung | umgesetzt und simuliert |
+| kompakter Arbeitsbereich | umgesetzt |
+| einheitlicher Arbeitslebenszyklus | umgesetzt und simuliert |
+| Sheet-Eventverwaltung | umgesetzt und intern simuliert |
+| Anbieter-Eventverwaltung | umgesetzt und intern simuliert |
+| Aktivitäts-Repo-Writeback | umgesetzt, durch Server-Gate geschützt |
+| öffentliche Verifikation aller Inhaltspfade | technisch umgesetzt |
+| Lernwirkungsanzeige | Content-Ops-Vertrag integriert |
+| Prozessstatus | integriert |
+| Search-/Intake-Wirkung | integriert |
+| Search Console und GA4 | bei vorhandenen Betriebsdaten integriert |
+| kombinierte öffentliche Eventqualität | umgesetzt |
+| separate Aktivitätsqualität | umgesetzt |
+| alte Inbox vollständig abgelöst | nein, Push-/Diagnose-Restfunktionen |
+| reale externe Gesamtkette | noch auf Staging beziehungsweise kontrolliert auf main nachzuweisen |
 
-## 8. Externe Nachweise
+## 10. Externe Nachweise
 
 Nicht intern simulierbar sind:
 
-- reale Google-Sheets-Berechtigung,
-- Apps-Script-Unlock und Deployment,
-- Staging-MySQL-Schema,
-- Dauer des realen Deployments,
-- tatsächliche öffentliche Feed-Aktualisierung,
+- reale Google-Sheets-Berechtigungen,
+- tatsächlicher Apps-Script-Deploy,
+- Staging-MySQL-Schema und vorhandene Content-Ops-Datensätze,
+- reale öffentliche Feed-/API-Aktualisierung,
 - GitHub-Secret und dessen konkrete Rechte,
-- Browserdarstellung auf Zielgeräten,
-- Search-Console-Daten.
+- aktivierter Aktivitätseditor,
+- Browserdarstellung auf den Zielgeräten,
+- tatsächliche Search-Console-/GA4-Daten,
+- realer Nutzer-Funnel.
 
-## 9. Ergebnis
+## 11. Ergebnis
 
-Der finale Härtungspatch ist intern konsistent modelliert und die kritischen Domänenprozesse sind erfolgreich simuliert. Weitere Codehärtung ist vor dem nächsten Staging-Nachweis nicht erforderlich. Eine Main-Freigabe folgt daraus noch nicht; sie setzt den realen externen E2E-Nachweis voraus.
+Der Gesamtprojekt-Integrationspatch ist intern konsistent modelliert. Die reinen Event-, Aktivitäts-, Workflow-, Veröffentlichungs- und Prozesskettenverträge wurden erfolgreich simuliert. Die Simulation hat einen realen Zeitstempelfehler gefunden und dessen Korrektur bestätigt.
+
+Weitere konzeptionelle Integration ist vor dem externen Staging-Nachweis nicht erforderlich. Eine Main-Freigabe folgt daraus noch nicht; sie setzt den realen Lauf der externen Systeme und die öffentliche Wirkungskontrolle voraus.
