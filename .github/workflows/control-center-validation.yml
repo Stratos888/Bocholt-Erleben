@@ -38,6 +38,7 @@ jobs:
           node --check js/control-center.js
           node --check js/control-center-source-editors.js
           node --check js/control-center-publication.js
+          node --check js/control-center-development.js
 
       - name: Validate JSON manifests
         shell: bash
@@ -56,6 +57,7 @@ jobs:
           test -s js/control-center.js
           test -s js/control-center-source-editors.js
           test -s js/control-center-publication.js
+          test -s js/control-center-development.js
           test -s data/control_center_repo_workpacks.json
           test -s scripts/audit_control_center_product_contract.py
           test -s tests/control_center_contracts_test.php
@@ -86,6 +88,7 @@ jobs:
           grep -q "X-BE-Review-Password" js/control-center.js
           grep -q "X-BE-Review-Password" js/control-center-source-editors.js
           grep -q "X-BE-Review-Password" js/control-center-publication.js
+          grep -q "X-BE-Review-Password" js/control-center-development.js
           grep -q "source_reference" api/control-center/_schema.php
           grep -q "UNIQUE KEY uq_control_cases_source" api/control-center/_schema.php
           grep -q "control_content_changes" api/control-center/_schema.php
