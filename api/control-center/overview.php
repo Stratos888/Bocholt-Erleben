@@ -41,24 +41,60 @@ function be_cc_sync_process_health_cases(array $processHealth): void
     }
 }
 
+function be_cc_safe_source_sync(string $key, string $label, callable $callback): array
+{
+    try {
+        $result = $callback();
+        $result = is_array($result) ? $result : [];
+        $result['status'] = 'ok';
+        $result['label'] = $label;
+        $stmt = be_db()->prepare("UPDATE control_cases SET state='done', completed_at=NOW(), updated_at=NOW() WHERE source_system='source_sync' AND source_reference=:reference AND state NOT IN ('done','rejected','parked')");
+        $stmt->execute(['reference' => 'sync:' . $key]);
+        return $result;
+    } catch (Throwable $error) {
+        $result = ['status' => 'error', 'label' => $label, 'seen' => 0, 'upserted' => 0, 'message' => $error->getMessage()];
+        be_cc_upsert_source_case([
+            'type' => 'task',
+            'state' => 'blocked',
+            'priority' => 'high',
+            'title' => 'Datenquelle prüfen: ' . $label,
+            'reason' => 'Die Quelle konnte nicht synchronisiert werden: ' . $error->getMessage(),
+            'next_action' => 'Zugriff beziehungsweise Quelldaten prüfen und Synchronisation erneut ausführen.',
+            'object_type' => 'data_source',
+            'object_id' => $key,
+            'object_title' => $label,
+            'source_system' => 'source_sync',
+            'source_reference' => 'sync:' . $key,
+            'source_payload' => $result,
+            'decision_ready' => false,
+        ]);
+        return $result;
+    }
+}
+
 try {
     be_cc_ensure_schema();
 
-    // Das führende Sheet wird zuerst gelesen. Der JSON-Feed bleibt nur als
-    // kompatibler, deduplizierter Fallback und erzeugt wegen identischer
-    // Quellidentität keine Doppelvorgänge.
+    // Jede Quelle ist einzeln gekapselt. Die führende Sheet-Inbox wird zuerst
+    // gelesen; der JSON-Feed bleibt ein deduplizierter Fallback.
     $sync = [
-        'sheet_inbox' => be_cc_sync_sheet_inbox(),
-        'inbox_feed_fallback' => be_cc_sync_inbox_feed(),
-        'submissions' => be_cc_sync_submissions(),
-        'content_audit' => be_cc_sync_content_audit(),
-        'growth_backlog' => be_cc_sync_growth_backlog(),
-        'repo_workpacks' => be_cc_sync_repo_workpacks(),
+        'sheet_inbox' => be_cc_safe_source_sync('sheet_inbox', 'Führende Sheet-Inbox', 'be_cc_sync_sheet_inbox'),
+        'inbox_feed_fallback' => be_cc_safe_source_sync('inbox_feed', 'Inbox-JSON-Fallback', 'be_cc_sync_inbox_feed'),
+        'submissions' => be_cc_safe_source_sync('submissions', 'Anbieter-Einreichungen', 'be_cc_sync_submissions'),
+        'content_audit' => be_cc_safe_source_sync('content_audit', 'Content-Prüfung', 'be_cc_sync_content_audit'),
+        'growth_backlog' => be_cc_safe_source_sync('growth_backlog', 'Growth-Backlog', 'be_cc_sync_growth_backlog'),
+        'repo_workpacks' => be_cc_safe_source_sync('repo_workpacks', 'Repo-Workpacks', 'be_cc_sync_repo_workpacks'),
     ];
 
     $contentOps = be_cc_content_ops_status(be_db());
     $processHealth = be_cc_process_health($contentOps);
     be_cc_sync_process_health_cases($processHealth);
+
+    $syncErrors = count(array_filter($sync, static fn(array $item): bool => ($item['status'] ?? '') === 'error'));
+    $systemStatus = $syncErrors > 0 ? 'attention' : $processHealth['status'];
+    $systemMessage = $syncErrors > 0
+        ? $syncErrors . ' Datenquellen konnten nicht synchronisiert werden. Andere Bereiche bleiben verfügbar.'
+        : $processHealth['message'];
 
     $cases = be_cc_list_cases(['active' => '1']);
     $groups = ['now' => [], 'next' => [], 'inbox' => [], 'information' => []];
@@ -75,8 +111,9 @@ try {
             'counts' => array_map('count', $groups),
             'sync' => $sync,
             'system' => [
-                'status' => $processHealth['status'],
-                'message' => $processHealth['message'],
+                'status' => $systemStatus,
+                'message' => $systemMessage,
+                'sync_errors' => $syncErrors,
                 'processes' => $processHealth['items'],
                 'content_ops_available' => (bool)$contentOps['available'],
             ],
@@ -85,7 +122,7 @@ try {
 } catch (Throwable $error) {
     be_json_response(500, [
         'status' => 'error',
-        'message' => 'Die Übersicht konnte nicht geladen werden.',
+        'message' => 'Die Steuerzentrale konnte nicht initialisiert werden.',
         'error_message' => $error->getMessage(),
     ]);
 }
