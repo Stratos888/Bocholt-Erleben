@@ -1,297 +1,167 @@
 # Steuerzentrale – verbindliche Informationsarchitektur
 
 Stand: 2026-07-10
-Status: verbindlicher Produktvertrag vor weiterer UI-Umsetzung
+Status: verbindlicher Navigations- und Bereichsvertrag
 
 ## 1. Leitentscheidung
 
-Die Steuerzentrale ist keine Sammlung vorhandener Seiten, sondern eine auf Handlungsbedarf optimierte Betreiberanwendung.
+Die Steuerzentrale ist eine Betreiberanwendung für Aufmerksamkeit, Arbeit und fachliche Verwaltung. Die Hauptnavigation enthält nur regelmäßig benötigte, vollständig nutzbare Bereiche.
 
-Die Hauptnavigation enthält nur Bereiche, die im finalen Zustand eine echte, regelmäßig nutzbare Funktion besitzen. Leere Platzhalter, reine Links auf öffentliche Seiten oder technische Altansichten gehören nicht in die primäre Navigation.
+## 2. Hauptnavigation
 
-## 2. Endgültige Hauptnavigation
+1. Übersicht
+2. Bearbeiten
+3. Arbeit
+4. Verwaltung
+5. Menü
 
-### 2.1 Übersicht
+Die Navigation bleibt auf Mobilgerät, Tablet und Desktop dauerhaft erreichbar.
 
-Aufgabe: In wenigen Sekunden beantworten, ob und was jetzt getan werden muss.
+## 3. Übersicht
 
-Enthält ausschließlich verdichtete Blöcke:
+Zweck: in wenigen Sekunden erkennen, ob und wo Handlung nötig ist.
 
-1. `Jetzt erforderlich`
-2. `Neuer Eingang`
-3. `Als Nächstes`
-4. `Zur Kenntnis`
-5. `Systemzustand`
+Blöcke:
 
-Die Übersicht zeigt keine vollständige Wiederholung aller Arbeitskarten.
+- Jetzt erforderlich
+- Zu bearbeiten
+- Arbeit
+- Wartet/Blockiert
+- Zur Kenntnis
+- Systemzustand
 
-### 2.2 Bearbeiten
+Regeln:
 
-Aufgabe: Fokussierte Bearbeitung aller ungeklärten und entscheidungsbedürftigen Fälle.
+- keine vollständigen Vorgangskarten,
+- keine doppelte Arbeitsliste,
+- maximal zwei Beispiele pro verdichtetem Block,
+- CTA öffnet den passenden Bereich mit gesetztem Filter,
+- Normalzustand ruhig und fachlich formuliert.
 
-Bezeichnung: `Bearbeiten` ist verständlicher als `Eingang`, weil der Bereich neben neuen Inhalten auch Qualitätskorrekturen, Änderungen und Freigaben enthält. `Eingang` bleibt ein Filter innerhalb dieses Bereichs.
+## 4. Bearbeiten
+
+Zweck: alle ungeklärten und entscheidungsbedürftigen Quellfälle sicher bearbeiten.
 
 Filter:
 
 - Alle
 - Neue Inhalte
 - Änderungen
-- Qualitätsprüfung
+- Qualität
 - Anbieter
 - Freigaben
 - Sonstige
 
-Mobil: ein fokussierter Vorgang mit Vorher/Weiter.
+Mobil:
 
-Desktop: kompakte Queue links, geöffneter Vorgang rechts.
+- ein fokussierter Vorgang,
+- Fortschritt,
+- Problem/Anlass,
+- erforderlicher Schritt,
+- relevante Daten und Quelle,
+- genau eine dominante Hauptaktion,
+- maximal zwei sichtbare Nebenaktionen,
+- Vorher/Weiter.
 
-### 2.3 Aufgaben
+Desktop:
 
-Aufgabe: Ausschließlich bereits entschiedene konkrete Arbeit verwalten.
+- kompakte Queue links,
+- Detail und Aktionen rechts,
+- Auswahl und Scrollzustand bleiben erhalten.
+
+## 5. Arbeit
+
+Zweck: den vollständigen Lebenszyklus geplanter menschlicher Arbeit abbilden.
 
 Unteransichten:
 
-- Jetzt
+- Aktiv/Jetzt
 - Als Nächstes
 - Wartet
 - Blockiert
-- Erledigt/Archiv
-
-Funktionen:
-
-- manuell anlegen
-- aus einem Vorgang erzeugen
-- starten
-- warten
-- blockieren
-- zurückstellen
-- erledigen
-- bearbeiten
-- mit Event, Aktivität oder Anbieterfall verknüpfen
-
-### 2.4 Verwaltung
-
-Aufgabe: Fachliche Objektverwaltung für Events und Aktivitäten.
-
-Bezeichnung: `Verwaltung` statt `Inhalte`, weil der Bereich nicht nur Inhalte öffnet, sondern Objekte sucht, bearbeitet, korrigiert und mit Vorgängen verknüpft.
-
-Unterbereiche:
-
-- Events
-- Aktivitäten
-
-Mindestfunktionen:
-
-- Suche
-- Filter
-- Publikationsstatus
-- öffentliche Vorschau
-- Stammdaten bearbeiten
-- Quelle und letzte Aktualisierung
-- offene Vorgänge am Objekt
-- Änderung oder Absage durchführen
-- relevanter Verlauf
-
-Die öffentliche Event- oder Aktivitätsseite ist nur eine Vorschau, nicht der Verwaltungsbereich selbst.
-
-### 2.5 Mehr
-
-Aufgabe: Selten benötigte, aber echte Funktionen bündeln.
-
-Enthält nur implementierte Bereiche:
-
+- Backlog
 - Ideen
-- Systemstatus
 - Archiv
-- Anbieterzugang
-- Einstellungen
-- Abmelden
 
-Optional später:
+### Aufgabe
 
-- Auswertungen
+Entschiedene konkrete Arbeit mit nächstem Schritt, optionaler Fälligkeit und Objektbezug.
 
-Nicht enthalten:
+### Backlog
 
-- technische Altansicht als regulärer Menüpunkt
-- leere Funktionsversprechen
-- Links ohne Betreibermehrwert
+Bewusst vorgemerkte Arbeit ohne aktive Einplanung. Quellen:
 
-## 3. Mobile Navigation
+- Growth-/Acquisition-Backlog,
+- kuratierte Repo-Workpacks,
+- Produkt-, Content- und Technikverbesserungen,
+- aus Ideen übernommene Punkte.
 
-Die Hauptnavigation ist auf allen mobilen und tabletähnlichen Viewports dauerhaft am unteren Viewportrand fixiert.
+### Idee
 
-Reihenfolge:
+Ungeprüfter Gedanke ohne Fälligkeit. Kann verworfen, geparkt, als Backlog übernommen oder direkt gestartet werden.
 
-1. Übersicht
-2. Bearbeiten
-3. Aufgaben
-4. Verwaltung
-5. Mehr
+Übergänge ändern den führenden Zustand und erzeugen keine Doppelkarte.
 
-Regeln:
+## 6. Verwaltung
 
-- bei jeder Scrollposition sichtbar
-- Safe-Area berücksichtigt
-- Inhalt besitzt ausreichenden unteren Abstand
-- Badge nur auf `Bearbeiten` und `Aufgaben`
-- keine Badge-Zählung für Ideen, Informationen oder erfolgreiche Systemläufe
-- aktive Ansicht eindeutig
+Zweck: Events und Aktivitäten intern suchen, prüfen und tatsächlich verändern.
 
-Auf breiten Desktopansichten darf dieselbe Navigation als feste linke Seitenleiste erscheinen. Sie darf niemals erst am Dokumentende sichtbar werden.
+### Objektliste
 
-## 4. Übersicht im Detail
+- stabiles Suchfeld ohne Fokusverlust,
+- Filter nach Typ, Status und Handlungsbedarf,
+- Publikationsstatus,
+- Quelle/letzte Aktualisierung,
+- offene Vorgänge,
+- kompakte Ergebnisse.
 
-### 4.1 Jetzt erforderlich
+### Objektdetail
 
-Zeigt nur dringende oder blockierende Sachverhalte.
+- öffentliche Vorschau,
+- bearbeitbare fachliche Felder,
+- Quelle,
+- Qualitätsstatus,
+- offene Vorgänge,
+- Verlauf,
+- Änderung/Absage,
+- Speichern mit führendem Writeback und Veröffentlichungswirkung.
 
-Darstellung:
+Das Suchfeld bleibt beim Tippen bestehen; nur die Ergebnisliste wird aktualisiert.
 
-- Anzahl
-- kurze Typzusammenfassung
-- maximal zwei priorisierte Beispiele
-- ein CTA `Jetzt bearbeiten`
+## 7. Menü
 
-### 4.2 Neuer Eingang
+Enthält nur selten benötigte Funktionen:
 
-Verdichtete Gruppen, zum Beispiel:
+- Anbieterbereich,
+- Systemstatus,
+- Einstellungen,
+- Abmelden,
+- technische Diagnose nachrangig.
 
-- 8 Qualitätsprüfungen
-- 3 neue Inhalte
-- 1 Anbieterfall
+Nicht im Menü:
 
-Ein CTA führt mit gesetztem Filter in `Bearbeiten`.
+- Ideen und Backlog als versteckte Nebenfunktion,
+- technische Rohwerte in der Standardansicht,
+- leere Funktionsversprechen,
+- reguläre Altansicht.
 
-### 4.3 Als Nächstes
+## 8. Systemstatus
 
-Zeigt:
+Standardansicht:
 
-- nächste fällige Aufgabe
-- erreichte Wiedervorlage
-- bald relevante wartende Entscheidung
+- Synchronisation erfolgreich/gestört,
+- betroffene fachliche Funktion,
+- tatsächliche Auswirkung,
+- genau eine nächste Aktion bei Handlungsbedarf.
 
-### 4.4 Zur Kenntnis
+Technische Details können `seen`, `upserted`, Fehlerklasse und Logs enthalten, sind aber eingeklappt.
 
-Verdichtete Informationen ohne Aktion.
+## 9. Badges
 
-### 4.5 Systemzustand
+- Bearbeiten: aktive entscheidungsbedürftige Fälle.
+- Arbeit: aktive Aufgaben plus tatsächlich fällige/blockierte Arbeit.
+- Keine Badges für Ideen, normalen Backlog, Informationen oder erfolgreiche Läufe.
 
-Normalzustand:
+## 10. Rolle der Altansicht
 
-`Automatisierungen laufen – keine bekannte Störung mit Auswirkung.`
-
-Nur bei echter Auswirkung wird ein auffälliger Handlungsblock erzeugt.
-
-## 5. Bearbeiten im Detail
-
-### 5.1 Mobil
-
-Struktur:
-
-1. Bereichstitel und Filter
-2. Fortschritt, zum Beispiel `3 von 8`
-3. fachlicher Vorgangstyp
-4. Titel
-5. Problem oder Anlass
-6. entscheidungsrelevanter Kontext
-7. Quelle beziehungsweise Vorher/Nachher
-8. genau eine dominante Hauptaktion
-9. maximal zwei direkt sichtbare Nebenaktionen
-10. weitere Aktionen im Menü oder Detailbereich
-11. Vorher/Weiter
-
-Nach erfolgreicher Aktion wird automatisch der nächste passende Fall geöffnet.
-
-### 5.2 Desktop
-
-Master-Detail:
-
-- links kompakte Queue mit Titel, Typ, Status und Kurzgrund
-- rechts der geöffnete Vorgang mit vollständigem Kontext und Aktionen
-- keine mehrspaltige Wand vollständiger Karten
-- Filter und Auswahl bleiben nach Aktionen erhalten
-
-## 6. Aufgaben im Detail
-
-### Listenzeile
-
-- Titel
-- Status
-- Fälligkeit oder Wartestatus
-- Objektbezug
-- nächster Schritt
-
-### Detail
-
-- Beschreibung
-- Herkunft
-- Verlauf
-- Blockade-/Wartegrund
-- Aktionen
-
-Ein wartender Vorgang zeigt nur dann `Status aktualisieren`, wenn diese Aktion tatsächlich eine Quelle neu prüft. Andernfalls lautet die Aktion `Details öffnen`.
-
-## 7. Verwaltung im Detail
-
-### 7.1 Objektliste
-
-- Suchfeld
-- Filter nach Typ, Status und Handlungsbedarf
-- kompakte Ergebnisse
-- sichtbarer Publikationsstatus
-- Indikator für offene Vorgänge
-
-### 7.2 Objektdetail
-
-- öffentliche Vorschau
-- Stammdaten
-- Quelle
-- Qualitätsstatus
-- offene Vorgänge
-- Verlauf
-- Bearbeiten
-- Absage/Änderung, sofern anwendbar
-
-Keine parallele Aufgabenliste innerhalb des Objekts; es werden nur zentrale Vorgänge verknüpft.
-
-## 8. Mehr im Detail
-
-### 8.1 Ideen
-
-- Idee erfassen
-- bearbeiten
-- kategorisieren
-- parken
-- verwerfen
-- in Aufgabe umwandeln
-
-### 8.2 Systemstatus
-
-- Alltagssprache
-- nur relevante Auswirkung prominent
-- letzte wichtige Läufe verdichtet
-- technische Details nachrangig
-
-### 8.3 Archiv
-
-- erledigte, abgelehnte und archivierte Vorgänge suchen
-- Verlauf öffnen
-- keine aktiven Badges
-
-### 8.4 Anbieterzugang
-
-Schnellzugriff auf den separaten Anbieterbereich. Kein Ersatz für interne Anbieterfälle in `Bearbeiten`.
-
-### 8.5 Einstellungen
-
-Nur tatsächlich vorhandene Betreiberoptionen, zum Beispiel Benachrichtigungen oder Anzeigepräferenzen.
-
-## 9. Nicht zulässige Navigationsmuster
-
-- öffentliche Event-/Aktivitätslisten als angebliche Verwaltung
-- technische Altansicht in der Hauptnavigation
-- leere Haupttabs
-- identische vollständige Vorgänge auf Übersicht und Bearbeiten
-- Bottom-Bar im Dokumentfluss
-- technische Begriffe als sichtbare Hauptnavigation
+`/inbox/` ist bis zur vollständigen Migration ausschließlich Fallback und Diagnose. Sie ist kein Bestandteil der finalen Hauptnavigation.
