@@ -1,11 +1,14 @@
 <?php
 declare(strict_types=1);
 
+require __DIR__ . '/_schema.php';
 require __DIR__ . '/_sources.php';
 
 be_require_review_access();
 
 try {
+    be_cc_ensure_schema();
+
     $sync = [
         'inbox' => be_cc_sync_inbox_feed(),
         'content_audit' => be_cc_sync_content_audit(),
