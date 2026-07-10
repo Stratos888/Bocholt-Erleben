@@ -1,592 +1,228 @@
 # Steuerzentrale – kanonischer Premium-Zielzustand
 
 Stand: 2026-07-10
-Status: verbindlicher Produkt-, UX- und Prozessvertrag für die private Verwaltungsoberfläche von Bocholt erleben
+Status: verbindlicher Produkt-, UX-, Daten- und E2E-Prozessvertrag
 
 ## 1. Zweck
 
-Die Steuerzentrale ist die zentrale, mobile-first Arbeitsoberfläche des Betreibers von Bocholt erleben. Sie ist weder ein technisches Monitoring-Dashboard noch eine Sammlung gleichrangiger Verwaltungsseiten.
+Die Steuerzentrale ist die zentrale private Betreiberoberfläche von Bocholt erleben. Sie bündelt Aufmerksamkeit und menschliche Arbeit, ohne eine zweite unabhängige Datenwelt neben den führenden Quellen aufzubauen.
 
-Sie muss jederzeit zuerst beantworten:
+Sie beantwortet zuerst:
 
-1. Was benötigt jetzt meine Aufmerksamkeit?
-2. Welche konkrete Entscheidung oder Handlung ist als Nächstes erforderlich?
-3. Was hat das System bereits selbst erledigt?
-4. Was ist nur eine Information und erzeugt keine Arbeit?
-5. An welchem fachlichen Objekt – Event, Aktivität, Anbieter, Bild oder anderem Inhalt – wird gearbeitet?
+1. Was benötigt jetzt Aufmerksamkeit?
+2. Welche konkrete Entscheidung oder Handlung ist erforderlich?
+3. Was ist bereits entschieden und als Arbeit vorgemerkt?
+4. Welche fachlichen Objekte sind betroffen?
+5. Welche Automatisierung ist gestört und welche Auswirkung hat das?
 
-Der Betreiber soll nicht mehrere Bereiche öffnen müssen, um herauszufinden, ob irgendwo etwas Wichtiges liegt. Die Steuerzentrale reduziert Aufmerksamkeit, Suchaufwand und Doppelpflege.
+## 2. Gesamtprojektprinzipien
 
-## 2. Verbindliche Grundprinzipien
+### 2.1 Führende Quellen bleiben führend
 
-### 2.1 Aufmerksamkeit statt Datenmenge
+Events, Aktivitäten, Anbieter-Einreichungen, Content-Audit und Backlogs werden nicht in der Steuerzentrale dupliziert. Die Steuerzentrale liest, normalisiert und schreibt über eindeutige fachliche Writebacks in die jeweilige führende Quelle zurück.
 
-Die Startansicht zeigt nicht möglichst viele Daten, sondern priorisiert ausschließlich nach tatsächlichem Handlungsbedarf.
+### 2.2 Ein Sachverhalt, ein Arbeitsstatus
 
-Prominent sind nur:
+Ein Sachverhalt darf nicht gleichzeitig als unabhängiger Eingang, Aufgabe, Backlogpunkt und Freigabe existieren. Bereiche sind Ansichten desselben Vorgangsmodells.
 
-- überfällige oder heute notwendige Aufgaben,
-- blockierte fachliche Vorgänge,
-- entscheidungsreife Freigaben,
-- neue ungeklärte Eingangsfälle,
-- fehlgeschlagene Automatisierungen mit echter fachlicher Auswirkung.
+### 2.3 Objekt und Arbeit bleiben getrennt
 
-Reine Kennzahlen, historische Mengen, erfolgreiche Routineabläufe und technische Details sind nachrangig.
+Events, Aktivitäten und Anbieter sind fachliche Objekte. Bearbeiten-Fälle, Aufgaben, Backlogpunkte und Ideen sind Arbeitszustände mit optionalem Objektbezug.
 
-### 2.2 Ein Vorgang, ein führender Status
+### 2.4 Automatisierung vor Handarbeit
 
-Jeder fachliche Vorgang besitzt genau einen führenden Datensatz und genau einen führenden Arbeitsstatus.
+Reihenfolge:
 
-Andere Bereiche dürfen denselben Vorgang als gefilterte Ansicht zeigen, aber keine unabhängige Kopie erzeugen.
+1. sicher automatisch beheben,
+2. sicher automatisch verwerfen oder verdichten,
+3. nur echte Unsicherheit unter `Bearbeiten`,
+4. entschiedene Arbeit unter `Arbeit`,
+5. mögliche spätere Arbeit als Backlog oder Idee.
 
-Unzulässig ist insbesondere, denselben Sachverhalt gleichzeitig getrennt als:
+### 2.5 E2E-Veröffentlichungswirkung
 
-- Eingangskarte,
-- Aufgabe,
-- Freigabe,
-- Content-Prüffall
+Fachliche Änderung:
 
-zu führen.
+`Aktion -> Validierung -> führende Quelle -> Verlauf -> Datenaufbereitung/Deploy -> öffentliche Wirkung`
 
-### 2.3 Fachliches Objekt und Arbeitsvorgang bleiben getrennt
+Ein Vorgang wird nicht als erledigt markiert, solange ein notwendiger Writeback oder Veröffentlichungsschritt fehlgeschlagen ist.
 
-Events, Aktivitäten, Anbieter, Bilder und redaktionelle Texte sind fachliche Objekte.
+### 2.6 Mobile first
 
-Eingänge, Aufgaben, Entscheidungen, Informationen und Ideen sind Arbeitsvorgänge oder Aufmerksamkeitstypen, die mit diesen Objekten verknüpft sein können.
+- dauerhaft sichtbare Navigation,
+- genau eine dominante Hauptaktion,
+- technische Details nachrangig,
+- sichere Touchziele,
+- Fokus und Suchzustand bleiben erhalten,
+- Desktop erhöht Dichte, ändert aber nicht die Prozesslogik.
 
-Beispiel:
+## 3. Kanonische Arbeitszustände
 
-`Event -> Qualitätsproblem -> notwendige Entscheidung/Aufgabe -> korrigierter Event`
+### Bearbeiten-Fall
 
-Nicht zulässig:
-
-`Eventkopie im Inhalt + unabhängige Inboxkopie + unabhängige Aufgabenkopie`.
-
-### 2.4 Menschliche Arbeit nur bei echtem Bedarf
-
-Für jeden automatisch erkannten Sachverhalt gilt diese Reihenfolge:
-
-1. Kann das System ihn sicher selbst beheben? Dann automatisch erledigen und protokollieren.
-2. Kann das System ihn sicher als unkritisch einstufen? Dann aggregiert dokumentieren.
-3. Ist eine menschliche Entscheidung erforderlich? Dann in den Eingang beziehungsweise die Entscheidungsansicht.
-4. Ist die Entscheidung bereits getroffen und nur noch konkrete Arbeit nötig? Dann als Aufgabe führen.
-5. Ist keine zeitnahe Handlung erforderlich? Dann als Information, Idee oder Backlog führen.
-
-Technische Guards, Visual-Backlogs, normale Audit-Hinweise und erfolgreiche Routineprozesse dürfen keine künstliche tägliche Aufgabenlast erzeugen.
-
-### 2.5 Mobile first
-
-Die Steuerzentrale wird zuerst für die regelmäßige Nutzung auf einem Smartphone entworfen.
-
-Mobile first bedeutet:
-
-- wichtigste Entscheidung und Hauptaktion sind ohne horizontales Scrollen sichtbar,
-- Karten sind knapp, scannbar und nicht mit technischen Details überladen,
-- eine Karte besitzt höchstens eine visuell dominante Hauptaktion,
-- sekundäre Aktionen liegen nachrangig oder in einem Menü,
-- Status, Dringlichkeit und nächster Schritt sind ohne Öffnen technischer Detaildaten verständlich,
-- Touch-Ziele sind sicher bedienbar,
-- Formulare vermeiden unnötige Pflichtfelder und Mehrfachpflege,
-- Zurück-Navigation, nächster/vorheriger Fall und Erhalt von Filter-/Scrollzustand funktionieren verlässlich,
-- leere Zustände erklären knapp, dass aktuell nichts zu tun ist,
-- Desktop erweitert Übersicht und Dichte, verändert aber nicht Begriffe oder Prozesslogik.
-
-## 3. Kanonische Aufmerksamkeitstypen
-
-Jeder Arbeitsvorgang gehört zu genau einem der folgenden Typen.
-
-### 3.1 Eingang
-
-Bedeutung: Ein neuer oder erneut aufgekommener Sachverhalt ist noch nicht abschließend eingeordnet oder entschieden.
-
-Typische Beispiele:
-
-- neuer KI-Eventkandidat,
-- manuell eingereichter Event,
-- neue Anbieteränderung,
-- Content-Fall mit echter menschlicher Unsicherheit,
-- neue Idee, die zunächst bewertet werden soll.
-
-Lebenszyklus:
-
-`neu -> prüfen -> übernehmen / ablehnen / zurückstellen / Aufgabe erzeugen -> aus Eingang verschwinden`
-
-Ein Eingang darf nicht dauerhaft zum Aufbewahrungsort werden.
-
-### 3.2 Aufgabe
-
-Bedeutung: Die Notwendigkeit ist bereits entschieden; ein konkreter nächster Arbeitsschritt steht fest.
-
-Pflichtbestandteile:
-
-- klarer Titel als Handlung,
-- nachvollziehbarer Kontext,
-- nächster Schritt,
-- Status,
-- optional Fälligkeit,
-- optional Verknüpfung zum fachlichen Objekt,
-- optional Blockade- oder Wartegrund.
-
-Lebenszyklus:
-
-`offen -> geplant/in Arbeit -> optional wartet/blockiert -> erledigt`
-
-Eine Aufgabe darf nicht gleichzeitig als ungeklärter Eingang geführt werden.
-
-### 3.3 Entscheidung / Freigabe
-
-Bedeutung: Alle notwendigen Informationen liegen vor; der Betreiber muss nur noch eine bewusste fachliche Entscheidung treffen.
-
-Typische Aktionen:
-
-- freigeben,
-- ablehnen,
-- zur Überarbeitung zurückgeben,
-- bewusst unverändert bestätigen.
-
-Freigaben sind kein unabhängiger Datentyp und kein separater Speicherort. Sie sind eine fokussierte Ansicht entscheidungsreifer Vorgänge.
-
-### 3.4 Information
-
-Bedeutung: Die Information ist relevant, erfordert aber keine Handlung.
+Noch ungeklärter oder entscheidungsbedürftiger Sachverhalt aus einem Quellsystem.
 
 Beispiele:
 
-- Weekly-KI-Lauf erfolgreich,
-- Content-Audit ohne kritische Befunde,
-- Event automatisch aktualisiert,
-- Aufgabe erfolgreich abgeschlossen.
-
-Informationen dürfen keine Aufgabenbadge-Zahl erhöhen. Sie werden gelesen, automatisch verdichtet oder nach angemessener Zeit archiviert.
-
-### 3.5 Idee
-
-Bedeutung: Ein mögliches Produkt-, Content- oder Geschäftsvorhaben ohne bereits getroffene Umsetzungsentscheidung.
-
-Ideen besitzen grundsätzlich:
-
-- keine normale Fälligkeit,
-- keinen Status „überfällig“,
-- keinen Platz in der täglichen Aufgabenlast.
-
-Lebenszyklus:
-
-`gesammelt -> bewerten -> verwerfen / parken / in Vorhaben oder konkrete Aufgabe umwandeln`
-
-## 4. Priorisierungsmodell der Übersicht
-
-Die Übersicht ist die persönliche Aufmerksamkeitszentrale und gliedert sich in dieser Reihenfolge.
-
-### 4.1 Jetzt erforderlich
-
-Enthält nur:
-
-- überfällige Aufgaben,
-- heute notwendige Aufgaben,
-- blockierende Fehler mit fachlicher Auswirkung,
-- dringende Freigaben,
-- kritische Content-Probleme.
-
-Jedes Element zeigt den nächsten sinnvollen Schritt.
-
-### 4.2 Als Nächstes
-
-Enthält:
-
-- bald fällige Aufgaben,
-- geplante Folgeaktionen,
-- zurückgestellte Vorgänge, deren Wiedervorlagedatum erreicht ist,
-- wartende Entscheidungen, die bald relevant werden.
-
-### 4.3 Neuer Eingang
-
-Zeigt neue ungeklärte Vorgänge, sinnvoll nach Typ gruppiert oder verdichtet.
-
-Die Übersicht muss nicht jede Karte vollständig replizieren. Sie führt direkt in die passende fokussierte Bearbeitung.
-
-### 4.4 Zur Kenntnis
-
-Zeigt wenige relevante Informationen ohne Handlungsdruck.
-
-Erfolgreiche Routineabläufe sollen bevorzugt verdichtet werden, beispielsweise:
-
-`3 automatische Prüfungen erfolgreich – keine Aktion erforderlich`.
-
-### 4.5 Systemzustand
-
-Der normale Zustand lautet knapp und ruhig:
-
-`Automatisierungen laufen – keine Störung mit Auswirkung`.
-
-Technische Details, Logs und historische Läufe liegen in einer nachrangigen Systemansicht.
-
-## 5. Kanonische Navigation
-
-Empfohlene primäre Navigation:
-
-1. Übersicht
-2. Eingang
-3. Inhalte
-4. Aufgaben
-5. Mehr
-
-Unter `Mehr`:
-
-- Ideen,
-- Anbieter,
-- Auswertungen,
-- Automatisierungen/Systemstatus,
-- Einstellungen,
-- Archiv.
-
-`Freigaben` sind eine hervorgehobene Filteransicht in Übersicht und Eingang beziehungsweise innerhalb des betroffenen Fachbereichs. Sie bilden keine zusätzliche gleichrangige Datenwelt.
-
-Die Nutzerbezeichnung lautet konsistent `Inhalte`, nicht wechselnd `Content`, sofern ein technischer Kontext nicht ausdrücklich gemeint ist.
-
-## 6. Einzelbereich: Übersicht
+- neuer Eventkandidat,
+- Qualitätskorrektur,
+- Anbieterprüfung,
+- Freigabe,
+- relevante Änderung oder Absage.
 
 ### Aufgabe
 
-Die Übersicht beantwortet in weniger als wenigen Sekunden, ob und was der Betreiber tun muss.
+Entschiedene konkrete Arbeit mit eindeutigem nächsten Schritt.
 
-### Muss enthalten
+### Backlog
 
-- klare Gesamtampel ohne dramatische Darstellung,
-- Anzahl und Einstieg in `Jetzt erforderlich`,
-- Anzahl und Einstieg in neue Eingangsfälle,
-- nächste fällige Aufgaben,
-- relevante Informationen stark verdichtet,
-- Systemstörung nur bei echter Auswirkung.
+Bewusst vorgemerkte Arbeit ohne aktive Einplanung. Backlogpunkte dürfen priorisiert, bearbeitet, verworfen oder in Aufgaben überführt werden.
 
-### Darf nicht
+### Idee
 
-- reine Gesamtmengen als dominante KPI darstellen,
-- erfolgreiche Routineprozesse wie Warnungen inszenieren,
-- dieselben Vorgänge mehrfach in mehreren Blöcken zählen,
-- eine Analyseoberfläche statt einer Arbeitsoberfläche sein.
+Ungeprüfter möglicher Nutzen. Keine normale Fälligkeit und keine Belastung der täglichen Aufgabenanzeige.
 
-### Mobile Abnahme
+### Information
 
-- oberster Bildschirmbereich zeigt Handlungsbedarf und nicht Dekoration,
-- zentrale CTAs beanspruchen nicht unverhältnismäßig viel Höhe,
-- ohne Scrollen ist mindestens der wichtigste aktuelle Handlungsblock vollständig verständlich,
-- Badges unterscheiden Handlung von Information.
+Relevante Meldung ohne Handlungsbedarf. Routineerfolge werden verdichtet.
 
-## 7. Einzelbereich: Eingang
+## 4. Arbeitslebenszyklus
 
-### Aufgabe
+`Idee -> Backlog -> Aufgabe -> erledigt`
 
-Der Eingang ist die mobile Ausnahme-Arbeitsansicht für noch ungeklärte Fälle.
+Direkte Übergänge sind möglich. Es entstehen keine Kopien. Ein Punkt wechselt seinen führenden Zustand.
 
-### Queue-Trennung
+Quellfälle folgen:
 
-Mindestens fachlich unterscheidbar:
+`neu/erneut relevant -> Bearbeiten -> übernehmen / ablehnen / zurückstellen / Aufgabe erzeugen -> aus aktiver Queue verschwinden`
+
+## 5. Verbindliche Hauptnavigation
+
+1. **Übersicht**
+2. **Bearbeiten**
+3. **Arbeit**
+4. **Verwaltung**
+5. **Menü**
+
+### Übersicht
+
+Verdichtete Aufmerksamkeitszentrale:
+
+- jetzt erforderlich,
+- zu bearbeiten,
+- nächste aktive Arbeit,
+- wartet/blockiert,
+- relevante Information,
+- Systemauswirkung.
+
+Keine vollständige Wiederholung aller Vorgänge.
+
+### Bearbeiten
+
+Fokussierte Queue für:
 
 - neue Inhalte,
-- Änderungen an bestehenden Inhalten,
-- echte Qualitätsentscheidungen,
-- Anbieter-/Nutzeranliegen,
-- sonstige neue Vorgänge.
+- Änderungen,
+- Qualität,
+- Anbieter,
+- Freigaben,
+- Sonstige.
 
-Die Trennung kann über Filter oder Tabs erfolgen, muss aber auf demselben Vorgangsmodell beruhen.
+Mobil ein Vorgang; Desktop Queue plus Detail.
 
-### Kartenstandard
+### Arbeit
 
-Jede Karte zeigt:
+Gemeinsamer Arbeitsbereich mit Unteransichten:
 
-- worum es geht,
-- warum der Fall hier liegt,
-- welches fachliche Objekt betroffen ist,
-- welche Hauptentscheidung jetzt erforderlich ist,
-- belastbare Quelle oder Kontext, sofern relevant.
+- Aktiv/Jetzt,
+- Als Nächstes,
+- Wartet,
+- Blockiert,
+- Backlog,
+- Ideen,
+- Archiv.
 
-Technische Felder, interne IDs und Guard-Codes sind eingeklappt oder in einer Debugansicht.
+### Verwaltung
 
-### Aktionen
-
-Typische primäre Aktionen:
-
-- übernehmen,
-- ablehnen,
-- bestätigen,
-- korrigieren,
-- Aufgabe erzeugen.
-
-Sekundär:
-
-- zurückstellen,
-- Details,
-- Quelle öffnen,
-- technischer Kontext.
-
-### Mobile Abnahme
-
-- vor/zurück beziehungsweise nächster Fall funktioniert,
-- nach einer Aktion wird der nächste sinnvolle Fall gezeigt,
-- Filter- und Scrollzustand gehen nicht unnötig verloren,
-- Ablehnung und Übernahme sind nicht verwechselbar,
-- destruktive Aktionen verlangen eine angemessene Bestätigung oder Undo-Möglichkeit,
-- zurückgestellte Fälle verschwinden bis zur Wiedervorlage aus der normalen Arbeitsmenge.
-
-## 8. Einzelbereich: Inhalte
-
-### Aufgabe
-
-`Inhalte` ist die fachliche Verwaltungsoberfläche für Events, Aktivitäten und später weitere öffentliche Objekte.
-
-### Muss ermöglichen
+Interne Objektverwaltung für Events und Aktivitäten:
 
 - suchen und filtern,
-- aktuellen Publikationsstatus erkennen,
-- öffentlichen Inhalt öffnen,
-- Daten gezielt bearbeiten,
-- mit dem Objekt verbundene offene Vorgänge sehen,
-- Änderung, Absage oder Korrektur nachvollziehbar durchführen,
-- Herkunft und letzte relevante Aktualisierung erkennen.
+- Status erkennen,
+- öffnen und bearbeiten,
+- Quelle und Aktualisierung sehen,
+- offene Vorgänge verknüpfen,
+- speichern mit Writeback,
+- Veröffentlichung anstoßen und Ergebnis sehen,
+- Verlauf nachvollziehen.
 
-### Objektzentrierung
+### Menü
 
-Auf der Objektseite erscheinen verknüpft:
+Seltene Funktionen:
 
-- öffentliche Darstellung,
-- Stammdaten,
-- Qualitätsstatus,
-- Quelle,
-- offene Aufgabe oder Entscheidung,
-- Verlauf relevanter Änderungen.
+- Anbieterbereich,
+- Systemstatus,
+- Einstellungen,
+- Abmelden,
+- technische Diagnose nur nachrangig.
 
-Es wird kein zweiter unabhängiger Aufgabenbestand innerhalb des Content-Bereichs aufgebaut.
+## 6. Priorisierung der Übersicht
 
-### Mobile Abnahme
+### Jetzt erforderlich
 
-- Listenzeile oder Karte zeigt Titel, Typ, Status und wichtigste Kontextinformation,
-- Bearbeitung konzentriert sich auf fachliche Felder,
-- lange Formulare werden logisch gegliedert,
-- Speichern/Verwerfen ist eindeutig,
-- öffentliche Vorschau ist direkt erreichbar,
-- technische Rohdaten sind nachrangig.
+Nur überfällige, heute notwendige, blockierende, kritische oder dringende Fälle.
 
-## 9. Einzelbereich: Aufgaben
+### Zu bearbeiten
 
-### Aufgabe
+Verdichtete Anzahl und Typverteilung der aktiven Bearbeiten-Fälle.
 
-`Aufgaben` enthält ausschließlich bereits entschiedene, konkrete Arbeit.
+### Arbeit
 
-### Mindestansichten
+Nächste Aufgabe, wartet/blockiert und relevante Fälligkeiten.
 
-- jetzt/überfällig,
-- als Nächstes,
-- wartet/blockiert,
-- erledigt beziehungsweise Archiv.
+### Zur Kenntnis
 
-### Aufgabenerstellung
+Wenige verdichtete Informationen ohne Handlungsdruck.
 
-Eine Aufgabe kann entstehen aus:
+### Systemzustand
 
-- einem Eingang,
-- einem fachlichen Objekt,
-- einer Idee,
-- einer manuellen Erfassung,
-- einem Systembefund, wenn menschliche Arbeit wirklich erforderlich ist.
+Normalzustand:
 
-Bei Umwandlung aus einem Eingang wird der Eingangsvorgang geschlossen oder in den neuen Aufgabenstatus überführt; es entsteht keine unabhängige Doppelkarte.
+`Alle relevanten Quellen sind synchronisiert. Keine bekannte Störung mit Auswirkung.`
 
-### Mobile Abnahme
+Rohwerte und Logs nur unter technischen Details.
 
-- Erledigen ist schnell möglich,
-- Fälligkeit und Dringlichkeit sind verständlich, aber nicht alarmistisch,
-- Blockiert/Wartet benötigt einen sichtbaren Grund,
-- Aufgabe öffnen, Objekt öffnen und nächsten Schritt ausführen sind klar getrennt,
-- erledigte Aufgaben belasten die aktive Ansicht nicht.
+## 7. Verwaltung als verbindlicher E2E-Bereich
 
-## 10. Einzelbereich: Freigaben / Entscheidungen
+Eine Verwaltung ist nur fertig, wenn Speichern tatsächlich:
 
-### Aufgabe
+1. fachliche Eingaben validiert,
+2. die führende Quelle aktualisiert,
+3. den zentralen Verlauf ergänzt,
+4. notwendige Datenaufbereitung/Deploy auslöst oder zuverlässig anstößt,
+5. die öffentliche Wirkung bestätigt oder einen wartenden/blockierten Vorgang erzeugt.
 
-Diese Ansicht bündelt Vorgänge, die ohne weitere Recherche entscheidungsbereit sind.
+Eine Such- oder Linkliste allein ist keine Verwaltung.
 
-### Muss zeigen
+## 8. Backlog- und Projektintegration
 
-- Entscheidungsgegenstand,
-- vorgeschlagene Änderung oder Veröffentlichung,
-- relevante Vorher-/Nachher-Information,
-- Quelle und Qualitätsstatus,
-- klare Auswirkungen der Entscheidung.
+Zu integrieren sind:
 
-### Mobile Abnahme
+- bestehender Growth-/Acquisition-Backlog,
+- manuelle Ideen,
+- relevante offene Workpacks,
+- kuratierte technische Schulden,
+- geplante Content- und Produktverbesserungen.
 
-- Freigeben und Ablehnen sind eindeutig,
-- Vorher/Nachher ist bei Änderungen mobil verständlich,
-- fehlende Informationen verhindern eine Scheinf­reigabe und führen zurück in Eingang/Aufgabe,
-- nach Entscheidung verschwindet der Vorgang aus der aktiven Freigabeliste.
+Repo-Inhalte werden nicht ungefiltert gespiegelt. Nur deduplizierte, handlungsrelevante Punkte mit Nutzen/Risiko und klarer Zuordnung werden übernommen.
 
-## 11. Einzelbereich: Ideen
+## 9. Freigaberegel
 
-### Aufgabe
+Der Zielzustand ist erst erreicht, wenn:
 
-Ideen dienen als ruhiger Sammel- und Bewertungsbereich, nicht als Schatten-Aufgabenliste.
-
-### Muss ermöglichen
-
-- schnell erfassen,
-- grob kategorisieren,
-- Nutzen oder Anlass notieren,
-- parken,
-- verwerfen,
-- bewusst in ein Vorhaben oder eine Aufgabe überführen.
-
-### Mobile Abnahme
-
-- schnelle Erfassung mit sehr wenigen Feldern,
-- keine künstlichen Pflichttermine,
-- keine roten Überfälligkeitszustände,
-- klare Umwandlung in konkrete Arbeit.
-
-## 12. Einzelbereich: Informationen und Systemstatus
-
-### Aufgabe
-
-Diese Bereiche schaffen Vertrauen in Automatisierungen, ohne den Betreiber mit Technik zu belasten.
-
-### Informationsregeln
-
-- Erfolg wird verdichtet,
-- Warnung erscheint nur bei möglicher fachlicher Auswirkung,
-- Fehler erscheint prominent nur bei bestätigter Auswirkung oder notwendiger Handlung,
-- technische Ursache und Logs sind nachrangig erreichbar,
-- ein Systemfehler erzeugt nur dann eine Aufgabe, wenn tatsächlich menschliche Arbeit erforderlich ist.
-
-### Mobile Abnahme
-
-- Status ist in Alltagssprache formuliert,
-- betroffene Funktion und Auswirkung sind erkennbar,
-- bei Handlungsbedarf existiert genau eine klare nächste Aktion,
-- Rohlogs dominieren keine Standardansicht.
-
-## 13. Bereichsübergreifende UX-Regeln
-
-### 13.1 Sprache
-
-Begriffe sind fachlich und konsistent:
-
-- Übersicht,
-- Eingang,
-- Inhalte,
-- Aufgaben,
-- Entscheidungen/Freigaben,
-- Ideen,
-- Informationen,
-- Systemstatus.
-
-Technische Begriffe wie Pipeline, Guard, Runtime, JSON oder Audit-Code erscheinen nur in technischen Details.
-
-### 13.2 Statusdarstellung
-
-Ein gemeinsames Statusmodell wird visuell konsistent verwendet:
-
-- neu,
-- Entscheidung erforderlich,
-- offen,
-- in Arbeit,
-- wartet,
-- blockiert,
-- zurückgestellt,
-- erledigt,
-- abgelehnt,
-- Information.
-
-Farben sind unterstützend, nie alleinige Bedeutungsträger.
-
-### 13.3 Badges und Zähler
-
-Badges zählen standardmäßig nur ungelesene oder handlungsrelevante Vorgänge.
-
-Nicht in den Hauptbadge gehören:
-
-- Ideen,
-- erfolgreiche Systemläufe,
-- normale Informationen,
-- technische Backlogs ohne unmittelbare Aktion,
-- erledigte Vorgänge.
-
-### 13.4 Rückmeldung nach Aktionen
-
-Jede Aktion liefert eine klare, knappe Rückmeldung:
-
-- was geändert wurde,
-- ob weitere Arbeit nötig ist,
-- wohin der Vorgang gewechselt ist.
-
-Bei leicht reversiblen Aktionen ist Undo einer zusätzlichen Bestätigungsstufe vorzuziehen.
-
-### 13.5 Leere Zustände
-
-Leere Zustände sind positiv und konkret:
-
-- `Kein neuer Eingang – aktuell ist nichts zu prüfen.`
-- `Keine dringenden Aufgaben.`
-- `Keine Freigabe erforderlich.`
-
-Keine technischen Nullzustände oder leeren Tabellen ohne Erklärung.
-
-## 14. Daten- und Prozessvertrag
-
-Jeder Vorgang benötigt mindestens:
-
-- stabile Vorgangs-ID,
-- Aufmerksamkeitstyp,
-- führenden Status,
-- Priorität/Dringlichkeit nur wenn fachlich begründet,
-- Erstellungs- und Änderungszeitpunkt,
-- optional Fälligkeit oder Wiedervorlage,
-- optional Verknüpfung zum fachlichen Objekt,
-- Quelle beziehungsweise Ursprung,
-- klaren nächsten Schritt,
-- Verlauf relevanter Entscheidungen.
-
-Übergänge müssen atomar sein. Beispiel:
-
-`Eingang -> Aufgabe`
-
-bedeutet nicht „neue Aufgabe zusätzlich erzeugen und Eingang offen lassen“, sondern eine nachvollziehbare Zustandsumwandlung oder geschlossene Herkunftsverknüpfung.
-
-## 15. Gesamtabnahme des Konzepts
-
-Der Zielzustand gilt erst als erreicht, wenn alle folgenden Aussagen wahr sind:
-
-1. Der Betreiber erkennt auf der Übersicht sofort, ob etwas zu tun ist.
-2. Kein wichtiger Vorgang erfordert das routinemäßige Öffnen mehrerer Bereiche.
-3. Derselbe Sachverhalt wird nicht mehrfach unabhängig geführt oder gezählt.
-4. Eingang, Aufgabe, Entscheidung, Information und Idee sind fachlich eindeutig unterscheidbar.
-5. Inhalte bleiben fachliche Objekte und werden nicht zu einer parallelen Aufgabenwelt.
-6. Automatisierungen reduzieren Arbeit und erzeugen nur bei echter Notwendigkeit menschliche Vorgänge.
-7. Alle Kernabläufe sind auf Mobile vollständig verständlich und bedienbar.
-8. Desktop bietet mehr Raum, aber keine andere Prozesslogik.
-9. Erfolgreiche Routineprozesse erzeugen Ruhe; echte Blockaden erzeugen klare Aufmerksamkeit.
-10. Nach jeder Aktion ist eindeutig, was mit dem Vorgang geschehen ist.
-
-## 16. Validierungs- und Umsetzungsreihenfolge
-
-Vor UI-Patches wird der aktuelle Bestand gegen diesen Vertrag inventarisiert:
-
-1. alle bestehenden Bereiche, Karten, Zähler und Datenquellen erfassen,
-2. Doppelungen und konkurrierende Statusmodelle identifizieren,
-3. jeden bestehenden Vorgangstyp einem kanonischen Aufmerksamkeitstyp zuordnen,
-4. Übergänge und führenden Datensatz festlegen,
-5. Übersicht und Navigation daraus ableiten,
-6. anschließend jeden Einzelbereich mobile-first härten,
-7. erst danach visuelles Polish durchführen.
-
-Nicht lokal einzelne Karten verschönern, solange unklar ist, ob sie im Gesamtsystem richtig eingeordnet sind.
-
-## 17. Abgrenzung zu bestehenden Dokumenten
-
-Bestehende Regeln bleiben gültig, soweit sie diesem Vertrag nicht widersprechen, insbesondere:
-
-- private Inbox als Ausnahme-Arbeitsansicht,
-- Trennung neuer Inhalte und bestehender Content-Prüffälle,
-- keine normalen Inboxkarten für technische oder aggregierbare Visual-Hinweise,
-- keine ungeprüfte automatische fachliche Datenänderung durch KI,
-- systemische Qualitätsverhinderung vor nachträglicher manueller Prüfung.
-
-Bei Widersprüchen ist dieser kanonische Zielzustand für die Steuerzentrale maßgeblich. Fachspezifische Dokumente konkretisieren ihn, dürfen aber keine abweichenden Parallelmodelle für Aufgaben, Eingang, Freigaben, Informationen oder Ideen einführen.
+- alle führenden Quellen korrekt angebunden sind,
+- Verwaltung echte Bearbeitung und Veröffentlichungswirkung besitzt,
+- Aufgaben, Backlog und Ideen als ein Lebenszyklus funktionieren,
+- Such- und Fokuszustände stabil bleiben,
+- Systemstatus fachlich statt technisch formuliert ist,
+- alte Inbox für reguläre Arbeit nicht mehr erforderlich ist,
+- alle automatisierten und realen Staging-Abnahmen bestanden sind.
