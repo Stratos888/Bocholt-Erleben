@@ -59,7 +59,7 @@ $throws(
 );
 $throws(
     static fn() => be_cc_validate_event_update($index, $row, ['ticket_url' => 'https://tickets.example.org']),
-    'keiner Sheet-Spalte',
+    'einer Sheet-Spalte',
     'Nicht vorhandene Spalte erzeugt keinen falschen Erfolg'
 );
 
