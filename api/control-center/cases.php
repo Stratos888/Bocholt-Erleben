@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/_schema.php';
+require_once __DIR__ . '/_domain.php';
 
 be_require_review_access();
 
