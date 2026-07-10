@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_domain.php';
 require_once __DIR__ . '/_content_source.php';
+require_once __DIR__ . '/_contracts.php';
 require_once dirname(__DIR__) . '/growth-backlog-lib.php';
 
 const BE_CC_INBOX_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxU3MYnINbhk-1XFehzGRYeto3f4BH9fyL6RmMlQPwmTt_wciHoESRo27nx1-KSIAos/exec';
@@ -91,76 +92,22 @@ function be_cc_find_event_row(string $contentId): array
     throw new RuntimeException('Matching event row was not found.');
 }
 
-function be_cc_event_target_column(array $index, array $aliases): ?string
-{
-    foreach ($aliases as $alias) {
-        if (isset($index[strtolower($alias)])) return strtolower($alias);
-    }
-    return null;
-}
-
 function be_cc_update_event_fields(string $contentId, array $updates): array
 {
     $target = be_cc_find_event_row($contentId);
-    $aliases = [
-        'title' => ['title'],
-        'date' => ['date', 'start_date'],
-        'end_date' => ['enddate', 'end_date'],
-        'time' => ['time'],
-        'city' => ['city'],
-        'location' => ['location', 'venue'],
-        'address' => ['address'],
-        'category' => ['kategorie', 'category'],
-        'tags' => ['tags'],
-        'source_url' => ['source_url', 'url', 'event_url'],
-        'ticket_url' => ['ticket_url'],
-        'description' => ['description'],
-        'visual_key' => ['visual_key'],
-        'visual_motif' => ['visual_motif', 'image_visual_motif'],
-    ];
-    $incomingAliases = [
-        'endDate' => 'end_date', 'end_date' => 'end_date',
-        'kategorie' => 'category', 'category' => 'category',
-        'url' => 'source_url', 'event_url' => 'source_url', 'source_url' => 'source_url',
-        'image_visual_motif' => 'visual_motif', 'visual_motif' => 'visual_motif',
-    ];
-    $normalized = [];
-    foreach ($updates as $field => $value) {
-        $canonical = $incomingAliases[$field] ?? $field;
-        if (isset($aliases[$canonical])) $normalized[$canonical] = trim((string)$value);
-    }
-    if (!$normalized) throw new InvalidArgumentException('Keine unterstützten Eventfelder übergeben.');
-
-    $currentTitleColumn = be_cc_event_target_column($target['index'], $aliases['title']);
-    $currentDateColumn = be_cc_event_target_column($target['index'], $aliases['date']);
-    $currentTitle = $currentTitleColumn !== null ? trim((string)($target['row'][$target['index'][$currentTitleColumn]] ?? '')) : '';
-    $currentDate = $currentDateColumn !== null ? trim((string)($target['row'][$target['index'][$currentDateColumn]] ?? '')) : '';
-    $finalTitle = array_key_exists('title', $normalized) ? $normalized['title'] : $currentTitle;
-    $finalDate = array_key_exists('date', $normalized) ? $normalized['date'] : $currentDate;
-    if ($finalTitle === '') throw new InvalidArgumentException('Titel darf nicht leer sein.');
-    if ($finalDate === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $finalDate)) throw new InvalidArgumentException('Ein gültiges Startdatum ist erforderlich.');
-
+    $resolved = be_cc_validate_event_update($target['index'], $target['row'], $updates);
     $data = [];
-    $written = [];
-    foreach ($normalized as $canonical => $clean) {
-        if (in_array($canonical, ['source_url','ticket_url'], true) && $clean !== '' && (!filter_var($clean, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//i', $clean))) {
-            throw new InvalidArgumentException('Ungültige URL für ' . $canonical . '.');
-        }
-        if (in_array($canonical, ['date','end_date'], true) && $clean !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $clean)) {
-            throw new InvalidArgumentException('Ungültiges Datum für ' . $canonical . '.');
-        }
-        $columnName = be_cc_event_target_column($target['index'], $aliases[$canonical]);
-        if ($columnName === null) continue;
-        $column = be_cc_column_letter((int)$target['index'][$columnName]);
-        $data[] = ['range' => 'Events!' . $column . $target['row_number'] . ':' . $column . $target['row_number'], 'values' => [[$clean]]];
-        $written[] = $canonical;
+    foreach ($resolved as $canonical => $plan) {
+        $column = be_cc_column_letter((int)$target['index'][$plan['column_name']]);
+        $data[] = [
+            'range' => 'Events!' . $column . $target['row_number'] . ':' . $column . $target['row_number'],
+            'values' => [[$plan['value']]],
+        ];
     }
-    if (!$data) throw new RuntimeException('Keine der übergebenen Eventänderungen konnte einer Sheet-Spalte zugeordnet werden.');
-
     $google = be_google_config();
     $url = sprintf('https://sheets.googleapis.com/v4/spreadsheets/%s/values:batchUpdate', rawurlencode($google['sheet_id']));
     be_google_sheets_request('POST', $url, ['valueInputOption' => 'USER_ENTERED', 'data' => $data]);
-    return $written;
+    return array_keys($resolved);
 }
 
 function be_cc_writeback_content_audit(array $case, string $action, array $payload): void
