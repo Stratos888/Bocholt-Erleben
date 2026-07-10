@@ -104,5 +104,8 @@ function be_cc_verify_public_change(array $change): array
         }
         return ['verified' => true, 'reason' => 'Öffentliche Aktivitätsdaten entsprechen der gespeicherten Änderung.'];
     }
+    if ($sourceSystem === 'submission_db') {
+        return be_cc_compare_submission_public_event_change($item, (array)$change['updates_json'], (array)$change['written_fields_json']);
+    }
     return be_cc_compare_public_event_change($item, (array)$change['updates_json'], (array)$change['written_fields_json']);
 }
