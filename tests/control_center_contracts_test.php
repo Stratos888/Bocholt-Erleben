@@ -63,6 +63,36 @@ $throws(
     'Nicht vorhandene Spalte erzeugt keinen falschen Erfolg'
 );
 
+$publicEvent = [
+    'id' => 'event-1',
+    'eventName' => 'Neuer Titel',
+    'datum' => '2026-08-02',
+    'ort' => 'TextilWerk',
+    'category' => 'Musik & Bühne',
+    'url' => 'https://example.org/neu',
+];
+$publicOk = be_cc_compare_public_event_change($publicEvent, [
+    'title' => 'Neuer Titel',
+    'date' => '2026-08-02',
+    'location' => 'TextilWerk',
+    'kategorie' => 'Musik & Bühne',
+    'source_url' => 'https://example.org/neu',
+], ['title','date','location','category','source_url']);
+$assert($publicOk['verified'] === true, 'Öffentliche Aliaswerte werden als bestätigt erkannt');
+
+$publicMismatch = be_cc_compare_public_event_change($publicEvent, [
+    'title' => 'Anderer Titel',
+    'date' => '2026-08-02',
+], ['title','date']);
+$assert($publicMismatch['verified'] === false, 'Abweichender öffentlicher Wert wird erkannt');
+$assert(($publicMismatch['field'] ?? '') === 'title', 'Abweichendes Feld wird benannt');
+
+$writtenOnly = be_cc_compare_public_event_change($publicEvent, [
+    'title' => 'Neuer Titel',
+    'ticket_url' => 'https://tickets.example.org',
+], ['title']);
+$assert($writtenOnly['verified'] === true, 'Nicht geschriebene optionale Felder blockieren die Bestätigung nicht');
+
 $baseline = be_cc_development_assessment([
     'missing_description' => 0,
     'missing_source' => 0,
