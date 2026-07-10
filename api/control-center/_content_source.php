@@ -57,6 +57,7 @@ function be_cc_event_items(bool $full = false): array
             'public_url' => '/events/?event=' . rawurlencode($id),
             'updated_at' => be_cc_sheet_value($row, $index, ['updated_at', 'last_modified']),
             'editable' => true,
+            'writeback_status' => ['available' => true, 'code' => 'ready', 'message' => 'Events werden im führenden Sheet bearbeitet.'],
         ];
         if ($full) {
             $item['description'] = be_cc_sheet_value($row, $index, ['description']);
@@ -75,7 +76,7 @@ function be_cc_activity_items(bool $full = false): array
     if (!is_file($path)) return [];
     $payload = json_decode((string)file_get_contents($path), true);
     $offers = is_array($payload['offers'] ?? null) ? $payload['offers'] : [];
-    $repoPrepared = be_cc_activity_writeback_available();
+    $writebackStatus = be_cc_activity_writeback_status();
     $items = [];
     foreach ($offers as $offer) {
         if (!is_array($offer)) continue;
@@ -91,11 +92,10 @@ function be_cc_activity_items(bool $full = false): array
             'source_url' => trim((string)($offer['url'] ?? '')),
             'public_url' => '/aktivitaeten/?activity=' . rawurlencode($id),
             'updated_at' => trim((string)($offer['opening_status']['checked_at'] ?? $offer['checked_at'] ?? '')),
-            'editable' => false,
-            'repo_writeback_prepared' => $repoPrepared,
-            'edit_notice' => $repoPrepared
-                ? 'Der sichere Repo-Writeback ist vorbereitet. Der Editor bleibt bis zur vollständigen E2E-Verifikation bewusst gesperrt.'
-                : 'Aktivitäten sind repo-geführt. Der sichere Repo-Writeback benötigt zusätzlich das serverseitige Secret BE_GITHUB_REPO_TOKEN und eine E2E-Verifikation.',
+            'editable' => (bool)$writebackStatus['available'],
+            'repo_writeback_prepared' => (bool)be_cc_github_repo_config()['configured'],
+            'writeback_status' => $writebackStatus,
+            'edit_notice' => $writebackStatus['message'],
         ];
         if ($full) {
             $item['description'] = trim((string)($offer['description'] ?? ''));
