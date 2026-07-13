@@ -47,6 +47,7 @@ jobs:
           node --check js/control-center.js
           node --check js/control-center-source-editors.js
           node --check js/control-center-final-bridge.js
+          node --check js/control-center-seo-embed.js
           node --check js/control-center-publication.js
           node --check js/control-center-development.js
           node --check js/control-center-integrations.js
@@ -69,6 +70,7 @@ jobs:
           test -s js/control-center.js
           test -s js/control-center-source-editors.js
           test -s js/control-center-final-bridge.js
+          test -s js/control-center-seo-embed.js
           test -s js/control-center-publication.js
           test -s js/control-center-development.js
           test -s js/control-center-integrations.js
@@ -113,13 +115,15 @@ jobs:
           grep -q "BE_INTERNAL_SEO_DASHBOARD" api/control-center/auth.php
           grep -q "be_internal_seo_dashboard_unlocked" api/control-center/auth.php
           grep -q "session_regenerate_id" api/control-center/auth.php
-          grep -q "HttpOnly\|httponly" api/control-center/auth.php
+          grep -q "httponly" api/control-center/auth.php
           grep -q "data-view=\"backlog\"" steuerzentrale/index.html
+          grep -q "control-center-seo-embed.js" steuerzentrale/index.html
           grep -q "SEO & Reichweite" js/control-center.js
           grep -q "/intern/seo-dashboard/" js/control-center.js
           grep -q "cc-review-select" js/control-center.js
           grep -q "visibleReviewGroups" js/control-center.js
           grep -q "data-backlog-action" js/control-center.js
+          grep -q "\.logout" js/control-center-seo-embed.js
           grep -q "UNIQUE KEY uq_control_cases_source" api/control-center/_schema.php
           grep -q "control_content_changes" api/control-center/_schema.php
           grep -q "control_development_snapshots" api/control-center/_schema.php
