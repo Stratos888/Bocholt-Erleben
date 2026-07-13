@@ -1,4 +1,4 @@
-/* === BEGIN FILE: js/startpartner-funnel.js | Zweck: steuert die Startpartner-Anfrage mit derselben Formularlogik wie bestehende Funnel-Seiten: keine nativen Browser-Bubbles, klare Feldmarkierung, Formspree-Submit; Umfang: komplette Datei === */
+/* === BEGIN FILE: js/startpartner-funnel.js | Zweck: steuert die kompakte Startpartner-Anfrage mit bestehender Funnel-Validierung: keine nativen Browser-Bubbles, klare Feldmarkierung, Formspree-Submit; Umfang: komplette Datei === */
 (() => {
   "use strict";
 
@@ -121,16 +121,12 @@
 
     const organization = document.getElementById("startpartner-organization");
     const email = document.getElementById("startpartner-email");
-    const kind = document.getElementById("startpartner-kind");
     const note = document.getElementById("startpartner-note");
-    const source = document.getElementById("startpartner-source");
     const privacy = document.getElementById("startpartner-privacy-confirmed");
 
     if (!safeText(organization?.value)) invalidIds.push("startpartner-organization");
     if (!safeText(email?.value) || (email && !email.validity.valid)) invalidIds.push("startpartner-email");
-    if (!safeText(kind?.value)) invalidIds.push("startpartner-kind");
-    if (safeText(note?.value).length < 12) invalidIds.push("startpartner-note");
-    if (safeText(source?.value) && source && !source.validity.valid) invalidIds.push("startpartner-source");
+    if (safeText(note?.value).length < 8) invalidIds.push("startpartner-note");
     if (!privacy?.checked) invalidIds.push("startpartner-privacy-confirmed");
 
     if (!invalidIds.length) return true;
@@ -197,4 +193,4 @@
     }
   });
 })();
- /* === END FILE: js/startpartner-funnel.js === */
+/* === END FILE: js/startpartner-funnel.js === */
