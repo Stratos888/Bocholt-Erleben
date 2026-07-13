@@ -24,3 +24,5 @@
   new MutationObserver(scan).observe(document.body, { childList:true, subtree:true });
   scan();
 })();
+
+// Deployment marker: control-center-final-v4
