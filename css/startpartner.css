@@ -1,0 +1,201 @@
+/* === BEGIN FILE: css/startpartner.css | Zweck: kapselt die Startpartner-Seite als begrenzten, begleiteten 6-Monats-Wirkungsnachweis auf bestehenden Subpage-/Token-Primitives; Umfang: nur .page--startpartner und zugehörige Startpartner-Komponenten === */
+.page--startpartner{
+  --subpage-rail-max: 1180px;
+  --subpage-hero-max: 1128px;
+  --subpage-body-max: 1088px;
+  --subpage-stack-gap: clamp(15px, 2vw, 24px);
+  --subpage-card-gap: 14px;
+  --subpage-card-pad-x: clamp(17px, 2.2vw, 24px);
+  --subpage-card-pad-y: clamp(18px, 2.3vw, 24px);
+}
+
+.page--startpartner .content-hero{
+  width: min(100%, var(--subpage-hero-max));
+  justify-self: stretch;
+}
+
+.startpartner-hero-layout{
+  display: grid;
+  gap: 18px;
+  align-items: start;
+}
+
+.startpartner-hero-copy{
+  display: grid;
+  gap: 13px;
+  min-width: 0;
+}
+
+.startpartner-hero .content-kicker{
+  color: var(--cmp-link-color);
+}
+
+.startpartner-hero .content-lead{
+  max-width: 58ch;
+}
+
+.startpartner-hero-actions{
+  margin-top: 4px;
+}
+
+.startpartner-proof-card{
+  display: grid;
+  gap: 11px;
+  align-content: start;
+  padding: 15px;
+  border: 1px solid var(--ui-border-primary);
+  border-radius: var(--cmp-card-radius);
+  background: color-mix(in srgb, white 76%, var(--color-primary-muted));
+  box-shadow:
+    0 8px 20px rgba(92,122,46,0.045),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+}
+
+.startpartner-proof-card > strong{
+  color: var(--color-text-primary);
+  font-size: 0.98rem;
+  line-height: 1.22;
+}
+
+.startpartner-proof-list,
+.startpartner-benefit-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.startpartner-proof-list{
+  display: grid;
+  gap: 8px;
+}
+
+.startpartner-proof-list li{
+  position: relative;
+  padding-left: 20px;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.38;
+}
+
+.startpartner-proof-list li::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-muted) 76%, transparent);
+}
+
+.startpartner-limit-card{
+  width: min(100%, var(--subpage-body-max));
+}
+
+.startpartner-section-grid{
+  display: grid;
+  gap: var(--subpage-stack-gap);
+  width: min(100%, var(--subpage-body-max));
+}
+
+.startpartner-section-grid > .content-card{
+  width: 100%;
+}
+
+.startpartner-benefit-list{
+  display: grid;
+  gap: 10px;
+}
+
+.startpartner-benefit-list li{
+  display: grid;
+  gap: 4px;
+  padding: 13px 14px;
+  border: 1px solid color-mix(in srgb, transparent 82%, var(--color-primary));
+  border-radius: var(--ui-radius-sm);
+  background: rgba(255,255,255,0.58);
+}
+
+.startpartner-benefit-list strong{
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  line-height: 1.24;
+}
+
+.startpartner-benefit-list span{
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.42;
+}
+
+.startpartner-trust-card{
+  background: rgba(255,255,255,0.68);
+}
+
+.startpartner-form-card{
+  width: min(100%, 920px);
+}
+
+.startpartner-form-card .content-form{
+  max-width: 860px;
+}
+
+.startpartner-form-card .content-actions--inline .content-cta{
+  min-width: min(100%, 248px);
+}
+
+@media (max-width: 540px){
+  .page--startpartner{
+    --subpage-stack-gap: 14px;
+  }
+
+  .startpartner-hero h1{
+    max-width: 11ch;
+  }
+
+  .startpartner-hero-actions .content-cta{
+    width: 100%;
+    min-width: 0;
+  }
+
+  .startpartner-proof-card{
+    padding: 14px;
+  }
+
+  .startpartner-benefit-list li{
+    padding: 12px;
+  }
+}
+
+@media (min-width: 900px){
+  .startpartner-hero-layout{
+    grid-template-columns: minmax(0, 1.08fr) minmax(280px, 0.72fr);
+    align-items: center;
+  }
+
+  .startpartner-section-grid{
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    align-items: stretch;
+  }
+
+  .startpartner-benefit-card{
+    grid-row: span 2;
+  }
+
+  .startpartner-form-card{
+    justify-self: start;
+  }
+}
+
+@media (min-width: 1180px){
+  .page--startpartner{
+    --subpage-rail-max: 1200px;
+    --subpage-stack-gap: 24px;
+  }
+
+  .startpartner-hero .content-lead{
+    font-size: 1.02rem;
+  }
+}
+/* === END FILE: css/startpartner.css === */
