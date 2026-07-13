@@ -36,7 +36,7 @@ Finales Modell:
 - Kostenloser Tipp-Kanal: Buerger, Besucher, Vereine, Veranstalter, Locations oder interne Redaktion koennen fehlende Veranstaltungen, Aktivitaeten oder Orte ueber das bestehende Feedback-Formular vorschlagen. Ein Link oder kurzer Hinweis reicht. Das ist kein Anbieterprodukt, keine Einreichung und kein Statusprozess.
 - Redaktionelle Auswahl: Ein Tipp ist nur ein Eingangssignal. Veroeffentlichung erfolgt nur nach redaktioneller Eignung, Quellenlage und Plattformqualitaet. Es gibt keine Veroeffentlichungsgarantie, keinen Anbieterbereich, keine Prioritaet und keinen Wirkungsbericht.
 - Bezahlte Premium-/Service-Schicht: Aufwandersparnis, dauerhafte Praesenz, Wirkungsbericht, automatische Uebernahme, komfortable Aenderungen und Anbieterbetreuung.
-- Startpartner-Pilot: passende neue Partner erhalten einmalig 6 Monate volle Anbieterleistung mit Wirkungsmessung. Danach wird anhand der gemessenen Wirkung in einen regulaeren Tarif ueberfuehrt.
+- Startpartner-Pilot: In der Aufbauphase wird eine begrenzte Zahl passender neuer Partner aufgenommen. Sie erhalten einmalig 6 Monate volle Anbieterleistung mit Wirkungsmessung und begleiteter Auswertung. Danach wird anhand der gemessenen Wirkung in einen regulaeren Tarif ueberfuehrt.
 
 Nicht empfohlen als Kernmodell:
 
@@ -140,14 +140,21 @@ Keine SEO-Massenrunde ohne messbare Objektbasis.
 
 ## 6. Startpartner-Logik
 
-Startpartner werden nicht als dauerhaft kostenlose Vollleistung gefuehrt, sondern als einmaliger Wirkungsnachweis mit klarem Uebergang in einen regulaeren Tarif.
+Startpartner werden nicht als dauerhaft kostenlose Vollleistung gefuehrt, sondern als begrenzter, begleiteter Wirkungsnachweis mit klarem Uebergang in einen regulaeren Tarif.
 
 Finale Regel:
 
 ```text
+Begrenzte Startpartnerplaetze in der Aufbauphase.
 6 Monate Startpartner-Pilot mit voller Anbieterleistung und Wirkungsmessung.
 Danach Wirkung auswerten und in einen regulaeren Tarif ueberfuehren.
 ```
+
+Warum begrenzt:
+
+- Einrichtung, Pflegeweg, redaktionelle Aufbereitung und Wirkungsauswertung werden persoenlich begleitet.
+- Die Begrenzung verhindert, dass Startpartner als dauerhaft offener Gratis-Tarif verstanden wird.
+- Passung und redaktionelle Qualitaet bleiben wichtiger als reine Menge.
 
 Warum 6 Monate:
 
@@ -165,6 +172,7 @@ Enthalten im Pilot:
 Nicht enthalten:
 
 - dauerhaft kostenlose Anbieterleistung,
+- dauerhaft offener Gratis-Einstieg,
 - oeffentliche Besserstellung gegenueber kostenlosen redaktionellen Inhalten,
 - mehrere parallel beworbene Testmodelle,
 - garantierte Veroeffentlichung ungeeigneter Inhalte.
@@ -188,8 +196,8 @@ Redaktionelle Qualitaet bleibt fuehrend.
 2. Verkaufs-/Sichtbar-werden-Seiten auf drei sauber getrennte Nutzerintentionen pruefen:
    - nur Tipp senden,
    - konkret sichtbar werden,
-   - Startpartner anfragen.
-3. Startpartner-Route als 6-Monats-Anfrageweg fuehren, nicht als weiterer Tarif in der normalen Tarifliste.
+   - begrenzten Startpartnerplatz anfragen.
+3. Startpartner-Route als begrenzten 6-Monats-Anfrageweg fuehren, nicht als weiterer Tarif in der normalen Tarifliste.
 4. Bestehende Anbieter-/Sichtbar-werden-Seiten weiter auf Ergebnisversprechen pruefen.
 5. Content-/Visual-/Inbox-Prozess parallel als Qualitaetsschutz weiterfuehren.
 
