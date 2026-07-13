@@ -5,6 +5,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 read = lambda path: (ROOT / path).read_text(encoding='utf-8')
 html = read('steuerzentrale/index.html')
+style_entry = read('css/style.css')
 js = read('js/control-center.js')
 source_js = read('js/control-center-source-editors.js')
 bridge_js = read('js/control-center-final-bridge.js')
@@ -46,8 +47,10 @@ for forbidden in ['<span>Arbeit</span>', '<span>Eingang</span>', '<span>Aufgaben
         errors.append(f'Veralteter Haupttab vorhanden: {forbidden}')
 if 'control-center-mobile-feedback.js' in html:
     errors.append('Veralteter UI-Überlagerungscontroller wird weiterhin geladen.')
-if 'control-center-final.css' not in html:
-    errors.append('Finale responsive Steuerzentralen-CSS fehlt.')
+if 'href="/css/style.css?v=2026-06-22-css-governance-v1"' not in html:
+    errors.append('Steuerzentrale verwendet nicht den vorgeschriebenen CSS-Governance-Entry-Point.')
+if '@import url("/css/control-center-final.css?v=2026-06-22-css-governance-v1");' not in style_entry:
+    errors.append('Finale responsive Steuerzentralen-CSS fehlt in der zentralen Importkette.')
 if 'id="cc-dialog-close" type="button"' not in html:
     errors.append('Dialog-Schließen ist nicht von Pflichtfeldvalidierung entkoppelt.')
 
