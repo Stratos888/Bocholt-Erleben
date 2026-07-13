@@ -1,10 +1,9 @@
-/* === BEGIN BLOCK: CSS_GOVERNANCE_ENTRYPOINT_V2 | Zweck: hält /css/style.css als einzigen öffentlichen CSS-Entry-Point, kapselt die Owner-Reihenfolge und ergänzt den separaten Startpartner-Page-Layer nach den generischen Komponenten; Umfang: nur Import-Kette, keine echten Styles === */
+/* === BEGIN BLOCK: CSS_GOVERNANCE_ENTRYPOINT_V1 | Zweck: hält /css/style.css als einzigen öffentlichen CSS-Entry-Point und kapselt die Owner-Reihenfolge; Umfang: nur Import-Kette, keine echten Styles === */
 @import url("/css/base.css?v=2026-06-22-css-governance-v1");
 @import url("/css/pages.css?v=2026-06-22-css-governance-v1");
 @import url("/css/components.css?v=2026-06-22-css-governance-v1");
-@import url("/css/startpartner.css?v=2026-07-06-startpartner-premium-v2");
 @import url("/css/home.css?v=2026-06-22-css-governance-v1");
 @import url("/css/today.css?v=2026-06-22-css-governance-v1");
 @import url("/css/overlays.css?v=2026-06-22-css-governance-v1");
 @import url("/css/control-center.css?v=2026-06-22-css-governance-v1");
-/* === END BLOCK: CSS_GOVERNANCE_ENTRYPOINT_V2 === */
+/* === END BLOCK: CSS_GOVERNANCE_ENTRYPOINT_V1 === */
