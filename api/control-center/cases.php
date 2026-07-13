@@ -6,16 +6,43 @@ require_once __DIR__ . '/_domain.php';
 
 be_require_review_access();
 
+function be_cc_backlog_fingerprint(array $case): string
+{
+    $title = mb_strtolower(trim((string)($case['title'] ?? '')), 'UTF-8');
+    $title = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $title) ?? $title;
+    $title = preg_replace('/\s+/u', ' ', trim($title)) ?? trim($title);
+    return $title;
+}
+
+function be_cc_deduplicate_presented_cases(array $cases): array
+{
+    $result = [];
+    $backlogFingerprints = [];
+    foreach ($cases as $case) {
+        if (!is_array($case)) continue;
+        if (($case['case_kind'] ?? '') === 'backlog_item') {
+            $fingerprint = be_cc_backlog_fingerprint($case);
+            if ($fingerprint !== '' && isset($backlogFingerprints[$fingerprint])) continue;
+            if ($fingerprint !== '') $backlogFingerprints[$fingerprint] = true;
+            if (trim((string)($case['next_action'] ?? '')) === 'Priorisieren oder als konkrete Aufgabe starten.') {
+                $case['next_action'] = 'Priorisieren, konkretisieren oder als abgeschlossen markieren.';
+            }
+        }
+        $result[] = $case;
+    }
+    return $result;
+}
+
 try {
     be_cc_ensure_schema();
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
     if ($method === 'GET') {
-        $cases = be_cc_list_cases([
+        $cases = be_cc_deduplicate_presented_cases(be_cc_list_cases([
             'type' => trim((string)($_GET['type'] ?? '')),
             'state' => trim((string)($_GET['state'] ?? '')),
             'active' => trim((string)($_GET['active'] ?? '')),
-        ]);
+        ]));
 
         be_json_response(200, [
             'status' => 'ok',
