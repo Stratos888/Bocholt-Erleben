@@ -1,101 +1,156 @@
-# Steuerzentrale – Freeze-Stand 2026-07-10
+# Steuerzentrale – finaler Zielzustand 2026-07-10
 
 ## Zweck
 
-Dieser Stand wird nach dem Deployment zunächst praktisch genutzt. Ziel ist, reale Bedienerfahrungen zu sammeln, ohne die Informationsarchitektur währenddessen erneut grundsätzlich umzubauen.
+Die Steuerzentrale ist der zentrale tägliche Betreiberarbeitsplatz. Sie integriert Entscheidungsfälle, Backlog, Inhaltsverwaltung, Projektstatus und das bestehende SEO-/Mehrwert-Dashboard ohne doppelte Bedienmodelle oder erneute Anmeldung.
 
-## Freeze-Umfang
-
-### Hauptnavigation
+## Verbindliche Hauptnavigation
 
 1. Übersicht
 2. Prüfen
-3. Arbeit
+3. Backlog
 4. Verwaltung
 5. Entwicklung
 
-### Verbindliche Bedienregeln
+Andere Haupttabs sind nicht Teil des Zielzustands.
 
-- `Prüfen` zeigt auf jedem Filter die aktuelle Fallzahl.
-- Auf Mobile wird der Prüfbereich über ein kompaktes Dropdown ausgewählt; die breite Pill-Leiste ist dort nicht das führende Bedienelement.
-- Qualitätsfälle zeigen aktuellen Inhalt und einen direkt übernehmbaren Vorschlag.
-- `Arbeit` verwendet aufklappbare Zeilen als einzige Detailebene.
-- Die sichtbare Arbeitslogik besteht nur aus `Offen` und `Backlog`.
-- Technische Zustände wie wartet oder blockiert bleiben intern möglich, werden aber unter `Offen` zusammengeführt.
-- Ideen werden nicht in der Steuerzentrale geführt; unscharfe Themen laufen über SpecDoc und werden bei Bedarf direkt als Backlogpunkt angelegt.
-- Erledigte Vorgänge werden nicht über ein sichtbares Archiv bedient; dauerhafte Nachvollziehbarkeit bleibt in Repo-Dokumentation und technischem Verlauf erhalten.
-- Backlogpunkte werden bearbeitet, abgeschlossen oder verworfen.
-- `Verwaltung` lädt redaktionelle Events und Anbieter-Events getrennt, parallel, mit Zeitlimit und Teilfehleranzeige.
-- `Entwicklung` zeigt ein kompaktes SEO- und Wirkungsdashboard statt Repo-Workpacks.
-- Repo-Workpacks erscheinen ausschließlich unter `Arbeit → Backlog`.
+## Übersicht
 
-## Technischer Freeze-Vertrag
+Die Übersicht zeigt ausschließlich:
 
-- JavaScript-Asset-Version: `2026-07-10-control-center-feedback-v2`
+- jetzt erforderliche Entscheidungen,
+- offene Prüffälle,
+- offene Backlogpunkte,
+- kompakten Projektstatus.
+
+Technische/systemische Vorgänge werden als prüfbare Fälle bewertet und nicht in einem separaten Aufgabenmodell versteckt.
+
+## Prüfen
+
+`Prüfen` enthält alle entscheidungsbedürftigen Fälle:
+
+- neue Inhalte,
+- Qualität,
+- Anbieter,
+- Freigaben,
+- System,
+- Sonstige.
+
+Verbindliche Regeln:
+
+- `Alle` wird immer angeboten.
+- Weitere Kategorien erscheinen nur bei mindestens einem offenen Fall.
+- Desktop verwendet kompakte Pills.
+- Mobile verwendet ein Dropdown.
+- Jede sichtbare Kategorie zeigt ihre Fallzahl.
+- Die Oberfläche fokussiert jeweils einen Fall.
+- Beschreibungsfälle zeigen aktuellen Text, faktenbasierten Vorschlag und direkte Übernahme.
+- Redundante Details-Aktionen sind nicht sichtbar.
+
+## Backlog
+
+Der frühere Tab `Arbeit` heißt verbindlich `Backlog`.
+
+Er enthält ausschließlich offene Growth-/Projekt-Backlogpunkte mit:
+
+- Bearbeiten,
+- Abschließen,
+- Verwerfen,
+- `+ Neu`.
+
+Nicht sichtbar und nicht Teil des Bedienmodells sind:
+
+- Als Nächstes,
+- Wartet,
+- Blockiert,
+- Ideen,
+- Archiv,
+- manuelle Aufgabenanlage.
+
+Abgeschlossene Entscheidungen und Entwicklungsschritte werden dauerhaft im Repo und in der Projektdokumentation festgehalten.
+
+## Verwaltung
+
+Die Verwaltung enthält nur:
+
+- Veranstaltungen,
+- Aktivitäten,
+- Suche,
+- Bearbeiten,
+- Vorschau.
+
+Redaktionelle Events und Anbieter-Events werden getrennt und parallel mit Zeitlimit geladen. Vergangene Events werden aus der operativen Standardliste ausgeschlossen. Mobile Karten zeigen nur Quelle/Status, Titel, Datum/Ort und die beiden Aktionen.
+
+## Entwicklung
+
+`Entwicklung` besitzt genau zwei Ansichten:
+
+### Projektstatus
+
+Kompakte Betreiberübersicht zu:
+
+- Contentqualität,
+- Prozesszustand,
+- offenem Backlog.
+
+### SEO & Reichweite
+
+Das bestehende Dashboard unter `/intern/seo-dashboard/` bleibt das führende SEO-/Mehrwert-Dashboard und wird innerhalb der Steuerzentrale eingebettet.
+
+Es wird kein zweites SEO-Dashboard nachgebaut.
+
+Oberhalb des eingebetteten Dashboards steht nur ein kompakter operativer Growth-/SEO-Prozesskopf mit:
+
+- Zustand des letzten Growth-/SEO-Laufs,
+- Verfügbarkeit der Betriebsdaten,
+- ausgewählten Chancen,
+- automatisch verhinderten Kandidaten,
+- offenem Backlog.
+
+Die vollständigen Sichtbarkeits-, Klick-, Nutzwert-, Vergleichs- und Reporting-Zielkennzahlen verbleiben im bestehenden SEO-Dashboard.
+
+## Gemeinsame Anmeldung
+
+Die Steuerzentralen-Anmeldung initialisiert zusätzlich die bestehende Session `BE_INTERNAL_SEO_DASHBOARD`.
+
+Verbindliche Sicherheitsregeln:
+
+- kein Passwort in URLs,
+- kein Passwort im iframe,
+- SEO-Dashboard ohne zweite Passwortabfrage,
+- `HttpOnly`-Session-Cookie,
+- `SameSite=Lax`,
+- Secure-Cookie bei HTTPS,
+- Session-ID-Regeneration nach erfolgreicher Anmeldung,
+- gemeinsame Abmeldung löscht die SEO-Dashboard-Session.
+
+Die bestehenden Control-Center-APIs bleiben mit dem Review-Header kompatibel.
+
+## Technischer Vertrag
+
+- JavaScript-Asset-Version: `2026-07-10-control-center-final-v1`
 - CSS-Governance-Version: `2026-06-22-css-governance-v1`
-- Branch: `staging`
+- ergänzende responsive CSS: `css/control-center-final.css`
 - führende Inbox: Google-Sheet-Tab `Inbox`
 - Inbox-Fallback: `data/inbox.json` nur bei Sheet-Fehler
 - redaktionelle Events: Events-Sheet
 - Anbieter-Events: `submissions`
-- Aktivitäten: `data/offers.json` mit explizitem Repo-Gate
+- Backlog: Growth-Backlog-Quelle
+- SEO-/Mehrwert-Dashboard: `intern/seo-dashboard/index.php`
 - Veröffentlichung gilt erst nach öffentlicher Bestätigung als abgeschlossen
-- Quell- und Prozessfehler bleiben als deduplizierte offene Arbeit sichtbar
 
-## Gebündeltes Nutzungsfeedback
+## Release-Gates
 
-Umgesetzt sind:
+Vor einer Übernahme nach `main` müssen mindestens erfolgreich sein:
 
-- `Prüfen`: aktueller Text und Vorschlag im direkten Vergleich.
-- `Prüfen`: Ablehnen löst den aktuellen Audit-Datensatz über `content_id + issue_code` auf und ist nicht von einer veralteten Zeilennummer abhängig.
-- `Prüfen`: mobile Auswahl der Prüfgruppe über ein Dropdown mit Fallzahlen.
-- `Arbeit`: nur `Offen` und `Backlog` als sichtbare Auswahl.
-- `Arbeit`: `+ Neu` legt direkt einen Backlogpunkt an.
-- `Arbeit`: Ideen und sichtbares Archiv entfallen.
-- `Verwaltung`: mobile Karten, Aktionen und Suchbereich sind verdichtet.
-- `Entwicklung`: technische SEO-Basis, Search-Console-Status, GA4-Status, Inhaltsvollständigkeit sowie Such- und Intake-Wirkung werden gemeinsam dargestellt.
-
-## SEO- und Wirkungsgrenze
-
-Das Dashboard zeigt nur nachweislich vorhandene Daten:
-
-- technische Onpage-Abdeckung,
-- Content-Vollständigkeit,
-- Anzahl vorhandener Search-Console-Datensätze,
-- Anzahl vorhandener GA4-Datensätze,
-- vorhandene Wertsignale,
-- Suchkandidaten und Intake-Wirkung.
-
-Klicks, Impressionen, CTR, Positionen und konkrete Seitenverläufe können erst angezeigt werden, wenn diese Kennzahlen durch den Growth-/SEO-Prozess in die Betriebsdatenbank geschrieben werden. Fehlende Daten werden als `Nicht angebunden` ausgewiesen und nicht als Nullleistung interpretiert.
-
-## Während des Freeze zu sammeln
-
-- Bedienprobleme,
-- unklare Begriffe,
-- fehlende oder überflüssige Informationen,
-- mobile Darstellungsprobleme,
-- unerwartete Zähler,
-- Lade- und Speicherfehler,
-- falsche Prozessbewertungen,
-- Abweichungen zwischen führender Quelle und öffentlicher Seite.
-
-## Während des Freeze nicht einzeln ändern
-
-- Hauptnavigation,
-- Grundtrennung `Prüfen` / `Arbeit`,
-- neue sichtbare Aufgabenstatus,
-- neue Workpack-Duplikate,
-- spontane Einzeloptimierungen ohne Gesamtabgleich.
-
-Ausnahme: belegte Funktionsfehler mit unmittelbarer Auswirkung dürfen als kleiner Fehlerkorrekturpatch behoben werden.
-
-## Bekannte externe Grenzen
-
-- Aktivitätseditor benötigt Server-Secret und explizite Freigabe.
-- Search Console und GA4 werden nur bei tatsächlich vorhandenen Betriebsdaten angezeigt.
-- Google Sheets, Apps Script, MySQL und öffentliche Feeds müssen zur Laufzeit verfügbar sein.
-- Änderungen werden zuerst auf `staging` geprüft und erst danach kontrolliert nach `main` übernommen.
-
-## Fortsetzung nach dem Freeze
-
-Nach ausreichender Nutzung werden alle Rückmeldungen gesammelt, priorisiert und als ein zusammenhängendes Folge-Workpack gegen den Premium-Zielzustand bewertet. Einzelne Beobachtungen sollen nicht wieder zu kleinteiligen, widersprüchlichen Umbauten führen.
+- PHP-Syntaxprüfung,
+- JavaScript-Syntaxprüfung,
+- Control-Center-Vertragstests,
+- Produktvertragsaudit,
+- Staging-Deployment,
+- Mobile-Smoke-Test,
+- gemeinsamer Login ohne zweite SEO-Passwortabfrage,
+- Prüfen mit dynamischen Kategorien,
+- Backlog ohne zusätzliche Filter,
+- Verwaltung mit aktuellen Events,
+- eingebettetes SEO-Dashboard.
