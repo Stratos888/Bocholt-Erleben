@@ -5,13 +5,14 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 read = lambda path: (ROOT / path).read_text(encoding='utf-8')
 html = read('steuerzentrale/index.html')
-style_entry = read('css/style.css')
+environment_js = read('js/control-center-environment.js')
 js = read('js/control-center.js')
 source_js = read('js/control-center-source-editors.js')
 bridge_js = read('js/control-center-final-bridge.js')
 publication_js = read('js/control-center-publication.js')
 development_js = read('js/control-center-development.js')
 integration_js = read('js/control-center-integrations.js')
+style_entry = read('css/style.css')
 css = read('css/control-center.css') + read('css/control-center-final.css')
 auth = read('api/control-center/auth.php')
 sources = read('api/control-center/_sources.php')
@@ -47,14 +48,16 @@ for forbidden in ['<span>Arbeit</span>', '<span>Eingang</span>', '<span>Aufgaben
         errors.append(f'Veralteter Haupttab vorhanden: {forbidden}')
 if 'control-center-mobile-feedback.js' in html:
     errors.append('Veralteter UI-Überlagerungscontroller wird weiterhin geladen.')
-if 'href="/css/style.css?v=2026-06-22-css-governance-v1"' not in html:
-    errors.append('Steuerzentrale verwendet nicht den vorgeschriebenen CSS-Governance-Entry-Point.')
-if '@import url("/css/control-center-final.css?v=2026-06-22-css-governance-v1");' not in style_entry:
-    errors.append('Finale responsive Steuerzentralen-CSS fehlt in der zentralen Importkette.')
+if '../css/style.css?v=2026-06-22-css-governance-v1' not in html:
+    errors.append('Steuerzentrale lädt den CSS-Entry-Point nicht umgebungsrelativ.')
+if './control-center-final.css?v=2026-06-22-css-governance-v1' not in style_entry:
+    errors.append('Finale responsive Steuerzentralen-CSS fehlt in der Governance-Importkette.')
+if '../js/control-center-environment.js' not in html:
+    errors.append('Umgebungsauflösung wird nicht vor den Steuerzentralen-Skripten geladen.')
 if 'id="cc-dialog-close" type="button"' not in html:
     errors.append('Dialog-Schließen ist nicht von Pflichtfeldvalidierung entkoppelt.')
 
-combined_js = js + source_js + bridge_js + publication_js + development_js + integration_js
+combined_js = environment_js + js + source_js + bridge_js + publication_js + development_js + integration_js
 ui_contracts = {
     'dynamische Prüfkategorien': 'visibleReviewGroups',
     'mobiles Prüfdropdown': 'cc-review-select',
@@ -71,6 +74,8 @@ ui_contracts = {
     'Growth-Prozesskopf': 'Growth-/SEO-Prozess',
     'Qualitätsvergleich': 'cc-copy-compare',
     'direkte Vorschlagsübernahme': 'Vorschlag übernehmen',
+    'umgebungsabhängige Pfadauflösung': 'beControlCenterPath',
+    'Staging-Fetch-Isolation': 'window.fetch =',
 }
 for label, marker in ui_contracts.items():
     if marker not in combined_js and marker not in css:
@@ -94,8 +99,7 @@ security_contracts = {
     'kein Passwort in iframe-URL': 'src="/intern/seo-dashboard/"',
 }
 for label, marker in security_contracts.items():
-    haystack = auth + js
-    if marker not in haystack:
+    if marker not in auth + js:
         errors.append(f'Sicherheitsvertrag fehlt: {label}')
 
 if 'be_cc_event_is_current_or_future' not in content_source or 'if (!be_cc_event_is_current_or_future($date, $endDate)) continue;' not in content_source:
