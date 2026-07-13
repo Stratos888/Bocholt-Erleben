@@ -27,6 +27,7 @@ workflow_contracts = read('api/control-center/_workflow_contracts.php')
 presentation = read('api/control-center/_presentation.php')
 content_api = read('api/control-center/content.php')
 case_api = read('api/control-center/case.php')
+cases_api = read('api/control-center/cases.php')
 publication_api = read('api/control-center/publication.php')
 content_history = read('api/control-center/_content_history.php')
 contracts = read('api/control-center/_contracts.php')
@@ -68,9 +69,16 @@ ui_contracts = {
     'getrennte Verwaltungsquellen': 'Promise.allSettled',
     'Verwaltungs-Timeout': 'timeoutMs:15000',
     'kompakte Verwaltungskarten': 'cc-manage-meta',
+    'deutsche Datumsbereiche': 'formatDateRange',
+    'deutsche Veröffentlichungsstatus': 'statusLabel',
+    'wahrheitsgemäßer Entwicklungsstatus': 'Event-Datenbasis vollständig',
+    'fachliche Prozessprüfung': 'Letzten Lauf prüfen',
+    'Statusbestätigung nach Prozessprüfung': 'Als behoben bestätigen',
     'Projektstatus-Umschalter': 'Projektstatus',
     'SEO-Umschalter': 'SEO & Reichweite',
     'bestehendes SEO-Dashboard eingebettet': '/intern/seo-dashboard/',
+    'SEO-Embed-Modus': "searchParams.set('embed', '1')",
+    'SEO-Embed ohne doppelte Abmeldung': '.topbar .logout',
     'Growth-Prozesskopf': 'Growth-/SEO-Prozess',
     'Qualitätsvergleich': 'cc-copy-compare',
     'direkte Vorschlagsübernahme': 'Vorschlag übernehmen',
@@ -108,6 +116,10 @@ if 'be_cc_content_audit_row' not in writeback:
     errors.append('Qualitätsaktionen verwenden keine stabile Audit-Zeilenauflösung.')
 if 'suggested_description' not in case_api or 'current_description' not in case_api:
     errors.append('Qualitätsfälle liefern keinen aktuellen Text und Vorschlag.')
+if 'be_cc_deduplicate_presented_cases' not in cases_api or 'be_cc_backlog_fingerprint' not in cases_api:
+    errors.append('Offene Backlogpunkte werden nicht kanonisch dedupliziert.')
+if 'Priorisieren, konkretisieren oder als abgeschlossen markieren.' not in cases_api:
+    errors.append('Backlog verwendet weiterhin das entfernte Aufgabenmodell in Standardformulierungen.')
 if 'BE_INTERNAL_SEO_DASHBOARD' not in seo_dashboard:
     errors.append('Bestehendes SEO-Dashboard verwendet nicht die erwartete Session.')
 
@@ -129,7 +141,7 @@ backend_contracts = {
     'Suchlaufmetriken': 'search.weekly.raw_candidates',
     'technische SEO-Prüfung': 'be_cc_technical_seo_metrics',
 }
-backend = sources + content_source + sheet_inbox + content_ops + process_chain + submission_content + writeback + domain + workflow_contracts + presentation + content_api + case_api + publication_api + content_history + contracts + github_repo + development_api + overview_api + deploy_api + schema + public_events
+backend = sources + content_source + sheet_inbox + content_ops + process_chain + submission_content + writeback + domain + workflow_contracts + presentation + content_api + case_api + cases_api + publication_api + content_history + contracts + github_repo + development_api + overview_api + deploy_api + schema + public_events
 for label, marker in backend_contracts.items():
     if marker not in backend:
         errors.append(f'Backendvertrag fehlt: {label}')
