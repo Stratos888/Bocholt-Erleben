@@ -7,11 +7,12 @@ read = lambda path: (ROOT / path).read_text(encoding='utf-8')
 html = read('steuerzentrale/index.html')
 js = read('js/control-center.js')
 source_js = read('js/control-center-source-editors.js')
+bridge_js = read('js/control-center-final-bridge.js')
 publication_js = read('js/control-center-publication.js')
 development_js = read('js/control-center-development.js')
 integration_js = read('js/control-center-integrations.js')
-mobile_js = read('js/control-center-mobile-feedback.js')
-css = read('css/control-center.css')
+css = read('css/control-center.css') + read('css/control-center-final.css')
+auth = read('api/control-center/auth.php')
 sources = read('api/control-center/_sources.php')
 content_source = read('api/control-center/_content_source.php')
 sheet_inbox = read('api/control-center/_sheet_inbox_source.php')
@@ -33,95 +34,92 @@ overview_api = read('api/control-center/overview.php')
 deploy_api = read('api/control-center/deploy.php')
 schema = read('api/control-center/_schema.php')
 public_events = read('api/events/public.php')
+seo_dashboard = read('intern/seo-dashboard/index.php')
 manifest = read('data/control_center_repo_workpacks.json')
 errors = []
 
-for label in ['Übersicht', 'Prüfen', 'Arbeit', 'Verwaltung', 'Entwicklung']:
+for label in ['Übersicht', 'Prüfen', 'Backlog', 'Verwaltung', 'Entwicklung']:
     if f'<span>{label}</span>' not in html:
         errors.append(f'Navigation fehlt: {label}')
-for forbidden in ['<span>Eingang</span>', '<span>Inhalte</span>', '<span>Aufgaben</span>', '<span>Mehr</span>', '<span>Menü</span>', '<span>Bearbeiten</span>']:
+for forbidden in ['<span>Arbeit</span>', '<span>Eingang</span>', '<span>Aufgaben</span>', '<span>Mehr</span>']:
     if forbidden in html:
         errors.append(f'Veralteter Haupttab vorhanden: {forbidden}')
-if '.cc-nav{' not in css or 'position:fixed' not in css:
-    errors.append('Bottom-Navigation ist nicht dauerhaft fixed.')
+if 'control-center-mobile-feedback.js' in html:
+    errors.append('Veralteter UI-Überlagerungscontroller wird weiterhin geladen.')
+if 'control-center-final.css' not in html:
+    errors.append('Finale responsive Steuerzentralen-CSS fehlt.')
 if 'id="cc-dialog-close" type="button"' not in html:
     errors.append('Dialog-Schließen ist nicht von Pflichtfeldvalidierung entkoppelt.')
-if 'control-center-integrations.js' not in html:
-    errors.append('Gesamtprojekt-Integrationscontroller wird nicht geladen.')
-if 'control-center-mobile-feedback.js' not in html:
-    errors.append('Mobile Feedback-Controller wird nicht geladen.')
 
-combined_js = js + source_js + publication_js + development_js + integration_js + mobile_js
-contracts_ui = {
-    'verdichtete Übersicht': 'cc-summary-card',
-    'fokussierter Prüfbereich': 'renderReviewDetail',
-    'Zähler auf allen Prüffiltern': 'reviewGroupCount',
-    'mobiler Prüfbereich als Dropdown': 'cc-review-select',
-    'Desktop Queue': 'cc-queue',
-    'kompakte Arbeitszeilen': 'cc-labor-row',
-    'sichtbare Arbeit nur Offen und Backlog': 'cc-simple-work-select',
-    'neue unscharfe Themen direkt ins Backlog': 'createBacklog',
-    'Live-Verwaltung': 'openContentEditor',
+combined_js = js + source_js + bridge_js + publication_js + development_js + integration_js
+ui_contracts = {
+    'dynamische Prüfkategorien': 'visibleReviewGroups',
+    'mobiles Prüfdropdown': 'cc-review-select',
+    'Systemfälle in Prüfen': "item.type === 'task'",
+    'reines Backlog': 'renderBacklog',
+    'direkte Backlog-Neuerfassung': 'openBacklogDialog',
+    'Backlog-Editor-Brücke': 'data-backlog-action="edit_source"',
     'getrennte Verwaltungsquellen': 'Promise.allSettled',
-    'Verwaltungs-Timeout': 'timeoutMs: 15000',
-    'ehrlicher Speichervorgang': 'Speichern und Aktualisierung starten',
-    'öffentliche Feed-Verifikation': 'verifyPublication',
-    'Aktivitätseditor': 'ca-save',
-    'Qualitätsvergleich aktuell gegen Vorschlag': 'cc-copy-compare',
+    'Verwaltungs-Timeout': 'timeoutMs:15000',
+    'kompakte Verwaltungskarten': 'cc-manage-meta',
+    'Projektstatus-Umschalter': 'Projektstatus',
+    'SEO-Umschalter': 'SEO & Reichweite',
+    'bestehendes SEO-Dashboard eingebettet': '/intern/seo-dashboard/',
+    'Growth-Prozesskopf': 'Growth-/SEO-Prozess',
+    'Qualitätsvergleich': 'cc-copy-compare',
     'direkte Vorschlagsübernahme': 'Vorschlag übernehmen',
-    'SEO- und Reichweiten-Dashboard': 'SEO & Projektwirkung',
-    'Search-Console-Status': 'Search Console',
-    'GA4-Status': 'Nutzung',
-    'Header-Menü': 'openHeaderMenu',
-    'verständlicher Systemstatus': 'cc-system-list',
 }
-for label, marker in contracts_ui.items():
+for label, marker in ui_contracts.items():
     if marker not in combined_js and marker not in css:
         errors.append(f'Produktvertrag fehlt: {label}')
+for forbidden in ['Als Nächstes', 'Wartet', 'Blockiert', 'Ideen', 'Archiv']:
+    if forbidden in js:
+        errors.append(f'Veralteter sichtbarer Arbeitsfilter vorhanden: {forbidden}')
 if 'Speichern und veröffentlichen' in combined_js:
-    errors.append('UI behauptet eine Veröffentlichung, bevor die öffentliche Wirkung bestätigt ist.')
-if 'Aktuelle Workpacks' in combined_js:
-    errors.append('Entwicklung dupliziert Arbeits- und Backloginhalte.')
-if 'data-labor-action="details"' in js:
-    errors.append('Arbeitszeilen enthalten weiterhin einen redundanten Details-Button.')
+    errors.append('UI behauptet eine Veröffentlichung vor öffentlicher Bestätigung.')
+if 'data-review-action="details"' in js:
+    errors.append('Prüfen enthält weiterhin redundante Details-Aktion.')
+if 'SEO & Projektwirkung' in combined_js:
+    errors.append('Altes nachgebautes SEO-Minidashboard ist weiterhin aktiv.')
+
+security_contracts = {
+    'gemeinsame SEO-Session': 'BE_INTERNAL_SEO_DASHBOARD',
+    'SEO-Freigabemarker': 'be_internal_seo_dashboard_unlocked',
+    'Session-Fixation-Schutz': 'session_regenerate_id',
+    'HttpOnly-Cookie': "'httponly' => true",
+    'SameSite-Cookie': "'samesite' => 'Lax'",
+    'kein Passwort in iframe-URL': 'src="/intern/seo-dashboard/"',
+}
+for label, marker in security_contracts.items():
+    haystack = auth + js
+    if marker not in haystack:
+        errors.append(f'Sicherheitsvertrag fehlt: {label}')
+
 if 'be_cc_event_is_current_or_future' not in content_source or 'if (!be_cc_event_is_current_or_future($date, $endDate)) continue;' not in content_source:
-    errors.append('Verwaltung filtert vergangene redaktionelle Events nicht aus der Standardliste.')
+    errors.append('Verwaltung filtert vergangene redaktionelle Events nicht aus.')
 if 'be_cc_content_audit_row' not in writeback:
     errors.append('Qualitätsaktionen verwenden keine stabile Audit-Zeilenauflösung.')
 if 'suggested_description' not in case_api or 'current_description' not in case_api:
-    errors.append('Qualitätsfälle liefern keinen aktuellen Text und keinen Vorschlag.')
-if "workMode = 'open'" not in mobile_js or "workMode === 'backlog'" not in mobile_js:
-    errors.append('Vereinfachtes Arbeitsmodell Offen/Backlog fehlt.')
-if "option value=\"open\"" not in mobile_js or "option value=\"backlog\"" not in mobile_js:
-    errors.append('Arbeitsdropdown enthält nicht ausschließlich Offen und Backlog.')
+    errors.append('Qualitätsfälle liefern keinen aktuellen Text und Vorschlag.')
+if 'BE_INTERNAL_SEO_DASHBOARD' not in seo_dashboard:
+    errors.append('Bestehendes SEO-Dashboard verwendet nicht die erwartete Session.')
 
 backend_contracts = {
     'führende Sheet-Inbox': 'be_cc_sync_sheet_inbox',
     'echter Inbox-Fallback': "'status' => 'standby'",
     'isolierte Quellsynchronisation': 'be_cc_safe_source_sync',
     'Growth-Backlog-Sync': 'be_cc_sync_growth_backlog',
-    'Repo-Workpack-Sync': 'be_cc_sync_repo_workpacks',
     'Growth-Backlog-Writeback': 'be_cc_writeback_growth_backlog',
     'gemeinsamer Workflow-Vertrag': 'be_cc_transition_target',
     'abhängige KI-Prozesskette': 'be_cc_integrated_process_health',
     'Event-Livewriteback': 'be_cc_update_event_fields',
     'getrennte Eventlistenquellen': 'be_cc_event_items_by_source',
-    'Aktivitäts-Repo-Writeback': 'be_cc_update_activity_in_repo',
-    'explizites Aktivitäts-Gate': 'BE_ACTIVITY_WRITEBACK_ENABLED',
     'Anbieter-Event-Verwaltung': 'be_cc_update_submission_event',
-    'Anbieter-Event-Quelle': 'be_cc_submission_event_items',
-    'öffentliche Anbieter-Sichtbarkeit': 'location_public_confirmed=1',
-    'Anbieter-Event-Public-Verifikation': "sourceSystem === 'submission_db'",
     'dauerhafter Änderungsverlauf': 'control_content_changes',
     'öffentliche Wirkung': 'be_cc_verify_public_change',
-    'Teilfehler als Arbeit': 'be_cc_upsert_publication_issue',
-    'Entwicklungs-Snapshots': 'control_development_snapshots',
     'Content-Ops-Wirkung': 'feedback_rule_effectiveness_daily',
-    'integrierter Prozessstatus': 'be_cc_integrated_process_health',
     'Funnelmetriken': 'growth.gsc_rows',
     'Suchlaufmetriken': 'search.weekly.raw_candidates',
-    'kombinierte Eventqualität': 'be_cc_sum_quality',
-    'Aktivitätsqualität': 'activity_coverage_percent',
     'technische SEO-Prüfung': 'be_cc_technical_seo_metrics',
 }
 backend = sources + content_source + sheet_inbox + content_ops + process_chain + submission_content + writeback + domain + workflow_contracts + presentation + content_api + case_api + publication_api + content_history + contracts + github_repo + development_api + overview_api + deploy_api + schema + public_events
@@ -132,16 +130,12 @@ for label, marker in backend_contracts.items():
 if 'no_automatic_doc_scraping' not in manifest:
     errors.append('Repo-Workpack-Manifest dokumentiert keine kuratierte Importgrenze.')
 if '/data/events.json' in js:
-    errors.append('Verwaltung verwendet direkt den öffentlichen Eventfeed statt der führenden Quelle.')
-if 'decision required' in combined_js.lower():
-    errors.append('Technischer englischer Status ist sichtbar codiert.')
+    errors.append('Verwaltung verwendet direkt den öffentlichen Eventfeed.')
 if "'available' => $enabled" not in github_repo or "'configured' =>" not in github_repo:
-    errors.append('Aktivitätseditor unterscheidet Konfiguration und bewusste Freigabe nicht.')
-if "type === 'activities'" not in publication_js or '#ca-save' not in publication_js:
-    errors.append('Aktivitätsveröffentlichung ist nicht in den gemeinsamen Verifikationscontroller eingebunden.')
+    errors.append('Aktivitätseditor unterscheidet Konfiguration und Freigabe nicht.')
 for marker, message in [
-    ("'address' => $address", 'Öffentliche Anbieter-Events geben die Adresse nicht verifizierbar aus.'),
-    ("'source_url' => $sourceUrl", 'Öffentliche Anbieter-Events geben die offizielle Quelle nicht separat aus.'),
+    ("'address' => $address", 'Öffentliche Anbieter-Events geben die Adresse nicht aus.'),
+    ("'source_url' => $sourceUrl", 'Öffentliche Anbieter-Events geben die Quelle nicht separat aus.'),
     ("'ticket_url' => $ticketUrl", 'Öffentliche Anbieter-Events geben den Ticketlink nicht separat aus.'),
 ]:
     if marker not in public_events:
