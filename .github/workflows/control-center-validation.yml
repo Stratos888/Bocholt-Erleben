@@ -128,4 +128,6 @@ jobs:
           grep -q "BE_ACTIVITY_WRITEBACK_ENABLED" api/control-center/_github_repo.php
           grep -q "be_cc_content_audit_row" api/control-center/_writeback.php
           grep -q "suggested_description" api/control-center/case.php
-          grep -q "cc-labor-select" js/control-center-mobile-feedback.js
+          grep -q "cc-simple-work-select" js/control-center-mobile-feedback.js
+          grep -q "cc-review-select" js/control-center-mobile-feedback.js
+          grep -q "SEO & Projektwirkung" js/control-center-mobile-feedback.js
