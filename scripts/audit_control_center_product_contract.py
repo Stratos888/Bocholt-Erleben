@@ -56,12 +56,11 @@ contracts_ui = {
     'verdichtete Übersicht': 'cc-summary-card',
     'fokussierter Prüfbereich': 'renderReviewDetail',
     'Zähler auf allen Prüffiltern': 'reviewGroupCount',
+    'mobiler Prüfbereich als Dropdown': 'cc-review-select',
     'Desktop Queue': 'cc-queue',
-    'gemeinsame Neuerfassung': 'openNewWorkMenu',
     'kompakte Arbeitszeilen': 'cc-labor-row',
-    'vereinfachte Backlogaktionen': "item.primary_action.key !== 'convert_to_task'",
-    'Arbeitsfilter als Dropdown mit Zahlen': 'cc-labor-select',
-    'Ideenbedienung aus Arbeit entfernt': 'data-new-kind="idea"',
+    'sichtbare Arbeit nur Offen und Backlog': 'cc-simple-work-select',
+    'neue unscharfe Themen direkt ins Backlog': 'createBacklog',
     'Live-Verwaltung': 'openContentEditor',
     'getrennte Verwaltungsquellen': 'Promise.allSettled',
     'Verwaltungs-Timeout': 'timeoutMs: 15000',
@@ -70,10 +69,9 @@ contracts_ui = {
     'Aktivitätseditor': 'ca-save',
     'Qualitätsvergleich aktuell gegen Vorschlag': 'cc-copy-compare',
     'direkte Vorschlagsübernahme': 'Vorschlag übernehmen',
-    'kompakte Entwicklung Content': "metricCard('Content'",
-    'kompakte Entwicklung Prozesse': "metricCard('Prozesse'",
-    'kompakte Entwicklung Sichtbarkeit': "metricCard('Sichtbarkeit'",
-    'mobile Zusatzwerte eingeklappt': 'Weitere Messwerte',
+    'SEO- und Reichweiten-Dashboard': 'SEO & Projektwirkung',
+    'Search-Console-Status': 'Search Console',
+    'GA4-Status': 'Nutzung',
     'Header-Menü': 'openHeaderMenu',
     'verständlicher Systemstatus': 'cc-system-list',
 }
@@ -92,6 +90,10 @@ if 'be_cc_content_audit_row' not in writeback:
     errors.append('Qualitätsaktionen verwenden keine stabile Audit-Zeilenauflösung.')
 if 'suggested_description' not in case_api or 'current_description' not in case_api:
     errors.append('Qualitätsfälle liefern keinen aktuellen Text und keinen Vorschlag.')
+if "workMode = 'open'" not in mobile_js or "workMode === 'backlog'" not in mobile_js:
+    errors.append('Vereinfachtes Arbeitsmodell Offen/Backlog fehlt.')
+if "option value=\"open\"" not in mobile_js or "option value=\"backlog\"" not in mobile_js:
+    errors.append('Arbeitsdropdown enthält nicht ausschließlich Offen und Backlog.')
 
 backend_contracts = {
     'führende Sheet-Inbox': 'be_cc_sync_sheet_inbox',
