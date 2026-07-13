@@ -67,6 +67,24 @@
     });
   }
 
+  function createBacklog() {
+    openDialog(`<h2>Backlogpunkt anlegen</h2><div class="cc-stack"><label class="cc-field"><span>Titel</span><input id="simple-new-title" required></label><label class="cc-field"><span>Beschreibung / Nutzen</span><textarea id="simple-new-note"></textarea></label><label class="cc-field"><span>Priorität</span><select id="simple-new-priority"><option value="hoch">Hoch</option><option value="mittel" selected>Mittel</option><option value="niedrig">Niedrig</option></select></label><button type="button" class="cc-button cc-button--primary" id="simple-new-save">Speichern</button></div>`);
+    document.querySelector('#simple-new-save')?.addEventListener('click', async () => {
+      const titleValue = clean(document.querySelector('#simple-new-title')?.value);
+      if (!titleValue) { status.textContent = 'Titel fehlt.'; return; }
+      const payload = { title:titleValue, note:clean(document.querySelector('#simple-new-note')?.value), priority:clean(document.querySelector('#simple-new-priority')?.value) };
+      closeDialog();
+      status.textContent = 'Backlog wird gespeichert …';
+      try {
+        await api('/api/growth-backlog/create.php', { method:'POST', body:JSON.stringify(payload) });
+        workMode = 'backlog';
+        await cases(true);
+        status.textContent = 'Gespeichert.';
+        renderSimpleWork();
+      } catch (error) { status.textContent = error.message; }
+    });
+  }
+
   async function renderSimpleWork() {
     if (title?.textContent !== 'Arbeit') return;
     const items = await cases();
@@ -75,7 +93,7 @@
     const visible = workMode === 'backlog' ? backlogItems : openItems;
     view.innerHTML = `<div class="cc-toolbar cc-toolbar--simple-work"><label class="cc-work-filter"><span>Ansicht</span><select id="cc-simple-work-select"><option value="open" ${workMode === 'open' ? 'selected' : ''}>Offen (${openItems.length})</option><option value="backlog" ${workMode === 'backlog' ? 'selected' : ''}>Backlog (${backlogItems.length})</option></select></label><button class="cc-button cc-button--primary" id="cc-simple-new">+ Neu</button></div><div class="cc-labor-list">${visible.length ? visible.map(workRow).join('') : `<div class="cc-empty cc-empty--large">${workMode === 'backlog' ? 'Backlog' : 'Offen'}: keine Einträge.</div>`}</div>`;
     document.querySelector('#cc-simple-work-select')?.addEventListener('change', event => { workMode = event.target.value; renderSimpleWork(); });
-    document.querySelector('#cc-simple-new')?.addEventListener('click', () => document.querySelector('#cc-new-work')?.click());
+    document.querySelector('#cc-simple-new')?.addEventListener('click', createBacklog);
     document.querySelectorAll('[data-simple-action]').forEach(button => button.addEventListener('click', async event => {
       const item = items.find(entry => entry.id === event.target.closest('[data-simple-case]')?.dataset.simpleCase);
       const action = event.target.dataset.simpleAction;
