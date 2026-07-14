@@ -189,3 +189,71 @@ Vor einer Übernahme nach `main` müssen erfolgreich sein:
 - Verwaltung mit aktuellen Events,
 - Baustein-Wirkungsansicht ohne Scheingenauigkeit,
 - eingebettetes SEO-Dashboard ohne Live-/Staging-Vermischung.
+
+## Operativer Übergabestand 2026-07-14
+
+### Freigabestand
+
+- Der validierte Steuerzentralen-Stand wurde auf `staging` vollständig sichtbar geprüft.
+- Die Ansicht `Entwicklung → Projektstatus → Automatisierte Verbesserung` ist vorhanden.
+- Die Bausteine KI-Suche, Contentprüfung und Lernen, Inbox und Intake, Growth und SEO sowie Veröffentlichung werden angezeigt.
+- `Datenbasis noch zu klein` ist unmittelbar nach Einführung der neuen Verlaufsmessung der erwartete und fachlich korrekte Zustand.
+- Der Merge von `staging` nach `main` wurde gestartet. Die abschließende Live-Prüfung ist noch offen.
+
+### Validierter Staging-Deploy
+
+Der Staging-Deploy verwendet jetzt einen inhaltsbasierten Delta-Prozess:
+
+- Manifestvergleich über SHA-256-Dateihashes,
+- Upload nur tatsächlich geänderter Dateien,
+- `api/_config.php` wird für die gewählte Umgebung immer aktualisiert,
+- HTML-Einstiegspunkte und `meta/build.txt` werden zuletzt veröffentlicht,
+- fehlendes Remote-Manifest löst automatisch einen vollständigen Reparatur-Deploy aus,
+- ein manueller `full_repair`-Modus bleibt verfügbar,
+- Live-Deploys bleiben vollständige Deploys.
+
+Der erste validierte Lauf mit diesem Modell war vollständig grün:
+
+- Gesamtlauf ungefähr 2 Minuten 23 Sekunden,
+- Delta-Vorbereitung ungefähr 1 Sekunde,
+- Upload geänderter Assets ungefähr 7 Sekunden,
+- HTTP-Smoke-Test erfolgreich,
+- Browser-Smoke-Test erfolgreich.
+
+### Nächste verbindliche Prüfung nach dem Main-Merge
+
+Live-URL:
+
+`https://bocholt-erleben.de/steuerzentrale/`
+
+In dieser Reihenfolge prüfen:
+
+1. Main-Deploy vollständig grün, einschließlich HTTP- und Browser-Smoke-Test.
+2. Anmeldung der Steuerzentrale funktioniert.
+3. Keine zweite Passwortabfrage beim Wechsel zu `SEO & Reichweite`.
+4. Hauptnavigation zeigt ausschließlich Übersicht, Prüfen, Backlog, Verwaltung und Entwicklung.
+5. Übersicht lädt korrekte Zähler und nennt konkrete Handlungsgründe.
+6. Prüfen zeigt auf Mobile das Dropdown und nur belegte Kategorien.
+7. Backlog enthält ausschließlich die kanonische Growth-Quelle und keine Repo-Workpack-Duplikate.
+8. Verwaltung lädt aktuelle Veranstaltungen und Aktivitäten.
+9. Projektstatus zeigt `Automatisierte Verbesserung` mit allen fünf Bausteinen.
+10. SEO-Dashboard ist ohne vorgeschaltete Großkarte, ohne verschachtelte Scrollfläche und ohne Live-/Staging-Pfadvermischung eingebettet.
+11. Keine produktiven Schreibaktionen nur zu Testzwecken ausführen.
+
+### Zeitliche Wirkungsprüfung
+
+Die neue Bausteinbewertung benötigt reale Verlaufsdaten:
+
+- nach mindestens 7 Tagen: erster technischer Vergleich; noch geringe Aussagekraft,
+- nach ungefähr 4 Wochen: erste belastbare Wirkungsbewertung,
+- nach 8 bis 12 Wochen: robuste Bewertung des E2E-Verbesserungs- und Selbstlernprozesses.
+
+Besonders zu beobachten:
+
+- KI-Suche: Übernahmequote, Verwerfungsquote, automatisch verhinderte Kandidaten und manuelle Ablehnungen,
+- Contentprüfung: False Positives, verhinderte Wiederholungen, Rückfälle und offene Qualitätsfälle,
+- Inbox und Intake: offener Bestand, Übernahmen und übersprungene Fälle,
+- Growth und SEO: technische Abdeckung, Search Console, GA4 und Nutzwertaktionen,
+- Veröffentlichung: Veröffentlichungsprobleme und blockierte Systemfälle.
+
+Eine positive Bewertung darf niemals allein aus geringeren Fallzahlen oder höheren Rohmengen abgeleitet werden. Technik, Qualität, Effizienz, Lernwirkung und Ergebnis müssen gemeinsam bewertet werden.
