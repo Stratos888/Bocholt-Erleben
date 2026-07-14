@@ -5,7 +5,7 @@ on:
     branches: ["staging"]
     paths:
       - "scripts/apply_deploy_delta_patch.py"
-      - ".github/workflows/apply-deploy-delta-patch.yml"
+      - ".github/workflows/apply-deploy-delta-patch.yml" 
 permissions:
   contents: write
 jobs:
