@@ -25,3 +25,4 @@ jobs:
           git diff --cached --check
           git commit -m "Use fast content-hash delta deploys for staging"
           git push origin HEAD:staging
+# trigger-after-registration
