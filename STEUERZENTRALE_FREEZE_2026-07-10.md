@@ -96,6 +96,41 @@ Angezeigt werden:
 - Prozesszustand,
 - offener kanonischer Backlog.
 
+### Automatisierte Verbesserung
+
+Unter dem kompakten Projektstatus wird die Entwicklung der automatisierten Projektbausteine dargestellt:
+
+- KI-Suche,
+- Contentprüfung und Lernwirkung,
+- Inbox und Intake,
+- Growth und SEO,
+- Veröffentlichung.
+
+Jede Zeile trennt:
+
+- aktuellen technischen Betriebszustand,
+- längerfristige Wirkungsentwicklung,
+- zugrunde liegende Messwerte.
+
+Verbindliche Bewertungsregeln:
+
+- Vergleich mit einem mindestens sieben Tage alten Snapshot,
+- mindestens zwei belastbare Vergleichssignale für eine Trendbewertung,
+- `Datenbasis noch zu klein`, solange diese Voraussetzung nicht erfüllt ist,
+- technische Fehler überschreiben eine rechnerisch positive Trendbewertung mit `Technische Aufmerksamkeit`,
+- Mengen allein gelten nicht als Verbesserung,
+- KI-Suche wird insbesondere über Übernahmequote, Verwerfungsquote und automatisch verhinderte Kandidaten bewertet,
+- Contentprüfung wird über offene Qualitätsfälle, verhinderte Wiederholungen, False Positives und Rückfälle bewertet,
+- Detailwerte bleiben standardmäßig eingeklappt.
+
+Mögliche Trendzustände sind ausschließlich:
+
+- Verbessert,
+- Stabil,
+- Verschlechtert,
+- Technische Aufmerksamkeit,
+- Datenbasis noch zu klein.
+
 ### SEO & Reichweite
 
 Das bestehende Dashboard unter `/intern/seo-dashboard/` bleibt das führende SEO-/Mehrwert-Dashboard und wird unmittelbar innerhalb der Steuerzentrale eingebettet.
@@ -126,7 +161,7 @@ Verbindliche Sicherheitsregeln:
 
 ## Technischer Vertrag
 
-- JavaScript-Asset-Version: `2026-07-14-control-center-stability-v1`
+- JavaScript-Asset-Version: `2026-07-14-control-center-improvement-v1`
 - CSS-Governance-Version: `2026-06-22-css-governance-v1`
 - führende Inbox: Google-Sheet-Tab `Inbox`
 - Inbox-Fallback: `data/inbox.json` nur bei Sheet-Fehler
@@ -135,6 +170,7 @@ Verbindliche Sicherheitsregeln:
 - Backlog: ausschließlich Growth-Backlog-Quelle
 - Repo-Workpacks: ausschließlich Projektdokumentation
 - SEO-/Mehrwert-Dashboard: `intern/seo-dashboard/index.php`
+- Bausteinverlauf: stündliche Snapshots, fachlicher Vergleich nach mindestens sieben Tagen
 - Veröffentlichung gilt erst nach öffentlicher Bestätigung als abgeschlossen
 
 ## Release-Gates
@@ -151,4 +187,5 @@ Vor einer Übernahme nach `main` müssen erfolgreich sein:
 - Systemfall-Neuprüfung mit belegtem Ergebnis,
 - Backlog ohne Repo-Workpack-Duplikate,
 - Verwaltung mit aktuellen Events,
+- Baustein-Wirkungsansicht ohne Scheingenauigkeit,
 - eingebettetes SEO-Dashboard ohne Live-/Staging-Vermischung.
