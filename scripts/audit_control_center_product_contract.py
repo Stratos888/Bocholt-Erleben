@@ -9,6 +9,8 @@ environment_js = read('js/control-center-environment.js')
 js = read('js/control-center.js')
 source_js = read('js/control-center-source-editors.js')
 bridge_js = read('js/control-center-final-bridge.js')
+seo_embed_js = read('js/control-center-seo-embed.js')
+stability_js = read('js/control-center-stability.js')
 publication_js = read('js/control-center-publication.js')
 development_js = read('js/control-center-development.js')
 integration_js = read('js/control-center-integrations.js')
@@ -28,6 +30,7 @@ presentation = read('api/control-center/_presentation.php')
 content_api = read('api/control-center/content.php')
 case_api = read('api/control-center/case.php')
 cases_api = read('api/control-center/cases.php')
+action_api = read('api/control-center/action.php')
 publication_api = read('api/control-center/publication.php')
 content_history = read('api/control-center/_content_history.php')
 contracts = read('api/control-center/_contracts.php')
@@ -53,12 +56,13 @@ if '../css/style.css?v=2026-06-22-css-governance-v1' not in html:
     errors.append('Steuerzentrale lädt den CSS-Entry-Point nicht umgebungsrelativ.')
 if './control-center-final.css?v=2026-06-22-css-governance-v1' not in style_entry:
     errors.append('Finale responsive Steuerzentralen-CSS fehlt in der Governance-Importkette.')
-if '../js/control-center-environment.js' not in html:
-    errors.append('Umgebungsauflösung wird nicht vor den Steuerzentralen-Skripten geladen.')
+for asset in ['control-center-environment.js','control-center-final-bridge.js','control-center-seo-embed.js','control-center-stability.js']:
+    if asset not in html:
+        errors.append(f'Erforderlicher Integrationscontroller fehlt: {asset}')
 if 'id="cc-dialog-close" type="button"' not in html:
     errors.append('Dialog-Schließen ist nicht von Pflichtfeldvalidierung entkoppelt.')
 
-combined_js = environment_js + js + source_js + bridge_js + publication_js + development_js + integration_js
+combined_js = environment_js + js + source_js + bridge_js + seo_embed_js + stability_js + publication_js + development_js + integration_js
 ui_contracts = {
     'dynamische Prüfkategorien': 'visibleReviewGroups',
     'mobiles Prüfdropdown': 'cc-review-select',
@@ -69,24 +73,19 @@ ui_contracts = {
     'getrennte Verwaltungsquellen': 'Promise.allSettled',
     'Verwaltungs-Timeout': 'timeoutMs:15000',
     'kompakte Verwaltungskarten': 'cc-manage-meta',
-    'deutsche Datumsbereiche': 'formatDateRange',
-    'deutsche Veröffentlichungsstatus': 'statusLabel',
-    'wahrheitsgemäßer Entwicklungsstatus': 'Event-Datenbasis vollständig',
-    'fachliche Prozessprüfung': 'Letzten Lauf prüfen',
-    'Statusbestätigung nach Prozessprüfung': 'Als behoben bestätigen',
     'Projektstatus-Umschalter': 'Projektstatus',
     'SEO-Umschalter': 'SEO & Reichweite',
     'bestehendes SEO-Dashboard eingebettet': '/intern/seo-dashboard/',
-    'SEO-Embed-Modus': "searchParams.set('embed', '1')",
-    'SEO-Embed ohne doppelte Abmeldung': '.topbar .logout',
-    'Growth-Prozesskopf': 'Growth-/SEO-Prozess',
+    'SEO-Embed ohne doppelte Abmeldung': '.logout{display:none',
+    'SEO-Embed ohne verschachteltes Scrollen': 'ResizeObserver',
+    'SEO-Staging-Isolation': 'mapDocumentUrl',
+    'wahrheitsgemäßer Betreiberstatus': 'operator_status',
     'Qualitätsvergleich': 'cc-copy-compare',
     'direkte Vorschlagsübernahme': 'Vorschlag übernehmen',
     'umgebungsabhängige Pfadauflösung': 'beControlCenterPath',
-    'Staging-Fetch-Isolation': 'window.fetch =',
 }
 for label, marker in ui_contracts.items():
-    if marker not in combined_js and marker not in css:
+    if marker not in combined_js and marker not in css and marker not in development_api:
         errors.append(f'Produktvertrag fehlt: {label}')
 for forbidden in ['Als Nächstes', 'Wartet', 'Blockiert', 'Ideen', 'Archiv']:
     if forbidden in js:
@@ -112,14 +111,24 @@ for label, marker in security_contracts.items():
 
 if 'be_cc_event_is_current_or_future' not in content_source or 'if (!be_cc_event_is_current_or_future($date, $endDate)) continue;' not in content_source:
     errors.append('Verwaltung filtert vergangene redaktionelle Events nicht aus.')
+if 'be_cc_event_is_current_or_future($date, $endDate)' not in development_api:
+    errors.append('Entwicklungsmetriken verwenden nicht dieselbe aktive Eventbasis wie die Verwaltung.')
+if "'scope_label'=>'Aktive Eventbasis'" not in development_api:
+    errors.append('Content-Vollständigkeit benennt ihren aktiven Scope nicht eindeutig.')
 if 'be_cc_content_audit_row' not in writeback:
     errors.append('Qualitätsaktionen verwenden keine stabile Audit-Zeilenauflösung.')
 if 'suggested_description' not in case_api or 'current_description' not in case_api:
     errors.append('Qualitätsfälle liefern keinen aktuellen Text und Vorschlag.')
-if 'be_cc_deduplicate_presented_cases' not in cases_api or 'be_cc_backlog_fingerprint' not in cases_api:
-    errors.append('Offene Backlogpunkte werden nicht kanonisch dedupliziert.')
-if 'Priorisieren, konkretisieren oder als abgeschlossen markieren.' not in cases_api:
-    errors.append('Backlog verwendet weiterhin das entfernte Aufgabenmodell in Standardformulierungen.')
+if 'be_cc_presented_cases' not in cases_api or "source_system'] ?? '') !== 'growth_backlog'" not in cases_api:
+    errors.append('Backlog ist nicht auf die kanonische Growth-Backlog-Quelle begrenzt.')
+if 'be_cc_case_priority_rank' not in cases_api:
+    errors.append('Backlog wird nicht stabil nach Priorität sortiert.')
+if "source_system='repo_workpack'" not in overview_api or "'repo_workpacks'" in overview_api:
+    errors.append('Repo-Workpacks werden weiterhin als operativer Backlog synchronisiert.')
+if "be_cc_action('recheck', 'Erneut prüfen')" not in presentation:
+    errors.append('Systemfälle besitzen keine fachliche Neuprüfung.')
+if 'be_cc_recheck_source_case' not in action_api or "be_cc_apply_action($caseId, 'complete'" not in action_api:
+    errors.append('Systemfälle werden nicht erst nach belegter Neuprüfung geschlossen.')
 if 'BE_INTERNAL_SEO_DASHBOARD' not in seo_dashboard:
     errors.append('Bestehendes SEO-Dashboard verwendet nicht die erwartete Session.')
 
@@ -141,7 +150,7 @@ backend_contracts = {
     'Suchlaufmetriken': 'search.weekly.raw_candidates',
     'technische SEO-Prüfung': 'be_cc_technical_seo_metrics',
 }
-backend = sources + content_source + sheet_inbox + content_ops + process_chain + submission_content + writeback + domain + workflow_contracts + presentation + content_api + case_api + cases_api + publication_api + content_history + contracts + github_repo + development_api + overview_api + deploy_api + schema + public_events
+backend = sources + content_source + sheet_inbox + content_ops + process_chain + submission_content + writeback + domain + workflow_contracts + presentation + content_api + case_api + cases_api + action_api + publication_api + content_history + contracts + github_repo + development_api + overview_api + deploy_api + schema + public_events
 for label, marker in backend_contracts.items():
     if marker not in backend:
         errors.append(f'Backendvertrag fehlt: {label}')
