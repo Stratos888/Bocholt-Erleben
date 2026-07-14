@@ -23,7 +23,7 @@ function be_cc_sync_process_health_cases(array $processHealth): void
                 'priority' => 'high',
                 'title' => 'Prozess prüfen: ' . (string)($item['label'] ?? $key),
                 'reason' => (string)($item['message'] ?? 'Der letzte Prozesslauf benötigt Aufmerksamkeit.'),
-                'next_action' => 'Letzten Lauf öffnen, Ursache beheben und Prozesswirkung erneut bestätigen.',
+                'next_action' => 'Prüfung erneut ausführen. Der Fall wird nur bei nachgewiesenem Erfolg geschlossen.',
                 'object_type' => 'automation_process',
                 'object_id' => $key,
                 'object_title' => (string)($item['label'] ?? $key),
@@ -59,7 +59,7 @@ function be_cc_safe_source_sync(string $key, string $label, callable $callback):
             'priority' => 'high',
             'title' => 'Datenquelle prüfen: ' . $label,
             'reason' => 'Die Quelle konnte nicht synchronisiert werden: ' . $error->getMessage(),
-            'next_action' => 'Zugriff beziehungsweise Quelldaten prüfen und Synchronisation erneut ausführen.',
+            'next_action' => 'Synchronisation erneut ausführen. Der Fall wird nur bei erfolgreichem Zugriff geschlossen.',
             'object_type' => 'data_source',
             'object_id' => $key,
             'object_title' => $label,
@@ -74,6 +74,7 @@ function be_cc_safe_source_sync(string $key, string $label, callable $callback):
 
 try {
     be_cc_ensure_schema();
+    be_db()->exec("UPDATE control_cases SET state='done', completed_at=COALESCE(completed_at,NOW()), updated_at=NOW() WHERE source_system='repo_workpack' AND state NOT IN ('done','rejected','parked')");
     $sheetInbox = be_cc_safe_source_sync('sheet_inbox', 'Führende Sheet-Inbox', 'be_cc_sync_sheet_inbox');
     $inboxFallback = ($sheetInbox['status'] ?? '') === 'error'
         ? be_cc_safe_source_sync('inbox_feed', 'Inbox-JSON-Fallback', 'be_cc_sync_inbox_feed')
@@ -84,7 +85,6 @@ try {
         'submissions' => be_cc_safe_source_sync('submissions', 'Anbieter-Einreichungen', 'be_cc_sync_submissions'),
         'content_audit' => be_cc_safe_source_sync('content_audit', 'Content-Prüfung', 'be_cc_sync_content_audit'),
         'growth_backlog' => be_cc_safe_source_sync('growth_backlog', 'Growth-Backlog', 'be_cc_sync_growth_backlog'),
-        'repo_workpacks' => be_cc_safe_source_sync('repo_workpacks', 'Repo-Workpacks', 'be_cc_sync_repo_workpacks'),
     ];
     $contentOps = be_cc_content_ops_status(be_db());
     $processHealth = be_cc_integrated_process_health($contentOps);
