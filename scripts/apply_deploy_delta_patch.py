@@ -11,3 +11,4 @@ pat=re.compile(r'      # === BEGIN BLOCK: STRATO_UPLOAD_V6.*?      # === END BLO
 if pat.search(s): s=pat.sub(new,s,1)
 elif 'STRATO_UPLOAD_DELTA_V1' not in s: raise SystemExit('upload block missing')
 p.write_text(s,encoding='utf-8')
+# run-fixed-patcher
