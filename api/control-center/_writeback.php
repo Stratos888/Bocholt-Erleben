@@ -110,13 +110,37 @@ function be_cc_update_event_fields(string $contentId, array $updates): array
     return array_keys($resolved);
 }
 
+function be_cc_content_audit_row(array $source): int
+{
+    $tab = be_content_audit_tab_name();
+    $response = be_google_sheets_values_get($tab . '!A:ZZ');
+    $values = is_array($response['values'] ?? null) ? $response['values'] : [];
+    if (count($values) < 4) throw new RuntimeException('Content audit source is empty.');
+    $header = array_map(static fn($value) => trim((string)$value), is_array($values[2] ?? null) ? $values[2] : []);
+    $index = array_flip($header);
+    $contentId = trim((string)($source['content_id'] ?? ''));
+    $issueCode = trim((string)($source['issue_code'] ?? ''));
+    $storedRow = (int)($source['row_number'] ?? 0);
+    $matches = static function(array $row) use ($index, $contentId, $issueCode): bool {
+        $contentPos = $index['content_id'] ?? null;
+        $issuePos = $index['issue_code'] ?? null;
+        if (!is_int($contentPos) || !is_int($issuePos)) return false;
+        return trim((string)($row[$contentPos] ?? '')) === $contentId
+            && trim((string)($row[$issuePos] ?? '')) === $issueCode;
+    };
+    if ($storedRow >= 4 && isset($values[$storedRow - 1]) && is_array($values[$storedRow - 1]) && $matches($values[$storedRow - 1])) return $storedRow;
+    for ($i = 3; $i < count($values); $i++) {
+        $row = is_array($values[$i] ?? null) ? $values[$i] : [];
+        if ($matches($row)) return $i + 1;
+    }
+    throw new RuntimeException('Der Qualitätsfall wurde im aktuellen Audit-Tab nicht wiedergefunden. Bitte neu laden.');
+}
+
 function be_cc_writeback_content_audit(array $case, string $action, array $payload): void
 {
     $source = json_decode((string)($case['source_payload_json'] ?? ''), true);
     if (!is_array($source)) throw new RuntimeException('Audit source payload is missing.');
-    $rowNumber = (int)($source['row_number'] ?? 0);
-    if ($rowNumber < 4) $rowNumber = (int)($payload['row_number'] ?? 0);
-    if ($rowNumber < 4) throw new RuntimeException('Audit row number is invalid.');
+    $rowNumber = be_cc_content_audit_row($source);
     $tab = be_content_audit_tab_name();
     $now = gmdate('Y-m-d\TH:i:s');
     if ($action === 'approve') {

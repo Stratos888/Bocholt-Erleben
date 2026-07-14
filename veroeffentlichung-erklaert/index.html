@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: PUBLISH_EXPLAINER_HEAD_V1 | Zweck: legt die zentrale Erklärseite für Veröffentlichung, Prüfung, Zahlung und Fairness an; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: PUBLISH_EXPLAINER_HEAD_V2_STARTPARTNER | Zweck: erweitert die zentrale Erklärseite um Startpartner als begrenzten begleiteten Wirkungsnachweis, ohne neue FAQ-Seite zu schaffen; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Veröffentlichung einfach erklärt | Bocholt erleben</title>
   <meta
     name="description"
-    content="So funktioniert Veröffentlichung bei Bocholt erleben: Einreichung, Prüfung, Freigabe, Zahlung, Aktivitätspräsenz und faire Sichtbarkeit einfach erklärt."
+    content="So funktioniert Veröffentlichung bei Bocholt erleben: Einreichung, Prüfung, Freigabe, Zahlung, Aktivitätspräsenz, Startpartner und faire Sichtbarkeit einfach erklärt."
   >
 
   <link rel="canonical" href="https://bocholt-erleben.de/veroeffentlichung-erklaert/">
@@ -24,13 +24,13 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bocholt erleben">
   <meta property="og:title" content="Veröffentlichung einfach erklärt | Bocholt erleben">
-  <meta property="og:description" content="Einreichung, Prüfung, Freigabe, Zahlung und faire Sichtbarkeit bei Bocholt erleben kurz erklärt.">
+  <meta property="og:description" content="Einreichung, Prüfung, Freigabe, Zahlung, Startpartner und faire Sichtbarkeit bei Bocholt erleben kurz erklärt.">
   <meta property="og:url" content="https://bocholt-erleben.de/veroeffentlichung-erklaert/">
   <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Veröffentlichung einfach erklärt | Bocholt erleben">
-  <meta name="twitter:description" content="Einreichung, Prüfung, Freigabe, Zahlung und faire Sichtbarkeit bei Bocholt erleben kurz erklärt.">
+  <meta name="twitter:description" content="Einreichung, Prüfung, Freigabe, Zahlung, Startpartner und faire Sichtbarkeit bei Bocholt erleben kurz erklärt.">
   <meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
@@ -42,7 +42,7 @@
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "name": "Veröffentlichung einfach erklärt",
-    "description": "So funktioniert Veröffentlichung bei Bocholt erleben: Einreichung, Prüfung, Freigabe, Zahlung, Aktivitätspräsenz und faire Sichtbarkeit einfach erklärt.",
+    "description": "So funktioniert Veröffentlichung bei Bocholt erleben: Einreichung, Prüfung, Freigabe, Zahlung, Aktivitätspräsenz, Startpartner und faire Sichtbarkeit einfach erklärt.",
     "url": "https://bocholt-erleben.de/veroeffentlichung-erklaert/",
     "isPartOf": {
       "@type": "WebSite",
@@ -73,17 +73,25 @@
           "@type": "Answer",
           "text": "Eine Veranstaltung ist ein konkreter Termin. Eine Aktivitätspräsenz ist für dauerhaft verfügbare, saisonale oder regelmäßig buchbare Angebote gedacht."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "Was ist ein Startpartnerplatz?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ein Startpartnerplatz ist ein begrenzter, begleiteter 6-Monats-Wirkungsnachweis für passende Anbieter in der Aufbauphase. Er ist kein dauerhaft kostenloser Tarif und keine gekaufte Platzierung."
+        }
       }
     ]
   }
   </script>
 
   <link rel="stylesheet" href="/css/style.css?v=2026-06-22-css-governance-v1">
-  <!-- === END BLOCK: PUBLISH_EXPLAINER_HEAD_V1 === -->
+  <!-- === END BLOCK: PUBLISH_EXPLAINER_HEAD_V2_STARTPARTNER === -->
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: PUBLISH_EXPLAINER_BODY_V1 | Zweck: rendert die zentrale Erklärseite ohne neue JS-Logik und ohne Eingriff in bestehende Funnel-Flows; Umfang: kompletter Body-Inhalt dieser Datei === -->
+  <!-- === BEGIN BLOCK: PUBLISH_EXPLAINER_BODY_V2_STARTPARTNER | Zweck: rendert die zentrale Erklärseite inklusive Startpartner-Weg ohne neue JS- oder CSS-Logik; Umfang: kompletter Body-Inhalt dieser Datei === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -117,7 +125,7 @@
     <section class="content-card publish-membership-card publish-models-card" id="welcher-weg-passt" aria-labelledby="publish-explainer-paths-title">
       <div class="publish-section-head">
         <h2 id="publish-explainer-paths-title">Welcher Weg passt?</h2>
-        <p class="content-note">Die Wege unterscheiden sich danach, ob es um einzelne Termine, regelmäßige Veranstaltungen oder dauerhafte Angebote geht.</p>
+        <p class="content-note">Die Wege unterscheiden sich danach, ob es um einzelne Termine, regelmäßige Veranstaltungen, dauerhafte Angebote oder einen begleiteten Start geht.</p>
       </div>
 
       <ul class="publish-benefits-grid" aria-label="Veröffentlichungswege bei Bocholt erleben">
@@ -161,13 +169,23 @@
             </a>
           </div>
         </li>
+        <li id="startpartner-weg">
+          <strong>Startpartnerplatz</strong>
+          <span>Für passende Anbieter in der Aufbauphase: 6 Monate begleitet testen, Wirkung messen und danach passend wechseln.</span>
+          <div class="content-actions content-actions--inline">
+            <a class="content-link publish-explainer-card-link" href="/startpartner/">
+              <span class="content-link__label">Startpartnerplatz anfragen</span>
+              <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+            </a>
+          </div>
+        </li>
       </ul>
     </section>
 
     <section class="content-card publish-benefits-card" id="ablauf" aria-labelledby="publish-explainer-flow-title">
       <div class="publish-section-head">
         <h2 id="publish-explainer-flow-title">Grundprinzip</h2>
-        <p class="content-note">Einreichen → Prüfung → Freigabe → Zahlung oder Veröffentlichung je nach Weg.</p>
+        <p class="content-note">Einreichen → Prüfung → Freigabe → Zahlung, Veröffentlichung oder Startpartner-Auswertung je nach Weg.</p>
       </div>
 
       <ul class="publish-benefits-grid" aria-label="Grundprinzip der Veröffentlichung">
@@ -229,6 +247,18 @@
         </div>
       </details>
 
+      <details class="publish-optional-fields" id="startpartner">
+        <summary>Was ist ein Startpartnerplatz?</summary>
+        <div class="publish-optional-fields__body">
+          <p class="content-note">
+            Ein Startpartnerplatz ist ein begrenzter, begleiteter 6-Monats-Wirkungsnachweis für passende Anbieter in der Aufbauphase. Er ist kein dauerhaft kostenloser Tarif, kein Rabattmodell und keine gekaufte Platzierung.
+          </p>
+          <p class="content-note">
+            Nach 6 Monaten wird anhand der gemessenen Wirkung entschieden, ob und welcher reguläre Tarif sinnvoll passt.
+          </p>
+        </div>
+      </details>
+
       <details class="publish-optional-fields">
         <summary>Warum wird geprüft?</summary>
         <div class="publish-optional-fields__body">
@@ -272,6 +302,10 @@
           <span class="content-link__label">Aktivität sichtbar machen</span>
           <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
         </a>
+        <a class="content-link" href="/startpartner/">
+          <span class="content-link__label">Startpartnerplatz anfragen</span>
+          <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+        </a>
       </nav>
     </section>
   </main>
@@ -300,10 +334,10 @@
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
 
-  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 | Zweck: lädt den zentralen Footer-Renderer für öffentliche Unterseiten; Umfang: site-footer.js Script-Include === -->
-  <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7" defer></script>
-  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 === -->
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V2 | Zweck: lädt den zentralen Footer-Renderer mit Tipp-Kanal-Copy; Umfang: site-footer.js Script-Include === -->
+  <script src="/js/site-footer.js?v=2026-07-06-startpartner-funnel-v1" defer></script>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V2 === -->
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <!-- === END BLOCK: PUBLISH_EXPLAINER_BODY_V1 === -->
+  <!-- === END BLOCK: PUBLISH_EXPLAINER_BODY_V2_STARTPARTNER === -->
 </body>
 </html>

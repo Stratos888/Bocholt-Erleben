@@ -33,7 +33,12 @@
       return;
     }
     const p = detail.source_payload || {};
-    open(`<h2>${esc(detail.title)}</h2><p>${esc(detail.reason || '')}</p><div class="cc-stack">${field('src-url','Offizielle Quelle',p.suggested_url || p.source_url,'url')}${field('src-title','Titel',p.title)}${field('src-date','Startdatum',p.date,'date')}${field('src-end','Enddatum',p.endDate || p.end_date,'date')}${field('src-time','Uhrzeit',p.time)}${field('src-city','Stadt',p.city)}${field('src-location','Ort',p.location)}<label class="cc-field"><span>Beschreibung</span><textarea id="src-description">${esc(p.description || p.current_description || '')}</textarea></label><button type="button" class="cc-button cc-button--primary" id="src-save">Korrigieren und übernehmen</button></div>`);
+    const currentDescription = clean(p.current_description || p.description);
+    const suggestedDescription = clean(p.suggested_description || p.replacement_text || currentDescription);
+    const comparison = String(detail.case_kind || '').includes('description')
+      ? `<div class="cc-copy-compare"><section><span class="cc-kicker">Aktuell</span><p>${currentDescription ? esc(currentDescription) : '<em>Keine Beschreibung vorhanden.</em>'}</p></section><section class="cc-copy-compare__proposal"><span class="cc-kicker">Vorschlag</span><p>${suggestedDescription ? esc(suggestedDescription) : '<em>Kein Vorschlag verfügbar.</em>'}</p></section></div>`
+      : '';
+    open(`<h2>${esc(detail.title)}</h2><p>${esc(detail.reason || '')}</p>${comparison}<div class="cc-stack">${field('src-url','Offizielle Quelle',p.suggested_url || p.source_url,'url')}${field('src-title','Titel',p.title)}${field('src-date','Startdatum',p.date,'date')}${field('src-end','Enddatum',p.endDate || p.end_date,'date')}${field('src-time','Uhrzeit',p.time)}${field('src-city','Stadt',p.city)}${field('src-location','Ort',p.location)}<label class="cc-field"><span>Zu übernehmende Beschreibung</span><textarea id="src-description">${esc(suggestedDescription)}</textarea></label><button type="button" class="cc-button cc-button--primary" id="src-save">Vorschlag übernehmen</button></div>`);
     document.querySelector('#src-save').addEventListener('click', async () => {
       const v = id => clean(document.querySelector(id)?.value);
       const source = v('#src-url');

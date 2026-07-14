@@ -5,7 +5,7 @@
 # =========================================================
 
 name: Deploy to STRATO
-
+# Staging delta deploy activated
 # === BEGIN BLOCK: WORKFLOW TRIGGERS (push + daily + manual) ===
 on:
   push:
@@ -13,6 +13,12 @@ on:
 
   # Manuell im GitHub UI startbar (Actions → Workflow → Run workflow)
   workflow_dispatch:
+    inputs:
+      full_repair:
+        description: "Vollständigen Reparatur-Deploy ausführen"
+        required: false
+        default: false
+        type: boolean
 
   # Täglich, damit der aus dem Google Sheet generierte Event-Feed aktuell bleibt.
   # Läuft weiterhin effektiv über den Default-Branch main.
@@ -447,7 +453,7 @@ jobs:
           # === BEGIN BLOCK: CONTENT_OPS_INGEST_TOKEN_DEPLOY_ENV_V1 | Zweck: macht den Content-Ops-Ingest-Token fuer die generierte private api/_config.php verfuegbar; Umfang: GitHub Secret nur im Deploy-Artefakt, kein Klartext im Repo ===
           CONTENT_OPS_INGEST_TOKEN: ${{ secrets.CONTENT_OPS_INGEST_TOKEN }}
           # === END BLOCK: CONTENT_OPS_INGEST_TOKEN_DEPLOY_ENV_V1 ===
-          # === END BLOCK: INBOX_PUSH_SECRETS_ENV_V1 === 
+          # === END BLOCK: INBOX_PUSH_SECRETS_ENV_V1 ===
           # === END BLOCK: SEARCH_METRICS_AND_REVIEW_SECRETS_ENV_V1 ===
         run: |
           set -e
@@ -966,67 +972,99 @@ jobs:
           ls -la deploy/api
           # === END BLOCK: BUILD_VERSION_AND_INJECT_PRIVATE_PHP_CONFIG_V1 ===
 
+      # === BEGIN BLOCK: STAGING_CONTENT_HASH_DELTA_V1 ===
+      - name: Prepare staging content-hash delta
+        shell: bash
+        env:
+          REQUEST_FULL_REPAIR: ${{ github.event_name == 'workflow_dispatch' && inputs.full_repair || false }}
+        run: |
+          set -euo pipefail
+          MODE=full
+          if [ "$DEPLOY_ENV_NAME" = staging ]; then MODE=delta; [ "$REQUEST_FULL_REPAIR" = true ] && MODE=full_repair; fi
+          REMOTE=/tmp/deploy-manifest.json
+          if [ "$MODE" = delta ]; then curl -fsSL --retry 2 --connect-timeout 10 "$SITE_ORIGIN/meta/deploy-manifest.json?run=$GITHUB_RUN_ID" -o "$REMOTE" || { echo '{}' > "$REMOTE"; MODE=full_repair; }; else echo '{}' > "$REMOTE"; fi
+          echo "DEPLOY_MODE=$MODE" >> "$GITHUB_ENV"
+          export MODE REMOTE
+          python - <<'PY'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          src=Path('deploy'); assets=Path('deploy-assets'); entry=Path('deploy-entry')
+          for d in (assets,entry): shutil.rmtree(d,ignore_errors=True); d.mkdir(parents=True)
+          def sha(p):
+              h=hashlib.sha256()
+              with p.open('rb') as f:
+                  for c in iter(lambda:f.read(1048576),b''): h.update(c)
+              return h.hexdigest()
+          cur={p.relative_to(src).as_posix():sha(p) for p in src.rglob('*') if p.is_file() and p.relative_to(src).as_posix()!='meta/deploy-manifest.json'}
+          try:
+              old=json.loads(Path(os.environ['REMOTE']).read_text()).get('files',{})
+              if not isinstance(old,dict): old={}
+          except Exception: old={}
+          mode=os.environ['MODE']; changed=set(cur) if mode!='delta' else {k for k,v in cur.items() if old.get(k)!=v}; deleted=(set(old)-set(cur)) if mode!='full' else set()
+          if 'api/_config.php' in cur: changed.add('api/_config.php')
+          late={k for k in cur if k.endswith('.html')}|{'meta/build.txt'}
+          for rel in changed:
+              a=src/rel; root=entry if rel in late else assets; b=root/rel; b.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(a,b)
+          manifest={'schema':1,'build':os.getenv('BUILD_ID',''),'environment':os.getenv('DEPLOY_ENV_NAME',''),'files':cur}
+          m=entry/'meta/deploy-manifest.json'; m.parent.mkdir(parents=True,exist_ok=True); m.write_text(json.dumps(manifest,sort_keys=True,indent=2)+'\n')
+          lines=[]
+          for rel in sorted(deleted):
+              if any(c in rel for c in ['"','\n','\r']): raise SystemExit('unsafe path')
+              lines.append(f'rm -f "{rel}"')
+          Path('deploy-delete.lftp').write_text('\n'.join(lines)+('\n' if lines else ''))
+          print('mode',mode,'changed',len(changed),'deleted',len(deleted))
+          PY
+      # === END BLOCK: STAGING_CONTENT_HASH_DELTA_V1 ===
+
       - name: Install lftp
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
 
-      # === BEGIN BLOCK: STRATO_UPLOAD_V6 | Zweck: main schützt staging vor --delete; staging deployt in staging; Scope: nur Upload-Step, mit einer einzigen stabilen lftp-Session ===
-      - name: Upload to STRATO via SFTP
-        timeout-minutes: 12
+      # === BEGIN BLOCK: STRATO_UPLOAD_DELTA_V1 ===
+      - name: Upload changed assets to STRATO via SFTP
+        timeout-minutes: 30
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
           STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
         run: |
-          set -e
-
-          test -n "$STRATO_FTP_SERVER"
-          test -n "$STRATO_FTP_USERNAME"
-          test -n "$STRATO_FTP_PASSWORD"
-
-          echo "Deploying branch '$GITHUB_REF_NAME' with environment '$DEPLOY_ENV_NAME' to remote dir '$DEPLOY_TARGET_DIR'"
-
-          if [ "$DEPLOY_TARGET_DIR" = "." ]; then
-            LFTP_TARGET_COMMANDS=$(cat <<'EOF'
-          cd .
-          pwd
-          cls -l
-          rm -f index.html
-          mirror -R --delete --verbose -x '^staging(/|$)' deploy/ .
-          EOF
-            )
-          else
-            LFTP_TARGET_COMMANDS=$(cat <<EOF
-          cd $DEPLOY_TARGET_DIR
-          pwd
-          cls -l
-          rm -f index.html
-          mirror -R --delete --verbose deploy/ .
-          EOF
-            )
-          fi
-
+          set -euo pipefail
+          DEL="$(cat deploy-delete.lftp 2>/dev/null || true)"
           lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
           set sftp:auto-confirm yes
           set cmd:fail-exit yes
-          set net:timeout 20
-          set net:max-retries 2
+          set net:timeout 25
+          set net:max-retries 4
           set net:reconnect-interval-base 2
-          set net:reconnect-interval-max 10
-          set net:persist-retries 0
-
-          pwd
-          cls -l
-
-          $LFTP_TARGET_COMMANDS
-
-          cls -l
+          set net:reconnect-interval-max 15
+          cd $DEPLOY_TARGET_DIR
+          mirror -R --parallel=8 --verbose deploy-assets/ .
+          $DEL
           bye
           LFTP
-      # === END BLOCK: STRATO_UPLOAD_V6 ===
+
+      - name: Publish HTML and build marker last
+        timeout-minutes: 8
+        shell: bash
+        env:
+          STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
+          STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
+          STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+        run: |
+          set -euo pipefail
+          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
+          set sftp:auto-confirm yes
+          set cmd:fail-exit yes
+          set net:timeout 25
+          set net:max-retries 4
+          cd $DEPLOY_TARGET_DIR
+          mirror -R --parallel=6 --verbose deploy-entry/ .
+          bye
+          LFTP
+      # === END BLOCK: STRATO_UPLOAD_DELTA_V1 ===
 
       # === BEGIN BLOCK: DEPLOY_HTTP_SMOKE_CHECK_V1 | Zweck: prüft nach STRATO-Upload zentrale Live-/Staging-Endpunkte fail-fast; Umfang: ruft tools/smoke-check-deploy.py gegen die gerade deployte Umgebung auf ===
       - name: Smoke-check deployed site

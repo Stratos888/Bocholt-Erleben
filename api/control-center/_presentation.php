@@ -120,23 +120,30 @@ function be_cc_case_presentation(array $row): array
         ];
         $url = trim((string)($payload['suggested_url'] ?? $payload['source_url'] ?? ''));
         if ($url !== '') $links[] = ['label' => 'Quelle', 'url' => $url];
-    } elseif (in_array($source, ['growth_backlog', 'repo_workpack'], true) && $type !== 'task') {
+    } elseif ($source === 'growth_backlog' && $type !== 'task') {
         $kind = 'backlog_item';
         $group = 'backlog';
-        $primary = be_cc_action('convert_to_task', 'Als Aufgabe starten');
-        $secondary = [];
-        if ($source === 'growth_backlog') $secondary[] = be_cc_action('edit_source', 'Bearbeiten', true);
-        $secondary[] = be_cc_action('complete', 'Abschließen');
-        $secondary[] = be_cc_action('reject', 'Verwerfen', true, true);
+        $primary = be_cc_action('edit_source', 'Bearbeiten', true);
+        $secondary = [be_cc_action('complete', 'Abschließen'), be_cc_action('reject', 'Verwerfen', true, true)];
         $context = [
             'backlog_type' => (string)($payload['type'] ?? ''),
             'source' => (string)($payload['source'] ?? $payload['source_document'] ?? ''),
             'recommended_action' => (string)($payload['recommended_action'] ?? $payload['next_action'] ?? ''),
             'expected_benefit' => (string)($payload['expected_benefit'] ?? ''),
         ];
+    } elseif ($type === 'task' && in_array($source, ['process_health','source_sync'], true)) {
+        $kind = 'system_check';
+        $group = 'system';
+        $primary = be_cc_action('recheck', 'Erneut prüfen');
+        $context = [
+            'issue_text' => (string)($row['reason'] ?? ''),
+            'recommended_action' => 'Die zugrunde liegende Prüfung wird erneut ausgeführt. Der Fall schließt nur bei nachgewiesenem Erfolg.',
+        ];
+        $runUrl = trim((string)($payload['run_url'] ?? ''));
+        if ($runUrl !== '') $links[] = ['label' => 'Lauf öffnen', 'url' => $runUrl];
     } elseif ($type === 'task') {
         $kind = 'manual_task';
-        $group = 'tasks';
+        $group = 'system';
         if ($state === 'open' || $state === 'new') {
             $primary = be_cc_action('start', 'Starten');
             $secondary = [be_cc_action('wait', 'Auf Rückmeldung warten', true), be_cc_action('block', 'Blockieren', true), be_cc_action('snooze', 'Zurückstellen', true)];
@@ -154,11 +161,6 @@ function be_cc_case_presentation(array $row): array
         } elseif ($state === 'snoozed') {
             $primary = be_cc_action('resume', 'Jetzt fortsetzen');
         }
-    } elseif ($type === 'idea') {
-        $kind = 'manual_idea';
-        $group = 'ideas';
-        $primary = be_cc_action('convert_to_task', 'In Aufgabe umwandeln');
-        $secondary = [be_cc_action('park', 'Parken'), be_cc_action('reject', 'Verwerfen', false, true)];
     } elseif ($type === 'information') {
         $kind = 'system_information';
         $group = 'information';
