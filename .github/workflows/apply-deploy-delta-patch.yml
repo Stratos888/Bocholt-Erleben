@@ -30,4 +30,5 @@ jobs:
           git add deploy-strato.patched.yml
           git diff --cached --check
           git commit -m "Prepare fast staging deploy workflow payload"
+          git pull --rebase origin staging
           git push origin HEAD:staging
