@@ -1,8 +1,8 @@
-# Steuerzentrale – finaler Zielzustand 2026-07-10
+# Steuerzentrale – validierter Zielzustand 2026-07-14
 
 ## Zweck
 
-Die Steuerzentrale ist der zentrale tägliche Betreiberarbeitsplatz. Sie integriert Entscheidungsfälle, Backlog, Inhaltsverwaltung, Projektstatus und das bestehende SEO-/Mehrwert-Dashboard ohne doppelte Bedienmodelle oder erneute Anmeldung.
+Die Steuerzentrale ist der zentrale tägliche Betreiberarbeitsplatz. Sie integriert Entscheidungsfälle, einen kanonischen Backlog, Inhaltsverwaltung, Projektstatus und das bestehende SEO-/Mehrwert-Dashboard ohne doppelte Bedienmodelle oder erneute Anmeldung.
 
 ## Verbindliche Hauptnavigation
 
@@ -23,7 +23,7 @@ Die Übersicht zeigt ausschließlich:
 - offene Backlogpunkte,
 - kompakten Projektstatus.
 
-Technische/systemische Vorgänge werden als prüfbare Fälle bewertet und nicht in einem separaten Aufgabenmodell versteckt.
+Der Projektstatus nennt den konkreten Handlungsgrund. Abstrakte Aussagen wie „benötigt Aufmerksamkeit“ ohne Begründung sind unzulässig.
 
 ## Prüfen
 
@@ -45,29 +45,29 @@ Verbindliche Regeln:
 - Jede sichtbare Kategorie zeigt ihre Fallzahl.
 - Die Oberfläche fokussiert jeweils einen Fall.
 - Beschreibungsfälle zeigen aktuellen Text, faktenbasierten Vorschlag und direkte Übernahme.
-- Redundante Details-Aktionen sind nicht sichtbar.
+- Systemfälle verwenden `Erneut prüfen`; sie werden nur nach einer erfolgreich ausgeführten Quell- oder Prozessprüfung geschlossen.
+- Ein manueller Statuswechsel gilt nicht als technische Behebung.
 
 ## Backlog
 
-Der frühere Tab `Arbeit` heißt verbindlich `Backlog`.
-
-Er enthält ausschließlich offene Growth-/Projekt-Backlogpunkte mit:
+Der Tab enthält ausschließlich offene Einträge der führenden Growth-Backlog-Quelle mit:
 
 - Bearbeiten,
 - Abschließen,
 - Verwerfen,
 - `+ Neu`.
 
-Nicht sichtbar und nicht Teil des Bedienmodells sind:
+Repo-Workpacks sind Dokumentation und keine zweite operative Backlogquelle. Sie werden nicht in die tägliche Backlogliste importiert.
 
-- Als Nächstes,
-- Wartet,
-- Blockiert,
-- Ideen,
-- Archiv,
-- manuelle Aufgabenanlage.
+Die Darstellung ist fest nach Priorität sortiert:
 
-Abgeschlossene Entscheidungen und Entwicklungsschritte werden dauerhaft im Repo und in der Projektdokumentation festgehalten.
+1. kritisch,
+2. hoch,
+3. mittel,
+4. niedrig,
+5. innerhalb einer Priorität ältere Einträge zuerst.
+
+Deduplizierung erfolgt über stabile Quellidentitäten und nicht ausschließlich über gleiche Titel.
 
 ## Verwaltung
 
@@ -79,7 +79,7 @@ Die Verwaltung enthält nur:
 - Bearbeiten,
 - Vorschau.
 
-Redaktionelle Events und Anbieter-Events werden getrennt und parallel mit Zeitlimit geladen. Vergangene Events werden aus der operativen Standardliste ausgeschlossen. Mobile Karten zeigen nur Quelle/Status, Titel, Datum/Ort und die beiden Aktionen.
+Redaktionelle Events und Anbieter-Events werden getrennt und parallel mit Zeitlimit geladen. Vergangene Events werden aus der operativen Standardliste ausgeschlossen.
 
 ## Entwicklung
 
@@ -87,27 +87,28 @@ Redaktionelle Events und Anbieter-Events werden getrennt und parallel mit Zeitli
 
 ### Projektstatus
 
-Kompakte Betreiberübersicht zu:
+Die Contentkennzahl bewertet ausschließlich die aktive Eventbasis, also aktuelle und zukünftige veröffentlichte Events. Der Scope wird ausdrücklich als `Aktive Eventbasis` bezeichnet.
 
-- Contentqualität,
+Angezeigt werden:
+
+- Vollständigkeit der aktiven Eventbasis,
+- Zahl offener Qualitätsfälle,
 - Prozesszustand,
-- offenem Backlog.
+- offener kanonischer Backlog.
 
 ### SEO & Reichweite
 
-Das bestehende Dashboard unter `/intern/seo-dashboard/` bleibt das führende SEO-/Mehrwert-Dashboard und wird innerhalb der Steuerzentrale eingebettet.
+Das bestehende Dashboard unter `/intern/seo-dashboard/` bleibt das führende SEO-/Mehrwert-Dashboard und wird unmittelbar innerhalb der Steuerzentrale eingebettet.
 
-Es wird kein zweites SEO-Dashboard nachgebaut.
+Verbindliche Regeln:
 
-Oberhalb des eingebetteten Dashboards steht nur ein kompakter operativer Growth-/SEO-Prozesskopf mit:
-
-- Zustand des letzten Growth-/SEO-Laufs,
-- Verfügbarkeit der Betriebsdaten,
-- ausgewählten Chancen,
-- automatisch verhinderten Kandidaten,
-- offenem Backlog.
-
-Die vollständigen Sichtbarkeits-, Klick-, Nutzwert-, Vergleichs- und Reporting-Zielkennzahlen verbleiben im bestehenden SEO-Dashboard.
+- kein vorgeschaltetes großes Growth-/SEO-Kartenmodul,
+- kein zweites SEO-Dashboard,
+- keine verschachtelte Scrollfläche,
+- automatische Anpassung der iframe-Höhe,
+- Staging prüft ausschließlich Staging-Endpunkte,
+- Live prüft ausschließlich Live-Endpunkte,
+- kein zweites Passwort.
 
 ## Gemeinsame Anmeldung
 
@@ -117,31 +118,28 @@ Verbindliche Sicherheitsregeln:
 
 - kein Passwort in URLs,
 - kein Passwort im iframe,
-- SEO-Dashboard ohne zweite Passwortabfrage,
 - `HttpOnly`-Session-Cookie,
 - `SameSite=Lax`,
 - Secure-Cookie bei HTTPS,
 - Session-ID-Regeneration nach erfolgreicher Anmeldung,
 - gemeinsame Abmeldung löscht die SEO-Dashboard-Session.
 
-Die bestehenden Control-Center-APIs bleiben mit dem Review-Header kompatibel.
-
 ## Technischer Vertrag
 
-- JavaScript-Asset-Version: `2026-07-10-control-center-final-v1`
+- JavaScript-Asset-Version: `2026-07-14-control-center-stability-v1`
 - CSS-Governance-Version: `2026-06-22-css-governance-v1`
-- ergänzende responsive CSS: `css/control-center-final.css`
 - führende Inbox: Google-Sheet-Tab `Inbox`
 - Inbox-Fallback: `data/inbox.json` nur bei Sheet-Fehler
 - redaktionelle Events: Events-Sheet
 - Anbieter-Events: `submissions`
-- Backlog: Growth-Backlog-Quelle
+- Backlog: ausschließlich Growth-Backlog-Quelle
+- Repo-Workpacks: ausschließlich Projektdokumentation
 - SEO-/Mehrwert-Dashboard: `intern/seo-dashboard/index.php`
 - Veröffentlichung gilt erst nach öffentlicher Bestätigung als abgeschlossen
 
 ## Release-Gates
 
-Vor einer Übernahme nach `main` müssen mindestens erfolgreich sein:
+Vor einer Übernahme nach `main` müssen erfolgreich sein:
 
 - PHP-Syntaxprüfung,
 - JavaScript-Syntaxprüfung,
@@ -150,7 +148,7 @@ Vor einer Übernahme nach `main` müssen mindestens erfolgreich sein:
 - Staging-Deployment,
 - Mobile-Smoke-Test,
 - gemeinsamer Login ohne zweite SEO-Passwortabfrage,
-- Prüfen mit dynamischen Kategorien,
-- Backlog ohne zusätzliche Filter,
+- Systemfall-Neuprüfung mit belegtem Ergebnis,
+- Backlog ohne Repo-Workpack-Duplikate,
 - Verwaltung mit aktuellen Events,
-- eingebettetes SEO-Dashboard.
+- eingebettetes SEO-Dashboard ohne Live-/Staging-Vermischung.
