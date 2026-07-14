@@ -6,30 +6,42 @@ require_once __DIR__ . '/_domain.php';
 
 be_require_review_access();
 
-function be_cc_backlog_fingerprint(array $case): string
+function be_cc_case_priority_rank(string $priority): int
 {
-    $title = mb_strtolower(trim((string)($case['title'] ?? '')), 'UTF-8');
-    $title = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $title) ?? $title;
-    $title = preg_replace('/\s+/u', ' ', trim($title)) ?? trim($title);
-    return $title;
+    return match ($priority) {
+        'critical' => 0,
+        'high' => 1,
+        'normal' => 2,
+        'low' => 3,
+        default => 4,
+    };
 }
 
-function be_cc_deduplicate_presented_cases(array $cases): array
+function be_cc_presented_cases(array $cases): array
 {
     $result = [];
-    $backlogFingerprints = [];
+    $seenSourceIdentities = [];
     foreach ($cases as $case) {
         if (!is_array($case)) continue;
-        if (($case['case_kind'] ?? '') === 'backlog_item') {
-            $fingerprint = be_cc_backlog_fingerprint($case);
-            if ($fingerprint !== '' && isset($backlogFingerprints[$fingerprint])) continue;
-            if ($fingerprint !== '') $backlogFingerprints[$fingerprint] = true;
-            if (trim((string)($case['next_action'] ?? '')) === 'Priorisieren oder als konkrete Aufgabe starten.') {
-                $case['next_action'] = 'Priorisieren, konkretisieren oder als abgeschlossen markieren.';
-            }
+        if (($case['case_kind'] ?? '') === 'backlog_item' && ($case['source_system'] ?? '') !== 'growth_backlog') continue;
+        $identity = trim((string)($case['source_system'] ?? '')) . ':' . trim((string)($case['source_reference'] ?? ''));
+        if ($identity !== ':' && isset($seenSourceIdentities[$identity])) continue;
+        if ($identity !== ':') $seenSourceIdentities[$identity] = true;
+        if (($case['case_kind'] ?? '') === 'backlog_item' && trim((string)($case['next_action'] ?? '')) === 'Priorisieren oder als konkrete Aufgabe starten.') {
+            $case['next_action'] = 'Priorisieren, konkretisieren oder als abgeschlossen markieren.';
         }
         $result[] = $case;
     }
+    usort($result, static function(array $left, array $right): int {
+        $leftBacklog = ($left['case_kind'] ?? '') === 'backlog_item';
+        $rightBacklog = ($right['case_kind'] ?? '') === 'backlog_item';
+        if ($leftBacklog && $rightBacklog) {
+            $priority = be_cc_case_priority_rank((string)($left['priority'] ?? 'normal')) <=> be_cc_case_priority_rank((string)($right['priority'] ?? 'normal'));
+            if ($priority !== 0) return $priority;
+            return strcmp((string)($left['created_at'] ?? ''), (string)($right['created_at'] ?? ''));
+        }
+        return 0;
+    });
     return $result;
 }
 
@@ -38,7 +50,7 @@ try {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
     if ($method === 'GET') {
-        $cases = be_cc_deduplicate_presented_cases(be_cc_list_cases([
+        $cases = be_cc_presented_cases(be_cc_list_cases([
             'type' => trim((string)($_GET['type'] ?? '')),
             'state' => trim((string)($_GET['state'] ?? '')),
             'active' => trim((string)($_GET['active'] ?? '')),
