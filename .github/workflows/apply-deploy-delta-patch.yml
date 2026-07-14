@@ -5,7 +5,7 @@ on:
     branches: ["staging"]
     paths:
       - "scripts/apply_deploy_delta_patch.py"
-      - ".github/workflows/apply-deploy-delta-patch.yml" 
+      - ".github/workflows/apply-deploy-delta-patch.yml"
 permissions:
   contents: write
 jobs:
@@ -16,13 +16,18 @@ jobs:
         with:
           ref: staging
           fetch-depth: 0
-      - run: python scripts/apply_deploy_delta_patch.py
-      - run: |
+      - name: Build patched workflow copy
+        run: |
+          set -euo pipefail
+          python scripts/apply_deploy_delta_patch.py
+          cp .github/workflows/deploy-strato.yml deploy-strato.patched.yml
+          git checkout -- .github/workflows/deploy-strato.yml
+      - name: Publish patched copy for final repository move
+        run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          rm -f scripts/apply_deploy_delta_patch.py .github/workflows/apply-deploy-delta-patch.yml
-          git add -A
+          git add deploy-strato.patched.yml
           git diff --cached --check
-          git commit -m "Use fast content-hash delta deploys for staging"
+          git commit -m "Prepare fast staging deploy workflow payload"
           git push origin HEAD:staging
-# trigger-after-registration
