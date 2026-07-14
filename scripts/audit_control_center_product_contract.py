@@ -80,6 +80,9 @@ ui_contracts = {
     'SEO-Embed ohne verschachteltes Scrollen': 'ResizeObserver',
     'SEO-Staging-Isolation': 'mapDocumentUrl',
     'wahrheitsgemäßer Betreiberstatus': 'operator_status',
+    'Baustein-Wirkungsansicht': 'Automatisierte Verbesserung',
+    'Baustein-Trendstatus': 'cc-component-trend',
+    'aufklappbare Wirkungsdetails': 'Messwerte anzeigen',
     'Qualitätsvergleich': 'cc-copy-compare',
     'direkte Vorschlagsübernahme': 'Vorschlag übernehmen',
     'umgebungsabhängige Pfadauflösung': 'beControlCenterPath',
@@ -115,6 +118,13 @@ if 'be_cc_event_is_current_or_future($date, $endDate)' not in development_api:
     errors.append('Entwicklungsmetriken verwenden nicht dieselbe aktive Eventbasis wie die Verwaltung.')
 if "'scope_label'=>'Aktive Eventbasis'" not in development_api:
     errors.append('Content-Vollständigkeit benennt ihren aktiven Scope nicht eindeutig.')
+if "new DateTimeImmutable('-7 days')" not in development_api:
+    errors.append('Bausteintrends verwenden keinen belastbaren Sieben-Tage-Vergleich.')
+for marker in ['be_cc_component_trend', "'component_improvement'", "'learning_recurrences'", "'search_selected_rate'", "'growth_gsc_rows'"]:
+    if marker not in development_api:
+        errors.append(f'Baustein-Wirkungsvertrag fehlt: {marker}')
+if "count($evidence) >= 2" not in development_api or "'insufficient'" not in development_api:
+    errors.append('Bausteintrends verhindern keine Scheingenauigkeit bei zu kleiner Datenbasis.')
 if 'be_cc_content_audit_row' not in writeback:
     errors.append('Qualitätsaktionen verwenden keine stabile Audit-Zeilenauflösung.')
 if 'suggested_description' not in case_api or 'current_description' not in case_api:
