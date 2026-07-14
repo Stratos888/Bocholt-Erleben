@@ -31,6 +31,8 @@ function be_cc_sheet_event_quality_metrics(): array
         $description = be_cc_sheet_value($row, $index, ['description']);
         $source = be_cc_sheet_value($row, $index, ['source_url','url','event_url']);
         $date = be_cc_sheet_value($row, $index, ['date','start_date']);
+        $endDate = be_cc_sheet_value($row, $index, ['end_date','endDate']);
+        if (!be_cc_event_is_current_or_future($date, $endDate)) continue;
         $result['total']++;
         if ($description === '') $result['missingDescription']++;
         if ($source === '') $result['missingSource']++;
@@ -135,11 +137,6 @@ try {
     $contentOps = be_cc_content_ops_status($pdo);
     $processHealth = be_cc_process_health($contentOps);
 
-    $workpackPath = dirname(__DIR__, 2) . '/data/control_center_repo_workpacks.json';
-    $workpacks = is_file($workpackPath) ? (json_decode((string)file_get_contents($workpackPath), true)['items'] ?? []) : [];
-    $workpacks = is_array($workpacks) ? $workpacks : [];
-    $openWorkpacks = count(array_filter($workpacks, static fn(array $item): bool => !in_array(strtolower((string)($item['status'] ?? 'open')), ['done','completed','rejected'], true)));
-
     $total = (int)$eventQuality['total'];
     $complete = (int)$eventQuality['complete'];
     $coverage = $total ? round($complete * 100 / $total, 1) : 0.0;
@@ -164,18 +161,22 @@ try {
     $funnel = $contentOps['funnel'] ?? ['available'=>false,'message'=>'Keine Funnel-Daten verfügbar.'];
     $searchConsoleConnected = isset($funnel['metrics']['growth.gsc_rows']);
     $seoMessage = $searchConsoleConnected ? 'Search-Console-/Growth-Signale sind aus der Betriebsdatenbank angebunden.' : 'Technische Onpage-Basissignale werden geprüft. Search-Console-Kennzahlen sind noch nicht belastbar vorhanden.';
+    $attentionReasons = [];
+    if ($openQuality > 0) $attentionReasons[] = $openQuality . ' Qualitätsfälle offen';
+    if ($blocked > 0) $attentionReasons[] = $blocked . ' Systemfälle offen';
+    if ($publicationProblems > 0) $attentionReasons[] = $publicationProblems . ' Veröffentlichungsprobleme offen';
+    $operatorStatus = $attentionReasons ? implode(' · ', $attentionReasons) : 'Kein aktueller Handlungsbedarf';
 
     be_json_response(200, ['status'=>'ok','data'=>[
-        'generated_at'=>gmdate('c'), 'summary'=>$assessment, 'trends'=>$trends,
+        'generated_at'=>gmdate('c'), 'summary'=>$assessment, 'operator_status'=>$operatorStatus, 'attention_reasons'=>$attentionReasons, 'trends'=>$trends,
         'content_quality'=>[
-            'events_total'=>$total,'sheet_events_total'=>(int)$sheetQuality['total'],'provider_events_total'=>(int)$providerQuality['total'],'complete_events'=>$complete,'coverage_percent'=>$coverage,
+            'scope_label'=>'Aktive Eventbasis','events_total'=>$total,'sheet_events_total'=>(int)$sheetQuality['total'],'provider_events_total'=>(int)$providerQuality['total'],'complete_events'=>$complete,'coverage_percent'=>$coverage,
             'missing_description'=>(int)$eventQuality['missingDescription'],'missing_source'=>(int)$eventQuality['missingSource'],'missing_date'=>(int)$eventQuality['missingDate'],
             'activities_total'=>(int)$activityQuality['total'],'complete_activities'=>(int)$activityQuality['complete'],'activity_coverage_percent'=>$activityCoverage,
             'activity_missing_description'=>(int)$activityQuality['missingDescription'],'activity_missing_source'=>(int)$activityQuality['missingSource'],'open_quality_reviews'=>$openQuality,
         ],
         'automation'=>['open_reviews'=>$openReviews,'waiting_tasks'=>$waitingTasks,'blocked_tasks'=>$blocked,'completed_cases'=>$completedCases,'publication_problems'=>$publicationProblems,'quality_effect_available'=>(bool)$contentOps['available'],'quality_effect_message'=>(string)($contentOps['message'] ?? ''),'search'=>$contentOps['search'] ?? [],'learning'=>$contentOps['learning'] ?? [],'process_health'=>$processHealth],
         'seo'=>['content_basis_percent'=>$coverage,'onpage_event_coverage_percent'=>$coverage,'missing_descriptions'=>(int)$eventQuality['missingDescription'],'missing_sources'=>(int)$eventQuality['missingSource'],'technical_seo_available'=>true,'technical_seo'=>$technicalSeo,'search_console_connected'=>$searchConsoleConnected,'funnel'=>$funnel,'message'=>$seoMessage,'search_console_message'=>$seoMessage],
-        'product'=>['open_repo_workpacks'=>$openWorkpacks,'workpacks'=>array_values(array_slice($workpacks,0,8))],
     ]]);
 } catch (Throwable $error) {
     be_json_response(500, ['status'=>'error','message'=>'Entwicklungsstand konnte nicht geladen werden.','error_message'=>$error->getMessage()]);
