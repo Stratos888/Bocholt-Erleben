@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/_submission_writeback.php';
+require_once __DIR__ . '/_sources.php';
 require_once __DIR__ . '/_sheet_inbox_source.php';
 require_once __DIR__ . '/_submission_source.php';
 require_once __DIR__ . '/_process_chain.php';
@@ -17,8 +18,6 @@ function be_cc_recheck_source_case(array $case): array
 {
     $source = (string)($case['source_system'] ?? '');
     $reference = (string)($case['source_reference'] ?? '');
-    $payload = json_decode((string)($case['source_payload_json'] ?? ''), true);
-    $payload = is_array($payload) ? $payload : [];
 
     if ($source === 'source_sync') {
         $key = str_starts_with($reference, 'sync:') ? substr($reference, 5) : trim((string)($case['object_id'] ?? ''));
