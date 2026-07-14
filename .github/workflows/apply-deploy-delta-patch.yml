@@ -1,0 +1,27 @@
+name: Apply deploy workflow patch
+on:
+  workflow_dispatch:
+  push:
+    branches: ["staging"]
+    paths:
+      - "scripts/apply_deploy_delta_patch.py"
+      - ".github/workflows/apply-deploy-delta-patch.yml"
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging
+          fetch-depth: 0
+      - run: python scripts/apply_deploy_delta_patch.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f scripts/apply_deploy_delta_patch.py .github/workflows/apply-deploy-delta-patch.yml
+          git add -A
+          git diff --cached --check
+          git commit -m "Use fast content-hash delta deploys for staging"
+          git push origin HEAD:staging
