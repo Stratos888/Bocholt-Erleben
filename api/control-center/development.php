@@ -44,18 +44,7 @@ function be_cc_sheet_event_quality_metrics(): array
 
 function be_cc_provider_event_quality_metrics(PDO $pdo): array
 {
-    $stmt = $pdo->query(
-        "SELECT description_text, event_url, ticket_url, start_date
-         FROM submissions
-         WHERE submission_kind='event'
-           AND status='approved'
-           AND approved_at IS NOT NULL
-           AND start_date IS NOT NULL
-           AND start_date >= CURRENT_DATE()
-           AND title IS NOT NULL AND title <> ''
-           AND location_name IS NOT NULL AND location_name <> ''
-           AND location_public_confirmed=1"
-    );
+    $stmt = $pdo->query("SELECT description_text, event_url, ticket_url, start_date FROM submissions WHERE submission_kind='event' AND status='approved' AND approved_at IS NOT NULL AND start_date IS NOT NULL AND start_date >= CURRENT_DATE() AND title IS NOT NULL AND title <> '' AND location_name IS NOT NULL AND location_name <> '' AND location_public_confirmed=1");
     $result = be_cc_quality_zero();
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $description = trim((string)($row['description_text'] ?? ''));
@@ -87,9 +76,7 @@ function be_cc_activity_quality_metrics(): array
 function be_cc_sum_quality(array $left, array $right): array
 {
     $sum = be_cc_quality_zero();
-    foreach (['total','complete','missingDescription','missingSource','missingDate'] as $key) {
-        $sum[$key] = (int)($left[$key] ?? 0) + (int)($right[$key] ?? 0);
-    }
+    foreach (['total','complete','missingDescription','missingSource','missingDate'] as $key) $sum[$key] = (int)($left[$key] ?? 0) + (int)($right[$key] ?? 0);
     return $sum;
 }
 
@@ -121,9 +108,57 @@ function be_cc_snapshot_decode(array|false $row): ?array
     return is_array($metrics) ? ['metrics'=>$metrics,'created_at'=>(string)$row['created_at']] : null;
 }
 function be_cc_latest_development_snapshot(PDO $pdo): ?array { return be_cc_snapshot_decode($pdo->query('SELECT metrics_json, created_at FROM control_development_snapshots ORDER BY created_at DESC, id DESC LIMIT 1')->fetch()); }
-function be_cc_comparison_development_snapshot(PDO $pdo): ?array { $stmt=$pdo->prepare('SELECT metrics_json, created_at FROM control_development_snapshots WHERE created_at <= :cutoff ORDER BY created_at DESC, id DESC LIMIT 1'); $stmt->execute(['cutoff'=>(new DateTimeImmutable('-1 hour'))->format('Y-m-d H:i:s')]); return be_cc_snapshot_decode($stmt->fetch()); }
+function be_cc_comparison_development_snapshot(PDO $pdo): ?array { $stmt=$pdo->prepare('SELECT metrics_json, created_at FROM control_development_snapshots WHERE created_at <= :cutoff ORDER BY created_at DESC, id DESC LIMIT 1'); $stmt->execute(['cutoff'=>(new DateTimeImmutable('-7 days'))->format('Y-m-d H:i:s')]); return be_cc_snapshot_decode($stmt->fetch()); }
 function be_cc_store_development_snapshot(PDO $pdo, array $metrics, ?array $latest): void { if ($latest && new DateTimeImmutable($latest['created_at']) > new DateTimeImmutable('-1 hour')) return; $stmt=$pdo->prepare('INSERT INTO control_development_snapshots (metrics_json) VALUES (:metrics)'); $stmt->execute(['metrics'=>json_encode($metrics, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR)]); }
 function be_cc_delta(float|int $current, array $previous, string $key): float { return round((float)$current - (float)($previous[$key] ?? $current), 1); }
+
+function be_cc_process_item(array $health, string $key): array
+{
+    foreach ((array)($health['items'] ?? []) as $item) if (($item['key'] ?? '') === $key) return $item;
+    return ['key'=>$key,'status'=>'unknown','message'=>'Noch kein Lauf nachgewiesen.'];
+}
+
+function be_cc_component_trend(string $key, string $label, array $health, array $current, ?array $comparison, array $signals): array
+{
+    $process = be_cc_process_item($health, $key);
+    $technical = (string)($process['status'] ?? 'unknown');
+    $previous = $comparison['metrics'] ?? [];
+    $evidence = [];
+    $score = 0;
+    foreach ($signals as $signal) {
+        $metric = (string)$signal['metric'];
+        if (!array_key_exists($metric, $current) || !array_key_exists($metric, $previous)) continue;
+        $now = (float)$current[$metric];
+        $before = (float)$previous[$metric];
+        $delta = round($now - $before, 1);
+        $direction = (int)($signal['direction'] ?? 1);
+        $weighted = $delta * $direction;
+        if (abs($delta) >= (float)($signal['threshold'] ?? 1)) $score += $weighted > 0 ? 1 : -1;
+        $evidence[] = ['label'=>(string)$signal['label'],'current'=>$now,'previous'=>$before,'delta'=>$delta,'unit'=>(string)($signal['unit'] ?? '')];
+    }
+    $trend = 'insufficient';
+    $trendLabel = 'Datenbasis noch zu klein';
+    if ($comparison && count($evidence) >= 2) {
+        $trend = $score >= 2 ? 'improved' : ($score <= -2 ? 'worsened' : 'stable');
+        $trendLabel = $trend === 'improved' ? 'Verbessert' : ($trend === 'worsened' ? 'Verschlechtert' : 'Stabil');
+    }
+    if ($technical === 'attention') {
+        $trend = 'attention';
+        $trendLabel = 'Technische Aufmerksamkeit';
+    }
+    return [
+        'key'=>$key,
+        'label'=>$label,
+        'technical_status'=>$technical,
+        'technical_message'=>(string)($process['message'] ?? ''),
+        'last_run_at'=>(string)($process['last_run_at'] ?? ''),
+        'run_url'=>(string)($process['run_url'] ?? ''),
+        'trend'=>$trend,
+        'trend_label'=>$trendLabel,
+        'comparison_at'=>$comparison['created_at'] ?? null,
+        'evidence'=>$evidence,
+    ];
+}
 
 try {
     be_cc_ensure_schema();
@@ -148,17 +183,69 @@ try {
     $completedCases = $count("SELECT COUNT(*) FROM control_cases WHERE state='done'");
     $publicationProblems = $count("SELECT COUNT(*) FROM control_content_changes WHERE publication_state IN ('deploy_failed','verification_failed')");
 
-    $missingContent = (int)$eventQuality['missingDescription'] + (int)$eventQuality['missingSource'] + (int)$eventQuality['missingDate'];
-    $snapshotMetrics = ['content_coverage'=>$coverage,'activity_coverage'=>$activityCoverage,'missing_content'=>$missingContent,'open_quality_reviews'=>$openQuality,'open_reviews'=>$openReviews,'blocked_tasks'=>$blocked,'technical_seo_coverage'=>$technicalSeo['coverage_percent'],'publication_problems'=>$publicationProblems,'learning_prevented'=>(int)($contentOps['learning']['prevented_total_35d'] ?? 0),'learning_false_positives'=>(int)($contentOps['learning']['false_positive_total_35d'] ?? 0)];
+    $search = $contentOps['search'] ?? [];
+    $learning = $contentOps['learning'] ?? [];
+    $funnel = $contentOps['funnel'] ?? ['available'=>false,'message'=>'Keine Funnel-Daten verfügbar.'];
+    $snapshotMetrics = [
+        'content_coverage'=>$coverage,
+        'activity_coverage'=>$activityCoverage,
+        'missing_content'=>(int)$eventQuality['missingDescription'] + (int)$eventQuality['missingSource'] + (int)$eventQuality['missingDate'],
+        'open_quality_reviews'=>$openQuality,
+        'open_reviews'=>$openReviews,
+        'blocked_tasks'=>$blocked,
+        'technical_seo_coverage'=>$technicalSeo['coverage_percent'],
+        'publication_problems'=>$publicationProblems,
+        'learning_prevented'=>(int)($learning['prevented_total_35d'] ?? 0),
+        'learning_false_positives'=>(int)($learning['false_positive_total_35d'] ?? 0),
+        'learning_recurrences'=>(int)($learning['recurrence_total_35d'] ?? 0),
+        'search_raw_candidates'=>(float)($search['raw_candidates'] ?? 0),
+        'search_selected_candidates'=>(float)($search['selected_candidates'] ?? 0),
+        'search_selected_rate'=>(float)($search['selected_rate_percent'] ?? 0),
+        'search_dropped_rate'=>(float)($search['dropped_rate_percent'] ?? 0),
+        'search_prevented_candidates'=>(float)($search['prevented_candidates'] ?? 0),
+        'intake_appended'=>(float)($search['intake_appended'] ?? 0),
+        'intake_skipped'=>(float)($search['intake_skipped'] ?? 0),
+        'growth_gsc_rows'=>(float)($funnel['gsc_rows'] ?? 0),
+        'growth_ga4_rows'=>(float)($funnel['ga4_rows'] ?? 0),
+        'growth_value_rows'=>(float)($funnel['value_metric_rows'] ?? 0),
+    ];
     $latest = be_cc_latest_development_snapshot($pdo);
     $comparison = be_cc_comparison_development_snapshot($pdo);
     $previous = $comparison['metrics'] ?? [];
     $trendAvailable = $comparison !== null;
     $assessment = be_cc_development_assessment(['missing_description'=>(int)$eventQuality['missingDescription'],'missing_source'=>(int)$eventQuality['missingSource'],'missing_date'=>(int)$eventQuality['missingDate'],'open_quality_reviews'=>$openQuality], ['blocked_tasks'=>$blocked], $trendAvailable);
-    $trends = ['available'=>$trendAvailable,'previous_at'=>$comparison['created_at'] ?? null,'content_coverage_delta'=>be_cc_delta($coverage,$previous,'content_coverage'),'activity_coverage_delta'=>be_cc_delta($activityCoverage,$previous,'activity_coverage'),'missing_content_delta'=>be_cc_delta($missingContent,$previous,'missing_content'),'open_quality_reviews_delta'=>be_cc_delta($openQuality,$previous,'open_quality_reviews'),'open_reviews_delta'=>be_cc_delta($openReviews,$previous,'open_reviews'),'blocked_tasks_delta'=>be_cc_delta($blocked,$previous,'blocked_tasks'),'technical_seo_delta'=>be_cc_delta($technicalSeo['coverage_percent'],$previous,'technical_seo_coverage'),'publication_problems_delta'=>be_cc_delta($publicationProblems,$previous,'publication_problems'),'learning_prevented_delta'=>be_cc_delta($snapshotMetrics['learning_prevented'],$previous,'learning_prevented'),'learning_false_positives_delta'=>be_cc_delta($snapshotMetrics['learning_false_positives'],$previous,'learning_false_positives')];
+    $trends = ['available'=>$trendAvailable,'previous_at'=>$comparison['created_at'] ?? null,'content_coverage_delta'=>be_cc_delta($coverage,$previous,'content_coverage'),'activity_coverage_delta'=>be_cc_delta($activityCoverage,$previous,'activity_coverage'),'missing_content_delta'=>be_cc_delta($snapshotMetrics['missing_content'],$previous,'missing_content'),'open_quality_reviews_delta'=>be_cc_delta($openQuality,$previous,'open_quality_reviews'),'open_reviews_delta'=>be_cc_delta($openReviews,$previous,'open_reviews'),'blocked_tasks_delta'=>be_cc_delta($blocked,$previous,'blocked_tasks'),'technical_seo_delta'=>be_cc_delta($technicalSeo['coverage_percent'],$previous,'technical_seo_coverage'),'publication_problems_delta'=>be_cc_delta($publicationProblems,$previous,'publication_problems'),'learning_prevented_delta'=>be_cc_delta($snapshotMetrics['learning_prevented'],$previous,'learning_prevented'),'learning_false_positives_delta'=>be_cc_delta($snapshotMetrics['learning_false_positives'],$previous,'learning_false_positives')];
     be_cc_store_development_snapshot($pdo, $snapshotMetrics, $latest);
 
-    $funnel = $contentOps['funnel'] ?? ['available'=>false,'message'=>'Keine Funnel-Daten verfügbar.'];
+    $components = [
+        be_cc_component_trend('weekly_ki_websearch', 'KI-Suche', $processHealth, $snapshotMetrics, $comparison, [
+            ['metric'=>'search_selected_rate','label'=>'Übernahmequote','direction'=>1,'threshold'=>2,'unit'=>'%'],
+            ['metric'=>'search_dropped_rate','label'=>'Verwerfungsquote','direction'=>-1,'threshold'=>2,'unit'=>'%'],
+            ['metric'=>'search_prevented_candidates','label'=>'Automatisch verhindert','direction'=>1,'threshold'=>1],
+        ]),
+        be_cc_component_trend('content_quality_audit', 'Contentprüfung & Lernen', $processHealth, $snapshotMetrics, $comparison, [
+            ['metric'=>'open_quality_reviews','label'=>'Offene Qualitätsfälle','direction'=>-1,'threshold'=>1],
+            ['metric'=>'learning_prevented','label'=>'Verhinderte Wiederholungen','direction'=>1,'threshold'=>1],
+            ['metric'=>'learning_false_positives','label'=>'False Positives','direction'=>-1,'threshold'=>1],
+            ['metric'=>'learning_recurrences','label'=>'Wiederholungen','direction'=>-1,'threshold'=>1],
+        ]),
+        be_cc_component_trend('manual_ki_intake', 'Inbox & Intake', $processHealth, $snapshotMetrics, $comparison, [
+            ['metric'=>'open_reviews','label'=>'Offene Prüfungen','direction'=>-1,'threshold'=>1],
+            ['metric'=>'intake_appended','label'=>'Übernommene Inhalte','direction'=>1,'threshold'=>1],
+            ['metric'=>'intake_skipped','label'=>'Übersprungene Inhalte','direction'=>-1,'threshold'=>1],
+        ]),
+        be_cc_component_trend('growth_intelligence', 'Growth & SEO', $processHealth, $snapshotMetrics, $comparison, [
+            ['metric'=>'technical_seo_coverage','label'=>'Technische SEO-Abdeckung','direction'=>1,'threshold'=>1,'unit'=>'%'],
+            ['metric'=>'growth_gsc_rows','label'=>'Search-Console-Daten','direction'=>1,'threshold'=>1],
+            ['metric'=>'growth_ga4_rows','label'=>'GA4-Daten','direction'=>1,'threshold'=>1],
+            ['metric'=>'growth_value_rows','label'=>'Nutzwertdaten','direction'=>1,'threshold'=>1],
+        ]),
+        be_cc_component_trend('publication_verification', 'Veröffentlichung', $processHealth, $snapshotMetrics, $comparison, [
+            ['metric'=>'publication_problems','label'=>'Veröffentlichungsprobleme','direction'=>-1,'threshold'=>1],
+            ['metric'=>'blocked_tasks','label'=>'Blockierte Systemfälle','direction'=>-1,'threshold'=>1],
+        ]),
+    ];
+
     $searchConsoleConnected = isset($funnel['metrics']['growth.gsc_rows']);
     $seoMessage = $searchConsoleConnected ? 'Search-Console-/Growth-Signale sind aus der Betriebsdatenbank angebunden.' : 'Technische Onpage-Basissignale werden geprüft. Search-Console-Kennzahlen sind noch nicht belastbar vorhanden.';
     $attentionReasons = [];
@@ -168,14 +255,15 @@ try {
     $operatorStatus = $attentionReasons ? implode(' · ', $attentionReasons) : 'Kein aktueller Handlungsbedarf';
 
     be_json_response(200, ['status'=>'ok','data'=>[
-        'generated_at'=>gmdate('c'), 'summary'=>$assessment, 'operator_status'=>$operatorStatus, 'attention_reasons'=>$attentionReasons, 'trends'=>$trends,
+        'generated_at'=>gmdate('c'),'summary'=>$assessment,'operator_status'=>$operatorStatus,'attention_reasons'=>$attentionReasons,'trends'=>$trends,
+        'component_improvement'=>['comparison_days'=>7,'comparison_at'=>$comparison['created_at'] ?? null,'items'=>$components],
         'content_quality'=>[
             'scope_label'=>'Aktive Eventbasis','events_total'=>$total,'sheet_events_total'=>(int)$sheetQuality['total'],'provider_events_total'=>(int)$providerQuality['total'],'complete_events'=>$complete,'coverage_percent'=>$coverage,
             'missing_description'=>(int)$eventQuality['missingDescription'],'missing_source'=>(int)$eventQuality['missingSource'],'missing_date'=>(int)$eventQuality['missingDate'],
             'activities_total'=>(int)$activityQuality['total'],'complete_activities'=>(int)$activityQuality['complete'],'activity_coverage_percent'=>$activityCoverage,
             'activity_missing_description'=>(int)$activityQuality['missingDescription'],'activity_missing_source'=>(int)$activityQuality['missingSource'],'open_quality_reviews'=>$openQuality,
         ],
-        'automation'=>['open_reviews'=>$openReviews,'waiting_tasks'=>$waitingTasks,'blocked_tasks'=>$blocked,'completed_cases'=>$completedCases,'publication_problems'=>$publicationProblems,'quality_effect_available'=>(bool)$contentOps['available'],'quality_effect_message'=>(string)($contentOps['message'] ?? ''),'search'=>$contentOps['search'] ?? [],'learning'=>$contentOps['learning'] ?? [],'process_health'=>$processHealth],
+        'automation'=>['open_reviews'=>$openReviews,'waiting_tasks'=>$waitingTasks,'blocked_tasks'=>$blocked,'completed_cases'=>$completedCases,'publication_problems'=>$publicationProblems,'quality_effect_available'=>(bool)$contentOps['available'],'quality_effect_message'=>(string)($contentOps['message'] ?? ''),'search'=>$search,'learning'=>$learning,'process_health'=>$processHealth],
         'seo'=>['content_basis_percent'=>$coverage,'onpage_event_coverage_percent'=>$coverage,'missing_descriptions'=>(int)$eventQuality['missingDescription'],'missing_sources'=>(int)$eventQuality['missingSource'],'technical_seo_available'=>true,'technical_seo'=>$technicalSeo,'search_console_connected'=>$searchConsoleConnected,'funnel'=>$funnel,'message'=>$seoMessage,'search_console_message'=>$seoMessage],
     ]]);
 } catch (Throwable $error) {
