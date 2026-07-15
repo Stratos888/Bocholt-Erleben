@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-/* === BEGIN FILE: api/growth-backlog-lib.php | Zweck: gemeinsame Helfer fuer das private Growth-/Acquisition-Backlog; Umfang: Sheet-Persistenz, Normalisierung, Deduplizierung und Statuslogik === */
+/* === BEGIN FILE: api/growth-backlog-lib.php | Zweck: gemeinsame Helfer fuer das private Growth-/Acquisition-Backlog; Umfang: Sheet-Persistenz, Normalisierung, vollstaendige Roadmap-Sicht und Statuslogik === */
 
 const GBL_TAB = 'Growth_Backlog';
 const GBL_HEADER_ROW = 1;
@@ -146,12 +146,31 @@ function gbl_update_cells(array $header, array $index, int $sheetRow, array $upd
     }
 }
 
+function gbl_status_normalize(string $status): string
+{
+    $value = mb_strtolower(trim($status), 'UTF-8');
+    $completed = ['done', 'closed', 'complete', 'completed', 'abgeschlossen', 'erledigt', 'archived', 'archiviert'];
+    return in_array($value, $completed, true) ? 'completed' : 'open';
+}
+
+function gbl_priority_rank(string $priority): int
+{
+    return match (mb_strtolower(trim($priority), 'UTF-8')) {
+        'hoch', 'high', 'critical', 'kritisch' => 0,
+        'mittel', 'medium', 'normal' => 1,
+        'niedrig', 'low' => 2,
+        default => 3,
+    };
+}
+
 function gbl_public_item(array $row): array
 {
+    $sourceStatus = (string)($row['status'] ?? 'open');
     return [
         'id' => (string)($row['id'] ?? ''),
         'cluster_key' => (string)($row['cluster_key'] ?? ''),
-        'status' => (string)($row['status'] ?? 'open'),
+        'status' => gbl_status_normalize($sourceStatus),
+        'source_status' => $sourceStatus,
         'priority' => (string)($row['priority'] ?? 'mittel'),
         'type' => (string)($row['type'] ?? 'Sonstiges'),
         'title' => (string)($row['title'] ?? ''),
@@ -163,12 +182,58 @@ function gbl_public_item(array $row): array
         'source' => (string)($row['source'] ?? ''),
         'created_at' => (string)($row['created_at'] ?? ''),
         'updated_at' => (string)($row['updated_at'] ?? ''),
+        'closed_at' => (string)($row['closed_at'] ?? ''),
+        'decision_note' => (string)($row['decision_note'] ?? ''),
+        'source_order' => max(1, ((int)($row['_sheet_row'] ?? 2)) - 1),
     ];
+}
+
+function gbl_backlog_snapshot_from_rows(array $rows): array
+{
+    $items = [];
+    foreach ($rows as $row) {
+        if (!is_array($row)) continue;
+        $item = gbl_public_item($row);
+        if (trim((string)$item['title']) === '') continue;
+        $items[] = $item;
+    }
+
+    usort($items, static function (array $a, array $b): int {
+        $statusOrder = ['open' => 0, 'completed' => 1];
+        $statusCompare = ($statusOrder[$a['status']] ?? 2) <=> ($statusOrder[$b['status']] ?? 2);
+        if ($statusCompare !== 0) return $statusCompare;
+        if ($a['status'] === 'open') {
+            $priorityCompare = gbl_priority_rank((string)$a['priority']) <=> gbl_priority_rank((string)$b['priority']);
+            if ($priorityCompare !== 0) return $priorityCompare;
+        }
+        return ((int)$a['source_order']) <=> ((int)$b['source_order']);
+    });
+
+    $openOrder = 0;
+    foreach ($items as &$item) {
+        $item['recommended_order'] = $item['status'] === 'open' ? ++$openOrder : null;
+    }
+    unset($item);
+
+    $open = count(array_filter($items, static fn(array $item): bool => $item['status'] === 'open'));
+    $completed = count($items) - $open;
+    return [
+        'status' => 'ok',
+        'label' => 'Growth-Backlog',
+        'items' => $items,
+        'counts' => ['total' => count($items), 'open' => $open, 'completed' => $completed],
+    ];
+}
+
+function gbl_read_snapshot(): array
+{
+    [, , $rows] = gbl_read_table();
+    return gbl_backlog_snapshot_from_rows($rows);
 }
 
 function gbl_status_is_open(string $status): bool
 {
-    return in_array($status, ['', 'open', 'offen'], true);
+    return gbl_status_normalize($status) === 'open';
 }
 
 /* === END FILE: api/growth-backlog-lib.php === */
