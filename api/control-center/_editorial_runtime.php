@@ -27,12 +27,16 @@ function be_cc_editorial_validate_action(array $case, string $action, array $pay
 {
     $decision = be_cc_validate_operator_decision($action, $payload, ['today'=>date('Y-m-d')]);
     if ($action === 'approve' && (string)($case['source_system'] ?? '') === 'inbox_feed') {
-        $review = be_cc_event_candidate_review_contract(be_cc_editorial_merge_updates(be_cc_editorial_payload($case), $decision['event_updates']));
-        if (empty($review['decision_gate']['ready'])) {
-            $labels = array_map(static fn(array $item): string => (string)($item['message'] ?? $item['code'] ?? 'Unvollständige Angabe'), (array)($review['decision_gate']['blockers'] ?? []));
-            throw new DomainException('Event ist nicht entscheidungsreif: ' . implode(' ', $labels));
+        $candidate = be_cc_editorial_merge_updates(be_cc_editorial_payload($case), $decision['event_updates']);
+        $isActivity = be_cc_decision_token($candidate['submission_kind'] ?? '') === 'activity';
+        if (!$isActivity) {
+            $review = be_cc_event_candidate_review_contract($candidate);
+            if (empty($review['decision_gate']['ready'])) {
+                $labels = array_map(static fn(array $item): string => (string)($item['message'] ?? $item['code'] ?? 'Unvollständige Angabe'), (array)($review['decision_gate']['blockers'] ?? []));
+                throw new DomainException('Event ist nicht entscheidungsreif: ' . implode(' ', $labels));
+            }
+            $decision['review_contract'] = $review;
         }
-        $decision['review_contract'] = $review;
     }
     return $decision;
 }
@@ -83,6 +87,45 @@ function be_cc_sheet_table(string $range): array
     return ['header_row'=>$headerOffset+1,'index'=>$index,'rows'=>$rows];
 }
 
+function be_cc_runtime_norm(mixed $value): string
+{
+    return trim(str_replace("\u{00A0}", ' ', (string)$value));
+}
+
+function be_cc_runtime_stable_hash(array $parts): string
+{
+    return substr(hash('sha256', implode("\n", array_map('be_cc_runtime_norm', $parts))), 0, 24);
+}
+
+function be_cc_runtime_event_fingerprint(array $event): string
+{
+    return be_cc_runtime_stable_hash([
+        $event['id'] ?? $event['event_id'] ?? $event['submission_id'] ?? '',
+        $event['title'] ?? '',
+        $event['date'] ?? $event['start_date'] ?? '',
+        $event['endDate'] ?? $event['end_date'] ?? '',
+        $event['time'] ?? '',
+        $event['city'] ?? '',
+        $event['location'] ?? '',
+        $event['address'] ?? '',
+        $event['kategorie'] ?? $event['category'] ?? '',
+        $event['source_url'] ?? $event['url'] ?? $event['event_url'] ?? '',
+    ]);
+}
+
+function be_cc_runtime_current_event(string $contentId): array
+{
+    foreach (be_cc_event_items(true) as $event) {
+        if ((string)($event['id'] ?? '') === $contentId) return $event;
+    }
+    throw new RuntimeException('Der aktuelle Eventstand wurde nicht gefunden.');
+}
+
+function be_cc_description_matches(string $expectedHash, string $currentDescription): bool
+{
+    return $expectedHash === '' || hash_equals($expectedHash, hash('sha256', trim($currentDescription)));
+}
+
 function be_cc_update_sheet_row_canonical(string $tab, int $headerRow, int $rowNumber, array $updates): array
 {
     $aliases=[
@@ -131,10 +174,18 @@ function be_cc_writeback_audit_stable(array $case,string $action,array $payload,
     $source=be_cc_editorial_payload($case);
     $tab=be_content_audit_tab_name();
     $table=be_cc_sheet_table($tab.'!A:ZZ');
-    $resolution=be_cc_resolve_audit_row($table['rows'],be_cc_audit_identity($source));
-    if(($resolution['status']??'')==='ambiguous')throw new DomainException((string)$resolution['message']);
-    $resolutionKind=($resolution['status']??'')==='resolved'?'current_audit_row':'superseded_audit_row';
-    if($action==='approve'&&$decision['event_updates'])be_cc_update_event_fields(trim((string)($source['content_id']??'')),$decision['event_updates']);
+    $identity=be_cc_audit_identity($source);
+    $resolution=be_cc_resolve_audit_row($table['rows'],$identity);
+    $contentId=trim((string)($source['content_id']??$case['object_id']??''));
+    $currentEvent=$contentId!==''?be_cc_runtime_current_event($contentId):[];
+    $currentFingerprint=$currentEvent?be_cc_runtime_event_fingerprint($currentEvent):'';
+    $resolutionState=be_cc_audit_resolution_state($identity,$currentFingerprint,$resolution);
+    if(empty($resolutionState['write_allowed']))throw new DomainException('Der Event wurde zwischenzeitlich verändert oder der Auditfall ist nicht eindeutig. Bitte den aktuellen Stand neu laden; dein Entwurf bleibt erhalten.');
+    if($action==='approve'&&$decision['event_updates']){
+        $expectedDescriptionHash=trim((string)($payload['current_description_hash']??''));
+        if(!be_cc_description_matches($expectedDescriptionHash,(string)($currentEvent['description']??'')))throw new DomainException('Die Beschreibung wurde zwischenzeitlich verändert. Bitte den aktuellen Stand neu laden; dein Entwurf bleibt erhalten.');
+        be_cc_update_event_fields($contentId,$decision['event_updates']);
+    }
     if(($resolution['status']??'')==='resolved'){
         $now=gmdate('Y-m-d\TH:i:s');
         $updates=match($action){
@@ -146,7 +197,7 @@ function be_cc_writeback_audit_stable(array $case,string $action,array $payload,
         $updates+=['verified_at'=>$now,'last_verified_at'=>$now,'verified_by'=>'control_center','review_note'=>$decision['decision_note']];
         be_cc_update_sheet_row_by_header($tab,(int)$table['header_row'],(int)$resolution['row_number'],$updates);
     }
-    return ['resolution'=>$resolution,'resolution_kind'=>$resolutionKind];
+    return ['resolution'=>$resolution,'resolution_state'=>$resolutionState['state'],'resolution_kind'=>$resolutionState['resolution_kind']];
 }
 
 function be_cc_record_editorial_feedback(PDO $pdo,array $case,array $decision,array $payload):void
