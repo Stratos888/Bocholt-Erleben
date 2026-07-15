@@ -42,6 +42,15 @@ Offene Punkte werden dargestellt nach:
 
 Die Ansicht weist jedem offenen Punkt eine sichtbare empfohlene Reihenfolgenummer zu. Abgeschlossene Punkte erhalten keine neue Arbeitsreihenfolge.
 
+## Darstellung
+
+- Jeder Punkt wird zunächst als kompakte einzelne Zeile dargestellt.
+- Die geschlossene Zeile zeigt Reihenfolgenummer, Titel, Status, Priorität und Themenbereich.
+- Eine kurze Vorschau darf einzeilig ergänzt werden.
+- Erst durch Klick auf die Zeile werden Begründung, empfohlener nächster Schritt, erwarteter Nutzen und Abschlussinformationen aufgeklappt.
+- Beim Laden der Ansicht ist kein Punkt automatisch geöffnet.
+- Die kompakte Darstellung ändert nichts an der vollständigen fachlichen Sichtbarkeit: Alle Punkte bleiben als Zeilen vorhanden.
+
 ## Inhalt eines Punktes
 
 Mindestens sichtbar:
@@ -56,6 +65,8 @@ Mindestens sichtbar:
 - erwarteter Nutzen,
 - bei abgeschlossenen Punkten Abschlussnotiz und Abschlussdatum, sofern vorhanden.
 
+Die ersten fünf Angaben gehören in die kompakte Zeile. Die übrigen Angaben erscheinen im aufgeklappten Detailbereich.
+
 ## Nicht zulässige Funktionen
 
 Im Backlogbereich sind nicht zulässig:
@@ -66,7 +77,8 @@ Im Backlogbereich sind nicht zulässig:
 - in Bearbeitung setzen,
 - generische Fallaktionen,
 - Ausblendung abgeschlossener Punkte,
-- Badge-Logik, die den Bereich als offene Arbeitsqueue darstellt.
+- Badge-Logik, die den Bereich als offene Arbeitsqueue darstellt,
+- dauerhaft vollständig aufgeklappte Karten für alle Punkte.
 
 ## Technischer Vertrag
 
@@ -76,7 +88,7 @@ Growth_Backlog
 → Status auf offen/abgeschlossen normalisieren
 → offene Punkte nach Priorität und Quellreihenfolge sortieren
 → abgeschlossene Punkte weiterhin ausgeben
-→ direkt an die Steuerzentrale liefern
+→ als kompakte aufklappbare Zeilen direkt an die Steuerzentrale liefern
 ```
 
 `control_cases` bleibt tatsächlichen Prüf-, Entscheidungs- und Systemvorgängen vorbehalten. Historisch synchronisierte Growth-Backlog-Fälle werden als reine Information neutralisiert und nicht mehr als führende Backlogquelle verwendet.
@@ -86,7 +98,9 @@ Growth_Backlog
 Der Vertrag gilt als erfüllt, wenn die Staging-Ansicht:
 
 - Gesamtzahl, offene und abgeschlossene Zahl zeigt,
-- sämtliche Quellpunkte darstellt,
+- sämtliche Quellpunkte als kompakte Zeilen darstellt,
 - offene und abgeschlossene Bereiche gleichzeitig sichtbar macht,
+- einen Punkt per Klick auf- und wieder zuklappen kann,
+- beim Laden keinen Punkt automatisch öffnet,
 - keine Arbeitsfallaktionen anbietet,
 - dieselben Zahlen wie die kanonische Quelle verwendet.
