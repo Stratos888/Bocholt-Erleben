@@ -25,7 +25,7 @@ try {
         if($contentId!=='')foreach(be_cc_event_items(true) as $event){
             if((string)($event['id']??'')!==$contentId)continue;
             $current=trim((string)($event['description']??'')); $suggested=trim((string)($payload['suggested_description']??$payload['replacement_text']??'')); if($suggested==='')$suggested=be_cc_safe_description_suggestion($event);
-            $payload['current_description']=$current; $payload['description']=$current; $payload['suggested_description']=$suggested;
+            $payload['current_description']=$current; $payload['current_description_hash']=hash('sha256',$current); $payload['description']=$current; $payload['suggested_description']=$suggested;
             foreach(['title','date','time','city','location','address','source_url','ticket_url','visual_key','visual_motif'] as $field)$payload[$field]=(string)($event[$field]??$payload[$field]??'');
             $payload['endDate']=(string)($event['end_date']??''); $payload['end_date']=(string)($event['end_date']??''); $payload['category']=(string)($event['category']??'');
             $item['decision_context']['current_description']=$current; $item['decision_context']['suggested_description']=$suggested; $item['decision_context']['current_event']=$event; break;
