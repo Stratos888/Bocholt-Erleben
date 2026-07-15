@@ -12,6 +12,7 @@ on:
       - "css/control-center*.css"
       - "data/control_center_repo_workpacks.json"
       - "scripts/audit_control_center_product_contract.py"
+      - "tools/audit-css-governance.py"
       - "tests/control_center*.php"
       - "tests/control_center*.mjs"
       - ".github/workflows/control-center-validation.yml"
@@ -56,6 +57,10 @@ jobs:
           set -euo pipefail
           python3 -m json.tool data/control_center_repo_workpacks.json >/dev/null
           python3 scripts/audit_control_center_product_contract.py
+      - name: Validate CSS governance
+        run: |
+          set -euo pipefail
+          python3 tools/audit-css-governance.py
       - name: Validate consolidated file architecture
         run: |
           set -euo pipefail
