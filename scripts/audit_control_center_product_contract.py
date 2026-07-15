@@ -37,6 +37,8 @@ process_chain=read('api/control-center/_process_chain.php')
 content_ops=read('api/control-center/_content_ops.php')
 github_repo=read('api/control-center/_github_repo.php')
 public_events=read('api/events/public.php')
+backlog_api=read('api/growth-backlog/list.php')
+backlog_lib=read('api/growth-backlog-lib.php')
 seo_dashboard=read('intern/seo-dashboard/index.php')
 manifest=read('data/control_center_repo_workpacks.json')
 for label in ['Übersicht','Prüfen','Backlog','Verwaltung','Entwicklung']:
@@ -52,14 +54,16 @@ require(style,'control-center-editorial.css','Redaktionelle CSS-Governance fehlt
 for label,marker in {
     'vollständige Eventkarte':'cc-fact-grid','Entscheidungsgate':'decision_gate','Bearbeiten und übernehmen':'edit_and_approve',
     'typisierte Ablehnung':'Ablehnungsgrund auswählen','stabile operation_id':'operation_id','konfliktfester Entwurf':'be_cc_draft:',
-    'Backlog-Quellenstatus':'Erfolgreich geladen ·','getrennte Verwaltungsquellen':'Promise.allSettled',
-    'Verwaltungsdetails':'data-manage-details','exakter Live-Link':'Live öffnen',
+    'vollständige Backlog-Roadmap':'Informations- und Reihenfolgeansicht','Backlog-Zweistatus':'Offen · empfohlene Reihenfolge',
+    'getrennte Verwaltungsquellen':'Promise.allSettled','Verwaltungsdetails':'data-manage-details','exakter Live-Link':'Live öffnen',
     'verständlicher Publikationsstatus':'Öffentliche Wirkung wird geprüft · Versuch',
     'Projektstatus':'operator_status','Wirkungsansicht':'Automatisierte Verbesserung','SEO-Embed':"appPath('/intern/seo-dashboard/?embed=1')",
 }.items(): require(modules+css,marker,f'Frontendvertrag fehlt: {label}',errors)
 if 'new MutationObserver(' in modules: errors.append('Fachmodule verwenden weiterhin DOM-Überlagerungen.')
 if '/data/events.json' in modules: errors.append('Verwaltung liest direkt den öffentlichen Eventfeed.')
 if 'Speichern und veröffentlichen' in modules: errors.append('UI behauptet Veröffentlichung vor Bestätigung.')
+for forbidden in ['data-backlog-action','cc-new-backlog','submitBacklog(','handleBacklog(']:
+    if forbidden in modules: errors.append(f'Backlog ist weiterhin als Arbeitsliste implementiert: {forbidden}')
 for label,marker,text in [
     ('Session-Fixation','session_regenerate_id',auth),('HttpOnly',"'httponly' => true",auth),('SameSite',"'samesite' => 'Lax'",auth),
     ('gemeinsame SEO-Session','BE_INTERNAL_SEO_DASHBOARD',auth+seo_dashboard),('Staging-Pfade','BE_CONTROL_CENTER_BASE',environment),
@@ -74,8 +78,10 @@ for label,marker in {
 }.items(): require(editorial,marker,f'Backendvertrag fehlt: {label}',errors)
 for label,marker,text in [
     ('aktuelle Eventbasis','be_cc_event_is_current_or_future',content_source+development),
-    ('Growth-Backlog-Sync','be_cc_sync_growth_backlog',sources+overview),('Backlog-Quellenstatus',"'sync' => $sync",overview),
-    ('reines Backlog',"source_system'] ?? '') !== 'growth_backlog'",cases),('Event-Livewriteback','be_cc_update_event_fields',writeback+editorial_runtime),
+    ('vollständige Growth-Roadmap','gbl_read_snapshot',backlog_api+backlog_lib+overview),
+    ('genau zwei Backlogstatus','gbl_status_normalize',backlog_lib),
+    ('Backlog ohne Arbeitsfälle',"source_system='growth_backlog'",overview),
+    ('Backlog-Quellenstatus',"'sync' => $sync",overview),('Event-Livewriteback','be_cc_update_event_fields',writeback+editorial_runtime),
     ('Inhaltshistorie','control_content_changes',history+schema),('Publikationsprüfung','be_cc_verify_public_change',publication),
     ('Prozesskette','be_cc_integrated_process_health',process_chain+overview),('Content-Ops-Wirkung','feedback_rule_effectiveness_daily',content_ops),
     ('Aktivitätswriteback','be_cc_update_activity_in_repo',content_api+github_repo),('Aktivitätsfreigabe','BE_ACTIVITY_WRITEBACK_ENABLED',github_repo),
