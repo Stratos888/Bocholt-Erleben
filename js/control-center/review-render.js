@@ -1,7 +1,7 @@
 import {
   state, els, reviewLabels, escapeHtml, clean, asArray, formatDate, fact,
   reviewGroup, allReviewCases, reviewCases,
-} from './shared.js';
+} from './shared.js?v=2026-07-15-control-center-editorial-v1';
 
 let handleAction = async () => {};
 export function configureReviewRenderer(callbacks = {}) { if (callbacks.handleAction) handleAction = callbacks.handleAction; }
