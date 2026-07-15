@@ -32,6 +32,7 @@ EXPECTED_IMPORTS = [
     "overlays.css",
     "control-center.css",
     "control-center-final.css",
+    "control-center-editorial.css",
 ]
 
 CSS_LINE_LIMITS = {
@@ -44,6 +45,7 @@ CSS_LINE_LIMITS = {
     "overlays.css": 3600,
     "control-center.css": 1200,
     "control-center-final.css": 300,
+    "control-center-editorial.css": 100,
     "legacy.css": 50,
 }
 
