@@ -1,0 +1,101 @@
+{
+  "version": "control_center_editorial_contract_v1",
+  "updated_at": "2026-07-15",
+  "principles": [
+    "Server-side decision gates are authoritative.",
+    "Stored sheet row numbers are hints and must never be used without identity validation.",
+    "Every operator decision is typed with the canonical content-ops decision taxonomy.",
+    "A single editorial text edit may create an observation but must never activate a permanent rule.",
+    "Phase 1 contracts are side-effect free and are not wired into production runtime yet."
+  ],
+  "event_candidate": {
+    "required_fields": [
+      "title",
+      "date",
+      "city_or_local_reference",
+      "location",
+      "category",
+      "source_url",
+      "description",
+      "visual_key",
+      "visual_motif"
+    ],
+    "conditional_fields": {
+      "end_date": "required_when_is_multi_day",
+      "time_reason": "required_when_time_is_empty",
+      "address": "required_when_address_required",
+      "ticket_url": "required_when_ticket_required"
+    },
+    "hard_blockers": [
+      "invalid_date",
+      "invalid_end_date",
+      "end_before_start",
+      "invalid_source_url",
+      "hard_duplicate",
+      "weak_source"
+    ]
+  },
+  "decisions": {
+    "approve_classes": ["accepted", "confirmed", "corrected"],
+    "reject_classes": [
+      "duplicate",
+      "rejected_not_event",
+      "rejected_not_public",
+      "rejected_not_local",
+      "rejected_source_weak",
+      "rejected_low_value",
+      "rejected_commercial"
+    ],
+    "snooze_class": "snoozed",
+    "required_fields": [
+      "decision_class",
+      "decision_note",
+      "resolved_by",
+      "resolved_at",
+      "suppress_until",
+      "recheck_at",
+      "reopen_policy",
+      "source_fingerprint",
+      "content_fingerprint"
+    ]
+  },
+  "sheet_identity": {
+    "inbox_match_order": [
+      "stable_candidate_id",
+      "canonical_source_url_and_date",
+      "content_fingerprint",
+      "validated_row_hint"
+    ],
+    "audit_match_order": [
+      "verification_key",
+      "full_audit_fingerprint",
+      "unique_content_id_and_issue_code",
+      "validated_row_hint"
+    ],
+    "zero_match_result": "not_found",
+    "multiple_match_result": "ambiguous"
+  },
+  "operations": {
+    "states": ["started", "source_written", "completed", "failed"],
+    "same_operation_same_payload": "replay",
+    "same_operation_different_payload": "conflict"
+  },
+  "editorial_feedback": {
+    "single_edit_auto_activate": false,
+    "activation_min_distinct_events": 3,
+    "max_prompt_context_rules": 18,
+    "categories": [
+      "advertising_language_removed",
+      "source_attribution_removed",
+      "unsupported_claim_removed",
+      "local_relevance_added",
+      "concrete_activity_added",
+      "target_group_added",
+      "shortened",
+      "more_precise",
+      "repetition_removed",
+      "more_factual_tone",
+      "editorial_precision"
+    ]
+  }
+}
