@@ -5,7 +5,7 @@ require __DIR__ . '/_schema.php';
 require __DIR__ . '/_submission_source.php';
 require __DIR__ . '/_sheet_inbox_source.php';
 require __DIR__ . '/_process_chain.php';
-require dirname(__DIR__) . '/growth-backlog-lib.php';
+require_once dirname(__DIR__) . '/growth-backlog-lib.php';
 
 be_require_review_access();
 
