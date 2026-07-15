@@ -48,6 +48,17 @@ try {
     $assert(str_contains($expected->getMessage(), 'nicht entscheidungsreif'), 'Blocker liefert verständlichen Konflikt.');
 }
 
+$activityCase = $case;
+$activityCase['object_id'] = 'fixture-activity-1';
+$activityCase['source_payload_json'] = json_encode([
+    'submission_kind'=>'activity',
+    'id_suggestion'=>'fixture-activity-1',
+    'title'=>'Dauerhafte Aktivität',
+], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+$activityAccepted = be_cc_editorial_validate_action($activityCase, 'approve', []);
+$assert($activityAccepted['decision_class'] === 'accepted', 'Activity-Kandidat bleibt vom Event-Pflichtfeldgate getrennt.');
+$assert(!isset($activityAccepted['review_contract']), 'Activity-Kandidat erhält keinen falschen Eventvertrag.');
+
 try {
     be_cc_editorial_validate_action($case, 'reject', ['reason'=>'Nicht passend']);
     $failures[] = 'Ablehnung ohne decision_class wurde akzeptiert.';
@@ -60,6 +71,18 @@ $legacy = be_cc_editorial_operation_id([], $case['id'], 'approve');
 $assert($legacy['legacy'] === true && str_starts_with($legacy['id'], 'legacy:'), 'Alte UI bleibt über markierte Legacy-operation_id kompatibel.');
 $modern = be_cc_editorial_operation_id(['operation_id'=>'cc:test:operation:0001'], $case['id'], 'approve');
 $assert($modern['legacy'] === false && $modern['id'] === 'cc:test:operation:0001', 'Explizite operation_id bleibt stabil.');
+
+$fingerprintBase = [
+    'id'=>'event-1','title'=>'Titel','date'=>'2026-08-15','end_date'=>'','time'=>'18:00','city'=>'Bocholt',
+    'location'=>'Marktplatz','address'=>'Markt 1','category'=>'Kultur','source_url'=>'https://example.org/event',
+];
+$fingerprintChanged = $fingerprintBase;
+$fingerprintChanged['location'] = 'Andere Halle';
+$assert(be_cc_runtime_event_fingerprint($fingerprintBase) !== be_cc_runtime_event_fingerprint($fingerprintChanged), 'Kernänderung verändert den Audit-Content-Fingerprint.');
+$description = 'Aktuelle Beschreibung';
+$descriptionHash = hash('sha256', $description);
+$assert(be_cc_description_matches($descriptionHash, $description), 'Unveränderte Beschreibung wird akzeptiert.');
+$assert(!be_cc_description_matches($descriptionHash, 'Zwischenzeitlich geändert'), 'Zwischenzeitliche Beschreibungsänderung wird erkannt.');
 
 if ($failures) {
     fwrite(STDERR, "=== Control Center Editorial Runtime Contract: FAILED ===\n");
