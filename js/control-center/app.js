@@ -57,18 +57,21 @@ function roadmapCopy(label, value) {
 function roadmapItem(item) {
   const completed = item.status === 'completed';
   const statusLabel = completed ? 'Abgeschlossen' : 'Offen';
-  const order = completed ? '' : `<span class="cc-roadmap-order">${escapeHtml(item.recommended_order || '–')}</span>`;
-  const meta = [item.priority, item.type].filter(Boolean).map(escapeHtml).join(' · ');
+  const orderPrefix = completed ? '' : `${escapeHtml(item.recommended_order || '–')}. `;
+  const meta = [statusLabel, item.priority, item.type].filter(Boolean).map(escapeHtml).join(' · ');
+  const preview = clean(item.recommended_action || item.why_relevant || item.short_reason || item.expected_benefit) || 'Details öffnen';
   const completion = completed
     ? `${roadmapCopy('Abschluss', item.decision_note)}${roadmapCopy('Abgeschlossen am', item.closed_at)}`
     : '';
-  return `<article class="cc-roadmap-item ${completed ? 'cc-roadmap-item--completed' : ''}">
-    <header>${order}<div><div class="cc-roadmap-meta"><span class="cc-roadmap-status cc-roadmap-status--${completed ? 'completed' : 'open'}">${statusLabel}</span>${meta ? `<span>${meta}</span>` : ''}</div><h3>${escapeHtml(item.title || 'Backlogpunkt')}</h3></div></header>
-    ${roadmapCopy('Warum relevant', item.why_relevant || item.short_reason)}
-    ${roadmapCopy('Empfohlener nächster Schritt', item.recommended_action)}
-    ${roadmapCopy('Erwarteter Nutzen', item.expected_benefit)}
-    ${completion}
-  </article>`;
+  return `<details class="cc-labor-row cc-roadmap-row ${completed ? 'cc-roadmap-row--completed' : ''}">
+    <summary><span><strong>${orderPrefix}${escapeHtml(item.title || 'Backlogpunkt')}</strong><small>${meta}</small></span><span class="cc-labor-summary">${escapeHtml(preview)}</span></summary>
+    <div class="cc-labor-detail">
+      ${roadmapCopy('Warum relevant', item.why_relevant || item.short_reason)}
+      ${roadmapCopy('Empfohlener nächster Schritt', item.recommended_action)}
+      ${roadmapCopy('Erwarteter Nutzen', item.expected_benefit)}
+      ${completion}
+    </div>
+  </details>`;
 }
 
 function roadmapSection(title, items, emptyText) {
