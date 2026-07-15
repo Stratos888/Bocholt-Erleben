@@ -1,7 +1,7 @@
-import { state, els, escapeHtml, clean, setStatus, appPath, api, openDialog, closeDialog, dialogMessage, field, textarea, value, operationId, activeCases, backlogCases, reviewGroup, allReviewCases } from './shared.js';
-import { configureReview, renderReview } from './review.js';
-import { renderManage } from './manage.js';
-import { renderDevelopment } from './development.js';
+import { state, els, escapeHtml, clean, setStatus, appPath, api, openDialog, closeDialog, dialogMessage, field, textarea, value, operationId, activeCases, backlogCases, reviewGroup, allReviewCases } from './shared.js?v=2026-07-15-control-center-editorial-v1';
+import { configureReview, renderReview } from './review.js?v=2026-07-15-control-center-editorial-v1';
+import { renderManage } from './manage.js?v=2026-07-15-control-center-editorial-v1';
+import { renderDevelopment } from './development.js?v=2026-07-15-control-center-editorial-v1';
 async function initializeSharedSession(){return api('/api/control-center/auth.php',{method:'POST',body:JSON.stringify({password:state.password}),timeoutMs:12000});}
 async function logout(callServer=true){if(callServer){try{await fetch(appPath('/api/control-center/auth.php'),{method:'DELETE',cache:'no-store'});}catch(_){}}state.password='';sessionStorage.removeItem('be_cc_password');els.content.hidden=true;els.auth.hidden=false;closeDialog();}
 function compactSummary(title,count,detail,view,label){return `<article class="cc-summary-card"><div><span class="cc-summary-label">${escapeHtml(title)}</span><strong>${escapeHtml(count)}</strong><p>${escapeHtml(detail)}</p></div>${view?`<button class="cc-button cc-button--primary" data-go-view="${view}">${escapeHtml(label)}</button>`:''}</article>`;}
