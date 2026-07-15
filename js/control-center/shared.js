@@ -6,6 +6,13 @@ export const state = {
   managementItems: { events: [], activities: [] },
   managementLoaded: { events: false, activities: false },
   managementWarnings: { events: [], activities: [] },
+  backlog: {
+    status: 'unknown',
+    label: 'Growth-Backlog',
+    items: [],
+    counts: { total: 0, open: 0, completed: 0 },
+    message: '',
+  },
 };
 
 export const els = {
