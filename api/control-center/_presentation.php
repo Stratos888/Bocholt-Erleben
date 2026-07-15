@@ -130,7 +130,7 @@ function be_cc_case_presentation(array $row): array
         $url = trim((string)($payload['event_url'] ?? $payload['ticket_url'] ?? ''));
         if ($url !== '') $links[] = ['label' => 'Einreichungsquelle', 'url' => $url];
     } elseif ($source === 'content_audit') {
-        $issueCode = strtolower(trim((string)($payload['issue_code'] ?? ''));
+        $issueCode = strtolower(trim((string)($payload['issue_code'] ?? '')));
         $group = 'quality';
         if (str_contains($issueCode, 'description')) {
             $kind = 'content_description_correction';
