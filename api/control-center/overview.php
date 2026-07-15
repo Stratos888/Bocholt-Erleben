@@ -5,6 +5,7 @@ require __DIR__ . '/_schema.php';
 require __DIR__ . '/_submission_source.php';
 require __DIR__ . '/_sheet_inbox_source.php';
 require __DIR__ . '/_process_chain.php';
+require dirname(__DIR__) . '/growth-backlog-lib.php';
 
 be_require_review_access();
 
@@ -72,9 +73,23 @@ function be_cc_safe_source_sync(string $key, string $label, callable $callback):
     }
 }
 
+function be_cc_read_growth_backlog_summary(): array
+{
+    $snapshot = gbl_read_snapshot();
+    $counts = (array)($snapshot['counts'] ?? []);
+    return [
+        'seen' => (int)($counts['total'] ?? 0),
+        'open' => (int)($counts['open'] ?? 0),
+        'completed' => (int)($counts['completed'] ?? 0),
+        'message' => 'Kanonische Roadmap vollständig gelesen; keine Arbeitsfälle erzeugt.',
+    ];
+}
+
 try {
     be_cc_ensure_schema();
-    be_db()->exec("UPDATE control_cases SET state='done', completed_at=COALESCE(completed_at,NOW()), updated_at=NOW() WHERE source_system='repo_workpack' AND state NOT IN ('done','rejected','parked')");
+    $pdo = be_db();
+    $pdo->exec("UPDATE control_cases SET state='done', completed_at=COALESCE(completed_at,NOW()), updated_at=NOW() WHERE source_system='repo_workpack' AND state NOT IN ('done','rejected','parked')");
+    $pdo->exec("UPDATE control_cases SET state='information', completed_at=COALESCE(completed_at,NOW()), updated_at=NOW() WHERE source_system='growth_backlog' AND state NOT IN ('done','rejected','parked','information')");
     $sheetInbox = be_cc_safe_source_sync('sheet_inbox', 'Führende Sheet-Inbox', 'be_cc_sync_sheet_inbox');
     $inboxFallback = ($sheetInbox['status'] ?? '') === 'error'
         ? be_cc_safe_source_sync('inbox_feed', 'Inbox-JSON-Fallback', 'be_cc_sync_inbox_feed')
@@ -84,7 +99,7 @@ try {
         'inbox_feed_fallback' => $inboxFallback,
         'submissions' => be_cc_safe_source_sync('submissions', 'Anbieter-Einreichungen', 'be_cc_sync_submissions'),
         'content_audit' => be_cc_safe_source_sync('content_audit', 'Content-Prüfung', 'be_cc_sync_content_audit'),
-        'growth_backlog' => be_cc_safe_source_sync('growth_backlog', 'Growth-Backlog', 'be_cc_sync_growth_backlog'),
+        'growth_backlog' => be_cc_safe_source_sync('growth_backlog', 'Growth-Backlog', 'be_cc_read_growth_backlog_summary'),
     ];
     $contentOps = be_cc_content_ops_status(be_db());
     $processHealth = be_cc_integrated_process_health($contentOps);
