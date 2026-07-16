@@ -54,7 +54,9 @@ $overview = $read('api/control-center/overview.php');
 $sheetInbox = $read('api/control-center/_sheet_inbox_source.php');
 $submissions = $read('api/control-center/_submission_source.php');
 $sources = $read('api/control-center/_sources.php');
+$reconciliation = $read('api/control-center/_source_reconciliation.php');
 $verifiedWriteback = $read('api/control-center/_verified_source_writeback.php');
+$activityAuditWriteback = $read('api/control-center/_activity_audit_writeback.php');
 $inboxWriteback = $read('api/control-center/_inbox_decision_writeback.php');
 $app = $read('js/control-center/app.js');
 $reviewActions = $read('js/control-center/review-actions.js');
@@ -62,12 +64,19 @@ $shared = $read('js/control-center/shared.js');
 $loader = $read('js/control-center.js');
 $html = $read('steuerzentrale/index.html');
 
-foreach (['be_cc_assert_case_postcondition','source_verified','completion','be_cc_writeback_inbox_approve_verified','be_cc_writeback_audit_verified'] as $marker) {
+foreach (['be_cc_assert_case_postcondition','source_verified','completion','be_cc_writeback_inbox_approve_verified','be_cc_writeback_audit_verified','be_cc_writeback_activity_audit_verified'] as $marker) {
     $assert(str_contains($action, $marker), "Action-E2E-Vertrag fehlt: {$marker}");
 }
 foreach ([$sheetInbox, $submissions, $sources] as $sourceFile) {
     $assert(str_contains($sourceFile, 'be_cc_reconcile_source_case'), 'Eine Quellkette besitzt keine lokale Reconciliation.');
 }
+$assert(str_contains($sheetInbox, 'be_cc_reconcile_source_snooze'), 'Sheet-Inbox reconciliiert Quell-Wiedervorlagen nicht.');
+$assert(str_contains($sources, 'be_cc_reconcile_source_snooze'), 'Fallback- oder Auditquelle reconciliiert Wiedervorlagen nicht.');
+$assert(str_contains($sources, "'reopen_terminal' => true"), 'Wiederkehrende Content-Audit-Befunde können nicht neu geöffnet werden.');
+$assert(str_contains($reconciliation, 'source_reconciled_snooze'), 'Gemeinsamer Snooze-Reconciliation-Vertrag fehlt.');
+$assert(str_contains($activityAuditWriteback, 'be_cc_update_activity_in_repo'), 'Aktivitäts-Audit-Korrekturen besitzen keinen Repo-Writeback.');
+$assert(!str_contains($activityAuditWriteback, 'be_cc_verified_current_event'), 'Aktivitäts-Audit darf keinen Event-Lookup verwenden.');
+$assert(str_contains($reviewActions, 'activityAuditFields'), 'Frontend besitzt keinen typgerechten Aktivitäts-Audit-Editor.');
 $assert(str_contains($overview, 'be_cc_sync_sheet_inbox'), 'Overview führt die führende Inbox-Synchronisation nicht aus.');
 $assert(strpos($app, "api('/api/control-center/overview.php'") < strpos($app, "api('/api/control-center/cases.php?active=1'"), 'Quellsynchronisation muss vor der aktiven Fallabfrage stehen.');
 $assert(!str_contains($app, "Promise.all([\n      api('/api/control-center/overview.php')"), 'Overview und Fallabfrage dürfen nicht parallel starten.');
@@ -82,7 +91,7 @@ $assert(str_contains($inboxWriteback, "'tab' => 'Inbox'"), 'Inbox-Tabelle liefer
 $modules = ['app','backlog','review','review-render','review-actions','manage','manage-render','manage-actions','development'];
 foreach ($modules as $module) {
     $source = $read('js/control-center/' . $module . '.js');
-    $assert(!str_contains($source, '2026-07-15-control-center-editorial-v1') && !str_contains($source, '2026-07-16-inbox-writeback-v3'), "Veraltete Modulversion in {$module}.js");
+    $assert(!str_contains($source, '2026-07-15-control-center-editorial-v1') && !str_contains($source, '2026-07-16-inbox-writeback-v3') && !str_contains($source, '2026-07-16-inbox-writeback-v4'), "Veraltete Modulversion in {$module}.js");
 }
 $assert(str_contains($loader, '2026-07-16-e2e-state-v5'), 'Top-Level-Loader lädt nicht das konsolidierte Bundle.');
 $assert(str_contains($html, '2026-07-16-e2e-state-v5'), 'HTML lädt nicht den konsolidierten Controller.');
