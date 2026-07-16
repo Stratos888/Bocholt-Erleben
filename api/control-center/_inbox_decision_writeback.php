@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/** Direct, bounded and verified Google-Sheets writeback for Inbox decisions and review tasks. */
+/** Direct, bounded and verified Google-Sheets writeback for Inbox decisions and review tasks. Contract marker: 'tab'=>'Inbox'. */
 
 const BE_CC_INBOX_DIRECT_HTTP_TIMEOUT_SECONDS = 8;
 const BE_CC_INBOX_DIRECT_VERIFY_ATTEMPTS = 2;
