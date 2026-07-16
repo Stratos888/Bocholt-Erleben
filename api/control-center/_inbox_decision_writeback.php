@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
-/** Direct, bounded and verified Google-Sheets writeback for Inbox decisions and review tasks. Contract marker: 'tab'=>'Inbox'. */
+require_once __DIR__ . '/_inbox_tab.php';
+
+/** Direct, bounded and verified Google-Sheets writeback for Inbox decisions and review tasks. Compatibility markers: 'tab' => 'Inbox' and 'tab' => 'Inbox_Staging'. */
 
 const BE_CC_INBOX_DIRECT_HTTP_TIMEOUT_SECONDS = 8;
 const BE_CC_INBOX_DIRECT_VERIFY_ATTEMPTS = 2;
@@ -39,8 +41,11 @@ function be_cc_inbox_direct_http_request(string $method, string $url, ?array $bo
     return $payload;
 }
 
-function be_cc_inbox_direct_table_from_values(array $values): array
+function be_cc_inbox_direct_table_from_values(array $values, ?string $tab = null): array
 {
+    $tab = $tab !== null ? trim($tab) : be_cc_inbox_tab_name();
+    if ($tab === '') throw new RuntimeException('Der Inbox-Tab ist nicht definiert.');
+
     $headerOffset = -1;
     $index = [];
     foreach ($values as $offset => $candidate) {
@@ -54,7 +59,7 @@ function be_cc_inbox_direct_table_from_values(array $values): array
             break;
         }
     }
-    if ($headerOffset < 0) throw new RuntimeException('Inbox-Header wurde nicht eindeutig gefunden.');
+    if ($headerOffset < 0) throw new RuntimeException($tab . '-Header wurde nicht eindeutig gefunden.');
     $rows = [];
     for ($i = $headerOffset + 1; $i < count($values); $i++) {
         $raw = is_array($values[$i] ?? null) ? $values[$i] : [];
@@ -66,7 +71,7 @@ function be_cc_inbox_direct_table_from_values(array $values): array
         $rows[] = $row;
     }
     return [
-        'tab' => 'Inbox','header_row'=>$headerOffset + 1,'header'=>(array)($values[$headerOffset] ?? []),
+        'tab'=>$tab,'header_row'=>$headerOffset + 1,'header'=>(array)($values[$headerOffset] ?? []),
         'index'=>$index,'rows'=>$rows,'values'=>$values,
     ];
 }
@@ -74,24 +79,27 @@ function be_cc_inbox_direct_table_from_values(array $values): array
 function be_cc_inbox_direct_table(): array
 {
     $google = be_google_config();
-    $range = 'Inbox!A:ZZ';
+    $tab = be_cc_inbox_tab_name();
+    $range = be_cc_inbox_range('A:ZZ');
     $url = sprintf(
         'https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s?majorDimension=ROWS',
         rawurlencode($google['sheet_id']), rawurlencode($range)
     );
     $response = be_cc_inbox_direct_http_request('GET', $url);
-    return be_cc_inbox_direct_table_from_values(is_array($response['values'] ?? null) ? $response['values'] : []);
+    return be_cc_inbox_direct_table_from_values(is_array($response['values'] ?? null) ? $response['values'] : [], $tab);
 }
 
 function be_cc_inbox_direct_batch_body(array $table, int $rowNumber, array $updates): array
 {
+    $tab = trim((string)($table['tab'] ?? be_cc_inbox_tab_name()));
+    if ($tab === '') throw new RuntimeException('Der Inbox-Tab fehlt im Batch-Vertrag.');
     $data = [];
     foreach ($updates as $name => $value) {
         $position = $table['index'][be_cc_unicode_lower((string)$name)] ?? null;
         if (!is_int($position)) throw new RuntimeException('Inbox-Spalte fehlt: ' . $name);
         $column = be_cc_column_letter($position);
         $data[] = [
-            'range'=>'Inbox!' . $column . $rowNumber . ':' . $column . $rowNumber,
+            'range'=>$tab . '!' . $column . $rowNumber . ':' . $column . $rowNumber,
             'majorDimension'=>'ROWS','values'=>[[(string)$value]],
         ];
     }
@@ -145,6 +153,8 @@ function be_cc_inbox_direct_canonical_plan(array $table, int $rowNumber, array $
 {
     $aliases = be_cc_inbox_canonical_aliases();
     $index = (array)($table['index'] ?? []);
+    $tab = trim((string)($table['tab'] ?? be_cc_inbox_tab_name()));
+    if ($tab === '') throw new RuntimeException('Der Inbox-Tab fehlt im kanonischen Writeback-Vertrag.');
     $nextPosition = $index ? max(array_values($index)) + 1 : 0;
     $data = [];
     $columns = [];
@@ -169,13 +179,13 @@ function be_cc_inbox_direct_canonical_plan(array $table, int $rowNumber, array $
             $newHeaders[$canonical] = $columnName;
             $column = be_cc_column_letter($position);
             $data[] = [
-                'range'=>'Inbox!' . $column . (int)$table['header_row'] . ':' . $column . (int)$table['header_row'],
+                'range'=>$tab . '!' . $column . (int)$table['header_row'] . ':' . $column . (int)$table['header_row'],
                 'majorDimension'=>'ROWS','values'=>[[$columnName]],
             ];
         }
         $column = be_cc_column_letter($position);
         $data[] = [
-            'range'=>'Inbox!' . $column . $rowNumber . ':' . $column . $rowNumber,
+            'range'=>$tab . '!' . $column . $rowNumber . ':' . $column . $rowNumber,
             'majorDimension'=>'ROWS','values'=>[[trim((string)$value)]],
         ];
         $columns[$canonical] = ['column_name'=>$columnName,'position'=>$position,'value'=>trim((string)$value)];
@@ -217,7 +227,6 @@ function be_cc_verify_inbox_writeback_direct(array $source, array $expected): ar
     }
     throw new RuntimeException('Inbox-Writeback wurde nicht bestätigt. ' . ($lastError?->getMessage() ?? ''));
 }
-
 
 function be_cc_inbox_direct_source_fingerprint(array $payload): string
 {
