@@ -1,5 +1,5 @@
 import { state, els, escapeHtml, clean, setStatus, appPath, api, openDialog, closeDialog, reviewGroup, allReviewCases } from './shared.js?v=2026-07-15-control-center-editorial-v1';
-import { configureReview, renderReview } from './review.js?v=2026-07-15-control-center-editorial-v1';
+import { configureReview, renderReview } from './review.js?v=2026-07-16-inbox-writeback-v3';
 import { configureBacklog, renderBacklog } from './backlog.js?v=2026-07-15-control-center-editorial-v1';
 import { renderManage } from './manage.js?v=2026-07-15-control-center-editorial-v1';
 import { renderDevelopment } from './development.js?v=2026-07-15-control-center-editorial-v1';

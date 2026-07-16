@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/api/control-center/_editorial_runtime.php';
+require_once dirname(__DIR__) . '/api/control-center/_inbox_decision_writeback.php';
 
 $failures = [];
 $assert = static function(bool $condition, string $label) use (&$failures): void {
@@ -68,6 +69,8 @@ $duplicate = be_cc_editorial_validate_action($case, 'reject', ['decision_class'=
 $expectedDuplicateWriteback = be_cc_inbox_expected_writeback('reject', $duplicate);
 $assert($expectedDuplicateWriteback['status'] === 'verworfen', 'Ablehnung schreibt den kanonischen Inbox-Status verworfen.');
 $assert($expectedDuplicateWriteback['reason'] === 'Dublette', 'Ablehnung ohne Freitext schreibt das menschenlesbare Klassenlabel.');
+$directDuplicateUpdates = be_cc_inbox_direct_updates($expectedDuplicateWriteback);
+$assert($directDuplicateUpdates === ['status'=>'verworfen','ablehnungsgrund'=>'Dublette'], 'Direkter Ablehnungsplan schreibt Status und Grund atomar in die führende Inbox.');
 $verifiedDuplicate = be_cc_inbox_verify_writeback_row([
     'status'=>'verworfen',
     'ablehnungsgrund'=>'Dublette',
@@ -90,6 +93,9 @@ try {
 
 $snooze = be_cc_editorial_validate_action($case, 'snooze', ['decision_class'=>'snoozed','suppress_until'=>'2026-08-20']);
 $assert($snooze['decision_class'] === 'snoozed', 'Zurückstellung verwendet kanonische Klasse.');
+$expectedSnoozeWriteback = be_cc_inbox_expected_writeback('snooze', $snooze);
+$directSnoozeUpdates = be_cc_inbox_direct_updates($expectedSnoozeWriteback);
+$assert($directSnoozeUpdates['status'] === 'später prüfen', 'Wiedervorlage nutzt ebenfalls den direkten kanonischen Statuspfad.');
 
 $legacy = be_cc_editorial_operation_id([], $case['id'], 'approve');
 $assert($legacy['legacy'] === true && str_starts_with($legacy['id'], 'legacy:'), 'Alte UI bleibt über markierte Legacy-operation_id kompatibel.');
