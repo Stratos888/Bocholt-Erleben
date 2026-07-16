@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-/* === BEGIN FILE: api/growth-backlog/create.php | Zweck: legt manuelle Backlog-Notizen aus der mobilen Inbox dedupliziert im Growth_Backlog-Sheet an; Umfang: geschuetzter Create-Endpunkt ohne automatische Umsetzung === */
+/* === BEGIN FILE: api/growth-backlog/create.php | Zweck: legt manuelle Backlogpunkte strukturiert und dedupliziert im Growth_Backlog-Sheet an; Umfang: geschuetzter Create-Endpunkt ohne automatische Umsetzung === */
 
 require dirname(__DIR__) . '/_bootstrap.php';
 require dirname(__DIR__) . '/growth-backlog-lib.php';
@@ -15,9 +15,18 @@ $payload = json_decode((string)file_get_contents('php://input'), true);
 if (!is_array($payload)) $payload = [];
 
 $title = trim((string)($payload['title'] ?? ''));
-$type = 'Sonstiges';
-$note = trim((string)($payload['note'] ?? ''));
+$type = trim((string)($payload['type'] ?? 'Sonstiges')) ?: 'Sonstiges';
 $priority = mb_strtolower(trim((string)($payload['priority'] ?? 'mittel')), 'UTF-8');
+$whyRelevant = trim((string)($payload['why_relevant'] ?? $payload['note'] ?? ''));
+$recommendedAction = trim((string)($payload['recommended_action'] ?? ''));
+$expectedBenefit = trim((string)($payload['expected_benefit'] ?? ''));
+$acquisitionNote = trim((string)($payload['acquisition_note'] ?? ''));
+$shortReason = trim((string)($payload['short_reason'] ?? ''));
+if ($shortReason === '') {
+    $shortReason = $recommendedAction !== '' ? $recommendedAction : ($whyRelevant !== '' ? $whyRelevant : 'Manuell notiert');
+}
+$shortReason = mb_substr($shortReason, 0, 220, 'UTF-8');
+
 if (!in_array($priority, ['hoch', 'mittel', 'niedrig'], true)) $priority = 'mittel';
 if ($title === '') {
     be_json_response(422, ['status' => 'error', 'message' => 'Titel fehlt.']);
@@ -43,13 +52,13 @@ try {
         'cluster_key' => $clusterKey,
         'status' => 'open',
         'priority' => $priority,
-        'type' => $type !== '' ? $type : 'Sonstiges',
+        'type' => $type,
         'title' => $title,
-        'short_reason' => $note !== '' ? mb_substr($note, 0, 220, 'UTF-8') : 'Manuell notiert',
-        'why_relevant' => $note,
-        'recommended_action' => '',
-        'expected_benefit' => '',
-        'acquisition_note' => '',
+        'short_reason' => $shortReason,
+        'why_relevant' => $whyRelevant,
+        'recommended_action' => $recommendedAction,
+        'expected_benefit' => $expectedBenefit,
+        'acquisition_note' => $acquisitionNote,
         'source' => 'manual',
         'signals_json' => '{}',
         'created_at' => $now,

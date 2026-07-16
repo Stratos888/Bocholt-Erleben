@@ -85,4 +85,46 @@ function be_cc_ensure_schema(): void
           KEY idx_development_snapshots_created (created_at)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
+
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS control_operations (
+          operation_id VARCHAR(128) NOT NULL,
+          case_id CHAR(36) NOT NULL,
+          action VARCHAR(64) NOT NULL,
+          payload_hash CHAR(64) NOT NULL,
+          status ENUM('started','source_written','completed','failed') NOT NULL DEFAULT 'started',
+          result_json JSON NULL,
+          error_text TEXT NULL,
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          completed_at DATETIME NULL,
+          PRIMARY KEY (operation_id),
+          KEY idx_control_operations_case (case_id, created_at),
+          KEY idx_control_operations_status (status, updated_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
+
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS control_editorial_feedback (
+          id CHAR(36) NOT NULL,
+          case_id CHAR(36) NOT NULL,
+          object_id VARCHAR(191) NULL,
+          issue_code VARCHAR(128) NULL,
+          before_text MEDIUMTEXT NULL,
+          suggested_text MEDIUMTEXT NULL,
+          final_text MEDIUMTEXT NOT NULL,
+          diff_json JSON NULL,
+          categories_json JSON NULL,
+          decision_class VARCHAR(64) NOT NULL,
+          source_fingerprint VARCHAR(191) NULL,
+          content_fingerprint VARCHAR(191) NULL,
+          rule_version VARCHAR(128) NULL,
+          status ENUM('observation','candidate','active','disabled') NOT NULL DEFAULT 'observation',
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (id),
+          KEY idx_control_editorial_feedback_case (case_id, created_at),
+          KEY idx_control_editorial_feedback_status (status, created_at),
+          KEY idx_control_editorial_feedback_issue (issue_code, created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
 }

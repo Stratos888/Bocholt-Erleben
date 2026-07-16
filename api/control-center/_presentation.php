@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/_editorial_contracts.php';
+
 function be_cc_decode_payload(array $row): array
 {
     $raw = (string)($row['source_payload_json'] ?? '');
@@ -27,9 +29,15 @@ function be_cc_display_status(string $state): string
     };
 }
 
-function be_cc_action(string $key, string $label, bool $requiresInput = false, bool $destructive = false): array
+function be_cc_action(string $key, string $label, bool $requiresInput = false, bool $destructive = false, bool $enabled = true): array
 {
-    return ['key' => $key, 'label' => $label, 'requires_input' => $requiresInput, 'destructive' => $destructive];
+    return [
+        'key' => $key,
+        'label' => $label,
+        'requires_input' => $requiresInput,
+        'destructive' => $destructive,
+        'enabled' => $enabled,
+    ];
 }
 
 function be_cc_case_presentation(array $row): array
@@ -45,22 +53,50 @@ function be_cc_case_presentation(array $row): array
     $context = [];
     $links = [];
     $waitingFor = '';
+    $reviewContract = null;
 
     if ($source === 'inbox_feed') {
         $kind = (($payload['submission_kind'] ?? '') === 'activity') ? 'activity_candidate' : 'event_candidate';
         $group = 'new_content';
-        $primary = be_cc_action('approve', 'Übernehmen');
-        $secondary = [be_cc_action('snooze', 'Zurückstellen', true), be_cc_action('reject', 'Ablehnen', true, true)];
-        $context = [
-            'description' => (string)($payload['description'] ?? ''),
-            'date' => (string)($payload['date'] ?? ''),
-            'end_date' => (string)($payload['endDate'] ?? ''),
-            'time' => (string)($payload['time'] ?? ''),
-            'location' => (string)($payload['location'] ?? ''),
-            'city' => (string)($payload['city'] ?? ''),
-            'visual_key' => (string)($payload['visual_key'] ?? ''),
-            'duplicate_hint' => (string)($payload['matched_event_id'] ?? ''),
-        ];
+        if ($kind === 'event_candidate') {
+            $reviewContract = be_cc_event_candidate_review_contract($payload);
+            $ready = (bool)($reviewContract['decision_gate']['ready'] ?? false);
+            $primary = $ready
+                ? be_cc_action('approve', 'Übernehmen')
+                : be_cc_action('edit_and_approve', 'Bearbeiten und übernehmen');
+            $secondary = [];
+            if ($ready) $secondary[] = be_cc_action('edit_and_approve', 'Bearbeiten und übernehmen', true);
+            $secondary[] = be_cc_action('snooze', 'Zurückstellen', true);
+            $secondary[] = be_cc_action('reject', 'Ablehnen', true, true);
+            $secondary[] = be_cc_action('details', 'Quelldaten');
+            $context = [
+                'review_contract' => $reviewContract,
+                'description' => (string)($reviewContract['description']['final'] ?? ''),
+                'date' => (string)($reviewContract['facts']['date'] ?? ''),
+                'end_date' => (string)($reviewContract['facts']['end_date'] ?? ''),
+                'time' => (string)($reviewContract['facts']['time'] ?? ''),
+                'time_reason' => (string)($reviewContract['facts']['time_reason'] ?? ''),
+                'location' => (string)($reviewContract['facts']['location'] ?? ''),
+                'address' => (string)($reviewContract['facts']['address'] ?? ''),
+                'city' => (string)($reviewContract['facts']['city'] ?? ''),
+                'category' => (string)($reviewContract['classification']['category'] ?? ''),
+                'source_name' => (string)($reviewContract['source']['name'] ?? ''),
+                'source_url' => (string)($reviewContract['source']['url'] ?? ''),
+                'ticket_url' => (string)($reviewContract['source']['ticket_url'] ?? ''),
+                'visual_key' => (string)($reviewContract['visual']['key'] ?? ''),
+                'visual_motif' => (string)($reviewContract['visual']['motif'] ?? ''),
+                'duplicate_hint' => (string)($reviewContract['dedupe']['matched_event_id'] ?? ''),
+                'decision_gate' => $reviewContract['decision_gate'] ?? [],
+            ];
+        } else {
+            $primary = be_cc_action('approve', 'Übernehmen');
+            $secondary = [
+                be_cc_action('snooze', 'Zurückstellen', true),
+                be_cc_action('reject', 'Ablehnen', true, true),
+                be_cc_action('details', 'Quelldaten'),
+            ];
+            $context = ['description' => (string)($payload['description'] ?? '')];
+        }
         $url = trim((string)($payload['source_url'] ?? $payload['url'] ?? ''));
         if ($url !== '') $links[] = ['label' => 'Offizielle Quelle', 'url' => $url];
     } elseif ($source === 'submission_db') {
@@ -81,6 +117,7 @@ function be_cc_case_presentation(array $row): array
         if ($primary !== null) {
             $secondary[] = be_cc_action('snooze', 'Zurückstellen', true);
             $secondary[] = be_cc_action('reject', 'Ablehnen', true, true);
+            $secondary[] = be_cc_action('details', 'Details');
         }
         $context = [
             'submission_status' => $submissionStatus,
@@ -97,10 +134,10 @@ function be_cc_case_presentation(array $row): array
         $group = 'quality';
         if (str_contains($issueCode, 'description')) {
             $kind = 'content_description_correction';
-            $primary = be_cc_action('approve', 'Korrigieren und übernehmen', true);
+            $primary = be_cc_action('edit_and_approve', 'Korrigieren und übernehmen', true);
         } elseif (str_contains($issueCode, 'source') || str_contains($issueCode, 'ticket_url')) {
             $kind = 'content_source_correction';
-            $primary = be_cc_action('approve', 'Quelle korrigieren', true);
+            $primary = be_cc_action('edit_and_approve', 'Quelle korrigieren', true);
         } elseif (str_contains($issueCode, 'fact') || str_contains($issueCode, 'evidence')) {
             $kind = 'content_fact_check';
             $primary = be_cc_action('approve', 'Als korrekt bestätigen');
@@ -108,12 +145,17 @@ function be_cc_case_presentation(array $row): array
             $kind = 'content_quality_review';
             $primary = be_cc_action('approve', 'Prüfung abschließen');
         }
-        $secondary = [be_cc_action('snooze', 'Zurückstellen', true), be_cc_action('reject', 'Ablehnen', true, true)];
+        $secondary = [
+            be_cc_action('snooze', 'Zurückstellen', true),
+            be_cc_action('reject', 'Ablehnen', true, true),
+            be_cc_action('details', 'Details'),
+        ];
         $context = [
             'issue_code' => (string)($payload['issue_code'] ?? ''),
             'issue_text' => (string)($payload['issue_text'] ?? ''),
             'recommended_action' => (string)($payload['recommended_action'] ?? ''),
             'current_description' => (string)($payload['description'] ?? ''),
+            'suggested_description' => (string)($payload['suggested_description'] ?? $payload['replacement_text'] ?? ''),
             'suggested_url' => (string)($payload['suggested_url'] ?? ''),
             'source_url' => (string)($payload['source_url'] ?? ''),
             'content_type' => (string)($payload['content_type'] ?? ''),
@@ -173,6 +215,7 @@ function be_cc_case_presentation(array $row): array
         'primary_action' => $primary,
         'secondary_actions' => $secondary,
         'decision_context' => $context,
+        'review_contract' => $reviewContract,
         'source_links' => $links,
         'waiting_for' => $waitingFor,
     ];
