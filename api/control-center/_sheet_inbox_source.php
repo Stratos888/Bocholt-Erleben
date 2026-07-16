@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_sources.php';
 require_once __DIR__ . '/_editorial_contracts.php';
+require_once __DIR__ . '/_inbox_tab.php';
 
 function be_cc_sync_sheet_inbox(): array
 {
-    $response = be_google_sheets_values_get('Inbox!A:ZZ');
+    $tab = be_cc_inbox_tab_name();
+    $response = be_google_sheets_values_get(be_cc_inbox_range('A:ZZ'));
     $values = is_array($response['values'] ?? null) ? $response['values'] : [];
-    if (count($values) < 2) return ['seen'=>0,'upserted'=>0,'reconciled'=>0,'source'=>'sheet'];
+    if (count($values) < 2) return ['seen'=>0,'upserted'=>0,'reconciled'=>0,'source'=>'sheet','tab'=>$tab];
 
     $headerOffset=-1;$index=[];
     foreach($values as $offset=>$row){
@@ -16,7 +18,7 @@ function be_cc_sync_sheet_inbox(): array
         $normalized=array_map(static fn($value):string=>be_cc_unicode_lower(trim((string)$value)),$row);
         if(in_array('title',$normalized,true)&&in_array('status',$normalized,true)){$headerOffset=(int)$offset;$index=array_flip($normalized);break;}
     }
-    if($headerOffset<0)throw new RuntimeException('Der führende Inbox-Tab besitzt keinen erkennbaren Header.');
+    if($headerOffset<0)throw new RuntimeException('Der führende '.$tab.'-Tab besitzt keinen erkennbaren Header.');
     $cell=static function(array $row,array $names)use($index):string{foreach($names as $name){$position=$index[be_cc_unicode_lower($name)]??null;if(is_int($position)&&isset($row[$position])){$value=trim((string)$row[$position]);if($value!=='')return $value;}}return '';};
 
     $seen=$upserted=$reconciled=0;
@@ -29,9 +31,9 @@ function be_cc_sync_sheet_inbox(): array
         $reference=$cell($row,['id_suggestion','id','event_id','source_url','url']);
         if($reference==='')$reference='sheet-row-'.(string)($i+1);
         $terminal=be_cc_source_terminal_target('inbox_feed',$status);
-        if($terminal!==null){$reconciled+=be_cc_reconcile_source_case(be_db(),'inbox_feed',$reference,$terminal,['source_status'=>$status,'sheet_row'=>$i+1]);continue;}
+        if($terminal!==null){$reconciled+=be_cc_reconcile_source_case(be_db(),'inbox_feed',$reference,$terminal,['source_status'=>$status,'sheet_row'=>$i+1,'sheet_tab'=>$tab]);continue;}
         if(!in_array($status,['review','open','new','pending','später prüfen','spaeter pruefen','snoozed'],true)||$title==='')continue;
-        $payload=[];foreach($index as $name=>$position)$payload[$name]=isset($row[$position])?trim((string)$row[$position]):'';$payload['row_number']=$i+1;
+        $payload=[];foreach($index as $name=>$position)$payload[$name]=isset($row[$position])?trim((string)$row[$position]):'';$payload['row_number']=$i+1;$payload['sheet_tab']=$tab;
         $review=be_cc_event_candidate_review_contract($payload);
         $openCount=count((array)($review['decision_gate']['blockers']??[]));
         be_cc_upsert_source_case([
@@ -44,8 +46,8 @@ function be_cc_sync_sheet_inbox(): array
         $upserted++;
         if(in_array($status,['später prüfen','spaeter pruefen','snoozed'],true)){
             $until=$cell($row,['next_review_at','next_check_at','snoozed_until','recheck_at']);
-            $reconciled+=be_cc_reconcile_source_snooze(be_db(),'inbox_feed',$reference,$until,['source_status'=>$status,'sheet_row'=>$i+1]);
+            $reconciled+=be_cc_reconcile_source_snooze(be_db(),'inbox_feed',$reference,$until,['source_status'=>$status,'sheet_row'=>$i+1,'sheet_tab'=>$tab]);
         }
     }
-    return ['seen'=>$seen,'upserted'=>$upserted,'reconciled'=>$reconciled,'source'=>'sheet'];
+    return ['seen'=>$seen,'upserted'=>$upserted,'reconciled'=>$reconciled,'source'=>'sheet','tab'=>$tab];
 }
