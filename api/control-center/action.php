@@ -9,6 +9,7 @@ require_once __DIR__ . '/_process_chain.php';
 require_once __DIR__ . '/_editorial_runtime.php';
 require_once __DIR__ . '/_inbox_decision_writeback.php';
 require_once __DIR__ . '/_verified_source_writeback.php';
+require_once __DIR__ . '/_activity_audit_writeback.php';
 require_once __DIR__ . '/_source_reconciliation.php';
 
 be_require_review_access();
@@ -130,7 +131,11 @@ try {
             $writebackMeta['source_verified'] = true;
         }
     } elseif ($sourceSystem === 'content_audit' && $editorialAction) {
-        $writebackMeta = be_cc_writeback_audit_verified($case, $action, $payload, $decision);
+        $auditSource = be_cc_editorial_payload($case);
+        $contentType = be_cc_source_state_token($auditSource['content_type'] ?? $case['object_type'] ?? 'event');
+        $writebackMeta = $contentType === 'activity'
+            ? be_cc_writeback_activity_audit_verified($case, $action, $payload, $decision)
+            : be_cc_writeback_audit_verified($case, $action, $payload, $decision);
         be_cc_record_editorial_feedback($pdo, $case, $decision, $payload);
     } elseif ($editorialAction) {
         be_cc_apply_source_writeback($case, $action, $payload);
