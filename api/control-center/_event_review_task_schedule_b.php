@@ -6,8 +6,8 @@
         if ($timeStatus === '') {
             $tasks[] = be_cc_review_task([
                 'task_id'=>'time.status','finding_code'=>'time_missing','field_scope'=>['time','time_status','time_details'],
-                'title'=>'Beginnzeit klären','message'=>'Die offizielle Quelle enthält noch keine typisierte Beginnzeit.',
-                'evidence'=>be_cc_review_evidence($payload, 'time', $legacyTimeReason, $legacyTimeReason !== '' ? 'human_required' : 'unverifiable', $legacyTimeReason !== '' ? 'Ein vorhandener Freitext ist noch kein verlässlicher Zeitstatus.' : 'Keine Beginnzeit gefunden.'),
+                'title'=>'Beginnzeit klären','message'=>'In den führenden Eventdaten ist noch keine typisierte Beginnzeit gespeichert. Prüfe die verlinkte offizielle Quelle, bevor du eine Uhrzeit oder einen Zeitstatus festlegst.',
+                'evidence'=>be_cc_review_evidence($payload, 'time', $legacyTimeReason, $legacyTimeReason !== '' ? 'human_required' : 'unverifiable', $legacyTimeReason !== '' ? 'Ein vorhandener Freitext ist noch kein verlässlicher Zeitstatus.' : 'Keine Beginnzeit in den führenden Eventdaten gefunden.'),
                 'actions'=>[
                     be_cc_review_action('set_fixed_time','Uhrzeit eintragen',[be_cc_review_field('time','Beginn','time')],['time_status'=>'fixed_time']),
                     be_cc_review_action('set_time_status','Zeitstatus speichern',[
