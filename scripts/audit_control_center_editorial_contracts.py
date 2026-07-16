@@ -14,6 +14,8 @@ editorial=json.loads(read('data/control_center_editorial_contract.json') or '{}'
 decisions=json.loads(read('data/content_ops_decision_classes.json') or '{}')
 required_files=[
     'api/control-center/_decision_contract.php','api/control-center/_editorial_contracts.php','api/control-center/_event_review_tasks.php',
+    'api/control-center/_event_review_task_support.php','api/control-center/_event_review_task_schedule_a.php','api/control-center/_event_review_task_schedule_b.php',
+    'api/control-center/_event_review_task_details.php','api/control-center/_event_review_task_visual.php','api/control-center/_event_review_task_result.php',
     'api/control-center/_event_review_writeback.php','api/control-center/_inbox_decision_writeback.php','api/control-center/_sheet_identity.php',
     'api/control-center/_operations.php','api/control-center/_editorial_feedback.php','tests/fixtures/control_center_editorial_cases.json',
     'tests/control_center_editorial_contracts_test.php','tests/control_center_exception_review_runtime_test.php',
@@ -28,8 +30,14 @@ for section in ('approve_classes','reject_classes'):
 if editorial.get('decisions',{}).get('snooze_class') not in classes:errors.append('Snooze-Klasse fehlt in kanonischer Taxonomie.')
 for required in ('evidence_states','task_states','time_statuses','finding_groups'):
     if not editorial.get('event_candidate',{}).get(required):errors.append(f'Eventvertrag enthält keine {required}.')
+task_contract='\n'.join(contents.get(path,'') for path in [
+    'api/control-center/_event_review_tasks.php','api/control-center/_event_review_task_support.php',
+    'api/control-center/_event_review_task_schedule_a.php','api/control-center/_event_review_task_schedule_b.php',
+    'api/control-center/_event_review_task_details.php','api/control-center/_event_review_task_visual.php','api/control-center/_event_review_task_result.php',
+])
+contents['event_review_task_contract']=task_contract
 markers={
-    'api/control-center/_event_review_tasks.php':['review_tasks','task_revision','time_not_published','visual_asset_id','visual_gap_id','field_evidence'],
+    'event_review_task_contract':['review_tasks','task_revision','time_not_published','visual_asset_id','visual_gap_id','field_evidence'],
     'api/control-center/_event_review_writeback.php':['be_cc_resolve_event_review_task','source_verified','be_cc_event_candidate_review_contract','review_task_resolved'],
     'api/control-center/_inbox_decision_writeback.php':['be_cc_inbox_direct_canonical_plan','Inbox!A:ZZ','expectedSourceFingerprint'],
     'api/control-center/_sheet_identity.php':['be_cc_resolve_inbox_row','be_cc_resolve_audit_row','validated_row_hint','superseded_audit_row'],
