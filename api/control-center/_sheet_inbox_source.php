@@ -76,6 +76,14 @@ function be_cc_sync_sheet_inbox(): array
             'decision_ready' => true,
         ]);
         $upserted++;
+
+        if (in_array($status, ['später prüfen','spaeter pruefen','snoozed'], true)) {
+            $until = $cell($row, ['next_review_at','next_check_at','snoozed_until','recheck_at']);
+            $reconciled += be_cc_reconcile_source_snooze(be_db(), 'inbox_feed', $reference, $until, [
+                'source_status' => $status,
+                'sheet_row' => $i + 1,
+            ]);
+        }
     }
 
     return ['seen' => $seen, 'upserted' => $upserted, 'reconciled' => $reconciled, 'source' => 'sheet'];
