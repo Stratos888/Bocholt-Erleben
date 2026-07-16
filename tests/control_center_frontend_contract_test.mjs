@@ -19,7 +19,7 @@ const backlogUpdate = read('api/growth-backlog/update.php');
 const errors = [];
 for (const asset of ['control-center-environment.js','control-center.js','control-center-seo-embed.js']) if (!html.includes(asset)) errors.push(`required script missing: ${asset}`);
 for (const asset of ['control-center-source-editors.js','control-center-final-bridge.js','control-center-stability.js','control-center-publication.js','control-center-development.js','control-center-integrations.js']) if (html.includes(asset)) errors.push(`overlay controller still loaded: ${asset}`);
-for (const marker of ['control-center/app.js','import(path)']) if (!loader.includes(marker)) errors.push(`module loader missing: ${marker}`);
+for (const marker of ['control-center/app.js','import(path)','2026-07-16-backlog-editor-v2']) if (!loader.includes(marker)) errors.push(`module loader missing: ${marker}`);
 for (const marker of ['edit_and_approve','decision_class','operation_id','Ablehnungsgrund auswählen','source_fingerprint','content_fingerprint','current_description_hash','data-manage-details','Live öffnen','Öffentliche Wirkung wird geprüft · Versuch','be_cc_draft:','Automatisierte Verbesserung','Promise.allSettled']) if (!modules.includes(marker) && !caseApi.includes(marker)) errors.push(`frontend contract missing: ${marker}`);
 for (const marker of ['review_contract','be_cc_event_candidate_review_contract','edit_and_approve']) if (!presentation.includes(marker) && !caseApi.includes(marker)) errors.push(`presentation contract missing: ${marker}`);
 for (const marker of ['/api/growth-backlog/list.php','configureBacklog','renderBacklog']) if (!app.includes(marker)) errors.push(`backlog module integration missing: ${marker}`);
