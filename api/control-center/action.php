@@ -11,6 +11,7 @@ require_once __DIR__ . '/_inbox_decision_writeback.php';
 require_once __DIR__ . '/_verified_source_writeback.php';
 require_once __DIR__ . '/_activity_audit_writeback.php';
 require_once __DIR__ . '/_source_reconciliation.php';
+require_once __DIR__ . '/_event_review_writeback.php';
 
 be_require_review_access();
 
@@ -76,14 +77,10 @@ try {
     $decision = $editorialAction ? be_cc_editorial_validate_action($case, $action, $payload) : null;
     if (is_array($decision)) {
         $payload = array_merge($payload, [
-            'decision_class'=>$decision['decision_class'],
-            'decision_note'=>$decision['decision_note'],
-            'suppress_until'=>$decision['suppress_until'],
-            'recheck_at'=>$decision['recheck_at'],
-            'reopen_policy'=>$decision['reopen_policy'],
-            'source_fingerprint'=>$decision['source_fingerprint'],
-            'content_fingerprint'=>$decision['content_fingerprint'],
-            'event_updates'=>$decision['event_updates'],
+            'decision_class'=>$decision['decision_class'],'decision_note'=>$decision['decision_note'],
+            'suppress_until'=>$decision['suppress_until'],'recheck_at'=>$decision['recheck_at'],
+            'reopen_policy'=>$decision['reopen_policy'],'source_fingerprint'=>$decision['source_fingerprint'],
+            'content_fingerprint'=>$decision['content_fingerprint'],'event_updates'=>$decision['event_updates'],
         ]);
     }
 
@@ -100,6 +97,13 @@ try {
         }
         if ((string)$row['status'] === 'failed') throw new RuntimeException((string)($row['error_text'] ?? 'Der frühere Vorgang ist fehlgeschlagen.'));
         throw new RuntimeException('Dieser Vorgang wird bereits verarbeitet.');
+    }
+
+    if ($sourceSystem === 'inbox_feed' && $action === 'resolve_review_task') {
+        $result = be_cc_resolve_event_review_task($pdo, $case, $payload, $operationId);
+        if (empty($result['completion']['source_verified'])) throw new RuntimeException('Die Event-Teilaktion wurde von der führenden Quelle nicht bestätigt.');
+        be_cc_operation_finish($pdo, $operationId, 'completed', $result);
+        be_json_response(200, ['status'=>'ok','data'=>$result]);
     }
 
     $effectiveAction = $action;
@@ -154,11 +158,7 @@ try {
     $expectedState = be_cc_action_expected_local_state($action, $effectiveAction);
     $local = $expectedState !== null ? be_cc_assert_case_postcondition($pdo, $caseId, $expectedState) : ['verified'=>true,'state'=>$result['state'] ?? ''];
     $result['writeback'] = $writebackMeta;
-    $result['completion'] = [
-        'complete' => true,
-        'source_verified' => true,
-        'local' => $local,
-    ];
+    $result['completion'] = ['complete'=>true,'source_verified'=>true,'local'=>$local];
     be_cc_operation_finish($pdo, $operationId, 'completed', $result);
     be_json_response(200, ['status'=>'ok','data'=>$result]);
 } catch (InvalidArgumentException|DomainException $error) {
