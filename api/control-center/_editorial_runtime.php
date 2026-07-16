@@ -151,6 +151,71 @@ function be_cc_update_sheet_row_canonical(string $tab, int $headerRow, int $rowN
     return $written;
 }
 
+function be_cc_inbox_rejection_reason(array $decision): string
+{
+    $note = trim((string)($decision['decision_note'] ?? ''));
+    if ($note !== '') return $note;
+    $label = trim((string)($decision['meta']['label'] ?? ''));
+    if ($label !== '') return $label;
+    return trim((string)($decision['decision_class'] ?? 'Abgelehnt'));
+}
+
+function be_cc_inbox_expected_writeback(string $action, array $decision): array
+{
+    return match ($action) {
+        'approve' => ['action'=>'approve', 'status'=>'übernommen', 'reason'=>''],
+        'reject' => ['action'=>'reject', 'status'=>'verworfen', 'reason'=>be_cc_inbox_rejection_reason($decision)],
+        'snooze' => ['action'=>'snooze', 'status'=>'später prüfen', 'reason'=>trim((string)($decision['decision_note'] ?? ''))],
+        default => throw new InvalidArgumentException('Unbekannter Inbox-Writeback: ' . $action),
+    };
+}
+
+function be_cc_inbox_verify_writeback_row(array $row, array $expected): array
+{
+    $expectedStatus = be_cc_decision_token($expected['status'] ?? '');
+    $actualStatus = be_cc_decision_token(be_cc_contract_value($row, ['status'], ''));
+    if ($expectedStatus === '' || $actualStatus !== $expectedStatus) {
+        throw new RuntimeException(sprintf(
+            'Inbox-Writeback konnte nicht bestätigt werden: erwartet "%s", gefunden "%s".',
+            (string)($expected['status'] ?? ''),
+            (string)be_cc_contract_value($row, ['status'], '')
+        ));
+    }
+
+    $expectedReason = trim((string)($expected['reason'] ?? ''));
+    $actualReason = trim((string)be_cc_contract_value($row, ['ablehnungsgrund','rejection_reason','decision_note'], ''));
+    if ($expectedReason !== '' && be_cc_identity_text($actualReason) !== be_cc_identity_text($expectedReason)) {
+        throw new RuntimeException('Inbox-Writeback konnte nicht bestätigt werden: Der gespeicherte Ablehnungsgrund stimmt nicht mit der Entscheidung überein.');
+    }
+
+    return [
+        'verified'=>true,
+        'status'=>(string)be_cc_contract_value($row, ['status'], ''),
+        'reason'=>$actualReason,
+    ];
+}
+
+function be_cc_verify_inbox_writeback(array $source, array $expected, int $maxAttempts = 4): array
+{
+    $identity = be_cc_inbox_identity($source);
+    $lastError = null;
+    for ($attempt = 1; $attempt <= max(1, $maxAttempts); $attempt++) {
+        try {
+            $table = be_cc_sheet_table('Inbox!A:AZ');
+            $resolution = be_cc_resolve_inbox_row($table['rows'], $identity);
+            if (($resolution['status'] ?? '') !== 'resolved') {
+                throw new RuntimeException((string)($resolution['message'] ?? 'Inbox-Datensatz konnte nach dem Writeback nicht eindeutig zurückgelesen werden.'));
+            }
+            $verified = be_cc_inbox_verify_writeback_row((array)($resolution['row'] ?? []), $expected);
+            return ['attempts'=>$attempt, 'resolution'=>$resolution, 'verified_row'=>$verified];
+        } catch (RuntimeException $error) {
+            $lastError = $error;
+            if ($attempt < $maxAttempts) usleep(250000);
+        }
+    }
+    throw new RuntimeException('Inbox-Writeback wurde von der führenden Quelle nicht bestätigt. ' . ($lastError?->getMessage() ?? ''));
+}
+
 function be_cc_writeback_inbox_stable(array $case,string $action,array $payload,array $decision):array
 {
     $source=be_cc_editorial_payload($case);
@@ -160,13 +225,15 @@ function be_cc_writeback_inbox_stable(array $case,string $action,array $payload,
     $rowNumber=(int)$resolution['row_number'];
     $written=[];
     if($action==='approve'&&$decision['event_updates'])$written=be_cc_update_sheet_row_canonical('Inbox',(int)$table['header_row'],$rowNumber,$decision['event_updates']);
+    $expected=be_cc_inbox_expected_writeback($action,$decision);
     $token=be_cc_inbox_token();
     if($action==='approve')$result=be_cc_jsonp_request(['action'=>'approve','token'=>$token,'row_number'=>(string)$rowNumber]);
-    elseif($action==='reject')$result=be_cc_jsonp_request(['action'=>'setStatus','token'=>$token,'row_number'=>(string)$rowNumber,'status'=>'verwerfen','ablehnungsgrund'=>$decision['decision_note']?:$decision['decision_class']]);
-    elseif($action==='snooze')$result=be_cc_jsonp_request(['action'=>'setStatus','token'=>$token,'row_number'=>(string)$rowNumber,'status'=>'später prüfen','ablehnungsgrund'=>$decision['decision_note']]);
+    elseif($action==='reject')$result=be_cc_jsonp_request(['action'=>'setStatus','token'=>$token,'row_number'=>(string)$rowNumber,'status'=>$expected['status'],'ablehnungsgrund'=>$expected['reason']]);
+    elseif($action==='snooze')$result=be_cc_jsonp_request(['action'=>'setStatus','token'=>$token,'row_number'=>(string)$rowNumber,'status'=>$expected['status'],'ablehnungsgrund'=>$expected['reason']]);
     else return ['resolution'=>$resolution,'written_fields'=>$written];
     if(empty($result['ok']))throw new RuntimeException('Inbox writeback failed: '.trim((string)($result['error']??$result['detail']??'unknown_error')));
-    return ['resolution'=>$resolution,'written_fields'=>$written];
+    $verification=be_cc_verify_inbox_writeback($source,$expected);
+    return ['resolution'=>$resolution,'written_fields'=>$written,'expected'=>$expected,'verification'=>$verification];
 }
 
 function be_cc_writeback_audit_stable(array $case,string $action,array $payload,array $decision):array
