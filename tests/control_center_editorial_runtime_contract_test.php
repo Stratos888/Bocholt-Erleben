@@ -70,7 +70,19 @@ $expectedDuplicateWriteback = be_cc_inbox_expected_writeback('reject', $duplicat
 $assert($expectedDuplicateWriteback['status'] === 'verworfen', 'Ablehnung schreibt den kanonischen Inbox-Status verworfen.');
 $assert($expectedDuplicateWriteback['reason'] === 'Dublette', 'Ablehnung ohne Freitext schreibt das menschenlesbare Klassenlabel.');
 $directDuplicateUpdates = be_cc_inbox_direct_updates($expectedDuplicateWriteback);
-$assert($directDuplicateUpdates === ['status'=>'verworfen','ablehnungsgrund'=>'Dublette'], 'Direkter Ablehnungsplan schreibt Status und Grund atomar in die führende Inbox.');
+$assert($directDuplicateUpdates === ['status'=>'verworfen','ablehnungsgrund'=>'Dublette'], 'Direkter Ablehnungsplan schreibt Status und Grund in die führende Inbox.');
+$fixtureTable = be_cc_inbox_direct_table_from_values([
+    ['status','ablehnungsgrund','id_suggestion','title','date','source_url'],
+    ['review','','fixture-event-1','Fixture Event','2026-08-15','https://example.org/events/fixture'],
+]);
+$assert($fixtureTable['header_row'] === 1 && count($fixtureTable['rows']) === 1, 'Inbox-spezifischer Header mit id_suggestion wird erkannt.');
+$batchBody = be_cc_inbox_direct_batch_body($fixtureTable, 2, $directDuplicateUpdates);
+$assert(($batchBody['valueInputOption'] ?? '') === 'RAW', 'Direkter Writeback verwendet RAW-Werte.');
+$assert(count($batchBody['data'] ?? []) === 2, 'Status und Ablehnungsgrund werden in einem Batch geplant.');
+$assert(($batchBody['data'][0]['range'] ?? '') === 'Inbox!A2:A2', 'Status-Zielzelle wird korrekt geplant.');
+$assert(($batchBody['data'][1]['range'] ?? '') === 'Inbox!B2:B2', 'Ablehnungsgrund-Zielzelle wird korrekt geplant.');
+$assert(BE_CC_INBOX_DIRECT_HTTP_TIMEOUT_SECONDS <= 8, 'Jeder direkte Google-Aufruf besitzt ein kurzes hartes Zeitlimit.');
+$assert(BE_CC_INBOX_DIRECT_VERIFY_ATTEMPTS === 2, 'Rückleseprüfung ist auf zwei Versuche begrenzt.');
 $verifiedDuplicate = be_cc_inbox_verify_writeback_row([
     'status'=>'verworfen',
     'ablehnungsgrund'=>'Dublette',
