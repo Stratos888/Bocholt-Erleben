@@ -12,6 +12,7 @@ on:
       - "api/control-center/_editorial_runtime.php"
       - "api/control-center/_source_reconciliation.php"
       - "api/control-center/_verified_source_writeback.php"
+      - "api/control-center/_activity_audit_writeback.php"
       - "api/control-center/_inbox_decision_writeback.php"
       - "api/control-center/_sheet_inbox_source.php"
       - "api/control-center/_submission_source.php"
@@ -59,6 +60,7 @@ jobs:
           php -l api/control-center/_editorial_runtime.php
           php -l api/control-center/_source_reconciliation.php
           php -l api/control-center/_verified_source_writeback.php
+          php -l api/control-center/_activity_audit_writeback.php
           php -l api/control-center/_inbox_decision_writeback.php
           php -l api/control-center/_sheet_inbox_source.php
           php -l api/control-center/_submission_source.php
