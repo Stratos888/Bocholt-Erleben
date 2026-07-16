@@ -64,6 +64,30 @@ try {
     $failures[] = 'Ablehnung ohne decision_class wurde akzeptiert.';
 } catch (InvalidArgumentException $expected) {}
 
+$duplicate = be_cc_editorial_validate_action($case, 'reject', ['decision_class'=>'duplicate']);
+$expectedDuplicateWriteback = be_cc_inbox_expected_writeback('reject', $duplicate);
+$assert($expectedDuplicateWriteback['status'] === 'verworfen', 'Ablehnung schreibt den kanonischen Inbox-Status verworfen.');
+$assert($expectedDuplicateWriteback['reason'] === 'Dublette', 'Ablehnung ohne Freitext schreibt das menschenlesbare Klassenlabel.');
+$verifiedDuplicate = be_cc_inbox_verify_writeback_row([
+    'status'=>'verworfen',
+    'ablehnungsgrund'=>'Dublette',
+], $expectedDuplicateWriteback);
+$assert(($verifiedDuplicate['verified'] ?? false) === true, 'Kanonischer Status und Grund werden als bestätigter Writeback erkannt.');
+try {
+    be_cc_inbox_verify_writeback_row([
+        'status'=>'review',
+        'ablehnungsgrund'=>'',
+    ], $expectedDuplicateWriteback);
+    $failures[] = 'Unveränderte Inbox-Zeile wurde fälschlich als bestätigter Writeback akzeptiert.';
+} catch (RuntimeException $expected) {}
+try {
+    be_cc_inbox_verify_writeback_row([
+        'status'=>'verworfen',
+        'ablehnungsgrund'=>'Redaktionell zu schwach',
+    ], $expectedDuplicateWriteback);
+    $failures[] = 'Abweichender Ablehnungsgrund wurde fälschlich als bestätigter Writeback akzeptiert.';
+} catch (RuntimeException $expected) {}
+
 $snooze = be_cc_editorial_validate_action($case, 'snooze', ['decision_class'=>'snoozed','suppress_until'=>'2026-08-20']);
 $assert($snooze['decision_class'] === 'snoozed', 'Zurückstellung verwendet kanonische Klasse.');
 
