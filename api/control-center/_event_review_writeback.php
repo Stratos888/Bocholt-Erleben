@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 /** Verified partial writeback for one event-review task without closing the case. */
+const BE_CC_REVIEW_TASK_RECHECK_PROCESS = 'review_contract_recheck';
 
 function be_cc_review_runtime_find_task(array $contract, string $taskId): array
 {
@@ -269,7 +270,7 @@ function be_cc_resolve_event_review_task(PDO $pdo, array $case, array $payload, 
         'completion'=>[
             'complete'=>true,'partial'=>true,'source_verified'=>true,
             'local'=>be_cc_review_runtime_completion($localRow, true),
-            'postcondition'=>['target_task_closed'=>!is_array($targetTask) || $waiting,'review_recalculated'=>true],
+            'postcondition'=>['target_task_closed'=>!is_array($targetTask) || $waiting,'review_recalculated'=>true,'process'=>BE_CC_REVIEW_TASK_RECHECK_PROCESS],
         ],
     ];
 }
