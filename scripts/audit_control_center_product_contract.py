@@ -8,7 +8,7 @@ def require(text,marker,message,errors):
 errors=[]
 html=read('steuerzentrale/index.html')
 loader=read('js/control-center.js')
-modules='\n'.join(read(f'js/control-center/{name}.js') for name in ['shared','app','review','review-render','review-actions','manage','manage-render','manage-actions','development'])
+modules='\n'.join(read(f'js/control-center/{name}.js') for name in ['shared','app','backlog','review','review-render','review-actions','manage','manage-render','manage-actions','development'])
 environment=read('js/control-center-environment.js')
 seo_embed=read('js/control-center-seo-embed.js')
 style=read('css/style.css')
@@ -39,6 +39,8 @@ github_repo=read('api/control-center/_github_repo.php')
 public_events=read('api/events/public.php')
 backlog_api=read('api/growth-backlog/list.php')
 backlog_lib=read('api/growth-backlog-lib.php')
+backlog_create=read('api/growth-backlog/create.php')
+backlog_update=read('api/growth-backlog/update.php')
 seo_dashboard=read('intern/seo-dashboard/index.php')
 manifest=read('data/control_center_repo_workpacks.json')
 for label in ['Übersicht','Prüfen','Backlog','Verwaltung','Entwicklung']:
@@ -54,16 +56,18 @@ require(style,'control-center-editorial.css','Redaktionelle CSS-Governance fehlt
 for label,marker in {
     'vollständige Eventkarte':'cc-fact-grid','Entscheidungsgate':'decision_gate','Bearbeiten und übernehmen':'edit_and_approve',
     'typisierte Ablehnung':'Ablehnungsgrund auswählen','stabile operation_id':'operation_id','konfliktfester Entwurf':'be_cc_draft:',
-    'vollständige Backlog-Roadmap':'Informations- und Reihenfolgeansicht','Backlog-Zweistatus':'Offen · empfohlene Reihenfolge',
+    'vollständiger Backlog':'Offen · empfohlene Reihenfolge','kompakte Backlogzeilen':'cc-roadmap-row',
+    'sichtbare Backlogbearbeitung':'Details &amp; Bearbeiten','neuer Backlogpunkt':'cc-backlog-new',
     'getrennte Verwaltungsquellen':'Promise.allSettled','Verwaltungsdetails':'data-manage-details','exakter Live-Link':'Live öffnen',
     'verständlicher Publikationsstatus':'Öffentliche Wirkung wird geprüft · Versuch',
     'Projektstatus':'operator_status','Wirkungsansicht':'Automatisierte Verbesserung','SEO-Embed':"appPath('/intern/seo-dashboard/?embed=1')",
 }.items(): require(modules+css,marker,f'Frontendvertrag fehlt: {label}',errors)
+if 'cc-roadmap-summary' in read('js/control-center/backlog.js'): errors.append('Backlog enthält weiterhin den unerwünschten Informationsblock.')
 if 'new MutationObserver(' in modules: errors.append('Fachmodule verwenden weiterhin DOM-Überlagerungen.')
 if '/data/events.json' in modules: errors.append('Verwaltung liest direkt den öffentlichen Eventfeed.')
 if 'Speichern und veröffentlichen' in modules: errors.append('UI behauptet Veröffentlichung vor Bestätigung.')
-for forbidden in ['data-backlog-action','cc-new-backlog','submitBacklog(','handleBacklog(']:
-    if forbidden in modules: errors.append(f'Backlog ist weiterhin als Arbeitsliste implementiert: {forbidden}')
+for forbidden in ['data-backlog-action','submitBacklog(','handleBacklog(']:
+    if forbidden in modules: errors.append(f'Backlog ist weiterhin als generische Arbeitsliste implementiert: {forbidden}')
 for label,marker,text in [
     ('Session-Fixation','session_regenerate_id',auth),('HttpOnly',"'httponly' => true",auth),('SameSite',"'samesite' => 'Lax'",auth),
     ('gemeinsame SEO-Session','BE_INTERNAL_SEO_DASHBOARD',auth+seo_dashboard),('Staging-Pfade','BE_CONTROL_CENTER_BASE',environment),
@@ -81,6 +85,9 @@ for label,marker,text in [
     ('vollständige Growth-Roadmap','gbl_read_snapshot',backlog_api+backlog_lib+overview),
     ('genau zwei Backlogstatus','gbl_status_normalize',backlog_lib),
     ('Backlog ohne Arbeitsfälle',"source_system='growth_backlog'",overview),
+    ('strukturierte Backlog-Erstellung','recommended_action',backlog_create),
+    ('Backlog-Bearbeitung','expected_updated_at',backlog_update),
+    ('Backlog-Wiederöffnung',"'reopen'",backlog_update),
     ('Backlog-Quellenstatus',"'sync' => $sync",overview),('Event-Livewriteback','be_cc_update_event_fields',writeback+editorial_runtime),
     ('Inhaltshistorie','control_content_changes',history+schema),('Publikationsprüfung','be_cc_verify_public_change',publication),
     ('Prozesskette','be_cc_integrated_process_health',process_chain+overview),('Content-Ops-Wirkung','feedback_rule_effectiveness_daily',content_ops),
