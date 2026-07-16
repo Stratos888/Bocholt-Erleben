@@ -224,7 +224,11 @@ function be_cc_writeback_inbox_stable(array $case,string $action,array $payload,
     if(($resolution['status']??'')!=='resolved')throw new DomainException((string)($resolution['message']??'Inbox-Datensatz ist nicht eindeutig.'));
     $rowNumber=(int)$resolution['row_number'];
     $written=[];
-    if($action==='approve'&&$decision['event_updates'])$written=be_cc_update_sheet_row_canonical('Inbox',(int)$table['header_row'],$rowNumber,$decision['event_updates']);
+    $verificationSource=$source;
+    if($action==='approve'&&$decision['event_updates']){
+        $written=be_cc_update_sheet_row_canonical('Inbox',(int)$table['header_row'],$rowNumber,$decision['event_updates']);
+        $verificationSource=be_cc_editorial_merge_updates($source,$decision['event_updates']);
+    }
     $expected=be_cc_inbox_expected_writeback($action,$decision);
     $token=be_cc_inbox_token();
     if($action==='approve')$result=be_cc_jsonp_request(['action'=>'approve','token'=>$token,'row_number'=>(string)$rowNumber]);
@@ -232,7 +236,7 @@ function be_cc_writeback_inbox_stable(array $case,string $action,array $payload,
     elseif($action==='snooze')$result=be_cc_jsonp_request(['action'=>'setStatus','token'=>$token,'row_number'=>(string)$rowNumber,'status'=>$expected['status'],'ablehnungsgrund'=>$expected['reason']]);
     else return ['resolution'=>$resolution,'written_fields'=>$written];
     if(empty($result['ok']))throw new RuntimeException('Inbox writeback failed: '.trim((string)($result['error']??$result['detail']??'unknown_error')));
-    $verification=be_cc_verify_inbox_writeback($source,$expected);
+    $verification=be_cc_verify_inbox_writeback($verificationSource,$expected);
     return ['resolution'=>$resolution,'written_fields'=>$written,'expected'=>$expected,'verification'=>$verification];
 }
 
