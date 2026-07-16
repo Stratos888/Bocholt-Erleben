@@ -1,16 +1,211 @@
-import { rejectOptions, escapeHtml, clean, formatDate, setStatus, operationId, readDraft, writeDraft, clearDraft, api, openDialog, closeDialog, dialogMessage, field, textarea, value, allReviewCases } from './shared.js?v=2026-07-16-e2e-state-v5';
+import {
+  rejectOptions, escapeHtml, clean, formatDate, setStatus, operationId,
+  readDraft, writeDraft, clearDraft, api, openDialog, closeDialog,
+  dialogMessage, field, textarea, value, allReviewCases,
+} from './shared.js?v=2026-07-16-e2e-state-v5';
 import { renderEventReview } from './review-render.js?v=2026-07-16-e2e-state-v5';
-let reload=async()=>{};
-export function configureReviewActions(callbacks={}){if(callbacks.reload)reload=callbacks.reload;}
-async function detail(item){return api(`/api/control-center/case.php?id=${encodeURIComponent(item.id)}`,{timeoutMs:15000});}
-async function submit(item,action,payload,id){return api('/api/control-center/action.php',{method:'POST',body:JSON.stringify({case_id:item.id,action,operation_id:id,payload}),timeoutMs:70000});}
-function assertCompletion(item,result){if(!result?.completion?.complete||!result?.completion?.source_verified)throw new Error('Die vollständige Entscheidungskette wurde nicht bestätigt.');const shouldRemainVisible=Boolean(result.completion.local?.review_visible);const remains=allReviewCases().some(entry=>entry.id===item.id);if(shouldRemainVisible!==remains)throw new Error(shouldRemainVisible?'Der erwartete Folgefall ist nach dem Neuladen nicht sichtbar.':'Der abgeschlossene Vorgang ist nach dem Neuladen weiterhin sichtbar.');}
-async function finalize(item,result,message){try{await reload({throwOnError:true});assertCompletion(item,result);}catch(error){throw new Error(`Entscheidung wurde gespeichert, aber die Ansicht konnte nicht konsistent aktualisiert werden: ${error.message}`);}closeDialog();setStatus(message,'success');}
-function fields(p,x='er'){return `${field(`${x}-title`,'Titel',p.title)}${field(`${x}-date`,'Startdatum',p.date,'date')}${field(`${x}-end`,'Enddatum',p.endDate||p.end_date,'date')}${field(`${x}-time`,'Uhrzeit',p.time)}${field(`${x}-time-reason`,'Hinweis bei fehlender Uhrzeit',p.time_reason||p.schedule_text)}${field(`${x}-city`,'Stadt',p.city)}${field(`${x}-location`,'Ort',p.location)}${field(`${x}-address`,'Adresse',p.address)}${field(`${x}-category`,'Kategorie',p.kategorie_suggestion||p.kategorie||p.category)}${field(`${x}-source`,'Offizielle Quelle',p.source_url||p.url,'url')}${field(`${x}-ticket`,'Ticketlink',p.ticket_url,'url')}${field(`${x}-visual-key`,'Visual-Key',p.visual_key)}${field(`${x}-visual-motif`,'Bildmotiv',p.visual_motif||p.image_visual_motif)}${textarea(`${x}-description`,'Finale Beschreibung',p.final_description||p.suggested_description||p.description)}`;}
-function read(x='er'){return{title:value(`#${x}-title`),date:value(`#${x}-date`),end_date:value(`#${x}-end`),time:value(`#${x}-time`),time_reason:value(`#${x}-time-reason`),city:value(`#${x}-city`),location:value(`#${x}-location`),address:value(`#${x}-address`),category:value(`#${x}-category`),source_url:value(`#${x}-source`),ticket_url:value(`#${x}-ticket`),visual_key:value(`#${x}-visual-key`),visual_motif:value(`#${x}-visual-motif`),description:value(`#${x}-description`)};}
-async function editor(item){setStatus('Vorgang wird geladen …');try{const data=await detail(item),source=data.source_payload||{},prior=readDraft(item.id),form=prior?.fields||source,current=clean(source.current_description||source.description),suggested=clean(source.suggested_description||source.replacement_text||source.final_description);const comparison=item.case_kind==='event_candidate'?'':`<div class="cc-copy-compare"><section><span class="cc-kicker">Aktuell</span><p>${escapeHtml(current||'Keine aktuelle Fassung.')}</p></section><section class="cc-copy-compare__proposal"><span class="cc-kicker">Vorschlag</span><p>${escapeHtml(suggested||'Kein Vorschlag verfügbar.')}</p></section></div>`;openDialog(`<h2>${escapeHtml(item.case_kind==='event_candidate'?'Event bearbeiten und übernehmen':data.title)}</h2><p class="cc-hint">Die finale Fassung wird serverseitig geprüft. Bei einem Konflikt bleibt dein Entwurf in dieser Sitzung erhalten.</p><div id="cc-dialog-message"></div>${comparison}<div class="cc-stack">${fields(form)}<label class="cc-field"><span>Redaktionelle Notiz (optional)</span><textarea id="er-note">${escapeHtml(prior?.note||'')}</textarea></label><button type="button" class="cc-button cc-button--primary" id="er-save">${item.case_kind==='event_candidate'?'Bearbeiten und übernehmen':'Korrektur übernehmen'}</button></div>`,'cc-dialog--wide');setStatus('');document.querySelector('#er-save')?.addEventListener('click',async event=>{const draft={fields:read(),note:value('#er-note'),operationId:prior?.operationId||operationId()};writeDraft(item.id,draft);event.currentTarget.disabled=true;dialogMessage('Fassung wird validiert, gespeichert und vollständig zurückgeprüft …','info');let saved=false;try{const result=await submit(item,'approve',{decision_class:'corrected',decision_note:draft.note||'Über Steuerzentrale korrigiert und fachlich geprüft.',event_updates:draft.fields,source_fingerprint:clean(source.source_fingerprint),content_fingerprint:clean(source.content_fingerprint),current_description_hash:clean(source.current_description_hash),rule_version:'control-center-editorial-v1'},draft.operationId);saved=true;clearDraft(item.id);await finalize(item,result,'Korrektur gespeichert und vollständig bestätigt.');}catch(error){event.currentTarget.disabled=saved;dialogMessage(`${error.message}${saved?' Bitte die Ansicht neu laden.':' Dein Entwurf bleibt in dieser Sitzung erhalten.'}`);}});}catch(error){setStatus(error.message,'attention');}}
-async function details(item){setStatus('Details werden geladen …');try{const data=await detail(item),payload=data.source_payload||{},entries=Object.entries(payload).filter(([,entry])=>!['',null,undefined].includes(entry)&&!Array.isArray(entry)&&typeof entry!=='object');openDialog(`<h2>${escapeHtml(data.title)}</h2><p>${escapeHtml(data.reason||'')}</p>${data.review_contract?renderEventReview(data.review_contract):''}<details class="cc-disclosure" open><summary>Quelldaten</summary><dl class="cc-detail-list">${entries.map(([key,entry])=>`<div><dt>${escapeHtml(key)}</dt><dd>${escapeHtml(entry)}</dd></div>`).join('')}</dl></details>`,'cc-dialog--wide');setStatus('');}catch(error){setStatus(error.message,'attention');}}
-function reject(item){openDialog(`<h2>${escapeHtml(item.title)} ablehnen</h2><p>Die Ablehnung wird als typisiertes Feedback gespeichert.</p><div id="cc-dialog-message"></div><div class="cc-stack"><label class="cc-field"><span>Ablehnungsgrund</span><select id="cc-reject-class" required><option value="">Ablehnungsgrund auswählen</option>${rejectOptions.map(([entry,label])=>`<option value="${entry}">${escapeHtml(label)}</option>`).join('')}</select></label>${textarea('cc-reject-note','Ergänzende Notiz (optional)','')}<button type="button" class="cc-button cc-button--danger" id="cc-reject-confirm">Ablehnung bestätigen</button></div>`);const id=operationId();document.querySelector('#cc-reject-confirm')?.addEventListener('click',async event=>{const decisionClass=value('#cc-reject-class');if(!decisionClass)return dialogMessage('Bitte zuerst einen Ablehnungsgrund auswählen.');event.currentTarget.disabled=true;dialogMessage('Ablehnung wird in Quelle und lokalem Fall gespeichert und anschließend vollständig geprüft …','info');let saved=false;try{const result=await submit(item,'reject',{decision_class:decisionClass,decision_note:value('#cc-reject-note')},id);saved=true;await finalize(item,result,'Ablehnung mit Grund gespeichert und vollständig bestätigt.');}catch(error){event.currentTarget.disabled=saved;dialogMessage(`${error.message}${saved?' Bitte die Ansicht neu laden.':''}`);}});}
-function snooze(item){const date=new Date();date.setDate(date.getDate()+7);openDialog(`<h2>${escapeHtml(item.title)} zurückstellen</h2><div id="cc-dialog-message"></div><div class="cc-stack">${field('cc-snooze-date','Wiedervorlage',date.toISOString().slice(0,10),'date')}${textarea('cc-snooze-note','Grund / Notiz (optional)','')}<button type="button" class="cc-button cc-button--primary" id="cc-snooze-confirm">Zurückstellen</button></div>`);const id=operationId();document.querySelector('#cc-snooze-confirm')?.addEventListener('click',async event=>{const until=value('#cc-snooze-date');if(!until)return dialogMessage('Wiedervorlagedatum fehlt.');event.currentTarget.disabled=true;dialogMessage('Wiedervorlage wird gespeichert und vollständig geprüft …','info');let saved=false;try{const result=await submit(item,'snooze',{decision_class:'snoozed',decision_note:value('#cc-snooze-note'),suppress_until:until,until},id);saved=true;await finalize(item,result,`Vorgang bis ${formatDate(until)} zurückgestellt.`);}catch(error){event.currentTarget.disabled=saved;dialogMessage(`${error.message}${saved?' Bitte die Ansicht neu laden.':''}`);}});}
-function reason(item,action,title,label){openDialog(`<h2>${escapeHtml(title)}</h2><div id="cc-dialog-message"></div>${textarea('cc-action-reason',label,'','required')}<button type="button" class="cc-button cc-button--primary" id="cc-action-confirm">Bestätigen</button>`);const id=operationId();document.querySelector('#cc-action-confirm')?.addEventListener('click',async event=>{const text=value('#cc-action-reason');if(!text)return dialogMessage('Begründung fehlt.');event.currentTarget.disabled=true;try{await submit(item,action,{reason:text},id);await reload({throwOnError:true});closeDialog();setStatus('Gespeichert.','success');}catch(error){event.currentTarget.disabled=false;dialogMessage(error.message);}});}
-export async function handleReviewAction(item,action){if(!item)return;if(action==='details')return details(item);if(action==='edit_and_approve')return editor(item);if(action==='reject')return reject(item);if(action==='snooze')return snooze(item);if(action==='wait')return reason(item,'wait','Auf Rückmeldung warten','Worauf wird gewartet?');if(action==='block')return reason(item,'block','Vorgang blockieren','Was blockiert den Vorgang?');const payload=action==='approve'?{decision_class:item.source?.system==='content_audit'?'confirmed':'accepted',decision_note:'Über Steuerzentrale fachlich bestätigt.'}:{};setStatus('Aktion wird ausgeführt und vollständig geprüft …');try{const result=await submit(item,action,payload,operationId());await reload({throwOnError:true});assertCompletion(item,result);setStatus('Gespeichert und vollständig bestätigt.','success');}catch(error){setStatus(error.message,'attention');}}
+
+let reload = async () => {};
+export function configureReviewActions(callbacks = {}) {
+  if (callbacks.reload) reload = callbacks.reload;
+}
+
+async function detail(item) {
+  return api(`/api/control-center/case.php?id=${encodeURIComponent(item.id)}`, { timeoutMs:15000 });
+}
+async function submit(item, action, payload, id) {
+  return api('/api/control-center/action.php', {
+    method:'POST',
+    body:JSON.stringify({ case_id:item.id, action, operation_id:id, payload }),
+    timeoutMs:70000,
+  });
+}
+function assertCompletion(item, result) {
+  if (!result?.completion?.complete || !result?.completion?.source_verified) {
+    throw new Error('Die vollständige Entscheidungskette wurde nicht bestätigt.');
+  }
+  const shouldRemainVisible = Boolean(result.completion.local?.review_visible);
+  const remains = allReviewCases().some(entry => entry.id === item.id);
+  if (shouldRemainVisible !== remains) {
+    throw new Error(shouldRemainVisible
+      ? 'Der erwartete Folgefall ist nach dem Neuladen nicht sichtbar.'
+      : 'Der abgeschlossene Vorgang ist nach dem Neuladen weiterhin sichtbar.');
+  }
+}
+async function finalize(item, result, message) {
+  try {
+    await reload({ throwOnError:true });
+    assertCompletion(item, result);
+  } catch (error) {
+    throw new Error(`Entscheidung wurde gespeichert, aber die Ansicht konnte nicht konsistent aktualisiert werden: ${error.message}`);
+  }
+  closeDialog();
+  setStatus(message, 'success');
+}
+
+function eventEditorFields(payload, prefix = 'er') {
+  return `${field(`${prefix}-title`,'Titel',payload.title)}${field(`${prefix}-date`,'Startdatum',payload.date,'date')}${field(`${prefix}-end`,'Enddatum',payload.endDate||payload.end_date,'date')}${field(`${prefix}-time`,'Uhrzeit',payload.time)}${field(`${prefix}-time-reason`,'Hinweis bei fehlender Uhrzeit',payload.time_reason||payload.schedule_text)}${field(`${prefix}-city`,'Stadt',payload.city)}${field(`${prefix}-location`,'Ort',payload.location)}${field(`${prefix}-address`,'Adresse',payload.address)}${field(`${prefix}-category`,'Kategorie',payload.kategorie_suggestion||payload.kategorie||payload.category)}${field(`${prefix}-source`,'Offizielle Quelle',payload.source_url||payload.url,'url')}${field(`${prefix}-ticket`,'Ticketlink',payload.ticket_url,'url')}${field(`${prefix}-visual-key`,'Visual-Key',payload.visual_key)}${field(`${prefix}-visual-motif`,'Bildmotiv',payload.visual_motif||payload.image_visual_motif)}${textarea(`${prefix}-description`,'Finale Beschreibung',payload.final_description||payload.suggested_description||payload.description)}`;
+}
+function readEventEditor(prefix = 'er') {
+  return {
+    title:value(`#${prefix}-title`), date:value(`#${prefix}-date`), end_date:value(`#${prefix}-end`),
+    time:value(`#${prefix}-time`), time_reason:value(`#${prefix}-time-reason`), city:value(`#${prefix}-city`),
+    location:value(`#${prefix}-location`), address:value(`#${prefix}-address`), category:value(`#${prefix}-category`),
+    source_url:value(`#${prefix}-source`), ticket_url:value(`#${prefix}-ticket`), visual_key:value(`#${prefix}-visual-key`),
+    visual_motif:value(`#${prefix}-visual-motif`), description:value(`#${prefix}-description`),
+  };
+}
+function activityAuditFields(payload, prefix = 'ar') {
+  return `${field(`${prefix}-title`,'Titel',payload.title)}${field(`${prefix}-category`,'Kategorie',payload.kategorie||payload.category)}${field(`${prefix}-location`,'Ort',payload.location)}${field(`${prefix}-address`,'Adresse / Kartenabfrage',payload.maps_query||payload.address)}${field(`${prefix}-source`,'Offizielle Quelle',payload.url||payload.source_url,'url')}${field(`${prefix}-visual-key`,'Visual-Key',payload.visual_key)}${textarea(`${prefix}-description`,'Finale Beschreibung',payload.suggested_description||payload.replacement_text||payload.description)}`;
+}
+function readActivityAudit(prefix = 'ar') {
+  return {
+    title:value(`#${prefix}-title`), category:value(`#${prefix}-category`), location:value(`#${prefix}-location`),
+    address:value(`#${prefix}-address`), source_url:value(`#${prefix}-source`), visual_key:value(`#${prefix}-visual-key`),
+    description:value(`#${prefix}-description`),
+  };
+}
+
+async function editor(item) {
+  setStatus('Vorgang wird geladen …');
+  try {
+    const data = await detail(item);
+    const source = data.source_payload || {};
+    const prior = readDraft(item.id);
+    const form = prior?.fields || source;
+    const current = clean(source.current_description || source.description);
+    const suggested = clean(source.suggested_description || source.replacement_text || source.final_description);
+    const activityAudit = item.source?.system === 'content_audit' && clean(source.content_type).toLowerCase() === 'activity';
+    const editorFields = activityAudit ? activityAuditFields(form) : eventEditorFields(form);
+    const readFields = activityAudit ? readActivityAudit : readEventEditor;
+    const comparison = item.case_kind === 'event_candidate' ? '' : `<div class="cc-copy-compare"><section><span class="cc-kicker">Aktuell</span><p>${escapeHtml(current||'Keine aktuelle Fassung.')}</p></section><section class="cc-copy-compare__proposal"><span class="cc-kicker">Vorschlag</span><p>${escapeHtml(suggested||'Kein Vorschlag verfügbar.')}</p></section></div>`;
+    const title = item.case_kind === 'event_candidate'
+      ? 'Event bearbeiten und übernehmen'
+      : activityAudit ? 'Aktivität korrigieren und übernehmen' : data.title;
+
+    openDialog(`<h2>${escapeHtml(title)}</h2><p class="cc-hint">Die finale Fassung wird serverseitig geprüft. Bei einem Konflikt bleibt dein Entwurf in dieser Sitzung erhalten.</p><div id="cc-dialog-message"></div>${comparison}<div class="cc-stack">${editorFields}<label class="cc-field"><span>Redaktionelle Notiz (optional)</span><textarea id="er-note">${escapeHtml(prior?.note||'')}</textarea></label><button type="button" class="cc-button cc-button--primary" id="er-save">${item.case_kind==='event_candidate'?'Bearbeiten und übernehmen':'Korrektur übernehmen'}</button></div>`, 'cc-dialog--wide');
+    setStatus('');
+    document.querySelector('#er-save')?.addEventListener('click', async event => {
+      const draft = { fields:readFields(), note:value('#er-note'), operationId:prior?.operationId||operationId() };
+      writeDraft(item.id, draft);
+      event.currentTarget.disabled = true;
+      dialogMessage('Fassung wird validiert, gespeichert und vollständig zurückgeprüft …', 'info');
+      let saved = false;
+      try {
+        const result = await submit(item, 'approve', {
+          decision_class:'corrected',
+          decision_note:draft.note || 'Über Steuerzentrale korrigiert und fachlich geprüft.',
+          event_updates:draft.fields,
+          source_fingerprint:clean(source.source_fingerprint),
+          content_fingerprint:clean(source.content_fingerprint),
+          current_description_hash:clean(source.current_description_hash),
+          rule_version:'control-center-editorial-v1',
+        }, draft.operationId);
+        saved = true;
+        clearDraft(item.id);
+        await finalize(item, result, 'Korrektur gespeichert und vollständig bestätigt.');
+      } catch (error) {
+        event.currentTarget.disabled = saved;
+        dialogMessage(`${error.message}${saved ? ' Bitte die Ansicht neu laden.' : ' Dein Entwurf bleibt in dieser Sitzung erhalten.'}`);
+      }
+    });
+  } catch (error) {
+    setStatus(error.message, 'attention');
+  }
+}
+
+async function details(item) {
+  setStatus('Details werden geladen …');
+  try {
+    const data = await detail(item);
+    const payload = data.source_payload || {};
+    const entries = Object.entries(payload).filter(([,entry]) => !['',null,undefined].includes(entry) && !Array.isArray(entry) && typeof entry !== 'object');
+    openDialog(`<h2>${escapeHtml(data.title)}</h2><p>${escapeHtml(data.reason||'')}</p>${data.review_contract?renderEventReview(data.review_contract):''}<details class="cc-disclosure" open><summary>Quelldaten</summary><dl class="cc-detail-list">${entries.map(([key,entry])=>`<div><dt>${escapeHtml(key)}</dt><dd>${escapeHtml(entry)}</dd></div>`).join('')}</dl></details>`, 'cc-dialog--wide');
+    setStatus('');
+  } catch (error) {
+    setStatus(error.message, 'attention');
+  }
+}
+
+function reject(item) {
+  openDialog(`<h2>${escapeHtml(item.title)} ablehnen</h2><p>Die Ablehnung wird als typisiertes Feedback gespeichert.</p><div id="cc-dialog-message"></div><div class="cc-stack"><label class="cc-field"><span>Ablehnungsgrund</span><select id="cc-reject-class" required><option value="">Ablehnungsgrund auswählen</option>${rejectOptions.map(([entry,label])=>`<option value="${entry}">${escapeHtml(label)}</option>`).join('')}</select></label>${textarea('cc-reject-note','Ergänzende Notiz (optional)','')}<button type="button" class="cc-button cc-button--danger" id="cc-reject-confirm">Ablehnung bestätigen</button></div>`);
+  const id = operationId();
+  document.querySelector('#cc-reject-confirm')?.addEventListener('click', async event => {
+    const decisionClass = value('#cc-reject-class');
+    if (!decisionClass) return dialogMessage('Bitte zuerst einen Ablehnungsgrund auswählen.');
+    event.currentTarget.disabled = true;
+    dialogMessage('Ablehnung wird in Quelle und lokalem Fall gespeichert und anschließend vollständig geprüft …', 'info');
+    let saved = false;
+    try {
+      const result = await submit(item, 'reject', { decision_class:decisionClass, decision_note:value('#cc-reject-note') }, id);
+      saved = true;
+      await finalize(item, result, 'Ablehnung mit Grund gespeichert und vollständig bestätigt.');
+    } catch (error) {
+      event.currentTarget.disabled = saved;
+      dialogMessage(`${error.message}${saved ? ' Bitte die Ansicht neu laden.' : ''}`);
+    }
+  });
+}
+
+function snooze(item) {
+  const date = new Date();
+  date.setDate(date.getDate() + 7);
+  openDialog(`<h2>${escapeHtml(item.title)} zurückstellen</h2><div id="cc-dialog-message"></div><div class="cc-stack">${field('cc-snooze-date','Wiedervorlage',date.toISOString().slice(0,10),'date')}${textarea('cc-snooze-note','Grund / Notiz (optional)','')}<button type="button" class="cc-button cc-button--primary" id="cc-snooze-confirm">Zurückstellen</button></div>`);
+  const id = operationId();
+  document.querySelector('#cc-snooze-confirm')?.addEventListener('click', async event => {
+    const until = value('#cc-snooze-date');
+    if (!until) return dialogMessage('Wiedervorlagedatum fehlt.');
+    event.currentTarget.disabled = true;
+    dialogMessage('Wiedervorlage wird gespeichert und vollständig geprüft …', 'info');
+    let saved = false;
+    try {
+      const result = await submit(item, 'snooze', { decision_class:'snoozed', decision_note:value('#cc-snooze-note'), suppress_until:until, until }, id);
+      saved = true;
+      await finalize(item, result, `Vorgang bis ${formatDate(until)} zurückgestellt.`);
+    } catch (error) {
+      event.currentTarget.disabled = saved;
+      dialogMessage(`${error.message}${saved ? ' Bitte die Ansicht neu laden.' : ''}`);
+    }
+  });
+}
+
+function reason(item, action, title, label) {
+  openDialog(`<h2>${escapeHtml(title)}</h2><div id="cc-dialog-message"></div>${textarea('cc-action-reason',label,'','required')}<button type="button" class="cc-button cc-button--primary" id="cc-action-confirm">Bestätigen</button>`);
+  const id = operationId();
+  document.querySelector('#cc-action-confirm')?.addEventListener('click', async event => {
+    const text = value('#cc-action-reason');
+    if (!text) return dialogMessage('Begründung fehlt.');
+    event.currentTarget.disabled = true;
+    try {
+      await submit(item, action, { reason:text }, id);
+      await reload({ throwOnError:true });
+      closeDialog();
+      setStatus('Gespeichert.', 'success');
+    } catch (error) {
+      event.currentTarget.disabled = false;
+      dialogMessage(error.message);
+    }
+  });
+}
+
+export async function handleReviewAction(item, action) {
+  if (!item) return;
+  if (action === 'details') return details(item);
+  if (action === 'edit_and_approve') return editor(item);
+  if (action === 'reject') return reject(item);
+  if (action === 'snooze') return snooze(item);
+  if (action === 'wait') return reason(item, 'wait', 'Auf Rückmeldung warten', 'Worauf wird gewartet?');
+  if (action === 'block') return reason(item, 'block', 'Vorgang blockieren', 'Was blockiert den Vorgang?');
+  const payload = action === 'approve'
+    ? { decision_class:item.source?.system === 'content_audit' ? 'confirmed' : 'accepted', decision_note:'Über Steuerzentrale fachlich bestätigt.' }
+    : {};
+  setStatus('Aktion wird ausgeführt und vollständig geprüft …');
+  try {
+    const result = await submit(item, action, payload, operationId());
+    await reload({ throwOnError:true });
+    assertCompletion(item, result);
+    setStatus('Gespeichert und vollständig bestätigt.', 'success');
+  } catch (error) {
+    setStatus(error.message, 'attention');
+  }
+}
