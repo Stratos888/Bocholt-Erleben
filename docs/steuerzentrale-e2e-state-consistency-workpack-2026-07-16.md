@@ -155,3 +155,34 @@ Diese Prüfung läuft sowohl in der allgemeinen Control-Center-Validierung als a
 - reale Staging-Quelle wird ohne manuellen Eingriff reconciliiert,
 - die bereits verworfene Vereinsmesse verschwindet nach Staging-Reload aus der aktiven Prüfliste,
 - kein Main-Merge ohne diesen Staging-Nachweis.
+
+## Realer Staging-Nachweis
+
+Der Nachweis wurde am 2026-07-16 auf dem Staging-Stand `bba370093f83bd2190ead0fb2f8f605c46c047f5` erbracht:
+
+1. Die führende Sheet-Zeile der Vereinsmesse war bereits terminal gespeichert.
+2. Die Staging-Steuerzentrale wurde neu geladen.
+3. Die Quelle wurde vor der aktiven Fallabfrage synchronisiert.
+4. Der lokale Altfall wurde automatisch auf den terminalen Zielzustand reconciliiert.
+5. Der Eintrag war anschließend nicht mehr in der offenen Prüfliste sichtbar.
+
+Damit ist die konkrete Zustandsfehlerklasse auf `staging` fachlich abgenommen. Die Zustandskonsistenz ist nicht länger ein offener Bestandteil des nächsten UX-Workpacks.
+
+## Release- und Workpack-Grenze
+
+PR `#77` bleibt vorerst ausschließlich auf `staging`. Der reale Nachweis erlaubt grundsätzlich einen späteren Release, aber der Main-Merge wird bewusst zurückgestellt, bis das nachfolgende Premium-Workpack zur Eventprüfung abgeschlossen ist.
+
+Die nächste offene Fehlerklasse betrifft nicht mehr Quelle-versus-lokaler-Fall, sondern die fachliche Nutzerführung innerhalb eines offenen Eventkandidaten:
+
+- technische Blocker ohne direkt ausführbare Fachaktion,
+- fehlende Kennzeichnung bereits geprüfter Felder,
+- kein typisierter Zeitstatus,
+- Motivbestätigung ohne konkrete Asset-Bindung,
+- Visual-Gaps ohne geschlossenen Rückführungsprozess,
+- Vollformular statt ausnahmebasierter Aufgaben.
+
+Kanonische Fortsetzung:
+
+`docs/steuerzentrale-naechstes-workpack-ausnahmebasierte-eventpruefung-2026-07-16.md`
+
+Der nächste Chat darf die mit diesem Dokument bestätigte Zustandsarchitektur nicht erneut symptomatisch umbauen. Er muss auf ihr aufsetzen und die fachlichen Event-Ausnahmen jeweils bis zum verifizierten Endzustand schließen.
