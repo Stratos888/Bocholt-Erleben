@@ -7,6 +7,7 @@ require_once __DIR__ . '/_sheet_inbox_source.php';
 require_once __DIR__ . '/_submission_source.php';
 require_once __DIR__ . '/_process_chain.php';
 require_once __DIR__ . '/_editorial_runtime.php';
+require_once __DIR__ . '/_inbox_decision_writeback.php';
 
 be_require_review_access();
 
@@ -118,7 +119,9 @@ try {
             be_json_response(200, ['status'=>'ok','data'=>$result]);
         }
     } elseif ($sourceSystem === 'inbox_feed' && $editorialAction) {
-        $writebackMeta = be_cc_writeback_inbox_stable($case, $action, $payload, $decision);
+        $writebackMeta = in_array($action, ['reject','snooze'], true)
+            ? be_cc_writeback_inbox_decision_direct($case, $action, $decision)
+            : be_cc_writeback_inbox_stable($case, $action, $payload, $decision);
     } elseif ($sourceSystem === 'content_audit' && $editorialAction) {
         $writebackMeta = be_cc_writeback_audit_stable($case, $action, $payload, $decision);
         be_cc_record_editorial_feedback($pdo, $case, $decision, $payload);
