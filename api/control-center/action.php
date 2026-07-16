@@ -8,6 +8,9 @@ require_once __DIR__ . '/_submission_source.php';
 require_once __DIR__ . '/_process_chain.php';
 require_once __DIR__ . '/_editorial_runtime.php';
 require_once __DIR__ . '/_inbox_decision_writeback.php';
+require_once __DIR__ . '/_verified_source_writeback.php';
+require_once __DIR__ . '/_activity_audit_writeback.php';
+require_once __DIR__ . '/_source_reconciliation.php';
 
 be_require_review_access();
 
@@ -64,7 +67,8 @@ try {
     if ($action === 'recheck') {
         $verification = be_cc_recheck_source_case($case);
         $result = be_cc_apply_action($caseId, 'complete', ['verification'=>$verification]);
-        be_json_response(200, ['status'=>'ok','data'=>$result + ['verification'=>$verification]]);
+        $local = be_cc_assert_case_postcondition($pdo, $caseId, 'done');
+        be_json_response(200, ['status'=>'ok','data'=>$result + ['verification'=>$verification,'completion'=>['complete'=>true,'source_verified'=>true,'local'=>$local]]]);
     }
 
     $sourceSystem = (string)$case['source_system'];
@@ -99,9 +103,10 @@ try {
     }
 
     $effectiveAction = $action;
-    $writebackMeta = [];
+    $writebackMeta = ['source_verified' => true, 'transport' => 'local_only'];
     if ($sourceSystem === 'submission_db') {
-        $effectiveAction = be_cc_writeback_submission($case, $action, $payload);
+        $writebackMeta = be_cc_writeback_submission($case, $action, $payload);
+        $effectiveAction = trim((string)($writebackMeta['effective_action'] ?? $action));
     } elseif ($sourceSystem === 'growth_backlog' && in_array($action, ['edit_source','complete','reject'], true)) {
         be_cc_apply_source_writeback($case, $action, $payload);
         if ($action === 'edit_source') {
@@ -119,16 +124,24 @@ try {
             be_json_response(200, ['status'=>'ok','data'=>$result]);
         }
     } elseif ($sourceSystem === 'inbox_feed' && $editorialAction) {
-        $writebackMeta = in_array($action, ['reject','snooze'], true)
-            ? be_cc_writeback_inbox_decision_direct($case, $action, $decision)
-            : be_cc_writeback_inbox_stable($case, $action, $payload, $decision);
+        if ($action === 'approve') {
+            $writebackMeta = be_cc_writeback_inbox_approve_verified($case, $payload, $decision);
+        } else {
+            $writebackMeta = be_cc_writeback_inbox_decision_direct($case, $action, $decision);
+            $writebackMeta['source_verified'] = true;
+        }
     } elseif ($sourceSystem === 'content_audit' && $editorialAction) {
-        $writebackMeta = be_cc_writeback_audit_stable($case, $action, $payload, $decision);
+        $auditSource = be_cc_editorial_payload($case);
+        $contentType = be_cc_source_state_token($auditSource['content_type'] ?? $case['object_type'] ?? 'event');
+        $writebackMeta = $contentType === 'activity'
+            ? be_cc_writeback_activity_audit_verified($case, $action, $payload, $decision)
+            : be_cc_writeback_audit_verified($case, $action, $payload, $decision);
         be_cc_record_editorial_feedback($pdo, $case, $decision, $payload);
     } elseif ($editorialAction) {
         be_cc_apply_source_writeback($case, $action, $payload);
     }
 
+    if (empty($writebackMeta['source_verified'])) throw new RuntimeException('Der Quell-Writeback wurde nicht bestätigt.');
     be_cc_operation_finish($pdo, $operationId, 'source_written', ['writeback'=>$writebackMeta]);
     $payload['writeback'] = $writebackMeta;
     if ($effectiveAction === 'wait' && (string)$case['case_type'] === 'intake') {
@@ -137,6 +150,15 @@ try {
     } else {
         $result = be_cc_apply_action($caseId, $effectiveAction, $payload);
     }
+
+    $expectedState = be_cc_action_expected_local_state($action, $effectiveAction);
+    $local = $expectedState !== null ? be_cc_assert_case_postcondition($pdo, $caseId, $expectedState) : ['verified'=>true,'state'=>$result['state'] ?? ''];
+    $result['writeback'] = $writebackMeta;
+    $result['completion'] = [
+        'complete' => true,
+        'source_verified' => true,
+        'local' => $local,
+    ];
     be_cc_operation_finish($pdo, $operationId, 'completed', $result);
     be_json_response(200, ['status'=>'ok','data'=>$result]);
 } catch (InvalidArgumentException|DomainException $error) {

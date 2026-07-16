@@ -77,7 +77,7 @@ function be_cc_inbox_direct_table_from_values(array $values): array
         $row['row_number'] = $i + 1;
         $rows[] = $row;
     }
-    return ['header_row' => $headerOffset + 1, 'index' => $index, 'rows' => $rows];
+    return ['tab' => 'Inbox', 'header_row' => $headerOffset + 1, 'index' => $index, 'rows' => $rows];
 }
 
 function be_cc_inbox_direct_table(): array

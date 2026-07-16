@@ -1,8 +1,8 @@
-import { state, els, escapeHtml, clean, setStatus, appPath, api, openDialog, closeDialog, reviewGroup, allReviewCases } from './shared.js?v=2026-07-15-control-center-editorial-v1';
-import { configureReview, renderReview } from './review.js?v=2026-07-16-inbox-writeback-v3';
-import { configureBacklog, renderBacklog } from './backlog.js?v=2026-07-15-control-center-editorial-v1';
-import { renderManage } from './manage.js?v=2026-07-15-control-center-editorial-v1';
-import { renderDevelopment } from './development.js?v=2026-07-15-control-center-editorial-v1';
+import { state, els, escapeHtml, clean, setStatus, appPath, api, openDialog, closeDialog, reviewGroup, allReviewCases } from './shared.js?v=2026-07-16-e2e-state-v5';
+import { configureReview, renderReview } from './review.js?v=2026-07-16-e2e-state-v5';
+import { configureBacklog, renderBacklog } from './backlog.js?v=2026-07-16-e2e-state-v5';
+import { renderManage } from './manage.js?v=2026-07-16-e2e-state-v5';
+import { renderDevelopment } from './development.js?v=2026-07-16-e2e-state-v5';
 
 async function initializeSharedSession() {
   return api('/api/control-center/auth.php', { method:'POST', body:JSON.stringify({ password:state.password }), timeoutMs:12000 });
@@ -57,12 +57,15 @@ function updateBadges() {
   els.badgeBacklog.textContent = '';
 }
 
-export async function load() {
+export async function load(options = {}) {
+  const { throwOnError = false } = options;
   setStatus('Daten werden geladen …');
   try {
-    const [overview, cases, development, backlogResult] = await Promise.all([
-      api('/api/control-center/overview.php'),
-      api('/api/control-center/cases.php'),
+    // Die Quellen müssen zuerst synchronisiert und reconciliiert werden. Erst danach
+    // darf die aktive Fallliste gelesen werden, sonst entsteht ein Race mit alten Fällen.
+    const overview = await api('/api/control-center/overview.php', { timeoutMs:70000 });
+    const [cases, development, backlogResult] = await Promise.all([
+      api('/api/control-center/cases.php?active=1'),
       api('/api/control-center/development.php'),
       api('/api/growth-backlog/list.php').then(data => ({ ok:true, data })).catch(error => ({ ok:false, error })),
     ]);
@@ -75,9 +78,12 @@ export async function load() {
     updateBadges();
     render();
     setStatus('');
+    return { overview:state.overview, cases:state.cases, development:state.development };
   } catch (error) {
     if (error.status === 401) logout(false);
     setStatus(error.message, 'attention');
+    if (throwOnError) throw error;
+    return null;
   }
 }
 

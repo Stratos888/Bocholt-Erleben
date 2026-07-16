@@ -1,4 +1,4 @@
-import { state, escapeHtml, clean, asArray, formatDate, formatDateTime, setStatus, sleep, api, openDialog, closeDialog, dialogMessage, field, textarea, value, fact } from './shared.js?v=2026-07-15-control-center-editorial-v1';
+import { state, escapeHtml, clean, asArray, formatDate, formatDateTime, setStatus, sleep, api, openDialog, closeDialog, dialogMessage, field, textarea, value, fact } from './shared.js?v=2026-07-16-e2e-state-v5';
 let renderManage=async()=>{};
 export function configureManageActions(callbacks={}){if(callbacks.renderManage)renderManage=callbacks.renderManage;}
 async function loadItem(id){return api(`/api/control-center/content.php?type=${encodeURIComponent(state.managementType)}&id=${encodeURIComponent(id)}`,{timeoutMs:15000});}

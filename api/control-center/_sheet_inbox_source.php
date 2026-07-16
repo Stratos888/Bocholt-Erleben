@@ -7,7 +7,7 @@ function be_cc_sync_sheet_inbox(): array
 {
     $response = be_google_sheets_values_get('Inbox!A:AZ');
     $values = is_array($response['values'] ?? null) ? $response['values'] : [];
-    if (count($values) < 2) return ['seen' => 0, 'upserted' => 0, 'source' => 'sheet'];
+    if (count($values) < 2) return ['seen' => 0, 'upserted' => 0, 'reconciled' => 0, 'source' => 'sheet'];
 
     $headerOffset = -1;
     $index = [];
@@ -33,20 +33,27 @@ function be_cc_sync_sheet_inbox(): array
         return '';
     };
 
-    // "verwerfen" war kurzzeitig ein fehlerhafter Writeback-Wert. Er bleibt als
-    // Kompatibilitätsalias geschlossen, der kanonische Status ist "verworfen".
-    $closed = ['übernommen','uebernommen','verworfen','verwerfen','rejected','done','archived'];
-    $seen = $upserted = 0;
+    $seen = $upserted = $reconciled = 0;
     for ($i = $headerOffset + 1; $i < count($values); $i++) {
         $row = is_array($values[$i] ?? null) ? $values[$i] : [];
         if (!array_filter($row, static fn($value): bool => trim((string)$value) !== '')) continue;
         $seen++;
-        $status = mb_strtolower($cell($row, ['status']) ?: 'review', 'UTF-8');
-        if (in_array($status, $closed, true)) continue;
+        $status = be_cc_source_state_token($cell($row, ['status']) ?: 'review');
         $title = $cell($row, ['title']);
-        if ($title === '') continue;
         $reference = $cell($row, ['id_suggestion','id','event_id','source_url','url']);
         if ($reference === '') $reference = 'sheet-row-' . (string)($i + 1);
+
+        $terminal = be_cc_source_terminal_target('inbox_feed', $status);
+        if ($terminal !== null) {
+            $reconciled += be_cc_reconcile_source_case(be_db(), 'inbox_feed', $reference, $terminal, [
+                'source_status' => $status,
+                'sheet_row' => $i + 1,
+            ]);
+            continue;
+        }
+
+        if (!in_array($status, ['review','open','new','pending','später prüfen','spaeter pruefen','snoozed'], true)) continue;
+        if ($title === '') continue;
         $payload = [];
         foreach ($index as $name => $position) {
             $payload[$name] = isset($row[$position]) ? trim((string)$row[$position]) : '';
@@ -63,14 +70,21 @@ function be_cc_sync_sheet_inbox(): array
             'object_type' => 'event_candidate',
             'object_id' => $reference,
             'object_title' => $title,
-            // Absichtlich identisch zum bisherigen JSON-Adapter: dieselbe Quelle erzeugt keinen Doppelvorgang.
             'source_system' => 'inbox_feed',
             'source_reference' => $reference,
             'source_payload' => $payload,
             'decision_ready' => true,
         ]);
         $upserted++;
+
+        if (in_array($status, ['später prüfen','spaeter pruefen','snoozed'], true)) {
+            $until = $cell($row, ['next_review_at','next_check_at','snoozed_until','recheck_at']);
+            $reconciled += be_cc_reconcile_source_snooze(be_db(), 'inbox_feed', $reference, $until, [
+                'source_status' => $status,
+                'sheet_row' => $i + 1,
+            ]);
+        }
     }
 
-    return ['seen' => $seen, 'upserted' => $upserted, 'source' => 'sheet'];
+    return ['seen' => $seen, 'upserted' => $upserted, 'reconciled' => $reconciled, 'source' => 'sheet'];
 }

@@ -3,9 +3,31 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_sources.php';
 
+function be_cc_reconcile_submission_cases(PDO $pdo): int
+{
+    $stmt = $pdo->query(
+        "SELECT DISTINCT c.source_reference, s.status
+         FROM control_cases c
+         INNER JOIN submissions s
+           ON c.source_system='submission_db'
+          AND c.source_reference=CONCAT('submission:', s.id)
+         WHERE c.source_system='submission_db'"
+    );
+    $reconciled = 0;
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $reference = trim((string)($row['source_reference'] ?? ''));
+        $status = trim((string)($row['status'] ?? ''));
+        $target = be_cc_source_terminal_target('submission_db', $status);
+        if ($reference === '' || $target === null) continue;
+        $reconciled += be_cc_reconcile_source_case($pdo, 'submission_db', $reference, $target, ['source_status' => $status]);
+    }
+    return $reconciled;
+}
+
 function be_cc_sync_submissions(): array
 {
     $pdo = be_db();
+    $reconciled = be_cc_reconcile_submission_cases($pdo);
     $stmt = $pdo->query(
         'SELECT id, submission_kind, status, title, start_date, time_text, location_name, location_address,
                 description_text, event_url, ticket_url, organization_name_snapshot, intake_origin,
@@ -59,5 +81,5 @@ function be_cc_sync_submissions(): array
         }
         $count++;
     }
-    return ['seen' => count($items), 'upserted' => $count];
+    return ['seen' => count($items), 'upserted' => $count, 'reconciled' => $reconciled];
 }

@@ -1,4 +1,4 @@
-import { state, els, escapeHtml, clean, api, openDialog, closeDialog, dialogMessage, field, textarea, value } from './shared.js?v=2026-07-15-control-center-editorial-v1';
+import { state, els, escapeHtml, clean, api, openDialog, closeDialog, dialogMessage, field, textarea, value } from './shared.js?v=2026-07-16-e2e-state-v5';
 
 let reloadApplication = async () => {};
 
@@ -98,7 +98,7 @@ function openBacklogEditor(item = null) {
     try {
       await api(item ? '/api/growth-backlog/update.php' : '/api/growth-backlog/create.php', { method:'POST', body:JSON.stringify(payload) });
       closeDialog();
-      await reloadApplication();
+      await reloadApplication({ throwOnError:true });
     } catch (error) {
       dialogMessage(error.message || 'Backlogpunkt konnte nicht gespeichert werden.');
       if (submit) submit.disabled = false;
@@ -133,7 +133,7 @@ function openBacklogStatus(item) {
         }),
       });
       closeDialog();
-      await reloadApplication();
+      await reloadApplication({ throwOnError:true });
     } catch (error) {
       dialogMessage(error.message || 'Status konnte nicht gespeichert werden.');
       button.disabled = false;
