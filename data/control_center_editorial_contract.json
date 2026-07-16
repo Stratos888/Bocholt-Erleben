@@ -1,101 +1,51 @@
 {
-  "version": "control_center_editorial_contract_v1",
-  "updated_at": "2026-07-15",
+  "version": "control_center_editorial_contract_v2",
+  "updated_at": "2026-07-16",
   "principles": [
-    "Server-side decision gates are authoritative.",
+    "Server-side decision gates and review tasks are authoritative.",
+    "The operator reviews unresolved exceptions and the final compact event, not every field again.",
+    "Every review task contains evidence, a direct action, canonical persistence, a follow-up process and a verified postcondition.",
     "Stored sheet row numbers are hints and must never be used without identity validation.",
-    "Every operator decision is typed with the canonical content-ops decision taxonomy.",
-    "A single editorial text edit may create an observation but must never activate a permanent rule.",
-    "Phase 1 contracts are side-effect free and are not wired into production runtime yet."
+    "Partial review actions keep the event case open until the final approve decision.",
+    "Missing visual assets create one idempotent visual gap and return a concrete ready candidate to the same review flow.",
+    "A single editorial correction may create an observation but must never activate a permanent rule."
   ],
   "event_candidate": {
-    "required_fields": [
-      "title",
-      "date",
-      "city_or_local_reference",
-      "location",
-      "category",
-      "source_url",
-      "description",
-      "visual_key",
-      "visual_motif"
-    ],
-    "conditional_fields": {
-      "end_date": "required_when_is_multi_day",
-      "time_reason": "required_when_time_is_empty",
-      "address": "required_when_address_required",
-      "ticket_url": "required_when_ticket_required"
-    },
-    "hard_blockers": [
-      "invalid_date",
-      "invalid_end_date",
-      "end_before_start",
-      "invalid_source_url",
-      "hard_duplicate",
-      "weak_source"
-    ]
+    "evidence_states": ["officially_verified", "cross_checked", "format_validated", "system_suggestion", "human_required", "unverifiable", "conflict"],
+    "task_states": ["open", "saving", "waiting_external", "candidate_ready", "resolved", "conflict", "failed_verification"],
+    "time_statuses": ["fixed_time", "all_day", "during_opening_hours", "multiple_times", "time_not_published", "time_conflict", "time_not_applicable"],
+    "required_fields": ["title", "date", "city_or_local_reference", "location", "category", "source_url", "description", "visual_key", "visual_motif", "visual_asset_id"],
+    "finding_groups": ["identity", "schedule", "time", "scope", "location", "classification", "source", "description", "access", "dedupe", "visual"],
+    "ready_rule": "no blocking review task remains open, waiting, conflicted or unverified",
+    "final_action": "approve"
+  },
+  "review_task": {
+    "required_fields": ["task_id", "task_revision", "finding_code", "field_scope", "severity", "state", "title", "message", "evidence", "actions", "persistence", "follow_up", "postcondition", "audit"],
+    "partial_action": "resolve_review_task",
+    "postconditions": ["source_fields_verified", "review_contract_recalculated", "local_case_visible_or_terminal_as_expected", "target_task_closed_or_waiting"]
   },
   "decisions": {
     "approve_classes": ["accepted", "confirmed", "corrected"],
-    "reject_classes": [
-      "duplicate",
-      "rejected_not_event",
-      "rejected_not_public",
-      "rejected_not_local",
-      "rejected_source_weak",
-      "rejected_low_value",
-      "rejected_commercial"
-    ],
+    "reject_classes": ["duplicate", "rejected_not_event", "rejected_not_public", "rejected_not_local", "rejected_source_weak", "rejected_low_value", "rejected_commercial"],
     "snooze_class": "snoozed",
-    "required_fields": [
-      "decision_class",
-      "decision_note",
-      "resolved_by",
-      "resolved_at",
-      "suppress_until",
-      "recheck_at",
-      "reopen_policy",
-      "source_fingerprint",
-      "content_fingerprint"
-    ]
+    "required_fields": ["decision_class", "decision_note", "resolved_by", "resolved_at", "suppress_until", "recheck_at", "reopen_policy", "source_fingerprint", "content_fingerprint"]
   },
   "sheet_identity": {
-    "inbox_match_order": [
-      "stable_candidate_id",
-      "canonical_source_url_and_date",
-      "content_fingerprint",
-      "validated_row_hint"
-    ],
-    "audit_match_order": [
-      "verification_key",
-      "full_audit_fingerprint",
-      "unique_content_id_and_issue_code",
-      "validated_row_hint"
-    ],
+    "inbox_match_order": ["stable_candidate_id", "canonical_source_url_and_date", "content_fingerprint", "validated_row_hint"],
+    "audit_match_order": ["verification_key", "full_audit_fingerprint", "unique_content_id_and_issue_code", "validated_row_hint"],
     "zero_match_result": "not_found",
     "multiple_match_result": "ambiguous"
   },
   "operations": {
     "states": ["started", "source_written", "completed", "failed"],
     "same_operation_same_payload": "replay",
-    "same_operation_different_payload": "conflict"
+    "same_operation_different_payload": "conflict",
+    "partial_action_requires_task_revision": true
   },
   "editorial_feedback": {
     "single_edit_auto_activate": false,
     "activation_min_distinct_events": 3,
     "max_prompt_context_rules": 18,
-    "categories": [
-      "advertising_language_removed",
-      "source_attribution_removed",
-      "unsupported_claim_removed",
-      "local_relevance_added",
-      "concrete_activity_added",
-      "target_group_added",
-      "shortened",
-      "more_precise",
-      "repetition_removed",
-      "more_factual_tone",
-      "editorial_precision"
-    ]
+    "categories": ["advertising_language_removed", "source_attribution_removed", "unsupported_claim_removed", "local_relevance_added", "concrete_activity_added", "target_group_added", "shortened", "more_precise", "repetition_removed", "more_factual_tone", "editorial_precision"]
   }
 }
