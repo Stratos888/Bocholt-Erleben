@@ -100,6 +100,46 @@ function be_cc_reconcile_source_case(PDO $pdo, string $sourceSystem, string $sou
     return $changed;
 }
 
+function be_cc_reconcile_source_snooze(PDO $pdo, string $sourceSystem, string $sourceReference, string $until = '', array $evidence = []): int
+{
+    $normalizedUntil = null;
+    if (trim($until) !== '') {
+        try {
+            $normalizedUntil = (new DateTimeImmutable($until))->format('Y-m-d H:i:s');
+        } catch (Throwable) {
+            throw new InvalidArgumentException('Source snooze date is invalid.');
+        }
+    }
+
+    $lookup = $pdo->prepare("SELECT id, state, snoozed_until FROM control_cases WHERE source_system=:system AND source_reference=:reference AND state NOT IN ('done','rejected','parked','information')");
+    $lookup->execute(['system' => $sourceSystem, 'reference' => $sourceReference]);
+    $rows = $lookup->fetchAll(PDO::FETCH_ASSOC);
+    $changed = 0;
+
+    foreach ($rows as $row) {
+        $caseId = (string)($row['id'] ?? '');
+        $from = (string)($row['state'] ?? '');
+        if ($caseId === '') continue;
+        $effectiveUntil = $normalizedUntil ?? ($row['snoozed_until'] ?? null);
+        if ($from === 'snoozed' && (string)($row['snoozed_until'] ?? '') === (string)$effectiveUntil) continue;
+
+        $update = $pdo->prepare('UPDATE control_cases SET state=\'snoozed\', snoozed_until=:until, completed_at=NULL, blocked_reason=NULL, updated_at=NOW() WHERE id=:id');
+        $update->execute(['until' => $effectiveUntil, 'id' => $caseId]);
+        if ($update->rowCount() !== 1) continue;
+
+        if (function_exists('be_cc_record_event')) {
+            be_cc_record_event($pdo, $caseId, 'source_reconciled_snooze', $from, 'snoozed', $evidence + [
+                'source_system' => $sourceSystem,
+                'source_reference' => $sourceReference,
+                'snoozed_until' => $effectiveUntil,
+            ], 'system');
+        }
+        $changed++;
+    }
+
+    return $changed;
+}
+
 function be_cc_assert_case_postcondition(PDO $pdo, string $caseId, string $expectedState): array
 {
     $stmt = $pdo->prepare('SELECT id, state, snoozed_until, completed_at FROM control_cases WHERE id=:id');
