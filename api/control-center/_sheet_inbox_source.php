@@ -33,7 +33,9 @@ function be_cc_sync_sheet_inbox(): array
         return '';
     };
 
-    $closed = ['übernommen','uebernommen','verworfen','rejected','done','archived'];
+    // "verwerfen" war kurzzeitig ein fehlerhafter Writeback-Wert. Er bleibt als
+    // Kompatibilitätsalias geschlossen, der kanonische Status ist "verworfen".
+    $closed = ['übernommen','uebernommen','verworfen','verwerfen','rejected','done','archived'];
     $seen = $upserted = 0;
     for ($i = $headerOffset + 1; $i < count($values); $i++) {
         $row = is_array($values[$i] ?? null) ? $values[$i] : [];
