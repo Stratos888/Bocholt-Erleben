@@ -37,34 +37,9 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
-
-      - name: Materialize isolated staging Events deploy
-        if: github.event_name == 'pull_request' && github.head_ref == 'agent/staging-events-isolation'
-        run: python3 scripts/materialize_staging_events_deploy.py
-
-      - name: Commit materialized deploy evidence
-        if: github.event_name == 'pull_request' && github.head_ref == 'agent/staging-events-isolation'
-        shell: bash
-        run: |
-          set -euo pipefail
-          evidence="docs/evidence/staging-events-isolation/deploy-strato-isolated.yml"
-          mkdir -p "$(dirname "$evidence")"
-          cp .github/workflows/deploy-strato.yml "$evidence"
-          git diff --check
-          if git diff --quiet -- "$evidence" && git ls-files --error-unmatch "$evidence" >/dev/null 2>&1; then
-            echo "Materialized deploy evidence is already committed."
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add "$evidence"
-            git commit -m "Materialize isolated staging Events deploy"
-            git push origin "HEAD:${GITHUB_HEAD_REF}"
-          fi
 
       - name: Validate deploy branch routing
         shell: bash
