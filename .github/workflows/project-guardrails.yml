@@ -37,9 +37,31 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Materialize isolated staging Events deploy
+        if: github.event_name == 'pull_request' && github.head_ref == 'agent/staging-events-isolation'
+        run: python3 scripts/materialize_staging_events_deploy.py
+
+      - name: Commit materialized deploy workflow
+        if: github.event_name == 'pull_request' && github.head_ref == 'agent/staging-events-isolation'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          if git diff --quiet -- .github/workflows/deploy-strato.yml; then
+            echo "Deploy workflow already materialized."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .github/workflows/deploy-strato.yml
+            git commit -m "Isolate staging Events deploy feed"
+            git push origin "HEAD:${GITHUB_HEAD_REF}"
+          fi
 
       - name: Validate deploy branch routing
         shell: bash
