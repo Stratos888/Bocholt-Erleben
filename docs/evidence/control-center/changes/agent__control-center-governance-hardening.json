@@ -4,6 +4,7 @@
   "branch": "agent/control-center-governance-hardening",
   "base": "staging",
   "change_class": "governance_only",
+  "proposal_status": "unvalidated_do_not_merge",
   "analysis": {
     "root_causes": [
       "Documented staging acceptance order contradicted the actual deploy topology.",
@@ -13,15 +14,17 @@
       "No enforceable stop-the-line rule existed after an unexpected real-data mutation."
     ],
     "preventive_controls": [
-      "Canonical workmode freeze",
-      "Per-PR machine-readable change manifest",
-      "Governance CI validator",
-      "Separated isolated integration, staging deployment and real staging acceptance",
-      "Mandatory environment and data identity evidence for source/writeback changes",
-      "Live write tests forbidden"
+      "Candidate phased work and acceptance model, subject to validation",
+      "Candidate per-PR machine-readable change manifest, subject to validation",
+      "Candidate governance CI validator, subject to validation",
+      "Candidate separation of isolated integration, staging deployment and real staging acceptance",
+      "Candidate environment and data identity evidence for source/writeback changes",
+      "Proposed prohibition of live write tests"
     ],
     "evidence_files": [
       "docs/evidence/control-center/governance-hardening-2026-07-17.md",
+      "docs/handoffs/steuerzentrale-analyse-validierung-uebergabe-2026-07-17.md",
+      "docs/proposals/steuerzentrale-arbeitsweise-governance-vorschlag-2026-07-17.md",
       "STEUERZENTRALE_WORKMODE_FREEZE_2026-07-17.md"
     ]
   },
@@ -52,7 +55,7 @@
     "status": "not_required",
     "evidence_files": []
   },
-  "rollback_plan": "Revert the governance-only PR. No runtime, deployment configuration or external data is changed by this workpack.",
+  "rollback_plan": "Close or discard this draft proposal branch. No runtime, deployment configuration or external data is changed by this workpack.",
   "merge": {
     "staging_allowed": true,
     "main_allowed": false
