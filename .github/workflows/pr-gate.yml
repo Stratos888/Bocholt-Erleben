@@ -1,0 +1,148 @@
+name: PR Gate
+
+on:
+  pull_request:
+    branches: ["staging", "main"]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: pr-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: read
+  pull-requests: read
+
+jobs:
+  gate:
+    name: PR Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Enforce repository and source-branch policy
+        shell: bash
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          CURRENT_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          if [ "$HEAD_REPOSITORY" != "$CURRENT_REPOSITORY" ]; then
+            echo "PRs from external repositories are not allowed for this project workflow."
+            exit 1
+          fi
+
+          case "$BASE_REF" in
+            staging)
+              echo "Authorized integration target: staging"
+              ;;
+            main)
+              if [ "$HEAD_REF" != "staging" ]; then
+                echo "Only staging may be merged into main; received head branch '$HEAD_REF'."
+                exit 1
+              fi
+              echo "Authorized release path: staging -> main"
+              ;;
+            *)
+              echo "Unsupported PR target '$BASE_REF'."
+              exit 1
+              ;;
+          esac
+
+      - name: Aggregate started GitHub Actions checks
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = context.payload.pull_request.head.sha;
+            const currentRunId = String(context.runId);
+            const acceptedConclusions = new Set(["success", "neutral", "skipped"]);
+            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+            // Give path-filtered workflows time to register their check runs. The
+            // gate then waits only for checks that actually started; it does not
+            // duplicate their PHP, JS, Python, browser or product-contract work.
+            await sleep(12000);
+
+            let stableSignature = "";
+            let stableRounds = 0;
+            const maxPolls = 180;
+
+            for (let poll = 1; poll <= maxPolls; poll += 1) {
+              const runs = await github.paginate(
+                github.rest.checks.listForRef,
+                {
+                  owner,
+                  repo,
+                  ref: sha,
+                  per_page: 100,
+                  filter: "latest",
+                },
+                (response) => response.data.check_runs,
+              );
+
+              const checks = runs
+                .filter((run) => run.app?.slug === "github-actions")
+                .filter((run) => {
+                  const detailsUrl = String(run.details_url || "");
+                  const isThisGate = run.name === "PR Gate"
+                    && detailsUrl.includes(`/actions/runs/${currentRunId}/`);
+                  return !isThisGate;
+                })
+                .sort((left, right) => left.name.localeCompare(right.name));
+
+              const failed = checks.filter((run) =>
+                run.status === "completed"
+                && !acceptedConclusions.has(String(run.conclusion || "")),
+              );
+
+              if (failed.length > 0) {
+                for (const run of failed) {
+                  core.error(`${run.name}: ${run.conclusion}`);
+                }
+                core.setFailed("At least one started GitHub Actions check failed.");
+                return;
+              }
+
+              const pending = checks.filter((run) => run.status !== "completed");
+              const signature = checks
+                .map((run) => `${run.id}:${run.name}:${run.status}:${run.conclusion || ""}`)
+                .join("|");
+
+              const summary = checks.length === 0
+                ? "no additional checks"
+                : checks.map((run) => `${run.name}=${run.status}/${run.conclusion || "-"}`).join(", ");
+              core.info(`Poll ${poll}: ${summary}`);
+
+              if (pending.length === 0) {
+                if (signature === stableSignature) {
+                  stableRounds += 1;
+                } else {
+                  stableSignature = signature;
+                  stableRounds = 1;
+                }
+
+                // Three stable observations prevent the gate from finishing in
+                // the short interval before another path-filtered workflow appears.
+                if (stableRounds >= 3) {
+                  await core.summary
+                    .addHeading("PR Gate")
+                    .addRaw("Source policy passed. All GitHub Actions checks that started for this commit completed successfully.")
+                    .addEOL()
+                    .addRaw(checks.length === 0 ? "No additional path-specific checks were required." : summary)
+                    .write();
+                  return;
+                }
+              } else {
+                stableSignature = "";
+                stableRounds = 0;
+              }
+
+              await sleep(5000);
+            }
+
+            core.setFailed("Timed out while waiting for the started GitHub Actions checks.");
