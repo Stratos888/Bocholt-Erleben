@@ -20,7 +20,8 @@ run_allowed_case() {
   local branch="$1"
   local expected_dir="$2"
   local expected_env="$3"
-  local expected_tab="$4"
+  local expected_inbox="$4"
+  local expected_events="$5"
   local output
   output="$(mktemp)"
   trap 'rm -f "$output"' RETURN
@@ -28,7 +29,8 @@ run_allowed_case() {
   bash "$RESOLVER" "$branch" "$output" >/dev/null
   assert_line "$output" "DEPLOY_TARGET_DIR=$expected_dir"
   assert_line "$output" "DEPLOY_ENV_NAME=$expected_env"
-  assert_line "$output" "INBOX_TAB_NAME=$expected_tab"
+  assert_line "$output" "INBOX_TAB_NAME=$expected_inbox"
+  assert_line "$output" "EVENTS_TAB_NAME=$expected_events"
 
   rm -f "$output"
   trap - RETURN
@@ -49,8 +51,8 @@ run_blocked_case() {
   trap - RETURN
 }
 
-run_allowed_case main . live Inbox
-run_allowed_case staging staging staging Inbox_Staging
+run_allowed_case main . live Inbox Events
+run_allowed_case staging staging staging Inbox_Staging Events_Staging
 run_blocked_case agent/example-workpack
 run_blocked_case feature/test
 run_blocked_case ""
@@ -61,6 +63,12 @@ grep -q 'name: Authorize deploy branch before external access' "$WORKFLOW" \
   || fail "Deploy workflow does not contain the early authorization step"
 grep -q 'bash scripts/resolve-deploy-target.sh "${GITHUB_REF_NAME}" "${GITHUB_ENV}"' "$WORKFLOW" \
   || fail "Deploy workflow does not call the canonical resolver"
+grep -q 'EVENTS_TAB_NAME' "$WORKFLOW" \
+  || fail "Deploy workflow does not consume the authorized Events target"
+grep -q 'Events_Staging' "$WORKFLOW" \
+  || fail "Deploy workflow does not recognize the isolated staging overlay"
+grep -q 'merge_events_overlay' "$WORKFLOW" \
+  || fail "Deploy workflow does not merge the staging Events overlay"
 
 checkout_line="$(grep -n 'name: Checkout' "$WORKFLOW" | head -1 | cut -d: -f1)"
 authorize_line="$(grep -n 'name: Authorize deploy branch before external access' "$WORKFLOW" | head -1 | cut -d: -f1)"
@@ -76,5 +84,7 @@ sheet_line="$(grep -n 'name: Resolve Google Sheet and Inbox tab target' "$WORKFL
 if grep -q 'if \[ "${GITHUB_REF_NAME}" = "staging" \].*' "$WORKFLOW"; then
   fail "Deploy workflow still contains the legacy staging/else-live branch decision"
 fi
+
+python3 "$ROOT/tests/test_events_overlay_merge.py"
 
 echo "Deploy branch routing guardrails: OK"

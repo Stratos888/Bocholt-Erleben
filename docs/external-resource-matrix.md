@@ -25,7 +25,7 @@ Jeder Workpack muss externe Ressourcen vor der ersten Umsetzung deklarieren. Nic
 |---|---|---|---|---|
 | Google Sheet Inbox | `Inbox_Staging` | `Inbox` | kontrolliert moeglich | nur dedizierter Testfall, Vorher-/Nachher-Evidence und Ruecklesen |
 | Google Sheet Inbox-Archiv | `Inbox_Archive_Staging` | `Inbox_Archive` | kontrolliert moeglich | nur zusammen mit dem zugehoerigen Inbox-Test und eindeutigem Fall |
-| Google Sheet Events | derzeit gemeinsamer Tab `Events` | `Events` | gesperrt | bis zu einer echten `Events_Staging`- oder Adapter-Isolation ausschliesslich read-only |
+| Google Sheet Events | `Events_Staging` als isoliertes Overlay auf der read-only Basis `Events` | `Events` | kontrolliert moeglich | Staging darf nur `Events_Staging` mutieren; Deploy merged Basis und Overlay fail-closed; Live-Tab bleibt read-only |
 | Google Sheet Content-/Search-Feedback | Tab und Umgebung je Workflow pruefen | produktive Feedback-Tabs | standardmaessig gesperrt | nur nach belegter Staging-Zielaufloesung und eigener Testidentitaet |
 | Growth-Backlog | konkrete Quelle je API/Workflow pruefen | produktive Quelle | standardmaessig gesperrt | vor Schreibtests Quelle, Umgebung und Objekt-ID inventarisieren |
 | Veranstalter-/Submission-Datenbank | Staging-DB laut Deploy-Konfiguration; Runtime separat nachweisen | Live-DB | kontrolliert erst nach Nachweis | keine Zahlung, Mail oder Veroeffentlichung als Testnebenwirkung |
@@ -37,6 +37,14 @@ Jeder Workpack muss externe Ressourcen vor der ersten Umsetzung deklarieren. Nic
 | Mail/SMTP | Staging-Konfiguration | Live-Konfiguration | keine echte Mail im normalen Smoke | nur expliziter Mail-Workpack mit Testempfaenger und Freigabe |
 | Search Console/Bing | read-only Export | read-only Export | read-only | keine Konfigurations- oder Property-Aenderung im Produktworkpack |
 | GitHub Actions / Deploy | Branch- und Workflowzustand | Main-Workflowzustand | nur kontrolliert | Feature-Branches duerfen niemals deployen; `main` und `staging` sind die einzigen erlaubten Deploy-Refs |
+
+## Events-Overlay-Vertrag
+
+1. `Events` bleibt die gemeinsame read-only Basis und darf von Staging niemals beschrieben werden.
+2. `Events_Staging` enthaelt ausschliesslich Staging-Freigaben oder gezielte Staging-Overrides.
+3. Der Staging-Deploy fuehrt Basis und Overlay anhand stabiler ID beziehungsweise URL zusammen; doppelte oder widerspruechliche Identitaeten blockieren den Deploy.
+4. Der Live-Deploy liest ausschliesslich `Events` und ignoriert `Events_Staging` vollstaendig.
+5. Eine Staging-Freigabe gilt erst nach unabhaengiger Ruecklesepruefung von Eventzeile und terminalem `Inbox_Staging`-Status als abgeschlossen.
 
 ## Ressourcendeklaration im Draft-PR
 
