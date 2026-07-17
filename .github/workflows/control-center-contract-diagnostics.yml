@@ -5,7 +5,11 @@ on:
     branches: ["staging"]
     paths:
       - "api/control-center/**"
+      - "js/control-center/**"
+      - "scripts/**"
       - "tests/control_center*.php"
+      - "tests/control_center*.mjs"
+      - "tests/test_event_visual_gap_backlog.py"
       - ".github/workflows/control-center-contract-diagnostics.yml"
 
 jobs:
@@ -27,3 +31,7 @@ jobs:
         run: php tests/control_center_state_consistency_contract_test.php
       - name: Inbox environment isolation
         run: php tests/control_center_inbox_tab_contract_test.php
+      - name: Visual gap backlog
+        run: python3 tests/test_event_visual_gap_backlog.py
+      - name: Frontend contract
+        run: node tests/control_center_frontend_contract_test.mjs
