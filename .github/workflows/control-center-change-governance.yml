@@ -1,0 +1,39 @@
+name: Control Center Change Governance
+
+on:
+  pull_request:
+    branches: ["staging", "main"]
+    paths:
+      - "api/control-center/**"
+      - "js/control-center/**"
+      - "js/control-center.js"
+      - "css/control-center*.css"
+      - "steuerzentrale/**"
+      - "data/control_center_*.json"
+      - "data/event_visual_*.json"
+      - "tests/control_center*"
+      - "scripts/audit_control_center*"
+      - "scripts/validate_control_center*"
+      - "docs/steuerzentrale*"
+      - "docs/evidence/control-center/**"
+      - "STEUERZENTRALE_*.md"
+      - ".github/pull_request_template.md"
+      - ".github/CODEOWNERS"
+      - ".github/workflows/control-center-*.yml"
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate control center change manifest
+        run: |
+          set -euo pipefail
+          python3 scripts/validate_control_center_change_governance.py \
+            --base "${GITHUB_BASE_REF}" \
+            --head "${GITHUB_HEAD_REF}"
