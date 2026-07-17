@@ -77,13 +77,13 @@ $assert($directDuplicateUpdates === ['status'=>'verworfen','ablehnungsgrund'=>'D
 $fixtureTable = be_cc_inbox_direct_table_from_values([
     ['status','ablehnungsgrund','id_suggestion','title','date','source_url'],
     ['review','','fixture-event-1','Fixture Event','2026-08-15','https://example.org/events/fixture'],
-]);
+], 'Inbox_Staging');
 $assert($fixtureTable['header_row'] === 1 && count($fixtureTable['rows']) === 1, 'Inbox-spezifischer Header mit id_suggestion wird erkannt.');
 $batchBody = be_cc_inbox_direct_batch_body($fixtureTable, 2, $directDuplicateUpdates);
 $assert(($batchBody['valueInputOption'] ?? '') === 'RAW', 'Direkter Writeback verwendet RAW-Werte.');
 $assert(count($batchBody['data'] ?? []) === 2, 'Status und Ablehnungsgrund werden in einem Batch geplant.');
-$assert(($batchBody['data'][0]['range'] ?? '') === 'Inbox!A2:A2', 'Status-Zielzelle wird korrekt geplant.');
-$assert(($batchBody['data'][1]['range'] ?? '') === 'Inbox!B2:B2', 'Ablehnungsgrund-Zielzelle wird korrekt geplant.');
+$assert(($batchBody['data'][0]['range'] ?? '') === 'Inbox_Staging!A2:A2', 'Status-Zielzelle wird korrekt geplant.');
+$assert(($batchBody['data'][1]['range'] ?? '') === 'Inbox_Staging!B2:B2', 'Ablehnungsgrund-Zielzelle wird korrekt geplant.');
 $assert(BE_CC_INBOX_DIRECT_HTTP_TIMEOUT_SECONDS <= 8, 'Jeder direkte Google-Aufruf besitzt ein kurzes hartes Zeitlimit.');
 $assert(BE_CC_INBOX_DIRECT_VERIFY_ATTEMPTS === 2, 'Rückleseprüfung ist auf zwei Versuche begrenzt.');
 $verifiedDuplicate = be_cc_inbox_verify_writeback_row([
