@@ -11,6 +11,7 @@ const evidenceLabels = {
   officially_verified:'Offiziell bestätigt', cross_checked:'Abgeglichen', format_validated:'Formal geprüft',
   system_suggestion:'Systemvorschlag', human_required:'Menschliche Prüfung', unverifiable:'Noch nicht belegbar', conflict:'Konflikt',
 };
+const confidenceLabels = { high:'hoch', medium:'mittel', low:'niedrig' };
 const taskStateLabels = { open:'Offen', waiting_external:'Wartet auf Folgeprozess', candidate_ready:'Ergebnis prüfen', conflict:'Konflikt', failed_verification:'Prüfung fehlgeschlagen' };
 const timeLabels = {
   fixed_time:'Feste Uhrzeit', all_day:'Ganztägig', during_opening_hours:'Während der Öffnungszeiten',
@@ -18,11 +19,12 @@ const timeLabels = {
 };
 function evidenceBadge(evidence={}) {
   const status=clean(evidence.status)||'human_required'; const confidence=clean(evidence.confidence);
-  return `<span class="cc-evidence cc-evidence--${escapeHtml(status)}">${escapeHtml(evidenceLabels[status]||status)}${confidence?` · ${escapeHtml(confidence)}`:''}</span>`;
+  return `<span class="cc-evidence cc-evidence--${escapeHtml(status)}">${escapeHtml(evidenceLabels[status]||status)}${confidence?` · ${escapeHtml(confidenceLabels[confidence]||confidence)}`:''}</span>`;
 }
 function assetPreview(asset) {
   if (!asset?.src) return '';
-  return `<figure class="cc-review-asset"><img src="${escapeHtml(asset.src)}" alt="${escapeHtml(asset.alt||'Vorgeschlagenes Eventbild')}" loading="lazy"><figcaption><strong>${escapeHtml(asset.id||'Bildvorschlag')}</strong><span>${escapeHtml(asset.alt||'Freigegebenes symbolisches Eventbild.')}</span></figcaption></figure>`;
+  const label=clean(asset.label)||'Freigegebenes Eventbild';
+  return `<figure class="cc-review-asset"><img src="${escapeHtml(asset.src)}" alt="${escapeHtml(asset.alt||'Vorgeschlagenes Eventbild')}" loading="lazy"><figcaption><strong>${escapeHtml(label)}</strong><span>${escapeHtml(asset.alt||'Freigegebenes symbolisches Eventbild.')}</span></figcaption></figure>`;
 }
 function renderTask(task) {
   const evidence=task.evidence||{}; const actions=asArray(task.actions);
@@ -48,10 +50,13 @@ function verifiedFact(label,value,evidence,url='') {
 function renderVerifiedFacts(review) {
   const facts=review.facts||{}, source=review.source||{}, visual=review.visual||{}, classification=review.classification||{}, evidence=review.field_evidence||{};
   const date=[facts.date?formatDate(facts.date):'',facts.end_date?`bis ${formatDate(facts.end_date)}`:''].filter(Boolean).join(' ');
-  const time=facts.time||timeLabels[facts.time_status]||facts.time_details||'';
+  const time=facts.time_details||facts.time||timeLabels[facts.time_status]||'';
   const asset=visual.asset;
+  const visualKey=visual.key_label||visual.key;
+  const visualMotif=visual.motif_label||visual.motif;
+  const visualAsset=visual.asset_label||(asset?'Freigegebenes Eventbild':'');
   return `<details class="cc-disclosure cc-reviewed-summary" ${review.decision_gate?.ready?'open':''}><summary>Geprüfte Gesamtfassung</summary>
-    <dl class="cc-fact-grid">${verifiedFact('Termin',date,evidence.date)}${verifiedFact('Uhrzeit',time,evidence.time||evidence.time_status)}${verifiedFact('Ort',[facts.location,facts.city].filter(Boolean).join(' · '),evidence.location)}${verifiedFact('Adresse',facts.address,evidence.address)}${verifiedFact('Kategorie',classification.category,evidence.category)}${verifiedFact('Prüfquelle',source.name||source.url,evidence.source_url,source.url)}${verifiedFact('Eventseite',source.event_url,evidence.event_url,source.event_url)}${verifiedFact('Ticket / Anmeldung',source.ticket_url,evidence.ticket_url,source.ticket_url)}${verifiedFact('Bildbereich',visual.key,evidence.visual_key)}${verifiedFact('Motiv',visual.motif,evidence.visual_motif)}${verifiedFact('Gebundenes Bild',visual.asset_id,evidence.visual_asset_id)}</dl>
+    <dl class="cc-fact-grid">${verifiedFact('Termin',date,evidence.date)}${verifiedFact('Uhrzeit',time,evidence.time_details||evidence.time||evidence.time_status)}${verifiedFact('Ort',[facts.location,facts.city].filter(Boolean).join(' · '),evidence.location)}${verifiedFact('Adresse',facts.address,evidence.address)}${verifiedFact('Kategorie',classification.category,evidence.category)}${verifiedFact('Prüfquelle',source.name||source.url,evidence.source_url,source.url)}${verifiedFact('Eventseite',source.event_url,evidence.event_url,source.event_url)}${verifiedFact('Ticket / Anmeldung',source.ticket_url,evidence.ticket_url,source.ticket_url)}${verifiedFact('Bildbereich',visualKey,evidence.visual_key)}${verifiedFact('Motiv',visualMotif,evidence.visual_motif)}${verifiedFact('Gebundenes Bild',visualAsset,evidence.visual_asset_id)}</dl>
     ${assetPreview(asset)}
     <section class="cc-detail-section"><h3>Finale Beschreibung</h3><p class="cc-description-copy">${escapeHtml(review.description?.final||'Keine Beschreibung vorhanden.')}</p></section>
   </details>`;

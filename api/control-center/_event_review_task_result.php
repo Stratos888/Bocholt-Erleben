@@ -26,6 +26,34 @@
     foreach ($tasks as $task) $stateCounts[$task['state']] = ($stateCounts[$task['state']]??0)+1;
 
     $asset = $visualAssetId !== '' ? be_cc_event_visual_asset_by_id($visualAssetId) : null;
+    $visualKeyLabel = '';
+    foreach (be_cc_event_visual_key_options() as $option) {
+        if ((string)($option['value'] ?? '') !== $visualKey) continue;
+        $visualKeyLabel = trim((string)($option['label'] ?? ''));
+        break;
+    }
+    if ($visualKeyLabel === '' && $visualKey !== '') $visualKeyLabel = be_cc_review_humanize($visualKey);
+    $visualMotifLabels = [
+        'art_market'=>'Kunstmarkt',
+        'creative_exhibition'=>'Kreativausstellung',
+        'neutral_art_exhibition'=>'Kunstausstellung und Galerie',
+        'csd_pride_parade'=>'CSD- und Pride-Parade',
+        'marching_band_procession'=>'Musikzug und Festumzug',
+        'fabric_market'=>'Stoffmarkt',
+        'flea_market'=>'Flohmarkt',
+        'seasonal_martinsmarkt'=>'Martinsmarkt',
+        'wine_festival'=>'Weinfest',
+        'street_food_festival'=>'Street-Food-Festival',
+        'organ_concert'=>'Orgelkonzert',
+        'choir'=>'Chor',
+        'puppet_theater'=>'Puppen- und Figurentheater',
+        'association_fair'=>'Vereinsmesse',
+        'health_career_fair'=>'Gesundheitsberufemesse',
+        'playfountain_water_splash'=>'Wasserspielfläche',
+        'children_flea_market'=>'Kinderflohmarkt',
+    ];
+    $visualMotifLabel = $visualMotif !== '' ? ($visualMotifLabels[$visualMotif] ?? be_cc_review_humanize($visualMotif)) : '';
+    $visualAssetLabel = $asset !== null ? 'Freigegebenes Eventbild' : '';
     return [
         'identity'=>['stable_id'=>$stableId],
         'facts'=>$facts,
@@ -37,7 +65,10 @@
         'classification'=>['category'=>$category],
         'access'=>['status'=>$accessStatus,'ticket_required'=>$ticketRequired],
         'visual'=>[
-            'key'=>$visualKey,'motif'=>$visualMotif,'asset_id'=>$visualAssetId,'asset_role'=>$visualAssetRole,'asset'=>$asset,
+            'key'=>$visualKey,'key_label'=>$visualKeyLabel,
+            'motif'=>$visualMotif,'motif_label'=>$visualMotifLabel,
+            'asset_id'=>$visualAssetId,'asset_label'=>$visualAssetLabel,
+            'asset_role'=>$visualAssetRole,'asset'=>$asset,
             'gap_id'=>be_cc_review_text($payload,['visual_gap_id']),
         ],
         'dedupe'=>[
