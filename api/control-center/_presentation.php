@@ -32,6 +32,7 @@ function be_cc_case_presentation(array $row): array
     $type = (string)($row['case_type'] ?? 'intake');
     $payload = be_cc_decode_payload($row);
     $kind = 'other'; $group = 'other'; $primary = null; $secondary = []; $context = []; $links = []; $waitingFor = ''; $reviewContract = null;
+    $displayStatus = be_cc_display_status($state);
 
     if ($source === 'inbox_feed') {
         $kind = (($payload['submission_kind'] ?? '') === 'activity') ? 'activity_candidate' : 'event_candidate';
@@ -40,6 +41,7 @@ function be_cc_case_presentation(array $row): array
             $reviewContract = be_cc_event_candidate_review_contract($payload);
             $ready = (bool)($reviewContract['decision_gate']['ready'] ?? false);
             $openTasks = count((array)($reviewContract['decision_gate']['blockers'] ?? []));
+            if ($ready) $displayStatus = 'Entscheidungsreif';
             $primary = $ready
                 ? be_cc_action('approve', 'Event übernehmen')
                 : be_cc_action('resolve_review_task', $openTasks === 1 ? 'Offenen Punkt klären' : 'Offene Punkte klären');
@@ -89,7 +91,7 @@ function be_cc_case_presentation(array $row): array
         else{$kind='content_quality_review';$primary=be_cc_action('approve','Prüfung abschließen');}
         $secondary=[be_cc_action('snooze','Zurückstellen',true),be_cc_action('reject','Ablehnen',true,true),be_cc_action('details','Details')];
         $context=['issue_code'=>(string)($payload['issue_code']??''),'issue_text'=>(string)($payload['issue_text']??''),'recommended_action'=>(string)($payload['recommended_action']??''),'current_description'=>(string)($payload['description']??''),'suggested_description'=>(string)($payload['suggested_description']??$payload['replacement_text']??''),'suggested_url'=>(string)($payload['suggested_url']??''),'source_url'=>(string)($payload['source_url']??''),'content_type'=>(string)($payload['content_type']??'')];
-        $url=trim((string)($payload['suggested_url']??$payload['source_url']??'')); if($url!=='')$links[]=['label'=>'Quelle','url'=>$url];
+        $url=trim((string)($payload['suggested_url']??$payload['source_url']??''));if($url!=='')$links[]=['label'=>'Quelle','url'=>$url];
     } elseif ($source === 'growth_backlog' && $type !== 'task') {
         $kind='backlog_item';$group='backlog';$primary=be_cc_action('edit_source','Bearbeiten',true);$secondary=[be_cc_action('complete','Abschließen'),be_cc_action('reject','Verwerfen',true,true)];
         $context=['backlog_type'=>(string)($payload['type']??''),'source'=>(string)($payload['source']??$payload['source_document']??''),'recommended_action'=>(string)($payload['recommended_action']??$payload['next_action']??''),'expected_benefit'=>(string)($payload['expected_benefit']??'')];
@@ -107,7 +109,7 @@ function be_cc_case_presentation(array $row): array
     } elseif ($type === 'information') { $kind='system_information';$group='information'; }
 
     return [
-        'case_kind'=>$kind,'queue_group'=>$group,'display_status'=>be_cc_display_status($state),
+        'case_kind'=>$kind,'queue_group'=>$group,'display_status'=>$displayStatus,
         'primary_action'=>$primary,'secondary_actions'=>$secondary,'decision_context'=>$context,
         'review_contract'=>$reviewContract,'source_links'=>$links,'waiting_for'=>$waitingFor,
     ];
