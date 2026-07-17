@@ -3,13 +3,16 @@ name: Project Guardrails
 on:
   pull_request:
     branches: ["staging", "main"]
-    paths:
+    paths: &guardrail_paths
       - ".github/workflows/deploy-strato.yml"
       - ".github/workflows/pr-gate.yml"
       - ".github/workflows/project-guardrails.yml"
       - ".github/pull_request_template.md"
       - "AI_ENTRYPOINT.md"
       - "ENGINEERING.md"
+      - "docs/architecture/SYSTEM_MAP.md"
+      - "docs/workpacks/active/CURRENT_WORKPACK.md"
+      - "docs/decisions/**"
       - "docs/external-resource-matrix.md"
       - "docs/github-actions-trigger-policy.md"
       - "scripts/resolve-deploy-target.sh"
@@ -18,19 +21,7 @@ on:
       - "tests/test_events_overlay_merge.py"
   push:
     branches: ["staging", "main"]
-    paths:
-      - ".github/workflows/deploy-strato.yml"
-      - ".github/workflows/pr-gate.yml"
-      - ".github/workflows/project-guardrails.yml"
-      - ".github/pull_request_template.md"
-      - "AI_ENTRYPOINT.md"
-      - "ENGINEERING.md"
-      - "docs/external-resource-matrix.md"
-      - "docs/github-actions-trigger-policy.md"
-      - "scripts/resolve-deploy-target.sh"
-      - "scripts/merge_events_overlay.py"
-      - "tests/test_deploy_branch_routing.sh"
-      - "tests/test_events_overlay_merge.py"
+    paths: *guardrail_paths
   workflow_dispatch:
 
 jobs:
@@ -60,23 +51,46 @@ jobs:
             exit 1
           fi
 
-      - name: Validate governance documents
+      - name: Validate AI working model
         shell: bash
         run: |
           set -euo pipefail
-          test -s AI_ENTRYPOINT.md
-          test -s ENGINEERING.md
-          test -s docs/external-resource-matrix.md
-          test -s docs/github-actions-trigger-policy.md
-          test -s .github/pull_request_template.md
+          for file in \
+            AI_ENTRYPOINT.md \
+            ENGINEERING.md \
+            docs/architecture/SYSTEM_MAP.md \
+            docs/workpacks/active/CURRENT_WORKPACK.md \
+            docs/external-resource-matrix.md \
+            docs/github-actions-trigger-policy.md \
+            .github/pull_request_template.md; do
+            test -s "$file"
+          done
 
-          grep -q 'Integrations-Chat' AI_ENTRYPOINT.md
-          grep -q 'maximal zwei aktive Workpack-Chats' AI_ENTRYPOINT.md
+          grep -q 'Ein primärer Ausführungs-Chat' AI_ENTRYPOINT.md
+          grep -q 'Einmaliges Arbeitsmandat' AI_ENTRYPOINT.md
+          grep -q 'R1.*lokal und reversibel' AI_ENTRYPOINT.md
+          grep -q 'Gate A.*Verstehen' AI_ENTRYPOINT.md
+          grep -q 'Gate C.*Reale Runtime beweisen' AI_ENTRYPOINT.md
+          grep -q 'Fehlerbudget und Stop-the-line' AI_ENTRYPOINT.md
+          grep -q 'Ein grüner PR beweist höchstens E2' AI_ENTRYPOINT.md
+
+          grep -q 'Architekturprinzip: vereinfachen statt schichten' ENGINEERING.md
           grep -q 'Ressourcen-Lock' ENGINEERING.md
           grep -q 'Alles, was nicht ausdrücklich als staging-isoliert' ENGINEERING.md
+          grep -q 'Ein echter Fachdatensatz wird erst nach isoliertem synthetischem Staging-Beweis verwendet' ENGINEERING.md
+
+          grep -q 'Kritischer Inbox-Übernahmepfad' docs/architecture/SYSTEM_MAP.md
+          grep -q 'Aktiver Workpack' docs/workpacks/active/CURRENT_WORKPACK.md
+          grep -q 'Risikoklasse' docs/workpacks/active/CURRENT_WORKPACK.md
+          grep -q 'Erforderliche Evidence' .github/pull_request_template.md
           grep -q 'Google Sheet Events' docs/external-resource-matrix.md
           grep -q 'Feature-Branches duerfen niemals deployen' docs/external-resource-matrix.md
           grep -q 'Always-run PR Gate' docs/github-actions-trigger-policy.md
+
+          if grep -q 'maximal zwei aktive Workpack-Chats' AI_ENTRYPOINT.md; then
+            echo "Legacy multi-chat default must not be reintroduced."
+            exit 1
+          fi
 
       - name: Validate no canonical freeze replacement
         shell: bash
