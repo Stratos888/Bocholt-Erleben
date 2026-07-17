@@ -16,9 +16,9 @@ required_files=[
     'api/control-center/_decision_contract.php','api/control-center/_editorial_contracts.php','api/control-center/_event_review_tasks.php',
     'api/control-center/_event_review_task_support.php','api/control-center/_event_review_task_schedule_a.php','api/control-center/_event_review_task_schedule_b.php',
     'api/control-center/_event_review_task_details.php','api/control-center/_event_review_task_visual.php','api/control-center/_event_review_task_result.php',
-    'api/control-center/_event_review_writeback.php','api/control-center/_inbox_decision_writeback.php','api/control-center/_sheet_identity.php',
+    'api/control-center/_event_review_writeback.php','api/control-center/_inbox_tab.php','api/control-center/_inbox_decision_writeback.php','api/control-center/_sheet_identity.php',
     'api/control-center/_operations.php','api/control-center/_editorial_feedback.php','tests/fixtures/control_center_editorial_cases.json',
-    'tests/control_center_editorial_contracts_test.php','tests/control_center_exception_review_runtime_test.php',
+    'tests/control_center_editorial_contracts_test.php','tests/control_center_exception_review_runtime_test.php','tests/control_center_inbox_tab_contract_test.php',
     'docs/steuerzentrale-redaktioneller-entscheidungs-und-lernprozess.md',
 ]
 contents={path:read(path) for path in required_files}
@@ -39,13 +39,15 @@ contents['event_review_task_contract']=task_contract
 markers={
     'event_review_task_contract':['review_tasks','task_revision','time_not_published','visual_asset_id','visual_gap_id','field_evidence'],
     'api/control-center/_event_review_writeback.php':['be_cc_resolve_event_review_task','source_verified','be_cc_event_candidate_review_contract','review_task_resolved'],
-    'api/control-center/_inbox_decision_writeback.php':['be_cc_inbox_direct_canonical_plan','Inbox!A:ZZ','expectedSourceFingerprint'],
+    'api/control-center/_inbox_tab.php':['be_cc_inbox_tab_name','Inbox_Staging','be_app_env_value'],
+    'api/control-center/_inbox_decision_writeback.php':['be_cc_inbox_direct_canonical_plan','be_cc_inbox_range','expectedSourceFingerprint'],
     'api/control-center/_sheet_identity.php':['be_cc_resolve_inbox_row','be_cc_resolve_audit_row','validated_row_hint','superseded_audit_row'],
     'api/control-center/_decision_contract.php':['be_cc_validate_operator_decision','decision_class','suppress_until'],
     'api/control-center/_operations.php':['be_cc_operation_reservation_decision','payload_hash','replay','conflict'],
     'api/control-center/_editorial_feedback.php':['be_cc_editorial_feedback_observation','be_cc_editorial_feedback_aggregate','permanent_rule_change_allowed'],
     'tests/control_center_editorial_contracts_test.php':['CityArt löst konkretes ready-Asset','Prüfpunkt besitzt Revision','Prüfpunkt besitzt Evidenz'],
     'tests/control_center_exception_review_runtime_test.php':['atomar in einem Batch','konkretes CityArt-Asset','Wiedervorlage wird typisiert'],
+    'tests/control_center_inbox_tab_contract_test.php':['Staging muss ausschließlich Inbox_Staging verwenden','fail-closed'],
 }
 for path,needles in markers.items():
     text=contents.get(path,'')

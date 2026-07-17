@@ -7,7 +7,7 @@ require_once dirname(__DIR__).'/api/control-center/_inbox_decision_writeback.php
 require_once dirname(__DIR__).'/api/control-center/_event_review_writeback.php';
 $failures=[];$assert=static function(bool $condition,string $label)use(&$failures):void{if(!$condition)$failures[]=$label;};$throws=static function(callable $callback,string $needle,string $label)use(&$failures):void{try{$callback();$failures[]=$label.' (keine Exception)';}catch(Throwable $error){if(!str_contains($error->getMessage(),$needle))$failures[]=$label.' ('.$error->getMessage().')';}};
 $values=[['status','title','date','id_suggestion','source_url'],['review','CityArt','2026-08-30','cityart-2026','https://example.org/cityart']];
-$table=be_cc_inbox_direct_table_from_values($values);
+$table=be_cc_inbox_direct_table_from_values($values, 'Inbox_Staging');
 $plan=be_cc_inbox_direct_canonical_plan($table,2,['time_status'=>'all_day','visual_asset_id'=>'motif-gap-art-market-01']);
 $assert(count($plan['new_headers'])===2,'fehlende kanonische Spalten werden geplant');
 $assert(count($plan['data'])===4,'Header und Werte werden atomar in einem Batch geplant');

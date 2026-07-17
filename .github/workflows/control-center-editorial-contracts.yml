@@ -21,6 +21,7 @@ on:
       - "api/control-center/_source_reconciliation.php"
       - "api/control-center/_verified_source_writeback.php"
       - "api/control-center/_activity_audit_writeback.php"
+      - "api/control-center/_inbox_tab.php"
       - "api/control-center/_inbox_decision_writeback.php"
       - "api/control-center/_sheet_inbox_source.php"
       - "api/control-center/_submission_source.php"
@@ -43,6 +44,7 @@ on:
       - "tests/control_center_sheet_identity_test.php"
       - "tests/control_center_editorial_runtime_contract_test.php"
       - "tests/control_center_state_consistency_contract_test.php"
+      - "tests/control_center_inbox_tab_contract_test.php"
       - "tests/control_center_frontend_contract_test.mjs"
       - "scripts/audit_control_center_editorial_contracts.py"
       - "scripts/build-event-visual-gap-backlog.py"
@@ -83,6 +85,7 @@ jobs:
           php -l api/control-center/_source_reconciliation.php
           php -l api/control-center/_verified_source_writeback.php
           php -l api/control-center/_activity_audit_writeback.php
+          php -l api/control-center/_inbox_tab.php
           php -l api/control-center/_inbox_decision_writeback.php
           php -l api/control-center/_sheet_inbox_source.php
           php -l api/control-center/_submission_source.php
@@ -96,6 +99,7 @@ jobs:
           php -l tests/control_center_sheet_identity_test.php
           php -l tests/control_center_editorial_runtime_contract_test.php
           php -l tests/control_center_state_consistency_contract_test.php
+          php -l tests/control_center_inbox_tab_contract_test.php
       - name: Run editorial and state fixtures
         run: |
           php tests/control_center_editorial_contracts_test.php
@@ -104,6 +108,7 @@ jobs:
           php tests/control_center_sheet_identity_test.php
           php tests/control_center_editorial_runtime_contract_test.php
           php tests/control_center_state_consistency_contract_test.php
+          php tests/control_center_inbox_tab_contract_test.php
           python3 tests/test_event_visual_gap_backlog.py
           node tests/control_center_frontend_contract_test.mjs
       - name: Audit editorial contract completeness

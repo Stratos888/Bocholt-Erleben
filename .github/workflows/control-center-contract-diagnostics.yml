@@ -1,0 +1,37 @@
+name: Control Center Contract Diagnostics
+
+on:
+  pull_request:
+    branches: ["staging"]
+    paths:
+      - "api/control-center/**"
+      - "js/control-center/**"
+      - "scripts/**"
+      - "tests/control_center*.php"
+      - "tests/control_center*.mjs"
+      - "tests/test_event_visual_gap_backlog.py"
+      - ".github/workflows/control-center-contract-diagnostics.yml"
+
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Editorial contracts
+        run: php tests/control_center_editorial_contracts_test.php
+      - name: Presentation contract
+        run: php tests/control_center_presentation_contract_test.php
+      - name: Exception review runtime
+        run: php tests/control_center_exception_review_runtime_test.php
+      - name: Sheet identity
+        run: php tests/control_center_sheet_identity_test.php
+      - name: Editorial runtime
+        run: php tests/control_center_editorial_runtime_contract_test.php
+      - name: State consistency
+        run: php tests/control_center_state_consistency_contract_test.php
+      - name: Inbox environment isolation
+        run: php tests/control_center_inbox_tab_contract_test.php
+      - name: Visual gap backlog
+        run: python3 tests/test_event_visual_gap_backlog.py
+      - name: Frontend contract
+        run: node tests/control_center_frontend_contract_test.mjs
