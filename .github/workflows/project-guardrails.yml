@@ -1,0 +1,61 @@
+name: Project Guardrails
+
+on:
+  pull_request:
+    branches: ["staging", "main"]
+    paths:
+      - ".github/workflows/deploy-strato.yml"
+      - ".github/workflows/project-guardrails.yml"
+      - ".github/pull_request_template.md"
+      - "AI_ENTRYPOINT.md"
+      - "ENGINEERING.md"
+      - "docs/external-resource-matrix.md"
+      - "scripts/resolve-deploy-target.sh"
+      - "tests/test_deploy_branch_routing.sh"
+  push:
+    branches: ["staging", "main"]
+    paths:
+      - ".github/workflows/deploy-strato.yml"
+      - ".github/workflows/project-guardrails.yml"
+      - ".github/pull_request_template.md"
+      - "AI_ENTRYPOINT.md"
+      - "ENGINEERING.md"
+      - "docs/external-resource-matrix.md"
+      - "scripts/resolve-deploy-target.sh"
+      - "tests/test_deploy_branch_routing.sh"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate deploy branch routing
+        shell: bash
+        run: bash tests/test_deploy_branch_routing.sh
+
+      - name: Validate governance documents
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s AI_ENTRYPOINT.md
+          test -s ENGINEERING.md
+          test -s docs/external-resource-matrix.md
+          test -s .github/pull_request_template.md
+
+          grep -q 'Integrations-Chat' AI_ENTRYPOINT.md
+          grep -q 'maximal zwei aktive Workpack-Chats' AI_ENTRYPOINT.md
+          grep -q 'Ressourcen-Lock' ENGINEERING.md
+          grep -q 'Alles, was nicht ausdrücklich als staging-isoliert' ENGINEERING.md
+          grep -q 'Google Sheet Events' docs/external-resource-matrix.md
+          grep -q 'Feature-Branches duerfen niemals deployen' docs/external-resource-matrix.md
+
+      - name: Validate no canonical freeze replacement
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s STEUERZENTRALE_FREEZE_2026-07-10.md
+          grep -q '^# Steuerzentrale' STEUERZENTRALE_FREEZE_2026-07-10.md

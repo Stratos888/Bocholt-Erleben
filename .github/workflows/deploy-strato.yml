@@ -39,6 +39,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # === BEGIN BLOCK: FAIL_CLOSED_DEPLOY_BRANCH_ROUTING_V1 | Zweck: autorisiert ausschließlich main/live und staging/staging vor Python, Secrets oder externen Zugriffen; Umfang: zentrale Branch-, Environment- und Inbox-Tab-Aufloesung ===
+      - name: Authorize deploy branch before external access
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash scripts/resolve-deploy-target.sh "${GITHUB_REF_NAME}" "${GITHUB_ENV}"
+      # === END BLOCK: FAIL_CLOSED_DEPLOY_BRANCH_ROUTING_V1 ===
+
       # === BEGIN BLOCK: BUILD EVENTS + INBOX FEEDS (TSV -> JSON, fail-fast where needed) ===
       # Zweck:
       # - Google Sheet / Tab "Events" ist die einzige Quelle für redaktionelle Events.
@@ -87,14 +95,15 @@ jobs:
             exit 1
           fi
 
-          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
-            INBOX_TAB_NAME="Inbox_Staging"
-          else
-            INBOX_TAB_NAME="Inbox"
-          fi
+          case "${INBOX_TAB_NAME:-}" in
+            Inbox|Inbox_Staging) ;;
+            *)
+              echo "❌ INBOX_TAB_NAME wurde nicht durch den autorisierten Deploy-Resolver gesetzt."
+              exit 1
+              ;;
+          esac
 
           echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
-          echo "INBOX_TAB_NAME=$INBOX_TAB_NAME" >> "$GITHUB_ENV"
           echo "✅ Google Sheet target resolved for ${GITHUB_REF_NAME}."
           echo "Inbox tab: $INBOX_TAB_NAME"
       # === END BLOCK: DEPLOY_SHEET_AND_INBOX_TAB_TARGET_V2 ===
@@ -206,28 +215,6 @@ jobs:
           # === END BLOCK: EVENTS_TAB_EXPORT_RETRY_HARDENED ===
           PY
           test -s data/events.tsv
-      # === BEGIN BLOCK: DEPLOY_ENV_DECISION_V4 | Zweck: main/live und staging nutzen denselben funktionierenden SFTP-Server/User; nur das Zielverzeichnis unterscheidet sich wieder ===
-      - name: Decide deploy target
-        shell: bash
-        run: |
-          set -e
-
-          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
-            TARGET_DIR="staging"
-            ENV_NAME="staging"
-          else
-            TARGET_DIR="."
-            ENV_NAME="live"
-          fi
-
-          echo "DEPLOY_TARGET_DIR=$TARGET_DIR" >> "$GITHUB_ENV"
-          echo "DEPLOY_ENV_NAME=$ENV_NAME" >> "$GITHUB_ENV"
-
-          echo "Branch: ${GITHUB_REF_NAME}"
-          echo "Deploy target dir: $TARGET_DIR"
-          echo "Environment: $ENV_NAME"
-      # === END BLOCK: DEPLOY_ENV_DECISION_V4 ===
-
       - name: Resolve public site origin for generated event assets
         shell: bash
         run: |
