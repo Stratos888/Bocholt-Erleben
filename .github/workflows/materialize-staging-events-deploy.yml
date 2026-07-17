@@ -1,0 +1,35 @@
+name: Materialize staging Events deploy
+
+on:
+  push:
+    branches: ["agent/staging-events-isolation"]
+    paths:
+      - "scripts/materialize_staging_events_deploy.py"
+      - ".github/workflows/materialize-staging-events-deploy.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Materialize deploy workflow
+        run: python3 scripts/materialize_staging_events_deploy.py
+      - name: Commit deterministic result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          if git diff --quiet -- .github/workflows/deploy-strato.yml; then
+            echo "Deploy workflow already materialized."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/deploy-strato.yml
+          git commit -m "Isolate staging Events deploy feed"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
