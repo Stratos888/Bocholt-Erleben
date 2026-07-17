@@ -1,48 +1,53 @@
-## Workpack-Vertrag
+## Workpack
 
-- **Workpack:**
+- **Zielzustand:**
 - **Ausgangs-SHA von `staging`:**
-- **Ziel / erwarteter Endzustand:**
-- **Belegte Ursache oder offene Hypothese:**
+- **Risikoklasse:** `R1` / `R2` / `R3`
+- **Aktuelles Gate:** `A` / `B` / `C` / `D`
+- **Erforderliche Evidence:** `E1` / `E2` / `E3` / `E4` / `E5` / `E6`
+- **Belegte Ursache oder klar markierte Evidence-Lücke:**
 
-## Scope und Locks
+## Scope
 
 - **Erlaubte Dateien/Pfade:**
 - **Gesperrte Dateien/Pfade:**
-- **Code-/Owner-Lock:**
+- **Owner-/Code-Lock:**
 - **Abhängige oder konkurrierende PRs:**
+- **Warum ist der Patch der kleinste nachhaltige Zielzustand?**
 
 ## Externe Ressourcen
 
 - **Ressourcen:**
-- **Zugriff je Ressource:** `none` / `read-only` / `controlled-write`
+- **Zugriff:** `none` / `read-only` / `controlled-write`
 - **Stabile Test-/Objektidentität:**
 - **Ressourcen-Lock:**
+- **Vorherzustand / erwartete Mutation / Rücklesen / Cleanup:**
 
-> `controlled-write` ist keine Schreibfreigabe für den Workpack-Chat. Eine kontrollierte Staging-Schreibprobe darf nur der Integrations-Chat nach Vorherzustand, Zielnachweis und Rollback koordinieren.
+## Beweise
 
-## Validierung
+- **E1 – Code/Diff:**
+- **E2 – Tests/CI/Replay:**
+- **E3 – deployter Runtime-Preflight, falls R2/R3:**
+- **E4 – isolierter synthetischer Write, falls R3:**
+- **E5 – echter Staging-Fall, falls erforderlich:**
+- **Offene Beweise:**
 
-- **Ausgeführte Syntax-/Vertragstests:**
-- **Realitätsnaher Replay-/Fixture-Nachweis:**
-- **Noch offene Beweise:**
-- **Staging-Abnahme erforderlich:** ja / nein
-- **Erwartete Staging-Prüfung:**
+## Nutzeraktion
 
-## Sicherheit und Rücknahme
+- **Erforderlich:** nein / ja
+- **Warum nicht durch die KI ausführbar:**
+- **Gebündelter konkreter Schritt:**
+
+## Sicherheit und Abschluss
 
 - **Rollback/Revert:**
 - [ ] Kein direkter Commit auf `main`
 - [ ] Kein Feature-Branch-Deploy
 - [ ] Keine Live-Testschreibaktion
-- [ ] Keine externe Mutation durch den Workpack-Chat
-- [ ] Aktueller `staging`-Stand vor Integrationsfreigabe einbezogen
-- [ ] Diff enthält ausschließlich den deklarierten Scope
-
-## Integrationsstatus
-
-- [ ] Draft / Work in progress
-- [ ] Ready for integration
-- [ ] Vom Integrations-Chat auf Überschneidungen geprüft
-- [ ] Nach Merge auf Staging deployed und abgenommen
-- [ ] Für `staging -> main` freigegeben
+- [ ] Diff entspricht dem dokumentierten Scope
+- [ ] Aktueller `staging`-Stand vor Integration einbezogen
+- [ ] Bei unerwartetem realen Verhalten wurde ohne Wiederholung gestoppt
+- [ ] `CURRENT_WORKPACK.md` stimmt mit diesem PR überein
+- [ ] Erforderliche Gates und Evidence sind erfüllt
+- [ ] Nach Staging-Merge wurden Deploy und Postconditions geprüft
+- [ ] Für `staging -> main` freigegeben oder bewusst nicht freigegeben
