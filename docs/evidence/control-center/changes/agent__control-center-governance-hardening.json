@@ -1,0 +1,60 @@
+{
+  "schema_version": "control_center_change_governance_v1",
+  "change_id": "control-center-governance-hardening-2026-07-17",
+  "branch": "agent/control-center-governance-hardening",
+  "base": "staging",
+  "change_class": "governance_only",
+  "analysis": {
+    "root_causes": [
+      "Documented staging acceptance order contradicted the actual deploy topology.",
+      "CI contract checks were treated as proof of the deployed end-to-end data chain.",
+      "Environment, stable data identity and pre-write evidence were not mandatory merge inputs.",
+      "Real data correction, system diagnosis and acceptance were mixed in one loop.",
+      "No enforceable stop-the-line rule existed after an unexpected real-data mutation."
+    ],
+    "preventive_controls": [
+      "Canonical workmode freeze",
+      "Per-PR machine-readable change manifest",
+      "Governance CI validator",
+      "Separated isolated integration, staging deployment and real staging acceptance",
+      "Mandatory environment and data identity evidence for source/writeback changes",
+      "Live write tests forbidden"
+    ],
+    "evidence_files": [
+      "docs/evidence/control-center/governance-hardening-2026-07-17.md",
+      "STEUERZENTRALE_WORKMODE_FREEZE_2026-07-17.md"
+    ]
+  },
+  "scope": {
+    "runtime": false,
+    "external_data": false,
+    "deployment": false,
+    "governance": true,
+    "live_write_allowed": false
+  },
+  "isolated_integration": {
+    "status": "not_required",
+    "evidence_files": []
+  },
+  "environment_isolation": {
+    "status": "not_required",
+    "evidence_files": []
+  },
+  "data_identity": {
+    "status": "not_required",
+    "evidence_files": []
+  },
+  "real_staging_write": {
+    "status": "not_required",
+    "authorized": false
+  },
+  "staging_acceptance": {
+    "status": "not_required",
+    "evidence_files": []
+  },
+  "rollback_plan": "Revert the governance-only PR. No runtime, deployment configuration or external data is changed by this workpack.",
+  "merge": {
+    "staging_allowed": true,
+    "main_allowed": false
+  }
+}
