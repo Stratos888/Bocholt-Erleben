@@ -1,0 +1,10 @@
+# Steuerzentrale, Deployment- und Governance-Dateien
+/api/control-center/ @Stratos888
+/js/control-center/ @Stratos888
+/js/control-center.js @Stratos888
+/css/control-center*.css @Stratos888
+/steuerzentrale/ @Stratos888
+/.github/workflows/control-center-*.yml @Stratos888
+/scripts/validate_control_center_change_governance.py @Stratos888
+/docs/evidence/control-center/ @Stratos888
+/STEUERZENTRALE_*.md @Stratos888
