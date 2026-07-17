@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/_inbox_tab.php';
+require_once __DIR__ . '/_inbox_schema.php';
 
 /** Direct, bounded and verified Google-Sheets writeback for Inbox decisions and review tasks. Compatibility markers: 'tab' => 'Inbox' and 'tab' => 'Inbox_Staging'. */
 
@@ -44,36 +45,7 @@ function be_cc_inbox_direct_http_request(string $method, string $url, ?array $bo
 function be_cc_inbox_direct_table_from_values(array $values, ?string $tab = null): array
 {
     $tab = $tab !== null ? trim($tab) : be_cc_inbox_tab_name();
-    if ($tab === '') throw new RuntimeException('Der Inbox-Tab ist nicht definiert.');
-
-    $headerOffset = -1;
-    $index = [];
-    foreach ($values as $offset => $candidate) {
-        if (!is_array($candidate)) continue;
-        $normalized = array_map(static fn($value): string => be_cc_unicode_lower(trim((string)$value)), $candidate);
-        $candidateIndex = array_flip($normalized);
-        $hasIdentity = isset($candidateIndex['id_suggestion']) || isset($candidateIndex['source_url']) || isset($candidateIndex['url']);
-        if (isset($candidateIndex['status'], $candidateIndex['title'], $candidateIndex['date']) && $hasIdentity) {
-            $headerOffset = (int)$offset;
-            $index = $candidateIndex;
-            break;
-        }
-    }
-    if ($headerOffset < 0) throw new RuntimeException($tab . '-Header wurde nicht eindeutig gefunden.');
-    $rows = [];
-    for ($i = $headerOffset + 1; $i < count($values); $i++) {
-        $raw = is_array($values[$i] ?? null) ? $values[$i] : [];
-        if (!array_filter($raw, static fn($value): bool => trim((string)$value) !== '')) continue;
-        $row = [];
-        foreach ($index as $name => $position) $row[$name] = trim((string)($raw[$position] ?? ''));
-        $row['row_number'] = $i + 1;
-        $row['_raw'] = $raw;
-        $rows[] = $row;
-    }
-    return [
-        'tab'=>$tab,'header_row'=>$headerOffset + 1,'header'=>(array)($values[$headerOffset] ?? []),
-        'index'=>$index,'rows'=>$rows,'values'=>$values,
-    ];
+    return be_cc_inbox_table_from_values($values, $tab);
 }
 
 function be_cc_inbox_direct_table(): array
@@ -124,29 +96,6 @@ function be_cc_inbox_direct_batch_update(array $table, int $rowNumber, array $up
 {
     $body = be_cc_inbox_direct_batch_body($table, $rowNumber, $updates);
     return be_cc_inbox_direct_batch_request((array)$body['data']);
-}
-
-function be_cc_inbox_canonical_aliases(): array
-{
-    return [
-        'title'=>['title'], 'date'=>['date','start_date'], 'end_date'=>['enddate','end_date'],
-        'schedule_type'=>['schedule_type','event_schedule_type'], 'time'=>['time','start_time'],
-        'time_status'=>['time_status','schedule_status'], 'time_details'=>['time_details','schedule_text'],
-        'time_not_applicable_allowed'=>['time_not_applicable_allowed'], 'city'=>['city','stadt'],
-        'local_reference'=>['local_reference','local_scope'], 'location'=>['location','venue','ort'],
-        'meeting_point'=>['meeting_point','treffpunkt'], 'address'=>['address','location_address','adresse'],
-        'address_status'=>['address_status'], 'category'=>['kategorie_suggestion','kategorie','category'],
-        'source_url'=>['source_url','official_source_url','url'], 'event_url'=>['event_url','target_url','listing_url'],
-        'source_quality'=>['source_quality','source_status'], 'ticket_url'=>['ticket_url','booking_url','registration_url'],
-        'access_status'=>['access_status','ticket_status','registration_status'],
-        'description'=>['description','description_text','final_description'],
-        'visual_key'=>['visual_key','image_visual_key'], 'visual_motif'=>['visual_motif','image_visual_motif'],
-        'visual_asset_id'=>['visual_asset_id','image_asset_id','visual_override_asset_id'],
-        'visual_asset_role'=>['visual_asset_role','image_asset_role'], 'visual_gap_id'=>['visual_gap_id'],
-        'matched_event_id'=>['matched_event_id','duplicate_event_id'], 'duplicate_status'=>['duplicate_status','dedupe_status'],
-        'event_status'=>['event_status','current_status','cancellation_status'], 'next_review_at'=>['next_review_at','recheck_at'],
-        'status'=>['status'],
-    ];
 }
 
 function be_cc_inbox_direct_canonical_plan(array $table, int $rowNumber, array $updates): array
