@@ -73,19 +73,19 @@ jobs:
             const maxPolls = 180;
 
             for (let poll = 1; poll <= maxPolls; poll += 1) {
-              const runs = await github.paginate(
-                github.rest.checks.listForRef,
-                {
-                  owner,
-                  repo,
-                  ref: sha,
-                  per_page: 100,
-                  filter: "latest",
-                },
-                (response) => response.data.check_runs,
-              );
+              const response = await github.rest.checks.listForRef({
+                owner,
+                repo,
+                ref: sha,
+                per_page: 100,
+                filter: "latest",
+              });
+              const runs = Array.isArray(response.data.check_runs)
+                ? response.data.check_runs
+                : [];
 
               const checks = runs
+                .filter(Boolean)
                 .filter((run) => run.app?.slug === "github-actions")
                 .filter((run) => {
                   const detailsUrl = String(run.details_url || "");
