@@ -32,6 +32,7 @@ $source = [
     'source_url'=>'https://www.bocholt.de/veranstaltungskalender/cityart?event=90900',
     'description'=>'Offener Kunstmarkt mit Mitmachaktionen für Kinder und Jugendliche.',
     'visual_key'=>'art_exhibition_gallery',
+    'sheet_tab'=>'Inbox_Staging',
 ];
 $event = be_cc_staging_event_from_source($source);
 $assert($event['id'] === 'bocholter-kulturtage-2026-kunstmarkt-cityart-und-kunstlerische-mitmach-stande-fur-kinder-und-jugendliche-2026-08-30', 'CityArt erhält dieselbe deterministische Event-ID wie der bestehende Importvertrag.');
@@ -72,10 +73,13 @@ $conflicting['url'] = $other['url'];
 $conflict = be_cc_staging_event_resolution([$tableRow, $other], $conflicting);
 $assert(($conflict['status'] ?? '') === 'conflict', 'Widersprüchliche ID-/URL-Treffer müssen blockieren.');
 
-$actionSource = (string)file_get_contents(dirname(__DIR__) . '/api/control-center/action.php');
+$actionSource = (string)file_get_contents(dirname(__DIR__) . '/api/control-center/action-v2.php');
+$actionShim = (string)file_get_contents(dirname(__DIR__) . '/api/control-center/action.php');
 $writerSource = (string)file_get_contents(dirname(__DIR__) . '/api/control-center/_staging_events_writeback.php');
 $assert(str_contains($actionSource, "\$eventsTab === 'Events_Staging'"), 'Action-Endpunkt routet Staging nicht explizit auf Events_Staging.');
 $assert(str_contains($actionSource, 'be_cc_writeback_staging_inbox_approve_verified'), 'Isolierter Staging-Writer ist nicht verdrahtet.');
+$assert(str_contains($actionSource, 'be_cc_assert_inbox_case_environment'), 'Action-Endpunkt validiert Host und Fallherkunft nicht.');
+$assert(str_contains($actionShim, "require __DIR__ . '/action-v2.php'"), 'Kompatibilitätsroute verweist nicht auf den versionierten Endpunkt.');
 $assert(str_contains($writerSource, "'events_tab'=>'Events_Staging'"), 'Writer weist das isolierte Ziel nicht aus.');
 $assert(!str_contains($writerSource, "'Events!'"), 'Staging-Writer enthält einen hart verdrahteten gemeinsamen Events-Tab.');
 
