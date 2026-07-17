@@ -1,13 +1,15 @@
 # GitHub Actions Trigger Policy
 
-Stand: 2026-07-07
+Stand: 2026-07-17
 Branch: `staging`
 
 ## Ziel
 
-Staging soll wieder als schneller technischer Testpfad funktionieren. Kleine Commits auf `staging` sollen primaer den notwendigen Staging-Deploy ausloesen, aber keine schweren Content-, Growth-, KI- oder Audit-Laeufe.
+Staging soll als schneller technischer Testpfad funktionieren. Kleine Commits auf `staging` sollen primaer den notwendigen Staging-Deploy ausloesen, aber keine schweren Content-, Growth-, KI- oder Audit-Laeufe.
 
 Diese Entkopplung ist gewollt und kein Fehler. Sie senkt nicht die Produktqualitaet, sondern trennt schnelle technische Iteration von periodischer und produktiver Qualitaetssicherung.
+
+Pull Requests erhalten zusaetzlich einen stabilen, immer vorhandenen Merge-Check. Dieser Check darf bestehende fachliche Tests nicht duplizieren und darf den schnellen `staging`-Push-Pfad nicht belasten.
 
 ## Grundsatz
 
@@ -20,6 +22,34 @@ Diese Entkopplung ist gewollt und kein Fehler. Sie senkt nicht die Produktqualit
 | KI-Websearch / Event Intake | nein | nur produktiv kontrolliert | ja | ja |
 | Inbox Cleanup / Content Ops Reporting | nein | nein | ja | ja |
 | Content Ops HTTP Ingest | nein | nein | via `workflow_run` nach relevanten Quelllaeufen | ja |
+
+## Always-run PR Gate
+
+`.github/workflows/pr-gate.yml` erzeugt bei jedem Pull Request nach `staging` oder `main` genau den stabilen Check:
+
+```text
+PR Gate
+```
+
+Der Gate-Workflow hat bewusst keinen `paths`-Filter. Dadurch ist der Check bei jedem PR vorhanden und kann spaeter als verpflichtender Statuscheck verwendet werden.
+
+Der Gate-Workflow fuehrt keine zweite Kopie aller Testpakete aus. Er arbeitet als schlanker Aggregator:
+
+1. Er prueft sofort die Repository- und Branch-Regel.
+2. PRs nach `staging` muessen aus einem Branch desselben Repositories kommen.
+3. PRs nach `main` sind ausschliesslich als `staging -> main` erlaubt.
+4. Danach wartet er nur auf GitHub-Actions-Checks, die fuer den konkreten Dateiscope ohnehin gestartet wurden.
+5. Ein gestarteter fehlgeschlagener, abgebrochener oder zeitlich ausgelaufener Check macht auch `PR Gate` rot.
+6. Nicht relevante schwere Workflows werden nicht gestartet und nicht simuliert.
+
+Effizienzziel:
+
+- Bei einem kleinen PR ohne weitere pfadspezifische Checks entsteht nur eine kurze Registrierungs- und Stabilitaetswartezeit von rund 20 bis 30 Sekunden plus Runner-Start.
+- Bei einem fachlichen PR endet `PR Gate` ungefaehr mit dem langsamsten ohnehin erforderlichen Check; es entsteht keine doppelte PHP-, JavaScript-, Python-, Browser- oder Produktpruefung.
+- Der Gate-Workflow laeuft nur auf `pull_request`, nicht auf `push`, `schedule` oder Content-Roboterlaeufen.
+- Ein neuer Commit storniert den veralteten Gate-Lauf desselben PRs automatisch.
+
+Damit verbessert der Gate die Sicherheit und Parallelisierbarkeit, ohne die bestehende schnelle Staging-Auslieferung in einen monolithischen CI-Lauf umzubauen.
 
 ## Gewollter schneller Staging-Pfad
 
@@ -36,6 +66,7 @@ Nicht gewollt bei normalen Staging-Testcommits:
 - `Manual KI Event Intake`
 - `Inbox Cleanup (Archive)`
 - `Content Ops HTTP Ingest` allein wegen Push
+- `PR Gate`, weil dieser ausschliesslich PR-basiert ist
 
 ## Aktueller Stand nach Trigger-Haertung
 
@@ -88,12 +119,16 @@ Die Entkopplung betrifft nur schnelle Staging-Iteration. Vor oder nach produktiv
 
 Wichtig: Keine Qualitaetspruefung entfernen, sondern Ausloesezeitpunkt sauberer steuern.
 
+Der stabile `PR Gate` ist die technische Eingangsschranke. Er ersetzt nicht die realen Staging- und Live-Abnahmen des Integrations-Chats.
+
 ## Arbeitsregel fuer zukuenftige KI-Chats
 
 Wenn ein Workflow schwer ist und nicht unmittelbar Deploybruch verhindert, darf er nicht wieder pauschal an jeden `staging`-Push gekoppelt werden.
 
 Bei Workflow-Aenderungen immer konkret pruefen:
 
+- `on.pull_request.branches`,
+- `on.pull_request.paths`,
 - `on.push.branches`,
 - `on.push.paths`,
 - `schedule`,
@@ -103,6 +138,8 @@ Bei Workflow-Aenderungen immer konkret pruefen:
 - Downstream-Dispatches und Artefakt-Abhaengigkeiten.
 
 Neue oder geaenderte Workflows muessen in diese Policy passen oder die Abweichung explizit begruenden.
+
+Der Checkname `PR Gate` darf nicht umbenannt werden, solange er in einem Branch-Ruleset als verpflichtender Check eingetragen ist.
 
 ## Workflow-Dateien: wichtige Aenderungsgrenzen
 
@@ -129,11 +166,18 @@ Nicht zulaessig:
 
 ## Validierung nach Aenderungen
 
+Sinnvoller Test fuer den stabilen PR-Gate:
+
+1. Kleinen PR nach `staging` oeffnen, der die Gate-/Governance-Dateien beruehrt.
+2. Erwartung: `Project Guardrails` und `PR Gate` laufen.
+3. Erwartung: `PR Gate` wartet auf `Project Guardrails` und wird erst danach gruen.
+4. Einen kontrollierten PR nach `main` aus einem anderen Branch als `staging` vermeiden; die statische Source-Policy ist bereits im Gate und im Review zu pruefen.
+
 Sinnvoller Test fuer den schnellen Staging-Pfad:
 
 1. Kleiner Commit auf `staging`, der keine Content-/Audit-Datenpfade beruehrt.
 2. Erwartung: `Deploy to STRATO` laeuft.
-3. Nicht erwartet: Growth-, KI-, Inbox-Cleanup- oder Content-Ops-Ingest-Run nur wegen Push.
+3. Nicht erwartet: Growth-, KI-, Inbox-Cleanup-, Content-Ops-Ingest- oder `PR Gate`-Run nur wegen Push.
 
 Sinnvoller separater Test fuer Qualitaetssicherung:
 
