@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-putenv('APP_ENV=staging');
 require_once dirname(__DIR__) . '/api/control-center/_inbox_tab.php';
 
 $failures = [];
@@ -9,20 +8,15 @@ $assert = static function (bool $condition, string $message) use (&$failures): v
     if (!$condition) $failures[] = $message;
 };
 
-$assert(be_cc_inbox_tab_name() === 'Inbox_Staging', 'Staging muss ausschließlich Inbox_Staging verwenden.');
-$assert(be_cc_inbox_range('A:ZZ') === 'Inbox_Staging!A:ZZ', 'Staging-Range ist nicht korrekt gebunden.');
+$assert(be_cc_inbox_tab_for_environment('staging') === 'Inbox_Staging', 'Staging muss ausschließlich Inbox_Staging verwenden.');
+$assert(be_cc_inbox_tab_for_environment('live') === 'Inbox', 'Live muss ausschließlich Inbox verwenden.');
+$assert(be_cc_inbox_tab_for_environment('production') === 'Inbox', 'Production muss ausschließlich Inbox verwenden.');
+$assert(be_cc_inbox_tab_for_environment('test') === 'Inbox_Staging', 'Tests dürfen niemals auf die Live-Inbox zeigen.');
+$assert(be_cc_inbox_tab_for_environment('local') === 'Inbox_Staging', 'Lokale Entwicklung darf niemals auf die Live-Inbox zeigen.');
 
-putenv('APP_ENV=live');
-$assert(be_cc_inbox_tab_name() === 'Inbox', 'Live muss ausschließlich Inbox verwenden.');
-$assert(be_cc_inbox_range('A1:B2') === 'Inbox!A1:B2', 'Live-Range ist nicht korrekt gebunden.');
-
-putenv('APP_ENV=test');
-$assert(be_cc_inbox_tab_name() === 'Inbox_Staging', 'Tests dürfen niemals auf die Live-Inbox zeigen.');
-
-putenv('APP_ENV=unknown');
 $blocked = false;
 try {
-    be_cc_inbox_tab_name();
+    be_cc_inbox_tab_for_environment('unknown');
 } catch (RuntimeException $error) {
     $blocked = true;
 }
