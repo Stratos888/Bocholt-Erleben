@@ -1,34 +1,26 @@
-# Steuerzentrale – kanonischer Einstieg
+# Steuerzentrale – aktueller Übergabe- und Stoppstatus
 
 Stand: 2026-07-17
 
-Vor jeder Analyse, Änderung, Abnahme oder Veröffentlichung der Steuerzentrale vollständig und in dieser Reihenfolge lesen:
+Vor jeder weiteren Analyse der Steuerzentrale zuerst lesen:
 
-1. `STEUERZENTRALE_WORKMODE_FREEZE_2026-07-17.md`
-2. `docs/steuerzentrale-zielzustand-2026-07-14.md`
-3. den aktiven fachlichen Workpack und seine Evidence-Dateien
+1. `docs/handoffs/steuerzentrale-analyse-validierung-uebergabe-2026-07-17.md`
+2. `docs/proposals/steuerzentrale-arbeitsweise-governance-vorschlag-2026-07-17.md`
+3. `docs/steuerzentrale-zielzustand-2026-07-14.md`
 
-Der Arbeits- und Abnahmemodus vom 17.07.2026 hat bei Prozess-, Test-, Daten- und Mergefragen Vorrang vor älteren Formulierungen.
+Wichtig:
 
-## Aktueller Stop-the-line-Status
+- Der Governance-Ansatz ist nur ein Vorschlag und noch nicht validiert.
+- PR #80 ist Draft und darf nicht gemergt werden, bevor ein separater Analyse- und Validierungs-Chat den Ansatz geprüft und der Nutzer über das weitere Vorgehen entschieden hat.
+- Die frühere Datei `STEUERZENTRALE_WORKMODE_FREEZE_2026-07-17.md` ist nur noch ein Hinweis auf diese Übergabe und besitzt keine eigene kanonische Wirkung.
+
+## Aktueller Arbeitsstopp
 
 - Keine weiteren funktionalen Patches an der Eventprüfung.
 - Keine manuellen Korrekturen in `Inbox` oder `Inbox_Staging` zu Testzwecken.
 - Keine weiteren Staging-Schreibaktionen zur Fehlersuche.
+- Keine Branch-Protection-Änderung auf Basis des unvalidierten Vorschlags.
+- Kein Merge von PR #80.
 - `main` bleibt unverändert.
-- Nächster fachlicher Schritt erst nach aktivierter Governance: forensische Inventur der vollständigen CityArt-Daten- und Zustandskette sowie Prüfung möglicher unbeabsichtigter Live-Mutationen.
 
-## Verbindliche Umgebungsgrenzen
-
-- CI/lokal: Fixtures oder temporärer Testbestand
-- Staging: `Inbox_Staging`
-- Live: `Inbox`
-- unbekannte Umgebung: fail-closed
-
-## Mergegrenzen
-
-- Arbeitsbranch → `staging`: nur nach belegter Ursache, isolierter Integration und grünem Governance-Manifest
-- Merge nach `staging`: Deploy in die Entwicklungsumgebung, keine fachliche Freigabe
-- reale Staging-Abnahme: erst nach Staging-Deploy, kontrolliert und evidence-basiert
-- `staging` → `main`: erst nach vollständig belegter Staging-Abnahme
-- keine Live-Schreibtests
+Der nächste Chat soll ausschließlich analysieren und validieren. Repository-Änderungen, Merge-Entscheidungen oder Datenaktionen erfolgen erst nach ausdrücklicher Freigabe auf Basis des validierten Ergebnisses.
