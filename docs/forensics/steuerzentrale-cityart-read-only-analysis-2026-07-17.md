@@ -7,7 +7,7 @@ Ausgangsstand: `staging` nach Merge von PR #82 (`757b48788ab1eff99be19002bbaf653
 
 ## 1. Zweck und Grenze
 
-Diese Datei dokumentiert den nachweisbaren Ist-Zustand der CityArt-Verarbeitung in der Steuerzentrale. Sie ist keine Implementierungsfreigabe und nimmt keine externe Datenmutation vor.
+Diese Datei dokumentiert den nachweisbaren Ist-Zustand der CityArt-Verarbeitung in der Steuerzentrale. Die hier beschriebene Analysephase nahm keine externe Datenmutation vor.
 
 Waehrend der Analyse wurden nicht ausgefuehrt:
 
@@ -17,6 +17,10 @@ Waehrend der Analyse wurden nicht ausgefuehrt:
 - kein Deploy;
 - kein Merge nach `main`;
 - keine produktive oder Staging-Schreibprobe.
+
+Nach ausdruecklicher Freigabe wurde der daraus abgeleitete systemische Code-Workpack auf demselben isolierten Branch umgesetzt. Implementierung, Tests und das weiterhin gesperrte externe Migrationsgate sind getrennt dokumentiert unter:
+
+`docs/evidence/control-center-cityart-inbox-schema-guard-2026-07-17.md`
 
 ## 2. Relevanter Zielvertrag
 
@@ -132,25 +136,25 @@ Aus den aktuell benannten Spalten kann der Sync lesen:
 - aber keine Visualfelder aus S bis V;
 - keinen `time_status` und keine `time_details` aus W und X.
 
-Daraus folgt im heutigen Code deterministisch:
+Daraus folgt im damaligen Code deterministisch:
 
 - keine Aufgabe `Beginnzeit klaeren`, weil `time` nicht leer ist;
 - keine Aufgabe wegen Titel, Datum, Ort, Kategorie, Quelle oder Beschreibung;
 - `visual_key` gilt als fehlend;
 - es entsteht voraussichtlich genau die Aufgabe `Bildbereich festlegen` (`missing_visual_key`).
 
-Die physisch vorhandenen Werte `art_exhibition_gallery`, `art_market` und `motif-gap-art-market-01` koennen den Vertrag nicht erreichen, solange ihre Header fehlen.
+Die physisch vorhandenen Werte `art_exhibition_gallery`, `art_market` und `motif-gap-art-market-01` konnten den Vertrag nicht erreichen, solange ihre Header fehlten.
 
 ## 6. Visual-Prozess ist fachlich vorhanden
 
-Der aktuelle Code besitzt bereits die CityArt-Regeln:
+Der untersuchte Code besitzt bereits die CityArt-Regeln:
 
 - Titel oder Beschreibung mit `Kunstmarkt` beziehungsweise `CityArt` → Motiv `art_market`;
 - Visual-Key `art_exhibition_gallery`;
 - ready Asset `motif-gap-art-market-01` im Event-Visual-Pool;
 - direkte Aufgabe zur Bestaetigung des konkreten Assets.
 
-Der Visual-Prozess scheitert daher nicht an einer fehlenden CityArt-Regel oder einem fehlenden Asset. Er wird durch die fehlende kanonische Headerzuordnung vor dem eigentlichen Motiv-/Assetresolver abgeschnitten.
+Der Visual-Prozess scheiterte daher nicht an einer fehlenden CityArt-Regel oder einem fehlenden Asset. Er wurde durch die fehlende kanonische Headerzuordnung vor dem eigentlichen Motiv-/Assetresolver abgeschnitten.
 
 ## 7. Historischer CTA-Befund
 
@@ -160,14 +164,14 @@ Der fruehere Screenshot zeigte gleichzeitig:
 - allgemeine Pflichtfeldblocker;
 - `Bearbeiten und uebernehmen` als Hauptaktion.
 
-Der aktuelle Code bildet diesen Widerspruch nicht mehr ab:
+Der aktuelle Code bildete diesen Widerspruch bereits vor dem Folgepatch nicht mehr in Presentation und Frontend ab:
 
 - bei offenen Eventaufgaben ist die Hauptaktion `Offenen Punkt klaeren` beziehungsweise `Offene Punkte klaeren`;
 - `Gesamtfassung bearbeiten` erscheint erst bei `decision_gate.ready=true`.
 
-Der historische CTA-Befund ist deshalb kein aktuell belegter Codefehler mehr. Plausible historische Ursachen sind ein aelterer Frontend-Assetstand, ein aelterer Presentation-Payload oder ein Zwischenstand vor der finalen PR-#78-Integration. Ohne damaligen Runtime-Payload bleibt die exakte historische Ursache offen.
+Der historische CTA-Befund war deshalb kein aktuell belegter Presentation-/Frontend-Codefehler mehr. Plausible historische Ursachen sind ein aelterer Frontend-Assetstand, ein aelterer Presentation-Payload oder ein Zwischenstand vor der finalen PR-#78-Integration. Ohne damaligen Runtime-Payload bleibt die exakte historische Ursache offen.
 
-Im Backend-Reviewvertrag existiert weiterhin die interne Aktion `edit_and_approve` mit `enabled=true`, obwohl Presentation und UI sie bei offenen Eventaufgaben nicht anbieten. Das ist eine latente Vertragsinkonsistenz und sollte im spaeteren Patch bereinigt oder eindeutig auf den finalen Ready-Zustand begrenzt werden.
+Im Backend-Reviewvertrag existierte weiterhin die interne Aktion `edit_and_approve` mit `enabled=true`, obwohl Presentation und UI sie bei offenen Eventaufgaben nicht anboten. Diese latente Vertragsinkonsistenz wurde im freigegebenen Folgepatch auf `decision_gate.ready` begrenzt.
 
 ## 8. Belegte Root Cause
 
@@ -175,32 +179,32 @@ Im Backend-Reviewvertrag existiert weiterhin die interne Aktion `edit_and_approv
 
 Die Staging-/Live-Trennung aus PR #79 wechselte das autoritative Staging-Ziel auf `Inbox_Staging`, ohne einen technisch erzwungenen Schema-Paritaets- und Migrationsvertrag fuer diesen Tab einzufuehren.
 
-Der reale `Inbox_Staging`-Tab verletzt den vom Code vorausgesetzten Headervertrag:
+Der reale `Inbox_Staging`-Tab verletzte den vom Code vorausgesetzten Headervertrag:
 
-- Daten stehen unter leeren Headerzellen;
-- der Sync arbeitet ausschliesslich headerbasiert;
-- dadurch werden vorhandene Werte als fehlend bewertet.
+- Daten standen unter leeren Headerzellen;
+- der Sync arbeitete ausschliesslich headerbasiert;
+- dadurch wurden vorhandene Werte als fehlend bewertet.
 
 ### Sekundaere Root Cause
 
-Die Laufzeit akzeptiert einen teilweise gueltigen Header stillschweigend. Sie erkennt zwar `status` und `title`, prueft aber nicht:
+Die Laufzeit akzeptierte einen teilweise gueltigen Header stillschweigend. Sie erkannte zwar `status` und `title`, pruefte aber nicht:
 
 - ob nichtleere Zellen unter leeren Headern existieren;
 - ob die kanonischen Reviewspalten eindeutig benannt sind;
 - ob der Staging-Tab strukturell mit dem erwarteten Vertrag kompatibel ist.
 
-Statt fail-closed einen Datenquellen-/Schemafall zu erzeugen, baut sie einen unvollstaendigen fachlichen Payload und erzeugt irrefuehrende manuelle Aufgaben.
+Statt fail-closed einen Datenquellen-/Schemafall zu erzeugen, baute sie einen unvollstaendigen fachlichen Payload und erzeugte irrefuehrende manuelle Aufgaben.
 
 ### Testluecke
 
-Die vorhandenen Tests pruefen:
+Die vorhandenen Tests prueften:
 
 - richtige Tabwahl pro Umgebung;
 - keine Hartverdrahtung auf `Inbox`;
 - synthetische Planung neuer Header;
 - CityArt-Motiv- und Assetvertrag auf vollstaendig benannten Payloads.
 
-Nicht geprueft werden:
+Nicht geprueft wurden:
 
 - reale Headerparitaet von `Inbox` und `Inbox_Staging`;
 - Werte unter leeren Headerzellen;
@@ -208,27 +212,29 @@ Nicht geprueft werden:
 - fail-closed Verhalten bei Schemaabweichungen;
 - Replay eines rohen realen Sheet-Ausschnitts.
 
+Diese Testluecke ist im freigegebenen Folgepatch durch ein Raw-Sheet-Replay geschlossen.
+
 ## 9. Bewertung gegen den Premium-Zielzustand
 
-| Bereich | Aktueller Ist-Zustand | Premium-Soll | Bewertung |
+| Bereich | Analysierter Ist-Zustand | Premium-Soll | Entscheidung |
 |---|---|---|---|
 | Umgebungsrouting | Staging → `Inbox_Staging`, Live → `Inbox` | strikt getrennt | technisch erfuellt |
 | Quellidentitaet | eindeutige offizielle URL, eine Zeile | stabile, belegte Identitaet | erfuellt |
-| Uhrzeit | `time=11:00` benannt; Details unbenannt | strukturierte Startzeit plus Zeitraum | teilweise erfuellt |
-| Visualdaten | Werte vorhanden, Header fehlen | kanonisch benannte Felder | nicht erfuellt |
+| Uhrzeit | `time=11:00` benannt; Details unbenannt | strukturierte Startzeit plus Zeitraum | Schemakorrektur erforderlich |
+| Visualdaten | Werte vorhanden, Header fehlen | kanonisch benannte Felder | Schemakorrektur erforderlich |
 | Motiv-/Assetresolver | Regel und ready Asset vorhanden | direkte konkrete Bestaetigung | durch vorgelagerte Struktur blockiert |
 | Aufgaben-UI | aktueller Code fokussiert offene Aufgaben | keine Vollformular-Abkuerzung | im Code erfuellt |
-| Schemafehler | wird als fachlicher Feldmangel interpretiert | fail-closed Systemfall | nicht erfuellt |
-| Tests | logische Payload-Fixtures | Raw-Sheet-Replay und Schema-Gate | nicht erfuellt |
+| Schemafehler | wurde als fachlicher Feldmangel interpretiert | fail-closed Systemfall | Codepatch freigegeben und umgesetzt |
+| Tests | logische Payload-Fixtures | Raw-Sheet-Replay und Schema-Gate | Codepatch freigegeben und umgesetzt |
 
 ## 10. Erforderlicher nachhaltiger Workpack
 
-Kein CityArt-Einzelhotfix. Der Implementierungs-Workpack muss tab- und vertragsweit arbeiten.
+Kein CityArt-Einzelhotfix. Der freigegebene Implementierungs-Workpack arbeitet tab- und vertragsweit.
 
 ### A. Kanonischer Sheet-Schema-Vertrag
 
 - zentrale Liste der erforderlichen und optionalen Inbox-Header;
-- eindeutige Aliasauflösung;
+- eindeutige Aliasaufloesung;
 - Erkennung doppelter Header;
 - Erkennung nichtleerer Zellen unter leeren Headern;
 - strukturierte Diagnose mit Tab, Headerzeile, Spalte und betroffenen Zeilen;
@@ -242,7 +248,7 @@ Fixture mit:
 - CityArt-Zeile mit Werten S bis X;
 - leeren Headern S bis X.
 
-Der Test muss vor dem Patch den heutigen Fehler reproduzieren und danach eine eindeutige Schemaabweichung liefern. Nach einer kontrollierten Schemakorrektur muss derselbe Datensatz die erwartete konkrete Visualaufgabe oder einen bereits ready Zustand ergeben.
+Der Test reproduziert den belegten Rohzustand und verlangt eine eindeutige Schemaabweichung. Nach einer kontrollierten Schemakorrektur muss derselbe Datensatz die kanonischen Zeit- und Visualwerte liefern.
 
 ### C. Kontrollierte Staging-Schemareparatur
 
@@ -287,20 +293,11 @@ Nach Merge nach `staging` und gruenem Deploy:
 
 ## 11. Arbeitsentscheidung
 
-Die Analysephase ist abgeschlossen.
+Die read-only Analysephase ist abgeschlossen. Der isolierte Implementierungs-Workpack wurde nach ausdruecklicher Freigabe umgesetzt und ist durch das separate Evidence-Artefakt nachvollziehbar.
 
-Freigegeben fuer den naechsten Schritt ist ausschliesslich ein isolierter Implementierungs-Workpack fuer:
+Bis zur Integration und zum gruenen Staging-Deploy bleiben weiterhin gesperrt:
 
-- Schema-Validierung;
-- Raw-Sheet-Replay;
-- fail-closed Diagnose;
-- Aktionsvertragsbereinigung;
-- anschliessend eine separat kontrollierte Reparatur von `Inbox_Staging!S1:X1`.
-
-Nicht freigegeben sind:
-
-- CityArt-Einzelbedingungen im UI;
-- manuelle Datenkorrekturen vor dem Code-Gate;
+- die externe Reparatur von `Inbox_Staging!S1:X1`;
 - Aenderungen am Live-Tab `Inbox`;
 - automatische fachliche Uebernahme des CityArt-Falls;
 - Merge nach `main` innerhalb dieses Workpacks.
