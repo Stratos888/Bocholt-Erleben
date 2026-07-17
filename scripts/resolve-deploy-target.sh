@@ -14,11 +14,13 @@ case "$branch" in
     target_dir="."
     environment="live"
     inbox_tab="Inbox"
+    events_tab="Events"
     ;;
   staging)
     target_dir="staging"
     environment="staging"
     inbox_tab="Inbox_Staging"
+    events_tab="Events_Staging"
     ;;
   *)
     echo "Deploy from branch '$branch' is not allowed. Only 'main' and 'staging' may deploy." >&2
@@ -30,6 +32,7 @@ emit() {
   printf 'DEPLOY_TARGET_DIR=%s\n' "$target_dir"
   printf 'DEPLOY_ENV_NAME=%s\n' "$environment"
   printf 'INBOX_TAB_NAME=%s\n' "$inbox_tab"
+  printf 'EVENTS_TAB_NAME=%s\n' "$events_tab"
 }
 
 if [[ -n "$env_file" ]]; then
@@ -42,3 +45,4 @@ printf 'Authorized deploy branch: %s\n' "$branch"
 printf 'Deploy environment: %s\n' "$environment"
 printf 'Deploy target directory: %s\n' "$target_dir"
 printf 'Inbox tab: %s\n' "$inbox_tab"
+printf 'Events tab: %s\n' "$events_tab"
