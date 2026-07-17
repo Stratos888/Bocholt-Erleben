@@ -33,6 +33,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Preserve exact deploy workflow input
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-workflow-input-${{ github.run_id }}
+          path: .github/workflows/deploy-strato.yml
+          if-no-files-found: error
+
       - name: Validate deploy branch routing
         shell: bash
         run: bash tests/test_deploy_branch_routing.sh
