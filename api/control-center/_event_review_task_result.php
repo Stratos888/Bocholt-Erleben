@@ -65,7 +65,7 @@
         'actions'=>[
             ['key'=>'approve','enabled'=>$ready],
             ['key'=>'resolve_review_task','enabled'=>!$ready],
-            ['key'=>'edit_and_approve','enabled'=>true],
+            ['key'=>'edit_and_approve','enabled'=>$ready],
             ['key'=>'snooze','enabled'=>true],
             ['key'=>'reject','enabled'=>true],
         ],
