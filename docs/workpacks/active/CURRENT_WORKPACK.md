@@ -8,23 +8,23 @@ Diese Datei ist der einzige operative technische Projektstatus. Ein neuer KI-Cha
 
 - **Programm:** KI-Arbeitsmodell und Runtime-Verlässlichkeit
 - **Workpack:** WP-2 – Runtime-Truth und read-only Preflight
-- **Status:** Gate A abgeschlossen; Implementierung auf eigenem Branch gestartet
+- **Status:** Implementierung vollständig; E2 validiert; Staging-Integration und E3 stehen aus
 - **Risikoklasse:** R2
 - **Aktuelles Gate:** B – Bauen und statisch beweisen
 - **Erforderliche Evidence:** E1, E2 und anschließend E3
 - **Ausgangs-SHA von `staging`:** `a2e89c1a1a10e0a9cdf9c8e9da4d01212f369df6`
 - **Branch:** `agent/wp2-runtime-truth-preflight`
-- **Draft-PR:** wird nach dem ersten Commit angelegt
+- **Draft-PR:** #91
 
 ## Belegter Ist-Zustand
 
 - `api/control-center/action.php` ist der reale schreibende Aktionsendpoint.
-- Bei `inbox_feed + approve` wird anhand von `be_cc_events_tab_name()` zwischen `be_cc_writeback_staging_inbox_approve_verified` und `be_cc_writeback_inbox_approve_verified` gewählt.
+- Bei `inbox_feed + approve` wird anhand des aufgelösten Events-Tabs zwischen dem isolierten Staging-Writer und dem bestehenden Live-Writer gewählt.
 - Staging ist fachlich auf `Inbox_Staging -> Events_Staging` gebunden; Live auf `Inbox -> Events`.
-- Ablehnen und Zurückstellen verwenden `be_cc_writeback_inbox_decision_direct`.
+- Ablehnen und Zurückstellen verwenden den direkten verifizierten Inbox-Writer.
 - Der Deploy veröffentlicht bereits `meta/build.txt` und `meta/deploy-manifest.json`.
-- Vor einer Aktion ist über die deployte Runtime derzeit nicht sichtbar, welcher Build, Host, Endpoint, Environment-Vertrag, Sheet-Fingerprint, Tab-Vertrag und Writer tatsächlich verwendet würden.
-- Ein grüner PR oder Deploy erreicht daher höchstens E2 und belegt den realen Writebackpfad nicht.
+- Vor WP-2 war über die deployte Runtime nicht sichtbar, welcher Build, Host, Endpoint, Environment-Vertrag, Sheet-Fingerprint, Tab-Vertrag und Writer tatsächlich verwendet würden.
+- Ein grüner PR oder Deploy erreicht höchstens E2 und belegt den realen Writebackpfad nicht.
 
 ## Zielzustand
 
@@ -48,8 +48,9 @@ Ein automatischer Staging-Smoke muss den eingefrorenen CityArt-Fall read-only fi
 - `api/control-center/preflight.php`
 - `api/control-center/action.php` ausschließlich für einen gemeinsam genutzten, verhaltensgleichen Writer-Resolver
 - `tests/control_center_runtime_preflight_contract_test.php`
+- `tests/control_center_staging_events_isolation_contract_test.php` ausschließlich zur Anpassung des bestehenden Routing-Nachweises an den gemeinsamen Resolver
 - `.github/workflows/control-center-validation.yml`
-- `.github/workflows/deploy-strato.yml` ausschließlich für den read-only E3-Smoke und dessen Artefakt
+- `.github/workflows/control-center-runtime-preflight.yml`
 - `docs/workpacks/active/CURRENT_WORKPACK.md`
 - `docs/evidence/**` für den abschließenden E3-Nachweis
 
@@ -76,18 +77,24 @@ Ein automatischer Staging-Smoke muss den eingefrorenen CityArt-Fall read-only fi
 - Ressourcen-Lock auf Inbox-/Events-Writeback bleibt bis WP-4 bestehen.
 - Kein anderer schreibender Workpack ist zulässig.
 
+## Erreichte Evidence
+
+- **E1:** aktueller Datenfluss, Environment-Tupel, Writer-Auflösung und Scope sind im Code und PR nachvollziehbar.
+- **E2:** PHP-Syntax, Runtime-Preflight-Vertrag, Staging-Isolationsvertrag, Control-Center-Validation, Contract Diagnostics, Editorial Contracts und Project Guardrails sind grün.
+- **E3:** noch offen; wird erst nach Merge und Staging-Deploy durch den automatisierten Runtime-Preflight-Smoke hergestellt.
+
 ## Definition of Done
 
-- [ ] Writer-Auflösung ist zwischen Action und Preflight identisch und zentral belegt.
-- [ ] Preflight ist review-authentifiziert, POST-only und mutiert weder DB noch Sheets.
-- [ ] Source- und Target-Identität werden read-only gegen Staging geprüft.
-- [ ] Build, Manifest, Host und Environment werden fail-closed validiert.
-- [ ] Contract- und Syntax-Tests sind grün.
-- [ ] PR-Gates und Control-Center-Validation sind grün.
+- [x] Writer-Auflösung ist zwischen Action und Preflight identisch und zentral belegt.
+- [x] Preflight ist review-authentifiziert, POST-only und mutiert weder DB noch Sheets.
+- [x] Source- und Target-Identität werden im Plan read-only geprüft.
+- [x] Build, Manifest, Host und Environment werden fail-closed validiert.
+- [x] Contract- und Syntax-Tests sind grün.
+- [ ] PR Gate ist nach dem finalen Dokumentationscommit grün.
 - [ ] Nach Staging-Integration belegt ein automatisierter Smoke E3 am CityArt-Fall.
 - [ ] Das E3-Artefakt enthält keine Secrets oder vollständige Sheet-ID.
 - [ ] Danach ist die Root Cause beziehungsweise die kleinste verbleibende Evidence-Lücke eindeutig dokumentiert.
 
 ## Nächster erlaubter Schritt
 
-Den kleinsten read-only Runtime-Preflight implementieren, statisch validieren und als Draft-PR gegen `staging` bereitstellen. Noch keine externe Mutation und kein CityArt-Klick.
+Finale PR-Gates prüfen, PR #91 nach `staging` integrieren und anschließend ausschließlich den automatisierten read-only E3-Smoke auswerten. Noch keine externe Mutation und kein CityArt-Klick.
