@@ -1,8 +1,8 @@
 # System Map – Bocholt erleben
 
-Stand: 2026-07-17
+Stand: 2026-07-18
 
-Diese Datei ist die kompakte technische Orientierung für neue KI-Chats. Sie beschreibt aktuelle Systeme, Datenhoheit, Umgebungen und kritische Pfade. Detailregeln stehen in `ENGINEERING.md` und `docs/external-resource-matrix.md`.
+Diese Datei beschreibt stabile Systeme, Datenhoheit, Umgebungen, kritische Datenflüsse und Owner. Operative Blocker, PRs und der aktuelle Workpack stehen ausschließlich in `docs/workpacks/active/CURRENT_WORKPACK.md`.
 
 ## 1. Repository und Umgebungen
 
@@ -13,71 +13,76 @@ Diese Datei ist die kompakte technische Orientierung für neue KI-Chats. Sie bes
 | öffentliche URL | `https://staging.bocholt-erleben.de/` | `https://bocholt-erleben.de/` | Hosting/DNS |
 | Steuerzentrale | `/steuerzentrale/` | `/steuerzentrale/` | `steuerzentrale/**`, `js/control-center/**`, `api/control-center/**` |
 
-Nur `staging` und `main` dürfen deployen. Feature-/Agent-Branches dürfen keine externe Umgebung ausliefern.
+Nur `staging` und `main` dürfen deployen. Feature- und Agent-Branches liefern keine externe Umgebung aus.
 
 ## 2. Hauptkomponenten
 
 ### Public Frontend
 
-- HTML/CSS/JavaScript im Repository.
-- Öffentliche CSS-Kette startet über `css/style.css`.
-- Event- und Activity-Darstellung nutzt generierte Runtime-Daten und freigegebene DB-Submissions.
+- statisches HTML, CSS und JavaScript im Repository;
+- öffentlicher CSS-Entrypoint `css/style.css`;
+- Today-, Event- und Activity-Oberflächen;
+- generierte Runtime-Daten und freigegebene DB-Submissions.
 
 ### Steuerzentrale
 
-- Frontend: `steuerzentrale/**`, `js/control-center/**`, Control-Center-CSS.
-- API: `api/control-center/**`.
-- Lokaler Zustand: Control-Center-Datenbank, insbesondere Fälle, Events und Operationsprotokolle.
-- Aufgabe: Quellen synchronisieren, Reviewfälle darstellen und kontrollierte Entscheidungen ausführen.
+- UI: `steuerzentrale/**`, `js/control-center/**`, Control-Center-CSS;
+- API: `api/control-center/**`;
+- lokaler Zustand: Control-Center-Datenbank für Fälle, Events und Operationsprotokolle;
+- Zweck: Quellen synchronisieren, Ausnahmen prüfen und kontrollierte Entscheidungen ausführen.
 
-### Google Sheets
+### Anbieterbereich und Submissions
 
-| Zweck | Staging | Live |
-|---|---|---|
-| offene Inbox | `Inbox_Staging` | `Inbox` |
-| Inbox-Archiv | `Inbox_Archive_Staging` | `Inbox_Archive` |
-| Eventziel | `Events_Staging` | `Events` |
-
-`Events` ist die redaktionelle Live-Basis. `Events_Staging` ist ein isoliertes Staging-Overlay und darf Live nicht verändern.
-
-### Event-Feed
-
-```text
-Google Sheet Events
-+ auf Staging optional Events_Staging-Overlay
-+ freigegebene DB-Submissions
--> Deploy/Generator
--> data/events.tsv / data/events.json
--> öffentliche Event-API und UI
-```
-
-`data/events.tsv` und `data/events.json` sind generierte Artefakte, keine manuell gepflegte Quelle.
-
-### Submissions und Anbieterprozesse
-
-- DB-/API-owned.
-- Öffentliche Freigabe wird über die vorgesehenen Submission- und Public-API-Pfade ergänzt.
-- Payment, Mail und Veröffentlichung sind externe Nebenwirkungen und grundsätzlich `R3`.
+- DB-/API-owned;
+- öffentliche Einreichungen, Anbieterstatus, Produkt-/Paymentzustand und Wirkungsmessung;
+- Mail, Zahlung und Veröffentlichung sind externe Nebenwirkungen und grundsätzlich R3.
 
 ### Visual-System
 
-- Datenvertrag: `data/event_visual_pool.json` und zugehörige Generatoren/Audits.
-- Arbeitsvertrag: `VISUAL_WORKFLOW.md`.
-- CSS definiert Darstellung, nicht fachliche Bildqualität.
+- Vertragsdaten: `data/event_visual_pool.json`;
+- Prozessvertrag: `VISUAL_WORKFLOW.md`;
+- Generatoren und Audits unter `scripts/**`;
+- CSS steuert Darstellung, nicht fachliche Bildqualität.
 
-## 3. Kritischer Inbox-Übernahmepfad
+## 3. Datenhoheit
 
-Fachlicher Zielpfad:
+| Domäne | Kanonische Quelle | Projektion/Artefakt |
+|---|---|---|
+| redaktionelle Live-Events | Google Sheet `Events` | `data/events.tsv`, `data/events.json`, Event-Detailseiten |
+| Staging-Eventfreigaben | `Events_Staging` als isoliertes Overlay | Staging-Feed |
+| offene Inbox | `Inbox_Staging` / `Inbox` | Control-Center-Fälle und Ansichten |
+| Inbox-Archiv | `Inbox_Archive_Staging` / `Inbox_Archive` | Audit-/Entscheidungsbelege |
+| DB-Submissions | Veranstalter-/Submission-Datenbank | Public-API und Feed-Ergänzung |
+| Activities | Repo-/JSON-Owner | öffentliche Activity-Ausgabe |
+| Visuals | Visual-Pool und freigegebene Assets | Karten-/Detaildarstellung |
+| Strategie/Produkt | `MASTER.md`, `Produktvertrag.md`, `COMMERCIAL_STRATEGY.md` | UI-/Backend-Implementierung |
+
+`data/events.tsv` und `data/events.json` sind generierte Artefakte und werden nicht manuell als Source of Truth gepflegt.
+
+## 4. Event-Feed
+
+```text
+Google Sheet Events
++ auf Staging Events_Staging-Overlay
++ freigegebene DB-Submissions
+-> Deploy-/Buildgeneratoren
+-> data/events.tsv und data/events.json
+-> Event-API, Detailseiten, Sitemap und UI
+```
+
+Staging darf `Events` lesen, aber nur `Events_Staging` beschreiben. Live ignoriert das Staging-Overlay.
+
+## 5. Kritischer Inbox-Übernahmepfad
 
 ```text
 Steuerzentrale
 -> Control-Center Action API
 -> Fall- und Environment-Auflösung
--> Writeback-Plan
+-> autoritativer Writeback-Plan
 -> Eventziel schreiben und zurücklesen
 -> Inboxstatus schreiben und zurücklesen
--> lokalen Fall schließen
--> Staging-Feed aktualisieren/prüfen
+-> lokalen Fall terminal schließen
+-> Feed und öffentliche Darstellung prüfen
 ```
 
 Umgebungsbindung:
@@ -87,66 +92,65 @@ staging: Inbox_Staging -> Events_Staging
 live:    Inbox         -> Events
 ```
 
-Aktueller Status:
+Dry-Run, Runtime-Preflight und Ausführung müssen denselben Environment-Resolver und Operationsplan verwenden.
 
-- Der CityArt-Fall bleibt bis zum Runtime-Truth- und E2E-Programm eingefroren.
-- PR #86 ist nur technische Evidence und darf nicht gemergt werden.
-- Vor einem weiteren echten Übernahmeversuch sind E3 und E4 erforderlich.
+## 6. Deploy- und Runtimepfad
 
-## 4. Evidence-Grenzen
+```text
+Feature-Branch
+-> PR nach staging
+-> PR Gate und path-spezifische Checks
+-> Merge nach staging
+-> Deploy to STRATO staging
+-> HTTP-/Browser-/Runtime-Evidence
+-> später staging -> main
+-> Live-Deploy und E6
+```
 
-| Ebene | Was sie beweist | Was sie nicht beweist |
+Direkte Main-Hotfixes sind eine eng begrenzte Ausnahme nach `AI_ENTRYPOINT.md` und verändern diese Standardarchitektur nicht.
+
+## 7. Evidence-Grenzen
+
+| Ebene | Beweist | Beweist nicht |
 |---|---|---|
 | Repo-Diff | implementierte Logik | reale Serverausführung |
-| Unit/Contract/CI | Testverhalten | tatsächlicher Host/Writer/Ressourcenzugriff |
-| grüner Deploy | Auslieferung und Smoke | gewählter Writebackpfad |
-| Runtime-Preflight | aktiver Build, Endpoint und Ressourcenplan | erfolgreiche Mutation |
-| isolierter synthetischer Write | realer technischer Writeback | fachliche Qualität eines echten Falls |
+| Unit/Contract/CI | Testverhalten | tatsächliche Host-/Ressourcenauflösung |
+| grüner Deploy | Auslieferung und Smokes | gewählter Writebackpfad |
+| Runtime-Preflight | aktiver Build, Endpoint, Umgebung und Plan | erfolgreiche Mutation |
+| isolierter synthetischer Write | realer technischer Writeback | fachliche Qualität |
 | echter Staging-Fall | fachlicher Gesamtprozess | Live-Freigabe |
+| Live-Smoke | erreichbarer konsistenter Produktivstand | Langzeitwirkung |
 
-## 5. Owner-Übersicht
+## 8. Owner-Übersicht
 
 | Domäne | Primäre Owner |
 |---|---|
-| Arbeitsprozess | `AI_ENTRYPOINT.md`, `CURRENT_WORKPACK.md` |
+| Arbeitsprozess | `AI_ENTRYPOINT.md`, `CURRENT_WORKPACK.md`, `docs/README.md` |
+| Architektur | `docs/architecture/SYSTEM_MAP.md` |
 | technische Guardrails | `ENGINEERING.md` |
 | externe Ressourcen | `docs/external-resource-matrix.md` |
 | Deploy/Branchrouting | `.github/workflows/deploy-strato.yml`, `scripts/resolve-deploy-target.sh` |
 | Control-Center UI | `steuerzentrale/**`, `js/control-center/**`, Control-Center-CSS |
 | Control-Center Runtime | `api/control-center/**` |
 | Eventfeed | Deployworkflow, Eventgeneratoren, `api/events/**` |
-| Eventdaten | Google Sheet `Events` bzw. `Events_Staging`; DB-Submissions |
-| Activities | Repo-/JSON-Daten und zugehörige Generatoren |
-| Visuals | `VISUAL_WORKFLOW.md`, Visual-Pool, Asset-/Audit-Skripte |
-| Produktprioritäten | `MASTER.md`, `ROADMAP.md` |
-| Testnachweise | `TEST_STATUS.md`, CI und Evidence-Dokumente |
+| Eventdaten | Sheets `Events`/`Events_Staging`, DB-Submissions |
+| Activities | Repo-/JSON-Daten und Generatoren |
+| Visuals | `VISUAL_WORKFLOW.md`, Visual-Pool, Assets und Audits |
+| Produktmechanik | `Produktvertrag.md` |
+| Produktziel und Priorität | `MASTER.md`, `COMMERCIAL_STRATEGY.md`, `ROADMAP.md` |
+| Proofindex | `TEST_STATUS.md`, CI und `docs/evidence/**` |
 
-## 6. Standard-Datenflussprüfung für KI
-
-Vor einer Änderung an einem kritischen Prozess beantwortet die KI:
+## 9. Standardprüfung vor kritischen Änderungen
 
 1. Wer besitzt den fachlichen Ursprungswert?
-2. Welche lokale Kopie oder Projektion existiert?
-3. Welcher Endpoint wird tatsächlich aufgerufen?
+2. Welche Kopie oder Projektion existiert?
+3. Welcher Endpoint und welche Version laufen tatsächlich?
 4. Wie wird die Umgebung aufgelöst?
 5. Welche Ressource wird gelesen und welche geschrieben?
-6. Welche einzelnen Postconditions müssen bestätigt werden?
+6. Welche Postconditions müssen einzeln bestätigt werden?
 7. Wie wird ein Teilfehler sichtbar und fortgesetzt?
-8. Wie werden synthetische Testdaten bereinigt?
-9. Wie wird Live-Unverändertheit bewiesen?
+8. Wie werden synthetische Daten bereinigt?
+9. Wie wird Live-Unverändertheit oder gezielte Live-Änderung bewiesen?
+10. Welcher Owner und Ressourcen-Lock gilt?
 
-Kann eine Frage nicht belegt werden, ist die nächste Änderung Observability und nicht Fachlogik.
-
-## 7. Dokumentationshierarchie
-
-```text
-AI_ENTRYPOINT.md
--> CURRENT_WORKPACK.md
--> SYSTEM_MAP.md
--> relevante Owner-Dateien
--> ENGINEERING.md / external-resource-matrix.md
--> ROADMAP.md / TEST_STATUS.md
--> Entscheidungen und Forensik
-```
-
-Historische Chats oder alte Dokumente dürfen diese aktuelle Systemkarte nicht übersteuern.
+Ist eine Antwort nicht belegbar, ist der nächste Schritt Observability oder read-only Forensik statt Fachlogik.

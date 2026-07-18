@@ -1,75 +1,86 @@
 # Externe Ressourcen- und Schreibmatrix
 
-Stand: 2026-07-17  
-Status: verbindlicher Sicherheitsvertrag für Repo-, Staging- und KI-Arbeit
+Stand: 2026-07-18  
+Status: verbindlicher Sicherheitsvertrag
 
-## Zweck
-
-Git-Konflikte erkennen nur Codeüberschneidungen. Google Sheets, Datenbanken, STRATO, Stripe, Mail und weitere Dienste benötigen zusätzlich einen Ressourcen-Lock und reale Runtime-Evidence.
-
-Jeder Workpack deklariert externe Ressourcen vor der Umsetzung. Nicht inventarisierte oder nicht nachweisbar isolierte Ressourcen bleiben fail-closed und read-only.
-
-## Allgemeine Regeln
+## 1. Grundregeln
 
 1. Keine Testschreibaktion auf Live-Ressourcen.
 2. Normale Implementierungsschritte mutieren keine externen Daten.
-3. Ein `R3`-Workpack darf innerhalb eines erteilten Arbeitsmandats isolierte synthetische Staging-Schreibtests ausführen, wenn Gate C, stabile Identität, Vorherzustand, Rücklesen und Cleanup dokumentiert sind.
-4. Ein echter Fachdatensatz wird erst nach E4 verwendet.
-5. Pro externer Ressource darf höchstens ein aktiver Schreib- oder Abnahme-Lock bestehen.
-6. Eine manuelle Datenkorrektur ist kein technischer Root-Cause- oder Erfolgsnachweis.
-7. Scope-Erweiterung, Live-Write, reale Zahlung, echte Nachricht oder irreversible Aktion erfordern eine neue Nutzerfreigabe.
+3. Nicht inventarisierte oder nicht nachweisbar isolierte Ressourcen bleiben fail-closed und read-only.
+4. Pro Ressource darf nur ein aktiver Schreib- oder Abnahme-Lock bestehen.
+5. Vor jedem Write stehen Ziel, stabile Identität, Vorherzustand, erwartete Mutation, Rücklesen und Cleanup/Rollback fest.
+6. Eine Teilmutation oder manuelle Grünkorrektur ist kein Erfolg.
+7. Ein wiederverwendbarer R3-Pfad nutzt zuerst einen isolierten synthetischen Staging-Beweis.
+8. Eine einzelne ausdrücklich beauftragte deterministische Live-Admin-Mutation ist nur nach dem Ausnahmevertrag aus `AI_ENTRYPOINT.md` zulässig und niemals ein Test.
 
-## Kanonische Matrix
+## 2. Zugriffsklassen
 
-| Ressource | Staging | Live | Staging-Schreibstatus | Gate-/Lock-Regel |
+- `none`: kein Zugriff im Workpack.
+- `read-only`: lesen, vergleichen und Evidence sichern.
+- `controlled-staging-write`: nur dokumentierter synthetischer oder freigegebener Staging-Write mit Rücklesen und Cleanup.
+- `controlled-live-admin`: genau eine ausdrücklich beauftragte deterministische Live-Änderung mit Vorherzustand, Rücklesen und Rollback.
+
+`controlled-live-admin` ist keine pauschale Live-Schreibfreigabe.
+
+## 3. Kanonische Matrix
+
+| Ressource | Staging | Live | Standardstatus | Ausnahme-/Gate-Regel |
 |---|---|---|---|---|
-| Google Sheet Inbox | `Inbox_Staging` | `Inbox` | kontrolliert möglich | R3; E3-Preflight, synthetischer E4-Test, Rücklesen |
-| Google Sheet Inbox-Archiv | `Inbox_Archive_Staging` | `Inbox_Archive` | kontrolliert möglich | nur mit zugehörigem Inbox-Test und eindeutiger Identität |
-| Google Sheet Events | `Events_Staging` als isoliertes Overlay auf der read-only Basis `Events` | `Events` | kontrolliert möglich | Staging schreibt nur `Events_Staging`; Live-Tab bleibt read-only |
-| Google Sheet Content-/Search-Feedback | je Workflow explizit auflösen | produktive Feedback-Tabs | standardmäßig gesperrt | erst nach E3 und eigener Testidentität |
-| Growth-Backlog | konkrete Quelle je API/Workflow | produktive Quelle | standardmäßig gesperrt | Quelle, Umgebung und Objekt-ID vor Write inventarisieren |
-| Veranstalter-/Submission-Datenbank | Staging-DB nach Runtime-Nachweis | Live-DB | kontrolliert nach E3/E4 | keine Zahlung, Mail oder Veröffentlichung als Nebenwirkung |
-| Activities | Repo-/JSON-owned | Repo-/JSON-owned | über Branch/PR | normaler Code-/Owner-Lock |
-| Visual-Pool und Asset-Backlog | Repo-/Artefaktvertrag | deployter Pool | über Branch/PR | `VISUAL_WORKFLOW.md` und Asset-Identität beachten |
-| STRATO Staging | Verzeichnis `staging` | nicht zutreffend | sequenzieller Deploy | ein Deploy/Smoke gleichzeitig; primärer Chat ist Owner |
-| STRATO Live | nicht zutreffend | Webroot `.` | keine Testschreibaktion | nur `staging -> main` und read-only Live-Smoke |
-| Stripe | Test-/Staging-Secrets | Live-Secrets | nur eigener R3-Workpack | keine reale Zahlung ohne neue Nutzerfreigabe |
-| Mail/SMTP | Staging-Konfiguration | Live-Konfiguration | nur eigener R3-Workpack | Testempfänger; keine echte Nachricht ohne Freigabe |
-| Search Console/Bing | read-only Export | read-only Export | read-only | keine Property-/Konfigurationsänderung im Produktworkpack |
-| GitHub Actions / Deploy | Branch-/Workflowzustand | Main-Workflowzustand | kontrolliert | Feature-Branches duerfen niemals deployen; nur `main` und `staging` |
+| Google Sheet Inbox | `Inbox_Staging` | `Inbox` | Staging kontrolliert, Live read-only | R3; E3, synthetisches E4, Rücklesen |
+| Inbox-Archiv | `Inbox_Archive_Staging` | `Inbox_Archive` | nur mit zugehörigem Inbox-Test | eindeutige Identität und Cleanup |
+| Google Sheet Events | `Events_Staging` über read-only Basis `Events` | `Events` | Staging schreibt nur Overlay | einzelnes Live-Event nur als `controlled-live-admin` |
+| Content-/Search-Feedback | je Workflow explizit | produktive Tabs | standardmäßig read-only | eigener R3-Vertrag und Testidentität |
+| Growth-Backlog | je API/Workflow | produktive Quelle | standardmäßig read-only | Quelle, Umgebung und Objekt-ID inventarisieren |
+| Submission-/Anbieter-DB | Staging-DB | Live-DB | nach E3/E4 kontrolliert | keine Zahlung, Mail oder Veröffentlichung als unbeabsichtigte Nebenwirkung |
+| Activities | Repo-/JSON-owned | Repo-/JSON-owned | Branch/PR | normaler Code-/Owner-Lock |
+| Visual-Pool/Assets | Repo-/Artefaktvertrag | deployter Pool | Branch/PR | `VISUAL_WORKFLOW.md` und Asset-Identität |
+| STRATO Staging | Verzeichnis `staging` | – | sequenzieller Deploy | ein Deploy/Smoke gleichzeitig |
+| STRATO Live | – | Webroot `.` | nur `staging -> main` | direkter Main-Hotfix nur nach vollständig freigeschaltetem Ausnahmevertrag; nie als Test |
+| Stripe | Test-/Staging-Konfiguration | Live-Secrets | eigener R3-Workpack | keine reale Zahlung ohne neue Freigabe |
+| Mail/SMTP | Staging-Testempfänger | Live-Empfänger | eigener R3-Workpack | keine echte Nachricht ohne neue Freigabe |
+| Search Console/Bing | read-only | read-only | read-only | keine Property-/Konfigurationsänderung im Produktworkpack |
+| GitHub Actions/Deploy | Branch-/Workflowzustand | Main-Workflowzustand | kontrolliert | Feature-Branches deployen nie; nur `staging` und `main` |
 
-## Events-Overlay-Vertrag
+## 4. Events-Overlay-Vertrag
 
-1. `Events` bleibt die gemeinsame read-only Basis und darf von Staging niemals beschrieben werden.
-2. `Events_Staging` enthält ausschließlich Staging-Freigaben oder gezielte Overrides.
-3. Der Staging-Deploy führt Basis und Overlay anhand stabiler ID beziehungsweise URL zusammen; Konflikte blockieren fail-closed.
-4. Der Live-Deploy ignoriert `Events_Staging` vollständig.
-5. Eine Staging-Freigabe gilt erst nach Rückleseprüfung von Eventzeile, terminalem Inboxstatus und lokalem Fallstatus als abgeschlossen.
+1. `Events` ist gemeinsame Live-Basis.
+2. Staging liest `Events`, schreibt aber ausschließlich `Events_Staging`.
+3. Das Overlay enthält nur Staging-Freigaben oder gezielte Overrides.
+4. Der Staging-Build führt Basis und Overlay über stabile Identität zusammen; Konflikte blockieren fail-closed.
+5. Der Live-Build ignoriert `Events_Staging`.
+6. Eine Staging-Freigabe ist erst nach Event-Rücklesen, terminalem Inboxstatus und lokalem Fallstatus abgeschlossen.
 
-## Ressourcendeklaration
+## 5. Einzelne Live-Event-Admin-Mutation
 
-PR und `CURRENT_WORKPACK.md` nennen:
+Zulässig nur bei ausdrücklicher Nutzerbeauftragung und:
+
+- eindeutigem Event und stabiler ID;
+- vollständigem Vorherzustand;
+- exakt deklarierten Feldern;
+- fachlichen, Schema- und Qualitätsguards;
+- sofortigem Rücklesen;
+- unveränderten Nicht-Zielfeldern;
+- eindeutigem Rollback;
+- read-only Feed-/Detailseitenprüfung;
+- exklusivem Ressourcen-Lock.
+
+Bei jeder Abweichung: stoppen, Evidence sichern, nicht erneut schreiben.
+
+## 6. Ressourcendeklaration im Workpack/PR
 
 - Ressource und Untereinheit;
-- Zugriff `none`, `read-only` oder `controlled-write`;
+- Zugriffsklasse;
 - stabile Test-/Objektidentität;
-- Besitzer des Ressourcen-Locks;
-- Vorherzustand, erwartete Mutation und Postconditions;
+- Lock-Owner;
+- Vorherzustand;
+- erwartete Mutation;
+- Postconditions;
 - Cleanup/Rollback;
-- benötigte Evidence-Stufe.
+- benötigte Evidence.
 
-`controlled-write` ist keine pauschale Freigabe. Es ist innerhalb des vereinbarten R3-Workpacks nur für den dokumentierten synthetischen Staging-Test zulässig. Der echte Fachfall folgt erst nach E4.
+## 7. Stop-the-line
 
-## Stop-the-line
+Sofort stoppen bei unerwarteter Umgebung oder Ressource, unklarer Identität, Abweichung zwischen Quelle/API/DB/UI, unerwarteter oder partieller Mutation, fehlendem Vorherzustand oder parallelem Zugriff.
 
-Sofort stoppen bei:
-
-- unerwarteter Umgebung, Sheet-ID, Tab-, DB- oder Deploy-Zielauflösung;
-- unklarer oder mehrfacher Objektidentität;
-- Abweichung zwischen Quelle, lokaler Kopie, API und UI;
-- unerwarteter oder partieller Mutation;
-- fehlendem Vorherzustand;
-- manueller Grünkorrektur;
-- parallelem Zugriff auf dieselbe Ressource.
-
-Danach gelten Fehlerbudget und Gate-Regeln aus `AI_ENTRYPOINT.md`: keine Wiederholung ohne neue E3-/E4-Evidence und nach zwei widerlegten Hypothesen Architektur- oder Revert-Entscheidung.
+Danach gelten Fehlerbudget und Gates aus `AI_ENTRYPOINT.md`.
