@@ -1,3 +1,82 @@
+<!-- === BEGIN BLOCK: ROADMAP_STARTPARTNER_GROWTH_PILOT_IMPLEMENTATION_2026_07_18 | Zweck: setzt nach Abschluss der oeffentlichen Startpartner-Oberflaeche den operativen End-to-End-Lebenszyklus als naechsten kommerziellen Workpack; Umfang: Produktvertrag, Datenmodell, Intake, Qualifizierung, Aktivierung, Messung, Abschluss und Stop-Regel === -->
+## Naechster kommerzieller Haupt-Workpack – Startpartner-Wachstumspilot operationalisieren
+
+Status: Zielzustand fachlich validiert und dokumentiert; noch keine Implementierung in diesem Dokumentations-Workpack.
+
+Massgebliche Zielzustandsdatei:
+
+`docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`
+
+### Ausgangslage
+
+Die oeffentliche Akquiseoberflaeche ist weitgehend vorhanden:
+
+- Startpartner-Landingpage,
+- Selbstmeldeformular,
+- Einordnung als begrenzter 6-Monats-Pilot,
+- Abgrenzung zu Tipp-Kanal und regulaeren Tarifen,
+- vorhandener Anbieterbereich und Wirkungsmessung.
+
+Nicht geschlossen ist der operative Lebenszyklus nach Eingang einer Anfrage. Aktuell darf deshalb noch keine groessere aktive Akquise-Kohorte gestartet werden.
+
+### Ziel des Workpacks
+
+Selbstmeldungen und gezielte Ansprache sollen in einen gemeinsamen, nachvollziehbaren Prozess fuehren:
+
+```text
+Kandidat
+→ Qualifizierung
+→ Aufnahmeentscheidung
+→ Onboarding
+→ Aktivierung
+→ 6-Monats-Pilot
+→ Zwischen- und Abschlussbewertung
+→ regulaerer Tarif oder geordnetes Ende
+```
+
+### Verbindliche Umsetzungsreihenfolge
+
+1. Startpartner-Produkt- und Prozesslogik aus dem Zielzustand in `Produktvertrag.md` uebernehmen.
+2. Datenmodell fuer Kandidat, Partner, Status, Kapazitaet, Pilotdaten, Reichweitenbeitrag und Abschlussentscheidung definieren.
+3. Startpartner-Anfragen aus der isolierten Formuebermittlung in einen strukturierten internen Fall ueberfuehren.
+4. Qualifizierung, Aufnahme, Ablehnung, alternativen Produktweg und Warteliste in der Steuerzentrale abbilden.
+5. Anbieteraccount, Pilotberechtigung, Inhalte und objektgenaue Wirkungsmessung verknuepfen.
+6. Aktivierungsdatum als Beginn der sechs Monate und ein eindeutiges Pilotende speichern.
+7. Kontrollpunkte nach Aktivierung, etwa 30 Tagen, etwa 90 Tagen, vor Ablauf und zum Abschluss unterstuetzen.
+8. Abschlussbericht und aktive Tarif- oder Endentscheidung abbilden.
+9. Kapazitaets- und Stop-Regel auswertbar machen.
+10. Erst nach bestandener End-to-End-Validierung die erste aktive Akquise-Kohorte starten.
+
+### Kapazitaets- und Stop-Regel
+
+- maximal acht gleichzeitig aktive Startpartner in der ersten Kohorte,
+- Aufnahmestopp bei etwa 80 Prozent belegter Betreuungskapazitaet,
+- Warteliste statt weiterer unmittelbarer Aktivierung,
+- Ende der allgemeinen kostenlosen Aufnahme nach mindestens sechs weitgehend abgeschlossenen Piloten, mindestens drei getesteten Partnerarten, mindestens vier belastbaren Wirkungsauswertungen und geklaerter Tarif-/Aufwandsbewertung,
+- keine automatische Verlaengerung des Gratis-Tests bei schwacher Zahlungsquote.
+
+### Abnahmekriterien
+
+Der Workpack ist erst abgeschlossen, wenn:
+
+- Inbound und aktive Akquise in denselben Prozess fuehren,
+- jeder Kandidat einen eindeutigen Status und eine dokumentierte Entscheidung besitzt,
+- Anbieteraccount, Inhalte, Pilotlaufzeit und Messdaten eindeutig verknuepft sind,
+- Kapazitaet und Warteliste kontrollierbar sind,
+- Reichweitenbeitrag und Betreuungspflichten festgehalten werden,
+- Zwischen- und Abschlussbewertung funktionieren,
+- ein Tarifuebergang nur nach ausdruecklicher Zustimmung erfolgt,
+- das kostenlose Pilotende technisch und organisatorisch durchsetzbar ist.
+
+### Nicht parallel starten
+
+- keine breite aktive Partneransprache vor geschlossenem End-to-End-Prozess,
+- keine zweite Startpartner-Variante oder andere Pilotlaufzeit,
+- kein offener kostenloser Anbieterzugang,
+- keine automatische kostenpflichtige Umwandlung,
+- keine neue allgemeine UI-Polish-Runde ohne konkreten Funnel-Befund.
+<!-- === END BLOCK: ROADMAP_STARTPARTNER_GROWTH_PILOT_IMPLEMENTATION_2026_07_18 === -->
+
 <!-- === BEGIN BLOCK: ROADMAP_COMMERCIAL_FUNNEL_PHASE_2026_07_06 | Zweck: priorisiert den final validierten Tipp-/Startpartner-Funnel nach Event-Impact-Backbone und Dashboard-Cockpit; Umfang: Tipp-Kanal ueber Feedback, 6-Monats-Startpartner, bezahlte Service-Abgrenzung, Nicht-Ziele === -->
 ## Kommerzielle Premium-Phase – Tipp-Kanal, Anbieterwert und Startpartner
 
@@ -262,6 +341,6 @@ Entscheidungen:
 - Kein Login, kein Konto, kein Sync, kein Backend.
 - Speicherung: lokal im Browser/PWA via bestehendem Nutzerpraeferenz-Speicher.
 - Datenschutz: keine Cookies, keine Serveruebertragung, kein Tracking; Hinweis in `/datenschutz/`.
-- Mobile UI: Activity-Cards werden in der Bildgeometrie an Event-Cards angeglichen, damit Seitenwechsel nicht wie ein Layoutsprung wirken.
+- Mobile UI: Activity-Cards werden in der Bildgeometrie an Event-Cards angeglichen, damit Seitenwechsel nicht wie ein Layoutsprung wirkt.
 - Mobile Schnellfilter: als einzeilige horizontale Premium-Chip-Rail; Desktop bleibt unveraendert.
 <!-- === END BLOCK: ROADMAP_ACTIVITY_FAVORITES_PREMIUM_2026_06_30 === -->
