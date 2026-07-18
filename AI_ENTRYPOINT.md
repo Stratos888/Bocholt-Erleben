@@ -14,7 +14,7 @@ Vor jeder Repo-Aufgabe:
 4. relevante Owner-Dateien im aktuellen Ref lesen;
 5. fachliche Source of Truth gemäß `ENGINEERING.md` und `docs/external-resource-matrix.md` prüfen.
 
-Memory, alte Chats, ZIPs und historische Dokumente sind Kontext, aber keine aktuelle Quelle der Wahrheit. Direkte KI-Schreibaktionen auf `main` sind verboten. Releases nach `main` erfolgen ausschließlich als `staging -> main`.
+Memory, alte Chats, ZIPs und historische Dokumente sind Kontext, aber keine aktuelle Quelle der Wahrheit. Der Normalfall bleibt die Arbeit über `staging`; vollständige Releases erfolgen als `staging -> main`. Eine direkte KI-Schreibaktion auf Live oder `main` ist ausschließlich im eng begrenzten Live-Sofortpfad aus Abschnitt 3a zulässig.
 
 ## 2. Standard-Arbeitsmodell
 
@@ -49,11 +49,57 @@ Innerhalb des dokumentierten Scopes darf die KI danach ohne wiederholte Zwischen
 Eine neue Nutzerfreigabe ist erforderlich bei:
 
 - Scope-Erweiterung;
-- Schreibzugriff auf Live;
+- Schreibzugriff auf Live, sofern er nicht bereits ausdrücklich als Live-Sofortpfad beauftragt wurde;
 - irreversibler oder destruktiver Aktion ohne sicheren Rollback;
 - Secrets, Credentials oder Berechtigungsänderungen;
 - realen Zahlungen, echten E-Mails/Nachrichten oder externen Veröffentlichungen;
 - fachlicher Produktentscheidung, die nicht aus dem bestehenden Vertrag ableitbar ist.
+
+### 3a. Kontrollierter Live-Sofortpfad für Events und kleine Hotfixes
+
+Der Nutzer hat festgelegt, dass die KI klar begrenzte Eventpflege und kleine, reversible Produktionskorrekturen ohne vollständigen `staging -> main`-Release durchführen können soll. Dieser Pfad ist eine Ausnahme und kein zweiter allgemeiner Entwicklungsweg.
+
+#### A. Live-Eventdaten
+
+Direkte Pflege der redaktionellen Live-Quelle `Events` ist zulässig, wenn der Nutzer das konkrete Event oder die konkrete Korrektur ausdrücklich beauftragt hat und folgende Bedingungen erfüllt sind:
+
+- stabile Event-ID und eindeutige Zielzeile;
+- Vorherzustand lesen und Zielressource `Events` bestätigen;
+- nur die fachlich erforderlichen Felder ändern;
+- Qualitäts- und Schema-Guards einhalten;
+- Änderung unmittelbar zurücklesen;
+- Live-Feed beziehungsweise Detailseite nach dem Deploy read-only prüfen;
+- kein stilles Überschreiben konkurrierender redaktioneller Änderungen.
+
+Eventdaten werden nicht ersatzweise in generierte Repo-Artefakte geschrieben. Ein Event-Write ist `R3`, aber für eine einzelne deterministische Zeile als kontrollierte Admin-Mutation zulässig, wenn Identität, Vorherzustand, Rücklesen und Rollback vollständig feststehen.
+
+#### B. Kleiner direkter Repo-Hotfix auf `main`
+
+Ein direkter KI-Commit auf `main` ist nur zulässig, wenn **alle** folgenden Bedingungen erfüllt sind:
+
+1. Der Nutzer beauftragt ausdrücklich einen sofortigen Live-Hotfix oder bestätigt, dass die Änderung direkt auf `main` erfolgen soll.
+2. Der aktuelle `main`-SHA und der tatsächliche Live-Fehler sind geprüft.
+3. Der Patch ist isoliert, reversibel und umfasst höchstens drei fachlich zusammengehörige Owner-Dateien sowie im Regelfall höchstens 100 geänderte Zeilen.
+4. Der Patch behebt einen konkreten Produktionsfehler oder eine klar begrenzte Content-/Visual-Korrektur; er enthält kein Feature, kein Refactoring und keine verdeckte Staging-Übernahme.
+5. Ausgeschlossen sind `.github/workflows/**`, Secrets, Berechtigungen, Deploy-/Environment-Verträge, zentrale Governance-Dateien, Datenbankmigrationen, externe Mehrfach-Writes und destruktive Änderungen.
+6. Syntax-, Schema- und passende Contract-Checks sind vor dem Write grün oder der Patch ist rein deklarativ und deterministisch prüfbar.
+7. Der Commit erhält eine eindeutige Hotfix-Message; Vorher-SHA, geänderte Dateien und Rollback-Commit sind nachvollziehbar.
+8. Nach dem Push müssen Main-Deploy und read-only Live-Postconditions geprüft werden. Bei Abweichung gilt sofort Stop-the-line und Revert statt Nachpatchen.
+
+Technische Voraussetzung ist ein **dedizierter, kontrollierter GitHub-Akteur** für KI-Live-Hotfixes, der im `main`-Ruleset gezielt als Bypass-Akteur freigegeben ist. Eine pauschale Administrator-Ausnahme für alle Änderungen ist nicht der Premium-Zielzustand. Solange diese technische Freigabe fehlt, darf die KI keinen breiten Merge als Ersatz ausführen. Sie dokumentiert den exakt vorbereiteten Patch und den blockierenden Ruleset-Status.
+
+#### C. Abgrenzung
+
+Der Live-Sofortpfad ist nicht zulässig für:
+
+- normale Produktentwicklung;
+- Änderungen mit mehr als einem fachlichen Ziel;
+- unklare Root Cause;
+- konkurrierende oder parallele Live-Writes;
+- Workflow-, Security-, Berechtigungs- oder Infrastrukturänderungen;
+- Patches, deren Erfolg erst durch weitere Live-Schreibversuche festgestellt werden könnte.
+
+Die dauerhafte Entscheidung und der Einrichtungsstatus stehen in `docs/decisions/2026-07-18-controlled-ai-live-hotfix-and-event-writes.md`.
 
 ## 4. Risikoklassen
 
@@ -74,6 +120,7 @@ Eine exakt begrenzte Admin-Migration kann verkürzt behandelt werden, wenn Ziel,
 Vor dem ersten Patch müssen sichtbar sein:
 
 - aktueller `staging`-SHA und offene PRs;
+- bei einem Live-Sofortpfad zusätzlich aktueller `main`-SHA;
 - Zielzustand und Risikoklasse;
 - belegte Fakten getrennt von Hypothesen;
 - Owner-Dateien und externe Ressourcen;
@@ -84,10 +131,11 @@ Bei einer ungeklärten realen Mutation darf nur Observability oder read-only For
 
 ### Gate B – Bauen und statisch beweisen
 
-- eigener Branch und Draft-PR;
+- eigener Branch und Draft-PR im Standardpfad;
+- im ausdrücklich freigegebenen Live-Hotfixpfad stattdessen isolierter Diff gegen den aktuellen `main`-SHA;
 - nur deklarierter Scope;
 - Syntax-, Unit-, Contract-, Replay-, Build- und relevante CI-Tests;
-- Diff gegen aktuellen `staging`-Stand;
+- Diff gegen den maßgeblichen Ausgangsstand;
 - keine externe Mutation durch normale Implementierungsschritte.
 
 Ein grüner PR beweist höchstens E2 und noch keine reale Runtimeausführung.
@@ -104,18 +152,19 @@ Für `R2` und `R3` erforderlich:
 
 Für `R3` zusätzlich vor einem echten Fachfall:
 
-- synthetischer eindeutig benannter Staging-Test;
+- synthetischer eindeutig benannter Staging-Test, sofern der Pfad nicht als vollständig deterministische einzelne Admin-Mutation dokumentiert ist;
 - Schreiben und Rücklesen aller Postconditions;
 - Retry-/Teilfehlernachweis, soweit der Prozess wiederholbar ist;
 - vollständiges Cleanup;
-- Nachweis, dass Live-Ressourcen unverändert blieben.
+- Nachweis, dass nicht adressierte Live-Ressourcen unverändert blieben.
 
 ### Gate D – Abnehmen und abschließen
 
 - genau eine fachliche oder visuelle Staging-Abnahme, falls erforderlich;
+- beim Live-Sofortpfad genau eine read-only Live-Abnahme;
 - technische Postconditions unmittelbar prüfen;
-- Dokumentation und `CURRENT_WORKPACK.md` aktualisieren;
-- PR-, Branch- und Incidentstatus klären;
+- Dokumentation und `CURRENT_WORKPACK.md` aktualisieren, soweit ein aktiver Workpack betroffen ist;
+- PR-, Branch-, Hotfix- und Incidentstatus klären;
 - nächsten erlaubten Schritt eindeutig nennen.
 
 Der Nutzer prüft primär Produktqualität. Er ist nicht das technische Integrationstest-System.
@@ -128,7 +177,7 @@ Der Nutzer prüft primär Produktqualität. Er ist nicht das technische Integrat
 | `E1` | aktueller Code/Diff | Code enthält die Logik |
 | `E2` | automatisierter Test/CI/Replay | Logik funktioniert in der Testumgebung |
 | `E3` | deployte read-only Runtime-Evidence | Server führt erwarteten Build und Pfad aus |
-| `E4` | isolierter automatisierter Staging-Write | technischer Schreibprozess funktioniert real |
+| `E4` | isolierter automatisierter Staging-Write oder deterministische kontrollierte Admin-Mutation mit Rücklesen | technischer Schreibprozess funktioniert real |
 | `E5` | echter fachlicher Staging-Fall | fachlicher Gesamtprozess ist abgenommen |
 | `E6` | read-only Live-Smoke | Produktivstand ist erreichbar und konsistent |
 
@@ -136,8 +185,9 @@ Verbindlich:
 
 - grüner PR = maximal E2;
 - grüner Deploy ohne Runtime-Preflight = kein Beweis des gewählten Schreibpfads;
-- echter Nutzerklick auf einen R3-Prozess erst nach E4;
-- keine Erfolgsbehauptung bei Teilmutation.
+- echter Nutzerklick auf einen wiederverwendbaren R3-Prozess erst nach E4;
+- keine Erfolgsbehauptung bei Teilmutation;
+- direkter Main-Hotfix ist erst nach E6 abgeschlossen.
 
 ## 7. Fehlerbudget und Stop-the-line
 
@@ -154,9 +204,9 @@ Regeln:
 
 1. Kein zweiter Schreibversuch ohne neue E3- oder E4-Evidence.
 2. Immer nur eine technische Hypothese gleichzeitig prüfen.
-3. Nach zwei widerlegten Hypothesen keinen dritten Patch bauen; Branch einfrieren und Architektur beziehungsweise Revert neu bewerten.
+3. Nach zwei widerlegten Hypothesen keinen dritten Patch bauen; Branch beziehungsweise Hotfix einfrieren und Architektur oder Revert neu bewerten.
 4. Keine manuelle Datenkorrektur, um einen Test scheinbar grün zu machen.
-5. Ein synthetischer Test hat Vorrang vor einem echten Fachdatensatz.
+5. Ein synthetischer Test hat Vorrang vor einem echten Fachdatensatz, außer bei der dokumentierten einzelnen deterministischen Admin-Mutation.
 
 ## 8. Nutzerinteraktion
 
@@ -175,11 +225,11 @@ Screenshots sind für visuelle/fachliche Abnahme oder fehlende technische Schnit
 
 Standardmäßig existiert nur ein aktiver schreibender Workpack. Ein optionaler zweiter Chat arbeitet ausschließlich read-only als Reviewer und erhält einen kopierbaren, klar begrenzten Prüfauftrag.
 
-Mehrere schreibende Workpacks sind nur erlaubt, wenn ihre Unabhängigkeit in `CURRENT_WORKPACK.md` dokumentiert ist. Integration, Staging-Deploy, externe Schreibprobe und Release bleiben immer sequenziell.
+Mehrere schreibende Workpacks sind nur erlaubt, wenn ihre Unabhängigkeit in `CURRENT_WORKPACK.md` dokumentiert ist. Integration, Staging-Deploy, externe Schreibprobe und Release bleiben immer sequenziell. Während eines Live-Sofortpfads gilt ein exklusiver Lock auf die betroffenen Owner-Dateien oder die externe Ressource.
 
 ## 10. Werkzeugwahl
 
-- GitHub-Connector: Standard für aktuellen Repo-Stand, Branches, PRs und kleine bis mittlere Änderungen.
+- GitHub-Connector: Standard für aktuellen Repo-Stand, Branches, PRs, kleine bis mittlere Änderungen und – nach technischer Ruleset-Freigabe – kontrollierte direkte Main-Hotfixes.
 - Codespace/lokaler Clone: wenn reale Ausführung, Browser-Smoke, Build, große Refactorings oder umfangreiche Dateiumstrukturierung nötig sind.
 - ZIP: nur Fallback oder bewusster Snapshotvergleich.
 - Externe Ressourcen: gemäß `docs/external-resource-matrix.md`.

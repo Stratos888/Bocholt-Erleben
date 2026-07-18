@@ -6,11 +6,12 @@ Diese Datei enthält ausschließlich dauerhafte technische Guardrails. Arbeitsab
 
 ### Repo
 
-- Aktueller GitHub-Stand auf `staging` ist die primäre Baseline.
+- Aktueller GitHub-Stand auf `staging` ist die primäre Entwicklungsbaseline.
+- Für einen ausdrücklich beauftragten Live-Sofortpfad ist der aktuelle `main`-SHA die verbindliche Patch-Baseline.
 - Ein aktiver lokaler Clone/Codespace kann die Baseline ergänzen, wenn sein Ref und Diff sichtbar sind.
 - ZIPs sind Fallback oder bewusster Snapshotvergleich.
 - Kein Patch ohne aktuellen Inhalt der betroffenen Owner-Dateien.
-- `main` wird nicht direkt beschrieben; Release ausschließlich `staging -> main`.
+- Der Normalfall ist Release ausschließlich `staging -> main`. Direkte KI-Schreibaktionen auf `main` sind nur im kontrollierten Live-Sofortpfad aus `AI_ENTRYPOINT.md` zulässig.
 
 ### Eventdaten
 
@@ -19,6 +20,7 @@ Diese Datei enthält ausschließlich dauerhafte technische Guardrails. Arbeitsab
 - DB-Submissions ergänzen den öffentlichen Feed über den freigegebenen API-Pfad.
 - `data/events.tsv` und `data/events.json` sind generierte Deploy-/Runtime-Artefakte, keine manuell gepflegte Source of Truth.
 - Staging verwendet `Inbox_Staging` und `Inbox_Archive_Staging`; Live verwendet `Inbox` und `Inbox_Archive`.
+- Ein ausdrücklich beauftragtes einzelnes Live-Event darf als deterministische Admin-Mutation direkt in `Events` angelegt oder korrigiert werden, wenn stabile Identität, Vorherzustand, Rücklesen und Rollback feststehen.
 
 ### Sonstige Daten
 
@@ -33,6 +35,7 @@ Diese Datei enthält ausschließlich dauerhafte technische Guardrails. Arbeitsab
 - Cross-file-Fixes nur, wenn die Root Cause mehrere Owner nachweislich betrifft.
 - Neue zentrale Abstraktionen benötigen einen klaren Owner und müssen alte Parallelpfade ersetzen, nicht nur ergänzen.
 - Ein aktiver Code-/Owner-Lock sperrt den Bereich für weitere schreibende Workpacks.
+- Ein Live-Sofortpfad erhält einen exklusiven Lock auf seine Owner-Dateien oder die externe Zielressource.
 
 Besonders zentral und standardmäßig seriell:
 
@@ -42,6 +45,8 @@ Besonders zentral und standardmäßig seriell:
 - globale CSS-/JS-/Bootstrap-/Environment-Entrypoints;
 - Control-Center-Schema-, Source-, Writeback- und Environment-Dateien;
 - Service Worker, Cache, Deploy und gemeinsame Datenverträge.
+
+Diese zentralen Bereiche sind vom direkten Main-Hotfixpfad ausgeschlossen.
 
 ## 3. Architekturprinzip: vereinfachen statt schichten
 
@@ -87,6 +92,15 @@ Für wiederverwendbare Schreibprozesse gilt:
 - Ein echter Fachdatensatz wird erst nach isoliertem synthetischem Staging-Beweis verwendet.
 - Live-Schreibtests sind ausgeschlossen.
 
+Für eine einzelne deterministische Live-Admin-Mutation – insbesondere ein ausdrücklich beauftragtes Event in `Events` – gilt die engere Ausnahme:
+
+- genau eine stabile Zielidentität;
+- Vorherzustand vollständig lesen;
+- nur deklarierte Felder ändern;
+- sofortiges Rücklesen;
+- klare Rücknahmeoption;
+- kein Testen durch wiederholte Live-Mutationen.
+
 Staging- und Live-Ressourcen:
 
 ```text
@@ -94,13 +108,13 @@ staging: Inbox_Staging -> Events_Staging
 live:    Inbox         -> Events
 ```
 
-`Events` bleibt für Staging read-only. Das Staging-Overlay darf beim Deploy gelesen, aber nicht mit Live verwechselt werden.
+`Events` bleibt für normale Staging-Arbeit read-only. Das Staging-Overlay darf beim Deploy gelesen, aber nicht mit Live verwechselt werden.
 
 ## 6. Externe Ressourcen und Ressourcen-Lock
 
 Die kanonische Matrix steht in `docs/external-resource-matrix.md`.
 
-- Alles, was nicht ausdrücklich als staging-isoliert nachgewiesen ist, bleibt fail-closed und read-only.
+- Alles, was nicht ausdrücklich als staging-isoliert oder als einzelne kontrollierte Live-Admin-Mutation nachgewiesen ist, bleibt fail-closed und read-only.
 - Pro externer Ressource darf nur ein kontrollierter Schreib- oder Abnahmevorgang aktiv sein.
 - Ein Ressourcen-Lock gilt unabhängig von Git-Dateipfaden.
 - Vor einem kontrollierten Write müssen Ziel, stabile Identität, Vorherzustand, erwartete Mutation, Rücklesen und Cleanup/Rollback feststehen.
@@ -111,9 +125,10 @@ Die kanonische Matrix steht in `docs/external-resource-matrix.md`.
 - `Deploy to STRATO` akzeptiert ausschließlich `main` und `staging` und blockiert andere Refs vor Secrets und externen Zugriffen.
 - Branch- und Zielauflösung liegen zentral in `scripts/resolve-deploy-target.sh`.
 - Staging- und Live-Deploys laufen nie parallel.
-- Ein Integrationsschritt endet erst nach Deploy und erforderlicher Abnahme.
+- Ein Integrations- oder Hotfixschritt endet erst nach Deploy und erforderlicher Abnahme.
 - Schwere Content-, Growth-, KI- und Audit-Läufe werden nicht pauschal an jeden `staging`-Push gekoppelt.
-- `PR Gate` bleibt stabiler Always-run-Check; er ersetzt keine Runtime-Evidence.
+- `PR Gate` bleibt stabiler Always-run-Check für PR-Pfade; er ersetzt keine Runtime-Evidence.
+- Der direkte Main-Hotfixpfad verwendet keinen PR als Umweg, sondern benötigt einen eigens freigegebenen Ruleset-Bypass-Akteur und die Live-Hotfix-Gates aus `AI_ENTRYPOINT.md`.
 - Workflowdateien werden nicht durch selbstmodifizierende One-off-Workflows geändert.
 - Service Worker, Cache und Asset-Versionierung werden nicht beiläufig verändert.
 - Der Deploy setzt öffentliche Asset-Versionen über `BUILD_ID`; keine manuellen Query-Bumps über viele HTML-Dateien.
@@ -143,7 +158,8 @@ Maßgeblich ist `VISUAL_WORKFLOW.md`.
 
 - prominente Flächen verwenden nur freigegebene `ready`- oder bewusst erlaubte `fallback`-Assets;
 - unsichere Bilder werden ersetzt, abgestuft oder blockiert;
-- Visual-Key-, Motiv- und Assetprobleme werden upstream im Pool-/Auditvertrag gelöst, nicht dauerhaft per CSS kaschiert.
+- Visual-Key-, Motiv- und Assetprobleme werden upstream im Pool-/Auditvertrag gelöst, nicht dauerhaft per CSS kaschiert;
+- ein Live-Hotfix darf ein nachweislich falsches Bild gezielt entfernen oder unterdrücken, aber kein ungeprüftes Ersatzmotiv als `ready` deklarieren.
 
 ## 9. Content- und KI-Regeln
 
@@ -160,9 +176,11 @@ Tests müssen Zielverhalten beweisen, nicht nur Marker oder Funktionsnamen.
 
 - Unit-/Contract-/Replay-/CI-Nachweise entsprechen maximal E2.
 - Runtime-, Host-, Endpoint- und Ressourcenauflösung benötigen E3.
-- Externe Writes benötigen E4 vor einem echten Fachfall.
+- Wiederverwendbare externe Writes benötigen E4 vor einem echten Fachfall.
+- Eine einzelne deterministische Admin-Mutation benötigt Vorherzustand, Write, Rücklesen und unveränderte Nicht-Zielfelder als E4-Nachweis.
 - Browser-Smokes sind read-only, außer ein R3-Testplan definiert ausdrücklich isolierte synthetische Daten und Cleanup.
 - Ein roter Staging-Smoke blockiert den Release nach `main`.
+- Ein direkter Main-Hotfix ist erst nach read-only Live-Smoke E6 abgeschlossen.
 
 ## 11. Stop-the-line
 
@@ -177,12 +195,16 @@ Sofortiger Stopp bei:
 - parallelem Zugriff auf denselben Owner oder dieselbe Ressource;
 - Tests, die nur statische Marker statt Zielverhalten beweisen.
 
-Danach gelten Fehlerbudget und Gates aus `AI_ENTRYPOINT.md`: keine Wiederholung ohne neue Evidence, keine manuelle Grünkorrektur und nach zwei widerlegten Hypothesen Architektur- oder Revert-Entscheidung.
+Danach gelten Fehlerbudget und Gates aus `AI_ENTRYPOINT.md`: keine Wiederholung ohne neue Evidence, keine manuelle Grünkorrektur und nach zwei widerlegten Hypothesen Architektur- oder Revert-Entscheidung. Bei einem Main-Hotfix gilt Revert vor einem zweiten Reparaturpatch.
 
 ## 12. Git- und Schreibdisziplin
 
 - Kein Force-Push.
-- Keine direkten Commits auf `main`.
+- Direkte Commits auf `main` sind ausschließlich im ausdrücklich beauftragten und technisch freigeschalteten Live-Sofortpfad zulässig.
+- Ein direkter Main-Hotfix umfasst höchstens drei fachlich zusammengehörige Owner-Dateien und im Regelfall höchstens 100 geänderte Zeilen.
+- Direkte Main-Hotfixes dürfen keine Features, Refactorings, Workflow-, Security-, Berechtigungs-, Deploy-, Environment- oder Governance-Änderungen enthalten.
+- Der GitHub-Akteur für direkte KI-Hotfixes muss im Main-Ruleset gezielt freigegeben sein; eine pauschale Abschaltung des Main-Schutzes ist unzulässig.
+- Fehlt diese technische Freigabe, wird kein breiter `staging -> main`-Merge als Ersatz durchgeführt.
 - Keine Feature-Branch-Deploys.
 - Keine Secrets oder Credentials im Repo oder Chat offenlegen.
 - Datei- oder Branchlöschungen nur, wenn sie Teil des genehmigten Scopes sind und der Inhalt weiterhin über Git/PR nachvollziehbar bleibt.
