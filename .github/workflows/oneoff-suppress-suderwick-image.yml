@@ -1,0 +1,67 @@
+name: One-off suppress Suderwick activity image
+
+on:
+  push:
+    branches:
+      - agent/suppress-suderwick-image-v2
+    paths:
+      - .github/workflows/oneoff-suppress-suderwick-image.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout patch branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/suppress-suderwick-image-v2
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Apply image suppression patch
+        run: python scripts/oneoff_suppress_suderwick_activity_image.py
+
+      - name: Validate patched files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m json.tool data/offers.json >/dev/null
+          node --check js/offers.js
+          node --check js/today-home.js
+          grep -n 'SUPPRESSED_ACTIVITY_IMAGE_IDS' js/offers.js
+          grep -n 'SUPPRESSED_TODAY_ACTIVITY_IMAGE_IDS' js/today-home.js
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('data/offers.json').read_text(encoding='utf-8'))
+          matches = [row for row in payload['offers'] if row.get('id') == 'suderwicker-maerchenspielplatz']
+          assert len(matches) == 1
+          row = matches[0]
+          assert row.get('image_suppressed') is True
+          assert not row.get('image')
+          print('Validated image suppression data contract.')
+          PY
+
+      - name: Remove one-off patch machinery
+        run: |
+          rm scripts/oneoff_suppress_suderwick_activity_image.py
+          rm .github/workflows/oneoff-suppress-suderwick-image.yml
+
+      - name: Commit patched product state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/offers.json js/offers.js js/today-home.js scripts/oneoff_suppress_suderwick_activity_image.py .github/workflows/oneoff-suppress-suderwick-image.yml
+          git diff --cached --check
+          git commit -m "Suppress unsuitable Suderwick playground image"
+          git push origin HEAD:agent/suppress-suderwick-image-v2
