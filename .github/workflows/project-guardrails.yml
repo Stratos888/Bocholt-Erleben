@@ -1,8 +1,9 @@
 name: Apply Documentation Migration
 
 on:
-  push:
-    branches: ["agent/documentation-domain-inventory"]
+  pull_request:
+    branches: ["staging"]
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
@@ -10,16 +11,24 @@ permissions:
 
 jobs:
   migrate:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.ref == 'agent/documentation-domain-inventory'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Apply role and reference migration
         shell: bash
         run: |
           set -euo pipefail
+
+          if [[ ! -f scripts/apply-documentation-content-migration.py ]]; then
+            echo "One-time migration is already applied."
+            exit 0
+          fi
+
           python3 scripts/apply-documentation-content-migration.py
 
           git config user.name "github-actions[bot]"
@@ -32,4 +41,4 @@ jobs:
           fi
 
           git commit -m "Consolidate documentation roles and references"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}"
