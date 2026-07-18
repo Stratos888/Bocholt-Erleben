@@ -281,7 +281,32 @@ const OfferVisuals = (() => {
     return "";
   }
 
+  const SUPPRESSED_ACTIVITY_IMAGE_IDS = new Set([
+    "suderwicker-maerchenspielplatz"
+  ]);
+
   function resolveImageData(offer) {
+    if (SUPPRESSED_ACTIVITY_IMAGE_IDS.has(normalizeLookupKey(offer?.id))) {
+      return {
+        url: "",
+        positionX: "50%",
+        positionY: "50%",
+        fit: "cover",
+        sourcePage: "",
+        author: "",
+        license: "",
+        credit: "",
+        sourceType: "",
+        isSymbolic: false,
+        isDocumentary: false,
+        isAiGenerated: false,
+        status: "suppressed",
+        visualKey: "",
+        alt: "",
+        note: ""
+      };
+    }
+
     const poolImage = resolvePoolImageData(offer);
     if (poolImage?.url) return poolImage;
 
