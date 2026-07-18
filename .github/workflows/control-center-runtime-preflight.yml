@@ -1,0 +1,214 @@
+name: Control Center Runtime Preflight
+
+on:
+  push:
+    branches: ["staging"]
+    paths:
+      - "api/control-center/**"
+      - "tests/control_center_runtime_preflight_contract_test.php"
+      - ".github/workflows/control-center-runtime-preflight.yml"
+      - ".github/workflows/deploy-strato.yml"
+      - "docs/workpacks/active/CURRENT_WORKPACK.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: control-center-runtime-preflight-staging
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: https://staging.bocholt-erleben.de
+      REVIEW_PASSWORD: ${{ secrets.STAGING_REVIEW_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate local preflight contract
+        run: |
+          set -euo pipefail
+          php -l api/control-center/_runtime_preflight.php
+          php -l api/control-center/preflight.php
+          php tests/control_center_runtime_preflight_contract_test.php
+
+      - name: Wait for the matching staging build
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_BUILD="$(git rev-parse --short=12 HEAD)"
+          echo "EXPECTED_BUILD=$EXPECTED_BUILD" >> "$GITHUB_ENV"
+
+          for attempt in $(seq 1 60); do
+            ACTUAL_BUILD="$(curl -fsSL --connect-timeout 10 --max-time 20 "$BASE_URL/meta/build.txt?attempt=$attempt" 2>/dev/null | tr -d '\r\n' || true)"
+            if [ "$ACTUAL_BUILD" = "$EXPECTED_BUILD" ]; then
+              echo "Matching staging build is deployed: $ACTUAL_BUILD"
+              exit 0
+            fi
+            echo "Waiting for staging deploy ($attempt/60): expected=$EXPECTED_BUILD actual=${ACTUAL_BUILD:-missing}"
+            sleep 10
+          done
+
+          echo "The expected staging build was not deployed within the bounded wait window."
+          exit 1
+
+      - name: Prove CityArt runtime plan without mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$REVIEW_PASSWORD"
+          mkdir -p artifacts
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+
+          base_url = os.environ["BASE_URL"].rstrip("/")
+          password = os.environ["REVIEW_PASSWORD"]
+          expected_build = os.environ["EXPECTED_BUILD"]
+          headers = {
+              "Accept": "application/json",
+              "X-BE-Review-Password": password,
+          }
+
+          def request_json(url, method="GET", body=None):
+              data = None
+              request_headers = dict(headers)
+              if body is not None:
+                  data = json.dumps(body, ensure_ascii=False).encode("utf-8")
+                  request_headers["Content-Type"] = "application/json; charset=utf-8"
+              request = urllib.request.Request(url, data=data, headers=request_headers, method=method)
+              try:
+                  with urllib.request.urlopen(request, timeout=45) as response:
+                      return response.status, json.loads(response.read().decode("utf-8"))
+              except urllib.error.HTTPError as error:
+                  raw = error.read().decode("utf-8", errors="replace")
+                  try:
+                      payload = json.loads(raw)
+                  except json.JSONDecodeError:
+                      payload = {"status": "error", "message": raw}
+                  return error.code, payload
+
+          status, cases_payload = request_json(f"{base_url}/api/control-center/cases.php?active=1")
+          if status != 200 or cases_payload.get("status") != "ok":
+              raise SystemExit(f"Cases read failed: HTTP {status} {cases_payload}")
+
+          items = cases_payload.get("data", {}).get("items", [])
+          cityart = None
+          for item in items:
+              searchable = json.dumps(item, ensure_ascii=False).lower()
+              source = item.get("source", {}) if isinstance(item, dict) else {}
+              if source.get("system") == "inbox_feed" and "cityart" in searchable:
+                  cityart = item
+                  break
+          if not cityart:
+              raise SystemExit("The frozen CityArt inbox case was not found read-only in staging.")
+
+          case_id = str(cityart.get("id", "")).strip()
+          if not case_id:
+              raise SystemExit("CityArt case has no stable case id.")
+
+          status, payload = request_json(
+              f"{base_url}/api/control-center/preflight.php",
+              method="POST",
+              body={"case_id": case_id, "action": "approve", "payload": {}},
+          )
+          if status != 200 or payload.get("status") != "ok":
+              raise SystemExit(f"Runtime preflight failed: HTTP {status} {payload}")
+
+          data = payload.get("data", {})
+          runtime = data.get("runtime", {})
+          build = runtime.get("build", {})
+          resources = data.get("resources", {})
+          source_snapshot = data.get("source_snapshot", {})
+          target_snapshot = data.get("target_snapshot", {})
+
+          assertions = {
+              "mutation_false": data.get("mutation") is False,
+              "allowed": data.get("allowed") is True,
+              "no_blockers": data.get("blockers") == [],
+              "build_matches": build.get("build_id") == expected_build,
+              "manifest_matches": build.get("manifest_build") == expected_build,
+              "manifest_environment": build.get("manifest_environment") == "staging",
+              "resolved_environment": runtime.get("resolved_environment") == "staging",
+              "configured_environment": runtime.get("configured_environment") == "staging",
+              "host": runtime.get("request", {}).get("host") == "staging.bocholt-erleben.de",
+              "endpoint": runtime.get("request", {}).get("request_path") == "/api/control-center/preflight.php",
+              "source_tab": resources.get("source_tab") == "Inbox_Staging",
+              "target_tab": resources.get("target_tab") == "Events_Staging",
+              "writer": data.get("writer") == "be_cc_writeback_staging_inbox_approve_verified",
+              "source_resolved": source_snapshot.get("tab") == "Inbox_Staging" and source_snapshot.get("resolution_status") == "resolved" and int(source_snapshot.get("row_number") or 0) > 0,
+              "target_read_only": target_snapshot.get("tab") == "Events_Staging" and target_snapshot.get("resolution_status") in {"absent", "resolved"},
+              "live_inbox_unused": resources.get("live_inbox") == "not_used",
+              "live_events_unused": resources.get("live_events") == "not_used",
+              "sheet_fingerprint_present": len(str(resources.get("sheet_fingerprint", ""))) == 16,
+          }
+          failed = [name for name, passed in assertions.items() if not passed]
+          if failed:
+              raise SystemExit("Runtime preflight assertions failed: " + ", ".join(failed))
+
+          evidence = {
+              "schema": 1,
+              "evidence_level": "E3",
+              "expected_build": expected_build,
+              "case": {
+                  "id": case_id,
+                  "title": cityart.get("title", ""),
+                  "source": cityart.get("source", {}),
+              },
+              "preflight": data,
+              "assertions": assertions,
+          }
+          Path("artifacts/runtime-preflight.json").write_text(
+              json.dumps(evidence, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print("Runtime preflight E3 proof completed without mutation.")
+          print(json.dumps({
+              "build": expected_build,
+              "environment": runtime.get("resolved_environment"),
+              "source_tab": resources.get("source_tab"),
+              "target_tab": resources.get("target_tab"),
+              "writer": data.get("writer"),
+              "mutation": data.get("mutation"),
+          }, ensure_ascii=False))
+          PY
+
+      - name: Add runtime preflight summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f artifacts/runtime-preflight.json ]; then
+            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          data = json.loads(Path("artifacts/runtime-preflight.json").read_text(encoding="utf-8"))
+          plan = data["preflight"]
+          runtime = plan["runtime"]
+          resources = plan["resources"]
+          print("## Control Center Runtime Preflight")
+          print(f"- Evidence: {data['evidence_level']}")
+          print(f"- Build: `{data['expected_build']}`")
+          print(f"- Environment: `{runtime['resolved_environment']}`")
+          print(f"- Source: `{resources['source_tab']}`")
+          print(f"- Target: `{resources['target_tab']}`")
+          print(f"- Writer: `{plan['writer']}`")
+          print(f"- Mutation: `{str(plan['mutation']).lower()}`")
+          PY
+          else
+            echo "Runtime preflight evidence was not created." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload runtime preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: control-center-runtime-preflight-${{ github.run_number }}
+          path: artifacts/runtime-preflight.json
+          if-no-files-found: warn
