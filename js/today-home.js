@@ -588,7 +588,16 @@
     return null;
   }
 
+  const SUPPRESSED_TODAY_ACTIVITY_IMAGE_IDS = new Set([
+    "suderwicker-maerchenspielplatz"
+  ]);
+
   function resolveItemVisual(item, usedImages) {
+    const activityId = asString(item?.id || item?.raw?.id);
+    if (item?.type === "activity" && SUPPRESSED_TODAY_ACTIVITY_IMAGE_IDS.has(activityId)) {
+      return null;
+    }
+
     if (item?.type === "activity") {
       const pool = activityVisualPool(item);
       const visual = selectVisualFromPool(
