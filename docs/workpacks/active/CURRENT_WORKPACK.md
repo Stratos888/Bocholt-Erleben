@@ -1,76 +1,93 @@
 # Current Workpack
 
-Stand: 2026-07-17
+Stand: 2026-07-18
 
 Diese Datei ist der einzige operative technische Projektstatus. Ein neuer KI-Chat liest sie direkt nach `AI_ENTRYPOINT.md`.
 
 ## Aktiver Workpack
 
-- **Aktive Implementierung:** keine
-- **Letzter abgeschlossener Workpack:** WP-1 – Arbeitsmodell vereinfachen und Projektsicht konsolidieren
-- **Abschluss-Commit auf `staging`:** `7a26fdd1f13cf5c469d6e56d811e2419dfd357a4`
-- **Erreichte Evidence:** E2
-- **Nächster geplanter Workpack:** WP-2 – Runtime-Truth und read-only Preflight
-- **Status von WP-2:** nicht gestartet; benötigt ein neues ausdrückliches Arbeitsmandat
+- **Programm:** KI-Arbeitsmodell und Runtime-Verlässlichkeit
+- **Workpack:** WP-2 – Runtime-Truth und read-only Preflight
+- **Status:** Gate A abgeschlossen; Implementierung auf eigenem Branch gestartet
+- **Risikoklasse:** R2
+- **Aktuelles Gate:** B – Bauen und statisch beweisen
+- **Erforderliche Evidence:** E1, E2 und anschließend E3
+- **Ausgangs-SHA von `staging`:** `a2e89c1a1a10e0a9cdf9c8e9da4d01212f369df6`
+- **Branch:** `agent/wp2-runtime-truth-preflight`
+- **Draft-PR:** wird nach dem ersten Commit angelegt
 
-## Verbindlicher Arbeitszustand
+## Belegter Ist-Zustand
 
-- Standard: ein primärer Ausführungs-Chat, ein aktiver Schreibbranch/Draft-PR.
-- Risikoklassen: R1–R3.
-- Prozess: Gates A–D.
-- KI arbeitet nach einem einmaligen Arbeitsmandat innerhalb des dokumentierten Scopes selbstständig.
-- Kritische Nutzeraktionen benötigen die passende Runtime- und Write-Evidence.
-- Optionaler Zweitchat ist read-only; parallele Schreibarbeit bleibt Ausnahme.
-- Fehlerbudget und Stop-the-line aus `AI_ENTRYPOINT.md` gelten verbindlich.
+- `api/control-center/action.php` ist der reale schreibende Aktionsendpoint.
+- Bei `inbox_feed + approve` wird anhand von `be_cc_events_tab_name()` zwischen `be_cc_writeback_staging_inbox_approve_verified` und `be_cc_writeback_inbox_approve_verified` gewählt.
+- Staging ist fachlich auf `Inbox_Staging -> Events_Staging` gebunden; Live auf `Inbox -> Events`.
+- Ablehnen und Zurückstellen verwenden `be_cc_writeback_inbox_decision_direct`.
+- Der Deploy veröffentlicht bereits `meta/build.txt` und `meta/deploy-manifest.json`.
+- Vor einer Aktion ist über die deployte Runtime derzeit nicht sichtbar, welcher Build, Host, Endpoint, Environment-Vertrag, Sheet-Fingerprint, Tab-Vertrag und Writer tatsächlich verwendet würden.
+- Ein grüner PR oder Deploy erreicht daher höchstens E2 und belegt den realen Writebackpfad nicht.
 
-## Aktueller Freeze
+## Zielzustand
 
-Bis WP-2 gestartet und E3 hergestellt ist:
+Ein geschützter read-only Preflight weist vor jeder Inbox-Entscheidung aus:
 
-- keine weitere CityArt-Übernahme;
-- keine manuelle Statuskorrektur;
-- keine Mutation in `Inbox_Staging`, `Events_Staging`, `Inbox` oder `Events`;
-- keine weiteren Hypothesenpatches im Writeback-/Environment-Scope.
+- Build-SHA und Manifest-Konsistenz;
+- Host, Requestpfad und Endpointversion;
+- konfigurierte und aufgelöste Umgebung;
+- Sheet-Fingerprint, Quelltab und Zieltab;
+- stabile Fall- und Quellidentität;
+- tatsächlich ausgewählten Writer;
+- geplante Operationsschritte und Postconditions;
+- eindeutige Blocker bei jeder Abweichung;
+- `mutation: false` als harter Vertragsbestandteil.
 
-Sicherer Datenzustand:
+Ein automatischer Staging-Smoke muss den eingefrorenen CityArt-Fall read-only finden und den Vertrag `Inbox_Staging -> Events_Staging` gegen den gerade deployten Build beweisen.
 
-- `Inbox_Staging`: CityArt bleibt `review`;
-- `Events_Staging`: kein CityArt-Eintrag;
-- `Events`: kein CityArt-Eintrag aus dem Staging-Versuch;
-- Live wurde nach dem Rollback nicht weiter verändert.
+## Erlaubter Scope
 
-## PR- und Lockstatus
+- `api/control-center/_runtime_preflight.php`
+- `api/control-center/preflight.php`
+- `api/control-center/action.php` ausschließlich für einen gemeinsam genutzten, verhaltensgleichen Writer-Resolver
+- `tests/control_center_runtime_preflight_contract_test.php`
+- `.github/workflows/control-center-validation.yml`
+- `.github/workflows/deploy-strato.yml` ausschließlich für den read-only E3-Smoke und dessen Artefakt
+- `docs/workpacks/active/CURRENT_WORKPACK.md`
+- `docs/evidence/**` für den abschließenden E3-Nachweis
 
-- PR #87: gemergt; WP-1 abgeschlossen.
-- PR #86: geschlossen, nicht gemergt, nur historische technische Evidence.
-- Kein aktiver Code-/Owner-Lock aus WP-1.
+## Gesperrter Scope
+
+- keine Änderung der Writerimplementierungen;
+- keine Änderung des fachlichen Writeback-Ablaufs;
+- keine Sheetmutation;
+- kein CityArt-Klick;
+- kein synthetischer Schreibtest;
+- kein Retry-/Transaktionsumbau;
+- kein WP-3-Code;
+- keine Apps-Script-Umstellung;
+- keine Live-Schreibaktion;
+- kein Feature-Branch-Deploy;
+- keine Vermischung mit dem Main-/Staging-Historienabgleich.
+
+## Externe Ressourcen und Locks
+
+- `Inbox_Staging`: read-only Preflight; keine Mutation.
+- `Events_Staging`: read-only Zielprüfung; keine Mutation.
+- `Inbox` und `Events`: nicht verwenden; read-only Unverändertheitsvertrag.
+- STRATO Staging: erst nach sequenzieller Integration nach `staging` deployen.
 - Ressourcen-Lock auf Inbox-/Events-Writeback bleibt bis WP-4 bestehen.
+- Kein anderer schreibender Workpack ist zulässig.
+
+## Definition of Done
+
+- [ ] Writer-Auflösung ist zwischen Action und Preflight identisch und zentral belegt.
+- [ ] Preflight ist review-authentifiziert, POST-only und mutiert weder DB noch Sheets.
+- [ ] Source- und Target-Identität werden read-only gegen Staging geprüft.
+- [ ] Build, Manifest, Host und Environment werden fail-closed validiert.
+- [ ] Contract- und Syntax-Tests sind grün.
+- [ ] PR-Gates und Control-Center-Validation sind grün.
+- [ ] Nach Staging-Integration belegt ein automatisierter Smoke E3 am CityArt-Fall.
+- [ ] Das E3-Artefakt enthält keine Secrets oder vollständige Sheet-ID.
+- [ ] Danach ist die Root Cause beziehungsweise die kleinste verbleibende Evidence-Lücke eindeutig dokumentiert.
 
 ## Nächster erlaubter Schritt
 
-Nur nach neuem Nutzerauftrag:
-
-### WP-2 – Runtime-Truth und read-only Preflight
-
-Ziel: E3 herstellen, ohne Writerlogik oder externe Daten zu verändern.
-
-Scope:
-
-- Build-SHA und Endpointversion sichtbar machen;
-- Host sowie konfigurierte und aufgelöste Umgebung ausweisen;
-- Quelltab, Zieltab und ausgewählten Writer read-only anzeigen;
-- Dry-Run/Operationsplan für eine Inbox-Entscheidung bereitstellen;
-- automatischen Staging-Smoke gegen diese Diagnose ergänzen.
-
-Nicht enthalten:
-
-- keine Writeränderung;
-- keine Sheetmutation;
-- kein CityArt-Klick;
-- keine Übernahme von Code aus PR #86 ohne neue Analyse und aktuellen Scope.
-
-## Danach geplante Reihenfolge
-
-1. **Entscheidungsgate nach WP-2** – reale Root Cause und kleinsten notwendigen Umbau bestimmen.
-2. **WP-3 – Minimaler robuster Writeback** – Umfang erst nach E3 festlegen.
-3. **WP-4 – Isolierter E4-Test und CityArt-Abschluss** – synthetischer Test vor genau einem echten CityArt-Versuch.
+Den kleinsten read-only Runtime-Preflight implementieren, statisch validieren und als Draft-PR gegen `staging` bereitstellen. Noch keine externe Mutation und kein CityArt-Klick.
