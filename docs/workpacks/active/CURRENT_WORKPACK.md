@@ -6,111 +6,106 @@ Diese Datei ist der einzige operative technische Projektstatus. Ein neuer KI-Cha
 
 ## Aktiver Workpack
 
-- **Programm:** KI-Arbeitsmodell und Runtime-Verlässlichkeit
-- **Workpack:** WP-2 – Runtime-Truth und read-only Preflight
-- **Status:** Runtime-Preflight und Deploy-Observability integriert; belegter Deploy-Blocker behoben; finaler E3-Lauf steht aus
-- **Risikoklasse:** R2
-- **Aktuelles Gate:** C – reale Runtime beweisen
-- **Erforderliche Evidence:** E1 und E2 erreicht; E3 jetzt ausführen
-- **Aktueller `staging`-Stand vor diesem Doku-Commit:** `3eb0b99c8e4e0b7cbd32b0cf8a6fccab1d85e5d7`
-- **Führende PRs:** #91 Runtime-Preflight, #92/#94 Evidence-Status, #98 Deploy-Observer, #99 Deploy-Fix; alle gemergt
+- **Aktive Implementierung:** keine
+- **Letzter abgeschlossener Workpack:** WP-2 – Runtime-Truth und read-only Preflight
+- **Abschlussstand:** E3 erreicht
+- **Belegter Staging-Build:** `42d555bd76a3`
+- **Deploy-Status:** `deploy/staging-observed` erfolgreich
+- **Runtime-Status:** `control-center/runtime-preflight-e3` erfolgreich
+- **Evidence:** `docs/evidence/control-center-runtime-preflight-e3-2026-07-18.md`
+- **Nächster geplanter Workpack:** isolierter synthetischer E4-Test und Wiederaufnahmenachweis
+- **Status des nächsten Workpacks:** nicht gestartet; benötigt ein neues ausdrückliches Arbeitsmandat
 
-## Belegter Runtime- und Deploy-Befund
+## Belegter Abschlusszustand von WP-2
 
-- `api/control-center/action.php` ist der reale schreibende Aktionsendpoint.
-- Bei `inbox_feed + approve` wird über einen gemeinsamen reinen Resolver zwischen dem isolierten Staging-Writer und dem bestehenden Live-Writer gewählt.
-- Staging ist auf `Inbox_Staging -> Events_Staging` gebunden; Live auf `Inbox -> Events`.
-- Der geschützte POST-Endpunkt `api/control-center/preflight.php` erzeugt ausschließlich einen read-only Operationsplan mit `mutation: false`.
-- Der Deploy veröffentlicht `meta/build.txt` und `meta/deploy-manifest.json`.
-- Der erste exakt beobachtete Deploy-Run `29639923944` scheiterte im Schritt `Export environment-safe Events feed to data/events.tsv`.
-- STRATO-Staging blieb dadurch auf Build `3b5795f07771`, dem Stand vor Einführung des Staging-Overlays.
-- Read-only Prüfung des führenden Sheets ergab:
-  - `Events` und `Events_Staging` besitzen denselben 11-spaltigen Header;
-  - `Events_Staging` ist korrekt header-only;
-  - `Events` enthält 199 nichtleere Eventzeilen;
-  - keine doppelte Event-ID;
-  - 15 legitime Gruppen mit gemeinsam verwendeter Quellen-URL, insbesondere Serientermine und gemeinsame Programmseiten.
-- Root Cause: `merge_event_rows` behandelte jede doppelte Basis-URL pauschal als Fehler, obwohl Event-IDs eindeutig waren.
-- PR #99 korrigiert ausschließlich diese Mehrdeutigkeitslogik:
-  - IDs bleiben kanonisch und eindeutig;
-  - gemeinsame Basis-URLs sind zulässig;
-  - ein Overlay mit passender bestehender ID kann genau den zugehörigen Termin aktualisieren;
-  - eine mehrdeutige URL ohne passende ID bleibt fail-closed blockiert.
-- Der anschließende Staging-Deploy für Commit `3eb0b99c8e4e` wurde durch `deploy/staging-observed` erfolgreich bestätigt.
+Der reale STRATO-Staging-Build und der geschützte Runtime-Preflight bestätigen für den eingefrorenen CityArt-Fall:
 
-## Zielzustand von WP-2
+- Buildmarker und Deploymanifest: `42d555bd76a3`;
+- Host: `staging.bocholt-erleben.de`;
+- Endpoint: `/api/control-center/preflight.php`;
+- konfigurierte und aufgelöste Umgebung: `staging`;
+- Quelltab: `Inbox_Staging`;
+- Zieltab: `Events_Staging`;
+- Writer: `be_cc_writeback_staging_inbox_approve_verified`;
+- Live-Inbox: `not_used`;
+- Live-Events: `not_used`;
+- CityArt-Quelle: eindeutig read-only aufgelöst;
+- Eventziel: read-only als noch nicht vorhanden aufgelöst;
+- Blocker: keine;
+- Mutation: `false`.
 
-Der deployte Runtime-Preflight muss für den eingefrorenen CityArt-Fall ohne Mutation ausweisen und bestätigen:
+Das E3-Artifact enthält keine Credentials, Tokens, Service-Account-Daten oder vollständige Google-Sheet-ID.
 
-- Build-SHA und Manifest-Konsistenz;
-- Host `staging.bocholt-erleben.de`;
-- Endpoint `/api/control-center/preflight.php`;
-- konfigurierte und aufgelöste Umgebung `staging`;
-- Quelltab `Inbox_Staging`;
-- Zieltab `Events_Staging`;
-- Writer `be_cc_writeback_staging_inbox_approve_verified`;
-- eindeutige Fall- und Quellidentität;
-- read-only Zielauflösung;
-- Live-Ressourcen `not_used`;
-- `mutation: false`;
-- keine Blocker.
+## Behobener Deploy-Blocker
 
-## Erlaubter Scope
+Der erste E3-Versuch zeigte zusätzlich, dass STRATO-Staging noch auf Build `3b5795f07771` stand. Der exakt beobachtete Deploy-Run scheiterte beim Export des umgebungssicheren Eventfeeds.
 
-Der Implementierungs- und Diagnose-Scope von WP-2 umfasst ausschließlich:
+Read-only Prüfung des führenden Sheets belegte:
 
-- `api/control-center/_runtime_preflight.php`
-- `api/control-center/preflight.php`
-- `api/control-center/action.php` nur für den gemeinsamen verhaltensgleichen Writer-Resolver
-- zugehörige Runtime-, Isolations- und Merge-Vertragstests
-- `.github/workflows/control-center-validation.yml`
-- `.github/workflows/control-center-runtime-preflight.yml`
-- `.github/workflows/staging-deploy-observer.yml`
-- `scripts/merge_events_overlay.py` ausschließlich für den belegten Deploy-Blocker
-- `docs/workpacks/active/CURRENT_WORKPACK.md`
-- `docs/evidence/**` für den Abschlussnachweis
+- `Events` und `Events_Staging` besitzen denselben kanonischen Header;
+- `Events_Staging` ist korrekt header-only;
+- der Basisbestand besitzt keine doppelte ID;
+- 15 Quellen-URLs werden legitim von mehreren Event-IDs genutzt.
 
-## Gesperrter Scope und Ressourcen-Locks
+Der Overlay-Merger hatte diese gemeinsamen Basis-URLs pauschal abgelehnt. PR #99 erlaubt sie jetzt bei weiterhin kanonisch eindeutigen IDs. Mehrdeutige Overlay-Auflösung ohne passende ID bleibt fail-closed. Der anschließende Staging-Deploy war erfolgreich.
 
-- keine Änderung der Writerimplementierungen;
-- keine Änderung des fachlichen Writeback-Ablaufs;
-- keine Mutation in `Inbox_Staging`, `Events_Staging`, `Inbox` oder `Events`;
-- kein CityArt-Klick;
-- kein synthetischer Schreibtest;
-- kein Retry-/Transaktionsumbau;
-- kein WP-3-Code;
-- keine Apps-Script-Umstellung;
-- keine Live-Schreibaktion;
-- kein Feature-Branch-Deploy;
-- kein Release nach `main` in WP-2;
-- Ressourcen-Lock auf Inbox-/Events-Writeback bleibt bis WP-4 bestehen.
+## Entscheidung nach E3
 
-## Erreichte Evidence
+Ein vorsorglicher allgemeiner WP-3-Writeback-Umbau ist derzeit nicht belegt.
 
-- **E1:** Datenfluss, Environment-Tupel, Writer-Auflösung, Deploypfad und Scope sind im aktuellen Code und in den gemergten PRs nachvollziehbar.
-- **E2:** PHP-Syntax, Runtime-Preflight-Vertrag, Staging-Isolationsvertrag, Overlay-Merge-Vertrag, Control-Center-Validation, Contract Diagnostics, Editorial Contracts, Project Guardrails und PR Gates sind grün.
-- **Deploy-Evidence:** Der konkrete fehlgeschlagene Deploy-Run und seine Root Cause wurden ermittelt; der minimal korrigierte Deploy für `3eb0b99c8e4e` ist erfolgreich.
-- **E3:** noch offen; dieser notwendige Status-Commit startet Deploy und Runtime-Preflight für exakt dieselbe neue `staging`-SHA.
+Der ausgewählte Staging-Writer ist bereits:
 
-## Definition of Done
+- auf `Inbox_Staging -> Events_Staging` isoliert;
+- bei Event-ID und Zielzeile fail-closed;
+- auf Event-Ebene idempotent;
+- mit Rücklesen und Fingerprint-Prüfung des Eventziels abgesichert;
+- mit Rücklesen und Prüfung des terminalen Inboxstatus abgesichert;
+- vor dem lokalen Fallabschluss an bestätigte Quellpostconditions gebunden.
 
-- [x] Writer-Auflösung ist zwischen Action und Preflight identisch und zentral belegt.
-- [x] Preflight ist review-authentifiziert, POST-only und mutiert weder DB noch Sheets.
-- [x] Source- und Target-Identität werden read-only geprüft.
-- [x] Build, Manifest, Host und Environment werden fail-closed validiert.
-- [x] Contract-, Syntax- und Merge-Tests sind grün.
-- [x] Deploy-Fehler ist mit exaktem Run und belegter Root Cause erklärt.
-- [x] Minimaler Deploy-Fix ist integriert und real deployt.
-- [ ] Finaler Deploy für diesen Status-Commit ist erfolgreich.
-- [ ] `control-center/runtime-preflight-e3` ist für dieselbe SHA grün.
-- [ ] Das E3-Artefakt enthält keine Secrets und keine vollständige Sheet-ID.
-- [ ] WP-2 wird mit dokumentierter Root-Cause-Entscheidung abgeschlossen.
+Die verbleibende offene Evidence ist ein realer technischer Staging-Write mit synthetischen Daten, insbesondere die Wiederaufnahme nach einem kontrollierten Teilfehler zwischen Event- und Inbox-Schritt.
+
+Daher gilt:
+
+- kein WP-3-Code vor E4;
+- E4 testet Erfolg, Teilfehler, Wiederaufnahme, Duplikatschutz, Cleanup und Live-Unverändertheit;
+- nur bei einer konkret belegten E4-Lücke wird anschließend ein minimaler WP-3-Fix geschnitten.
+
+## Aktueller Freeze
+
+Bis E4 ausdrücklich gestartet und erfolgreich abgeschlossen ist:
+
+- kein echter CityArt-Klick;
+- keine manuelle Statuskorrektur;
+- keine Mutation des CityArt-Falls in `Inbox_Staging` oder `Events_Staging`;
+- keine Mutation in `Inbox` oder `Events`;
+- kein Live-Schreibtest;
+- kein allgemeiner Writeback-Umbau;
+- Ressourcen-Lock auf Inbox-/Events-Writeback bleibt bestehen.
+
+Sicherer Datenzustand:
+
+- `Inbox_Staging`: CityArt bleibt `review`;
+- `Events_Staging`: kein CityArt-Eintrag;
+- `Events`: kein CityArt-Eintrag aus einem Staging-Versuch;
+- Live wurde nicht verändert.
 
 ## Nächster erlaubter Schritt
 
-Diesen reinen Status-Commit nach `staging` integrieren und ausschließlich die beiden read-only Nachweise auswerten:
+Nur nach neuem Nutzerauftrag:
 
-1. `deploy/staging-observed` muss für dieselbe SHA erfolgreich sein.
-2. `control-center/runtime-preflight-e3` muss CityArt mit `Inbox_Staging -> Events_Staging`, dem isolierten Writer und `mutation=false` bestätigen.
+### E4 – isolierter synthetischer Staging-Write und Wiederaufnahmenachweis
 
-Bei jeder Abweichung sofort stoppen. Keine externe Mutation und kein CityArt-Klick.
+Pflichtumfang:
+
+1. eindeutig benannter synthetischer Testkandidat;
+2. dokumentierter Vorherzustand aller Staging- und Live-Ressourcen;
+3. read-only E3-Preflight für den Testkandidaten;
+4. erfolgreicher Gesamtwrite nach `Inbox_Staging -> Events_Staging`;
+5. kontrollierter Teilfehler nach bestätigtem Event-Write;
+6. sichere Wiederaufnahme ohne doppelte Eventzeile;
+7. Rücklesen von Event, Inboxstatus und lokalem Fallstatus;
+8. Prüfung des generierten Staging-Feeds;
+9. vollständiges Cleanup;
+10. Nachweis, dass `Inbox`, `Events` und Live unverändert blieben.
+
+Kein echter Fachfall vor erfolgreichem E4.
