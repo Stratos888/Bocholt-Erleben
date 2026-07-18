@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/api/control-center/_staging_events_writeback.php';
+require_once dirname(__DIR__) . '/api/control-center/_runtime_preflight.php';
 
 $failures = [];
 $assert = static function(bool $condition, string $message) use (&$failures): void {
@@ -73,8 +73,10 @@ $conflict = be_cc_staging_event_resolution([$tableRow, $other], $conflicting);
 $assert(($conflict['status'] ?? '') === 'conflict', 'Widersprüchliche ID-/URL-Treffer müssen blockieren.');
 
 $actionSource = (string)file_get_contents(dirname(__DIR__) . '/api/control-center/action.php');
+$runtimeSource = (string)file_get_contents(dirname(__DIR__) . '/api/control-center/_runtime_preflight.php');
 $writerSource = (string)file_get_contents(dirname(__DIR__) . '/api/control-center/_staging_events_writeback.php');
-$assert(str_contains($actionSource, "\$eventsTab === 'Events_Staging'"), 'Action-Endpunkt routet Staging nicht explizit auf Events_Staging.');
+$assert(str_contains($actionSource, 'be_cc_inbox_writer_name($action, $eventsTab)'), 'Action-Endpunkt nutzt nicht den gemeinsamen fail-closed Writer-Resolver.');
+$assert(str_contains($runtimeSource, "if (\$action === 'approve' && \$eventsTab === 'Events_Staging') return 'be_cc_writeback_staging_inbox_approve_verified';"), 'Der gemeinsame Resolver routet Staging-Approve nicht explizit auf den isolierten Writer.');
 $assert(str_contains($actionSource, 'be_cc_writeback_staging_inbox_approve_verified'), 'Isolierter Staging-Writer ist nicht verdrahtet.');
 $assert(str_contains($writerSource, "'events_tab'=>'Events_Staging'"), 'Writer weist das isolierte Ziel nicht aus.');
 $assert(!str_contains($writerSource, "'Events!'"), 'Staging-Writer enthält einen hart verdrahteten gemeinsamen Events-Tab.');
