@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Inventory and classify all tracked Markdown documents.
 
-This report is intentionally diagnostic. It does not fail merely because a
-large historical or domain reference exists; it identifies where a human or
-AI should consolidate roles without deleting technical knowledge blindly.
+This report is intentionally diagnostic. It identifies routing and maintenance
+risks without deleting domain knowledge merely because a reference is large.
 """
 
 from __future__ import annotations
@@ -59,18 +58,29 @@ MUTABLE_CANONICAL = {
 
 BEGIN_BLOCK = re.compile(r"<!--\s*===\s*BEGIN BLOCK:", re.IGNORECASE)
 DYNAMIC_PR = re.compile(r"\bPR\s*#\d+\b")
-STATUS_HEADING = re.compile(r"^#{1,4}\s+(Aktueller Stand|Aktueller Status|Nächste Workstreams|Naechste Workstreams|Nächste Maßnahmen|Naechste Massnahmen)\b", re.MULTILINE | re.IGNORECASE)
+STATUS_HEADING = re.compile(
+    r"^#{1,4}\s+(Aktueller Stand|Aktueller Status|Nächste Workstreams|"
+    r"Naechste Workstreams|Nächste Maßnahmen|Naechste Massnahmen)\b",
+    re.MULTILINE | re.IGNORECASE,
+)
 
 
-def tracked_markdown() -> list[str]:
+def tracked_markdown() -> list[tuple[str, str, str]]:
     completed = subprocess.run(
-        ["git", "ls-files", "*.md"],
+        ["git", "ls-files", "-s", "*.md"],
         cwd=ROOT,
         check=True,
         capture_output=True,
         text=True,
     )
-    return sorted(line for line in completed.stdout.splitlines() if line)
+    rows: list[tuple[str, str, str]] = []
+    for line in completed.stdout.splitlines():
+        if not line:
+            continue
+        metadata, path = line.split("\t", 1)
+        mode, blob_sha, _stage = metadata.split()
+        rows.append((path, mode, blob_sha))
+    return sorted(rows)
 
 
 def classify(path: str) -> str:
@@ -103,7 +113,7 @@ def main() -> None:
     rows: list[dict[str, object]] = []
     warnings: list[str] = []
 
-    for relative in tracked_markdown():
+    for relative, mode, blob_sha in tracked_markdown():
         path = ROOT / relative
         text = path.read_text(encoding="utf-8")
         role = classify(relative)
@@ -115,6 +125,8 @@ def main() -> None:
         row = {
             "path": relative,
             "role": role,
+            "mode": mode,
+            "blob_sha": blob_sha,
             "lines": lines,
             "bytes": path.stat().st_size,
             "append_blocks": blocks,
@@ -128,11 +140,28 @@ def main() -> None:
         if relative in MUTABLE_CANONICAL and blocks:
             warnings.append(f"mutable canonical document uses {blocks} append block(s): {relative}")
         if role.startswith("legacy_composite"):
-            warnings.append(f"legacy composite reference should not be used as a current-status router: {relative} ({lines} lines)")
-        if lines > 500 and role not in {"implemented_product_contract", "event_search_source_registry", "evidence", "archive", "dated_historical_or_target_reference"}:
+            warnings.append(
+                f"legacy composite reference should not be used as a current-status router: "
+                f"{relative} ({lines} lines)"
+            )
+        if lines > 500 and role not in {
+            "implemented_product_contract",
+            "event_search_source_registry",
+            "evidence",
+            "archive",
+            "dated_historical_or_target_reference",
+        }:
             warnings.append(f"large mixed-role candidate: {relative} ({lines} lines, role={role})")
-        if status_headings and role not in {"current_workpack", "current_proof_index", "dated_forensics", "evidence", "completed_workpack"}:
-            warnings.append(f"current-status heading appears outside a current-status/evidence document: {relative}")
+        if status_headings and role not in {
+            "current_workpack",
+            "current_proof_index",
+            "dated_forensics",
+            "evidence",
+            "completed_workpack",
+        }:
+            warnings.append(
+                f"current-status heading appears outside a current-status/evidence document: {relative}"
+            )
 
     role_counts = Counter(row["role"] for row in rows)
     summary = {
