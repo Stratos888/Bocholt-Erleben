@@ -67,7 +67,9 @@ jobs:
 
       - name: Report complete documentation inventory
         shell: bash
-        run: python3 scripts/report-documentation-inventory.py
+        run: |
+          python3 scripts/report-documentation-inventory.py
+          git ls-files -z '*.md' | tar --null -czf build/documentation-source-snapshot.tar.gz --files-from=-
 
       - name: Upload documentation inventory
         uses: actions/upload-artifact@v4
@@ -75,6 +77,13 @@ jobs:
           name: documentation-inventory
           path: build/documentation-inventory.json
           retention-days: 14
+
+      - name: Upload temporary documentation source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-source-snapshot
+          path: build/documentation-source-snapshot.tar.gz
+          retention-days: 1
 
       - name: Validate durable engineering contracts
         shell: bash
