@@ -8,91 +8,87 @@ Diese Datei ist der einzige operative technische Projektstatus. Ein neuer KI-Cha
 
 - **Programm:** KI-Arbeitsmodell und Runtime-Verlässlichkeit
 - **Workpack:** E4 – isolierter synthetischer Staging-Write und Wiederaufnahmenachweis
-- **Status:** Implementierung und E2-Vertragstest in Arbeit; noch keine externe Mutation
+- **Status:** Implementierung integriert und Gate C erreicht; externer E4-Lauf noch nicht gestartet
 - **Risikoklasse:** R3 – ausschließlich synthetische, vollständig rückbaubare Staging-Mutation
-- **Aktuelles Gate:** B – Bauen und statisch beweisen
-- **Erforderliche Evidence:** E1, E2, anschließend E4
-- **Ausgangs-SHA von `staging`:** `4b1a646840d361a7033cc48e8760fa690e60a2e3`
-- **Branch:** `agent/control-center-e4-synthetic-resume-proof-current`
-- **Schreibender PR:** genau ein Draft-PR dieses Branches; weitere schreibende Staging-Workpacks sind gesperrt
+- **Aktuelles Gate:** C – reale Runtime bewiesen; E4-Ausführung bereit
+- **Erforderliche Evidence:** E4
+- **Implementierungs-PR:** #105, gemergt
+- **Implementierungs-Commit:** `f504014da3e1c93a627c16dd3ac712fbd39267b7`
+- **Deploy-Status:** `deploy/staging-observed` erfolgreich
+- **Runtime-Status:** `control-center/runtime-preflight-e3` erfolgreich
+- **E4-Workflow:** `Control Center E4 Synthetic Proof`
+- **Workflow-Trigger:** ausschließlich manuell per `workflow_dispatch` auf Branch `staging`
 
-## Ausgangslage
+## Belegter Bereitschaftszustand
 
-WP-2 hat für den real deployten Staging-Build nachgewiesen:
+- E4-Harness und Workflow sind auf `staging` deployt.
+- Python-Syntax und deterministischer Selbsttest sind grün.
+- Project Guardrails, Contract Diagnostics und PR Gate sind grün.
+- Der reale Staging-Build entspricht dem Implementierungs-Commit.
+- Der read-only Preflight bestätigt:
+  - `Inbox_Staging -> Events_Staging`;
+  - Writer `be_cc_writeback_staging_inbox_approve_verified`;
+  - Live-Inbox und Live-Events `not_used`;
+  - `mutation=false`;
+  - keine Blocker.
+- `Inbox_Staging` und `Events_Staging` enthalten aktuell keine Zeile mit Präfix `be-e4-synthetic`.
+- Der echte CityArt-Fall steht weiterhin unverändert auf `review` und besitzt keinen Eventeintrag in `Events_Staging`.
 
-- `Inbox_Staging -> Events_Staging`;
-- Writer `be_cc_writeback_staging_inbox_approve_verified`;
-- Live-Inbox und Live-Events werden nicht verwendet;
-- Build, Manifest, Host, Endpoint und Environment stimmen überein;
-- der read-only Preflight mutiert nichts und meldet keine Blocker.
+## Geplanter E4-Nachweis
 
-Der Writer ist auf Event-Ebene idempotent und bestätigt Event sowie Inboxstatus durch Rücklesen. Offen ist ausschließlich der reale Nachweis, dass ein bestätigtes Event bei noch offenem Inboxstatus ohne Duplikat sicher wiederaufgenommen und anschließend vollständig bereinigt wird.
+Der einmalige Lauf verwendet zwei eindeutige synthetische Kandidaten:
 
-## E4-Testmodell
-
-Der Test verwendet zwei eindeutig benannte synthetische Kandidaten. Die Identität enthält Build-SHA und GitHub-Run-ID.
-
-1. **Erfolgspfad:** synthetische Zeile in `Inbox_Staging`, read-only Preflight mit Zielstatus `absent`, echte Staging-Freigabe mit Eventmodus `appended`, terminaler Inbox- und lokaler Fallstatus sowie idempotenter Replay derselben abgeschlossenen `operation_id`.
-2. **Wiederaufnahmepfad:** synthetische Inbox-Zeile bleibt `review`; die exakt passende Eventzeile wird vorab in `Events_Staging` angelegt und zurückgelesen. Eine synthetische fehlgeschlagene Operation dokumentiert den kontrollierten Teilzustand. Dieselbe `operation_id` bleibt fail-closed; eine neue `operation_id` muss den Eventdatensatz mit Modus `existing` wiederverwenden und ohne Duplikat abschließen.
-3. **Feed- und Cleanup-Beweis:** Ein Staging-Deploy weist beide Testevents im Staging-Feed und ihre Abwesenheit im Live-Feed nach. Danach werden ausschließlich die synthetischen Sheetzeilen und DB-Datensätze entfernt; ein zweiter Deploy muss die Testevents wieder aus dem Staging-Feed entfernen.
+1. **Erfolgspfad:** Eventmodus `appended`, terminaler Inbox- und lokaler Fallstatus sowie idempotenter Replay derselben abgeschlossenen `operation_id`.
+2. **Wiederaufnahmepfad:** vorab bestätigte Eventzeile bei offener Inbox; fehlgeschlagene Operation bleibt fail-closed; neue `operation_id` übernimmt mit Modus `existing` ohne Duplikat.
+3. **Feed-Beweis:** beide Testevents erscheinen nur im Staging-Feed und niemals im Live-Feed.
+4. **Cleanup:** synthetische Sheetzeilen und DB-Datensätze werden gelöscht; ein Cleanup-Deploy entfernt die Events wieder aus dem Staging-Feed.
+5. **Abschluss:** Live-, Nicht-Test- und CityArt-Zustände müssen unverändert sein.
 
 ## Erlaubter Scope
 
-- `scripts/control-center-e4-synthetic.py`
-- `.github/workflows/control-center-e4-contract.yml`
-- `.github/workflows/control-center-e4-synthetic.yml`
-- `docs/workpacks/active/CURRENT_WORKPACK.md`
-- `docs/evidence/**` erst nach einem real abgeschlossenen Lauf
+- genau ein manueller Lauf von `.github/workflows/control-center-e4-synthetic.yml` auf `staging`;
+- zwei synthetische Zeilen in `Inbox_Staging`;
+- zwei synthetische Event-IDs in `Events_Staging`;
+- zugehörige synthetische `control_cases` und `control_operations` in der Staging-Datenbank;
+- ein Feed-Deploy und ein Cleanup-Deploy;
+- anschließend `docs/evidence/**` und Abschlussaktualisierung dieser Datei.
 
 ## Gesperrter Scope
 
-- keine Änderung an `action.php` oder den Writerimplementierungen;
-- keine Fehlerweiche und keine Fault-Injection in der produktiven Runtime;
-- keine Mutation des echten CityArt-Falls;
+- kein echter CityArt-Klick;
+- keine Mutation des CityArt-Falls;
 - keine Mutation in `Inbox` oder `Events`;
-- kein Live-Schreibtest;
+- keine Live-Schreibaktion;
 - kein Feature-Branch-Deploy;
 - kein allgemeiner WP-3- oder Transaktionsumbau;
-- keine weitere Produkt-, UI- oder Contentänderung.
+- kein zweiter E4-Lauf ohne Auswertung des ersten Laufs.
 
-## Externe Ressourcen und Ressourcen-Lock
+## Ressourcen-Lock und Stop-the-line
 
-- `Inbox_Staging`: nur zwei synthetische Zeilen mit Präfix `be-e4-synthetic`; CityArt bleibt unverändert.
-- `Events_Staging`: nur zwei synthetische Event-IDs desselben Laufs.
-- Staging-Datenbank: nur synthetische `control_cases` und `control_operations` desselben Laufs.
-- `Inbox`, `Events` und Live: read-only Unverändertheitsnachweis.
-- STRATO Staging: ein Deploy für den synthetischen Feed und ein Cleanup-Deploy.
-- Der Ressourcen-Lock gilt vom ersten synthetischen Write bis zur bestätigten vollständigen Bereinigung.
+- Der Ressourcen-Lock beginnt mit dem manuellen Workflow-Start und endet erst nach bestätigtem Sheet-, DB- und Feed-Cleanup.
 - Während dieses Fensters ist kein anderer schreibender Staging-Workpack zulässig.
+- Der `finally`-Pfad versucht Cleanup unabhängig vom Testergebnis.
+- E4 gilt nur bei Evidence `result=success`, leerer Cleanup-Fehlerliste und vollständig grünen Unverändertheitschecks.
+- Bei unvollständigem Cleanup keine Wiederholung und kein echter Fachfall.
 
-## Sicherheits- und Stop-the-line-Vertrag
+## Technische Ausführungsgrenze
 
-- Der E4-Ausführungsworkflow ist ausschließlich manuell per `workflow_dispatch` auf `staging` startbar.
-- PR-Checks führen nur Syntax und deterministische Selbsttests aus; sie besitzen keine Secrets und keinen externen Schreibzugriff.
-- Vor der ersten Mutation müssen Staging-Build, DB-Schema, Sheet-Metadaten, CityArt-Zustand und vollständige Live-/Staging-Baselines erfolgreich gelesen sein.
-- Jede Abweichung stoppt den Fachtest.
-- Der `finally`-Pfad versucht unabhängig vom Testergebnis Sheet-, DB- und Feed-Cleanup.
-- Ein Lauf gilt nur als E4, wenn das Evidence-Artefakt `result=success`, keine Cleanup-Fehler und alle Unverändertheitschecks `true` enthält.
-- Bei unvollständigem Cleanup keine Wiederholung und kein echter Fachfall; zuerst gezielte Bereinigung und Ursachenentscheidung.
+Der verbundene GitHub-Connector kann Workflows lesen, integrieren und auswerten, stellt aber keine Aktion zum Erzeugen eines `workflow_dispatch`-Runs bereit. Ein automatisch schreibender Push-Ersatz wurde nicht zugelassen und wird nicht umgangen. Deshalb ist genau ein manueller UI-Start erforderlich; alle anschließenden Auswertungs-, Cleanup- und Dokumentationsschritte können wieder durch den primären Ausführungs-Chat erfolgen.
 
 ## Definition of Done
 
-- [ ] E1: Scope, Testidentitäten, Operationszustände und Cleanup-Vertrag sind im Diff eindeutig.
-- [ ] E2: Python-Syntax, Selbsttest, Project Guardrails und PR Gate sind grün.
-- [ ] Der aktuelle `staging`-Build ist vor der Mutation erfolgreich deployt.
-- [ ] Beide synthetischen Preflights bestätigen Staging-Tabs, isolierten Writer und `mutation=false`.
-- [ ] Erfolgspfad: `appended`, genau eine Eventzeile, terminaler Inbox- und lokaler Status.
-- [ ] Gleiche abgeschlossene `operation_id`: idempotenter Replay.
-- [ ] Teilzustand: vorhandenes Event, offene Inbox, fehlgeschlagene Operation.
-- [ ] Gleiche fehlgeschlagene `operation_id`: fail-closed.
-- [ ] Neue `operation_id`: Wiederaufnahme mit `existing`, keine doppelte Eventzeile.
-- [ ] Staging-Feed enthält beide synthetischen Events; Live-Feed enthält keines.
-- [ ] Cleanup entfernt Sheet-, DB- und Feed-Testdaten vollständig.
-- [ ] CityArt bleibt `review`; kein CityArt-Eintrag in `Events_Staging`.
-- [ ] `Inbox`, `Events` und Live sind unverändert.
-- [ ] E4-Evidence ist geheimnisfrei dokumentiert.
-- [ ] Danach wird entschieden: kein WP-3 oder ausschließlich ein durch E4 belegter Minimalfix.
+- [x] E1/E2 grün.
+- [x] Implementierung nach `staging` integriert.
+- [x] Deploy und E3 für denselben Commit grün.
+- [x] Keine synthetischen Restdaten vor dem Lauf.
+- [x] CityArt vor dem Lauf unverändert.
+- [ ] Workflow genau einmal manuell auf `staging` gestartet.
+- [ ] Erfolg, fail-closed Verhalten und Wiederaufnahme belegt.
+- [ ] Feed-Isolation belegt.
+- [ ] Cleanup vollständig belegt.
+- [ ] E4-Evidence dokumentiert.
+- [ ] Entscheidung: kein WP-3 oder ausschließlich ein durch E4 belegter Minimalfix.
 
 ## Nächster erlaubter Schritt
 
-Draft-PR anlegen, ausschließlich E1/E2 prüfen und nach grünem Gate sequenziell nach `staging` integrieren. Erst danach darf der manuell gegatete E4-Workflow genau einmal gestartet werden. Kein CityArt-Klick und keine externe Mutation vor diesem Gate.
+In GitHub unter **Actions → Control Center E4 Synthetic Proof → Run workflow** den Branch **staging** auswählen und den Workflow genau einmal starten. Danach ausschließlich den entstandenen Run auswerten; kein weiterer Klick und kein echter CityArt-Fall.
