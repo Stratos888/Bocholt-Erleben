@@ -54,7 +54,13 @@ $assert(
     'Reject muss den direkten verifizierten Entscheidungs-Writer auswählen.'
 );
 
+/*
+ * Der Planvertrag wird mit einem Activity-Kandidaten getestet, damit dieser
+ * isolierte Test ausschließlich Runtime-, Resolver- und Mutationsfreiheit
+ * prüft. Der separate Event-Review-Vertrag besitzt eigene vollständige Tests.
+ */
 $source = [
+    'submission_kind'=>'activity',
     'id_suggestion'=>'cityart-2026',
     'title'=>'Bocholter Kulturtage 2026 - Kunstmarkt CityArt und künstlerische Mitmach-Stände für Kinder und Jugendliche',
     'date'=>'2026-08-30',
