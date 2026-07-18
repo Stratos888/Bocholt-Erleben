@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import csv
 from pathlib import Path
-from typing import Iterable, List, Sequence, Tuple
+from typing import Dict, Iterable, List, Sequence, Set, Tuple
 
 
 REQUIRED_COLUMNS = ("id", "title", "date", "city", "location", "kategorie")
@@ -46,13 +46,33 @@ def _validate_header(header: Sequence[object], label: str) -> List[str]:
     return normalized
 
 
+def _remove_position(index: Dict[str, Set[int]], key: str, position: int) -> None:
+    if not key or key not in index:
+        return
+    index[key].discard(position)
+    if not index[key]:
+        index.pop(key, None)
+
+
+def _add_position(index: Dict[str, Set[int]], key: str, position: int) -> None:
+    if key:
+        index.setdefault(key, set()).add(position)
+
+
 def merge_event_rows(
     base_header: Sequence[object],
     base_rows: Iterable[Sequence[object]],
     overlay_header: Sequence[object] | None = None,
     overlay_rows: Iterable[Sequence[object]] | None = None,
 ) -> Tuple[List[str], List[List[str]], dict]:
-    """Return header, merged rows and deterministic merge statistics."""
+    """Return header, merged rows and deterministic merge statistics.
+
+    Event IDs are canonical and therefore must be unique in the base and the
+    overlay. A source URL may legitimately be shared by recurring events or by
+    several events from one programme page. Such URLs remain usable as a
+    secondary key only when they resolve to exactly one base row or when the
+    overlay's canonical ID already identifies one row inside that URL group.
+    """
 
     header = _validate_header(base_header, "Events")
     width = len(header)
@@ -70,8 +90,8 @@ def merge_event_rows(
     id_pos = index["id"]
     url_pos = index.get("url")
 
-    base_by_id: dict[str, int] = {}
-    base_by_url: dict[str, int] = {}
+    base_by_id: Dict[str, int] = {}
+    base_by_url: Dict[str, Set[int]] = {}
     for position, row in enumerate(merged):
         event_id = _key(row[id_pos])
         event_url = _key(row[url_pos]) if url_pos is not None else ""
@@ -79,13 +99,10 @@ def merge_event_rows(
             if event_id in base_by_id:
                 raise ValueError(f"Events: doppelte ID im Basisbestand: {row[id_pos]}")
             base_by_id[event_id] = position
-        if event_url:
-            if event_url in base_by_url and base_by_url[event_url] != position:
-                raise ValueError(f"Events: doppelte URL im Basisbestand: {row[url_pos]}")
-            base_by_url[event_url] = position
+        _add_position(base_by_url, event_url, position)
 
     seen_overlay_ids: set[str] = set()
-    seen_overlay_urls: set[str] = set()
+    seen_overlay_urls: Dict[str, str] = {}
     replaced = 0
     appended = 0
 
@@ -97,13 +114,27 @@ def merge_event_rows(
         if event_id in seen_overlay_ids:
             raise ValueError(f"Events_Staging: doppelte Overlay-ID: {row[id_pos]}")
         seen_overlay_ids.add(event_id)
+
         if event_url:
-            if event_url in seen_overlay_urls:
+            previous_overlay_id = seen_overlay_urls.get(event_url)
+            if previous_overlay_id is not None and previous_overlay_id != event_id:
                 raise ValueError(f"Events_Staging: doppelte Overlay-URL: {row[url_pos]}")
-            seen_overlay_urls.add(event_url)
+            seen_overlay_urls[event_url] = event_id
 
         id_match = base_by_id.get(event_id)
-        url_match = base_by_url.get(event_url) if event_url else None
+        url_matches = set(base_by_url.get(event_url, set())) if event_url else set()
+        url_match = None
+        if len(url_matches) == 1:
+            url_match = next(iter(url_matches))
+        elif len(url_matches) > 1:
+            if id_match is not None and id_match in url_matches:
+                url_match = id_match
+            else:
+                raise ValueError(
+                    "Events_Staging: URL ist im Basisbestand mehrdeutig und benötigt eine "
+                    f"passende bestehende ID: {row[url_pos]}"
+                )
+
         if id_match is not None and url_match is not None and id_match != url_match:
             raise ValueError(
                 f"Events_Staging: ID und URL verweisen auf unterschiedliche Basiszeilen: {row[id_pos]}"
@@ -120,14 +151,13 @@ def merge_event_rows(
             old_url = _key(old[url_pos]) if url_pos is not None else ""
             if old_id and old_id != event_id:
                 base_by_id.pop(old_id, None)
-            if old_url and old_url != event_url:
-                base_by_url.pop(old_url, None)
+            if old_url != event_url:
+                _remove_position(base_by_url, old_url, target)
             merged[target] = row
             replaced += 1
 
         base_by_id[event_id] = target
-        if event_url:
-            base_by_url[event_url] = target
+        _add_position(base_by_url, event_url, target)
 
     return header, merged, {
         "base": len(merged) - appended,
