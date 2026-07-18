@@ -8,6 +8,7 @@ Diese Datei ist der einzige operative technische Projektstatus. Ein neuer KI-Cha
 
 - **Aktive Implementierung:** keine
 - **Letzter abgeschlossener Workpack:** WP-2 – Runtime-Truth und read-only Preflight
+- **Risikoklasse:** R2 – abgeschlossen
 - **Abschlussstand:** E3 erreicht
 - **Belegter Staging-Build:** `42d555bd76a3`
 - **Deploy-Status:** `deploy/staging-observed` erfolgreich
