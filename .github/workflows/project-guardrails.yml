@@ -20,28 +20,35 @@ jobs:
           fetch-depth: 1
           show-progress: false
 
-      - name: Apply role and reference migration
+      - name: Apply documentation migration
         shell: bash
         run: |
           set -euo pipefail
-
           if [[ ! -f scripts/apply-documentation-content-migration.py ]]; then
             echo "One-time migration is already applied."
             exit 0
           fi
-
           python3 scripts/apply-documentation-content-migration.py
           git checkout -- .github/workflows/project-guardrails.yml
 
+      - name: Commit documentation migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f scripts/apply-documentation-content-migration.py ]]; then
+            echo "Migration script was not consumed."
+            exit 1
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git status --short
-
           if git diff --cached --quiet; then
             echo "No migration changes detected."
             exit 1
           fi
-
           git commit -m "Consolidate documentation roles and references"
-          git push origin "HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}"
+
+      - name: Push documentation migration
+        shell: bash
+        run: git push origin "HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}"
