@@ -36,20 +36,54 @@ jobs:
           php -l api/control-center/preflight.php
           php tests/control_center_runtime_preflight_contract_test.php
 
+      - name: Initialize machine-readable E3 status
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          EXPECTED_BUILD="$(git rev-parse --short=12 HEAD)"
+          ACTUAL_BUILD="$(curl -fsSL --connect-timeout 5 --max-time 8 "$BASE_URL/meta/build.txt?phase=initial" 2>/dev/null | tr -d '\r\n' || true)"
+          printf '%s' "$ACTUAL_BUILD" > artifacts/last-build.txt
+          echo "EXPECTED_BUILD=$EXPECTED_BUILD" >> "$GITHUB_ENV"
+          export EXPECTED_BUILD ACTUAL_BUILD
+
+          python3 - <<'PY' > /tmp/runtime-preflight-pending.json
+          import json
+          import os
+          expected = os.environ["EXPECTED_BUILD"]
+          actual = os.environ.get("ACTUAL_BUILD", "") or "missing"
+          print(json.dumps({
+              "state": "pending",
+              "target_url": f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              "description": f"E3 waiting: expected {expected}; deployed {actual}"[:140],
+              "context": "control-center/runtime-preflight-e3",
+          }))
+          PY
+
+          curl -fsS --retry 3 --retry-all-errors \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            --data-binary @/tmp/runtime-preflight-pending.json
+
       - name: Wait for the matching staging build
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_BUILD="$(git rev-parse --short=12 HEAD)"
-          echo "EXPECTED_BUILD=$EXPECTED_BUILD" >> "$GITHUB_ENV"
+          mkdir -p artifacts
 
-          for attempt in $(seq 1 90); do
-            ACTUAL_BUILD="$(curl -fsSL --connect-timeout 10 --max-time 20 "$BASE_URL/meta/build.txt?attempt=$attempt" 2>/dev/null | tr -d '\r\n' || true)"
+          for attempt in $(seq 1 60); do
+            ACTUAL_BUILD="$(curl -fsSL --connect-timeout 5 --max-time 8 "$BASE_URL/meta/build.txt?attempt=$attempt" 2>/dev/null | tr -d '\r\n' || true)"
+            printf '%s' "$ACTUAL_BUILD" > artifacts/last-build.txt
             if [ "$ACTUAL_BUILD" = "$EXPECTED_BUILD" ]; then
               echo "Matching staging build is deployed: $ACTUAL_BUILD"
               exit 0
             fi
-            echo "Waiting for staging deploy ($attempt/90): expected=$EXPECTED_BUILD actual=${ACTUAL_BUILD:-missing}"
+            echo "Waiting for staging deploy ($attempt/60): expected=$EXPECTED_BUILD actual=${ACTUAL_BUILD:-missing}"
             sleep 10
           done
 
@@ -202,7 +236,12 @@ jobs:
           print(f"- Mutation: `{str(plan['mutation']).lower()}`")
           PY
           else
-            echo "Runtime preflight evidence was not created." >> "$GITHUB_STEP_SUMMARY"
+            ACTUAL_BUILD="$(cat artifacts/last-build.txt 2>/dev/null || true)"
+            echo "## Control Center Runtime Preflight" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Evidence: blocked" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Expected build: \`${EXPECTED_BUILD:-unknown}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Deployed build: \`${ACTUAL_BUILD:-missing}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Mutation: \`false\`" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload runtime preflight evidence
@@ -210,7 +249,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: control-center-runtime-preflight-${{ github.run_number }}
-          path: artifacts/runtime-preflight.json
+          path: |
+            artifacts/runtime-preflight.json
+            artifacts/last-build.txt
           if-no-files-found: warn
 
       - name: Publish machine-readable E3 commit status
@@ -221,12 +262,13 @@ jobs:
           CURRENT_JOB_STATUS: ${{ job.status }}
         run: |
           set -euo pipefail
+          ACTUAL_BUILD="$(cat artifacts/last-build.txt 2>/dev/null || true)"
           if [ "$CURRENT_JOB_STATUS" = "success" ] && [ -s artifacts/runtime-preflight.json ]; then
             STATE="success"
             DESCRIPTION="E3: staging Inbox_Staging -> Events_Staging; mutation=false"
           else
             STATE="failure"
-            DESCRIPTION="E3 runtime preflight failed or produced no evidence"
+            DESCRIPTION="E3 blocked: expected ${EXPECTED_BUILD:-unknown}; deployed ${ACTUAL_BUILD:-missing}"
           fi
 
           export STATE DESCRIPTION
