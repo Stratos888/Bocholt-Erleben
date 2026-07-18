@@ -24,6 +24,7 @@ on:
       - "docs/external-resource-matrix.md"
       - "docs/github-actions-trigger-policy.md"
       - "scripts/audit-documentation-governance.py"
+      - "scripts/report-documentation-inventory.py"
       - "scripts/resolve-deploy-target.sh"
       - "scripts/merge_events_overlay.py"
       - "tests/test_deploy_branch_routing.sh"
@@ -63,6 +64,17 @@ jobs:
       - name: Validate documentation governance
         shell: bash
         run: python3 scripts/audit-documentation-governance.py
+
+      - name: Report complete documentation inventory
+        shell: bash
+        run: python3 scripts/report-documentation-inventory.py
+
+      - name: Upload documentation inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-inventory
+          path: build/documentation-inventory.json
+          retention-days: 14
 
       - name: Validate durable engineering contracts
         shell: bash
