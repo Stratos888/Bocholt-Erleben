@@ -10,6 +10,7 @@ require_once __DIR__ . '/_editorial_runtime.php';
 require_once __DIR__ . '/_inbox_decision_writeback.php';
 require_once __DIR__ . '/_verified_source_writeback.php';
 require_once __DIR__ . '/_staging_events_writeback.php';
+require_once __DIR__ . '/_runtime_preflight.php';
 require_once __DIR__ . '/_activity_audit_writeback.php';
 require_once __DIR__ . '/_source_reconciliation.php';
 require_once __DIR__ . '/_event_review_writeback.php';
@@ -129,18 +130,17 @@ try {
             be_json_response(200, ['status'=>'ok','data'=>$result]);
         }
     } elseif ($sourceSystem === 'inbox_feed' && $editorialAction) {
-        if ($action === 'approve') {
-            $eventsTab = be_cc_events_tab_name();
-            if ($eventsTab === 'Events_Staging') {
-                $writebackMeta = be_cc_writeback_staging_inbox_approve_verified($case, $payload, $decision);
-            } elseif ($eventsTab === 'Events') {
-                $writebackMeta = be_cc_writeback_inbox_approve_verified($case, $payload, $decision);
-            } else {
-                throw new DomainException('Für diese Umgebung ist kein sicherer Event-Freigabepfad definiert.');
-            }
-        } else {
+        $eventsTab = be_cc_events_tab_name();
+        $writer = be_cc_inbox_writer_name($action, $eventsTab);
+        if ($writer === 'be_cc_writeback_staging_inbox_approve_verified') {
+            $writebackMeta = be_cc_writeback_staging_inbox_approve_verified($case, $payload, $decision);
+        } elseif ($writer === 'be_cc_writeback_inbox_approve_verified') {
+            $writebackMeta = be_cc_writeback_inbox_approve_verified($case, $payload, $decision);
+        } elseif ($writer === 'be_cc_writeback_inbox_decision_direct') {
             $writebackMeta = be_cc_writeback_inbox_decision_direct($case, $action, $decision);
             $writebackMeta['source_verified'] = true;
+        } else {
+            throw new DomainException('Für diese Umgebung ist kein sicherer Inbox-Writer definiert.');
         }
     } elseif ($sourceSystem === 'content_audit' && $editorialAction) {
         $auditSource = be_cc_editorial_payload($case);
