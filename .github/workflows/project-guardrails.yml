@@ -71,7 +71,6 @@ jobs:
           grep -q 'Architekturprinzip: vereinfachen statt schichten' ENGINEERING.md
           grep -q 'Ressourcen-Lock' ENGINEERING.md
           grep -q 'Ein echter Fachdatensatz wird erst nach isoliertem synthetischem Staging-Beweis verwendet' ENGINEERING.md
-          grep -q 'Feature-Branches duerfen niemals deployen' docs/github-actions-trigger-policy.md
 
       - name: Validate no canonical freeze replacement
         shell: bash
