@@ -40,6 +40,46 @@ def main() -> None:
     assert merged == base
     assert stats == {"base": 1, "overlay": 0, "replaced": 0, "appended": 0}
 
+    # Reale Eventserien und Programmseiten verwenden absichtlich dieselbe
+    # Quellen-URL für mehrere Termine. Eindeutige IDs bleiben kanonisch.
+    shared_url_base = [
+        row("series-1", "Serientermin 1", "https://example.org/series"),
+        row("series-2", "Serientermin 2", "https://example.org/series"),
+    ]
+    _, merged, stats = merge_event_rows(HEADER, shared_url_base, HEADER, [])
+    assert merged == shared_url_base
+    assert stats == {"base": 2, "overlay": 0, "replaced": 0, "appended": 0}
+
+    shared_url_update = row("series-2", "Serientermin 2 aktualisiert", "https://example.org/series", "20:00")
+    _, merged, stats = merge_event_rows(HEADER, shared_url_base, HEADER, [shared_url_update])
+    assert merged == [shared_url_base[0], shared_url_update]
+    assert stats == {"base": 2, "overlay": 1, "replaced": 1, "appended": 0}
+
+    expect_error(
+        "mehrdeutige Basis-URL ohne passende ID",
+        lambda: merge_event_rows(
+            HEADER,
+            shared_url_base,
+            HEADER,
+            [row("series-new", "Nicht eindeutig", "https://example.org/series")],
+        ),
+        "URL ist im Basisbestand mehrdeutig",
+    )
+
+    expect_error(
+        "doppelte Basis-ID",
+        lambda: merge_event_rows(
+            HEADER,
+            [
+                row("duplicate-id", "A", "https://example.org/a"),
+                row("duplicate-id", "B", "https://example.org/b"),
+            ],
+            HEADER,
+            [],
+        ),
+        "doppelte ID im Basisbestand",
+    )
+
     appended = row("staging-1", "Staging", "https://example.org/staging", "11:00–18:00 Uhr")
     _, merged, stats = merge_event_rows(HEADER, base, HEADER, [appended])
     assert merged == [base[0], appended]
