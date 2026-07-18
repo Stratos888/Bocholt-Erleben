@@ -65,16 +65,20 @@ STATUS_HEADING = re.compile(
 )
 
 
-def tracked_markdown() -> list[tuple[str, str, str]]:
+def git_output(*args: str) -> str:
     completed = subprocess.run(
-        ["git", "ls-files", "-s", "*.md"],
+        ["git", *args],
         cwd=ROOT,
         check=True,
         capture_output=True,
         text=True,
     )
+    return completed.stdout.strip()
+
+
+def tracked_markdown() -> list[tuple[str, str, str]]:
     rows: list[tuple[str, str, str]] = []
-    for line in completed.stdout.splitlines():
+    for line in git_output("ls-files", "-s", "*.md").splitlines():
         if not line:
             continue
         metadata, path = line.split("\t", 1)
@@ -165,6 +169,8 @@ def main() -> None:
 
     role_counts = Counter(row["role"] for row in rows)
     summary = {
+        "commit_sha": git_output("rev-parse", "HEAD"),
+        "tree_sha": git_output("rev-parse", "HEAD^{tree}"),
         "markdown_files": len(rows),
         "total_lines": sum(int(row["lines"]) for row in rows),
         "role_counts": dict(sorted(role_counts.items())),
@@ -177,6 +183,8 @@ def main() -> None:
     out.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     print("Documentation inventory")
+    print(f"- commit: {summary['commit_sha']}")
+    print(f"- tree: {summary['tree_sha']}")
     print(f"- tracked Markdown files: {summary['markdown_files']}")
     print(f"- total Markdown lines: {summary['total_lines']}")
     print("- roles:")
