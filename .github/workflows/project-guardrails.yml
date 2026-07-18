@@ -8,13 +8,22 @@ on:
       - ".github/workflows/pr-gate.yml"
       - ".github/workflows/project-guardrails.yml"
       - ".github/pull_request_template.md"
+      - "README.md"
       - "AI_ENTRYPOINT.md"
       - "ENGINEERING.md"
+      - "MASTER.md"
+      - "ROADMAP.md"
+      - "TEST_STATUS.md"
+      - "Produktvertrag.md"
+      - "docs/README.md"
       - "docs/architecture/SYSTEM_MAP.md"
       - "docs/workpacks/active/CURRENT_WORKPACK.md"
+      - "docs/workpacks/queued/**"
       - "docs/decisions/**"
+      - "docs/forensics/**"
       - "docs/external-resource-matrix.md"
       - "docs/github-actions-trigger-policy.md"
+      - "scripts/audit-documentation-governance.py"
       - "scripts/resolve-deploy-target.sh"
       - "scripts/merge_events_overlay.py"
       - "tests/test_deploy_branch_routing.sh"
@@ -51,46 +60,18 @@ jobs:
             exit 1
           fi
 
-      - name: Validate AI working model
+      - name: Validate documentation governance
+        shell: bash
+        run: python3 scripts/audit-documentation-governance.py
+
+      - name: Validate durable engineering contracts
         shell: bash
         run: |
           set -euo pipefail
-          for file in \
-            AI_ENTRYPOINT.md \
-            ENGINEERING.md \
-            docs/architecture/SYSTEM_MAP.md \
-            docs/workpacks/active/CURRENT_WORKPACK.md \
-            docs/external-resource-matrix.md \
-            docs/github-actions-trigger-policy.md \
-            .github/pull_request_template.md; do
-            test -s "$file"
-          done
-
-          grep -q 'Ein primärer Ausführungs-Chat' AI_ENTRYPOINT.md
-          grep -q 'Einmaliges Arbeitsmandat' AI_ENTRYPOINT.md
-          grep -q 'R1.*lokal und reversibel' AI_ENTRYPOINT.md
-          grep -q 'Gate A.*Verstehen' AI_ENTRYPOINT.md
-          grep -q 'Gate C.*Reale Runtime beweisen' AI_ENTRYPOINT.md
-          grep -q 'Fehlerbudget und Stop-the-line' AI_ENTRYPOINT.md
-          grep -q 'Ein grüner PR beweist höchstens E2' AI_ENTRYPOINT.md
-
           grep -q 'Architekturprinzip: vereinfachen statt schichten' ENGINEERING.md
           grep -q 'Ressourcen-Lock' ENGINEERING.md
-          grep -q 'Alles, was nicht ausdrücklich als staging-isoliert' ENGINEERING.md
           grep -q 'Ein echter Fachdatensatz wird erst nach isoliertem synthetischem Staging-Beweis verwendet' ENGINEERING.md
-
-          grep -q 'Kritischer Inbox-Übernahmepfad' docs/architecture/SYSTEM_MAP.md
-          grep -q 'Aktiver Workpack' docs/workpacks/active/CURRENT_WORKPACK.md
-          grep -q 'Risikoklasse' docs/workpacks/active/CURRENT_WORKPACK.md
-          grep -q 'Erforderliche Evidence' .github/pull_request_template.md
-          grep -q 'Google Sheet Events' docs/external-resource-matrix.md
-          grep -q 'Feature-Branches duerfen niemals deployen' docs/external-resource-matrix.md
-          grep -q 'Always-run PR Gate' docs/github-actions-trigger-policy.md
-
-          if grep -q 'maximal zwei aktive Workpack-Chats' AI_ENTRYPOINT.md; then
-            echo "Legacy multi-chat default must not be reintroduced."
-            exit 1
-          fi
+          grep -q 'Feature-Branches duerfen niemals deployen' docs/github-actions-trigger-policy.md
 
       - name: Validate no canonical freeze replacement
         shell: bash
