@@ -33,7 +33,7 @@ try {
     if ($mode !== 'case') throw new InvalidArgumentException('Unbekannter Preflight-Modus.');
 
     $caseId = trim((string)($input['case_id'] ?? ''));
-    $action = strtolower(trim((string)($input['action'] ?? ''));
+    $action = strtolower(trim((string)($input['action'] ?? '')));
     $payload = is_array($input['payload'] ?? null) ? $input['payload'] : [];
     if ($caseId === '' || $action === '') throw new InvalidArgumentException('Case and action are required.');
 
