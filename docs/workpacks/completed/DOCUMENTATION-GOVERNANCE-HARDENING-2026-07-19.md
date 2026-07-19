@@ -1,8 +1,8 @@
 # Dokumentations-Governance-Härtung
 
 Datum: 2026-07-19  
-Status: abgeschlossen nach grünem Integrations-Gate  
-Risikoklasse: R2, weil der read-only CI-Vertrag erweitert wird; keine Produkt- oder Runtimeänderung
+Status: abgeschlossen und in `staging` integriert  
+Risikoklasse: R2, weil der read-only CI-Vertrag erweitert wurde; keine Produkt- oder Runtimeänderung
 
 ## Anlass
 
@@ -23,7 +23,7 @@ Eine neue KI kann mit minimaler Lesemenge deterministisch feststellen:
 - `AI_ENTRYPOINT.md`: verbindlicher Dokumentations- und Implementierungsvertrag;
 - `docs/README.md`: aufgabenbezogene Lesepfade und exakter Pflegeablauf;
 - `docs/DOCUMENT_REGISTRY.md`: Rollen, Pfadklassen und Änderungsmatrix;
-- `docs/domains/visual-system.md` und `docs/domains/event-search-system.md`: kompakte Router vor den zwei großen Legacy-Referenzen;
+- `docs/domains/visual-system.md` und `docs/domains/event-search-system.md`: kompakte Router vor großen Legacy-Referenzen;
 - `scripts/report-documentation-inventory.py`: vollständige read-only Inventur;
 - `scripts/audit-documentation-governance.py`: Schutz der kanonischen Dateien und des CI-Vertrags;
 - `.github/workflows/project-guardrails.yml`: read-only Ausführung und Inventurartefakt;
@@ -38,27 +38,27 @@ Eine neue KI kann mit minimaler Lesemenge deterministisch feststellen:
 - kein Commit, Push oder Force-Push aus einem Guardrail-Workflow;
 - keine Umdeutung historischer Detailreferenzen ohne fachliche Prüfung.
 
-Dateimigrationen sind nur noch als eigener atomarer Workpack zulässig, wenn der Inventurbericht einen konkreten Nutzen und vollständige Referenzierbarkeit belegt.
+Dateimigrationen sind nur als eigener atomarer Workpack zulässig, wenn der Inventurbericht einen konkreten Nutzen und vollständige Referenzierbarkeit belegt.
 
 ## Evidence
 
 ### E1
 
 - klar begrenzter Dokumentations-/CI-Diff;
-- Rollen- und Pfadvertrag ist explizit;
+- Rollen- und Pfadvertrag explizit;
 - keine fachfremden Dateien im Scope.
 
 ### E2
 
-Vor Integration müssen erfolgreich sein:
+Erfolgreich ausgeführt wurden:
 
 - `python3 scripts/report-documentation-inventory.py --check`;
 - `python3 scripts/audit-documentation-governance.py`;
 - bestehende `Project Guardrails`-Prüfungen;
 - stabiler `PR Gate`.
 
-Der Workflow veröffentlicht `build/documentation-inventory.json` als read-only Artefakt. Der finale Inventurstand muss `0` Fehler und `0` Warnungen ausweisen; bekannte exakt benannte Legacy-Marker werden nur als Notes geführt.
+Der Workflow veröffentlichte `build/documentation-inventory.json` als read-only Artefakt. Der Integrationsstand wies 76 getrackte Markdown-Dateien, 0 Fehler und 0 Warnungen aus; exakt benannte Legacy-Marker wurden als kontrollierte Notes geführt.
 
-## Ergebnis
+## Ergebnis und Folge
 
-Nach Integration ist kein Dokumentations-Workpack aktiv. Der nächste zulässige technische Schritt bleibt die bereits gequeue-te Control-Center-Workflow-Konsolidierung. Die externen Ressourcen-Locks bleiben unverändert bestehen.
+Die strukturelle Governance wurde integriert. Eine anschließende semantische Vollklassifikation beseitigte den verbliebenen generischen `docs/**`-Catch-all und ergänzte den Control-Center-Router. Nach beiden Paketen ist kein Dokumentations-Workpack aktiv. Der nächste zulässige technische Schritt ist die Control-Center-Workflow-Konsolidierung; externe Ressourcen-Locks bleiben bestehen.
