@@ -76,6 +76,8 @@ jobs:
           grep -q 'context": "deploy/staging-observed"' .github/workflows/staging-verification.yml
           grep -q 'context": "control-center/runtime-preflight-e3"' .github/workflows/staging-verification.yml
           grep -q 'mutation_false' .github/workflows/staging-verification.yml
+          grep -q 'frozen_case_excluded' .github/workflows/staging-verification.yml
+          grep -q 'if "cityart" in haystack' .github/workflows/staging-verification.yml
           grep -q 'python3 scripts/control-center-e4-synthetic.py --self-test' .github/workflows/control-center-ci.yml
 
           if grep -q 'control-center-e4-synthetic.yml.*dispatches' .github/workflows/staging-verification.yml; then
