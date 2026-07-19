@@ -71,10 +71,10 @@ Root-Dateien dürfen erst nach einer erfolgreichen Vollinventur und einem atomar
 | `ingest-bridge.md` | veralteter Alias auf den kanonischen HTTP-Ingest-Vertrag |
 | `content-ops-self-learning-target.md`, `internal-dashboard-target.md`, `internal-dashboard.md`, `startpartner-wachstumspilot-zielzustand-2026-07-18.md` | Zielreferenzen, keine Implementierungsbehauptung |
 | `detailpanel-premium-system-contract.md` | Legacy-Vertragsreferenz; aktuelle Produktmechanik steht im Produktvertrag und Code |
-| `steuerzentrale-backlog-roadmap-vertrag.md`, `steuerzentrale-redaktioneller-entscheidungs-und-lernprozess.md` | aktuelle Control-Center-Verträge |
+| `steuerzentrale-backlog-roadmap-vertrag.md` | aktueller Control-Center-Vertrag |
 | `steuerzentrale-inbox-feature-gap-analysis-2026-07-16.md` | datierte Forensik |
 | `steuerzentrale-ausnahmebasierte-eventpruefung-implementation-2026-07-16.md`, `steuerzentrale-e2e-state-consistency-workpack-2026-07-16.md` | abgeschlossene Implementierungsbelege |
-| `content-ops-robot-handoff.md`, `steuerzentrale-naechstes-workpack-ausnahmebasierte-eventpruefung-2026-07-16.md` | historische Handoffs, niemals aktueller Arbeitsrouter |
+| `content-ops-robot-handoff.md`, `steuerzentrale-naechstes-workpack-ausnahmebasierte-eventpruefung-2026-07-16.md`, `steuerzentrale-redaktioneller-entscheidungs-und-lernprozess.md` | historische Handoffs beziehungsweise Phasen-Workpacks, niemals aktueller Arbeitsrouter |
 | `deploy/staging-phase3-redeploy-2026-07-15.md`, `staging-redeploy-2026-07-15-compact-backlog.md`, `live-event-feed-refresh-2026-07-18-kinderzaubershow.md` | historische Deploy-/Release-Evidence |
 | `today-home-premium-release-plan.md` | historischer Releaseplan |
 
