@@ -23,10 +23,11 @@ Diese Datei ist ein kompakter Index der aktuell relevanten Evidence. Sie ist kei
 | Branch- und Deployrouting | E2 | nur `staging` und `main` dürfen deployen; Standardrelease `staging -> main` | CI und `SYSTEM_MAP.md` |
 | PR-Integration | E2 | Always-run `PR Gate` aggregiert gestartete Actions-Checks | `.github/workflows/pr-gate.yml` |
 | Dokumentations-Governance | E2 integriert | Vollinventur, exakte Rollenklassifikation, Link-/Statusgrenzen und read-only CI-Gate integriert | Governance-Skripte, Inventurartefakt und completed Workpacks |
-| Staging-Deploy Control Center | E3 | deployter Staging-Build und read-only Runtime-Preflight belegt | `CURRENT_WORKPACK.md` und CI |
-| Control-Center-Environment | E3 | `Inbox_Staging -> Events_Staging`; Live-Ressourcen nicht verwendet | `CURRENT_WORKPACK.md` |
+| Workflowtopologie Control Center | E2 integriert | vollständige Gate-A-Inventur; ein autoritativer `Control Center CI`; keine doppelten statischen Top-Level-Prüfungen | Workflowinventur, Konsolidierungs-PR und `Project Guardrails` |
+| Staging-Deploy Control Center | E3 | `Deploy to STRATO` plus gemeinsame read-only `Staging Verification` belegt | GitHub-Status `deploy/staging-observed` |
+| Control-Center-Environment | E3 | aktiver Staging-Build, `Inbox_Staging -> Events_Staging`, `mutation=false`; Live-Ressourcen unbenutzt | GitHub-Status `control-center/runtime-preflight-e3` |
 | Control-Center externer Write | E3, E4 offen | Harness statisch vorhanden; kein synthetischer E4-Lauf ausgeführt | `CURRENT_WORKPACK.md` |
-| CityArt-Fachfall | unter E5 | eingefroren bis Workflow-Konsolidierung und E4 | `CURRENT_WORKPACK.md` |
+| CityArt-Fachfall | unter E5 | eingefroren bis eigenständigem grünem E4 | `CURRENT_WORKPACK.md` |
 | direkte einzelne Live-Eventpflege | pro Operation neu | Policy vorhanden; jeder Fall benötigt eigenen Vorher-/Write-/Rücklesebeleg | `AI_ENTRYPOINT.md`, Ressourcenmatrix |
 | direkter Main-Hotfix | nicht operativ freigeschaltet | dedizierter Ruleset-Bypass-Akteur fehlt; kein allgemeiner Erfolgsbeweis | zugehörige Entscheidung und `AI_ENTRYPOINT.md` |
 | Search-Intent-/SEO-Recovery | E1 Ziel/Forensik | Zielarchitektur und Workpack dokumentiert; noch keine Implementierung | `docs/forensics/` und queued Workpack |
@@ -38,10 +39,10 @@ Diese Datei ist ein kompakter Index der aktuell relevanten Evidence. Sie ist kei
 Der wichtigste offene Runtimebeweis ist:
 
 ```text
-Workflow-Konsolidierung
--> erneutes E3
+separater R3-Workpack
 -> genau ein synthetischer E4-Staging-Write
 -> vollständiges Rücklesen und Cleanup
+-> erst danach ein möglicher echter CityArt-Staging-Fall
 ```
 
 Bis dahin darf kein echter Control-Center-Fachfall als technischer Erfolgsbeweis verwendet werden.
