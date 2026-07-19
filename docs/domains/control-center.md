@@ -41,8 +41,7 @@ Nur aufgabenbezogen lesen:
 - `STEUERZENTRALE_SCREENVERTRAG.md` – Screen- und Interaktionsvertrag.
 - `STEUERZENTRALE_VORGANGSKATALOG.md` – Vorgänge und Falltypen.
 - `STEUERZENTRALE_ABNAHMEMATRIX.md` – fachliche Abnahmedimensionen.
-- `docs/steuerzentrale-backlog-roadmap-vertrag.md` – Backlog-/Roadmap-Vertrag.
-- `docs/steuerzentrale-redaktioneller-entscheidungs-und-lernprozess.md` – redaktioneller Entscheidungs- und Lernvertrag.
+- `docs/steuerzentrale-backlog-roadmap-vertrag.md` – aktueller Backlog-/Roadmap-Vertrag.
 - `docs/internal-dashboard.md` und `docs/internal-dashboard-target.md` – Zielreferenzen für die interne Betreiberoberfläche, keine Implementierungsbehauptung.
 
 ## 5. Historische Dateien
@@ -53,7 +52,8 @@ Die folgenden Dokumenttypen dürfen keinen aktuellen Arbeitsauftrag bilden:
 - datierte E2E-/Implementierungsworkpacks;
 - alte „nächster Chat“- oder „nächstes Workpack“-Handoffs;
 - alte Deploy-, Redeploy- und Release-Notizen;
-- frühere konkrete CityArt- oder Einzelfallbeschreibungen.
+- frühere konkrete CityArt- oder Einzelfallbeschreibungen;
+- `docs/steuerzentrale-redaktioneller-entscheidungs-und-lernprozess.md` mit seinem damaligen Phasen-, Gate- und Freigabestatus.
 
 Sie werden nur geöffnet, wenn ein aktueller Owner sie ausdrücklich als Beleg benötigt. Alte SHAs, PR-Nummern und damalige nächste Schritte übersteuern niemals `CURRENT_WORKPACK.md`.
 
@@ -65,7 +65,7 @@ Sie werden nur geöffnet, wenn ein aktueller Owner sie ausdrücklich als Beleg b
 | externer Write oder E4 | Ressourcenmatrix, Current Workpack, Writer-/Reconciliation-Owner, E4-Harness und konkrete Staging-Ressourcen |
 | Review-UI oder Entscheidungsaktion | Informationsarchitektur, Screenvertrag, Vorgangskatalog, Render-/Action-Owner und Browser-Smoke |
 | falscher Zustand oder verschwundener Fall | Source-Reconciliation, führende Ressource, lokale Projektion, API-Antwort und Rücklesebeleg |
-| neuer Falltyp oder neue Entscheidung | Vorgangskatalog, redaktioneller Vertrag, Backendverträge und vollständiger End-to-End-Folgeprozess |
+| neuer Falltyp oder neue Entscheidung | Vorgangskatalog, aktuelle Backendverträge und vollständiger End-to-End-Folgeprozess |
 | internes Dashboard | Dashboard-Zielreferenzen, bestehende Datenquellen und Betreiber-Jobs; keine parallele zweite Writeback-Logik |
 
 ## 7. Harte Regeln
