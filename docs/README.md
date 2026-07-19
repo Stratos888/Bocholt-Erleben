@@ -37,9 +37,10 @@ Alte Chats, Memory, ZIPs, PR-Beschreibungen, Freeze-Dateien und historische Doku
 | Entscheidung | `docs/decisions/**` | dauerhaft angenommene Architektur-/Produktentscheidung | datiert und danach grundsätzlich unverändert |
 | Forensik | `docs/forensics/**` | belegte Untersuchung mit Restunsicherheiten | datiert und danach grundsätzlich unverändert |
 | Evidence | `TEST_STATUS.md`, `docs/evidence/**` | Proofindex und ausführliche Nachweise | nach neuer Evidence |
-| Vertrag/Playbook | z. B. `EVENT_DESCRIPTION_STANDARD.md`, `DEBUG.md` | aktueller Vertrag oder Vorgehen einer klaren Domäne | beim Domainwechsel |
-| Referenz | historische oder ausführliche Detaildateien | unterstützender Kontext, kein Statusrouter | nur bei fachlichem Bedarf |
-| Archiv | `docs/archive/**` oder klar historische Root-Datei | ersetzter Zustand oder Beleg | grundsätzlich unverändert |
+| Vertrag/Playbook | `docs/contracts/**`, Domainverträge | aktueller Vertrag oder Vorgehen einer klaren Domäne | beim Domainwechsel |
+| Zielreferenz | Zielbilder und geplante Mechanik | beschlossen oder fachlich validiert, nicht zwingend umgesetzt | vor Umsetzung neu validieren |
+| Historie | Handoffs, alte Workpacks, Deploy-/Release-Notizen | früherer Zustand oder Beleg | nicht als aktueller Arbeitsrouter |
+| Archiv | `docs/archive/**` | ersetzter Zustand | grundsätzlich unverändert |
 
 Bei Widerspruch gilt die speziellere aktuelle Source of Truth innerhalb ihrer Rolle. Ein Zielzustandsdokument darf keine bereits umgesetzte Produktmechanik vortäuschen.
 
@@ -70,7 +71,7 @@ Für `AI_ENTRYPOINT.md`, `CURRENT_WORKPACK.md`, `SYSTEM_MAP.md`, `MASTER.md`, `R
 7. Ein Dokument hat genau eine Hauptrolle.
 8. Links auf Zielzustände nennen ausdrücklich, ob sie umgesetzt sind.
 9. Kanonische Dokumente verlinken nicht direkt auf Archive als Arbeitsanweisung.
-10. Neue Root-Markdown-Dateien benötigen vor dem Merge eine registrierte Rolle.
+10. Neue Markdown-Dateien benötigen vor dem Merge eine registrierte Rolle; unbekannte Dateien unter `docs/**` sind ein Gate-Fehler.
 
 ## 5. Workpack-Lebenszyklus
 
@@ -94,7 +95,7 @@ Die KI liest nicht pauschal alle Dokumente, sondern nur den kleinsten belastbare
 | Aufgabe | Pflichtpfad nach Einstieg und Systemkarte |
 |---|---|
 | Produktmechanik oder Funnel | `MASTER.md` -> `Produktvertrag.md` -> `COMMERCIAL_STRATEGY.md` -> `ROADMAP.md` -> Workpack/Owner |
-| Control Center oder externe Writes | `ENGINEERING.md` -> `external-resource-matrix.md` -> relevante Control-Center-Verträge -> API-/UI-Owner |
+| Control Center, Inbox-Review oder externe Writes | `docs/domains/control-center.md` -> Ressourcenmatrix -> relevante Verträge -> API-/UI-/Workflow-Owner |
 | Content und KI-Suche | `docs/domains/event-search-system.md` -> `EVENT_DESCRIPTION_STANDARD.md` -> relevante Owner und Evidence |
 | Visuals und Bildqualität | `docs/domains/visual-system.md` -> Visual-Pool -> Generatoren/Audits -> konkrete Owner |
 | Public UI oder Today | `ENGINEERING.md` -> betroffene CSS-/JS-/HTML-Owner -> `DEBUG.md` nur für UI-Proofs |
@@ -125,7 +126,7 @@ Nach dem Patch:
 
 1. `CURRENT_WORKPACK.md` auf den echten Folgezustand setzen.
 2. Vollinventur und Governance-Audit ausführen.
-3. Fehler beseitigen; Warnungen bewusst bewerten und im PR benennen.
+3. Fehler und Warnungen beseitigen.
 4. Erst danach integrieren.
 
 ## 8. Dokumentations-Definition-of-Done
@@ -138,13 +139,14 @@ Ein Workpack ist dokumentarisch erst abgeschlossen, wenn:
 - `TEST_STATUS.md` nur bei tatsächlich neuer Evidence aktualisiert wurde;
 - veraltete Statusaussagen entfernt statt ergänzt wurden;
 - alle betroffenen Dokumentlinks funktionieren;
-- jede Markdown-Datei eine bekannte Rolle besitzt;
-- keine kanonische Datei ungeprüft auf ein Archiv routet;
-- `python3 scripts/report-documentation-inventory.py --check` grün ist;
+- jede Markdown-Datei eine exakte oder pfadbasierte bekannte Rolle besitzt;
+- keine generische unbekannte `docs/**`-Datei durchgewunken wird;
+- kein aktueller Router historische Handoffs als Arbeitsweg verwendet;
+- `python3 scripts/report-documentation-inventory.py --check` mit 0 Fehlern und 0 Warnungen grün ist;
 - `python3 scripts/audit-documentation-governance.py` grün ist.
 
 ## 9. Automatischer Schutz
 
-`report-documentation-inventory.py` inventarisiert alle getrackten Markdown-Dateien, klassifiziert Rollen und prüft Links sowie Statusgrenzen. `audit-documentation-governance.py` schützt die kanonischen Steuerdateien und den CI-Vertrag. `Project Guardrails` führt beide Prüfungen read-only aus und veröffentlicht den maschinenlesbaren Inventurbericht als Artefakt.
+`report-documentation-inventory.py` inventarisiert alle getrackten Markdown-Dateien, klassifiziert Rollen und prüft Links sowie Statusgrenzen. Unbekannte Root- und `docs/**`-Dateien blockieren die Integration. `audit-documentation-governance.py` schützt die kanonischen Steuerdateien und den CI-Vertrag. `Project Guardrails` führt beide Prüfungen read-only aus und veröffentlicht den maschinenlesbaren Inventurbericht als Artefakt.
 
 Die Prüfungen ersetzen keine fachliche Bewertung. Sie verhindern, dass die Dokumentation erneut zu einem widersprüchlichen Statusarchiv oder zu einer ungerouteten Dateisammlung anwächst.
