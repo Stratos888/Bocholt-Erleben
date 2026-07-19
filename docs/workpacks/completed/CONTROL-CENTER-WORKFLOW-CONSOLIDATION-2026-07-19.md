@@ -53,11 +53,22 @@ Die vollständige Test- und Evidence-Abdeckung wurde vor Entfernung in den Zielw
 
 Der erste integrierte Lauf der konsolidierten `Staging Verification` war read-only und belegte `mutation=false`, wählte als technisches Preflight-Objekt aber erneut den eingefrorenen CityArt-Fall. Es erfolgte kein Fachklick, kein Writeback und keine externe Mutation. Wegen der harten Fachfallgrenze zählt dieser Lauf nicht als finale E3-Abnahme.
 
-Die Korrektur und ihre finale Abnahmebedingung stehen in:
+Der zweite Lauf schloss CityArt korrekt aus, blieb aber noch an `allowed=true` und damit an fachliche Entscheidungsreife gekoppelt. Deploy, Build und lokaler Runtimevertrag waren grün; der finale E3-Status blieb fail-closed rot. Diese Kopplung wurde entfernt, weil E3 ausschließlich Runtime, Ressourcen und Mutationsfreiheit belegt und keine fachliche Aktion freigibt.
+
+Die vollständige Korrektur und ihre Abnahmebedingungen stehen in:
 
 - `docs/evidence/control-center-workflow-e3-correction-2026-07-19.md`.
 
-Der Selektor schließt CityArt nun vor jedem Preflight-Aufruf aus, dokumentiert übersprungene eingefrorene Fälle und bricht ohne geeigneten Nicht-CityArt-Fall fail-closed ab. `Project Guardrails` schützt diesen Vertrag dauerhaft.
+Der finale Selektor:
+
+- schließt CityArt vor jedem Preflight-Aufruf aus;
+- prüft Scope `runtime_and_resource_contract_only`;
+- verlangt `mutation=false`, passenden Build, Staging-Host, Staging-Ressourcen, Writer und read-only Snapshots;
+- dokumentiert `action_allowed` und `business_blockers`, ohne eine Aktion abzuleiten;
+- schreibt auch im Fehlerfall Evidence;
+- bricht ohne gültigen Nicht-CityArt-Runtimevertrag fail-closed ab.
+
+`Project Guardrails` schützt diesen Vertrag dauerhaft.
 
 ## Evidence
 
@@ -72,7 +83,7 @@ Der Selektor schließt CityArt nun vor jedem Preflight-Aufruf aus, dokumentiert 
 - `Project Guardrails`, `Control Center CI` und `PR Gate` im Konsolidierungs-PR grün;
 - keine duplizierten alten Control-Center-Top-Level-Checks;
 - E4-Harness nur statisch kompiliert und selbstgetestet;
-- CityArt-Ausschluss und fail-closed-Verhalten durch `Project Guardrails` abgesichert.
+- CityArt-Ausschluss und Runtime-only-E3 durch `Project Guardrails` abgesichert.
 
 ### E3
 
@@ -81,11 +92,13 @@ Der Abschluss setzt nach Integration voraus:
 - erfolgreichen normalen Staging-Deploy;
 - Status `deploy/staging-observed=success`;
 - Status `control-center/runtime-preflight-e3=success`;
+- Scope `runtime_and_resource_contract_only`;
 - Staging-Host, passender Build und `mutation=false`;
 - ausgewählter Preflight-Fall ohne CityArt-Bezug;
 - Assertion `frozen_case_excluded=true`;
 - `Inbox_Staging -> Events_Staging`;
-- Live-Ressourcen unbenutzt.
+- Live-Ressourcen unbenutzt;
+- fachliche Blocker nur dokumentiert, keine Aktion ausgeführt.
 
 Die konkreten Run- und Commit-IDs werden direkt aus GitHub gelesen und nicht als veraltender operativer Status in diesem Dokument gespiegelt.
 

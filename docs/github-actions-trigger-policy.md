@@ -69,11 +69,13 @@ Er:
 2. veröffentlicht weiterhin `deploy/staging-observed`;
 3. wartet auf den passenden Build;
 4. schließt ausdrücklich eingefrorene CityArt-Kandidaten vor jedem Preflight-Aufruf aus;
-5. führt den read-only Runtime-Preflight mit `mutation=false` nur auf einem Nicht-CityArt-Fall aus;
-6. bricht fail-closed ab, wenn kein geeigneter Nicht-CityArt-Fall verfügbar ist;
-7. veröffentlicht weiterhin `control-center/runtime-preflight-e3`;
-8. lädt ein gemeinsames Evidence-Artefakt einschließlich `frozen_cases_skipped` und `frozen_case_excluded` hoch;
-9. besitzt keine Sheet- oder DB-Credentials.
+5. prüft auf einem Nicht-CityArt-Fall ausschließlich den Runtime- und Ressourcenvertrag mit `mutation=false`;
+6. verlangt keine fachliche Aktionsfreigabe und führt keine Aktion aus;
+7. dokumentiert `action_allowed` und `business_blockers`, ohne diese zu verändern oder zu übergehen;
+8. bricht fail-closed ab, wenn kein gültiger Nicht-CityArt-Runtimevertrag verfügbar ist;
+9. veröffentlicht weiterhin `control-center/runtime-preflight-e3`;
+10. lädt ein gemeinsames Evidence-Artefakt einschließlich `frozen_cases_skipped`, `frozen_case_excluded`, Runtimeassertions und gegebenenfalls fachlicher Blocker hoch;
+11. besitzt keine Sheet- oder DB-Credentials.
 
 Die beiden Statuskontexte bleiben unverändert, bis eine nachweislich koordinierte Ruleset-Anpassung erfolgt.
 
@@ -167,7 +169,7 @@ Bei jeder Änderung prüfen:
 - Ruleset-Abhängigkeiten;
 - tatsächlichen Operatorpfad.
 
-`Project Guardrails` muss bei jeder Änderung unter `.github/workflows/**` starten und die autoritative Topologie einschließlich des CityArt-Ausschlusses prüfen.
+`Project Guardrails` muss bei jeder Änderung unter `.github/workflows/**` starten und die autoritative Topologie einschließlich CityArt-Ausschluss und Runtime-only-E3 prüfen.
 
 ## Verbotene Muster
 
@@ -177,7 +179,8 @@ Bei jeder Änderung prüfen:
 - Umbenennung von `PR Gate`, `deploy/staging-observed` oder `control-center/runtime-preflight-e3` ohne koordinierte Ruleset-Prüfung;
 - Entfernen einer Qualitätsprüfung ohne expliziten Ersatz;
 - E4-Aufruf aus der read-only Staging Verification;
-- Verwendung eines ausdrücklich eingefrorenen Fachfalls als E3-Abnahmeobjekt.
+- Verwendung eines ausdrücklich eingefrorenen Fachfalls als E3-Abnahmeobjekt;
+- Ableitung einer fachlichen Aktionsfreigabe aus dem technischen E3-Status.
 
 ## Validierung nach Änderungen
 
@@ -194,7 +197,9 @@ Bei jeder Änderung prüfen:
 2. `Deploy to STRATO` grün.
 3. `deploy/staging-observed=success`.
 4. `control-center/runtime-preflight-e3=success`.
-5. Build, Host, Umgebung und `Inbox_Staging -> Events_Staging` bestätigt.
-6. ausgewählter Fall ohne CityArt-Bezug und `frozen_case_excluded=true`.
-7. `mutation=false`; Live-Ressourcen unbenutzt.
-8. Kein E4-Run.
+5. Scope `runtime_and_resource_contract_only`.
+6. Build, Host, Umgebung und `Inbox_Staging -> Events_Staging` bestätigt.
+7. ausgewählter Fall ohne CityArt-Bezug und `frozen_case_excluded=true`.
+8. `mutation=false`; Live-Ressourcen unbenutzt.
+9. `action_allowed` und `business_blockers` nur dokumentiert; keine Aktion ausgeführt.
+10. Kein E4-Run.
