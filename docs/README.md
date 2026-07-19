@@ -95,8 +95,8 @@ Die KI liest nicht pauschal alle Dokumente, sondern nur den kleinsten belastbare
 |---|---|
 | Produktmechanik oder Funnel | `MASTER.md` -> `Produktvertrag.md` -> `COMMERCIAL_STRATEGY.md` -> `ROADMAP.md` -> Workpack/Owner |
 | Control Center oder externe Writes | `ENGINEERING.md` -> `external-resource-matrix.md` -> relevante Control-Center-Verträge -> API-/UI-Owner |
-| Content und KI-Suche | `EVENT_DESCRIPTION_STANDARD.md` -> Suchregelwerk/Quellenregister -> relevante Skripte -> Evidence |
-| Visuals und Bildqualität | `VISUAL_WORKFLOW.md` -> Visual-Pool -> Generatoren/Audits -> konkrete Owner |
+| Content und KI-Suche | `docs/domains/event-search-system.md` -> `EVENT_DESCRIPTION_STANDARD.md` -> relevante Owner und Evidence |
+| Visuals und Bildqualität | `docs/domains/visual-system.md` -> Visual-Pool -> Generatoren/Audits -> konkrete Owner |
 | Public UI oder Today | `ENGINEERING.md` -> betroffene CSS-/JS-/HTML-Owner -> `DEBUG.md` nur für UI-Proofs |
 | Activities und saisonale Inhalte | fachliche Activity-Referenzen -> Datenowner -> Generatoren/Audits |
 | SEO und Growth | aktuelle Forensik/Entscheidung -> queued Workpack -> Rendering-/Tracking-Owner |
