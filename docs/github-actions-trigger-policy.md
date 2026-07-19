@@ -68,10 +68,12 @@ Er:
 1. beobachtet den passenden `Deploy to STRATO`-Run;
 2. veröffentlicht weiterhin `deploy/staging-observed`;
 3. wartet auf den passenden Build;
-4. führt den read-only Runtime-Preflight mit `mutation=false` aus;
-5. veröffentlicht weiterhin `control-center/runtime-preflight-e3`;
-6. lädt ein gemeinsames Evidence-Artefakt hoch;
-7. besitzt keine Sheet- oder DB-Credentials.
+4. schließt ausdrücklich eingefrorene CityArt-Kandidaten vor jedem Preflight-Aufruf aus;
+5. führt den read-only Runtime-Preflight mit `mutation=false` nur auf einem Nicht-CityArt-Fall aus;
+6. bricht fail-closed ab, wenn kein geeigneter Nicht-CityArt-Fall verfügbar ist;
+7. veröffentlicht weiterhin `control-center/runtime-preflight-e3`;
+8. lädt ein gemeinsames Evidence-Artefakt einschließlich `frozen_cases_skipped` und `frozen_case_excluded` hoch;
+9. besitzt keine Sheet- oder DB-Credentials.
 
 Die beiden Statuskontexte bleiben unverändert, bis eine nachweislich koordinierte Ruleset-Anpassung erfolgt.
 
@@ -165,7 +167,7 @@ Bei jeder Änderung prüfen:
 - Ruleset-Abhängigkeiten;
 - tatsächlichen Operatorpfad.
 
-`Project Guardrails` muss bei jeder Änderung unter `.github/workflows/**` starten und die autoritative Topologie prüfen.
+`Project Guardrails` muss bei jeder Änderung unter `.github/workflows/**` starten und die autoritative Topologie einschließlich des CityArt-Ausschlusses prüfen.
 
 ## Verbotene Muster
 
@@ -174,7 +176,8 @@ Bei jeder Änderung prüfen:
 - staging-only `workflow_dispatch` als angeblich sicher bedienbarer Operatorpfad;
 - Umbenennung von `PR Gate`, `deploy/staging-observed` oder `control-center/runtime-preflight-e3` ohne koordinierte Ruleset-Prüfung;
 - Entfernen einer Qualitätsprüfung ohne expliziten Ersatz;
-- E4-Aufruf aus der read-only Staging Verification.
+- E4-Aufruf aus der read-only Staging Verification;
+- Verwendung eines ausdrücklich eingefrorenen Fachfalls als E3-Abnahmeobjekt.
 
 ## Validierung nach Änderungen
 
@@ -192,5 +195,6 @@ Bei jeder Änderung prüfen:
 3. `deploy/staging-observed=success`.
 4. `control-center/runtime-preflight-e3=success`.
 5. Build, Host, Umgebung und `Inbox_Staging -> Events_Staging` bestätigt.
-6. `mutation=false`; Live-Ressourcen unbenutzt.
-7. Kein E4-Run.
+6. ausgewählter Fall ohne CityArt-Bezug und `frozen_case_excluded=true`.
+7. `mutation=false`; Live-Ressourcen unbenutzt.
+8. Kein E4-Run.
