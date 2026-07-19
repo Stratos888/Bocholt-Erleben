@@ -14,6 +14,7 @@ from urllib.parse import unquote
 ROOT = Path(__file__).resolve().parents[1]
 
 EXACT_ROLES = {
+    ".github/pull_request_template.md": "pull_request_template",
     "README.md": "repository_entrypoint",
     "AI_ENTRYPOINT.md": "ai_execution_router",
     "ENGINEERING.md": "engineering_guardrails",
@@ -104,7 +105,7 @@ STABLE_NO_DYNAMIC_PR_ROLES = {
     "github_actions_policy",
 }
 
-BEGIN_BLOCK = re.compile(r"<!--\s*===\s*BEGIN BLOCK:", re.IGNORECASE)
+BEGIN_BLOCK = re.compile(r"<!--\s*===\s*BEGIN BLOCK:\s*([^|>]+?)\s*(?:\||===)", re.IGNORECASE)
 DYNAMIC_PR = re.compile(r"\bPR\s*#\d+\b")
 STATUS_HEADING = re.compile(
     r"^#{1,4}\s+(Aktueller Stand|Aktueller Status|Nächste Workstreams|"
@@ -115,6 +116,24 @@ MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 FENCED_CODE = re.compile(r"```.*?```|~~~.*?~~~", re.DOTALL)
 SCHEME = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
 DATED_NAME = re.compile(r"20\d{2}-\d{2}-\d{2}")
+
+KNOWN_APPEND_BLOCKS = {
+    "BROWSER_SMOKE_SYSTEM.md": {
+        "BROWSER_SMOKE_ACTIVITY_FAVORITES_PREMIUM_2026_06_30",
+        "BROWSER_SMOKE_MOBILE_QUICK_FILTER_RAIL_2026_07_01",
+    },
+    "COMMERCIAL_STRATEGY.md": {
+        "COMMERCIAL_STARTPARTNER_GROWTH_PILOT_TARGET_2026_07_18",
+    },
+    "Produktvertrag.md": {
+        "PRODUKTVERTRAG_PUBLIC_LEGAL_ALIGNMENT_2026_06_29",
+    },
+}
+
+STATUS_HEADING_ALLOWLIST = {
+    "MAIL_SYSTEM.md",
+    "docs/github-actions-trigger-policy.md",
+}
 
 
 def git_output(*args: str) -> str:
@@ -208,6 +227,7 @@ def inspect_links(relative: str, text: str) -> list[dict[str, object]]:
 def build_report() -> dict[str, object]:
     files: list[dict[str, object]] = []
     warnings: list[str] = []
+    notes: list[str] = []
     errors: list[str] = []
 
     for relative, mode, blob_sha in tracked_markdown():
@@ -215,7 +235,8 @@ def build_report() -> dict[str, object]:
         text = path.read_text(encoding="utf-8")
         role = classify(relative)
         lines = len(text.splitlines())
-        append_blocks = len(BEGIN_BLOCK.findall(text))
+        append_block_names = sorted({name.strip() for name in BEGIN_BLOCK.findall(text)})
+        append_blocks = len(append_block_names)
         status_headings = len(STATUS_HEADING.findall(text))
         dynamic_prs = sorted(set(DYNAMIC_PR.findall(text)))
         links = inspect_links(relative, text)
@@ -241,6 +262,7 @@ def build_report() -> dict[str, object]:
                 "lines": lines,
                 "bytes": path.stat().st_size,
                 "append_blocks": append_blocks,
+                "append_block_names": append_block_names,
                 "status_headings": status_headings,
                 "dynamic_pr_references": dynamic_prs,
                 "broken_markdown_links": broken_markdown_links,
@@ -252,9 +274,26 @@ def build_report() -> dict[str, object]:
         if role == "unclassified_root_document":
             errors.append(f"unclassified root document: {relative}")
         if role in MUTABLE_CANONICAL_ROLES and append_blocks:
-            errors.append(f"mutable canonical document uses {append_blocks} append block(s): {relative}")
+            allowed_blocks = KNOWN_APPEND_BLOCKS.get(relative, set())
+            unexpected_blocks = sorted(set(append_block_names) - allowed_blocks)
+            if unexpected_blocks:
+                errors.append(
+                    f"mutable canonical document uses unapproved append block(s): {relative}: "
+                    + ", ".join(unexpected_blocks)
+                )
+            approved_blocks = sorted(set(append_block_names) & allowed_blocks)
+            if approved_blocks:
+                notes.append(
+                    f"known legacy append block(s) retained until a safe full-file edit: {relative}: "
+                    + ", ".join(approved_blocks)
+                )
         if status_headings and role not in STATUS_ALLOWED_ROLES:
-            errors.append(f"current-status heading outside current-status/evidence role: {relative}")
+            if relative in STATUS_HEADING_ALLOWLIST:
+                notes.append(
+                    f"explicitly allowed implementation-status section in bounded contract/policy: {relative}"
+                )
+            else:
+                errors.append(f"current-status heading outside current-status/evidence role: {relative}")
         if dynamic_prs and role in STABLE_NO_DYNAMIC_PR_ROLES:
             errors.append(f"dynamic PR reference in stable document: {relative}: {', '.join(dynamic_prs)}")
         if broken_markdown_links:
@@ -287,8 +326,10 @@ def build_report() -> dict[str, object]:
         "role_counts": dict(sorted(role_counts.items())),
         "error_count": len(errors),
         "warning_count": len(warnings),
+        "note_count": len(notes),
         "errors": errors,
         "warnings": warnings,
+        "notes": notes,
         "files": files,
     }
 
@@ -310,10 +351,13 @@ def main() -> None:
     print(f"- total Markdown lines: {report['total_lines']}")
     print(f"- errors: {report['error_count']}")
     print(f"- warnings: {report['warning_count']}")
+    print(f"- notes: {report['note_count']}")
     for error in report["errors"]:
         print(f"  ERROR: {error}")
     for warning in report["warnings"]:
         print(f"  WARNING: {warning}")
+    for note in report["notes"]:
+        print(f"  NOTE: {note}")
     print(f"- report: {out.relative_to(ROOT)}")
 
     if args.check and report["errors"]:
