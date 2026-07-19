@@ -49,7 +49,7 @@ Folgende Root-Dateien besitzen eine begrenzte fachliche Rolle und sind keine all
 | Activities/Badegewässer | `ACTIVITY_SEASONAL_HIGHLIGHTS.md`, `BATHING_WATER_*` | Domainreferenz oder Evidence |
 | Steuerzentrale | `STEUERZENTRALE_*` | Vertrag, Zielreferenz oder historischer Beleg gemäß Dateiname |
 
-Diese Dateien dürfen erst nach einer erfolgreichen Vollinventur und einem atomaren Referenzpatch verschoben werden. Eine bloße Aufräumabsicht rechtfertigt keine Massenmigration.
+Die großen Dateien `VISUAL_WORKFLOW.md` und `bocholt-erleben_eventsuche_regelwerk_v3.md` werden nur über die kompakten Router `docs/domains/visual-system.md` und `docs/domains/event-search-system.md` gelesen. Root-Dateien dürfen erst nach einer erfolgreichen Vollinventur und einem atomaren Referenzpatch verschoben werden. Eine bloße Aufräumabsicht rechtfertigt keine Massenmigration.
 
 ## 4. Pfadbasierte Rollen
 
@@ -58,6 +58,7 @@ Diese Dateien dürfen erst nach einer erfolgreichen Vollinventur und einem atoma
 | `docs/README.md` | Dokumentations-Governance | aktuell, ersetzend |
 | `docs/DOCUMENT_REGISTRY.md` | Rollenregister | aktuell, ersetzend |
 | `docs/architecture/**` | stabile Architektur oder Architekturreferenz | selten |
+| `docs/domains/**` | kompakte aktuelle Domain-Router | bei dauerhafter Domainänderung |
 | `docs/contracts/**` | aktuelle Domain- oder Runtimeverträge | bei Vertragsänderung |
 | `docs/playbooks/**` | operative Vorgehensweisen | bei Prozessänderung |
 | `docs/workpacks/active/CURRENT_WORKPACK.md` | einziger operativer Status | bei jedem Statuswechsel |
