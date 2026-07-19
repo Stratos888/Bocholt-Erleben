@@ -24,13 +24,19 @@ Das Control Center soll redaktionelle und technische Prüffälle bis zu einem ve
 | Arbeits- und Risikovertrag | `AI_ENTRYPOINT.md` | Mandat, R2/R3, E3/E4, Stop-the-line |
 | Architektur und Datenhoheit | `docs/architecture/SYSTEM_MAP.md` | autoritativer System- und Ressourcenfluss |
 | externe Ressourcen | `docs/external-resource-matrix.md` | Staging-/Live-Ziele und Mutationsgrenzen |
-| technische Workflowpolicy | `docs/github-actions-trigger-policy.md` | Trigger-, Branch- und Operatorvertrag |
+| technische Workflowpolicy | `docs/github-actions-trigger-policy.md` | Trigger-, Branch-, Check- und Operatorvertrag |
+| PR-Integration | `.github/workflows/pr-gate.yml` | Always-run-Aggregator und Branchpolicy |
+| Governance | `.github/workflows/project-guardrails.yml` | Architektur-, Dokumentations- und Workflowtopologie-Gates |
+| Control-Center E1/E2 | `.github/workflows/control-center-ci.yml` | vollständige statische und Contractprüfung |
+| Deploy | `.github/workflows/deploy-strato.yml` | einziger Staging-/Live-Deploypfad |
+| Control-Center E3 | `.github/workflows/staging-verification.yml` | gemeinsame read-only Deploy-/Build-/Runtime-Evidence |
+| Control-Center E4 | `.github/workflows/control-center-e4-synthetic.yml` | getrennte, gesperrte R3-Capability |
 | redaktionelle Backendverträge | `api/control-center/_editorial_contracts.php` | Felder, Entscheidungen und Validierung |
 | Darstellung | `api/control-center/_presentation.php`, `js/control-center/review-render.js` | Projektion und Review-UI |
 | Aktionen | `js/control-center/review-actions.js` | Nutzeraktionen und Aufrufpfade |
 | Quellenabgleich | `api/control-center/_source_reconciliation.php` | Abgleich lokaler und führender Zustände |
 | verifizierter Writeback | `api/control-center/_verified_source_writeback.php` | begrenzte Mutation und Rücklesen |
-| Workflowkonsolidierung | `docs/workpacks/queued/CONTROL-CENTER-WORKFLOW-CONSOLIDATION.md` | nächster technischer Zielscope, noch nicht aktiv |
+| Workflowinventur | `docs/evidence/control-center-workflow-inventory-2026-07-19.md` | Gate-A-Matrix, Zieltopologie und Ruleset-Grenzen |
 
 ## 4. Aktuelle fachliche Referenzen
 
@@ -61,7 +67,7 @@ Sie werden nur geöffnet, wenn ein aktueller Owner sie ausdrücklich als Beleg b
 
 | Aufgabe | Zusätzlich lesen |
 |---|---|
-| GitHub-Actions- oder Operatorproblem | queued Workflow-Konsolidierungsworkpack, Triggerpolicy, alle betroffenen Workflows und Ruleset-Abhängigkeiten |
+| GitHub-Actions- oder Operatorproblem | Triggerpolicy, Workflowinventur, alle betroffenen Workflows und Ruleset-/Statuscheck-Abhängigkeiten |
 | externer Write oder E4 | Ressourcenmatrix, Current Workpack, Writer-/Reconciliation-Owner, E4-Harness und konkrete Staging-Ressourcen |
 | Review-UI oder Entscheidungsaktion | Informationsarchitektur, Screenvertrag, Vorgangskatalog, Render-/Action-Owner und Browser-Smoke |
 | falscher Zustand oder verschwundener Fall | Source-Reconciliation, führende Ressource, lokale Projektion, API-Antwort und Rücklesebeleg |
@@ -77,6 +83,9 @@ Sie werden nur geöffnet, wenn ein aktueller Owner sie ausdrücklich als Beleg b
 - Ein wiederverwendbarer R3-Pfad benötigt vor dem echten Fachfall einen isolierten synthetischen E4-Beweis mit Rücklesen und Cleanup.
 - Beim ersten unerwarteten realen Verhalten wird nicht erneut geschrieben.
 - Keine zweite fachliche Resolver-, Writer- oder Observer-Schicht ohne belegte Notwendigkeit.
+- `Control Center CI` ist der einzige statische Control-Center-Top-Level-Testworkflow.
+- `Staging Verification` ist der einzige zusätzliche read-only Staging-E3-Workflow.
+- `Staging Verification` darf E4 weder aufrufen noch dispatchen.
 
 ## 8. Evidence
 
