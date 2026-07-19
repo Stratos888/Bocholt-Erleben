@@ -23,6 +23,7 @@ Eine neue KI kann mit minimaler Lesemenge deterministisch feststellen:
 - `AI_ENTRYPOINT.md`: verbindlicher Dokumentations- und Implementierungsvertrag;
 - `docs/README.md`: aufgabenbezogene Lesepfade und exakter Pflegeablauf;
 - `docs/DOCUMENT_REGISTRY.md`: Rollen, Pfadklassen und Änderungsmatrix;
+- `docs/domains/visual-system.md` und `docs/domains/event-search-system.md`: kompakte Router vor den zwei großen Legacy-Referenzen;
 - `scripts/report-documentation-inventory.py`: vollständige read-only Inventur;
 - `scripts/audit-documentation-governance.py`: Schutz der kanonischen Dateien und des CI-Vertrags;
 - `.github/workflows/project-guardrails.yml`: read-only Ausführung und Inventurartefakt;
@@ -56,7 +57,7 @@ Vor Integration müssen erfolgreich sein:
 - bestehende `Project Guardrails`-Prüfungen;
 - stabiler `PR Gate`.
 
-Der Workflow veröffentlicht `build/documentation-inventory.json` als read-only Artefakt.
+Der Workflow veröffentlicht `build/documentation-inventory.json` als read-only Artefakt. Der finale Inventurstand muss `0` Fehler und `0` Warnungen ausweisen; bekannte exakt benannte Legacy-Marker werden nur als Notes geführt.
 
 ## Ergebnis
 
