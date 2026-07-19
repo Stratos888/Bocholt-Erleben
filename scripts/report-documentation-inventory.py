@@ -77,7 +77,7 @@ EXACT_ROLES = {
     "docs/steuerzentrale-e2e-state-consistency-workpack-2026-07-16.md": "completed_implementation_record",
     "docs/steuerzentrale-inbox-feature-gap-analysis-2026-07-16.md": "dated_forensics",
     "docs/steuerzentrale-naechstes-workpack-ausnahmebasierte-eventpruefung-2026-07-16.md": "historical_handoff",
-    "docs/steuerzentrale-redaktioneller-entscheidungs-und-lernprozess.md": "control_center_contract",
+    "docs/steuerzentrale-redaktioneller-entscheidungs-und-lernprozess.md": "historical_handoff",
     "docs/today-home-premium-release-plan.md": "historical_release_plan",
 }
 
