@@ -1,6 +1,6 @@
 # Aktueller Proofindex – Bocholt erleben
 
-Stand: 2026-07-18
+Stand: 2026-07-19
 
 Diese Datei ist ein kompakter Index der aktuell relevanten Evidence. Sie ist kein historisches Testtagebuch. Ausführliche Nachweise liegen in CI, `docs/evidence/`, `docs/forensics/`, Entscheidungen und Git-Historie.
 
@@ -22,7 +22,7 @@ Diese Datei ist ein kompakter Index der aktuell relevanten Evidence. Sie ist kei
 |---|---:|---|---|
 | Branch- und Deployrouting | E2 | nur `staging` und `main` dürfen deployen; Standardrelease `staging -> main` | CI und `SYSTEM_MAP.md` |
 | PR-Integration | E2 | Always-run `PR Gate` aggregiert gestartete Actions-Checks | `.github/workflows/pr-gate.yml` |
-| Dokumentations-Governance | E2 nach grünem PR | Struktur-, Größen- und Widerspruchsaudit | `scripts/audit-documentation-governance.py` |
+| Dokumentations-Governance | E2 integriert | Vollinventur, exakte Rollenklassifikation, Link-/Statusgrenzen und read-only CI-Gate integriert | Governance-Skripte, Inventurartefakt und completed Workpacks |
 | Staging-Deploy Control Center | E3 | deployter Staging-Build und read-only Runtime-Preflight belegt | `CURRENT_WORKPACK.md` und CI |
 | Control-Center-Environment | E3 | `Inbox_Staging -> Events_Staging`; Live-Ressourcen nicht verwendet | `CURRENT_WORKPACK.md` |
 | Control-Center externer Write | E3, E4 offen | Harness statisch vorhanden; kein synthetischer E4-Lauf ausgeführt | `CURRENT_WORKPACK.md` |
