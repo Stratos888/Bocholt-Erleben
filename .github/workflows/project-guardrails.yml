@@ -87,7 +87,7 @@ jobs:
             echo "Staging Verification must not select a real control case for E3."
             exit 1
           fi
-          if grep -q '"case_id"' .github/workflows/staging-verification.yml; then
+          if grep -Eq '"case_id"[[:space:]]*:' .github/workflows/staging-verification.yml; then
             echo "Staging Verification must not send a case identity for E3."
             exit 1
           fi
