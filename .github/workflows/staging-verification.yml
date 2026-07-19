@@ -1,0 +1,495 @@
+name: Staging Verification
+
+on:
+  push:
+    branches: ["staging"]
+    paths:
+      - "api/control-center/**"
+      - "api/growth-backlog/**"
+      - "api/growth-backlog-lib.php"
+      - "api/events/public.php"
+      - "steuerzentrale/**"
+      - "js/control-center*.js"
+      - "js/control-center/**"
+      - "css/style.css"
+      - "css/control-center*.css"
+      - "data/control_center_repo_workpacks.json"
+      - "data/control_center_editorial_contract.json"
+      - "data/event_visual_pool.json"
+      - "scripts/control-center-e4-synthetic.py"
+      - "scripts/resolve-deploy-target.sh"
+      - "scripts/merge_events_overlay.py"
+      - "tests/control_center_runtime_preflight_contract_test.php"
+      - "tests/test_deploy_branch_routing.sh"
+      - "tests/test_events_overlay_merge.py"
+      - ".github/workflows/control-center-ci.yml"
+      - ".github/workflows/control-center-e4-synthetic.yml"
+      - ".github/workflows/staging-verification.yml"
+      - ".github/workflows/deploy-strato.yml"
+      - "docs/workpacks/active/CURRENT_WORKPACK.md"
+
+permissions:
+  actions: read
+  contents: read
+  statuses: write
+
+concurrency:
+  group: staging-verification-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Staging Verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      BASE_URL: https://staging.bocholt-erleben.de
+      REVIEW_PASSWORD: ${{ secrets.STAGING_REVIEW_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish pending verification statuses
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          for CONTEXT in "deploy/staging-observed" "control-center/runtime-preflight-e3"; do
+            export CONTEXT
+            python3 - <<'PY' > "/tmp/status-${CONTEXT//\//-}.json"
+          import json
+          import os
+          context = os.environ["CONTEXT"]
+          description = (
+              f"Observing staging deploy for {os.environ['GITHUB_SHA'][:12]}"
+              if context == "deploy/staging-observed"
+              else f"E3 waiting for staging build {os.environ['GITHUB_SHA'][:12]}"
+          )
+          print(json.dumps({
+              "state": "pending",
+              "target_url": f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              "description": description[:140],
+              "context": context,
+          }))
+          PY
+            curl -fsS --retry 3 --retry-all-errors \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+              --data-binary "@/tmp/status-${CONTEXT//\//-}.json"
+          done
+
+      - name: Observe matching Deploy to STRATO run
+        id: observe_deploy
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          api_url = os.environ["GITHUB_API_URL"].rstrip("/")
+          repository = os.environ["GITHUB_REPOSITORY"]
+          head_sha = os.environ["GITHUB_SHA"]
+          token = os.environ["GH_TOKEN"]
+          endpoint = (
+              f"{api_url}/repos/{repository}/actions/workflows/"
+              f"{urllib.parse.quote('deploy-strato.yml', safe='')}/runs"
+              "?branch=staging&event=push&per_page=50"
+          )
+          headers = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": f"Bearer {token}",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "User-Agent": "bocholt-erleben-staging-verification",
+          }
+
+          observed = None
+          for attempt in range(1, 91):
+              request = urllib.request.Request(endpoint, headers=headers)
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  payload = json.loads(response.read().decode("utf-8"))
+              matching = [
+                  run for run in payload.get("workflow_runs", [])
+                  if str(run.get("head_sha", "")) == head_sha
+              ]
+              if matching:
+                  matching.sort(key=lambda run: int(run.get("run_attempt") or 0), reverse=True)
+                  observed = matching[0]
+                  print(
+                      f"Deploy run {observed.get('id')} status={observed.get('status')} "
+                      f"conclusion={observed.get('conclusion')} attempt={attempt}/90"
+                  )
+                  if observed.get("status") == "completed":
+                      break
+              else:
+                  print(f"Matching deploy run not visible yet ({attempt}/90).")
+              time.sleep(10)
+
+          if not observed:
+              observed = {
+                  "id": None,
+                  "status": "missing",
+                  "conclusion": "failure",
+                  "html_url": "",
+                  "head_sha": head_sha,
+                  "message": "No matching Deploy to STRATO run became visible.",
+              }
+          elif observed.get("status") != "completed":
+              observed = dict(observed)
+              observed["conclusion"] = "failure"
+              observed["message"] = "Matching deploy run did not complete inside the bounded observation window."
+
+          evidence = {
+              "schema": 1,
+              "observed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+              "expected_head_sha": head_sha,
+              "workflow": "deploy-strato.yml",
+              "run": {
+                  "id": observed.get("id"),
+                  "status": observed.get("status"),
+                  "conclusion": observed.get("conclusion"),
+                  "html_url": observed.get("html_url", ""),
+                  "head_sha": observed.get("head_sha", ""),
+                  "run_attempt": observed.get("run_attempt"),
+                  "created_at": observed.get("created_at"),
+                  "updated_at": observed.get("updated_at"),
+                  "message": observed.get("message", ""),
+              },
+          }
+          Path("artifacts/staging-deploy.json").write_text(
+              json.dumps(evidence, indent=2, ensure_ascii=False) + "\n",
+              encoding="utf-8",
+          )
+          if observed.get("status") != "completed" or observed.get("conclusion") != "success":
+              raise SystemExit(
+                  f"Deploy observation failed: status={observed.get('status')} "
+                  f"conclusion={observed.get('conclusion')} run={observed.get('id')}"
+              )
+          PY
+
+      - name: Validate local runtime-preflight contract
+        run: |
+          set -euo pipefail
+          php -l api/control-center/_runtime_preflight.php
+          php -l api/control-center/preflight.php
+          php tests/control_center_runtime_preflight_contract_test.php
+
+      - name: Confirm matching staging build
+        id: confirm_build
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_BUILD="$(git rev-parse --short=12 HEAD)"
+          echo "EXPECTED_BUILD=$EXPECTED_BUILD" >> "$GITHUB_ENV"
+          export EXPECTED_BUILD
+
+          for attempt in $(seq 1 60); do
+            ACTUAL_BUILD="$(curl -fsSL --connect-timeout 5 --max-time 8 "$BASE_URL/meta/build.txt?attempt=$attempt" 2>/dev/null | tr -d '\r\n' || true)"
+            printf '%s' "$ACTUAL_BUILD" > artifacts/last-build.txt
+            if [ "$ACTUAL_BUILD" = "$EXPECTED_BUILD" ]; then
+              echo "Matching staging build is deployed: $ACTUAL_BUILD"
+              exit 0
+            fi
+            echo "Waiting for staging build ($attempt/60): expected=$EXPECTED_BUILD actual=${ACTUAL_BUILD:-missing}"
+            sleep 10
+          done
+
+          echo "The expected staging build was not deployed inside the bounded wait window."
+          exit 1
+
+      - name: Prove one eligible runtime plan without mutation
+        id: runtime_preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$REVIEW_PASSWORD"
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          base_url = os.environ["BASE_URL"].rstrip("/")
+          password = os.environ["REVIEW_PASSWORD"]
+          expected_build = os.environ["EXPECTED_BUILD"]
+          headers = {
+              "Accept": "application/json",
+              "X-BE-Review-Password": password,
+          }
+
+          def request_json(url, method="GET", body=None):
+              data = None
+              request_headers = dict(headers)
+              if body is not None:
+                  data = json.dumps(body, ensure_ascii=False).encode("utf-8")
+                  request_headers["Content-Type"] = "application/json; charset=utf-8"
+              request = urllib.request.Request(url, data=data, headers=request_headers, method=method)
+              try:
+                  with urllib.request.urlopen(request, timeout=45) as response:
+                      return response.status, json.loads(response.read().decode("utf-8"))
+              except urllib.error.HTTPError as error:
+                  raw = error.read().decode("utf-8", errors="replace")
+                  try:
+                      payload = json.loads(raw)
+                  except json.JSONDecodeError:
+                      payload = {"status": "error", "message": raw}
+                  return error.code, payload
+
+          status, cases_payload = request_json(f"{base_url}/api/control-center/cases.php?active=1")
+          if status != 200 or cases_payload.get("status") != "ok":
+              raise SystemExit(f"Cases read failed: HTTP {status} {cases_payload}")
+
+          items = cases_payload.get("data", {}).get("items", [])
+          candidates = []
+          for item in items:
+              if not isinstance(item, dict):
+                  continue
+              source = item.get("source", {}) if isinstance(item.get("source"), dict) else {}
+              case_id = str(item.get("id", "")).strip()
+              if source.get("system") == "inbox_feed" and case_id:
+                  candidates.append(item)
+          candidates.sort(key=lambda item: str(item.get("id", "")))
+          if not candidates:
+              raise SystemExit("No stable inbox_feed case is available for read-only staging preflight.")
+
+          selected = None
+          attempts = []
+          for item in candidates:
+              case_id = str(item.get("id", "")).strip()
+              status, payload = request_json(
+                  f"{base_url}/api/control-center/preflight.php",
+                  method="POST",
+                  body={"case_id": case_id, "action": "approve", "payload": {}},
+              )
+              data = payload.get("data", {}) if isinstance(payload, dict) else {}
+              attempt = {
+                  "case_id": case_id,
+                  "http_status": status,
+                  "payload_status": payload.get("status") if isinstance(payload, dict) else None,
+                  "mutation": data.get("mutation") if isinstance(data, dict) else None,
+                  "allowed": data.get("allowed") if isinstance(data, dict) else None,
+                  "blockers": data.get("blockers") if isinstance(data, dict) else None,
+              }
+              attempts.append(attempt)
+              if (
+                  status == 200
+                  and payload.get("status") == "ok"
+                  and data.get("mutation") is False
+                  and data.get("allowed") is True
+                  and data.get("blockers") == []
+              ):
+                  selected = (item, data)
+                  break
+
+          if selected is None:
+              raise SystemExit(
+                  "No eligible inbox_feed case produced an allowed read-only preflight: "
+                  + json.dumps(attempts, ensure_ascii=False)
+              )
+
+          case, data = selected
+          runtime = data.get("runtime", {})
+          build = runtime.get("build", {})
+          resources = data.get("resources", {})
+          source_snapshot = data.get("source_snapshot", {})
+          target_snapshot = data.get("target_snapshot", {})
+          case_id = str(case.get("id", "")).strip()
+
+          assertions = {
+              "mutation_false": data.get("mutation") is False,
+              "allowed": data.get("allowed") is True,
+              "no_blockers": data.get("blockers") == [],
+              "build_matches": build.get("build_id") == expected_build,
+              "manifest_matches": build.get("manifest_build") == expected_build,
+              "manifest_environment": build.get("manifest_environment") == "staging",
+              "resolved_environment": runtime.get("resolved_environment") == "staging",
+              "configured_environment": runtime.get("configured_environment") == "staging",
+              "host": runtime.get("request", {}).get("host") == "staging.bocholt-erleben.de",
+              "endpoint": runtime.get("request", {}).get("request_path") == "/api/control-center/preflight.php",
+              "source_tab": resources.get("source_tab") == "Inbox_Staging",
+              "target_tab": resources.get("target_tab") == "Events_Staging",
+              "writer": data.get("writer") == "be_cc_writeback_staging_inbox_approve_verified",
+              "source_resolved": source_snapshot.get("tab") == "Inbox_Staging" and source_snapshot.get("resolution_status") == "resolved" and int(source_snapshot.get("row_number") or 0) > 0,
+              "target_read_only": target_snapshot.get("tab") == "Events_Staging" and target_snapshot.get("resolution_status") in {"absent", "resolved"},
+              "live_inbox_unused": resources.get("live_inbox") == "not_used",
+              "live_events_unused": resources.get("live_events") == "not_used",
+              "sheet_fingerprint_present": len(str(resources.get("sheet_fingerprint", ""))) == 16,
+          }
+          failed = [name for name, passed in assertions.items() if not passed]
+          if failed:
+              raise SystemExit("Runtime preflight assertions failed: " + ", ".join(failed))
+
+          evidence = {
+              "schema": 1,
+              "evidence_level": "E3",
+              "expected_build": expected_build,
+              "case": {
+                  "id": case_id,
+                  "title": case.get("title", ""),
+                  "source": case.get("source", {}),
+              },
+              "candidate_attempts": attempts,
+              "preflight": data,
+              "assertions": assertions,
+          }
+          Path("artifacts/runtime-preflight.json").write_text(
+              json.dumps(evidence, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print("Runtime preflight E3 proof completed without mutation.")
+          print(json.dumps({
+              "case_id": case_id,
+              "build": expected_build,
+              "environment": runtime.get("resolved_environment"),
+              "source_tab": resources.get("source_tab"),
+              "target_tab": resources.get("target_tab"),
+              "writer": data.get("writer"),
+              "mutation": data.get("mutation"),
+          }, ensure_ascii=False))
+          PY
+
+      - name: Add combined verification summary
+        if: always()
+        shell: bash
+        run: |
+          echo "## Staging Verification" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f artifacts/staging-deploy.json ]; then
+            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          run = json.loads(Path("artifacts/staging-deploy.json").read_text(encoding="utf-8"))["run"]
+          print(f"- Deploy run: `{run.get('id')}`")
+          print(f"- Deploy conclusion: `{run.get('conclusion')}`")
+          PY
+          else
+            echo "- Deploy evidence: `missing`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ -f artifacts/runtime-preflight.json ]; then
+            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          data = json.loads(Path("artifacts/runtime-preflight.json").read_text(encoding="utf-8"))
+          plan = data["preflight"]
+          runtime = plan["runtime"]
+          resources = plan["resources"]
+          print(f"- Evidence: `{data['evidence_level']}`")
+          print(f"- Build: `{data['expected_build']}`")
+          print(f"- Environment: `{runtime['resolved_environment']}`")
+          print(f"- Source: `{resources['source_tab']}`")
+          print(f"- Target: `{resources['target_tab']}`")
+          print(f"- Mutation: `{str(plan['mutation']).lower()}`")
+          PY
+          else
+            ACTUAL_BUILD="$(cat artifacts/last-build.txt 2>/dev/null || true)"
+            echo "- Runtime evidence: `blocked`" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Expected build: `${EXPECTED_BUILD:-unknown}`" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Deployed build: `${ACTUAL_BUILD:-missing}`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload combined staging evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-verification-${{ github.run_number }}
+          path: |
+            artifacts/staging-deploy.json
+            artifacts/runtime-preflight.json
+            artifacts/last-build.txt
+          if-no-files-found: warn
+
+      - name: Publish final verification statuses
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+          DEPLOY_OUTCOME: ${{ steps.observe_deploy.outcome }}
+          BUILD_OUTCOME: ${{ steps.confirm_build.outcome }}
+          PREFLIGHT_OUTCOME: ${{ steps.runtime_preflight.outcome }}
+        run: |
+          set -euo pipefail
+          DEPLOY_SUCCESS=false
+          RUNTIME_SUCCESS=false
+          [ "$DEPLOY_OUTCOME" = "success" ] && DEPLOY_SUCCESS=true
+          [ "$JOB_STATUS" = "success" ] && [ "$BUILD_OUTCOME" = "success" ] && [ "$PREFLIGHT_OUTCOME" = "success" ] && RUNTIME_SUCCESS=true
+          export DEPLOY_SUCCESS RUNTIME_SUCCESS
+
+          python3 - <<'PY' > /tmp/final-statuses.json
+          import json
+          import os
+          from pathlib import Path
+
+          deploy_success = os.environ["DEPLOY_SUCCESS"] == "true"
+          runtime_success = os.environ["RUNTIME_SUCCESS"] == "true"
+          deploy = {}
+          deploy_path = Path("artifacts/staging-deploy.json")
+          if deploy_path.is_file():
+              deploy = json.loads(deploy_path.read_text(encoding="utf-8")).get("run", {})
+          run_id = deploy.get("id")
+          target_url = str(deploy.get("html_url") or "")
+          if not target_url:
+              target_url = f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          actual_build = Path("artifacts/last-build.txt").read_text(encoding="utf-8") if Path("artifacts/last-build.txt").is_file() else "missing"
+
+          statuses = [
+              {
+                  "state": "success" if deploy_success else "failure",
+                  "target_url": target_url,
+                  "description": (
+                      f"Deploy succeeded for {os.environ['GITHUB_SHA'][:12]} (run {run_id})"
+                      if deploy_success
+                      else f"Deploy failed for {os.environ['GITHUB_SHA'][:12]} (run {run_id or 'missing'})"
+                  )[:140],
+                  "context": "deploy/staging-observed",
+              },
+              {
+                  "state": "success" if runtime_success else "failure",
+                  "target_url": f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                  "description": (
+                      "E3: staging Inbox_Staging -> Events_Staging; mutation=false"
+                      if runtime_success
+                      else f"E3 blocked: expected {os.environ.get('EXPECTED_BUILD', 'unknown')}; deployed {actual_build or 'missing'}"
+                  )[:140],
+                  "context": "control-center/runtime-preflight-e3",
+              },
+          ]
+          print(json.dumps(statuses))
+          PY
+
+          python3 - <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          statuses = json.loads(Path("/tmp/final-statuses.json").read_text(encoding="utf-8"))
+          for index, payload in enumerate(statuses):
+              path = Path(f"/tmp/final-status-{index}.json")
+              path.write_text(json.dumps(payload), encoding="utf-8")
+              subprocess.run([
+                  "curl", "-fsS", "--retry", "3", "--retry-all-errors",
+                  "-X", "POST",
+                  "-H", "Accept: application/vnd.github+json",
+                  "-H", f"Authorization: Bearer {os.environ['GH_TOKEN']}",
+                  "-H", "X-GitHub-Api-Version: 2022-11-28",
+                  f"{os.environ['GITHUB_API_URL']}/repos/{os.environ['GITHUB_REPOSITORY']}/statuses/{os.environ['GITHUB_SHA']}",
+                  "--data-binary", f"@{path}",
+              ], check=True)
+          PY
+
+          if [ "$DEPLOY_SUCCESS" != true ] || [ "$RUNTIME_SUCCESS" != true ]; then
+            exit 1
+          fi
