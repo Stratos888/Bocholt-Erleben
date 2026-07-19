@@ -5,9 +5,7 @@ on:
     branches: ["staging", "main"]
     paths: &guardrail_paths
       - "**/*.md"
-      - ".github/workflows/deploy-strato.yml"
-      - ".github/workflows/pr-gate.yml"
-      - ".github/workflows/project-guardrails.yml"
+      - ".github/workflows/**"
       - ".github/pull_request_template.md"
       - "scripts/audit-documentation-governance.py"
       - "scripts/report-documentation-inventory.py"
@@ -44,6 +42,44 @@ jobs:
 
           if grep -q '^[[:space:]]*paths:' .github/workflows/pr-gate.yml; then
             echo "PR Gate must remain an always-run pull-request workflow without a paths filter."
+            exit 1
+          fi
+
+      - name: Validate authoritative workflow topology
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for file in \
+            .github/workflows/pr-gate.yml \
+            .github/workflows/project-guardrails.yml \
+            .github/workflows/control-center-ci.yml \
+            .github/workflows/deploy-strato.yml \
+            .github/workflows/staging-verification.yml \
+            .github/workflows/control-center-e4-synthetic.yml; do
+            test -s "$file"
+          done
+
+          for legacy in \
+            .github/workflows/control-center-validation.yml \
+            .github/workflows/control-center-editorial-contracts.yml \
+            .github/workflows/control-center-contract-diagnostics.yml \
+            .github/workflows/control-center-e4-contract.yml \
+            .github/workflows/control-center-runtime-preflight.yml \
+            .github/workflows/staging-deploy-observer.yml; do
+            test ! -e "$legacy"
+          done
+
+          grep -q '^name: Control Center CI$' .github/workflows/control-center-ci.yml
+          grep -q '^    name: Control Center CI$' .github/workflows/control-center-ci.yml
+          grep -q '^name: Staging Verification$' .github/workflows/staging-verification.yml
+          grep -q 'context": "deploy/staging-observed"' .github/workflows/staging-verification.yml
+          grep -q 'context": "control-center/runtime-preflight-e3"' .github/workflows/staging-verification.yml
+          grep -q 'mutation_false' .github/workflows/staging-verification.yml
+          grep -q 'python3 scripts/control-center-e4-synthetic.py --self-test' .github/workflows/control-center-ci.yml
+
+          if grep -q 'control-center-e4-synthetic.yml.*dispatches' .github/workflows/staging-verification.yml; then
+            echo "Staging Verification must never dispatch E4."
             exit 1
           fi
 

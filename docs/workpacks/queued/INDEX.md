@@ -1,6 +1,6 @@
 # Workpack-Queue
 
-Stand: 2026-07-18
+Stand: 2026-07-19
 
 Diese Datei ordnet geplante technische und fachliche Workpacks. Sie aktiviert keinen Workpack. Der einzige operative Status steht in `docs/workpacks/active/CURRENT_WORKPACK.md`.
 
@@ -8,11 +8,10 @@ Diese Datei ordnet geplante technische und fachliche Workpacks. Sie aktiviert ke
 
 | Rang | Workpack | Risiko | Status | Abhängigkeit |
 |---:|---|---|---|---|
-| 1 | `CONTROL-CENTER-WORKFLOW-CONSOLIDATION.md` | R2 | als nächstes zulässig | Dokumentationsbaseline |
-| 2 | Control Center: genau ein synthetischer E4-Lauf | R3 | noch anzulegen | Rang 1 und erneutes E3 |
-| 3 | CityArt: genau ein echter Staging-Fall | R3 | bedingt | grünes E4 und gesonderte Aktivierung |
+| 1 | Control Center: genau ein synthetischer E4-Lauf | R3 | noch anzulegen | abgeschlossene Workflow-Konsolidierung und erneutes read-only E3 |
+| 2 | CityArt: genau ein echter Staging-Fall | R3 | bedingt | grünes E4 und gesonderte Aktivierung |
 
-Die Ränge 2 und 3 werden nicht vorgezogen und nicht parallel gestartet.
+Die Ränge 1 und 2 werden nicht vorgezogen und nicht parallel gestartet.
 
 ## Produktworkpacks – bereit zur späteren Aktivierung
 

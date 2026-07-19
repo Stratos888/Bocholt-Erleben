@@ -1,8 +1,9 @@
-name: Control Center Validation
+name: Control Center CI
+
 on:
   pull_request:
     branches: ["staging", "main"]
-    paths: &control_center_paths
+    paths: &control_center_ci_paths
       - "api/control-center/**"
       - "api/growth-backlog/**"
       - "api/growth-backlog-lib.php"
@@ -14,27 +15,52 @@ on:
       - "css/control-center*.css"
       - "data/control_center_repo_workpacks.json"
       - "data/control_center_editorial_contract.json"
+      - "data/content_ops_decision_classes.json"
       - "data/event_visual_pool.json"
+      - "tests/fixtures/control_center_editorial_cases.json"
       - "scripts/audit_control_center_product_contract.py"
       - "scripts/audit_control_center_editorial_contracts.py"
       - "scripts/build-event-visual-gap-backlog.py"
       - "scripts/event_visual_motifs.py"
+      - "scripts/control-center-e4-synthetic.py"
       - "tools/audit-css-governance.py"
       - "tests/control_center*.php"
       - "tests/control_center*.mjs"
       - "tests/test_event_visual_gap_backlog.py"
-      - ".github/workflows/control-center-validation.yml"
+      - ".github/workflows/control-center-ci.yml"
+      - ".github/workflows/control-center-e4-synthetic.yml"
+      - ".github/workflows/staging-verification.yml"
       - ".github/workflows/deploy-strato.yml"
-  push:
-    branches: ["staging", "main"]
-    paths: *control_center_paths
   workflow_dispatch:
+
+concurrency:
+  group: control-center-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   validate:
+    name: Control Center CI
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate contract JSON
+        run: |
+          set -euo pipefail
+          python3 -m json.tool data/control_center_repo_workpacks.json >/dev/null
+          python3 -m json.tool data/control_center_editorial_contract.json >/dev/null
+          python3 -m json.tool data/content_ops_decision_classes.json >/dev/null
+          python3 -m json.tool data/event_visual_pool.json >/dev/null
+          python3 -m json.tool tests/fixtures/control_center_editorial_cases.json >/dev/null
+
       - name: Validate PHP syntax
         run: |
           set -euo pipefail
@@ -44,18 +70,9 @@ jobs:
           php -l api/growth-backlog/create.php
           php -l api/growth-backlog/update.php
           php -l api/events/public.php
-          php -l tests/control_center_contracts_test.php
-          php -l tests/control_center_process_chain_test.php
-          php -l tests/control_center_presentation_contract_test.php
-          php -l tests/control_center_editorial_contracts_test.php
-          php -l tests/control_center_exception_review_runtime_test.php
-          php -l tests/control_center_backlog_roadmap_contract_test.php
-          php -l tests/control_center_state_consistency_contract_test.php
-          php -l tests/control_center_inbox_tab_contract_test.php
-          php -l tests/control_center_inbox_schema_contract_test.php
-          php -l tests/control_center_staging_events_isolation_contract_test.php
-          php -l tests/control_center_runtime_preflight_contract_test.php
-      - name: Simulate control center contracts
+          for file in tests/control_center*.php; do php -l "$file"; done
+
+      - name: Simulate all control center contracts
         env:
           BE_ACTIVITY_WRITEBACK_ENABLED: "false"
           BE_GITHUB_REPO_TOKEN: ""
@@ -67,13 +84,16 @@ jobs:
           php tests/control_center_editorial_contracts_test.php
           php tests/control_center_exception_review_runtime_test.php
           php tests/control_center_backlog_roadmap_contract_test.php
+          php tests/control_center_sheet_identity_test.php
+          php tests/control_center_editorial_runtime_contract_test.php
           php tests/control_center_state_consistency_contract_test.php
           php tests/control_center_inbox_tab_contract_test.php
           php tests/control_center_inbox_schema_contract_test.php
           php tests/control_center_staging_events_isolation_contract_test.php
           php tests/control_center_runtime_preflight_contract_test.php
           python3 tests/test_event_visual_gap_backlog.py
-      - name: Validate JavaScript modules
+
+      - name: Validate JavaScript modules and frontend contract
         run: |
           set -euo pipefail
           node --check js/control-center-environment.js
@@ -82,18 +102,18 @@ jobs:
           for file in js/control-center/*.js; do node --input-type=module --check < "$file"; done
           node --check tests/control_center_frontend_contract_test.mjs
           node tests/control_center_frontend_contract_test.mjs
-      - name: Validate product contract
+
+      - name: Validate product and editorial contracts
         run: |
           set -euo pipefail
-          python3 -m json.tool data/control_center_repo_workpacks.json >/dev/null
-          python3 -m json.tool data/control_center_editorial_contract.json >/dev/null
-          python3 -m json.tool data/event_visual_pool.json >/dev/null
           python3 scripts/audit_control_center_product_contract.py
           python3 scripts/audit_control_center_editorial_contracts.py
+
       - name: Validate CSS governance
         run: |
           set -euo pipefail
           python3 tools/audit-css-governance.py
+
       - name: Validate consolidated file architecture
         run: |
           set -euo pipefail
@@ -104,6 +124,7 @@ jobs:
           test ! -e js/control-center-publication.js
           test ! -e js/control-center-development.js
           test ! -e js/control-center-integrations.js
+
       - name: Validate security and integration contracts
         run: |
           set -euo pipefail
@@ -140,3 +161,9 @@ jobs:
           grep -q "be_cc_reconcile_source_case" api/control-center/_submission_source.php
           grep -q "be_cc_reconcile_source_case" api/control-center/_sources.php
           grep -q "caseIsReviewVisible" js/control-center/shared.js
+
+      - name: Validate E4 harness without external access
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/control-center-e4-synthetic.py
+          python3 scripts/control-center-e4-synthetic.py --self-test
