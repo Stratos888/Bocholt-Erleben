@@ -50,6 +50,8 @@ EXACT_ROLES = {
     "STEUERZENTRALE_ZIELBILD.md": "control_center_target_reference",
     "docs/README.md": "documentation_governance",
     "docs/DOCUMENT_REGISTRY.md": "documentation_registry",
+    "docs/domains/visual-system.md": "domain_router",
+    "docs/domains/event-search-system.md": "domain_router",
     "docs/architecture/SYSTEM_MAP.md": "system_architecture",
     "docs/external-resource-matrix.md": "external_resource_contract",
     "docs/github-actions-trigger-policy.md": "github_actions_policy",
@@ -117,6 +119,11 @@ FENCED_CODE = re.compile(r"```.*?```|~~~.*?~~~", re.DOTALL)
 SCHEME = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
 DATED_NAME = re.compile(r"20\d{2}-\d{2}-\d{2}")
 
+LARGE_REFERENCE_ROUTES = {
+    "VISUAL_WORKFLOW.md": "docs/domains/visual-system.md",
+    "bocholt-erleben_eventsuche_regelwerk_v3.md": "docs/domains/event-search-system.md",
+}
+
 KNOWN_APPEND_BLOCKS = {
     "BROWSER_SMOKE_SYSTEM.md": {
         "BROWSER_SMOKE_ACTIVITY_FAVORITES_PREMIUM_2026_06_30",
@@ -172,6 +179,8 @@ def classify(path: str) -> str:
         return "evidence"
     if path.startswith("docs/architecture/"):
         return "architecture_reference"
+    if path.startswith("docs/domains/"):
+        return "domain_router"
     if path.startswith("docs/contracts/"):
         return "domain_contract"
     if path.startswith("docs/playbooks/"):
@@ -305,17 +314,24 @@ def build_report() -> dict[str, object]:
         if archive_links and role in MUTABLE_CANONICAL_ROLES:
             for link in archive_links:
                 errors.append(f"canonical document links directly to archive: {relative} -> {link['target']}")
-        if lines > 700 and role not in {
-            "implemented_product_contract",
-            "event_search_source_registry",
-            "evidence",
-            "archive",
-            "dated_historical_or_target_reference",
-            "historical_evidence",
-            "historical_freeze",
-            "supporting_reference",
-        }:
-            warnings.append(f"large mixed-role candidate: {relative} ({lines} lines, role={role})")
+        if lines > 700:
+            routed_by = LARGE_REFERENCE_ROUTES.get(relative)
+            if routed_by:
+                notes.append(
+                    f"large explicit reference is protected by compact domain router: "
+                    f"{relative} -> {routed_by}"
+                )
+            elif role not in {
+                "implemented_product_contract",
+                "event_search_source_registry",
+                "evidence",
+                "archive",
+                "dated_historical_or_target_reference",
+                "historical_evidence",
+                "historical_freeze",
+                "supporting_reference",
+            }:
+                warnings.append(f"large mixed-role candidate: {relative} ({lines} lines, role={role})")
 
     role_counts = Counter(str(row["role"]) for row in files)
     return {
