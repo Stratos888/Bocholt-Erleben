@@ -1,14 +1,22 @@
 # Current Workpack
 
-Stand: 2026-07-18
+Stand: 2026-07-19
 
 Diese Datei ist der einzige operative technische Projektstatus. Offene PRs, aktuelle SHAs und CI-Zustände werden bei jeder Aufgabe direkt aus GitHub gelesen und nicht dauerhaft hier gespiegelt.
 
 ## Aktiver Implementierungs-Workpack
 
-**Keiner.**
+**Keiner nach Integration dieses Dokumentationspakets.**
 
-Die Dokumentations-Governance ist konsolidiert. Vor dem nächsten fachlichen oder technischen Workpack gilt ausschließlich die unten festgelegte Reihenfolge.
+Die Dokumentations-Governance-Härtung ist mit erfolgreicher Integration abgeschlossen. Ergebnis und Grenzen stehen in `docs/workpacks/completed/DOCUMENTATION-GOVERNANCE-HARDENING-2026-07-19.md`.
+
+Belegt beziehungsweise durch den Integrations-Gate vorgeschrieben:
+
+- vollständige read-only Inventur aller getrackten Markdown-Dateien;
+- explizites Dokumentregister mit Rollen, Pfaden und Änderungsmatrix;
+- Prüfung unklassifizierter Root-Dateien, Statusmischung, Append-Blöcke, dynamischer PR-Verweise und interner Markdown-Links;
+- read-only CI-Ausführung mit maschinenlesbarem Inventurartefakt;
+- kein selbstschreibender Workflow, keine Massenmigration und keine fachfremde Datenänderung.
 
 ## Pausierter Runtime-Workpack
 
@@ -42,7 +50,7 @@ Eine ausdrücklich beauftragte, deterministische einzelne Live-Eventpflege nach 
 
 ## Nächster erlaubter Schritt
 
-Den R2-Workpack `docs/workpacks/queued/CONTROL-CENTER-WORKFLOW-CONSOLIDATION.md` aktivieren.
+Den R2-Workpack `docs/workpacks/queued/CONTROL-CENTER-WORKFLOW-CONSOLIDATION.md` gegen den dann aktuellen `staging`-Stand neu validieren und aktivieren.
 
 Er beginnt zwingend mit einer vollständigen Inventur aller GitHub-Actions-Workflows, Trigger, Jobs, Testüberschneidungen, Secrets, Artefakte, Statusnamen, Laufzeiten, Bedienpfade und Ruleset-Abhängigkeiten. Erst danach ist ein Konsolidierungspatch zulässig.
 
@@ -56,6 +64,7 @@ Er beginnt zwingend mit einer vollständigen Inventur aller GitHub-Actions-Workf
 ## Dokumentationsstatus
 
 - Dokumentrollen und Rangfolge: `docs/README.md`
-- Technische Queue: `docs/workpacks/queued/INDEX.md`
-- Aktueller Proofstand: `TEST_STATUS.md`
+- vollständiger Rollenvertrag: `docs/DOCUMENT_REGISTRY.md`
+- technische Queue: `docs/workpacks/queued/INDEX.md`
+- aktueller Proofstand: `TEST_STATUS.md`
 - Architektur- und Produktzielentscheidungen bleiben getrennt von diesem operativen Status.
