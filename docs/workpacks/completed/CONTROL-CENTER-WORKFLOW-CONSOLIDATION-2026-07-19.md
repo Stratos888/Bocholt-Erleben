@@ -49,6 +49,16 @@ Die vollständige Test- und Evidence-Abdeckung wurde vor Entfernung in den Zielw
 - neue Staging Verification besitzt keine Sheet- oder DB-Secrets;
 - die bestehenden Statuskontexte `deploy/staging-observed` und `control-center/runtime-preflight-e3` bleiben stabil.
 
+## Abnahmekorrektur
+
+Der erste integrierte Lauf der konsolidierten `Staging Verification` war read-only und belegte `mutation=false`, wählte als technisches Preflight-Objekt aber erneut den eingefrorenen CityArt-Fall. Es erfolgte kein Fachklick, kein Writeback und keine externe Mutation. Wegen der harten Fachfallgrenze zählt dieser Lauf nicht als finale E3-Abnahme.
+
+Die Korrektur und ihre finale Abnahmebedingung stehen in:
+
+- `docs/evidence/control-center-workflow-e3-correction-2026-07-19.md`.
+
+Der Selektor schließt CityArt nun vor jedem Preflight-Aufruf aus, dokumentiert übersprungene eingefrorene Fälle und bricht ohne geeigneten Nicht-CityArt-Fall fail-closed ab. `Project Guardrails` schützt diesen Vertrag dauerhaft.
+
 ## Evidence
 
 ### E1
@@ -61,7 +71,8 @@ Die vollständige Test- und Evidence-Abdeckung wurde vor Entfernung in den Zielw
 
 - `Project Guardrails`, `Control Center CI` und `PR Gate` im Konsolidierungs-PR grün;
 - keine duplizierten alten Control-Center-Top-Level-Checks;
-- E4-Harness nur statisch kompiliert und selbstgetestet.
+- E4-Harness nur statisch kompiliert und selbstgetestet;
+- CityArt-Ausschluss und fail-closed-Verhalten durch `Project Guardrails` abgesichert.
 
 ### E3
 
@@ -71,6 +82,8 @@ Der Abschluss setzt nach Integration voraus:
 - Status `deploy/staging-observed=success`;
 - Status `control-center/runtime-preflight-e3=success`;
 - Staging-Host, passender Build und `mutation=false`;
+- ausgewählter Preflight-Fall ohne CityArt-Bezug;
+- Assertion `frozen_case_excluded=true`;
 - `Inbox_Staging -> Events_Staging`;
 - Live-Ressourcen unbenutzt.
 
@@ -78,7 +91,7 @@ Die konkreten Run- und Commit-IDs werden direkt aus GitHub gelesen und nicht als
 
 ## Rollback
 
-Bei fehlendem E2 oder E3 wird der gesamte Konsolidierungs-Mergecommit revertiert. Da dieses Workpack keine externe Ressource verändert, besteht kein Daten-Cleanup; E4 bleibt weiterhin gesperrt.
+Bei fehlendem E2 oder E3 wird der jeweilige Konsolidierungs- beziehungsweise Korrektur-Mergecommit revertiert. Da dieses Workpack keine externe Ressource verändert, besteht kein Daten-Cleanup; E4 bleibt weiterhin gesperrt.
 
 ## Nächster Schritt
 
