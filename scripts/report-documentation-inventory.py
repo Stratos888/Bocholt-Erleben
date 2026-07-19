@@ -50,6 +50,7 @@ EXACT_ROLES = {
     "STEUERZENTRALE_ZIELBILD.md": "control_center_target_reference",
     "docs/README.md": "documentation_governance",
     "docs/DOCUMENT_REGISTRY.md": "documentation_registry",
+    "docs/domains/control-center.md": "domain_router",
     "docs/domains/visual-system.md": "domain_router",
     "docs/domains/event-search-system.md": "domain_router",
     "docs/architecture/SYSTEM_MAP.md": "system_architecture",
@@ -57,54 +58,70 @@ EXACT_ROLES = {
     "docs/github-actions-trigger-policy.md": "github_actions_policy",
     "docs/workpacks/active/CURRENT_WORKPACK.md": "current_workpack",
     "docs/workpacks/queued/INDEX.md": "workpack_queue",
+    "docs/GROWTH_INTELLIGENCE_BACKLOG.md": "growth_contract",
+    "docs/GROWTH_TRACKING_GAPS.md": "growth_gap_reference",
+    "docs/content-ops-decision-impact-engine.md": "content_ops_contract",
+    "docs/content-ops-http-ingest.md": "content_ops_contract",
+    "docs/content-ops-robot-handoff.md": "historical_handoff",
+    "docs/content-ops-self-learning-target.md": "target_reference",
+    "docs/deploy/staging-phase3-redeploy-2026-07-15.md": "historical_deploy_evidence",
+    "docs/detailpanel-premium-system-contract.md": "legacy_product_contract_reference",
+    "docs/ingest-bridge.md": "deprecated_alias",
+    "docs/internal-dashboard-target.md": "target_reference",
+    "docs/internal-dashboard.md": "control_center_target_reference",
+    "docs/live-event-feed-refresh-2026-07-18-kinderzaubershow.md": "historical_release_evidence",
+    "docs/staging-redeploy-2026-07-15-compact-backlog.md": "historical_deploy_evidence",
+    "docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md": "target_reference",
+    "docs/steuerzentrale-ausnahmebasierte-eventpruefung-implementation-2026-07-16.md": "completed_implementation_record",
+    "docs/steuerzentrale-backlog-roadmap-vertrag.md": "control_center_contract",
+    "docs/steuerzentrale-e2e-state-consistency-workpack-2026-07-16.md": "completed_implementation_record",
+    "docs/steuerzentrale-inbox-feature-gap-analysis-2026-07-16.md": "dated_forensics",
+    "docs/steuerzentrale-naechstes-workpack-ausnahmebasierte-eventpruefung-2026-07-16.md": "historical_handoff",
+    "docs/steuerzentrale-redaktioneller-entscheidungs-und-lernprozess.md": "historical_handoff",
+    "docs/today-home-premium-release-plan.md": "historical_release_plan",
 }
 
 MUTABLE_CANONICAL_ROLES = {
-    "repository_entrypoint",
-    "ai_execution_router",
-    "engineering_guardrails",
-    "product_north_star",
-    "implemented_product_contract",
-    "commercial_strategy",
-    "product_roadmap",
-    "current_proof_index",
-    "documentation_governance",
-    "documentation_registry",
-    "system_architecture",
-    "external_resource_contract",
-    "github_actions_policy",
-    "current_workpack",
-    "workpack_queue",
-    "event_description_contract",
-    "browser_smoke_contract",
-    "event_impact_contract",
+    "repository_entrypoint", "ai_execution_router", "engineering_guardrails",
+    "product_north_star", "implemented_product_contract", "commercial_strategy",
+    "product_roadmap", "current_proof_index", "documentation_governance",
+    "documentation_registry", "system_architecture", "external_resource_contract",
+    "github_actions_policy", "current_workpack", "workpack_queue",
+    "event_description_contract", "browser_smoke_contract", "event_impact_contract",
+    "domain_router", "domain_contract", "control_center_contract",
+    "content_ops_contract", "growth_contract",
 }
 
 STATUS_ALLOWED_ROLES = {
-    "current_workpack",
-    "current_proof_index",
-    "dated_forensics",
-    "evidence",
-    "evidence_reference",
-    "completed_workpack",
-    "historical_status",
-    "historical_evidence",
-    "historical_freeze",
+    "current_workpack", "current_proof_index", "dated_forensics", "evidence",
+    "evidence_reference", "completed_workpack", "completed_implementation_record",
+    "historical_status", "historical_evidence", "historical_freeze",
+    "historical_handoff", "historical_deploy_evidence",
+    "historical_release_evidence", "historical_release_plan",
 }
 
 STABLE_NO_DYNAMIC_PR_ROLES = {
-    "repository_entrypoint",
-    "ai_execution_router",
-    "engineering_guardrails",
-    "product_north_star",
-    "implemented_product_contract",
-    "commercial_strategy",
-    "product_roadmap",
-    "documentation_governance",
-    "documentation_registry",
-    "system_architecture",
-    "external_resource_contract",
-    "github_actions_policy",
+    "repository_entrypoint", "ai_execution_router", "engineering_guardrails",
+    "product_north_star", "implemented_product_contract", "commercial_strategy",
+    "product_roadmap", "documentation_governance", "documentation_registry",
+    "system_architecture", "external_resource_contract", "github_actions_policy",
+    "domain_router", "domain_contract", "control_center_contract",
+    "content_ops_contract", "growth_contract",
+}
+
+HISTORICAL_ONLY_ROLES = {
+    "archive", "completed_workpack", "completed_implementation_record",
+    "historical_status", "historical_evidence", "historical_freeze",
+    "historical_handoff", "historical_deploy_evidence",
+    "historical_release_evidence", "historical_release_plan",
+    "dated_historical_or_target_reference",
+}
+
+NO_HISTORICAL_ROUTING_ROLES = {
+    "repository_entrypoint", "ai_execution_router", "documentation_governance",
+    "documentation_registry", "system_architecture", "external_resource_contract",
+    "domain_router", "domain_contract", "control_center_contract",
+    "content_ops_contract", "growth_contract",
 }
 
 BEGIN_BLOCK = re.compile(r"<!--\s*===\s*BEGIN BLOCK:\s*([^|>]+?)\s*(?:\||===)", re.IGNORECASE)
@@ -129,18 +146,11 @@ KNOWN_APPEND_BLOCKS = {
         "BROWSER_SMOKE_ACTIVITY_FAVORITES_PREMIUM_2026_06_30",
         "BROWSER_SMOKE_MOBILE_QUICK_FILTER_RAIL_2026_07_01",
     },
-    "COMMERCIAL_STRATEGY.md": {
-        "COMMERCIAL_STARTPARTNER_GROWTH_PILOT_TARGET_2026_07_18",
-    },
-    "Produktvertrag.md": {
-        "PRODUKTVERTRAG_PUBLIC_LEGAL_ALIGNMENT_2026_06_29",
-    },
+    "COMMERCIAL_STRATEGY.md": {"COMMERCIAL_STARTPARTNER_GROWTH_PILOT_TARGET_2026_07_18"},
+    "Produktvertrag.md": {"PRODUKTVERTRAG_PUBLIC_LEGAL_ALIGNMENT_2026_06_29"},
 }
 
-STATUS_HEADING_ALLOWLIST = {
-    "MAIL_SYSTEM.md",
-    "docs/github-actions-trigger-policy.md",
-}
+STATUS_HEADING_ALLOWLIST = {"MAIL_SYSTEM.md", "docs/github-actions-trigger-policy.md"}
 
 
 def git_output(*args: str) -> str:
@@ -152,8 +162,7 @@ def git_output(*args: str) -> str:
 
 def tracked_markdown() -> list[tuple[str, str, str]]:
     rows: list[tuple[str, str, str]] = []
-    output = git_output("ls-files", "-s", "*.md")
-    for line in output.splitlines():
+    for line in git_output("ls-files", "-s", "*.md").splitlines():
         if not line:
             continue
         metadata, path = line.split("\t", 1)
@@ -190,7 +199,7 @@ def classify(path: str) -> str:
     if path.startswith("docs/archive/") or "/archive/" in path:
         return "archive"
     if path.startswith("docs/"):
-        return "supporting_documentation"
+        return "unclassified_supporting_document"
     if DATED_NAME.search(path) or "FREEZE" in path.upper():
         return "dated_historical_or_target_reference"
     return "unclassified_root_document"
@@ -207,9 +216,8 @@ def clean_link_target(raw: str) -> str:
 
 def inspect_links(relative: str, text: str) -> list[dict[str, object]]:
     source = ROOT / relative
-    without_code = FENCED_CODE.sub("", text)
     links: list[dict[str, object]] = []
-    for raw in MARKDOWN_LINK.findall(without_code):
+    for raw in MARKDOWN_LINK.findall(FENCED_CODE.sub("", text)):
         target = clean_link_target(raw)
         if not target or target.startswith("#") or target.startswith("//") or SCHEME.match(target):
             continue
@@ -222,14 +230,12 @@ def inspect_links(relative: str, text: str) -> list[dict[str, object]]:
         except ValueError:
             links.append({"target": target, "resolved": None, "exists": False, "outside_repo": True})
             continue
-        links.append(
-            {
-                "target": target,
-                "resolved": repository_path,
-                "exists": resolved.exists(),
-                "outside_repo": False,
-            }
-        )
+        links.append({
+            "target": target,
+            "resolved": repository_path,
+            "exists": resolved.exists(),
+            "outside_repo": False,
+        })
     return links
 
 
@@ -245,7 +251,6 @@ def build_report() -> dict[str, object]:
         role = classify(relative)
         lines = len(text.splitlines())
         append_block_names = sorted({name.strip() for name in BEGIN_BLOCK.findall(text)})
-        append_blocks = len(append_block_names)
         status_headings = len(STATUS_HEADING.findall(text))
         dynamic_prs = sorted(set(DYNAMIC_PR.findall(text)))
         links = inspect_links(relative, text)
@@ -254,35 +259,33 @@ def build_report() -> dict[str, object]:
             if not link["exists"] and str(link["target"]).split("#", 1)[0].lower().endswith(".md")
         ]
         broken_other_links = [
-            link for link in links
-            if not link["exists"] and link not in broken_markdown_links
+            link for link in links if not link["exists"] and link not in broken_markdown_links
         ]
         archive_links = [
             link for link in links
             if isinstance(link["resolved"], str) and str(link["resolved"]).startswith("docs/archive/")
         ]
 
-        files.append(
-            {
-                "path": relative,
-                "role": role,
-                "mode": mode,
-                "blob_sha": blob_sha,
-                "lines": lines,
-                "bytes": path.stat().st_size,
-                "append_blocks": append_blocks,
-                "append_block_names": append_block_names,
-                "status_headings": status_headings,
-                "dynamic_pr_references": dynamic_prs,
-                "broken_markdown_links": broken_markdown_links,
-                "broken_other_links": broken_other_links,
-                "archive_links": archive_links,
-            }
-        )
+        files.append({
+            "path": relative,
+            "role": role,
+            "mode": mode,
+            "blob_sha": blob_sha,
+            "lines": lines,
+            "bytes": path.stat().st_size,
+            "append_blocks": len(append_block_names),
+            "append_block_names": append_block_names,
+            "status_headings": status_headings,
+            "dynamic_pr_references": dynamic_prs,
+            "local_links": links,
+            "broken_markdown_links": broken_markdown_links,
+            "broken_other_links": broken_other_links,
+            "archive_links": archive_links,
+        })
 
-        if role == "unclassified_root_document":
-            errors.append(f"unclassified root document: {relative}")
-        if role in MUTABLE_CANONICAL_ROLES and append_blocks:
+        if role in {"unclassified_root_document", "unclassified_supporting_document"}:
+            errors.append(f"unclassified document: {relative}")
+        if role in MUTABLE_CANONICAL_ROLES and append_block_names:
             allowed_blocks = KNOWN_APPEND_BLOCKS.get(relative, set())
             unexpected_blocks = sorted(set(append_block_names) - allowed_blocks)
             if unexpected_blocks:
@@ -298,40 +301,44 @@ def build_report() -> dict[str, object]:
                 )
         if status_headings and role not in STATUS_ALLOWED_ROLES:
             if relative in STATUS_HEADING_ALLOWLIST:
-                notes.append(
-                    f"explicitly allowed implementation-status section in bounded contract/policy: {relative}"
-                )
+                notes.append(f"explicitly allowed implementation-status section in bounded contract/policy: {relative}")
             else:
                 errors.append(f"current-status heading outside current-status/evidence role: {relative}")
         if dynamic_prs and role in STABLE_NO_DYNAMIC_PR_ROLES:
             errors.append(f"dynamic PR reference in stable document: {relative}: {', '.join(dynamic_prs)}")
-        if broken_markdown_links:
-            for link in broken_markdown_links:
-                errors.append(f"broken Markdown link in {relative}: {link['target']}")
-        if broken_other_links:
-            for link in broken_other_links:
-                warnings.append(f"unresolved local link in {relative}: {link['target']}")
+        for link in broken_markdown_links:
+            errors.append(f"broken Markdown link in {relative}: {link['target']}")
+        for link in broken_other_links:
+            warnings.append(f"unresolved local link in {relative}: {link['target']}")
         if archive_links and role in MUTABLE_CANONICAL_ROLES:
             for link in archive_links:
                 errors.append(f"canonical document links directly to archive: {relative} -> {link['target']}")
         if lines > 700:
             routed_by = LARGE_REFERENCE_ROUTES.get(relative)
             if routed_by:
-                notes.append(
-                    f"large explicit reference is protected by compact domain router: "
-                    f"{relative} -> {routed_by}"
-                )
+                notes.append(f"large explicit reference is protected by compact domain router: {relative} -> {routed_by}")
             elif role not in {
-                "implemented_product_contract",
-                "event_search_source_registry",
-                "evidence",
-                "archive",
-                "dated_historical_or_target_reference",
-                "historical_evidence",
-                "historical_freeze",
-                "supporting_reference",
+                "implemented_product_contract", "event_search_source_registry", "evidence",
+                "archive", "dated_historical_or_target_reference", "historical_evidence",
+                "historical_freeze", "historical_handoff", "historical_release_plan",
+                "supporting_reference", "target_reference",
             }:
                 warnings.append(f"large mixed-role candidate: {relative} ({lines} lines, role={role})")
+
+    role_by_path = {str(row["path"]): str(row["role"]) for row in files}
+    for row in files:
+        if str(row["role"]) not in NO_HISTORICAL_ROUTING_ROLES:
+            continue
+        for link in row["local_links"]:
+            resolved = link.get("resolved")
+            if not isinstance(resolved, str):
+                continue
+            target_role = role_by_path.get(resolved)
+            if target_role in HISTORICAL_ONLY_ROLES:
+                errors.append(
+                    f"current router/contract links to historical document: "
+                    f"{row['path']} -> {resolved} ({target_role})"
+                )
 
     role_counts = Counter(str(row["role"]) for row in files)
     return {
@@ -340,6 +347,7 @@ def build_report() -> dict[str, object]:
         "markdown_files": len(files),
         "total_lines": sum(int(row["lines"]) for row in files),
         "role_counts": dict(sorted(role_counts.items())),
+        "unclassified_count": sum(1 for row in files if str(row["role"]).startswith("unclassified")),
         "error_count": len(errors),
         "warning_count": len(warnings),
         "note_count": len(notes),
@@ -352,7 +360,7 @@ def build_report() -> dict[str, object]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--check", action="store_true", help="exit non-zero when governance errors exist")
+    parser.add_argument("--check", action="store_true", help="exit non-zero when governance errors or warnings exist")
     parser.add_argument("--output", default="build/documentation-inventory.json")
     args = parser.parse_args()
 
@@ -365,6 +373,7 @@ def main() -> None:
     print(f"- commit: {report['commit_sha']}")
     print(f"- tracked Markdown files: {report['markdown_files']}")
     print(f"- total Markdown lines: {report['total_lines']}")
+    print(f"- unclassified: {report['unclassified_count']}")
     print(f"- errors: {report['error_count']}")
     print(f"- warnings: {report['warning_count']}")
     print(f"- notes: {report['note_count']}")
@@ -376,7 +385,7 @@ def main() -> None:
         print(f"  NOTE: {note}")
     print(f"- report: {out.relative_to(ROOT)}")
 
-    if args.check and report["errors"]:
+    if args.check and (report["errors"] or report["warnings"]):
         sys.exit(1)
 
 

@@ -18,6 +18,9 @@ REQUIRED = {
     "Produktvertrag.md",
     "docs/README.md",
     "docs/DOCUMENT_REGISTRY.md",
+    "docs/domains/control-center.md",
+    "docs/domains/event-search-system.md",
+    "docs/domains/visual-system.md",
     "docs/architecture/SYSTEM_MAP.md",
     "docs/external-resource-matrix.md",
     "docs/workpacks/active/CURRENT_WORKPACK.md",
@@ -33,6 +36,9 @@ LINE_LIMITS = {
     "TEST_STATUS.md": 150,
     "docs/README.md": 230,
     "docs/DOCUMENT_REGISTRY.md": 230,
+    "docs/domains/control-center.md": 150,
+    "docs/domains/event-search-system.md": 120,
+    "docs/domains/visual-system.md": 120,
     "docs/architecture/SYSTEM_MAP.md": 220,
     "docs/external-resource-matrix.md": 170,
     "docs/workpacks/active/CURRENT_WORKPACK.md": 140,
@@ -46,6 +52,9 @@ NO_APPEND_BLOCKS = {
     "TEST_STATUS.md",
     "docs/README.md",
     "docs/DOCUMENT_REGISTRY.md",
+    "docs/domains/control-center.md",
+    "docs/domains/event-search-system.md",
+    "docs/domains/visual-system.md",
     "docs/architecture/SYSTEM_MAP.md",
     "docs/external-resource-matrix.md",
     "docs/workpacks/active/CURRENT_WORKPACK.md",
@@ -66,9 +75,10 @@ REQUIRED_MARKERS = {
         "docs/DOCUMENT_REGISTRY.md",
     ],
     "docs/workpacks/active/CURRENT_WORKPACK.md": [
-        "Aktiver Implementierungs-Workpack",
+        "**Keiner.**",
         "Nächster erlaubter Schritt",
         "Ressourcen-Lock",
+        "docs/domains/control-center.md",
     ],
     "docs/architecture/SYSTEM_MAP.md": [
         "Datenhoheit",
@@ -82,17 +92,26 @@ REQUIRED_MARKERS = {
     ],
     "MASTER.md": ["Produkt-Nordstern", "Nicht verhandelbare Produktprinzipien"],
     "ROADMAP.md": ["Ausführungsreihenfolge", "Aktivierungsregel"],
-    "TEST_STATUS.md": ["Aktueller Proofindex", "Aktuelle harte Evidence-Lücke"],
+    "TEST_STATUS.md": ["Aktueller Proofindex", "Aktuelle harte Evidence-Lücke", "E2 integriert"],
     "docs/README.md": [
         "Dokumenttypen und Rangfolge",
         "Aufgabenbezogener Lesepfad",
         "Dokumentations-Definition-of-Done",
+        "docs/domains/control-center.md",
     ],
     "docs/DOCUMENT_REGISTRY.md": [
         "Kanonische Root-Dokumente",
-        "Pfadbasierte Rollen",
+        "Domain-Router",
+        "Explizit klassifizierte Dokumente unter `docs/`",
         "Änderungsmatrix",
         "Neue Dokumente",
+    ],
+    "docs/domains/control-center.md": [
+        "Autoritätsreihenfolge",
+        "Aktuelle Owner",
+        "Historische Dateien",
+        "Aufgabenbezogener Lesepfad",
+        "Harte Regeln",
     ],
 }
 
@@ -139,6 +158,8 @@ if current.is_file():
     text = current.read_text(encoding="utf-8")
     if re.search(r"Offene PR.*#\d+", text, re.IGNORECASE):
         errors.append("CURRENT_WORKPACK.md: do not persist an open-PR list; read GitHub directly")
+    if "Keiner nach Integration" in text:
+        errors.append("CURRENT_WORKPACK.md: conditional post-integration wording is stale")
 
 ai = ROOT / "AI_ENTRYPOINT.md"
 matrix = ROOT / "docs/external-resource-matrix.md"
@@ -149,6 +170,21 @@ if ai.is_file() and matrix.is_file():
         errors.append("live event admin exception is not consistently documented")
     if "technisch gesperrt" not in ai_text:
         errors.append("AI_ENTRYPOINT.md must state that direct main hotfix is technically blocked until bypass setup")
+
+inventory = ROOT / "scripts/report-documentation-inventory.py"
+if inventory.is_file():
+    text = inventory.read_text(encoding="utf-8")
+    for marker in [
+        '"docs/domains/control-center.md": "domain_router"',
+        'return "unclassified_supporting_document"',
+        "HISTORICAL_ONLY_ROLES",
+        'report["errors"] or report["warnings"]',
+        '"unclassified_count"',
+    ]:
+        if marker not in text:
+            errors.append(f"documentation inventory semantic contract missing: {marker!r}")
+    if 'return "supporting_documentation"' in text:
+        errors.append("documentation inventory must not use a generic supporting_documentation catch-all")
 
 workflow = ROOT / ".github/workflows/project-guardrails.yml"
 if workflow.is_file():
