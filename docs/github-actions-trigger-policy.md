@@ -1,185 +1,196 @@
 # GitHub Actions Trigger Policy
 
-Stand: 2026-07-17
+Stand: 2026-07-19  
 Branch: `staging`
 
 ## Ziel
 
-Staging soll als schneller technischer Testpfad funktionieren. Kleine Commits auf `staging` sollen primaer den notwendigen Staging-Deploy ausloesen, aber keine schweren Content-, Growth-, KI- oder Audit-Laeufe.
+GitHub Actions trennt Integrationsprüfung, Deploy, read-only Runtime-Evidence und schreibende Betriebsautomation. Jede Prüfung besitzt genau einen autoritativen Owner; kleine Staging-Commits lösen keine schweren Content-, Growth-, KI- oder Audit-Läufe aus.
 
-Diese Entkopplung ist gewollt und kein Fehler. Sie senkt nicht die Produktqualitaet, sondern trennt schnelle technische Iteration von periodischer und produktiver Qualitaetssicherung.
+## Autoritative Topologie
 
-Pull Requests erhalten zusaetzlich einen stabilen, immer vorhandenen Merge-Check. Dieser Check darf bestehende fachliche Tests nicht duplizieren und darf den schnellen `staging`-Push-Pfad nicht belasten.
-
-## Grundsatz
-
-| Workflow-Klasse | `staging` Push | `main` Push | Schedule | Manual |
-|---|---:|---:|---:|---:|
-| Deploy / Staging-Auslieferung | ja | ja | ja, wenn fachlich benoetigt | ja |
-| Schnelle Smoke-/Syntaxchecks | optional | optional | nein | optional |
-| Content Quality Audit | nein, ausser gezielter Workflow-Haertung | ja bzw. relevante Produkt-/Content-Pfade | ja | ja |
-| Growth Intelligence | nein | nein | ja | ja |
-| KI-Websearch / Event Intake | nein | nur produktiv kontrolliert | ja | ja |
-| Inbox Cleanup / Content Ops Reporting | nein | nein | ja | ja |
-| Content Ops HTTP Ingest | nein | nein | via `workflow_run` nach relevanten Quelllaeufen | ja |
+| Workflow | Owner | PR | `staging` Push | `main` Push | Schedule | Manual |
+|---|---|---:|---:|---:|---:|---:|
+| `PR Gate` | Always-run-Integration und Branchpolicy | ja, `staging`/`main` | nein | nein | nein | nein |
+| `Project Guardrails` | Architektur-, Dokumentations- und Workflowtopologie | pfadspezifisch | pfadspezifisch | pfadspezifisch | nein | ja |
+| `Control Center CI` | vollständige Control-Center-E1/E2-Prüfung | pfadspezifisch | nein | nein | nein | ja, sobald Datei auf Default-Branch vorhanden |
+| `Deploy to STRATO` | einziger Deploypfad | nein | ja | ja | ja | ja |
+| `Staging Verification` | kombinierte Deploy-/Build-/read-only-E3-Evidence | nein | pfadspezifisch | nein | nein | nein |
+| `Control Center E4 Synthetic Proof` | isolierter R3-Write-/Resume-/Cleanup-Beweis | nein | nein | nein | nein | gesperrt; erst nach eigenem R3-Workpack |
+| Content-/Growth-/Inbox-/KI-/Content-Ops-Workflows | fachlicher Betrieb | nein | nein | nur wo ausdrücklich definiert | ja | ja |
 
 ## Always-run PR Gate
 
-`.github/workflows/pr-gate.yml` erzeugt bei jedem Pull Request nach `staging` oder `main` genau den stabilen Check:
+`.github/workflows/pr-gate.yml` erzeugt bei jedem Pull Request nach `staging` oder `main` den stabilen Check:
 
 ```text
 PR Gate
 ```
 
-Der Gate-Workflow hat bewusst keinen `paths`-Filter. Dadurch ist der Check bei jedem PR vorhanden und kann spaeter als verpflichtender Statuscheck verwendet werden.
+Der Gate-Workflow:
 
-Der Gate-Workflow fuehrt keine zweite Kopie aller Testpakete aus. Er arbeitet als schlanker Aggregator:
+1. erlaubt PRs nach `staging` nur aus demselben Repository;
+2. erlaubt PRs nach `main` ausschließlich als `staging -> main`;
+3. wartet nur auf GitHub-Actions-Checks, die für den konkreten PR tatsächlich gestartet wurden;
+4. dupliziert keine PHP-, JavaScript-, Python-, Browser- oder Produktprüfung;
+5. wird rot, sobald ein gestarteter Check fehlschlägt, abbricht oder zeitlich ausläuft;
+6. besitzt keinen `paths`-Filter und darf nicht umbenannt werden, solange ein Ruleset davon abhängt.
 
-1. Er prueft sofort die Repository- und Branch-Regel.
-2. PRs nach `staging` muessen aus einem Branch desselben Repositories kommen.
-3. PRs nach `main` sind ausschliesslich als `staging -> main` erlaubt.
-4. Danach wartet er nur auf GitHub-Actions-Checks, die fuer den konkreten Dateiscope ohnehin gestartet wurden.
-5. Ein gestarteter fehlgeschlagener, abgebrochener oder zeitlich ausgelaufener Check macht auch `PR Gate` rot.
-6. Nicht relevante schwere Workflows werden nicht gestartet und nicht simuliert.
+## Control Center CI
 
-Effizienzziel:
+`.github/workflows/control-center-ci.yml` ist der einzige autoritative statische Control-Center-Testworkflow.
 
-- Bei einem kleinen PR ohne weitere pfadspezifische Checks entsteht nur eine kurze Registrierungs- und Stabilitaetswartezeit von rund 20 bis 30 Sekunden plus Runner-Start.
-- Bei einem fachlichen PR endet `PR Gate` ungefaehr mit dem langsamsten ohnehin erforderlichen Check; es entsteht keine doppelte PHP-, JavaScript-, Python-, Browser- oder Produktpruefung.
-- Der Gate-Workflow laeuft nur auf `pull_request`, nicht auf `push`, `schedule` oder Content-Roboterlaeufen.
-- Ein neuer Commit storniert den veralteten Gate-Lauf desselben PRs automatisch.
+Er enthält einmalig:
 
-Damit verbessert der Gate die Sicherheit und Parallelisierbarkeit, ohne die bestehende schnelle Staging-Auslieferung in einen monolithischen CI-Lauf umzubauen.
+- JSON- und PHP-Syntax;
+- vollständige Control-Center-Contracttests;
+- Frontend-/JavaScript-Prüfungen;
+- Produkt- und Editorial-Audits;
+- CSS-Governance;
+- konsolidierte Dateiarchitektur;
+- Security-/Integrationsguards;
+- den rein lokalen E4-Harness-Self-Test.
+
+Er läuft auf relevanten Pull Requests, nicht erneut bei jedem Merge-Push. Alte Teilworkflows dürfen nicht wieder eingeführt werden.
+
+Stabiler Job-/Checkname:
+
+```text
+Control Center CI
+```
+
+## Staging Verification
+
+`.github/workflows/staging-verification.yml` ist der einzige zusätzliche read-only Runtime-Verifikationspfad für relevante `staging`-Pushes.
+
+Er:
+
+1. beobachtet den passenden `Deploy to STRATO`-Run;
+2. veröffentlicht weiterhin `deploy/staging-observed`;
+3. wartet auf den passenden Build;
+4. führt den read-only Runtime-Preflight mit `mutation=false` aus;
+5. veröffentlicht weiterhin `control-center/runtime-preflight-e3`;
+6. lädt ein gemeinsames Evidence-Artefakt hoch;
+7. besitzt keine Sheet- oder DB-Credentials.
+
+Die beiden Statuskontexte bleiben unverändert, bis eine nachweislich koordinierte Ruleset-Anpassung erfolgt.
+
+Ein manueller `workflow_dispatch` wird nicht vorgetäuscht: Ein Dispatch-Workflow ist nur zuverlässig bedienbar, wenn seine Datei auf dem Default-Branch vorhanden ist. Für Staging-E3 genügt der normale Integrations-Push; ein bestehender Run kann über GitHub erneut ausgeführt werden.
+
+## E4-Grenze
+
+`Control Center E4 Synthetic Proof` bleibt getrennt, weil der Workflow:
+
+- reale Staging-Write-Secrets benötigt;
+- eine andere Risikoklasse besitzt;
+- Write, Resume, Rücklesen und Cleanup ausführt;
+- ausschließlich in einem separaten R3-Workpack freigeschaltet werden darf.
+
+`Staging Verification` darf E4 weder aufrufen noch dispatchen. Ein E4-Self-Test im `Control Center CI` besitzt keinen externen Zugriff.
 
 ## Gewollter schneller Staging-Pfad
 
-Ein kleiner technischer Commit auf `staging` soll im Regelfall nur ausloesen:
+Ein normaler relevanter Merge nach `staging` löst aus:
 
-1. `Deploy to STRATO`
-2. ggf. sehr schnelle Guards, falls sie Deploybruch verhindern
+1. `Deploy to STRATO`;
+2. bei Control-Center-/Verification-Scope genau einmal `Staging Verification`;
+3. gegebenenfalls `Project Guardrails` bei Governance-Scope.
 
-Nicht gewollt bei normalen Staging-Testcommits:
+Nicht gewollt allein wegen eines technischen Staging-Pushes:
 
-- `Content Quality Audit`
-- `Growth Intelligence Backlog`
-- `Weekly KI Websearch → Manual Inbox`
-- `Manual KI Event Intake`
-- `Inbox Cleanup (Archive)`
-- `Content Ops HTTP Ingest` allein wegen Push
-- `PR Gate`, weil dieser ausschliesslich PR-basiert ist
+- `Control Center CI`;
+- `Content Quality Audit`;
+- `Growth Intelligence Backlog`;
+- `Weekly KI Websearch → Manual Inbox`;
+- `Manual KI Event Intake`;
+- `Inbox Cleanup (Archive)`;
+- `Content Ops HTTP Ingest`;
+- `PR Gate`.
 
-## Aktueller Stand nach Trigger-Haertung
+## Fachliche Betriebsworkflows
 
-### Bereits absichtlich entkoppelt
+### Content Quality Audit
 
-- `.github/workflows/growth-intelligence-backlog.yml`
-  - `push`-Trigger wurde entfernt.
-  - Workflow laeuft nur noch per `workflow_dispatch` oder `schedule`.
-  - Grund: Growth-/Acquisition-Analyse ist schwer und fuer technische Staging-Tests nicht erforderlich.
+- manual, schedule und gezielter `main`-Push;
+- kein normaler `staging`-Push;
+- Audit-/Feedback-/Cache-Schreiblogik bleibt fachlich getrennt.
 
-- `.github/workflows/content-ops-http-ingest.yml`
-  - `push`-Trigger wurde entfernt.
-  - Workflow laeuft nur noch per `workflow_dispatch` oder `workflow_run` nach relevanten Content-Ops-Quellworkflows.
-  - Grund: HTTP-Ingest soll Artefakte abgeschlossener Roboterlaeufe uebertragen, nicht jeden Staging-Push begleiten.
+### Growth Intelligence Backlog
 
-### Bereits passend
+- nur manual oder schedule;
+- kein Push.
 
-- `.github/workflows/deploy-strato.yml`
-  - laeuft auf `push` nach `main` und `staging`.
-  - bleibt zentraler schneller Staging-Testpfad.
+### Weekly KI und Manual Intake
 
-- `.github/workflows/inbox-cleanup.yml`
-  - laeuft per `workflow_dispatch` und `schedule`.
-  - kein `staging`-Push-Trigger.
+- echter Lauf nur auf `main`;
+- Staging-Starts brechen fail-closed ab;
+- produktive Repo-/Sheet-/Dispatch-Schreibrechte bleiben ausschließlich in diesen fachlichen Workflows.
 
-- `.github/workflows/weekly-ki-websearch-to-manual-inbox.yml`
-  - laeuft per `workflow_dispatch` und `schedule`.
-  - zusaetzlich produktiver Branch-Guard: echter KI-Lauf nur auf `main`.
+### Inbox Cleanup
 
-- `.github/workflows/manual-ki-intake.yml`
-  - laeuft per `workflow_dispatch`.
-  - zusaetzlich produktiver Branch-Guard: echter Intake nur auf `main`.
+- manual oder schedule;
+- Staging-/Live-Tabs werden anhand des Refs getrennt.
 
-### Final gehaertet
+### Content Ops HTTP Ingest
 
-- `.github/workflows/content-quality-audit.yml`
-  - `push` auf `staging` wurde entfernt.
-  - Workflow laeuft weiter per `workflow_dispatch` und `schedule`.
-  - Zusaetzlich laeuft er bei `push` auf `main`, aber nur fuer gezielte Audit-/Content-relevante Pfade.
-  - Breite `data/**`-Ausloesung wurde bewusst entfernt, damit automatische oder kleine Daten-/Testcommits keine schweren Audits mitziehen.
+- manual oder `workflow_run` nach definierten Quellworkflows;
+- kein Push.
 
-## Main-Schutz
+## Permissions
 
-Die Entkopplung betrifft nur schnelle Staging-Iteration. Vor oder nach produktiven Aenderungen duerfen schwere Qualitaetslaeufe weiterhin laufen:
+Jeder read-only Workflow setzt minimale Rechte explizit:
 
-- per `schedule`,
-- per `workflow_dispatch`,
-- auf `main`,
-- oder bei bewusst relevanten Pfadaenderungen.
+- `PR Gate`: `contents/checks/pull-requests: read`;
+- `Project Guardrails`: `contents: read`;
+- `Control Center CI`: `contents: read`;
+- `Staging Verification`: `actions: read`, `contents: read`, `statuses: write`.
 
-Wichtig: Keine Qualitaetspruefung entfernen, sondern Ausloesezeitpunkt sauberer steuern.
+Breite Repository-Default-Permissions dürfen nicht stillschweigend für Testworkflows verwendet werden.
 
-Der stabile `PR Gate` ist die technische Eingangsschranke. Er ersetzt nicht die realen Staging- und Live-Abnahmen des Integrations-Chats.
+## Workflowänderungen
 
-## Arbeitsregel fuer zukuenftige KI-Chats
+Bei jeder Änderung prüfen:
 
-Wenn ein Workflow schwer ist und nicht unmittelbar Deploybruch verhindert, darf er nicht wieder pauschal an jeden `staging`-Push gekoppelt werden.
+- `pull_request.branches` und `paths`;
+- `push.branches` und `paths`;
+- `schedule`;
+- `workflow_dispatch`;
+- `workflow_run`;
+- job-level `if`;
+- Permissions und Secrets;
+- Artefakte;
+- Job-, Check- und Commitstatusnamen;
+- Downstream-Dispatches;
+- Vorkommen der Datei auf `main` und `staging`;
+- Ruleset-Abhängigkeiten;
+- tatsächlichen Operatorpfad.
 
-Bei Workflow-Aenderungen immer konkret pruefen:
+`Project Guardrails` muss bei jeder Änderung unter `.github/workflows/**` starten und die autoritative Topologie prüfen.
 
-- `on.pull_request.branches`,
-- `on.pull_request.paths`,
-- `on.push.branches`,
-- `on.push.paths`,
-- `schedule`,
-- `workflow_dispatch`,
-- `workflow_run`,
-- job-level `if`,
-- Downstream-Dispatches und Artefakt-Abhaengigkeiten.
+## Verbotene Muster
 
-Neue oder geaenderte Workflows muessen in diese Policy passen oder die Abweichung explizit begruenden.
+- selbstmodifizierender One-off-Workflow für `.github/workflows/**`;
+- zusätzliche Observer-/Wrapper-Schicht ohne belegten Mehrwert;
+- staging-only `workflow_dispatch` als angeblich sicher bedienbarer Operatorpfad;
+- Umbenennung von `PR Gate`, `deploy/staging-observed` oder `control-center/runtime-preflight-e3` ohne koordinierte Ruleset-Prüfung;
+- Entfernen einer Qualitätsprüfung ohne expliziten Ersatz;
+- E4-Aufruf aus der read-only Staging Verification.
 
-Der Checkname `PR Gate` darf nicht umbenannt werden, solange er in einem Branch-Ruleset als verpflichtender Check eingetragen ist.
+## Validierung nach Änderungen
 
-## Workflow-Dateien: wichtige Aenderungsgrenzen
+### E2
 
-Nicht erneut versuchen, Workflow-Dateien durch einen selbstmodifizierenden One-off-Workflow auf `staging` zu aendern.
+1. Draft-PR nach `staging`.
+2. `Project Guardrails`, `Control Center CI` und `PR Gate` grün.
+3. Keine alten `diagnostics`-, `contracts`- oder duplizierten Control-Center-`validate`-Top-Level-Checks.
+4. PR mergebar.
 
-Validierte Fehlerursachen vom 2026-07-07:
+### E3
 
-- `workflow_dispatch` ist fuer manuelle Ausloesung nur verlaesslich nutzbar, wenn die Workflow-Datei auf dem Default-Branch vorhanden ist. Ein nur auf `staging` angelegter One-off-Workflow kann zwar Push-Runs zeigen, aber keinen nutzbaren `Run workflow`-Button anbieten.
-- Ein Actions-Run mit `GITHUB_TOKEN` und `contents: write` darf in diesem Repo keine Dateien unter `.github/workflows/` veraendern. Der Push wurde mit fehlender `workflows`-Permission abgelehnt.
-- `permissions: contents: write` reicht fuer normale Repo-Dateien, aber nicht fuer das selbststaendige Erzeugen oder Aendern anderer Workflow-Dateien.
-
-Zulaessige Wege fuer Workflow-Datei-Aenderungen:
-
-1. GitHub-Connector direkt, wenn die Datei klein genug ist oder sicher vollstaendig ersetzt werden kann.
-2. Lokale Arbeitskopie/Codespace mit normalem Git-Push durch den Nutzer.
-3. Bewusstes Patch-Paket, wenn der Connector eine grosse Workflow-Datei nicht risikoarm ersetzen kann.
-4. GitHub UI-Edit durch den Nutzer bei kleinen, klar beschriebenen Zeilenaenderungen.
-
-Nicht zulaessig:
-
-- One-off-Workflow, der `.github/workflows/*.yml` veraendert.
-- Annahme, dass `workflow_dispatch` auf einem nur in `staging` existierenden Workflow manuell per Button startbar ist.
-- Annahme, dass `GITHUB_TOKEN` mit `contents: write` Workflow-Dateien editieren darf.
-
-## Validierung nach Aenderungen
-
-Sinnvoller Test fuer den stabilen PR-Gate:
-
-1. Kleinen PR nach `staging` oeffnen, der die Gate-/Governance-Dateien beruehrt.
-2. Erwartung: `Project Guardrails` und `PR Gate` laufen.
-3. Erwartung: `PR Gate` wartet auf `Project Guardrails` und wird erst danach gruen.
-4. Einen kontrollierten PR nach `main` aus einem anderen Branch als `staging` vermeiden; die statische Source-Policy ist bereits im Gate und im Review zu pruefen.
-
-Sinnvoller Test fuer den schnellen Staging-Pfad:
-
-1. Kleiner Commit auf `staging`, der keine Content-/Audit-Datenpfade beruehrt.
-2. Erwartung: `Deploy to STRATO` laeuft.
-3. Nicht erwartet: Growth-, KI-, Inbox-Cleanup-, Content-Ops-Ingest- oder `PR Gate`-Run nur wegen Push.
-
-Sinnvoller separater Test fuer Qualitaetssicherung:
-
-1. `Content Quality Audit` manuell per `workflow_dispatch` ausloesen.
-2. Danach pruefen, ob Content-Ops-Artefakte und ggf. HTTP-Ingest wie erwartet laufen.
+1. Merge nach `staging`.
+2. `Deploy to STRATO` grün.
+3. `deploy/staging-observed=success`.
+4. `control-center/runtime-preflight-e3=success`.
+5. Build, Host, Umgebung und `Inbox_Staging -> Events_Staging` bestätigt.
+6. `mutation=false`; Live-Ressourcen unbenutzt.
+7. Kein E4-Run.
