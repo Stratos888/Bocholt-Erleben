@@ -17,7 +17,7 @@ Die Control-Center-Prüf- und Evidence-Kette wurde auf wenige autoritative Workf
 - `Control Center E4 Synthetic Proof` bleibt als gesperrte R3-Capability unverändert getrennt;
 - Content-, Growth-, Inbox-, KI- und Content-Ops-Betriebsworkflows bleiben unverändert;
 - keine neue Observer-, Wrapper- oder One-off-Schicht;
-- keine Fach-, Daten-, SEO-, Visual-, Content- oder Produktänderung.
+- keine Daten-, SEO-, Visual-, Content- oder Produktänderung.
 
 ## Ersetzte Top-Level-Workflows
 
@@ -43,30 +43,32 @@ Die vollständige Test- und Evidence-Abdeckung wurde vor Entfernung in den Zielw
 ## Sicherheitsgrenzen
 
 - kein E4-Lauf;
-- kein CityArt-Fachfall;
+- kein CityArt- oder anderer Fachfall als E3-Abnahmeobjekt;
 - keine Mutation in `Inbox_Staging`, `Events_Staging`, `Inbox` oder `Events`;
 - keine Live-Schreibaktion;
-- neue Staging Verification besitzt keine Sheet- oder DB-Secrets;
+- `Staging Verification` besitzt keine Sheet- oder DB-Secrets;
 - die bestehenden Statuskontexte `deploy/staging-observed` und `control-center/runtime-preflight-e3` bleiben stabil.
 
 ## Abnahmekorrektur
 
-Der erste integrierte Lauf der konsolidierten `Staging Verification` war read-only und belegte `mutation=false`, wählte als technisches Preflight-Objekt aber erneut den eingefrorenen CityArt-Fall. Es erfolgte kein Fachklick, kein Writeback und keine externe Mutation. Wegen der harten Fachfallgrenze zählt dieser Lauf nicht als finale E3-Abnahme.
+Die erste E3-Fassung wählte read-only den eingefrorenen CityArt-Fall. Die zweite Fassung schloss CityArt aus, war aber noch an fachliche Entscheidungsreife gekoppelt. Die dritte Fassung belegte, dass der einzige andere aktive Fall keine eindeutig auflösbare aktuelle `Inbox_Staging`-Quelle besitzt.
 
-Der zweite Lauf schloss CityArt korrekt aus, blieb aber noch an `allowed=true` und damit an fachliche Entscheidungsreife gekoppelt. Deploy, Build und lokaler Runtimevertrag waren grün; der finale E3-Status blieb fail-closed rot. Diese Kopplung wurde entfernt, weil E3 ausschließlich Runtime, Ressourcen und Mutationsfreiheit belegt und keine fachliche Aktion freigibt.
+Alle drei Abweichungen blieben fail-closed und mutationsfrei. Sie zeigen zugleich, dass ein technischer E3 nicht von einem zufälligen echten Fachdatensatz abhängen darf.
 
-Die vollständige Korrektur und ihre Abnahmebedingungen stehen in:
+Die Endkorrektur erweitert den bestehenden authentifizierten `preflight.php` um einen dauerhaften `runtime`-Modus:
+
+- kein neuer Endpoint;
+- keine Case-Liste;
+- keine `case_id`;
+- keine `action`;
+- read-only Validierung von Build, Host, Environment, `Inbox_Staging`-Schema, `Events_Staging`-Schema und Writerauflösung;
+- keine fachlichen Zeilendaten in der Antwort;
+- `mutation=false`;
+- Live-Ressourcen `not_used`.
+
+Die vollständige Evidenzkette und Abnahmebedingungen stehen in:
 
 - `docs/evidence/control-center-workflow-e3-correction-2026-07-19.md`.
-
-Der finale Selektor:
-
-- schließt CityArt vor jedem Preflight-Aufruf aus;
-- prüft Scope `runtime_and_resource_contract_only`;
-- verlangt `mutation=false`, passenden Build, Staging-Host, Staging-Ressourcen, Writer und read-only Snapshots;
-- dokumentiert `action_allowed` und `business_blockers`, ohne eine Aktion abzuleiten;
-- schreibt auch im Fehlerfall Evidence;
-- bricht ohne gültigen Nicht-CityArt-Runtimevertrag fail-closed ab.
 
 `Project Guardrails` schützt diesen Vertrag dauerhaft.
 
@@ -76,14 +78,16 @@ Der finale Selektor:
 
 - vollständige Workflow-/Trigger-/Test-/Secret-/Artefakt-/Ruleset-Matrix;
 - explizite Test-Union;
-- begrenzter Diff.
+- begrenzter Diff;
+- begründete Scope-Erweiterung nur um den fachfallfreien read-only Runtime-Ressourcenvertrag im bestehenden Endpoint.
 
 ### E2
 
-- `Project Guardrails`, `Control Center CI` und `PR Gate` im Konsolidierungs-PR grün;
+- `Project Guardrails`, `Control Center CI` und `PR Gate` grün;
 - keine duplizierten alten Control-Center-Top-Level-Checks;
 - E4-Harness nur statisch kompiliert und selbstgetestet;
-- CityArt-Ausschluss und Runtime-only-E3 durch `Project Guardrails` abgesichert.
+- Runtime-Modus akzeptiert weder Case noch Action;
+- lokaler Contracttest beweist `mutation=false`, Staging-Ressourcenbindung und fail-closed Hostschutz.
 
 ### E3
 
@@ -93,18 +97,18 @@ Der Abschluss setzt nach Integration voraus:
 - Status `deploy/staging-observed=success`;
 - Status `control-center/runtime-preflight-e3=success`;
 - Scope `runtime_and_resource_contract_only`;
+- Assertion `no_fachfall=true`;
 - Staging-Host, passender Build und `mutation=false`;
-- ausgewählter Preflight-Fall ohne CityArt-Bezug;
-- Assertion `frozen_case_excluded=true`;
-- `Inbox_Staging -> Events_Staging`;
-- Live-Ressourcen unbenutzt;
-- fachliche Blocker nur dokumentiert, keine Aktion ausgeführt.
+- gültiges `Inbox_Staging`-Schema;
+- gültiges `Events_Staging`-Schema;
+- Writer korrekt aufgelöst, aber nicht aufgerufen;
+- Live-Ressourcen unbenutzt.
 
 Die konkreten Run- und Commit-IDs werden direkt aus GitHub gelesen und nicht als veraltender operativer Status in diesem Dokument gespiegelt.
 
 ## Rollback
 
-Bei fehlendem E2 oder E3 wird der jeweilige Konsolidierungs- beziehungsweise Korrektur-Mergecommit revertiert. Da dieses Workpack keine externe Ressource verändert, besteht kein Daten-Cleanup; E4 bleibt weiterhin gesperrt.
+Bei fehlendem E2 oder E3 wird der jeweilige Mergecommit revertiert. Da dieses Workpack keine externe Ressource verändert, besteht kein Daten-Cleanup; E4 bleibt weiterhin gesperrt.
 
 ## Nächster Schritt
 
