@@ -14,10 +14,12 @@ Für jede KI- oder Engineering-Aufgabe gilt diese Reihenfolge:
 1. `AI_ENTRYPOINT.md`
 2. `docs/workpacks/active/CURRENT_WORKPACK.md`
 3. `docs/architecture/SYSTEM_MAP.md`
-4. relevante fachliche Owner-Dateien
-5. `ENGINEERING.md` und `docs/external-resource-matrix.md`
+4. Aufgabenroute aus `docs/README.md`
+5. Rollenprüfung über `docs/DOCUMENT_REGISTRY.md`
+6. relevante fachliche Owner-Dateien
+7. `ENGINEERING.md` und `docs/external-resource-matrix.md`
 
-Die vollständige Dokumentationslandkarte und die Regeln zur Pflege stehen in `docs/README.md`.
+Die vollständige Dokumentationslandkarte, die Regeln zur Pflege und der automatische Vollinventurvertrag stehen unter `docs/`.
 
 ## Produktquellen
 
@@ -45,6 +47,10 @@ Direkte Live-Eventpflege und kleine direkte Main-Hotfixes sind keine alternative
 
 `data/events.tsv` und `data/events.json` sind generierte Runtime-Artefakte. Die tatsächlichen Datenquellen und Umgebungsgrenzen stehen in `docs/architecture/SYSTEM_MAP.md` und `docs/external-resource-matrix.md`.
 
+## Dokumentationsqualität
+
+Jede getrackte Markdown-Datei muss eine bekannte Rolle besitzen. `Project Guardrails` führt eine read-only Vollinventur, Linkprüfung und den Governance-Audit aus. Neue Root-Dokumente, Statusmischung und ungeprüfte Archivpfade sind nicht zulässig.
+
 ## Historie
 
-Aktuelle Steuerdateien werden inhaltlich ersetzt und nicht als fortlaufendes Tagebuch erweitert. Frühere Zustände bleiben über Git, `docs/decisions/` und `docs/forensics/` nachvollziehbar.
+Aktuelle Steuerdateien werden inhaltlich ersetzt und nicht als fortlaufendes Tagebuch erweitert. Frühere Zustände bleiben über Git, `docs/decisions/`, `docs/forensics/`, `docs/evidence/`, completed Workpacks und Archive nachvollziehbar.
