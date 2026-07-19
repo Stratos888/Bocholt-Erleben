@@ -34,11 +34,15 @@
 - **E5 – echter Staging-Fall, falls erforderlich:**
 - **Offene Beweise:**
 
-## Dokumentation
+## Dokumentationsauswirkung
 
+- **Betroffene Aussageart:** `keine` / `IST` / `dauerhafter Vertrag` / `ZIEL` / `Evidence` / `Historie`
 - **Geänderte kanonische Dokumente:**
-- **IST/ZIEL/HISTORIE sauber getrennt:**
+- **Warum ist kein anderer Dokument-Owner betroffen?**
 - **`CURRENT_WORKPACK.md` aktualisiert, falls operativer Status betroffen:**
+- **Neue Markdown-Datei mit registrierter Rolle und Lesepfad:**
+- **Keine geplante Funktion als umgesetzt dokumentiert:**
+- **Vollinventur und Governance-Audit:**
 
 ## Nutzeraktion
 
@@ -56,5 +60,6 @@
 - [ ] Aktueller `staging`-Stand vor Integration einbezogen
 - [ ] Bei unerwartetem realen Verhalten ohne Wiederholung gestoppt
 - [ ] Erforderliche Gates und Evidence erfüllt
+- [ ] Dokumentationsauswirkung vollständig und rollenrichtig behandelt
 - [ ] Nach Staging-Merge Deploy und Postconditions geprüft
 - [ ] Für späteres `staging -> main` freigegeben oder bewusst nicht freigegeben

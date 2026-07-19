@@ -2,7 +2,7 @@
 
 Arbeitsbranch: `staging`
 
-Diese Datei ist der verbindliche Kurzrouter für KI-Arbeit. Dokumentrollen und Lesepfade stehen in `docs/README.md`. Der einzige operative Status steht in `docs/workpacks/active/CURRENT_WORKPACK.md`.
+Diese Datei ist der verbindliche Kurzrouter für KI-Arbeit. Dokumentrollen stehen in `docs/DOCUMENT_REGISTRY.md`; Lesepfade und Pflege in `docs/README.md`. Der einzige operative Status steht in `docs/workpacks/active/CURRENT_WORKPACK.md`.
 
 ## 1. Startprotokoll
 
@@ -11,7 +11,7 @@ Vor jeder Repo-Aufgabe:
 1. aktuellen `staging`-SHA und offene PRs direkt in GitHub prüfen;
 2. `CURRENT_WORKPACK.md` lesen;
 3. `SYSTEM_MAP.md` für betroffene Systeme und Datenflüsse lesen;
-4. fachliche Owner-Dateien im aktuellen Ref lesen;
+4. Aufgabe über `docs/README.md` und `docs/DOCUMENT_REGISTRY.md` routen und danach nur die relevanten fachlichen Owner-Dateien im aktuellen Ref lesen;
 5. `ENGINEERING.md` und `external-resource-matrix.md` für technische und externe Grenzen prüfen;
 6. IST, ZIEL, HYPOTHESE und HISTORIE sichtbar trennen.
 
@@ -167,7 +167,19 @@ Regeln:
 4. keine manuelle Datenkorrektur zum künstlichen Grünmachen;
 5. Revert vor Nachpatchen bei einem direkten Main-Hotfix.
 
-## 9. Nutzerinteraktion
+## 9. Dokumentations- und Implementierungsvertrag
+
+Für jede Änderung gilt:
+
+1. Der PR benennt, ob `IST`, dauerhafter Vertrag, `ZIEL`, Evidence oder Historie betroffen sind.
+2. Code und zugehörige Dokumentation werden im selben Workpack konsistent geändert; reine Statushistorie kommt nicht in stabile Verträge.
+3. Eine geplante Funktion darf weder in `Produktvertrag.md` noch in einer IST-Aussage als umgesetzt erscheinen.
+4. `CURRENT_WORKPACK.md` wird bei operativen Zustandswechseln ersetzt, nicht ergänzt.
+5. Neue dauerhafte Regeln gehören genau in den fachlichen Owner; Evidence und Entscheidungen bleiben getrennte Dokumenttypen.
+6. Neue Root-Markdown-Dateien sind nur mit registrierter Rolle zulässig. Historische Dateien dürfen keinen aktuellen Lesepfad bilden.
+7. Vor Abschluss laufen Vollinventur und Governance-Audit aus `Project Guardrails` grün.
+
+## 10. Nutzerinteraktion
 
 Die KI ermittelt selbst, was über Repo, CI, Logs und read-only Dienste zugänglich ist. Eine unvermeidbare Nutzeraktion enthält genau einen Schritt, technische Begründung, erwartetes Ergebnis und klare Nicht-Aktionen.
 
