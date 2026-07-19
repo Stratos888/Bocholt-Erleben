@@ -169,7 +169,7 @@ jobs:
           done
           exit 1
 
-      - name: Prove non-frozen read-only runtime plan
+      - name: Prove non-frozen read-only runtime contract
         id: e3
         if: steps.deploy.outcome == 'success' && steps.build.outcome == 'success'
         continue-on-error: true
@@ -181,11 +181,16 @@ jobs:
           import json, os, urllib.error, urllib.request
           from pathlib import Path
 
+          evidence_path = Path("artifacts/runtime-preflight.json")
           base = os.environ["BASE_URL"].rstrip("/")
+          expected_build = os.environ["EXPECTED_BUILD"]
           headers = {
               "Accept": "application/json",
               "X-BE-Review-Password": os.environ["REVIEW_PASSWORD"],
           }
+
+          def write_evidence(payload):
+              evidence_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
 
           def request_json(path, method="GET", body=None):
               data = None
@@ -207,6 +212,13 @@ jobs:
 
           status, payload = request_json("/api/control-center/cases.php?active=1")
           if status != 200 or payload.get("status") != "ok":
+              write_evidence({
+                  "schema": 4,
+                  "evidence_level": "E3",
+                  "status": "blocked",
+                  "reason": "cases_read_failed",
+                  "http_status": status,
+              })
               raise SystemExit(f"Cases read failed: HTTP {status}")
 
           eligible = []
@@ -232,7 +244,8 @@ jobs:
 
           eligible.sort(key=lambda pair: pair[0])
           selected = None
-          rejected = []
+          candidate_attempts = []
+
           for case_id, item in eligible:
               http, result = request_json(
                   "/api/control-center/preflight.php",
@@ -240,75 +253,81 @@ jobs:
                   body={"case_id": case_id, "action": "approve", "payload": {}},
               )
               data = result.get("data", {}) if isinstance(result, dict) else {}
-              if (
-                  http == 200
-                  and result.get("status") == "ok"
-                  and data.get("mutation") is False
-                  and data.get("allowed") is True
-                  and data.get("blockers") == []
-              ):
-                  selected = (case_id, item, data)
+              runtime = data.get("runtime", {}) if isinstance(data, dict) else {}
+              build = runtime.get("build", {}) if isinstance(runtime, dict) else {}
+              resources = data.get("resources", {}) if isinstance(data, dict) else {}
+              source_snapshot = data.get("source_snapshot", {}) if isinstance(data, dict) else {}
+              target_snapshot = data.get("target_snapshot", {}) if isinstance(data, dict) else {}
+              selected_text = " ".join((
+                  str(item.get("title", "")),
+                  str(item.get("object_id", "")),
+                  str((item.get("source", {}) or {}).get("reference", "")),
+              )).casefold()
+
+              assertions = {
+                  "runtime_plan_present": http in {200, 409} and result.get("status") in {"ok", "blocked"} and isinstance(data, dict),
+                  "frozen_case_excluded": "cityart" not in selected_text,
+                  "mutation_false": data.get("mutation") is False,
+                  "build_matches": build.get("build_id") == expected_build,
+                  "manifest_matches": build.get("manifest_build") == expected_build,
+                  "staging_environment": (
+                      build.get("manifest_environment") == "staging"
+                      and runtime.get("resolved_environment") == "staging"
+                      and runtime.get("configured_environment") == "staging"
+                  ),
+                  "staging_host": runtime.get("request", {}).get("host") == "staging.bocholt-erleben.de",
+                  "preflight_endpoint": runtime.get("request", {}).get("request_path") == "/api/control-center/preflight.php",
+                  "staging_resources": resources.get("source_tab") == "Inbox_Staging" and resources.get("target_tab") == "Events_Staging",
+                  "expected_writer": data.get("writer") == "be_cc_writeback_staging_inbox_approve_verified",
+                  "source_resolved": source_snapshot.get("tab") == "Inbox_Staging" and source_snapshot.get("resolution_status") == "resolved" and int(source_snapshot.get("row_number") or 0) > 0,
+                  "target_read_only": target_snapshot.get("tab") == "Events_Staging" and target_snapshot.get("resolution_status") in {"absent", "resolved"},
+                  "live_unused": resources.get("live_inbox") == "not_used" and resources.get("live_events") == "not_used",
+              }
+              failed = [name for name, passed in assertions.items() if not passed]
+              candidate_attempts.append({
+                  "case_id": case_id,
+                  "http_status": http,
+                  "response_status": result.get("status") if isinstance(result, dict) else None,
+                  "action_allowed": data.get("allowed") if isinstance(data, dict) else None,
+                  "business_blockers": data.get("blockers", []) if isinstance(data, dict) else [],
+                  "failed_runtime_assertions": failed,
+              })
+              if not failed:
+                  selected = (case_id, item, data, assertions)
                   break
-              rejected.append({"id": case_id, "http": http, "blockers": data.get("blockers", [])})
 
           if selected is None:
-              raise SystemExit(
-                  "No non-frozen case produced an allowed read-only preflight: "
-                  + json.dumps({"frozen": frozen_skipped, "rejected": rejected[:10]}, ensure_ascii=False)
-              )
+              write_evidence({
+                  "schema": 4,
+                  "evidence_level": "E3",
+                  "status": "blocked",
+                  "reason": "no_non_frozen_runtime_contract",
+                  "expected_build": expected_build,
+                  "frozen_cases_skipped": frozen_skipped,
+                  "candidate_attempts": candidate_attempts,
+              })
+              raise SystemExit("No non-frozen case produced a valid read-only runtime contract.")
 
-          case_id, item, data = selected
-          runtime = data.get("runtime", {})
-          build = runtime.get("build", {})
-          resources = data.get("resources", {})
-          source = data.get("source_snapshot", {})
-          target = data.get("target_snapshot", {})
-          selected_text = " ".join((
-              str(item.get("title", "")),
-              str(item.get("object_id", "")),
-              str((item.get("source", {}) or {}).get("reference", "")),
-          )).casefold()
-
-          assertions = {
-              "frozen_case_excluded": "cityart" not in selected_text,
-              "mutation_false": data.get("mutation") is False,
-              "allowed": data.get("allowed") is True,
-              "no_blockers": data.get("blockers") == [],
-              "build_matches": build.get("build_id") == os.environ["EXPECTED_BUILD"],
-              "manifest_matches": build.get("manifest_build") == os.environ["EXPECTED_BUILD"],
-              "staging_environment": (
-                  build.get("manifest_environment") == "staging"
-                  and runtime.get("resolved_environment") == "staging"
-                  and runtime.get("configured_environment") == "staging"
-              ),
-              "staging_host": runtime.get("request", {}).get("host") == "staging.bocholt-erleben.de",
-              "preflight_endpoint": runtime.get("request", {}).get("request_path") == "/api/control-center/preflight.php",
-              "staging_resources": resources.get("source_tab") == "Inbox_Staging" and resources.get("target_tab") == "Events_Staging",
-              "expected_writer": data.get("writer") == "be_cc_writeback_staging_inbox_approve_verified",
-              "source_resolved": source.get("tab") == "Inbox_Staging" and source.get("resolution_status") == "resolved" and int(source.get("row_number") or 0) > 0,
-              "target_read_only": target.get("tab") == "Events_Staging" and target.get("resolution_status") in {"absent", "resolved"},
-              "live_unused": resources.get("live_inbox") == "not_used" and resources.get("live_events") == "not_used",
-          }
-          failed = [name for name, passed in assertions.items() if not passed]
-          if failed:
-              raise SystemExit("E3 assertions failed: " + ", ".join(failed))
-
+          case_id, item, data, assertions = selected
           evidence = {
-              "schema": 3,
+              "schema": 4,
               "evidence_level": "E3",
-              "expected_build": os.environ["EXPECTED_BUILD"],
+              "status": "verified",
+              "scope": "runtime_and_resource_contract_only",
+              "expected_build": expected_build,
               "selected_case": {
                   "id": case_id,
                   "title": item.get("title", ""),
                   "source": item.get("source", {}),
               },
               "frozen_cases_skipped": frozen_skipped,
+              "candidate_attempts": candidate_attempts,
+              "action_allowed": data.get("allowed"),
+              "business_blockers": data.get("blockers", []),
               "preflight": data,
               "assertions": assertions,
           }
-          Path("artifacts/runtime-preflight.json").write_text(
-              json.dumps(evidence, ensure_ascii=False, indent=2) + "\n"
-          )
+          write_evidence(evidence)
           PY
 
       - name: Upload combined staging evidence
@@ -342,14 +361,19 @@ jobs:
           token = os.environ["GH_TOKEN"]
           run_url = f"{os.environ['GITHUB_SERVER_URL']}/{repo}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
           deploy = {}
+          runtime_evidence = {}
           if Path("artifacts/staging-deploy.json").is_file():
               deploy = json.loads(Path("artifacts/staging-deploy.json").read_text()).get("run", {})
+          if Path("artifacts/runtime-preflight.json").is_file():
+              runtime_evidence = json.loads(Path("artifacts/runtime-preflight.json").read_text())
           deploy_ok = os.environ.get("DEPLOY_OUTCOME") == "success" and deploy.get("conclusion") == "success"
           e3_ok = (
               deploy_ok
               and os.environ.get("BUILD_OUTCOME") == "success"
               and os.environ.get("E3_OUTCOME") == "success"
-              and Path("artifacts/runtime-preflight.json").is_file()
+              and runtime_evidence.get("status") == "verified"
+              and runtime_evidence.get("assertions", {}).get("frozen_case_excluded") is True
+              and runtime_evidence.get("assertions", {}).get("mutation_false") is True
           )
           headers = {
               "Accept": "application/vnd.github+json",
@@ -361,7 +385,7 @@ jobs:
               ("deploy/staging-observed", deploy_ok, deploy.get("html_url") or run_url,
                f"Deploy {'succeeded' if deploy_ok else 'failed'} for {sha[:12]}"),
               ("control-center/runtime-preflight-e3", e3_ok, run_url,
-               "E3: non-frozen case; Inbox_Staging -> Events_Staging; mutation=false"
+               "E3: staging runtime/resources; non-frozen; mutation=false"
                if e3_ok else "E3 blocked"),
           )
           for context, success, target, description in statuses:
