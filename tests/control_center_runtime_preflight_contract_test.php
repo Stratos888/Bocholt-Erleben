@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/api/control-center/_runtime_preflight.php';
+require_once dirname(__DIR__) . '/api/control-center/_runtime_resource_contract.php';
 
 $failures = [];
 $assert = static function(bool $condition, string $message) use (&$failures): void {
@@ -54,10 +54,41 @@ $assert(
     'Reject muss den direkten verifizierten Entscheidungs-Writer auswählen.'
 );
 
+$inboxResourceSnapshot = [
+    'tab'=>'Inbox_Staging',
+    'schema'=>'valid',
+    'header_row'=>1,
+    'row_count'=>2,
+    'header_fingerprint'=>'inbox-header',
+];
+$eventsResourceSnapshot = [
+    'tab'=>'Events_Staging',
+    'schema'=>'valid',
+    'header_row'=>1,
+    'row_count'=>0,
+    'header_fingerprint'=>'events-header',
+];
+$resourcePlan = be_cc_runtime_resource_contract($context, $inboxResourceSnapshot, $eventsResourceSnapshot);
+$assert(($resourcePlan['mode'] ?? '') === 'runtime', 'Der Ressourcenvertrag muss den Runtime-Modus ausweisen.');
+$assert(($resourcePlan['scope'] ?? '') === 'runtime_and_resource_contract_only', 'E3 muss fachfallfrei auf Runtime und Ressourcen begrenzt sein.');
+$assert(($resourcePlan['mutation'] ?? true) === false, 'Der Runtime-Ressourcenvertrag muss Mutation hart auf false setzen.');
+$assert(($resourcePlan['allowed'] ?? false) === true, 'Ein konsistenter Staging-Ressourcenvertrag muss freigegeben werden.');
+$assert(!array_key_exists('case', $resourcePlan), 'Der Runtime-Ressourcenvertrag darf keine Fachfallidentität enthalten.');
+$assert(($resourcePlan['writer'] ?? '') === 'be_cc_writeback_staging_inbox_approve_verified', 'Der Runtime-Ressourcenvertrag muss den Writer nur auflösen.');
+$assert(($resourcePlan['resources']['source_tab'] ?? '') === 'Inbox_Staging', 'Runtime-E3 muss Inbox_Staging als Quelle ausweisen.');
+$assert(($resourcePlan['resources']['target_tab'] ?? '') === 'Events_Staging', 'Runtime-E3 muss Events_Staging als Ziel ausweisen.');
+$assert(($resourcePlan['resources']['live_inbox'] ?? '') === 'not_used', 'Runtime-E3 darf Live-Inbox nicht verwenden.');
+$assert(($resourcePlan['resources']['live_events'] ?? '') === 'not_used', 'Runtime-E3 darf Live-Events nicht verwenden.');
+$assert(($resourcePlan['inbox_snapshot']['schema'] ?? '') === 'valid', 'Inbox_Staging-Schema muss read-only bestätigt werden.');
+$assert(($resourcePlan['events_snapshot']['schema'] ?? '') === 'valid', 'Events_Staging-Schema muss read-only bestätigt werden.');
+
+$blockedResourcePlan = be_cc_runtime_resource_contract($blockedContext, $inboxResourceSnapshot, $eventsResourceSnapshot);
+$assert(($blockedResourcePlan['allowed'] ?? true) === false, 'Ein Hostkonflikt muss auch den fachfallfreien Ressourcenvertrag blockieren.');
+
 /*
- * Der Planvertrag wird mit einem Activity-Kandidaten getestet, damit dieser
- * isolierte Test ausschließlich Runtime-, Resolver- und Mutationsfreiheit
- * prüft. Der separate Event-Review-Vertrag besitzt eigene vollständige Tests.
+ * Der fallbezogene Planvertrag bleibt separat erhalten. Diese Fixture prüft
+ * ausschließlich den bestehenden Planpfad und wird nicht von Staging-E3 als
+ * realer Fachfall verwendet.
  */
 $source = [
     'submission_kind'=>'activity',
@@ -97,8 +128,8 @@ $targetSnapshot = [
     'identical'=>false,
 ];
 $plan = be_cc_preflight_plan($case, 'approve', [], $context, $sourceSnapshot, $targetSnapshot);
-$assert(($plan['mutation'] ?? true) === false, 'Der Preflight-Vertrag muss Mutation hart auf false setzen.');
-$assert(($plan['allowed'] ?? false) === true, 'Der konsistente Staging-Plan muss freigegeben werden.');
+$assert(($plan['mutation'] ?? true) === false, 'Der fallbezogene Preflight-Vertrag muss Mutation hart auf false setzen.');
+$assert(($plan['allowed'] ?? false) === true, 'Der konsistente fallbezogene Staging-Plan muss freigegeben werden.');
 $assert(($plan['writer'] ?? '') === 'be_cc_writeback_staging_inbox_approve_verified', 'Plan und Action müssen denselben Staging-Writer verwenden.');
 $assert(($plan['resources']['source_tab'] ?? '') === 'Inbox_Staging', 'Preflight muss Inbox_Staging als Quelle ausweisen.');
 $assert(($plan['resources']['target_tab'] ?? '') === 'Events_Staging', 'Preflight muss Events_Staging als Ziel ausweisen.');
@@ -106,12 +137,14 @@ $assert(($plan['resources']['live_inbox'] ?? '') === 'not_used', 'Staging-Prefli
 $assert(($plan['resources']['live_events'] ?? '') === 'not_used', 'Staging-Preflight darf Live-Events nicht verwenden.');
 
 $blockedPlan = be_cc_preflight_plan($case, 'approve', [], $blockedContext, $sourceSnapshot, $targetSnapshot);
-$assert(($blockedPlan['allowed'] ?? true) === false, 'Ein Hostkonflikt muss den Gesamtplan blockieren.');
+$assert(($blockedPlan['allowed'] ?? true) === false, 'Ein Hostkonflikt muss den fallbezogenen Gesamtplan blockieren.');
 
 $endpointSource = (string)file_get_contents(dirname(__DIR__) . '/api/control-center/preflight.php');
 $actionSource = (string)file_get_contents(dirname(__DIR__) . '/api/control-center/action.php');
 $assert(str_contains($endpointSource, 'be_require_review_access'), 'Preflight-Endpunkt muss review-authentifiziert sein.');
 $assert(str_contains($endpointSource, "REQUEST_METHOD") && str_contains($endpointSource, "POST"), 'Preflight-Endpunkt muss POST-only sein.');
+$assert(str_contains($endpointSource, "mode === 'runtime'"), 'Der bestehende Preflight-Endpunkt muss den fachfallfreien Runtime-Modus besitzen.');
+$assert(str_contains($endpointSource, 'akzeptiert keinen Fachfall und keine Aktion'), 'Runtime-Modus muss Case und Action fail-closed ablehnen.');
 $assert(!str_contains($endpointSource, 'be_cc_operation_reserve_persistent'), 'Preflight darf keine persistente Operation reservieren.');
 $assert(!str_contains($endpointSource, 'be_cc_apply_action'), 'Preflight darf keinen lokalen Fallzustand verändern.');
 $assert(str_contains($actionSource, 'be_cc_inbox_writer_name($action, $eventsTab)'), 'Action-Endpunkt muss denselben Writer-Resolver wie der Preflight verwenden.');

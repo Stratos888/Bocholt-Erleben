@@ -56,7 +56,8 @@ jobs:
             .github/workflows/control-center-ci.yml \
             .github/workflows/deploy-strato.yml \
             .github/workflows/staging-verification.yml \
-            .github/workflows/control-center-e4-synthetic.yml; do
+            .github/workflows/control-center-e4-synthetic.yml \
+            api/control-center/_runtime_resource_contract.php; do
             test -s "$file"
           done
 
@@ -75,13 +76,21 @@ jobs:
           grep -q '^name: Staging Verification$' .github/workflows/staging-verification.yml
           grep -q 'deploy/staging-observed' .github/workflows/staging-verification.yml
           grep -q 'control-center/runtime-preflight-e3' .github/workflows/staging-verification.yml
-          grep -q 'mutation_false' .github/workflows/staging-verification.yml
-          grep -q 'frozen_case_excluded' .github/workflows/staging-verification.yml
-          grep -q 'if "cityart" in haystack' .github/workflows/staging-verification.yml
+          grep -q '"mode": "runtime"' .github/workflows/staging-verification.yml
+          grep -q 'no_fachfall' .github/workflows/staging-verification.yml
           grep -q 'runtime_and_resource_contract_only' .github/workflows/staging-verification.yml
-          grep -q 'business_blockers' .github/workflows/staging-verification.yml
+          grep -q 'mutation_false' .github/workflows/staging-verification.yml
+          grep -q 'be_cc_runtime_resource_contract' api/control-center/preflight.php
           grep -q 'python3 scripts/control-center-e4-synthetic.py --self-test' .github/workflows/control-center-ci.yml
 
+          if grep -q '/api/control-center/cases.php' .github/workflows/staging-verification.yml; then
+            echo "Staging Verification must not select a real control case for E3."
+            exit 1
+          fi
+          if grep -Eq '"case_id"[[:space:]]*:' .github/workflows/staging-verification.yml; then
+            echo "Staging Verification must not send a case identity for E3."
+            exit 1
+          fi
           if grep -q 'control-center-e4-synthetic.yml.*dispatches' .github/workflows/staging-verification.yml; then
             echo "Staging Verification must never dispatch E4."
             exit 1

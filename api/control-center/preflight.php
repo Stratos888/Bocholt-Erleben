@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/_domain.php';
-require_once __DIR__ . '/_runtime_preflight.php';
+require_once __DIR__ . '/_runtime_resource_contract.php';
 
 be_require_review_access();
 
@@ -14,6 +14,23 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
 try {
     $input = json_decode((string)file_get_contents('php://input'), true);
     if (!is_array($input)) throw new InvalidArgumentException('Invalid JSON body.');
+
+    $mode = strtolower(trim((string)($input['mode'] ?? 'case')));
+    if ($mode === 'runtime') {
+        if (trim((string)($input['case_id'] ?? '')) !== '' || trim((string)($input['action'] ?? '')) !== '') {
+            throw new InvalidArgumentException('Der Runtime-Ressourcen-Preflight akzeptiert keinen Fachfall und keine Aktion.');
+        }
+        $plan = be_cc_runtime_resource_contract();
+        if (empty($plan['allowed'])) {
+            be_json_response(409, [
+                'status'=>'blocked',
+                'message'=>'Der Runtime-Ressourcen-Preflight hat die Umgebung fail-closed blockiert.',
+                'data'=>$plan,
+            ]);
+        }
+        be_json_response(200, ['status'=>'ok', 'data'=>$plan]);
+    }
+    if ($mode !== 'case') throw new InvalidArgumentException('Unbekannter Preflight-Modus.');
 
     $caseId = trim((string)($input['case_id'] ?? ''));
     $action = strtolower(trim((string)($input['action'] ?? '')));
