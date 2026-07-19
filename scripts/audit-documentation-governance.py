@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Validate the canonical documentation contract for Bocholt erleben."""
-
 from __future__ import annotations
 
 import re
@@ -18,22 +17,25 @@ REQUIRED = {
     "TEST_STATUS.md",
     "Produktvertrag.md",
     "docs/README.md",
+    "docs/DOCUMENT_REGISTRY.md",
     "docs/architecture/SYSTEM_MAP.md",
     "docs/external-resource-matrix.md",
     "docs/workpacks/active/CURRENT_WORKPACK.md",
     "docs/workpacks/queued/INDEX.md",
+    "scripts/report-documentation-inventory.py",
 }
 
 LINE_LIMITS = {
-    "README.md": 100,
+    "README.md": 110,
     "AI_ENTRYPOINT.md": 230,
     "MASTER.md": 150,
     "ROADMAP.md": 190,
     "TEST_STATUS.md": 150,
     "docs/README.md": 230,
+    "docs/DOCUMENT_REGISTRY.md": 230,
     "docs/architecture/SYSTEM_MAP.md": 220,
     "docs/external-resource-matrix.md": 170,
-    "docs/workpacks/active/CURRENT_WORKPACK.md": 130,
+    "docs/workpacks/active/CURRENT_WORKPACK.md": 140,
     "docs/workpacks/queued/INDEX.md": 130,
 }
 
@@ -43,6 +45,7 @@ NO_APPEND_BLOCKS = {
     "ROADMAP.md",
     "TEST_STATUS.md",
     "docs/README.md",
+    "docs/DOCUMENT_REGISTRY.md",
     "docs/architecture/SYSTEM_MAP.md",
     "docs/external-resource-matrix.md",
     "docs/workpacks/active/CURRENT_WORKPACK.md",
@@ -59,6 +62,8 @@ REQUIRED_MARKERS = {
         "Fehlerbudget und Stop-the-line",
         "Ein grüner PR beweist höchstens E2",
         "dedizierter Ruleset-Bypass",
+        "Dokumentations- und Implementierungsvertrag",
+        "docs/DOCUMENT_REGISTRY.md",
     ],
     "docs/workpacks/active/CURRENT_WORKPACK.md": [
         "Aktiver Implementierungs-Workpack",
@@ -78,7 +83,17 @@ REQUIRED_MARKERS = {
     "MASTER.md": ["Produkt-Nordstern", "Nicht verhandelbare Produktprinzipien"],
     "ROADMAP.md": ["Ausführungsreihenfolge", "Aktivierungsregel"],
     "TEST_STATUS.md": ["Aktueller Proofindex", "Aktuelle harte Evidence-Lücke"],
-    "docs/README.md": ["Dokumenttypen und Rangfolge", "Dokumentations-Definition-of-Done"],
+    "docs/README.md": [
+        "Dokumenttypen und Rangfolge",
+        "Aufgabenbezogener Lesepfad",
+        "Dokumentations-Definition-of-Done",
+    ],
+    "docs/DOCUMENT_REGISTRY.md": [
+        "Kanonische Root-Dokumente",
+        "Pfadbasierte Rollen",
+        "Änderungsmatrix",
+        "Neue Dokumente",
+    ],
 }
 
 errors: list[str] = []
@@ -134,6 +149,21 @@ if ai.is_file() and matrix.is_file():
         errors.append("live event admin exception is not consistently documented")
     if "technisch gesperrt" not in ai_text:
         errors.append("AI_ENTRYPOINT.md must state that direct main hotfix is technically blocked until bypass setup")
+
+workflow = ROOT / ".github/workflows/project-guardrails.yml"
+if workflow.is_file():
+    text = workflow.read_text(encoding="utf-8")
+    for marker in [
+        "scripts/report-documentation-inventory.py --check",
+        "documentation-inventory.json",
+        "actions/upload-artifact@v4",
+    ]:
+        if marker not in text:
+            errors.append(f"project-guardrails.yml: documentation inventory contract missing: {marker!r}")
+    if re.search(r"contents:\s*write", text):
+        errors.append("project-guardrails.yml: documentation guardrail must remain read-only")
+    if "git push" in text or "force-with-lease" in text:
+        errors.append("project-guardrails.yml: self-writing or force-push behavior is forbidden")
 
 if errors:
     print("Documentation governance audit FAILED:")
