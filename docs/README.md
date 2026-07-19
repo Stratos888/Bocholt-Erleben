@@ -1,8 +1,8 @@
 # Dokumentationslandkarte
 
-Stand: 2026-07-18
+Stand: 2026-07-19
 
-Diese Datei definiert Rollen, Rangfolge und Pflege der Projektdokumentation. Sie ist kein Projektstatus und kein Workpack.
+Diese Datei definiert Lesepfade, Rangfolge und Pflege der Projektdokumentation. Die vollständige Rollenklassifikation steht in `DOCUMENT_REGISTRY.md`. Diese Datei ist kein Projektstatus und kein Workpack.
 
 ## 1. Verbindliche Lesereihenfolge
 
@@ -11,12 +11,13 @@ Für jede neue Repo-Aufgabe:
 1. `AI_ENTRYPOINT.md` – Arbeitsrouter und Sicherheitsgrenzen
 2. `docs/workpacks/active/CURRENT_WORKPACK.md` – einziger operativer Projektstatus
 3. `docs/architecture/SYSTEM_MAP.md` – stabile Systeme, Datenhoheit und Datenflüsse
-4. fachliche Owner-Dateien und relevante Implementierung
-5. `ENGINEERING.md` – dauerhafte technische Guardrails
-6. `docs/external-resource-matrix.md` – externe Ressourcen und Schreibgrenzen
-7. Produkt-, Strategie-, Roadmap- und Evidence-Dokumente nach Bedarf
+4. Aufgabenroute aus Abschnitt 6 und `docs/DOCUMENT_REGISTRY.md`
+5. fachliche Owner-Dateien und relevante Implementierung im aktuellen Ref
+6. `ENGINEERING.md` – dauerhafte technische Guardrails
+7. `docs/external-resource-matrix.md` – externe Ressourcen und Schreibgrenzen
+8. Produkt-, Strategie-, Roadmap- und Evidence-Dokumente nur nach Bedarf
 
-Alte Chats, Memory, ZIPs, PR-Beschreibungen und historische Dokumente sind Kontext. Sie dürfen die aktuelle Repo-Hierarchie nicht übersteuern.
+Alte Chats, Memory, ZIPs, PR-Beschreibungen, Freeze-Dateien und historische Dokumente sind Kontext. Sie dürfen die aktuelle Repo-Hierarchie nicht übersteuern.
 
 ## 2. Dokumenttypen und Rangfolge
 
@@ -24,6 +25,7 @@ Alte Chats, Memory, ZIPs, PR-Beschreibungen und historische Dokumente sind Konte
 |---|---|---|---|
 | Arbeitsrouter | `AI_ENTRYPOINT.md` | Vorgehen, Mandat, Risiko, Evidence, Stop-the-line | inhaltlich ersetzen |
 | Operativer Status | `CURRENT_WORKPACK.md` | exakt ein aktiver oder nächster erlaubter Schritt, Locks, Blocker | bei jedem Statuswechsel ersetzen |
+| Dokumentregister | `DOCUMENT_REGISTRY.md` | Rollen, Pfade, Änderungsmatrix | bei Rollen- oder Strukturänderung |
 | Architektur | `SYSTEM_MAP.md` | stabile Komponenten, Datenflüsse, Owner | nur bei Architekturänderung |
 | Technische Guardrails | `ENGINEERING.md` | dauerhafte Entwicklungs- und Runtime-Regeln | nur bei neuer dauerhafter Regel |
 | Ressourcenvertrag | `external-resource-matrix.md` | Staging-/Live-Ressourcen, Zugriff, Locks | bei Ressourcen- oder Schreibvertragsänderung |
@@ -35,7 +37,9 @@ Alte Chats, Memory, ZIPs, PR-Beschreibungen und historische Dokumente sind Konte
 | Entscheidung | `docs/decisions/**` | dauerhaft angenommene Architektur-/Produktentscheidung | datiert und danach grundsätzlich unverändert |
 | Forensik | `docs/forensics/**` | belegte Untersuchung mit Restunsicherheiten | datiert und danach grundsätzlich unverändert |
 | Evidence | `TEST_STATUS.md`, `docs/evidence/**` | Proofindex und ausführliche Nachweise | nach neuer Evidence |
-| Domainvertrag/Playbook | z. B. `VISUAL_WORKFLOW.md`, `EVENT_DESCRIPTION_STANDARD.md`, `DEBUG.md` | Regeln eines klar begrenzten Fachbereichs | beim Domainwechsel |
+| Vertrag/Playbook | z. B. `EVENT_DESCRIPTION_STANDARD.md`, `DEBUG.md` | aktueller Vertrag oder Vorgehen einer klaren Domäne | beim Domainwechsel |
+| Referenz | historische oder ausführliche Detaildateien | unterstützender Kontext, kein Statusrouter | nur bei fachlichem Bedarf |
+| Archiv | `docs/archive/**` oder klar historische Root-Datei | ersetzter Zustand oder Beleg | grundsätzlich unverändert |
 
 Bei Widerspruch gilt die speziellere aktuelle Source of Truth innerhalb ihrer Rolle. Ein Zielzustandsdokument darf keine bereits umgesetzte Produktmechanik vortäuschen.
 
@@ -55,7 +59,7 @@ Git und Evidence-Dateien tragen die Historie.
 
 ## 4. Regeln für kanonische Steuerdateien
 
-Für `AI_ENTRYPOINT.md`, `CURRENT_WORKPACK.md`, `SYSTEM_MAP.md`, `MASTER.md`, `ROADMAP.md` und `TEST_STATUS.md` gilt:
+Für `AI_ENTRYPOINT.md`, `CURRENT_WORKPACK.md`, `SYSTEM_MAP.md`, `MASTER.md`, `ROADMAP.md`, `TEST_STATUS.md`, `docs/README.md` und `DOCUMENT_REGISTRY.md` gilt:
 
 1. Keine fortlaufenden `BEGIN BLOCK`-/`END BLOCK`-Anhänge.
 2. Keine immer neuen „aktueller Stand“-Kapitel über älteren „aktuellen“ Kapiteln.
@@ -65,6 +69,8 @@ Für `AI_ENTRYPOINT.md`, `CURRENT_WORKPACK.md`, `SYSTEM_MAP.md`, `MASTER.md`, `R
 6. Veraltete Inhalte werden ersetzt. Git bewahrt die Vorgeschichte.
 7. Ein Dokument hat genau eine Hauptrolle.
 8. Links auf Zielzustände nennen ausdrücklich, ob sie umgesetzt sind.
+9. Kanonische Dokumente verlinken nicht direkt auf Archive als Arbeitsanweisung.
+10. Neue Root-Markdown-Dateien benötigen vor dem Merge eine registrierte Rolle.
 
 ## 5. Workpack-Lebenszyklus
 
@@ -81,29 +87,48 @@ queued
 - Beim Abschluss werden Ergebnis, erreichte Evidence, Restlücken und nächster zulässiger Schritt dokumentiert.
 - Offene PRs werden bei Taskbeginn aus GitHub gelesen und nicht als dauerhafte Liste in Steuerdateien kopiert.
 
-## 6. Fachliche Lesepfade
+## 6. Aufgabenbezogener Lesepfad
 
-### Produkt oder Funnel
+Die KI liest nicht pauschal alle Dokumente, sondern nur den kleinsten belastbaren Satz:
 
-`MASTER.md` -> `Produktvertrag.md` -> `COMMERCIAL_STRATEGY.md` -> `ROADMAP.md` -> fachlicher Zielzustand/Workpack
+| Aufgabe | Pflichtpfad nach Einstieg und Systemkarte |
+|---|---|
+| Produktmechanik oder Funnel | `MASTER.md` -> `Produktvertrag.md` -> `COMMERCIAL_STRATEGY.md` -> `ROADMAP.md` -> Workpack/Owner |
+| Control Center oder externe Writes | `ENGINEERING.md` -> `external-resource-matrix.md` -> relevante Control-Center-Verträge -> API-/UI-Owner |
+| Content und KI-Suche | `EVENT_DESCRIPTION_STANDARD.md` -> Suchregelwerk/Quellenregister -> relevante Skripte -> Evidence |
+| Visuals und Bildqualität | `VISUAL_WORKFLOW.md` -> Visual-Pool -> Generatoren/Audits -> konkrete Owner |
+| Public UI oder Today | `ENGINEERING.md` -> betroffene CSS-/JS-/HTML-Owner -> `DEBUG.md` nur für UI-Proofs |
+| Activities und saisonale Inhalte | fachliche Activity-Referenzen -> Datenowner -> Generatoren/Audits |
+| SEO und Growth | aktuelle Forensik/Entscheidung -> queued Workpack -> Rendering-/Tracking-Owner |
+| Deploy, CI oder GitHub Actions | `ENGINEERING.md` -> `github-actions-trigger-policy.md` -> betroffene Workflows und Tests |
+| Dokumentationsänderung | `DOCUMENT_REGISTRY.md` -> zuständiger Owner -> Inventur -> Governance-Audit |
 
-### Control Center und externe Writes
+Historische Referenzen werden nur geöffnet, wenn eine aktuelle Datei sie ausdrücklich als Beleg oder Detailquelle nennt.
 
-`CURRENT_WORKPACK.md` -> `SYSTEM_MAP.md` -> `ENGINEERING.md` -> `external-resource-matrix.md` -> betroffene API-/UI-Owner
+## 7. Änderungsvorgehen
 
-### Content und KI-Suche
+Vor dem Patch:
 
-`EVENT_DESCRIPTION_STANDARD.md` -> `bocholt-erleben_eventsuche_regelwerk_v3.md` -> relevante Such-/Audit-Skripte -> Evidence
+1. Rolle der betroffenen Aussage bestimmen.
+2. Bestehenden Owner und aktuellen Ref lesen.
+3. Entscheiden, ob IST, Vertrag, ZIEL, Evidence oder Historie betroffen ist.
+4. Dokumentationsauswirkung im Workpack und PR deklarieren.
 
-### Visuals
+Beim Patch:
 
-`VISUAL_WORKFLOW.md` -> `data/event_visual_pool.json` -> Visual-Generatoren/Audits -> konkrete Owner
+1. Code und dauerhafte Dokumentation konsistent ändern.
+2. Keine zukünftige Funktion als umgesetzt dokumentieren.
+3. Statusdateien ersetzen statt ergänzen.
+4. Evidence getrennt von Vertrag und Entscheidung halten.
 
-### UI-Debugging
+Nach dem Patch:
 
-`DEBUG.md` ist ein begrenztes UI-/Layout-Proof-Kit. Es ist keine globale Projektstatus- oder Architekturquelle.
+1. `CURRENT_WORKPACK.md` auf den echten Folgezustand setzen.
+2. Vollinventur und Governance-Audit ausführen.
+3. Fehler beseitigen; Warnungen bewusst bewerten und im PR benennen.
+4. Erst danach integrieren.
 
-## 7. Dokumentations-Definition-of-Done
+## 8. Dokumentations-Definition-of-Done
 
 Ein Workpack ist dokumentarisch erst abgeschlossen, wenn:
 
@@ -113,10 +138,13 @@ Ein Workpack ist dokumentarisch erst abgeschlossen, wenn:
 - `TEST_STATUS.md` nur bei tatsächlich neuer Evidence aktualisiert wurde;
 - veraltete Statusaussagen entfernt statt ergänzt wurden;
 - alle betroffenen Dokumentlinks funktionieren;
+- jede Markdown-Datei eine bekannte Rolle besitzt;
+- keine kanonische Datei ungeprüft auf ein Archiv routet;
+- `python3 scripts/report-documentation-inventory.py --check` grün ist;
 - `python3 scripts/audit-documentation-governance.py` grün ist.
 
-## 8. Automatischer Schutz
+## 9. Automatischer Schutz
 
-`scripts/audit-documentation-governance.py` prüft Struktur, Größenbudget und zentrale Widerspruchsgrenzen. `Project Guardrails` führt diesen Audit für Änderungen an den Steuerdateien aus.
+`report-documentation-inventory.py` inventarisiert alle getrackten Markdown-Dateien, klassifiziert Rollen und prüft Links sowie Statusgrenzen. `audit-documentation-governance.py` schützt die kanonischen Steuerdateien und den CI-Vertrag. `Project Guardrails` führt beide Prüfungen read-only aus und veröffentlicht den maschinenlesbaren Inventurbericht als Artefakt.
 
-Der Audit ersetzt keine fachliche Prüfung. Er verhindert, dass die Dokumentation erneut zu einem langen, widersprüchlichen Statusarchiv anwächst.
+Die Prüfungen ersetzen keine fachliche Bewertung. Sie verhindern, dass die Dokumentation erneut zu einem widersprüchlichen Statusarchiv oder zu einer ungerouteten Dateisammlung anwächst.
