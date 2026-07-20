@@ -32,9 +32,10 @@ ein primärer Entwicklungs-Chat
 1. `PR Gate`
 2. `Deploy to STRATO`
 3. `Content Quality Audit`
-4. `Inbox Cleanup (Archive)`
-5. `Weekly KI Websearch → Manual Inbox`
-6. `Manual KI Event Intake`
+4. `Growth Intelligence Backlog`
+5. `Inbox Cleanup (Archive)`
+6. `Weekly KI Websearch → Manual Inbox`
+7. `Manual KI Event Intake`
 
 ## Abgeschlossener synthetischer Writeback-Nachweis
 
