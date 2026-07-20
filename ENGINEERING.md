@@ -48,9 +48,10 @@ Dauerhafte Workflowrollen:
 1. `PR Gate` – einziger Entwicklungs- und Integrationscheck;
 2. `Deploy to STRATO` – einziger Deploy- und Feed-Build-Pfad;
 3. `Content Quality Audit` – fachlicher Inhaltsaudit;
-4. `Inbox Cleanup (Archive)` – fachliche Inbox-Pflege;
-5. `Weekly KI Websearch → Manual Inbox` – fachliche Kandidatensuche;
-6. `Manual KI Event Intake` – fachlicher Intake-Handoff.
+4. `Growth Intelligence Backlog` – fachliche Growth-/SEO-Signale;
+5. `Inbox Cleanup (Archive)` – fachliche Inbox-Pflege;
+6. `Weekly KI Websearch → Manual Inbox` – fachliche Kandidatensuche;
+7. `Manual KI Event Intake` – fachlicher Intake-Handoff.
 
 Neue Workflows sind nur zulässig, wenn keine bestehende Rolle die Aufgabe übernehmen kann und der Workflow dauerhaft produktiv gebraucht wird. Reine Aggregatoren, Observer, Governance-Workflows und einmalige Testharnesses gehören nicht in die dauerhafte Topologie.
 
