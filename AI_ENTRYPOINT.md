@@ -29,6 +29,8 @@ Ein primärer Ausführungs-Chat
 
 Der primäre Chat darf Analyse, Implementierung, Tests, PR, Integration nach `staging`, Deployprüfung und Abschluss zusammenhängend durchführen. Parallele schreibende Chats sind nur nach dokumentiertem Nachweis vollständiger Owner-, Runtime- und Ressourcenunabhängigkeit zulässig.
 
+Das Ziel ist nicht möglichst viel Governance, sondern der kleinste zusammenhängende Premium-Zielzustand. Ein allgemeiner Prozess-, Dokumentations- oder Architektur-Workpack wird nur bei einer belegten aktuellen Lücke eröffnet. Sobald die notwendige Governance ausreichend ist, wird sie abgeschlossen und die Arbeit kehrt zum produkt- oder risikowirksamsten Workpack zurück.
+
 ## 3. Einmaliges Arbeitsmandat
 
 Eine eindeutige Anweisung wie `umsetzen`, `patchen`, `dokumentieren` oder `mach das` erteilt für den vereinbarten Scope ein einmaliges Arbeitsmandat.
@@ -85,7 +87,7 @@ Ein direkter Main-Hotfix ist nur nach ausdrücklicher Nutzerbeauftragung und nur
 
 Solange der dedizierte Ruleset-Bypass nicht eingerichtet ist, ist dieser Pfad technisch gesperrt. Ein breiter `staging -> main`-Merge darf nicht als Ersatzhotfix verwendet werden.
 
-## 5. Risikoklassen
+## 5. Risikoklassen und proportionaler Prüfpfad
 
 | Klasse | Typische Änderung | Mindestpfad |
 |---|---|---|
@@ -95,11 +97,32 @@ Solange der dedizierte Ruleset-Bypass nicht eingerichtet ist, ist dieser Pfad te
 
 Die KI klassifiziert selbst. Risiko, Scope, benötigte Evidence und Rollback stehen im Workpack und PR.
 
+Die Tiefe der Analyse folgt dem Risiko und der tatsächlichen Architekturwirkung:
+
+- `R1`: aktueller Owner, begrenzter Diff, passende statische Prüfung und direkte Abnahme;
+- `R2`: vollständiger Runtimevertrag, E2, Deploy und fachfallfreie E3-Evidence, sofern nicht der Fachfall selbst Prüfgegenstand ist;
+- `R3`: vollständiger Ressourcen-, Identitäts-, Transaktions-, Rücklese- und Cleanup-Vertrag plus E4;
+- eine Vollinventur aller Pfade ist nur erforderlich, wenn konkurrierende Owner, Trigger, Writer, Resolver oder Runtimepfade tatsächlich betroffen sind.
+
+Keine Vollinventur und kein Meta-Workpack nur aus Vorsicht, wenn Scope, Owner und Zielverhalten bereits eindeutig belegt sind.
+
 ## 6. Vier Gates
 
-### Gate A – Verstehen
+### Gate A – Verstehen und Evidence entwerfen
 
 Vor dem Patch müssen Zielzustand, Ausgangs-SHA, Fakten/Hypothesen, Owner, erlaubter und gesperrter Scope, externe Ressourcen, Evidence und Rollback feststehen.
+
+Für `R2` und `R3` ist das Evidence-Design Teil der Lösung und muss vor dem ersten Patch konkret beantworten:
+
+- welcher Host, Endpoint, Trigger oder Workflow den Nachweis erzeugt;
+- welche Umgebung, Quelle, Zielressource, Identität und welcher Operationsplan erwartet werden;
+- welche exakten positiven und negativen Assertions gelten;
+- welche Daten dafür zwingend existieren müssen;
+- ob der Nachweis von einem zufällig vorhandenen echten Fachdatensatz abhängt;
+- welche Contract-, Fixture- oder Replay-Prüfung die späteren E3-/E4-Assertions bereits in E2 absichert;
+- welche Postconditions, Cleanup- und Revertbedingungen gelten.
+
+Technische Runtime- oder Infrastruktur-Evidence ist fachfallfrei zu entwerfen, solange nicht ausdrücklich der echte Fachfall selbst der Prüfgegenstand ist. Fehlen geeignete Daten, wird kein zufälliger oder eingefrorener Fachfall als technisches Prüfobjekt verwendet.
 
 Bei ungeklärter realer Mutation ist nur read-only Forensik oder Observability zulässig.
 
@@ -111,6 +134,15 @@ Bei ungeklärter realer Mutation ist nur read-only Forensik oder Observability z
 - keine externe Mutation durch normale Implementierungsschritte.
 
 Ein grüner PR beweist höchstens E2.
+
+Vor der Integration eines `R2`- oder `R3`-Workpacks gilt zusätzlich das Runtime-Design-Gate:
+
+- alle späteren E3-/E4-Assertions sind bereits eindeutig und maschinenprüfbar definiert;
+- der vorgesehene Runtime-Aufruf kann den Zielzustand tatsächlich beweisen;
+- notwendige Fixtures, Replays und Negativfälle sind vorhanden oder ihre begründete Nichtanwendbarkeit ist dokumentiert;
+- der Nachweis hängt nicht unbeabsichtigt vom aktuellen Inhalt eines echten Fachfalls ab.
+
+Ist dieses Gate nicht erfüllt, wird nicht nach `staging` integriert.
 
 ### Gate C – Reale Runtime beweisen
 
@@ -163,9 +195,13 @@ Regeln:
 
 1. eine technische Hypothese gleichzeitig;
 2. kein zweiter Write ohne neue Evidence;
-3. nach zwei widerlegten Hypothesen kein dritter Patch, sondern Architektur- oder Revert-Entscheidung;
-4. keine manuelle Datenkorrektur zum künstlichen Grünmachen;
-5. Revert vor Nachpatchen bei einem direkten Main-Hotfix.
+3. nach einer fehlgeschlagenen Integration ist höchstens eine eng begrenzte Korrekturrunde im selben Workpack zulässig;
+4. scheitert auch diese Runde oder war eine tragende Annahme falsch, folgt kein weiterer Reparatur-PR, sondern Revert-, Architektur- oder Workpack-Neuentscheidung;
+5. mehrere aufeinanderfolgende Merge-/Deploy-Runden zur schrittweisen Suche nach dem richtigen Prüfdesign sind unzulässig;
+6. keine manuelle Datenkorrektur zum künstlichen Grünmachen;
+7. Revert vor Nachpatchen bei einem direkten Main-Hotfix.
+
+Vor der ersten Integration darf der Feature-Branch innerhalb des vereinbarten Scopes anhand neuer E1-/E2-Evidence korrigiert werden. Das Korrekturbudget begrenzt nachgelagerte Runtime-Try-and-Error-Schleifen, nicht sorgfältige Vorabvalidierung.
 
 ## 9. Dokumentations- und Implementierungsvertrag
 
@@ -178,6 +214,7 @@ Für jede Änderung gilt:
 5. Neue dauerhafte Regeln gehören genau in den fachlichen Owner; Evidence und Entscheidungen bleiben getrennte Dokumenttypen.
 6. Neue Root-Markdown-Dateien sind nur mit registrierter Rolle zulässig. Historische Dateien dürfen keinen aktuellen Lesepfad bilden.
 7. Vor Abschluss laufen Vollinventur und Governance-Audit aus `Project Guardrails` grün.
+8. Abgeschlossene Governance wird nicht durch weitere allgemeine Optimierungsdokumente fortgesetzt; neue Prozessregeln benötigen eine konkrete belegte Ursache.
 
 ## 10. Nutzerinteraktion
 
