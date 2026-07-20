@@ -29,7 +29,7 @@ def main() -> None:
     assert distinct_enriched["hard_duplicate"] is False
     assert distinct_enriched["duplicate_status"] == "distinct"
 
-    resume = payload["cases"][4]
+    resume = next(case for case in payload["cases"] if case["name"] == "same_id_resume")
     resume_match = find_best_event_match(resume["candidate"], resume["existing"])
     stale_resume = dict(resume["candidate"], matched_event_id="stale", duplicate_status="review", duplicate_reason="stale")
     resume_enriched = apply_event_identity_match(stale_resume, resume_match, allow_same_identity=True)
@@ -42,6 +42,9 @@ def main() -> None:
         {"status": "none"},
     )
     assert no_match["matched_event_id"] == "" and no_match["duplicate_status"] == ""
+
+    intake_script_text = (ROOT / "scripts" / "manual_ki_event_intake.py").read_text(encoding="utf-8")
+    assert '{"possible", "exact", "same_identity", "identity_conflict"}' in intake_script_text
 
     rows = event_rows_from_sheet_values([
         ["id", "title", "date", "city", "location", "url"],
