@@ -12,7 +12,7 @@
   "stopwords": [
     "am", "an", "auf", "aus", "bei", "das", "der", "die", "ein", "eine", "einer", "eines",
     "event", "fuer", "im", "in", "mit", "und", "veranstaltung", "vom", "von", "zum", "zur",
-    "bocholt", "bocholter"
+    "bocholt", "bocholter", "kulturtage"
   ],
   "token_aliases": {
     "bocholts": "bocholt",
