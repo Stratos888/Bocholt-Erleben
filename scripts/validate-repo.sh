@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 section="${1:-all}"
+PREFLIGHT_TEST="tests/control_center_runtime_preflight_contract_test.php"
 
 validate_routing() {
   echo "== Branch routing and JSON contracts =="
@@ -27,9 +28,17 @@ validate_php_syntax() {
   done
 }
 
+validate_preflight() {
+  echo "== Runtime preflight contract =="
+  php "$PREFLIGHT_TEST"
+}
+
 validate_php_tests() {
-  echo "== Control Center PHP contracts =="
+  echo "== Remaining Control Center PHP contracts =="
   for file in tests/control_center*.php; do
+    if [ "$file" = "$PREFLIGHT_TEST" ]; then
+      continue
+    fi
     echo "Running $file"
     php "$file"
   done
@@ -59,12 +68,14 @@ validate_repository() {
 case "$section" in
   routing) validate_routing ;;
   php-syntax) validate_php_syntax ;;
+  preflight) validate_preflight ;;
   php-tests) validate_php_tests ;;
   frontend) validate_frontend ;;
   repository) validate_repository ;;
   all)
     validate_routing
     validate_php_syntax
+    validate_preflight
     validate_php_tests
     validate_frontend
     validate_repository
