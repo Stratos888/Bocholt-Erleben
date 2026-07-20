@@ -1,102 +1,66 @@
 # Domain-Router: Control Center und interne Steuerzentrale
 
-Stand: 2026-07-19
+Diese Datei ist der aktuelle Einstieg für Aufgaben an Control Center, Inbox-Review, Source-Reconciliation und Writeback. Operativer Status und Locks stehen ausschließlich in `docs/workpacks/active/CURRENT_WORKPACK.md`.
 
-Rolle: aktueller Einstieg für Aufgaben an Control Center, Inbox-Review, interner Steuerzentrale, Source-Reconciliation und externen Writeback-Pfaden. Diese Datei enthält keinen Workpackstatus. Operativer Status, Locks und der nächste erlaubte Schritt stehen ausschließlich in `docs/workpacks/active/CURRENT_WORKPACK.md`.
+## Ziel
 
-## 1. Ziel
+Anzeige, Entscheidung, führende Quelle, Persistenz und Rücklesen müssen zu einem eindeutigen Endzustand führen. Eine sichtbare Erfolgsmeldung ohne bestätigten Quell- und Zielzustand ist unvollständig.
 
-Das Control Center soll redaktionelle und technische Prüffälle bis zu einem verifizierten Endzustand führen. Anzeige, Entscheidung, Persistenz, Folgeprozess und Rücklesen müssen zusammenpassen. Eine sichtbare Meldung ohne ausführbare und nachweisbare Folgeaktion ist unvollständig.
+## Autoritätsreihenfolge
 
-## 2. Autoritätsreihenfolge
+1. `CURRENT_WORKPACK.md`
+2. `docs/architecture/SYSTEM_MAP.md`
+3. `docs/external-resource-matrix.md`
+4. aktuelle Backend-, UI- und Datenowner im aktuellen Ref
+5. Evidence oder Forensik nur für den konkreten Fall
 
-1. `docs/workpacks/active/CURRENT_WORKPACK.md` – aktiver Status, Locks und nächster Schritt.
-2. `docs/architecture/SYSTEM_MAP.md` – Systeme, Datenhoheit und Datenflüsse.
-3. `docs/external-resource-matrix.md` – reale Ressourcen, Umgebungen und Schreibgrenzen.
-4. aktuelle Control-Center-Verträge und die konkrete Implementierung im aktuellen Ref.
-5. Evidence und Forensik nur für den belegten Einzelfall.
-6. historische Handoffs, alte Workpacks, Freeze- und Simulationsdateien nur als Historie.
+## Aktuelle Owner
 
-## 3. Aktuelle Owner
+| Ebene | Owner |
+|---|---|
+| Arbeitsmodell | `AI_ENTRYPOINT.md` |
+| Architektur und Datenhoheit | `docs/architecture/SYSTEM_MAP.md` |
+| externe Ressourcen | `docs/external-resource-matrix.md` |
+| Workflowpolicy | `docs/github-actions-trigger-policy.md` |
+| PR-Prüfung | `.github/workflows/pr-gate.yml`, `scripts/validate-repo.sh` |
+| Deploy | `.github/workflows/deploy-strato.yml` |
+| Backendverträge | `api/control-center/_editorial_contracts.php` |
+| Darstellung | `api/control-center/_presentation.php`, `js/control-center/review-render.js` |
+| Aktionen | `js/control-center/review-actions.js`, `api/control-center/action.php` |
+| Source-Reconciliation | `api/control-center/_source_reconciliation.php` |
+| verifizierter Writeback | `api/control-center/_verified_source_writeback.php`, `api/control-center/_staging_events_writeback.php` |
+| fallbezogener Preflight | `api/control-center/preflight.php`, `api/control-center/_runtime_preflight.php` |
 
-| Ebene | Owner | Rolle |
-|---|---|---|
-| Arbeits- und Risikovertrag | `AI_ENTRYPOINT.md` | Mandat, R2/R3, E3/E4, Stop-the-line |
-| Architektur und Datenhoheit | `docs/architecture/SYSTEM_MAP.md` | autoritativer System- und Ressourcenfluss |
-| externe Ressourcen | `docs/external-resource-matrix.md` | Staging-/Live-Ziele und Mutationsgrenzen |
-| technische Workflowpolicy | `docs/github-actions-trigger-policy.md` | Trigger-, Branch-, Check- und Operatorvertrag |
-| PR-Integration | `.github/workflows/pr-gate.yml` | Always-run-Aggregator und Branchpolicy |
-| Governance | `.github/workflows/project-guardrails.yml` | Architektur-, Dokumentations- und Workflowtopologie-Gates |
-| Control-Center E1/E2 | `.github/workflows/control-center-ci.yml` | vollständige statische und Contractprüfung |
-| Deploy | `.github/workflows/deploy-strato.yml` | einziger Staging-/Live-Deploypfad |
-| Control-Center E3 | `.github/workflows/staging-verification.yml` | gemeinsame read-only Deploy-/Build-/Runtime-Evidence |
-| Control-Center E4 | `.github/workflows/control-center-e4-synthetic.yml` | getrennte, gesperrte R3-Capability |
-| redaktionelle Backendverträge | `api/control-center/_editorial_contracts.php` | Felder, Entscheidungen und Validierung |
-| Darstellung | `api/control-center/_presentation.php`, `js/control-center/review-render.js` | Projektion und Review-UI |
-| Aktionen | `js/control-center/review-actions.js` | Nutzeraktionen und Aufrufpfade |
-| Quellenabgleich | `api/control-center/_source_reconciliation.php` | Abgleich lokaler und führender Zustände |
-| verifizierter Writeback | `api/control-center/_verified_source_writeback.php` | begrenzte Mutation und Rücklesen |
-| Workflowinventur | `docs/evidence/control-center-workflow-inventory-2026-07-19.md` | Gate-A-Matrix, Zieltopologie und Ruleset-Grenzen |
-
-## 4. Aktuelle fachliche Referenzen
-
-Nur aufgabenbezogen lesen:
-
-- `STEUERZENTRALE_GESAMTPROJEKT_INTEGRATION.md` – Integrationsvertrag.
-- `STEUERZENTRALE_INFORMATIONARCHITEKTUR.md` – Informationsarchitektur.
-- `STEUERZENTRALE_SCREENVERTRAG.md` – Screen- und Interaktionsvertrag.
-- `STEUERZENTRALE_VORGANGSKATALOG.md` – Vorgänge und Falltypen.
-- `STEUERZENTRALE_ABNAHMEMATRIX.md` – fachliche Abnahmedimensionen.
-- `docs/steuerzentrale-backlog-roadmap-vertrag.md` – aktueller Backlog-/Roadmap-Vertrag.
-- `docs/internal-dashboard.md` und `docs/internal-dashboard-target.md` – Zielreferenzen für die interne Betreiberoberfläche, keine Implementierungsbehauptung.
-
-## 5. Historische Dateien
-
-Die folgenden Dokumenttypen dürfen keinen aktuellen Arbeitsauftrag bilden:
-
-- Freeze-, Implementierungsstatus- und Simulationsdateien;
-- datierte E2E-/Implementierungsworkpacks;
-- alte „nächster Chat“- oder „nächstes Workpack“-Handoffs;
-- alte Deploy-, Redeploy- und Release-Notizen;
-- frühere konkrete CityArt- oder Einzelfallbeschreibungen;
-- `docs/steuerzentrale-redaktioneller-entscheidungs-und-lernprozess.md` mit seinem damaligen Phasen-, Gate- und Freigabestatus.
-
-Sie werden nur geöffnet, wenn ein aktueller Owner sie ausdrücklich als Beleg benötigt. Alte SHAs, PR-Nummern und damalige nächste Schritte übersteuern niemals `CURRENT_WORKPACK.md`.
-
-## 6. Aufgabenbezogener Lesepfad
+## Aufgabenbezogener Lesepfad
 
 | Aufgabe | Zusätzlich lesen |
 |---|---|
-| GitHub-Actions- oder Operatorproblem | Triggerpolicy, Workflowinventur, alle betroffenen Workflows und Ruleset-/Statuscheck-Abhängigkeiten |
-| externer Write oder E4 | Ressourcenmatrix, Current Workpack, Writer-/Reconciliation-Owner, E4-Harness und konkrete Staging-Ressourcen |
-| Review-UI oder Entscheidungsaktion | Informationsarchitektur, Screenvertrag, Vorgangskatalog, Render-/Action-Owner und Browser-Smoke |
-| falscher Zustand oder verschwundener Fall | Source-Reconciliation, führende Ressource, lokale Projektion, API-Antwort und Rücklesebeleg |
-| neuer Falltyp oder neue Entscheidung | Vorgangskatalog, aktuelle Backendverträge und vollständiger End-to-End-Folgeprozess |
-| internes Dashboard | Dashboard-Zielreferenzen, bestehende Datenquellen und Betreiber-Jobs; keine parallele zweite Writeback-Logik |
+| Review-UI oder Aktion | Informationsarchitektur, Screenvertrag, Render-/Action-Owner |
+| falscher oder verschwundener Zustand | führende Quelle, Reconciliation, lokale Projektion und API-Antwort |
+| externer Write | Ressourcenmatrix, Writer, stabile Identität, Vorherzustand und Rücklesen |
+| neuer Falltyp | Vorgangskatalog, Backendvertrag und vollständiger Folgeprozess |
+| Workflow oder Deploy | Triggerpolicy und genau die betroffene Workflowdatei |
 
-## 7. Harte Regeln
+## Harte Regeln
 
 - Genau ein schreibender Control-Center-Workpack.
-- Keine E4-Ausführung, kein CityArt-Fachfall und keine Mutation, solange `CURRENT_WORKPACK.md` dies sperrt.
 - Staging und Live verwenden ausschließlich ihre dokumentierten Ressourcen.
 - UI-Erfolg beweist keinen Writeback; ein Write beweist keinen korrekten Endzustand.
-- Ein wiederverwendbarer R3-Pfad benötigt vor dem echten Fachfall einen isolierten synthetischen E4-Beweis mit Rücklesen und Cleanup.
-- Beim ersten unerwarteten realen Verhalten wird nicht erneut geschrieben.
-- Keine zweite fachliche Resolver-, Writer- oder Observer-Schicht ohne belegte Notwendigkeit.
-- `Control Center CI` ist der einzige statische Control-Center-Top-Level-Testworkflow.
-- `Staging Verification` ist der einzige zusätzliche read-only Staging-E3-Workflow.
-- `Staging Verification` darf E4 weder aufrufen noch dispatchen.
+- Vor einem externen Write wird der konkrete fallbezogene Preflight gelesen.
+- Jeder Write wird unmittelbar aus der führenden Quelle zurückgelesen.
+- Beim ersten unerwarteten Verhalten wird nicht erneut geschrieben.
+- Keine zweite Resolver-, Writer-, Observer- oder Workflow-Schicht ohne belegte dauerhafte Notwendigkeit.
+- Temporäre synthetische Testinfrastruktur wird nach dem Nachweis entfernt.
 
-## 8. Evidence
+## Fachliche Referenzen
 
-Mindestens zu trennen sind:
+Nur bei Bedarf lesen:
 
-- E1: Owner, Verträge und Diff sind konsistent.
-- E2: Tests, Replay, Trigger- und Contract-Gates sind grün.
-- E3: deployter Host, Build, Umgebung, Ressourcen und read-only Operationsplan sind belegt.
-- E4: genau ein isolierter synthetischer Staging-Write wurde vollständig zurückgelesen und bereinigt.
-- E5: ein echter fachlicher Staging-Fall wurde erst nach grünem E4 ausgeführt.
+- `STEUERZENTRALE_GESAMTPROJEKT_INTEGRATION.md`
+- `STEUERZENTRALE_INFORMATIONARCHITEKTUR.md`
+- `STEUERZENTRALE_SCREENVERTRAG.md`
+- `STEUERZENTRALE_VORGANGSKATALOG.md`
+- `STEUERZENTRALE_ABNAHMEMATRIX.md`
+- `docs/steuerzentrale-backlog-roadmap-vertrag.md`
 
-## 9. Dokumentationspflege
-
-Dauerhafte Regeln gehören in diesen Router, die Ressourcenmatrix, die Workflowpolicy oder den konkreten fachlichen Owner. Laufstände gehören ausschließlich in `CURRENT_WORKPACK.md`; konkrete Belege in Evidence oder Forensik; abgeschlossene Umsetzungspakete in `docs/workpacks/completed/`.
+Freeze-, frühere Implementierungs-, E3-/E4- und Einzelfalldokumente sind keine aktuellen Arbeitsrouter. Git bewahrt ihre Historie.
