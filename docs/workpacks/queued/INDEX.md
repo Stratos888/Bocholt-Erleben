@@ -1,44 +1,25 @@
 # Workpack-Queue
 
-Stand: 2026-07-19
+Diese Datei aktiviert keinen Workpack. Der operative Status steht in `docs/workpacks/active/CURRENT_WORKPACK.md`.
 
-Diese Datei ordnet geplante technische und fachliche Workpacks. Sie aktiviert keinen Workpack. Der einzige operative Status steht in `docs/workpacks/active/CURRENT_WORKPACK.md`.
+## Mögliche nächste Workpacks
 
-## Verbindliche technische Reihenfolge
+1. Event-Builder-Kompatibilität als kleiner lokaler Contract-Test.
+2. `SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md` nach aktueller Suchbaseline.
+3. Startpartner-Wachstumspilot aus `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md` operationalisieren.
 
-| Rang | Workpack | Risiko | Status | Abhängigkeit |
-|---:|---|---|---|---|
-| 1 | Control Center: genau ein synthetischer E4-Lauf | R3 | noch anzulegen | abgeschlossene Workflow-Konsolidierung und erneutes read-only E3 |
-| 2 | CityArt: genau ein echter Staging-Fall | R3 | bedingt | grünes E4 und gesonderte Aktivierung |
+Die Priorität wird erst bei Aktivierung anhand Produktwirkung und konkretem Risiko festgelegt.
 
-Die Ränge 1 und 2 werden nicht vorgezogen und nicht parallel gestartet.
+## Laufender Betrieb
 
-## Produktworkpacks – bereit zur späteren Aktivierung
+- Weekly-KI-Ergebnisse konkret bewerten;
+- Content-, Visual- und Quellenhinweise ausnahmebasiert bearbeiten;
+- normalen Deploy-Smoke grün halten;
+- keine weitere Prozess- oder Workflowoptimierung ohne neuen belegten Engpass.
 
-| Workpack | Risiko | Zielzustand | Aktivierungsgrenze |
-|---|---|---|---|
-| `SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md` | R2 | statische Suchbasis plus Progressive Enhancement | technischer Pflichtpfad abgeschlossen; frische Suchbaseline |
-| Startpartner-Wachstumspilot operationalisieren | voraussichtlich R3 | gemeinsamer Kandidaten-, Aktivierungs-, Pilot- und Abschlussprozess | eigener Workpack aus dem validierten Zielzustand erstellen |
+## Regeln
 
-Startpartner-Referenz:
-
-`docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`
-
-Zwischen den beiden Produktworkpacks wird bei Aktivierung anhand aktueller Nutzungs-/Suchdaten und Geschäftspriorität entschieden. Sie dürfen nicht parallel dieselben zentralen Owner oder Deploys verändern.
-
-## Laufende Betriebsbeweise
-
-Diese Punkte sind keine allgemeinen Umbau-Workpacks:
-
-- regulären Weekly-KI-Lauf auf Vorlauf-/Drop-Regeln prüfen;
-- Content-, Visual- und Quellenhinweise aus regulären Reports ausnahmebasiert bearbeiten;
-- Browser- und Deploy-Smokes grün halten;
-- keine gefreezten UI-Bereiche ohne konkreten Fehler öffnen.
-
-## Queue-Regeln
-
-1. Genau ein schreibender aktiver Workpack.
-2. Jeder Workpack wird vor Aktivierung gegen aktuellen `staging`-Stand neu geprüft.
-3. Zielzustandsdokumente sind keine Implementierungsbehauptung.
-4. Neue ungeplante Aufgaben verdrängen die Reihenfolge nur bei belegtem Produktionsfehler, Sicherheit, Recht oder akutem Datenrisiko.
-5. Ein Workpack wird nicht durch einen Chat, PR oder Commit allein als abgeschlossen markiert, sondern erst nach erforderlicher Evidence und aktualisiertem `CURRENT_WORKPACK.md`.
+- genau ein aktiver schreibender Workpack;
+- vor Aktivierung den aktuellen `staging`-Stand prüfen;
+- Produktwirkung hat Vorrang vor Meta-Arbeit;
+- parallele Arbeit nur bei vollständig getrennten Dateien und externen Ressourcen.
