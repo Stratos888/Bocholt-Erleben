@@ -6,10 +6,9 @@ cd "$ROOT"
 
 section="${1:-all}"
 
-validate_backend() {
-  echo "== Branch, data and backend contracts =="
+validate_routing() {
+  echo "== Branch routing and JSON contracts =="
   bash tests/test_deploy_branch_routing.sh
-
   for file in \
     data/control_center_repo_workpacks.json \
     data/control_center_editorial_contract.json \
@@ -18,11 +17,20 @@ validate_backend() {
     tests/fixtures/control_center_editorial_cases.json; do
     python3 -m json.tool "$file" >/dev/null
   done
+}
 
+validate_php_syntax() {
+  echo "== PHP syntax =="
   find api -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null
   for file in tests/control_center*.php; do
-    echo "Running $file"
     php -l "$file" >/dev/null
+  done
+}
+
+validate_php_tests() {
+  echo "== Control Center PHP contracts =="
+  for file in tests/control_center*.php; do
+    echo "Running $file"
     php "$file"
   done
 }
@@ -49,11 +57,15 @@ validate_repository() {
 }
 
 case "$section" in
-  backend) validate_backend ;;
+  routing) validate_routing ;;
+  php-syntax) validate_php_syntax ;;
+  php-tests) validate_php_tests ;;
   frontend) validate_frontend ;;
   repository) validate_repository ;;
   all)
-    validate_backend
+    validate_routing
+    validate_php_syntax
+    validate_php_tests
     validate_frontend
     validate_repository
     ;;
