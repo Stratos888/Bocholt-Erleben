@@ -10,7 +10,7 @@ Dauerhafter Standard:
 ein Chat -> ein Workpack -> ein Branch -> ein PR -> ein Deploy
 ```
 
-Das Repository behält einen PR-Check, einen Deploypfad und vier fachlich arbeitende Betriebsworkflows.
+Das Repository behält einen PR-Check, einen Deploypfad und fünf fachlich arbeitende Betriebsworkflows.
 
 ## Entfernt
 
@@ -19,10 +19,9 @@ Das Repository behält einen PR-Check, einen Deploypfad und vier fachlich arbeit
 - Staging-Verification-Observer;
 - einmaliger synthetischer E4-Workflow und seine temporären Hilfsdateien;
 - Content-Ops-Folgeobserver;
-- aktuell nicht priorisierter Growth-Schedule;
 - Dokumentationsregister und Vollinventur als Standardgate.
 
-Die fachlich relevanten Tests bleiben bestehen und laufen zentral über `scripts/validate-repo.sh` im `PR Gate`.
+Die produktiven Content-, Growth-, Inbox- und KI-Workflows bleiben erhalten. Die fachlich relevanten Tests bleiben ebenfalls bestehen und laufen zentral über `scripts/validate-repo.sh` im `PR Gate`.
 
 ## Begründung
 
@@ -30,4 +29,4 @@ Die zusätzlichen Prüf- und Beobachtungsschichten erzeugten mehrere Merge- und 
 
 ## Dauerhafte Regel
 
-Neue Workflows benötigen einen dauerhaft notwendigen fachlichen Trigger. Observer, Aggregatoren und einmalige Testharnesses werden nach ihrem Einsatz entfernt. Historie bleibt in Git; aktuelle Dokumente werden ersetzt statt durch weitere Verwaltungsdateien ergänzt.
+Neue Workflows benötigen einen dauerhaft notwendigen fachlichen Trigger. Observer, Aggregatoren und einmalige Testharnesses werden nach ihrem Einsatz entfernt. Produktive Fachworkflows werden nicht im Namen der Prozessvereinfachung gelöscht. Historie bleibt in Git; aktuelle Dokumente werden ersetzt statt durch weitere Verwaltungsdateien ergänzt.
