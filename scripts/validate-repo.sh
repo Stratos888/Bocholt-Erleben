@@ -8,7 +8,6 @@ section="${1:-all}"
 PREFLIGHT_TEST="tests/control_center_runtime_preflight_contract_test.php"
 
 validate_routing() {
-  echo "== Branch routing and JSON contracts =="
   bash tests/test_deploy_branch_routing.sh
   for file in \
     data/control_center_repo_workpacks.json \
@@ -21,7 +20,6 @@ validate_routing() {
 }
 
 validate_php_syntax() {
-  echo "== PHP syntax =="
   find api -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null
   for file in tests/control_center*.php; do
     php -l "$file" >/dev/null
@@ -29,19 +27,24 @@ validate_php_syntax() {
 }
 
 validate_preflight() {
-  echo "== Runtime preflight contract =="
   php "$PREFLIGHT_TEST"
 }
 
 validate_php_tests() {
-  echo "== Remaining Control Center PHP contracts =="
   for file in tests/control_center*.php; do
     if [ "$file" = "$PREFLIGHT_TEST" ]; then
       continue
     fi
-    echo "Running $file"
     php "$file"
   done
+}
+
+validate_backend() {
+  echo "== Backend and data contracts =="
+  validate_routing
+  validate_php_syntax
+  validate_preflight
+  validate_php_tests
 }
 
 validate_frontend() {
@@ -66,6 +69,7 @@ validate_repository() {
 }
 
 case "$section" in
+  backend) validate_backend ;;
   routing) validate_routing ;;
   php-syntax) validate_php_syntax ;;
   preflight) validate_preflight ;;
@@ -73,10 +77,7 @@ case "$section" in
   frontend) validate_frontend ;;
   repository) validate_repository ;;
   all)
-    validate_routing
-    validate_php_syntax
-    validate_preflight
-    validate_php_tests
+    validate_backend
     validate_frontend
     validate_repository
     ;;
