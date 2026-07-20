@@ -300,6 +300,21 @@ def apply_event_identity_match(candidate: Mapping[str, Any], match: Mapping[str,
     enriched = dict(candidate)
     status = _text(match.get("status"))
     if status == "none" or (status == "same_identity" and allow_same_identity):
+        for field in (
+            "matched_event_id",
+            "match_score",
+            "duplicate_score",
+            "duplicate_confidence",
+            "duplicate_reason",
+            "duplicate_match_type",
+            "matched_event_title",
+            "matched_event_date",
+            "matched_event_location",
+            "matched_event_url",
+        ):
+            enriched[field] = ""
+        if normalize_identity_text(enriched.get("duplicate_status", "")) == "review":
+            enriched["duplicate_status"] = ""
         enriched["hard_duplicate"] = False
         enriched["event_identity_status"] = status or "none"
         return enriched
