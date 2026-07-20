@@ -25,7 +25,7 @@
       "minimum_score": 0.79
     },
     {
-      "name": "same_source_url_requires_review",
+      "name": "same_source_url_exact",
       "candidate": {
         "title": "Weinfest Bocholt",
         "date": "2026-09-11",
@@ -87,6 +87,52 @@
           "city": "Aalten",
           "location": "Centrum Aalten",
           "url": "https://aaltendagen.nl/programma"
+        }
+      ],
+      "expected_status": "none",
+      "expected_id": "",
+      "minimum_score": 0.0
+    },
+    {
+      "name": "same_generic_title_different_venue",
+      "candidate": {
+        "title": "Sommerfest",
+        "date": "2026-08-30",
+        "city": "Bocholt",
+        "location": "Aasee",
+        "source_url": "https://example.test/aasee-sommerfest"
+      },
+      "existing": [
+        {
+          "id": "sommerfest-rathaus",
+          "title": "Sommerfest",
+          "date": "2026-08-30",
+          "city": "Bocholt",
+          "location": "Rathaus",
+          "url": "https://other.test/rathaus-sommerfest"
+        }
+      ],
+      "expected_status": "none",
+      "expected_id": "",
+      "minimum_score": 0.0
+    },
+    {
+      "name": "shared_program_url_distinct_items",
+      "candidate": {
+        "title": "Bocholter Kulturtage – Open Air Konzert",
+        "date": "2026-08-30",
+        "city": "Bocholt",
+        "location": "Marktplatz",
+        "source_url": "https://bocholt.de/kulturtage/programm"
+      },
+      "existing": [
+        {
+          "id": "kulturtage-cityart-shared-url",
+          "title": "Bocholter Kulturtage – Kunstmarkt CityArt",
+          "date": "2026-08-30",
+          "city": "Bocholt",
+          "location": "Innenstadt",
+          "url": "https://bocholt.de/kulturtage/programm"
         }
       ],
       "expected_status": "none",
