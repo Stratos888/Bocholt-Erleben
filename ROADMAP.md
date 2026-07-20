@@ -1,22 +1,13 @@
 # Roadmap – Bocholt erleben
 
-Stand: 2026-07-18  
+Stand: 2026-07-20  
 Status: priorisierte Produktziele; kein operativer Workpack-Status
 
 Der aktuelle technische Schritt steht in `docs/workpacks/active/CURRENT_WORKPACK.md`. Die technische Warteschlange steht in `docs/workpacks/queued/INDEX.md`.
 
-## 1. Ausführungsreihenfolge vor neuen Produktworkpacks
+Die allgemeine Prozess-, Workflow- und Dokumentationsoptimierung ist abgeschlossen. Sie wird nur bei einem neuen konkret belegten Bedarf erneut als Workpack aktiviert.
 
-Der Control-Center-Schreibpfad bleibt eingefroren, bis:
-
-1. die GitHub-Actions-/Verification-Struktur konsolidiert ist;
-2. der read-only E3-Preflight erneut grün ist;
-3. genau ein isolierter synthetischer E4-Staging-Write vollständig ausgeführt und bereinigt wurde;
-4. erst danach über einen echten CityArt-Staging-Fall entschieden wurde.
-
-Diese Pflichtfolge ist technische Risikoreduktion und keine neue Produktpriorität.
-
-## 2. Bereite Produktziele
+## 1. Bereite Produktziele
 
 ### A. Search-Intent und statische Renderingbasis
 
@@ -65,7 +56,7 @@ Referenz:
 
 `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`
 
-## 3. Danach folgende Produktketten
+## 2. Danach folgende Produktketten
 
 ### Anbieterwert weiter stärken
 
@@ -87,7 +78,7 @@ Referenz:
 - keine schwere Account-/Sync-Logik ohne belegten Bedarf;
 - neue Personalisierung nur mit klarem Nutzerwert und Datenschutzvertrag.
 
-## 4. Laufende Betriebsaufgaben
+## 3. Laufende Betriebsaufgaben
 
 - Deploy-, HTTP- und Browser-Smokes grün halten;
 - regulären Weekly-KI-Lauf auf Vorlauf, Drop-Gründe und begrenztes Feedback prüfen;
@@ -95,10 +86,10 @@ Referenz:
 - Suchwirkung nach SEO-Änderungen mit Baseline sowie 14-/28-Tage-Fenstern bewerten;
 - keine Erfolgsbehauptung aus einzelnen Tagen oder bloßen CI-Markern.
 
-## 5. Nicht als nächstes starten
+## 4. Nicht als nächstes starten
 
 - allgemeine UI-Neugestaltung ohne konkreten Fehler;
-- zusätzliche Workflow-/Observer-Schichten vor der Konsolidierung;
+- zusätzliche Workflow-, Observer- oder Dokumentationsschichten ohne neuen belegten Bedarf;
 - parallele schreibende Control-Center-Workpacks;
 - gekaufte Empfehlungen oder Zwei-Klassen-Darstellung;
 - Display-Werbung als Kernmodell;
@@ -108,11 +99,10 @@ Referenz:
 - neue Bildproduktion ohne konkreten Visual-Gap;
 - große CSS-/JS-Sanierung ohne Produkt- und Ownerbezug.
 
-## 6. Aktivierungsregel
+## 5. Aktivierungsregel
 
 Ein Produktziel wird erst aktiver Workpack, wenn:
 
-- der aktuelle Pflichtpfad abgeschlossen ist;
 - aktueller Repo-, Runtime- und Datenstand geprüft wurde;
 - Ziel, Scope, Risiko, Owner, Evidence und Rollback dokumentiert sind;
 - es keine konkurrierende zentrale Änderung gibt;
