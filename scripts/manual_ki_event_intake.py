@@ -10,9 +10,6 @@ from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-
 from event_description_quality import evaluate_event_description
 from event_identity import apply_event_identity_match, event_rows_from_sheet_values, find_best_event_match
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
@@ -257,7 +254,7 @@ def prepare_rows(
             candidate = apply_event_identity_match(candidate, event_match, allow_same_identity=False)
 
         inbox_match = find_best_event_match(candidate, inbox_rows)
-        if norm(inbox_match.get("status")) in {"exact", "same_identity"}:
+        if norm(inbox_match.get("status")) in {"possible", "exact", "same_identity", "identity_conflict"}:
             skip(candidate, "duplicate_open_inbox:" + norm(inbox_match.get("match_type")))
             continue
 
@@ -276,6 +273,9 @@ def prepare_rows(
 
 
 def main() -> None:
+    from google.oauth2 import service_account
+    from googleapiclient.discovery import build
+
     if not MANUAL_JSON_PATH.exists():
         fail(f"Manual-JSON fehlt: {MANUAL_JSON_PATH}")
     try:
