@@ -24,7 +24,7 @@ Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Histor
 | Staging-Deploy | E3 | normaler Deploy enthält Build- und HTTP-Smoke |
 | Control-Center-Writeback | E4 | Success, Replay, kontrollierter Fehler, Resume und Cleanup synthetisch belegt |
 | Live-Unverändertheit beim E4 | E4 | Live-Sheet und Live-Feed blieben unverändert |
-| Event-Builder-Kompatibilität | offene Contract-Lücke | ein synthetisch akzeptierter Datensatz scheiterte im nachgelagerten Feed-Build |
+| Event-Builder-Kompatibilität | E2 | eine vom echten Control-Center-Writer erzeugte Zeile mit `11:00–18:00 Uhr` wird vom normalen Event-Builder vollständig verarbeitet |
 | echter Control-Center-Fachfall | nicht erforderlich | kein echter Fall wurde für den technischen Nachweis verwendet |
 | Weekly-KI-/Inbox-Betrieb | laufender Betrieb | anhand der jeweiligen fachlichen Action-Läufe bewerten |
 
@@ -40,7 +40,7 @@ Der synthetische Lauf für Build `6702fd5c12a0` bestätigte:
 - keine synthetischen Reste;
 - unveränderte Live- und Nicht-Testdaten.
 
-Der Lauf blieb insgesamt rot, weil der zusätzlich gekoppelte vollständige Feed-Deploy beim Event-Build scheiterte. Der Cleanup-Deploy war anschließend grün. Der Writeback-Beweis wird deshalb nicht wiederholt; die Build-Kompatibilität ist ein eigener lokaler Contract-Bedarf.
+Der damalige gekoppelte Feed-Build scheiterte an der unterschiedlichen Zeitformat-Akzeptanz von Control-Center-Writer und Event-Builder. Der lokale E2-Contract schließt diese Lücke dauerhaft; der E4-Writeback-Beweis wird nicht wiederholt.
 
 ## Pflege
 
