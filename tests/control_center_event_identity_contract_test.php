@@ -19,14 +19,16 @@ foreach ((array)($fixture['cases'] ?? []) as $case) {
 }
 
 $cityart = $fixture['cases'][0];
-$match = be_cc_event_identity_find_best($cityart['candidate'], $cityart['existing']);
 $enriched = be_cc_event_identity_enrich($cityart['candidate'], $cityart['existing'], false);
 if (empty($enriched['hard_duplicate']) || ($enriched['duplicate_status'] ?? '') !== 'review') {
     throw new RuntimeException('Semantic match must open the duplicate review task.');
 }
 $review = be_cc_event_candidate_review_contract($enriched);
-$duplicateTasks = array_values(array_filter((array)($review['tasks'] ?? []), static fn(array $task): bool => ($task['key'] ?? '') === 'duplicate'));
-if (count($duplicateTasks) !== 1 || empty($duplicateTasks[0]['blocking'])) {
+$duplicateTasks = array_values(array_filter(
+    (array)($review['review_tasks'] ?? []),
+    static fn(array $task): bool => ($task['task_id'] ?? '') === 'dedupe.decision'
+));
+if (count($duplicateTasks) !== 1 || ($duplicateTasks[0]['severity'] ?? '') !== 'blocking') {
     throw new RuntimeException('Semantic match must activate the blocking duplicate review task.');
 }
 $distinct = $cityart['candidate'];
@@ -37,8 +39,11 @@ if (!empty($distinct['hard_duplicate']) || ($distinct['duplicate_status'] ?? '')
     throw new RuntimeException('A human distinct decision must survive the same current match.');
 }
 $distinctReview = be_cc_event_candidate_review_contract($distinct);
-$distinctTasks = array_values(array_filter((array)($distinctReview['tasks'] ?? []), static fn(array $task): bool => ($task['key'] ?? '') === 'duplicate'));
-if (count($distinctTasks) !== 1 || !empty($distinctTasks[0]['blocking'])) {
+$distinctTasks = array_values(array_filter(
+    (array)($distinctReview['review_tasks'] ?? []),
+    static fn(array $task): bool => ($task['task_id'] ?? '') === 'dedupe.decision'
+));
+if ($distinctTasks !== []) {
     throw new RuntimeException('Human distinct decision must resolve the duplicate review task.');
 }
 
