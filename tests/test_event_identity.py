@@ -31,8 +31,17 @@ def main() -> None:
 
     resume = payload["cases"][4]
     resume_match = find_best_event_match(resume["candidate"], resume["existing"])
-    resume_enriched = apply_event_identity_match(resume["candidate"], resume_match, allow_same_identity=True)
+    stale_resume = dict(resume["candidate"], matched_event_id="stale", duplicate_status="review", duplicate_reason="stale")
+    resume_enriched = apply_event_identity_match(stale_resume, resume_match, allow_same_identity=True)
     assert resume_enriched["hard_duplicate"] is False
+    assert resume_enriched["matched_event_id"] == ""
+    assert resume_enriched["duplicate_status"] == ""
+
+    no_match = apply_event_identity_match(
+        {"matched_event_id": "stale", "duplicate_status": "review", "duplicate_reason": "stale"},
+        {"status": "none"},
+    )
+    assert no_match["matched_event_id"] == "" and no_match["duplicate_status"] == ""
 
     rows = event_rows_from_sheet_values([
         ["id", "title", "date", "city", "location", "url"],
