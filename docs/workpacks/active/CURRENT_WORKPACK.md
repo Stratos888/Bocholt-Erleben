@@ -18,4 +18,4 @@ Stand: 2026-07-20
 
 **Empfohlen, noch nicht aktiviert.**
 
-Der Workpack wird erst durch eine ausdrückliche Aktivierung in dieser Datei und einen eigenen Feature-Branch gestartet. Die allgemeine Prozess-, Workflow- und Dokumentationsoptimierung bleibt ohne neuen konkret belegten Bedarf abgeschlossen.
+Der Event-Identitätsvertrag für KI-Intake und Freigabe-Preflight ist mit E2 abgeschlossen. Exakte Dubletten werden früh verworfen, mögliche semantische Treffer zur Entscheidung weitergegeben und direkt vor der Übernahme gegen den aktuellen Eventbestand neu geprüft. Der nächste Workpack benötigt eine ausdrückliche Aktivierung und einen eigenen Feature-Branch.

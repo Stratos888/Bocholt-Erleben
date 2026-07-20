@@ -25,7 +25,8 @@ Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Histor
 | Control-Center-Writeback | E4 | Success, Replay, kontrollierter Fehler, Resume und Cleanup synthetisch belegt |
 | Live-Unverändertheit beim E4 | E4 | Live-Sheet und Live-Feed blieben unverändert |
 | Event-Builder-Kompatibilität | E2 | eine vom echten Control-Center-Writer erzeugte Zeile mit `11:00–18:00 Uhr` wird vom normalen Event-Builder vollständig verarbeitet |
-| echter Control-Center-Fachfall | nicht erforderlich | kein echter Fall wurde für den technischen Nachweis verwendet |
+| Event-Identität und Dubletten-Preflight | E2 | gemeinsamer Python-/PHP-Vertrag; CityArt-Semantik, Shared-URL, getrennte Programmpunkte, ID-Konflikt, Same-ID-Resume, Staging-Overlay und Approval-Wiring sind im `PR Gate` grün |
+| echter Control-Center-Fachfall | nicht erforderlich | kein echter Fall wurde für den technischen Nachweis verändert |
 | Weekly-KI-/Inbox-Betrieb | laufender Betrieb | anhand der jeweiligen fachlichen Action-Läufe bewerten |
 
 ## E4-Ergebnis

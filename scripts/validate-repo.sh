@@ -13,8 +13,10 @@ validate_routing() {
     data/control_center_repo_workpacks.json \
     data/control_center_editorial_contract.json \
     data/content_ops_decision_classes.json \
+    data/event_identity_contract.json \
     data/event_visual_pool.json \
-    tests/fixtures/control_center_editorial_cases.json; do
+    tests/fixtures/control_center_editorial_cases.json \
+    tests/fixtures/event_identity_cases.json; do
     python3 -m json.tool "$file" >/dev/null
   done
 }
@@ -67,6 +69,7 @@ validate_repository() {
   python3 tests/test_event_visual_gap_backlog.py
   python3 tests/test_events_overlay_merge.py
   python3 tests/test_event_builder_control_center_contract.py
+  python3 tests/test_event_identity.py
 }
 
 case "$section" in

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_inbox_tab.php';
 require_once __DIR__ . '/_inbox_schema.php';
+require_once __DIR__ . '/_event_identity.php';
 
 /** Direct, bounded and verified Google-Sheets writeback for Inbox decisions and review tasks. Compatibility markers: 'tab' => 'Inbox' and 'tab' => 'Inbox_Staging'. */
 
@@ -192,7 +193,7 @@ function be_cc_inbox_direct_current_source(array $case): array
     if (($resolution['status'] ?? '') !== 'resolved') throw new DomainException((string)($resolution['message'] ?? 'Inbox-Datensatz ist nicht eindeutig.'));
     $row = (array)($resolution['row'] ?? []);
     unset($row['_raw'], $row['row_number']);
-    $source = array_replace($stored, $row);
+    $source = be_cc_event_identity_enrich_current(array_replace($stored, $row), true);
     return ['table'=>$table,'resolution'=>$resolution,'source_payload'=>$source,'fingerprint'=>be_cc_inbox_direct_source_fingerprint($source)];
 }
 
@@ -219,7 +220,7 @@ function be_cc_inbox_direct_canonical_update_verified(array $case, array $update
             $freshRow = (array)($freshResolution['row'] ?? []);
             be_cc_inbox_direct_verify_canonical_row($freshRow, $plan['columns']);
             unset($freshRow['_raw'], $freshRow['row_number']);
-            $sourcePayload = array_replace($source, $freshRow, $updates);
+            $sourcePayload = be_cc_event_identity_enrich_current(array_replace($source, $freshRow, $updates), true);
             return [
                 'transport'=>'google_sheets_verified_review_task_batch','source_verified'=>true,
                 'resolution'=>$freshResolution,'written_fields'=>array_keys($updates),
