@@ -9,48 +9,41 @@ Bocholt erleben ist eine mobile-first Web-App für kuratierte Veranstaltungen, A
 
 ## Einstieg
 
-Für jede KI- oder Engineering-Aufgabe gilt diese Reihenfolge:
+Für jede KI- oder Engineering-Aufgabe:
 
 1. `AI_ENTRYPOINT.md`
 2. `docs/workpacks/active/CURRENT_WORKPACK.md`
 3. `docs/architecture/SYSTEM_MAP.md`
 4. Aufgabenroute aus `docs/README.md`
-5. Rollenprüfung über `docs/DOCUMENT_REGISTRY.md`
-6. relevante fachliche Owner-Dateien
-7. `ENGINEERING.md` und `docs/external-resource-matrix.md`
-
-Die vollständige Dokumentationslandkarte, die Regeln zur Pflege und der automatische Vollinventurvertrag stehen unter `docs/`.
-
-## Produktquellen
-
-- `MASTER.md` – stabiler Produkt-Nordstern
-- `Produktvertrag.md` – bereits gültige und umgesetzte Produktmechanik
-- `COMMERCIAL_STRATEGY.md` – kommerzielle Ausrichtung
-- `ROADMAP.md` – priorisierte Produktentwicklung
-- `TEST_STATUS.md` – kompakter aktueller Proofindex
+5. relevante fachliche Owner-Dateien
+6. `ENGINEERING.md`
+7. `docs/external-resource-matrix.md`, falls externe Ressourcen betroffen sind
 
 ## Arbeitsmodell
 
-Der Normalfall ist:
-
 ```text
-Feature-Branch
--> Draft-PR nach staging
--> CI und passende Evidence
--> Staging-Deploy und Abnahme
--> vollständiger Release staging -> main
+ein primärer Chat
+-> ein Workpack
+-> ein Feature-Branch
+-> ein PR nach staging
+-> ein normaler Staging-Deploy
+-> Abschluss
 ```
 
-Direkte Live-Eventpflege und kleine direkte Main-Hotfixes sind keine alternativen Entwicklungswege. Sie sind nur als ausdrücklich beauftragte, eng begrenzte Ausnahme nach `AI_ENTRYPOINT.md` zulässig.
+Der Required Check `PR Gate` führt die lokalen Syntax-, Unit- und Contracttests aus. `Deploy to STRATO` ist der einzige Deploypfad. Zusätzliche Observer-, Governance- oder Einmal-Testworkflows gehören nicht zur dauerhaften Architektur.
+
+## Produktquellen
+
+- `MASTER.md` – Produkt-Nordstern
+- `Produktvertrag.md` – gültige Produktmechanik
+- `COMMERCIAL_STRATEGY.md` – kommerzielle Ausrichtung
+- `ROADMAP.md` – priorisierte Produktentwicklung
+- `TEST_STATUS.md` – kompakter aktueller Proofstand
 
 ## Datenhoheit
 
-`data/events.tsv` und `data/events.json` sind generierte Runtime-Artefakte. Die tatsächlichen Datenquellen und Umgebungsgrenzen stehen in `docs/architecture/SYSTEM_MAP.md` und `docs/external-resource-matrix.md`.
-
-## Dokumentationsqualität
-
-Jede getrackte Markdown-Datei muss eine bekannte Rolle besitzen. `Project Guardrails` führt eine read-only Vollinventur, Linkprüfung und den Governance-Audit aus. Neue Root-Dokumente, Statusmischung und ungeprüfte Archivpfade sind nicht zulässig.
+`data/events.tsv`, `data/events.json` und `data/inbox.json` sind generierte Runtime-Artefakte. Die tatsächlichen Datenquellen und Umgebungsgrenzen stehen in `docs/architecture/SYSTEM_MAP.md` und `docs/external-resource-matrix.md`.
 
 ## Historie
 
-Aktuelle Steuerdateien werden inhaltlich ersetzt und nicht als fortlaufendes Tagebuch erweitert. Frühere Zustände bleiben über Git, `docs/decisions/`, `docs/forensics/`, `docs/evidence/`, completed Workpacks und Archive nachvollziehbar.
+Aktuelle Steuerdateien werden ersetzt, nicht als Tagebuch erweitert. Frühere Zustände bleiben in Git nachvollziehbar. Historische Workpacks, Evidence- oder Entscheidungsdateien werden nur im Arbeitsbaum behalten, wenn sie für eine aktuelle Entscheidung tatsächlich benötigt werden.
