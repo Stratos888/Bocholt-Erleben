@@ -1,6 +1,6 @@
 # GitHub Actions Trigger Policy
 
-Stand: 2026-07-19  
+Stand: 2026-07-20  
 Branch: `staging`
 
 ## Ziel
@@ -16,7 +16,7 @@ GitHub Actions trennt Integrationsprüfung, Deploy, read-only Runtime-Evidence u
 | `Control Center CI` | vollständige Control-Center-E1/E2-Prüfung | pfadspezifisch | nein | nein | nein | ja, sobald Datei auf Default-Branch vorhanden |
 | `Deploy to STRATO` | einziger Deploypfad | nein | ja | ja | ja | ja |
 | `Staging Verification` | kombinierte Deploy-/Build-/read-only-E3-Evidence | nein | pfadspezifisch | nein | nein | nein |
-| `Control Center E4 Synthetic Proof` | isolierter R3-Write-/Resume-/Cleanup-Beweis | nein | nein | nein | nein | gesperrt; erst nach eigenem R3-Workpack |
+| `Control Center E4 Synthetic Proof` | isolierter R3-Write-/Resume-/Cleanup-Beweis | nein | nein | nein | nein | ausschließlich auf `main`, manuell, bestätigt und SHA-gebunden |
 | Content-/Growth-/Inbox-/KI-/Content-Ops-Workflows | fachlicher Betrieb | nein | nein | nur wo ausdrücklich definiert | ja | ja |
 
 ## Always-run PR Gate
@@ -35,6 +35,8 @@ Der Gate-Workflow:
 4. dupliziert keine PHP-, JavaScript-, Python-, Browser- oder Produktprüfung;
 5. wird rot, sobald ein gestarteter Check fehlschlägt, abbricht oder zeitlich ausläuft;
 6. besitzt keinen `paths`-Filter und darf nicht umbenannt werden, solange ein Ruleset davon abhängt.
+
+Ein enger, ausdrücklich dokumentierter Default-Branch-Operatoranker kann nur dann separat nach `main` integriert werden, wenn der auf `main` tatsächlich geltende Ruleset- und Checkzustand diesen eng begrenzten Workflow-Pfad zulässt. Regeln werden dafür nicht deaktiviert oder umgangen. Ist der Pfad technisch blockiert, stoppt der R3-Workpack vor E4.
 
 ## Control Center CI
 
@@ -83,7 +85,7 @@ Die beiden Statuskontexte bleiben unverändert, bis eine nachweislich koordinier
 
 Ein manueller `workflow_dispatch` wird nicht vorgetäuscht: Ein Dispatch-Workflow ist nur zuverlässig bedienbar, wenn seine Datei auf dem Default-Branch vorhanden ist. Für Staging-E3 genügt der normale Integrations-Push; ein bestehender Run kann über GitHub erneut ausgeführt werden.
 
-## E4-Grenze
+## E4-Operator- und Sicherheitsvertrag
 
 `Control Center E4 Synthetic Proof` bleibt getrennt, weil der Workflow:
 
@@ -91,6 +93,30 @@ Ein manueller `workflow_dispatch` wird nicht vorgetäuscht: Ein Dispatch-Workflo
 - eine andere Risikoklasse besitzt;
 - Write, Resume, Rücklesen und Cleanup ausführt;
 - ausschließlich in einem separaten R3-Workpack freigeschaltet werden darf.
+
+Der Workflow besitzt absichtlich genau einen manuellen Operatorpfad:
+
+1. Die Workflowdatei liegt als enger Operatoranker auf dem Default-Branch `main`.
+2. Der Run wird ausschließlich auf `main` gestartet.
+3. Pflichtinput `expected_staging_sha` ist der exakte aktuelle 40-stellige `staging`-SHA.
+4. Pflichtinput `confirmation` ist exakt `RUN_ONE_SYNTHETIC_E4`.
+5. Der Job checkt nicht Main-Runtime aus, sondern genau den angegebenen Staging-Commit.
+6. Vor jedem Write wird der Remote-Head von `staging` erneut gegen den Input geprüft.
+7. Bei abweichendem SHA, falscher Bestätigung oder falschem Ref bleibt der Job fail-closed.
+8. Der Operatoranker besitzt keinen Push-, Schedule-, `workflow_run`- oder automatischen Dispatch-Trigger.
+9. Ein erfolgreicher Lauf berechtigt nicht zu einem weiteren Lauf. Jeder weitere E4 benötigt einen neuen ausdrücklich aktiven R3-Workpack.
+
+Der Main-Operatoranker ist kein Live-Release. Er enthält ausschließlich die Workflowdatei; Harness und ausführbarer Code werden aus dem SHA-gebundenen Staging-Commit ausgecheckt. Ein breiter `staging -> main`-Merge ist dafür weder erforderlich noch zulässig.
+
+Der E4-Beweis ist vollständig synthetisch und fachfallfrei:
+
+- keine Auswahl oder Abhängigkeit von CityArt oder anderen realen Fachfällen;
+- keine vorhandene reale Zeile als Sentinel;
+- vor dem Write müssen Sheets, Staging-DB und Feeds frei von jedem synthetischen E4-Marker sein;
+- Live-Sheets und Live-Feed werden ausschließlich read-only verglichen;
+- jede begonnene synthetische Mutation führt zwingend in einen Cleanup-Versuch;
+- Cleanup-Fehler machen den Lauf rot;
+- nach einem roten E4 gibt es keinen zweiten Lauf.
 
 `Staging Verification` darf E4 weder aufrufen noch dispatchen. Ein E4-Self-Test im `Control Center CI` besitzt keinen externen Zugriff.
 
@@ -105,6 +131,7 @@ Ein normaler relevanter Merge nach `staging` löst aus:
 Nicht gewollt allein wegen eines technischen Staging-Pushes:
 
 - `Control Center CI`;
+- `Control Center E4 Synthetic Proof`;
 - `Content Quality Audit`;
 - `Growth Intelligence Backlog`;
 - `Weekly KI Websearch → Manual Inbox`;
@@ -151,6 +178,11 @@ Jeder read-only Workflow setzt minimale Rechte explizit:
 - `Control Center CI`: `contents: read`;
 - `Staging Verification`: `actions: read`, `contents: read`, `statuses: write`.
 
+Der E4-Workflow erhält ausschließlich:
+
+- `contents: read` für den SHA-gebundenen Checkout;
+- `actions: write` für die zwei kontrollierten Staging-Feed-Deploys.
+
 Breite Repository-Default-Permissions dürfen nicht stillschweigend für Testworkflows verwendet werden.
 
 ## Workflowänderungen
@@ -160,7 +192,7 @@ Bei jeder Änderung prüfen:
 - `pull_request.branches` und `paths`;
 - `push.branches` und `paths`;
 - `schedule`;
-- `workflow_dispatch`;
+- `workflow_dispatch` und Inputs;
 - `workflow_run`;
 - job-level `if`;
 - Permissions und Secrets;
@@ -169,15 +201,22 @@ Bei jeder Änderung prüfen:
 - Downstream-Dispatches;
 - Vorkommen der Datei auf `main` und `staging`;
 - Ruleset-Abhängigkeiten;
-- tatsächlichen Operatorpfad.
+- tatsächlichen Operatorpfad;
+- SHA-Bindung und Race-Condition vor dem ersten Write;
+- Cleanup-Verhalten nach Branchbewegung oder Teilfehler.
 
-`Project Guardrails` muss bei jeder Änderung unter `.github/workflows/**` starten und die autoritative Topologie einschließlich fachfallfreiem Runtime-E3 prüfen.
+`Project Guardrails` muss bei jeder Änderung unter `.github/workflows/**` starten und die autoritative Topologie einschließlich fachfallfreiem Runtime-E3 und manuell bestätigtem, SHA-gebundenem E4 prüfen.
 
 ## Verbotene Muster
 
 - selbstmodifizierender One-off-Workflow für `.github/workflows/**`;
 - zusätzliche Observer-/Wrapper-Schicht ohne belegten Mehrwert;
 - staging-only `workflow_dispatch` als angeblich sicher bedienbarer Operatorpfad;
+- E4-Push-, Schedule-, `workflow_run`- oder automatischer Dispatch-Trigger;
+- E4 ohne vollständigen erwarteten Staging-SHA und exakte Bestätigung;
+- E4-Checkout von `main`, einem beweglichen Branch oder einem ungeprüften Ref;
+- E4-Ausführung nach zwischenzeitlicher Bewegung von `staging`;
+- CityArt oder ein anderer realer Fachfall als technische E4-Abhängigkeit oder Sentinel;
 - Umbenennung von `PR Gate`, `deploy/staging-observed` oder `control-center/runtime-preflight-e3` ohne koordinierte Ruleset-Prüfung;
 - Entfernen einer Qualitätsprüfung ohne expliziten Ersatz;
 - E4-Aufruf aus der read-only Staging Verification;
@@ -190,8 +229,11 @@ Bei jeder Änderung prüfen:
 
 1. Draft-PR nach `staging`.
 2. `Project Guardrails`, `Control Center CI` und `PR Gate` grün.
-3. Keine alten `diagnostics`-, `contracts`- oder duplizierten Control-Center-`validate`-Top-Level-Checks.
-4. PR mergebar.
+3. E4-Harness-Syntax und Self-Test grün.
+4. Workflow enthält ausschließlich manuellen `workflow_dispatch`, Pflichtinputs, Bestätigung, SHA-Checkout und aktuellen Staging-Head-Guard.
+5. Workflow und Harness enthalten keinen CityArt-Bezug.
+6. Keine alten `diagnostics`-, `contracts`- oder duplizierten Control-Center-`validate`-Top-Level-Checks.
+7. PR mergebar und nicht hinter `staging`.
 
 ### E3
 
@@ -204,4 +246,17 @@ Bei jeder Änderung prüfen:
 7. `Inbox_Staging`- und `Events_Staging`-Schema gültig.
 8. Writer aufgelöst, aber nicht aufgerufen.
 9. `mutation=false`; Live-Ressourcen unbenutzt.
-10. Kein E4-Run.
+10. Noch kein E4-Run.
+
+### E4
+
+1. Identische Workflowdatei als enger Operatoranker auf `main` vorhanden.
+2. Genau ein manueller Run mit finalem aktuellem `staging`-SHA und exakter Bestätigung.
+3. Success-Write und idempotenter Replay bestätigt.
+4. Kontrollierter Teilfehler fail-closed und Wiederaufnahme ohne Duplikat bestätigt.
+5. Beide synthetischen IDs genau einmal im Staging-Feed, niemals im Live-Feed.
+6. Synthetische Sheet- und DB-Datensätze vollständig entfernt.
+7. Bereinigter Staging-Feed frei von synthetischen Markern.
+8. Nicht-Testdaten und Live-Ressourcen unverändert.
+9. Evidence-Artefakt `result=success`, keine Cleanup-Fehler.
+10. Kein zweiter E4-Lauf.

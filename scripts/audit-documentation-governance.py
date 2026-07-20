@@ -75,7 +75,7 @@ REQUIRED_MARKERS = {
         "docs/DOCUMENT_REGISTRY.md",
     ],
     "docs/workpacks/active/CURRENT_WORKPACK.md": [
-        "**Keiner.**",
+        "Aktiver Implementierungs-Workpack",
         "Nächster erlaubter Schritt",
         "Ressourcen-Lock",
         "docs/domains/control-center.md",
