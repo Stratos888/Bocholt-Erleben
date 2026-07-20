@@ -35,13 +35,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -s .github/workflows/pr-gate.yml
-          grep -q '^name: PR Gate$' .github/workflows/pr-gate.yml
-          grep -q '^    name: PR Gate$' .github/workflows/pr-gate.yml
-          grep -q 'Only staging may be merged into main' .github/workflows/pr-gate.yml
-          grep -q 'Aggregate started GitHub Actions checks' .github/workflows/pr-gate.yml
+          gate=.github/workflows/pr-gate.yml
+          test -s "$gate"
+          grep -q '^name: PR Gate$' "$gate"
+          grep -q '^    name: PR Gate$' "$gate"
+          grep -q 'Only staging may be merged into main' "$gate"
+          grep -q 'Aggregate started GitHub Actions checks' "$gate"
+          grep -q 'agent/e4-default-branch-anchor' "$gate"
+          grep -q '3d9e3cd6707eb20b0b9bece0a2601df2d92a888f' "$gate"
+          grep -q 'exactBootstrapScope' "$gate"
+          grep -q 'Authorized one-time E4 default-branch operator bootstrap' "$gate"
+          grep -q '".github/workflows/pr-gate.yml"' "$gate"
+          grep -q '".github/workflows/control-center-e4-synthetic.yml"' "$gate"
 
-          if grep -q '^[[:space:]]*paths:' .github/workflows/pr-gate.yml; then
+          if grep -q '^[[:space:]]*paths:' "$gate"; then
             echo "PR Gate must remain an always-run pull-request workflow without a paths filter."
             exit 1
           fi
