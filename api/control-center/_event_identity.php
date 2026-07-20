@@ -203,7 +203,7 @@ function be_cc_event_identity_compare(array $candidateItem, array $existingItem,
             $reason = 'Die stabile Event-ID ist bereits belegt, aber Titel, Termin oder Quelle passen nicht sicher zusammen.';
             $confidence = 'high';
         }
-    } elseif ($sameTitle && ($sameLocation || (float)$details['city_score'] === 1.0)) {
+    } elseif ($sameTitle && ($sameLocation || $sameUrl)) {
         $status = 'exact';
         $matchType = 'same_title_and_date';
         $reason = 'Titel und Termin stimmen mit einem vorhandenen Event überein.';
