@@ -27,8 +27,12 @@ function be_cc_e4_validate_run_key(mixed $value, string $targetSha): string
     return $runKey;
 }
 
-function be_cc_e4_validate_context(array $input, string $environment, string $deployedBuild): array
-{
+function be_cc_e4_validate_context(
+    array $input,
+    string $environment,
+    string $deployedBuild,
+    bool $requireBuildMatch = true
+): array {
     if (strtolower(trim($environment)) !== 'staging') {
         throw new DomainException('Synthetic E4 runtime operations are allowed only on staging.');
     }
@@ -36,13 +40,16 @@ function be_cc_e4_validate_context(array $input, string $environment, string $de
     $targetSha = be_cc_e4_validate_target_sha($input['target_sha'] ?? '');
     $runKey = be_cc_e4_validate_run_key($input['run_key'] ?? '', $targetSha);
     $expectedBuild = substr($targetSha, 0, 12);
-    if (!hash_equals($expectedBuild, trim($deployedBuild))) {
+    $actualBuild = trim($deployedBuild);
+    if ($requireBuildMatch && !hash_equals($expectedBuild, $actualBuild)) {
         throw new DomainException('Synthetic E4 target does not match the deployed staging build.');
     }
 
     return [
         'target_sha' => $targetSha,
         'expected_build' => $expectedBuild,
+        'deployed_build' => $actualBuild,
+        'build_matches' => hash_equals($expectedBuild, $actualBuild),
         'run_key' => $runKey,
         'case_prefix' => BE_CC_E4_PREFIX . '-' . $runKey . '-',
         'operation_prefix' => 'e4:' . $runKey . ':',
@@ -105,7 +112,10 @@ function be_cc_e4_string_list(mixed $value, int $maxItems = 8): array
     if (!is_array($value) || !array_is_list($value) || count($value) > $maxItems) {
         throw new InvalidArgumentException('Synthetic E4 identifier list is invalid.');
     }
-    return array_values(array_unique(array_map(static fn(mixed $item): string => trim((string)$item), $value)));
+    return array_values(array_unique(array_map(
+        static fn(mixed $item): string => trim((string)$item),
+        $value
+    )));
 }
 
 /**
@@ -126,12 +136,14 @@ function be_cc_e4_execute(array $input, array $dependencies): array
         }
     }
 
+    $mode = strtolower(trim((string)($input['mode'] ?? '')));
+    $cleanupSafeMode = in_array($mode, ['states', 'cleanup', 'counts'], true);
     $context = be_cc_e4_validate_context(
         $input,
         (string)($dependencies['environment'] ?? ''),
-        (string)($dependencies['deployed_build'] ?? '')
+        (string)($dependencies['deployed_build'] ?? ''),
+        !$cleanupSafeMode
     );
-    $mode = strtolower(trim((string)($input['mode'] ?? '')));
 
     if ($mode === 'preflight') {
         $global = ($dependencies['counts'])(null);
@@ -184,18 +196,27 @@ function be_cc_e4_execute(array $input, array $dependencies): array
     }
 
     if ($mode === 'states') {
-        $caseIds = array_map('be_cc_e4_validate_case_id', be_cc_e4_string_list($input['case_ids'] ?? []));
+        $caseIds = array_map(
+            'be_cc_e4_validate_case_id',
+            be_cc_e4_string_list($input['case_ids'] ?? [])
+        );
         $operationIds = array_map(
-            static fn(string $value): string => be_cc_e4_validate_operation_id($value, $context['operation_prefix']),
+            static fn(string $value): string => be_cc_e4_validate_operation_id(
+                $value,
+                $context['operation_prefix']
+            ),
             be_cc_e4_string_list($input['operation_ids'] ?? [])
         );
         foreach ($caseIds as $caseId) {
             $case = ($dependencies['lookup_case'])($caseId);
-            if ($case !== null) be_cc_e4_validate_synthetic_case($case, $context['case_prefix']);
+            if ($case !== null) {
+                be_cc_e4_validate_synthetic_case($case, $context['case_prefix']);
+            }
         }
         return [
             'mode' => $mode,
             'mutation' => false,
+            'build_matches' => $context['build_matches'],
             'states' => ($dependencies['states'])($caseIds, $operationIds),
         ];
     }
@@ -205,6 +226,7 @@ function be_cc_e4_execute(array $input, array $dependencies): array
         return [
             'mode' => $mode,
             'mutation' => true,
+            'build_matches' => $context['build_matches'],
             'deleted' => $deleted,
             'remaining' => ($dependencies['counts'])($context['run_key']),
             'global_remaining' => ($dependencies['counts'])(null),
@@ -215,6 +237,7 @@ function be_cc_e4_execute(array $input, array $dependencies): array
         return [
             'mode' => $mode,
             'mutation' => false,
+            'build_matches' => $context['build_matches'],
             'run' => ($dependencies['counts'])($context['run_key']),
             'global' => ($dependencies['counts'])(null),
         ];
