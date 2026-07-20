@@ -11,6 +11,7 @@ on:
       - "scripts/report-documentation-inventory.py"
       - "scripts/resolve-deploy-target.sh"
       - "scripts/merge_events_overlay.py"
+      - "scripts/control-center-e4-synthetic.py"
       - "tests/test_deploy_branch_routing.sh"
       - "tests/test_events_overlay_merge.py"
   push:
@@ -57,7 +58,8 @@ jobs:
             .github/workflows/deploy-strato.yml \
             .github/workflows/staging-verification.yml \
             .github/workflows/control-center-e4-synthetic.yml \
-            api/control-center/_runtime_resource_contract.php; do
+            api/control-center/_runtime_resource_contract.php \
+            scripts/control-center-e4-synthetic.py; do
             test -s "$file"
           done
 
@@ -95,6 +97,50 @@ jobs:
             echo "Staging Verification must never dispatch E4."
             exit 1
           fi
+
+      - name: Validate SHA-bound fachfall-free E4 contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          workflow=.github/workflows/control-center-e4-synthetic.yml
+          harness=scripts/control-center-e4-synthetic.py
+
+          grep -q '^name: Control Center E4 Synthetic Proof$' "$workflow"
+          grep -q 'workflow_dispatch:' "$workflow"
+          grep -q 'expected_staging_sha:' "$workflow"
+          grep -q 'confirmation:' "$workflow"
+          grep -q "inputs.confirmation == 'RUN_ONE_SYNTHETIC_E4'" "$workflow"
+          grep -q "github.ref_name == 'main'" "$workflow"
+          grep -q 'E4_TARGET_SHA:' "$workflow"
+          grep -q 'ref: \${{ inputs.expected_staging_sha }}' "$workflow"
+          grep -q 'refs/remotes/origin/staging' "$workflow"
+          grep -q 'test "${staging_head}" = "${E4_TARGET_SHA}"' "$workflow"
+          grep -q 'contents: read' "$workflow"
+          grep -q 'actions: write' "$workflow"
+          grep -q 'if-no-files-found: error' "$workflow"
+
+          if grep -Eq '^[[:space:]]+(push|schedule|workflow_run):' "$workflow"; then
+            echo "E4 must remain manual-only without push, schedule or workflow_run triggers."
+            exit 1
+          fi
+          if grep -Eqi 'cityart' "$workflow" "$harness"; then
+            echo "Technical E4 proof must not depend on CityArt or another real fachfall."
+            exit 1
+          fi
+
+          grep -q 'fachfall_free' "$harness"
+          grep -q 'validate_target_sha' "$harness"
+          grep -q 'assert_staging_head' "$harness"
+          grep -q 'Pre-existing synthetic Sheet state found' "$harness"
+          grep -q 'Pre-existing synthetic database state found' "$harness"
+          grep -q 'database_global_synthetic_absent' "$harness"
+          grep -q 'live_inbox_unchanged' "$harness"
+          grep -q 'live_events_unchanged' "$harness"
+          grep -q 'live_feed_synthetic_absent' "$harness"
+          grep -q 'Cleanup feed' "$harness"
+
+          python3 -m py_compile "$harness"
+          python3 "$harness" --self-test
 
       - name: Inventory all tracked documentation
         shell: bash
