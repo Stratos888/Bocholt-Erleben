@@ -1,0 +1,169 @@
+{
+  "cases": [
+    {
+      "name": "cityart_semantic_duplicate",
+      "candidate": {
+        "id_suggestion": "cityart-bocholt-bocholter-kunstmarkt-2026-08-30",
+        "title": "CityArt Bocholt – Bocholter Kunstmarkt",
+        "date": "2026-08-30",
+        "city": "Bocholt",
+        "location": "Innenstadt Bocholt",
+        "source_url": "https://cityart-bocholt.de/kunstmarkt-2026"
+      },
+      "existing": [
+        {
+          "id": "bocholter-kulturtage-2026-kunstmarkt-cityart-2026-08-30",
+          "title": "Bocholter Kulturtage 2026 – Kunstmarkt CityArt",
+          "date": "2026-08-30",
+          "city": "Bocholt",
+          "location": "Innenstadt",
+          "url": "https://www.cityart-bocholt.de/programm/kunstmarkt"
+        }
+      ],
+      "expected_status": "possible",
+      "expected_id": "bocholter-kulturtage-2026-kunstmarkt-cityart-2026-08-30",
+      "minimum_score": 0.79
+    },
+    {
+      "name": "same_source_url_requires_review",
+      "candidate": {
+        "title": "Weinfest Bocholt",
+        "date": "2026-09-11",
+        "city": "Bocholt",
+        "location": "Marktplatz",
+        "source_url": "https://bocholt.de/weinfest?utm_source=test"
+      },
+      "existing": [
+        {
+          "id": "bocholter-weinfest-2026",
+          "title": "Bocholter Weinfest",
+          "date": "2026-09-11",
+          "city": "Bocholt",
+          "location": "Marktplatz",
+          "url": "https://bocholt.de/weinfest"
+        }
+      ],
+      "expected_status": "possible",
+      "expected_id": "bocholter-weinfest-2026",
+      "minimum_score": 0.79
+    },
+    {
+      "name": "same_day_distinct_program_items",
+      "candidate": {
+        "title": "Bocholter Kulturtage – Open Air Konzert",
+        "date": "2026-08-30",
+        "city": "Bocholt",
+        "location": "Marktplatz",
+        "source_url": "https://bocholt.de/kulturtage/open-air"
+      },
+      "existing": [
+        {
+          "id": "kulturtage-cityart",
+          "title": "Bocholter Kulturtage – Kunstmarkt CityArt",
+          "date": "2026-08-30",
+          "city": "Bocholt",
+          "location": "Innenstadt",
+          "url": "https://bocholt.de/kulturtage/cityart"
+        }
+      ],
+      "expected_status": "none",
+      "expected_id": "",
+      "minimum_score": 0.0
+    },
+    {
+      "name": "shared_program_url_different_date",
+      "candidate": {
+        "title": "AaltenDag August",
+        "date": "2026-08-20",
+        "city": "Aalten",
+        "location": "Centrum Aalten",
+        "source_url": "https://aaltendagen.nl/programma"
+      },
+      "existing": [
+        {
+          "id": "aaltendag-juli",
+          "title": "AaltenDag Juli",
+          "date": "2026-07-23",
+          "city": "Aalten",
+          "location": "Centrum Aalten",
+          "url": "https://aaltendagen.nl/programma"
+        }
+      ],
+      "expected_status": "none",
+      "expected_id": "",
+      "minimum_score": 0.0
+    },
+    {
+      "name": "same_id_resume",
+      "candidate": {
+        "id_suggestion": "synthetic-e4-event",
+        "title": "Synthetischer E4 Event",
+        "date": "2026-10-01",
+        "city": "Bocholt",
+        "location": "Testort",
+        "source_url": "https://example.test/e4"
+      },
+      "existing": [
+        {
+          "id": "synthetic-e4-event",
+          "title": "Synthetischer E4 Event",
+          "date": "2026-10-01",
+          "city": "Bocholt",
+          "location": "Testort",
+          "url": "https://example.test/e4"
+        }
+      ],
+      "expected_status": "same_identity",
+      "expected_id": "synthetic-e4-event",
+      "minimum_score": 0.79
+    },
+    {
+      "name": "same_id_conflict",
+      "candidate": {
+        "id_suggestion": "occupied-id",
+        "title": "Neues Familienfest",
+        "date": "2026-10-01",
+        "city": "Bocholt",
+        "location": "Aasee",
+        "source_url": "https://example.test/new"
+      },
+      "existing": [
+        {
+          "id": "occupied-id",
+          "title": "Kammerkonzert",
+          "date": "2026-10-01",
+          "city": "Bocholt",
+          "location": "Rathaus",
+          "url": "https://example.test/concert"
+        }
+      ],
+      "expected_status": "identity_conflict",
+      "expected_id": "occupied-id",
+      "minimum_score": 0.0
+    },
+    {
+      "name": "same_id_different_date_conflict",
+      "candidate": {
+        "id_suggestion": "occupied-id-date",
+        "title": "Neues Event",
+        "date": "2026-11-01",
+        "city": "Bocholt",
+        "location": "Aasee",
+        "source_url": "https://example.test/new-date"
+      },
+      "existing": [
+        {
+          "id": "occupied-id-date",
+          "title": "Altes Event",
+          "date": "2026-10-01",
+          "city": "Bocholt",
+          "location": "Rathaus",
+          "url": "https://example.test/old-date"
+        }
+      ],
+      "expected_status": "identity_conflict",
+      "expected_id": "occupied-id-date",
+      "minimum_score": 0.0
+    }
+  ]
+}
