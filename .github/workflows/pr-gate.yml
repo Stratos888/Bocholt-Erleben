@@ -11,16 +11,16 @@ concurrency:
 
 permissions:
   contents: read
-  checks: read
   pull-requests: read
 
 jobs:
-  gate:
+  validate:
     name: PR Gate
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Enforce repository and source-branch policy
+      - name: Enforce serial branch path
+        id: policy
         uses: actions/github-script@v8
         with:
           script: |
@@ -32,152 +32,64 @@ jobs:
             const baseSha = String(pr?.base?.sha || "");
 
             if (headRepository !== currentRepository) {
-              core.setFailed("PRs from external repositories are not allowed for this project workflow.");
+              core.setFailed("External repository PRs are not allowed.");
               return;
             }
 
-            if (baseRef === "staging") {
-              core.info("Authorized integration target: staging");
+            if (baseRef === "staging" || (baseRef === "main" && headRef === "staging")) {
+              core.setOutput("mode", "normal");
               return;
             }
 
-            if (baseRef !== "main") {
-              core.setFailed(`Unsupported PR target '${baseRef}'.`);
-              return;
-            }
-
-            if (headRef === "staging") {
-              core.info("Authorized release path: staging -> main");
-              return;
-            }
-
-            // One-time bootstrap for the manual E4 operator anchor. The exact
-            // base SHA makes this exception expire automatically after the merge.
-            const bootstrapHead = "agent/e4-default-branch-anchor";
-            const bootstrapBaseSha = "3d9e3cd6707eb20b0b9bece0a2601df2d92a888f";
-            const bootstrapFiles = new Set([
-              ".github/workflows/pr-gate.yml",
+            const cleanupBranch = "agent/remove-obsolete-e4-main";
+            const cleanupBase = "2a3f79c2e00946cfae9d2a2bd4468190e575149a";
+            const cleanupPaths = new Set([
               ".github/workflows/control-center-e4-synthetic.yml",
+              ".github/workflows/pr-gate.yml",
             ]);
 
-            if (headRef !== bootstrapHead || baseSha !== bootstrapBaseSha) {
-              core.setFailed(`Only staging may be merged into main; received head branch '${headRef}'.`);
+            if (baseRef !== "main" || headRef !== cleanupBranch || baseSha !== cleanupBase) {
+              core.setFailed("Allowed paths: feature branch -> staging, staging -> main.");
               return;
             }
 
-            const changedFiles = await github.paginate(
-              github.rest.pulls.listFiles,
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                per_page: 100,
-              },
-            );
-            const paths = changedFiles.map((file) => String(file.filename || "")).sort();
-            const exactBootstrapScope = paths.length === bootstrapFiles.size
-              && paths.every((path) => bootstrapFiles.has(path));
-
-            if (!exactBootstrapScope) {
-              core.setFailed(
-                `E4 operator bootstrap scope mismatch. Allowed exactly: ${[...bootstrapFiles].sort().join(", ")}; received: ${paths.join(", ")}`,
-              );
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+            const paths = files.map((file) => String(file.filename || "")).sort();
+            const exactScope = paths.length === cleanupPaths.size
+              && paths.every((path) => cleanupPaths.has(path));
+            if (!exactScope) {
+              core.setFailed(`Main workflow cleanup scope mismatch: ${paths.join(", ")}`);
               return;
             }
 
-            core.info("Authorized one-time E4 default-branch operator bootstrap.");
+            core.setOutput("mode", "expired-main-cleanup");
 
-      - name: Aggregate started GitHub Actions checks
-        uses: actions/github-script@v8
+      - name: Checkout
+        if: steps.policy.outputs.mode == 'normal'
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        if: steps.policy.outputs.mode == 'normal'
+        uses: actions/setup-python@v5
         with:
-          script: |
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const sha = context.payload.pull_request.head.sha;
-            const currentRunId = String(context.runId);
-            const acceptedConclusions = new Set(["success", "neutral", "skipped"]);
-            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+          python-version: "3.11"
 
-            // Give path-filtered workflows time to register their check runs. The
-            // gate then waits only for checks that actually started; it does not
-            // duplicate their PHP, JS, Python, browser or product-contract work.
-            await sleep(12000);
+      - name: Validate backend and data contracts
+        if: steps.policy.outputs.mode == 'normal'
+        shell: bash
+        run: bash scripts/validate-repo.sh backend
 
-            let stableSignature = "";
-            let stableRounds = 0;
-            const maxPolls = 180;
+      - name: Validate frontend contracts
+        if: steps.policy.outputs.mode == 'normal'
+        shell: bash
+        run: bash scripts/validate-repo.sh frontend
 
-            for (let poll = 1; poll <= maxPolls; poll += 1) {
-              const response = await github.rest.checks.listForRef({
-                owner,
-                repo,
-                ref: sha,
-                per_page: 100,
-                filter: "latest",
-              });
-              const runs = Array.isArray(response.data.check_runs)
-                ? response.data.check_runs
-                : [];
-
-              const checks = runs
-                .filter(Boolean)
-                .filter((run) => run.app?.slug === "github-actions")
-                .filter((run) => {
-                  const detailsUrl = String(run.details_url || "");
-                  const isThisGate = run.name === "PR Gate"
-                    && detailsUrl.includes(`/actions/runs/${currentRunId}/`);
-                  return !isThisGate;
-                })
-                .sort((left, right) => left.name.localeCompare(right.name));
-
-              const failed = checks.filter((run) =>
-                run.status === "completed"
-                && !acceptedConclusions.has(String(run.conclusion || "")),
-              );
-
-              if (failed.length > 0) {
-                for (const run of failed) {
-                  core.error(`${run.name}: ${run.conclusion}`);
-                }
-                core.setFailed("At least one started GitHub Actions check failed.");
-                return;
-              }
-
-              const pending = checks.filter((run) => run.status !== "completed");
-              const signature = checks
-                .map((run) => `${run.id}:${run.name}:${run.status}:${run.conclusion || ""}`)
-                .join("|");
-
-              const summary = checks.length === 0
-                ? "no additional checks"
-                : checks.map((run) => `${run.name}=${run.status}/${run.conclusion || "-"}`).join(", ");
-              core.info(`Poll ${poll}: ${summary}`);
-
-              if (pending.length === 0) {
-                if (signature === stableSignature) {
-                  stableRounds += 1;
-                } else {
-                  stableSignature = signature;
-                  stableRounds = 1;
-                }
-
-                // Three stable observations prevent the gate from finishing in
-                // the short interval before another path-filtered workflow appears.
-                if (stableRounds >= 3) {
-                  await core.summary
-                    .addHeading("PR Gate")
-                    .addRaw("Source policy passed. All GitHub Actions checks that started for this commit completed successfully.")
-                    .addEOL()
-                    .addRaw(checks.length === 0 ? "No additional path-specific checks were required." : summary)
-                    .write();
-                  return;
-                }
-              } else {
-                stableSignature = "";
-                stableRounds = 0;
-              }
-
-              await sleep(5000);
-            }
-
-            core.setFailed("Timed out while waiting for the started GitHub Actions checks.");
+      - name: Validate repository tools
+        if: steps.policy.outputs.mode == 'normal'
+        shell: bash
+        run: bash scripts/validate-repo.sh repository
