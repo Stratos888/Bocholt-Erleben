@@ -11,36 +11,47 @@ Diese Datei ist der einzige operative technische Projektstatus. Offene PRs, aktu
 - Detailvertrag: `docs/workpacks/active/CONTROL-CENTER-E4-SYNTHETIC-2026-07-20.md`
 - Domain-Router: `docs/domains/control-center.md`
 - Risikoklasse: `R3`
-- Aktivierungsbaseline von `staging`: `80655c5e730565e43faaa51af9d96b2d02fb8057`
-- aktuelles Gate: `B` – Implementierung und E2 vor Integration
-- erreichte Evidence vor Aktivierung: E1, E2 und fachfallfreies read-only E3
-- Ziel dieses Workpacks: genau ein synthetischer E4-Lauf mit Write, Rücklesen, idempotentem Replay, kontrolliertem Teilfehler, Wiederaufnahme, Staging-Feed-Beweis und vollständigem Cleanup
+- Aktivierungsbaseline: `80655c5e730565e43faaa51af9d96b2d02fb8057`
+- erste integrierte E4-Implementierung: `fe3124347eab7a59f497940ec20dbc7abe0d9b98`
+- E2 und fachfallfreies read-only E3 für diesen SHA: grün
+- externe Mutation und E4-Lauf bisher: keine
+- aktueller Zustand: genau eine begrenzte Korrekturrunde vor dem Main-Operator-Bootstrap
 
-Die allgemeine Dokumentations-Governance, die semantische Vollklassifikation, die Control-Center-Workflow-Konsolidierung und die Evidence-first-Härtung des Ausführungsmodells bleiben abgeschlossen. Es wird kein weiterer allgemeiner Governance- oder Prozessoptimierungs-Workpack eröffnet.
+## Anlass der Korrekturrunde
+
+Der Ein-Datei-Operatoranker-PR nach `main` wurde korrekt durch das Required Check `PR Gate` blockiert. Das bestehende Gate erlaubt im Standard ausschließlich `staging -> main`; ein manueller Status oder Ruleset-Bypass ist ausgeschlossen.
+
+Die Korrektur stellt den Required Check real bereit und begrenzt die einmalige Ausnahme auf:
+
+- Headbranch `agent/e4-default-branch-anchor`;
+- Main-Base-SHA `3d9e3cd6707eb20b0b9bece0a2601df2d92a888f`;
+- exakt `.github/workflows/pr-gate.yml` und `.github/workflows/control-center-e4-synthetic.yml`.
+
+Nach dem Merge ist die Ausnahme wegen des veränderten Main-SHAs automatisch abgelaufen.
 
 ## Verbindlicher Evidence-first-Modus
 
-1. Evidence-Design ist vollständig vor dem ersten Patch festgelegt.
-2. Der E4-Beweis ist vollständig synthetisch und fachfallfrei.
-3. Technische Assertions, Negativfälle, Cleanup und Revert stehen im aktiven Detailvertrag.
-4. Vor Integration muss das Runtime-Design-Gate über `Control Center CI`, `Project Guardrails` und `PR Gate` grün sein.
-5. Nach einer fehlgeschlagenen Integration ist höchstens eine eng begrenzte Korrekturrunde zulässig.
-6. Nach einem fehlgeschlagenen E4-Lauf gibt es keine Wiederholung; es folgt eine Revert-, Architektur- oder Workpack-Neuentscheidung.
+1. Der E4-Beweis bleibt vollständig synthetisch und fachfallfrei.
+2. Vor Integration sind PR-Gate-, Operator-, SHA-, Confirmation-, Cleanup- und Negativverträge maschinenprüfbar.
+3. Nach der Korrektur-Integration werden Deploy und read-only E3 für den neuen finalen Staging-SHA erneut geprüft.
+4. Der Main-PR muss einen real grünen `PR Gate` besitzen.
+5. Der Main-Squash-Commit muss `[skip ci]` enthalten, damit der vorhandene Main-Push-Deploy für genau diesen Bootstrap nicht startet.
+6. Nach einem fehlgeschlagenen E4 gibt es keinen zweiten Lauf.
 
 ## Autoritative technische Kette
 
-1. `PR Gate` – Always-run-Integration und Branchpolicy.
-2. `Project Guardrails` – Architektur-, Dokumentations- und Workflowtopologie-Governance.
-3. `Control Center CI` – vollständige E1/E2-Prüfung je relevantem PR.
+1. `PR Gate` – Always-run-Integration und Branchpolicy einschließlich ablaufendem Bootstrapvertrag.
+2. `Project Guardrails` – Architektur-, Dokumentations-, Workflow- und Bootstrap-Governance.
+3. `Control Center CI` – vollständige E1/E2-Prüfung.
 4. `Deploy to STRATO` – einziger Deploypfad.
-5. `Staging Verification` – gemeinsame read-only Deploy-/Build-/E3-Evidence.
-6. `Control Center E4 Synthetic Proof` – getrennte, manuelle und SHA-gebundene R3-Capability.
+5. `Staging Verification` – fachfallfreie read-only E3-Evidence.
+6. `Control Center E4 Synthetic Proof` – manuelle, bestätigte und SHA-gebundene R3-Capability.
 
-Die Statuskontexte `deploy/staging-observed` und `control-center/runtime-preflight-e3` bleiben verbindlich. `Staging Verification` ist read-only und darf E4 weder aufrufen noch dispatchen.
+`Staging Verification` darf E4 weder aufrufen noch dispatchen.
 
 ## Aktiver Ressourcen-Lock
 
-Bis zum dokumentierten Abschluss dieses Workpacks gilt exklusiv:
+Bis zum Abschluss gilt:
 
 - keine parallele Control-Center-Workflow- oder Writeränderung;
 - keine parallele Mutation in `Inbox_Staging`, `Events_Staging` oder der Staging-Control-Center-DB;
@@ -48,70 +59,44 @@ Bis zum dokumentierten Abschluss dieses Workpacks gilt exklusiv:
 - kein CityArt-Fachklick und kein anderer echter Fachfall;
 - keine Mutation in `Inbox` oder `Events`;
 - kein Live-Deploy und keine Live-Schreibaktion;
-- kein zusätzlicher Trigger-, Observer- oder One-off-Workflow.
+- kein Ruleset- oder Required-Check-Bypass.
 
-Erlaubter externer Zugriff im E4-Lauf:
-
-- `Inbox_Staging`, `Events_Staging` und synthetische Staging-DB-Datensätze: `controlled-staging-write`;
-- `Inbox`, `Events` und Live-Feed: ausschließlich read-only für Unverändert-Nachweise;
-- STRATO Staging: sequenzielle Deploys für Initial-, synthetischen und bereinigten Feedzustand.
-
-## Geplanter Operatorpfad
-
-Der manuelle E4-Workflow benötigt einen Workflowanker auf dem Default-Branch `main`. Der zulässige Weg ist:
-
-1. hardened E4-Workflow und Harness nach grüner E2-Prüfung nach `staging` integrieren;
-2. Staging-Deploy und read-only E3 für den finalen Merge-SHA bestätigen;
-3. ausschließlich die identische Workflowdatei als engen Operatoranker nach `main` bringen;
-4. den Workflow auf `main` mit dem exakten aktuellen 40-stelligen `staging`-SHA und der Bestätigung `RUN_ONE_SYNTHETIC_E4` starten;
-5. der Job checkt genau diesen Staging-Commit aus und stoppt, falls `staging` inzwischen weitergelaufen ist.
-
-Der Main-Operatoranker ist kein Live-Release. Ein breiter `staging -> main`-Merge ist nicht Teil dieses Workpacks.
+Im späteren E4-Lauf sind nur synthetische Staging-Writes und read-only Live-Unverändert-Nachweise erlaubt.
 
 ## E4-Erfolgskriterien
 
-Der Workpack ist nur grün, wenn das Evidence-Artefakt mindestens bestätigt:
-
-- fachfallfreie synthetische Identitäten;
-- korrekter aktueller Staging-SHA, Host, Build und Ressourcenpfad;
+- aktueller Staging-SHA, Host, Build und Ressourcenpfad bestätigt;
 - Success-Write und idempotenter Replay;
-- fail-closed Teilfehler und erfolgreiche Wiederaufnahme ohne Duplikat;
-- beide synthetischen Events genau einmal im Staging-Feed;
-- kein synthetischer Eintrag im Live-Feed;
+- fail-closed Teilfehler und Resume ohne Duplikat;
+- beide synthetischen IDs genau einmal im Staging-Feed und niemals im Live-Feed;
 - vollständiger Sheet-, DB- und Feed-Cleanup;
-- unveränderte Nicht-Testdaten in Staging;
-- unveränderte Live-Sheets;
-- keine synthetischen Restdaten;
-- `result=success` und keine Cleanup-Fehler.
+- Nicht-Testdaten in Staging und Live-Ressourcen unverändert;
+- Evidence `result=success`, keine Cleanup-Fehler.
 
 ## Stop-the-line
 
-Beim ersten unerwarteten realen Verhalten:
-
 ```text
-weitere Writes stoppen
+unerwartetes Verhalten
+-> weitere Writes stoppen
 -> Evidence sichern
 -> nur Cleanup versuchen
 -> keinen zweiten E4-Lauf starten
--> Revert-, Architektur- oder Workpack-Neuentscheidung
+-> Revert- oder Architekturentscheidung
 ```
-
-Manuelle Datenkorrekturen zum künstlichen Grünmachen sind ausgeschlossen.
 
 ## Nächster erlaubter Schritt
 
-Den aktiven Workpack auf dem Feature-Branch vollständig durch E2 validieren, nach `staging` integrieren und die read-only E3-Postconditions für den finalen Merge-SHA bestätigen.
+Die begrenzte PR-Gate-/Dokumentationskorrektur vollständig durch E2 validieren, nach `staging` integrieren und Deploy sowie fachfallfreies E3 für den neuen finalen Staging-SHA bestätigen.
 
-Erst danach darf der enge Default-Branch-Operatoranker eingerichtet und genau ein synthetischer E4-Lauf gestartet werden.
+Danach werden die bytegleichen Workflowdateien in den bestehenden Main-Operator-PR übernommen. Nur bei real grünem `PR Gate` wird dieser als Squash mit `[skip ci]` integriert. Anschließend darf genau ein manueller E4-Lauf gestartet werden.
 
 ## Nicht Teil dieses Workpacks
 
-- echter CityArt-Staging-Fall;
-- sonstiger echter Fachfall;
+- echter CityArt- oder anderer Fachfall;
 - Produkt-, UI-, SEO-, Content- oder Visualänderung;
-- allgemeine Workflowkonsolidierung;
+- breiter `staging -> main`-Release;
 - Live-Release oder Live-Write.
 
 ## Folgezustand
 
-Nach einem vollständig grünen und bereinigten E4 wird gesondert entschieden, ob ein echter CityArt-Staging-Fall noch zusätzliche E5-Evidence benötigt. Er wird nicht automatisch ausgeführt. Danach wird wieder ein produktwirksamer Workpack aus `docs/workpacks/queued/INDEX.md` aktiviert.
+Nach grünem und bereinigtem E4 wird gesondert entschieden, ob ein echter CityArt-Staging-Fall noch E5-Mehrwert besitzt. Er wird nicht automatisch ausgeführt. Danach folgt wieder ein produktwirksamer Workpack.
