@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/api/control-center/_event_identity.php';
+require_once dirname(__DIR__) . '/api/control-center/_editorial_contracts.php';
 
 $fixture = json_decode((string)file_get_contents(__DIR__ . '/fixtures/event_identity_cases.json'), true, 512, JSON_THROW_ON_ERROR);
 foreach ((array)($fixture['cases'] ?? []) as $case) {
@@ -23,6 +24,11 @@ $enriched = be_cc_event_identity_enrich($cityart['candidate'], $cityart['existin
 if (empty($enriched['hard_duplicate']) || ($enriched['duplicate_status'] ?? '') !== 'review') {
     throw new RuntimeException('Semantic match must open the duplicate review task.');
 }
+$review = be_cc_event_candidate_review_contract($enriched);
+$duplicateTasks = array_values(array_filter((array)($review['tasks'] ?? []), static fn(array $task): bool => ($task['key'] ?? '') === 'duplicate'));
+if (count($duplicateTasks) !== 1 || empty($duplicateTasks[0]['blocking'])) {
+    throw new RuntimeException('Semantic match must activate the blocking duplicate review task.');
+}
 $distinct = $cityart['candidate'];
 $distinct['matched_event_id'] = $cityart['expected_id'];
 $distinct['duplicate_status'] = 'distinct';
@@ -30,8 +36,14 @@ $distinct = be_cc_event_identity_enrich($distinct, $cityart['existing'], false);
 if (!empty($distinct['hard_duplicate']) || ($distinct['duplicate_status'] ?? '') !== 'distinct') {
     throw new RuntimeException('A human distinct decision must survive the same current match.');
 }
+$distinctReview = be_cc_event_candidate_review_contract($distinct);
+$distinctTasks = array_values(array_filter((array)($distinctReview['tasks'] ?? []), static fn(array $task): bool => ($task['key'] ?? '') === 'duplicate'));
+if (count($distinctTasks) !== 1 || !empty($distinctTasks[0]['blocking'])) {
+    throw new RuntimeException('Human distinct decision must resolve the duplicate review task.');
+}
 
-$resume = $fixture['cases'][4];
+$resume = current(array_filter($fixture['cases'], static fn(array $case): bool => ($case['name'] ?? '') === 'same_id_resume'));
+if (!is_array($resume)) throw new RuntimeException('Same-ID resume fixture missing.');
 $staleResume = array_replace($resume['candidate'], ['matched_event_id'=>'stale','duplicate_status'=>'review','duplicate_reason'=>'stale']);
 $resumeEnriched = be_cc_event_identity_enrich($staleResume, $resume['existing'], true);
 if (!empty($resumeEnriched['hard_duplicate']) || ($resumeEnriched['matched_event_id'] ?? 'x') !== '' || ($resumeEnriched['duplicate_status'] ?? 'x') !== '') {
