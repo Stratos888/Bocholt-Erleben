@@ -18,6 +18,7 @@ foreach ((array)($fixture['cases'] ?? []) as $case) {
 }
 
 $cityart = $fixture['cases'][0];
+$match = be_cc_event_identity_find_best($cityart['candidate'], $cityart['existing']);
 $enriched = be_cc_event_identity_enrich($cityart['candidate'], $cityart['existing'], false);
 if (empty($enriched['hard_duplicate']) || ($enriched['duplicate_status'] ?? '') !== 'review') {
     throw new RuntimeException('Semantic match must open the duplicate review task.');
@@ -31,9 +32,14 @@ if (!empty($distinct['hard_duplicate']) || ($distinct['duplicate_status'] ?? '')
 }
 
 $resume = $fixture['cases'][4];
-$resumeEnriched = be_cc_event_identity_enrich($resume['candidate'], $resume['existing'], true);
-if (!empty($resumeEnriched['hard_duplicate'])) {
-    throw new RuntimeException('Idempotent same-ID resume must not be blocked.');
+$staleResume = array_replace($resume['candidate'], ['matched_event_id'=>'stale','duplicate_status'=>'review','duplicate_reason'=>'stale']);
+$resumeEnriched = be_cc_event_identity_enrich($staleResume, $resume['existing'], true);
+if (!empty($resumeEnriched['hard_duplicate']) || ($resumeEnriched['matched_event_id'] ?? 'x') !== '' || ($resumeEnriched['duplicate_status'] ?? 'x') !== '') {
+    throw new RuntimeException('Idempotent same-ID resume must clear stale duplicate evidence.');
+}
+$noMatch = be_cc_event_identity_enrich(['matched_event_id'=>'stale','duplicate_status'=>'review'], [], true);
+if (($noMatch['matched_event_id'] ?? 'x') !== '' || ($noMatch['duplicate_status'] ?? 'x') !== '') {
+    throw new RuntimeException('Missing current matches must clear stale duplicate evidence.');
 }
 
 $base = [['id'=>'a','title'=>'Base','date'=>'2026-01-01']];
