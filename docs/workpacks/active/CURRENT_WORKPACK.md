@@ -1,6 +1,6 @@
 # Current Workpack
 
-Stand: 2026-07-19
+Stand: 2026-07-20
 
 Diese Datei ist der einzige operative technische Projektstatus. Offene PRs, aktuelle SHAs und CI-Zustände werden bei jeder Aufgabe direkt aus GitHub gelesen und nicht dauerhaft hier gespiegelt.
 
@@ -8,12 +8,28 @@ Diese Datei ist der einzige operative technische Projektstatus. Offene PRs, aktu
 
 **Keiner.**
 
-Die Dokumentations-Governance, die semantische Vollklassifikation und die Control-Center-Workflow-Konsolidierung sind abgeschlossen. Ergebnisse und Grenzen stehen in:
+Die Dokumentations-Governance, die semantische Vollklassifikation, die Control-Center-Workflow-Konsolidierung und die Evidence-first-Härtung des Ausführungsmodells sind abgeschlossen. Ergebnisse und Grenzen stehen in:
 
 - `docs/workpacks/completed/DOCUMENTATION-GOVERNANCE-HARDENING-2026-07-19.md`
 - `docs/workpacks/completed/DOCUMENTATION-SEMANTIC-CLASSIFICATION-2026-07-19.md`
 - `docs/workpacks/completed/CONTROL-CENTER-WORKFLOW-CONSOLIDATION-2026-07-19.md`
+- `docs/workpacks/completed/EXECUTION-MODEL-EVIDENCE-DESIGN-2026-07-20.md`
 - `docs/evidence/control-center-workflow-inventory-2026-07-19.md`
+
+Es wird kein weiterer allgemeiner Governance-, Dokumentations- oder Prozessoptimierungs-Workpack eröffnet, solange keine neue konkrete und belegte Lücke vorliegt.
+
+## Verbindlicher Ausführungsmodus
+
+Für folgende Workpacks gilt ab jetzt:
+
+1. Evidence-Design ist bei `R2` und `R3` vor dem ersten Patch vollständig Teil von Gate A.
+2. Technische Runtime-Evidence ist fachfallfrei, solange nicht der echte Fachfall selbst Prüfgegenstand ist.
+3. Der Prüfaufwand bleibt proportional; Vollinventuren gibt es nur bei tatsächlich konkurrierenden Pfaden.
+4. Vor Integration eines `R2`-/`R3`-Workpacks muss das Runtime-Design-Gate erfüllt sein.
+5. Nach einer fehlgeschlagenen Integration ist höchstens eine eng begrenzte Korrekturrunde zulässig; danach folgt eine Revert-, Architektur- oder Workpack-Neuentscheidung.
+6. Nach erfüllter Evidence wird der Workpack abgeschlossen und die Arbeit kehrt zum nächsten produkt- oder risikowirksamen Ziel zurück.
+
+Der vollständige Vertrag steht in `AI_ENTRYPOINT.md`; das PR-Template macht ihn für jeden neuen Workpack explizit.
 
 ## Integrierter Workflowzustand
 
@@ -59,16 +75,18 @@ Eine ausdrücklich beauftragte deterministische einzelne Live-Eventpflege nach `
 
 ## Nächster erlaubter Schritt
 
-Einen separaten R3-Workpack für genau einen isolierten synthetischen E4-Staging-Lauf erstellen und vor Aktivierung gegen den aktuellen `staging`-Stand validieren.
+Einen separaten R3-Workpack für genau einen isolierten synthetischen E4-Staging-Lauf erstellen und vor dem ersten Patch gegen den aktuellen `staging`-Stand mit dem neuen Evidence-first-Vertrag validieren.
 
-Der Workpack muss insbesondere klären:
+Der Workpack muss insbesondere vor der Implementierung klären:
 
 - wie der Workflow auf dem Default-Branch sicher bedienbar wird, ohne E4 vorzeitig freizuschalten;
 - exakte synthetische Identität;
 - `Inbox_Staging`- und `Events_Staging`-Vorherzustand;
 - Write-, Resume-, Rücklese- und Cleanup-Postconditions;
+- positiven und negativen E4-Assertions sowie ihren E2-Contract-/Replay-Nachweis;
 - exklusiven Ressourcen-Lock;
-- sofortigen Stop bei jeder Abweichung.
+- sofortigen Stop bei jeder Abweichung;
+- Revert- oder Architekturentscheidung, falls eine begrenzte Korrekturrunde nicht ausreicht.
 
 ## Verbindliche Folgefolge
 
