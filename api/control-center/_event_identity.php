@@ -23,7 +23,8 @@ function be_cc_event_identity_contract(): array
 function be_cc_event_identity_text(mixed $value): string
 {
     $raw = strtr(trim((string)$value), ['Ä'=>'Ae','Ö'=>'Oe','Ü'=>'Ue','ä'=>'ae','ö'=>'oe','ü'=>'ue','ß'=>'ss']);
-    $raw = strtolower($raw);
+    $ascii = function_exists('iconv') ? @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $raw) : false;
+    $raw = strtolower(is_string($ascii) && $ascii !== '' ? $ascii : $raw);
     $raw = (string)preg_replace('/[^a-z0-9]+/u', ' ', $raw);
     return trim((string)preg_replace('/\s+/u', ' ', $raw));
 }
@@ -257,6 +258,11 @@ function be_cc_event_identity_enrich(array $candidate, array $events, bool $allo
     $match = be_cc_event_identity_find_best($candidate, $events);
     $status = trim((string)($match['status'] ?? 'none'));
     if ($status === 'none' || ($status === 'same_identity' && $allowSameIdentity)) {
+        foreach ([
+            'matched_event_id','match_score','duplicate_score','duplicate_confidence','duplicate_reason',
+            'duplicate_match_type','matched_event_title','matched_event_date','matched_event_location','matched_event_url',
+        ] as $field) $candidate[$field] = '';
+        if (be_cc_event_identity_text($candidate['duplicate_status'] ?? '') === 'review') $candidate['duplicate_status'] = '';
         $candidate['hard_duplicate'] = false;
         $candidate['event_identity_status'] = $status;
         return $candidate;
