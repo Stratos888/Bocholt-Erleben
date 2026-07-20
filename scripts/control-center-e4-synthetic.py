@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""One-shot synthetic E4 entrypoint using the authenticated staging API."""
+"""One-shot synthetic E4 entrypoint.
+
+Uses the authenticated staging HTTPS contract at
+``/api/control-center/e4-synthetic.php`` through the isolated adapter module.
+"""
 from __future__ import annotations
 
 import control_center_e4_server_adapter as adapter
