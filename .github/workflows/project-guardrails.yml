@@ -112,9 +112,11 @@ jobs:
           grep -q "inputs.confirmation == 'RUN_ONE_SYNTHETIC_E4'" "$workflow"
           grep -q "github.ref_name == 'main'" "$workflow"
           grep -q 'E4_TARGET_SHA:' "$workflow"
-          grep -q 'ref: \${{ inputs.expected_staging_sha }}' "$workflow"
+          expected_ref='ref: $'
+          expected_ref+='{{ inputs.expected_staging_sha }}'
+          grep -Fq "$expected_ref" "$workflow"
           grep -q 'refs/remotes/origin/staging' "$workflow"
-          grep -q 'test "${staging_head}" = "${E4_TARGET_SHA}"' "$workflow"
+          grep -Fq 'test "${staging_head}" = "${E4_TARGET_SHA}"' "$workflow"
           grep -q 'contents: read' "$workflow"
           grep -q 'actions: write' "$workflow"
           grep -q 'if-no-files-found: error' "$workflow"
