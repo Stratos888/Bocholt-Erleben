@@ -1,8 +1,6 @@
 # System Map – Bocholt erleben
 
-Stand: 2026-07-18
-
-Diese Datei beschreibt stabile Systeme, Datenhoheit, Umgebungen, kritische Datenflüsse und Owner. Operative Blocker, PRs und der aktuelle Workpack stehen ausschließlich in `docs/workpacks/active/CURRENT_WORKPACK.md`.
+Diese Datei beschreibt stabile Systeme, Datenhoheit, Umgebungen und kritische Datenflüsse. Operative Blocker und der aktuelle Workpack stehen ausschließlich in `docs/workpacks/active/CURRENT_WORKPACK.md`.
 
 ## 1. Repository und Umgebungen
 
@@ -13,51 +11,48 @@ Diese Datei beschreibt stabile Systeme, Datenhoheit, Umgebungen, kritische Daten
 | öffentliche URL | `https://staging.bocholt-erleben.de/` | `https://bocholt-erleben.de/` | Hosting/DNS |
 | Steuerzentrale | `/steuerzentrale/` | `/steuerzentrale/` | `steuerzentrale/**`, `js/control-center/**`, `api/control-center/**` |
 
-Nur `staging` und `main` dürfen deployen. Feature- und Agent-Branches liefern keine externe Umgebung aus.
+Nur `staging` und `main` dürfen deployen. Feature-Branches besitzen keine externe Umgebung.
 
 ## 2. Hauptkomponenten
 
 ### Public Frontend
 
-- statisches HTML, CSS und JavaScript im Repository;
-- öffentlicher CSS-Entrypoint `css/style.css`;
+- statisches HTML, CSS und JavaScript;
 - Today-, Event- und Activity-Oberflächen;
-- generierte Runtime-Daten und freigegebene DB-Submissions.
+- generierte Event-/Inbox-Daten und freigegebene DB-Submissions.
 
 ### Steuerzentrale
 
 - UI: `steuerzentrale/**`, `js/control-center/**`, Control-Center-CSS;
 - API: `api/control-center/**`;
-- lokaler Zustand: Control-Center-Datenbank für Fälle, Events und Operationsprotokolle;
+- lokaler Zustand: Control-Center-Datenbank für Fälle und Operationszustände;
 - Zweck: Quellen synchronisieren, Ausnahmen prüfen und kontrollierte Entscheidungen ausführen.
 
 ### Anbieterbereich und Submissions
 
 - DB-/API-owned;
-- öffentliche Einreichungen, Anbieterstatus, Produkt-/Paymentzustand und Wirkungsmessung;
-- Mail, Zahlung und Veröffentlichung sind externe Nebenwirkungen und grundsätzlich R3.
+- Einreichungen, Anbieterstatus, Produkte, Zahlung und Wirkungsmessung;
+- Mail, Zahlung und Veröffentlichung sind externe Nebenwirkungen.
 
 ### Visual-System
 
 - Vertragsdaten: `data/event_visual_pool.json`;
 - Prozessvertrag: `VISUAL_WORKFLOW.md`;
-- Generatoren und Audits unter `scripts/**`;
-- CSS steuert Darstellung, nicht fachliche Bildqualität.
+- Generatoren und Audits unter `scripts/**`.
 
 ## 3. Datenhoheit
 
 | Domäne | Kanonische Quelle | Projektion/Artefakt |
 |---|---|---|
-| redaktionelle Live-Events | Google Sheet `Events` | `data/events.tsv`, `data/events.json`, Event-Detailseiten |
-| Staging-Eventfreigaben | `Events_Staging` als isoliertes Overlay | Staging-Feed |
+| redaktionelle Live-Events | Google Sheet `Events` | Eventfeed und Detailseiten |
+| Staging-Eventfreigaben | `Events_Staging` als Overlay | Staging-Feed |
 | offene Inbox | `Inbox_Staging` / `Inbox` | Control-Center-Fälle und Ansichten |
-| Inbox-Archiv | `Inbox_Archive_Staging` / `Inbox_Archive` | Audit-/Entscheidungsbelege |
-| DB-Submissions | Veranstalter-/Submission-Datenbank | Public-API und Feed-Ergänzung |
+| Inbox-Archiv | `Inbox_Archive_Staging` / `Inbox_Archive` | Archiv |
+| DB-Submissions | Submission-Datenbank | Public-API und Feed-Ergänzung |
 | Activities | Repo-/JSON-Owner | öffentliche Activity-Ausgabe |
 | Visuals | Visual-Pool und freigegebene Assets | Karten-/Detaildarstellung |
-| Strategie/Produkt | `MASTER.md`, `Produktvertrag.md`, `COMMERCIAL_STRATEGY.md` | UI-/Backend-Implementierung |
 
-`data/events.tsv` und `data/events.json` sind generierte Artefakte und werden nicht manuell als Source of Truth gepflegt.
+`data/events.tsv`, `data/events.json` und `data/inbox.json` sind generierte Buildartefakte.
 
 ## 4. Event-Feed
 
@@ -66,23 +61,21 @@ Google Sheet Events
 + auf Staging Events_Staging-Overlay
 + freigegebene DB-Submissions
 -> Deploy-/Buildgeneratoren
--> data/events.tsv und data/events.json
 -> Event-API, Detailseiten, Sitemap und UI
 ```
 
-Staging darf `Events` lesen, aber nur `Events_Staging` beschreiben. Live ignoriert das Staging-Overlay.
+Staging darf `Events` lesen, aber nur `Events_Staging` beschreiben. Live ignoriert das Overlay.
 
-## 5. Kritischer Inbox-Übernahmepfad
+## 5. Inbox-Übernahmepfad
 
 ```text
 Steuerzentrale
--> Control-Center Action API
+-> Action API
 -> Fall- und Environment-Auflösung
--> autoritativer Writeback-Plan
+-> fallbezogener read-only Preflight
 -> Eventziel schreiben und zurücklesen
 -> Inboxstatus schreiben und zurücklesen
--> lokalen Fall terminal schließen
--> Feed und öffentliche Darstellung prüfen
+-> lokalen Fall schließen
 ```
 
 Umgebungsbindung:
@@ -92,65 +85,58 @@ staging: Inbox_Staging -> Events_Staging
 live:    Inbox         -> Events
 ```
 
-Dry-Run, Runtime-Preflight und Ausführung müssen denselben Environment-Resolver und Operationsplan verwenden.
+Preflight und Ausführung verwenden denselben Environment- und Writer-Resolver.
 
-## 6. Deploy- und Runtimepfad
+## 6. Entwicklungs- und Deploypfad
 
 ```text
 Feature-Branch
 -> PR nach staging
--> PR Gate und path-spezifische Checks
+-> ein Required Check: PR Gate
 -> Merge nach staging
--> Deploy to STRATO staging
--> HTTP-/Browser-/Runtime-Evidence
+-> genau ein Deploy to STRATO
+-> Build-/HTTP-Smoke
 -> später staging -> main
--> Live-Deploy und E6
 ```
 
-Direkte Main-Hotfixes sind eine eng begrenzte Ausnahme nach `AI_ENTRYPOINT.md` und verändern diese Standardarchitektur nicht.
+Zusätzliche Deployobserver, Runtimeverification-Workflows und synthetische Folge-Deploys gehören nicht zur Standardarchitektur.
 
-## 7. Evidence-Grenzen
+## 7. Dauerhafte Workflowrollen
 
-| Ebene | Beweist | Beweist nicht |
-|---|---|---|
-| Repo-Diff | implementierte Logik | reale Serverausführung |
-| Unit/Contract/CI | Testverhalten | tatsächliche Host-/Ressourcenauflösung |
-| grüner Deploy | Auslieferung und Smokes | gewählter Writebackpfad |
-| Runtime-Preflight | aktiver Build, Endpoint, Umgebung und Plan | erfolgreiche Mutation |
-| isolierter synthetischer Write | realer technischer Writeback | fachliche Qualität |
-| echter Staging-Fall | fachlicher Gesamtprozess | Live-Freigabe |
-| Live-Smoke | erreichbarer konsistenter Produktivstand | Langzeitwirkung |
+| Workflow | Rolle |
+|---|---|
+| `PR Gate` | Branchpolicy und Repositorytests |
+| `Deploy to STRATO` | Feed-Build und Deploy |
+| `Content Quality Audit` | Inhaltsqualität |
+| `Inbox Cleanup (Archive)` | Inbox-Archivierung |
+| `Weekly KI Websearch → Manual Inbox` | Eventkandidatensuche |
+| `Manual KI Event Intake` | Kandidaten-Handoff |
 
 ## 8. Owner-Übersicht
 
 | Domäne | Primäre Owner |
 |---|---|
-| Arbeitsprozess | `AI_ENTRYPOINT.md`, `CURRENT_WORKPACK.md`, `docs/README.md` |
+| Arbeitsprozess | `AI_ENTRYPOINT.md`, `CURRENT_WORKPACK.md` |
 | Architektur | `docs/architecture/SYSTEM_MAP.md` |
-| technische Guardrails | `ENGINEERING.md` |
+| technische Regeln | `ENGINEERING.md` |
 | externe Ressourcen | `docs/external-resource-matrix.md` |
+| PR-Prüfung | `.github/workflows/pr-gate.yml`, `scripts/validate-repo.sh` |
 | Deploy/Branchrouting | `.github/workflows/deploy-strato.yml`, `scripts/resolve-deploy-target.sh` |
-| Control-Center UI | `steuerzentrale/**`, `js/control-center/**`, Control-Center-CSS |
+| Control-Center UI | `steuerzentrale/**`, `js/control-center/**` |
 | Control-Center Runtime | `api/control-center/**` |
 | Eventfeed | Deployworkflow, Eventgeneratoren, `api/events/**` |
-| Eventdaten | Sheets `Events`/`Events_Staging`, DB-Submissions |
-| Activities | Repo-/JSON-Daten und Generatoren |
-| Visuals | `VISUAL_WORKFLOW.md`, Visual-Pool, Assets und Audits |
-| Produktmechanik | `Produktvertrag.md` |
 | Produktziel und Priorität | `MASTER.md`, `COMMERCIAL_STRATEGY.md`, `ROADMAP.md` |
-| Proofindex | `TEST_STATUS.md`, CI und `docs/evidence/**` |
+| Proofstand | `TEST_STATUS.md` |
 
-## 9. Standardprüfung vor kritischen Änderungen
+## 9. Prüfung vor kritischen Änderungen
 
-1. Wer besitzt den fachlichen Ursprungswert?
-2. Welche Kopie oder Projektion existiert?
-3. Welcher Endpoint und welche Version laufen tatsächlich?
-4. Wie wird die Umgebung aufgelöst?
-5. Welche Ressource wird gelesen und welche geschrieben?
-6. Welche Postconditions müssen einzeln bestätigt werden?
-7. Wie wird ein Teilfehler sichtbar und fortgesetzt?
-8. Wie werden synthetische Daten bereinigt?
-9. Wie wird Live-Unverändertheit oder gezielte Live-Änderung bewiesen?
-10. Welcher Owner und Ressourcen-Lock gilt?
+1. Wer besitzt den Ursprungswert?
+2. Welche Projektionen existieren?
+3. Welche Umgebung und Ressource wird verwendet?
+4. Was wird konkret gelesen oder geschrieben?
+5. Welche Postconditions müssen bestätigt werden?
+6. Wie wird ein Teilfehler sichtbar?
+7. Wie erfolgt Rollback oder Cleanup?
+8. Ist ein anderer Chat oder Workpack am selben Owner aktiv?
 
-Ist eine Antwort nicht belegbar, ist der nächste Schritt Observability oder read-only Forensik statt Fachlogik.
+Ist eine Antwort nicht belegbar, folgt read-only Analyse statt Mutation.
