@@ -1,77 +1,47 @@
 # Aktueller Proofindex – Bocholt erleben
 
-Stand: 2026-07-19
+Stand: 2026-07-20
 
-Diese Datei ist ein kompakter Index der aktuell relevanten Evidence. Sie ist kein historisches Testtagebuch. Ausführliche Nachweise liegen in CI, `docs/evidence/`, `docs/forensics/`, Entscheidungen und Git-Historie.
+Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Historie liegt in Git und den jeweiligen Action-Artefakten.
 
-## 1. Evidence-Legende
+## Evidence-Legende
 
 | Stufe | Bedeutung |
 |---|---|
-| E0 | Hypothese |
 | E1 | aktueller Code oder Diff |
-| E2 | automatisierter Test, CI oder Replay |
-| E3 | deployte read-only Runtime-Evidence |
-| E4 | isolierter realer Staging-Write oder kontrollierte deterministische Admin-Mutation mit Rücklesen |
+| E2 | automatisierter lokaler/CI-Test |
+| E3 | deployter read-only Nachweis |
+| E4 | begrenzter realer Write mit Rücklesen und Cleanup |
 | E5 | echter fachlicher Staging-Fall |
 | E6 | read-only Live-Smoke |
 
-## 2. Aktueller projektweiter Proofstand
+## Aktueller Proofstand
 
-| Bereich | Höchste aktuell relevante Evidence | Status | Führende Quelle |
-|---|---:|---|---|
-| Branch- und Deployrouting | E2 | nur `staging` und `main` dürfen deployen; Standardrelease `staging -> main` | CI und `SYSTEM_MAP.md` |
-| PR-Integration | E2 | Always-run `PR Gate` aggregiert gestartete Actions-Checks | `.github/workflows/pr-gate.yml` |
-| Dokumentations-Governance | E2 integriert | Vollinventur, exakte Rollenklassifikation, Link-/Statusgrenzen und read-only CI-Gate integriert | Governance-Skripte, Inventurartefakt und completed Workpacks |
-| Workflowtopologie Control Center | E2 integriert | vollständige Gate-A-Inventur; ein autoritativer `Control Center CI`; keine doppelten statischen Top-Level-Prüfungen | Workflowinventur, Konsolidierungs-PR und `Project Guardrails` |
-| Staging-Deploy Control Center | E3 | `Deploy to STRATO` plus gemeinsame read-only `Staging Verification` belegt | GitHub-Status `deploy/staging-observed` |
-| Control-Center-Environment | E3 | aktiver Staging-Build, `Inbox_Staging -> Events_Staging`, `mutation=false`; Live-Ressourcen unbenutzt | GitHub-Status `control-center/runtime-preflight-e3` |
-| Control-Center externer Write | E3, E4 offen | Harness statisch vorhanden; kein synthetischer E4-Lauf ausgeführt | `CURRENT_WORKPACK.md` |
-| CityArt-Fachfall | unter E5 | eingefroren bis eigenständigem grünem E4 | `CURRENT_WORKPACK.md` |
-| direkte einzelne Live-Eventpflege | pro Operation neu | Policy vorhanden; jeder Fall benötigt eigenen Vorher-/Write-/Rücklesebeleg | `AI_ENTRYPOINT.md`, Ressourcenmatrix |
-| direkter Main-Hotfix | nicht operativ freigeschaltet | dedizierter Ruleset-Bypass-Akteur fehlt; kein allgemeiner Erfolgsbeweis | zugehörige Entscheidung und `AI_ENTRYPOINT.md` |
-| Search-Intent-/SEO-Recovery | E1 Ziel/Forensik | Zielarchitektur und Workpack dokumentiert; noch keine Implementierung | `docs/forensics/` und queued Workpack |
-| Startpartner-Wachstumspilot | E1 Zielzustand | fachlich validiert; operativer E2E-Lebenszyklus noch nicht umgesetzt | Zielzustandsdatei |
-| Weekly-KI-/Inbox-Betrieb | historische E2/E5-Teilbelege | reguläre Folgeläufe nur anhand neuer Artefakte bewerten | CI/Artefakte; kein aktueller Umbau ohne Befund |
+| Bereich | Evidence | Status |
+|---|---:|---|
+| Branch- und Deployrouting | E2 | nur `staging` und `main` dürfen deployen; Releasepfad `staging -> main` |
+| PR-Integration | E2 | ein Required Check `PR Gate` führt die Repositorytests aus |
+| Staging-Deploy | E3 | normaler Deploy enthält Build- und HTTP-Smoke |
+| Control-Center-Writeback | E4 | Success, Replay, kontrollierter Fehler, Resume und Cleanup synthetisch belegt |
+| Live-Unverändertheit beim E4 | E4 | Live-Sheet und Live-Feed blieben unverändert |
+| Event-Builder-Kompatibilität | offene Contract-Lücke | ein synthetisch akzeptierter Datensatz scheiterte im nachgelagerten Feed-Build |
+| echter Control-Center-Fachfall | nicht erforderlich | kein echter Fall wurde für den technischen Nachweis verwendet |
+| Weekly-KI-/Inbox-Betrieb | laufender Betrieb | anhand der jeweiligen fachlichen Action-Läufe bewerten |
 
-## 3. Aktuelle harte Evidence-Lücke
+## E4-Ergebnis
 
-Der wichtigste offene Runtimebeweis ist:
+Der synthetische Lauf für Build `6702fd5c12a0` bestätigte:
 
-```text
-separater R3-Workpack
--> genau ein synthetischer E4-Staging-Write
--> vollständiges Rücklesen und Cleanup
--> erst danach ein möglicher echter CityArt-Staging-Fall
-```
+- `Inbox_Staging -> Events_Staging`;
+- genau ein Success-Event trotz Replay;
+- fail-closed Retry der fehlgeschlagenen Operation;
+- erfolgreiche Wiederaufnahme ohne Duplikat;
+- zwei gelöschte Inboxzeilen, zwei gelöschte Eventzeilen, zwei gelöschte Cases und drei gelöschte Operationszustände;
+- keine synthetischen Reste;
+- unveränderte Live- und Nicht-Testdaten.
 
-Bis dahin darf kein echter Control-Center-Fachfall als technischer Erfolgsbeweis verwendet werden.
+Der Lauf blieb insgesamt rot, weil der zusätzlich gekoppelte vollständige Feed-Deploy beim Event-Build scheiterte. Der Cleanup-Deploy war anschließend grün. Der Writeback-Beweis wird deshalb nicht wiederholt; die Build-Kompatibilität ist ein eigener lokaler Contract-Bedarf.
 
-## 4. Evidence-Eintrag
+## Pflege
 
-Neue ausführliche Evidence dokumentiert mindestens:
-
-- Datum und exakten Commit-/Build-SHA;
-- Umgebung, Host und Endpoint;
-- relevante Quell- und Zielressourcen;
-- Test- oder Objektidentität;
-- ausgeführte Schritte;
-- erwartete und tatsächliche Postconditions;
-- Cleanup/Rollback;
-- erreichte Evidence-Stufe;
-- Restunsicherheiten;
-- Link auf Workflow, Artefakt, Decision oder Forensik.
-
-## 5. Pflege
-
-`TEST_STATUS.md` wird nur geändert, wenn sich der höchste relevante Proofstand oder eine harte Evidence-Lücke ändert.
-
-Nicht hier ablegen:
-
-- komplette Run-Logs;
-- wiederholte Patchbeschreibungen;
-- „nach Deployment prüfen“-Listen ohne neuen Beweis;
-- alte Screenshots oder historische UI-Abnahmen;
-- Produktroadmap und Workpackstatus.
-
-Frühere umfangreiche Einträge bleiben vollständig in der Git-Historie nachvollziehbar.
+`TEST_STATUS.md` wird nur geändert, wenn sich ein relevanter Proofstand oder eine konkrete Evidence-Lücke ändert. Keine kompletten Logs, Patchchroniken oder Prozessinventuren hier ablegen.
