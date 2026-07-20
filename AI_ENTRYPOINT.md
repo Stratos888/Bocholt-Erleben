@@ -2,222 +2,127 @@
 
 Arbeitsbranch: `staging`
 
-Diese Datei ist der verbindliche Kurzrouter für KI-Arbeit. Dokumentrollen stehen in `docs/DOCUMENT_REGISTRY.md`; Lesepfade und Pflege in `docs/README.md`. Der einzige operative Status steht in `docs/workpacks/active/CURRENT_WORKPACK.md`.
+Diese Datei ist der verbindliche Arbeitsrouter. Ziel ist die schnellste zuverlässige Arbeitsweise für einen primären KI-Chat – nicht maximale Prozess- oder Testinfrastruktur.
 
-## 1. Startprotokoll
+## 1. Start jeder Repo-Aufgabe
 
-Vor jeder Repo-Aufgabe:
+1. aktuellen `staging`-SHA und offene PRs in GitHub prüfen;
+2. `docs/workpacks/active/CURRENT_WORKPACK.md` lesen;
+3. `docs/architecture/SYSTEM_MAP.md` und nur die betroffenen Owner-Dateien lesen;
+4. bei externen Daten zusätzlich `docs/external-resource-matrix.md` lesen;
+5. erst danach patchen.
 
-1. aktuellen `staging`-SHA und offene PRs direkt in GitHub prüfen;
-2. `CURRENT_WORKPACK.md` lesen;
-3. `SYSTEM_MAP.md` für betroffene Systeme und Datenflüsse lesen;
-4. Aufgabe über `docs/README.md` und `docs/DOCUMENT_REGISTRY.md` routen und danach nur die relevanten fachlichen Owner-Dateien im aktuellen Ref lesen;
-5. `ENGINEERING.md` und `external-resource-matrix.md` für technische und externe Grenzen prüfen;
-6. IST, ZIEL, HYPOTHESE und HISTORIE sichtbar trennen.
+Alte Chats, Memory, ZIPs und historische Dokumente sind Kontext. Der aktuelle Ref und die aktuellen Owner-Dateien sind die Source of Truth.
 
-Memory, alte Chats, ZIPs, PR-Texte und historische Dokumente sind Kontext, aber keine aktuelle Source of Truth.
-
-## 2. Standard-Arbeitsmodell
+## 2. Verbindlicher Arbeitsmodus
 
 ```text
-Ein primärer Ausführungs-Chat
-+ ein aktiver Workpack
-+ ein Feature-Branch
-+ ein Draft-PR nach staging
-+ optional eine unabhängige read-only Zweitprüfung
+ein primärer Entwicklungs-Chat
+-> ein aktiver Workpack
+-> ein Feature-Branch
+-> ein PR nach staging
+-> ein normaler Staging-Deploy
+-> Abschluss
 ```
 
-Der primäre Chat darf Analyse, Implementierung, Tests, PR, Integration nach `staging`, Deployprüfung und Abschluss zusammenhängend durchführen. Parallele schreibende Chats sind nur nach dokumentiertem Nachweis vollständiger Owner-, Runtime- und Ressourcenunabhängigkeit zulässig.
+- Standardmäßig gibt es nur einen schreibenden Chat.
+- Eine unabhängige read-only Analyse darf parallel laufen, verändert aber nichts.
+- Zwei schreibende Chats sind nur bei vollständig getrennten Dateien, Workflows und externen Ressourcen zulässig; sie sind nicht der Normalfall.
+- Workflow-, Deploy-, zentrale Doku-, Schema-, Environment- und globale UI-Owner werden immer seriell geändert.
 
-Das Ziel ist nicht möglichst viel Governance, sondern der kleinste zusammenhängende Premium-Zielzustand. Ein allgemeiner Prozess-, Dokumentations- oder Architektur-Workpack wird nur bei einer belegten aktuellen Lücke eröffnet. Sobald die notwendige Governance ausreichend ist, wird sie abgeschlossen und die Arbeit kehrt zum produkt- oder risikowirksamsten Workpack zurück.
+## 3. Arbeitsmandat
 
-## 3. Einmaliges Arbeitsmandat
+Eine eindeutige Anweisung wie `mach das`, `umsetzen`, `patchen` oder `dokumentieren` erlaubt innerhalb des vereinbarten Scopes:
 
-Eine eindeutige Anweisung wie `umsetzen`, `patchen`, `dokumentieren` oder `mach das` erteilt für den vereinbarten Scope ein einmaliges Arbeitsmandat.
+- Analyse und Zieldefinition;
+- Branch, Commits und PR;
+- automatisierte Tests;
+- Merge nach `staging`, wenn `PR Gate` grün ist;
+- Prüfung des normalen Staging-Deploys;
+- Abschluss der Dokumentation.
 
-Innerhalb dieses Scopes darf die KI ohne wiederholte Freigabe:
+Eine neue Freigabe ist nur bei echter Scope-Erweiterung, Live-Schreibaktion, irreversibler Aktion, Zahlung, Nachricht, Veröffentlichung oder Berechtigungsänderung erforderlich.
 
-- analysieren und den Workpack präzisieren;
-- Branch, Commits und Draft-PR erstellen;
-- statische und automatisierte Tests ausführen;
-- nach erfüllten Gates nach `staging` integrieren;
-- Staging-Deploy und read-only Postconditions prüfen;
-- ausdrücklich geplante, isolierte synthetische Staging-Daten anlegen, zurücklesen und bereinigen.
+## 4. Kleinster nachhaltiger Patch
 
-Eine neue Freigabe ist erforderlich bei Scope-Erweiterung, irreversibler Aktion, Secrets/Berechtigungen, realer Zahlung, echter Nachricht, externer Veröffentlichung oder einer nicht aus bestehenden Verträgen ableitbaren Produktentscheidung.
+Vor jeder Änderung werden genau vier Fragen beantwortet:
 
-## 4. Ausführungspfade
+1. Was ist die belegte Ursache oder das konkrete Ziel?
+2. Welche Datei oder Komponente besitzt das Verhalten?
+3. Was ist der kleinste vollständige Zielzustand?
+4. Welche Prüfung beweist genau diesen Zielzustand?
 
-### Standardpfad
+Keine Vollinventur, kein Meta-Workpack und keine neue Workflow-Schicht nur aus Vorsicht. Neue Wrapper, Observer, Guardrail-Dateien oder dauerhafte Testharnesses sind nur zulässig, wenn sie einen bestehenden Pfad ersetzen und dauerhaft gebraucht werden.
 
-Normale Entwicklung und vollständige Releases erfolgen ausschließlich über:
+## 5. Proportionale Prüfung
+
+### Dokumentation und kleine statische Änderungen
+
+- Diff und Links prüfen;
+- `PR Gate` ausführen;
+- nach dem Merge keine zusätzliche Sonderverification.
+
+### Code oder Runtime ohne externen Write
+
+- relevante Unit-/Contract-/Syntaxtests im `PR Gate`;
+- genau ein normaler Staging-Deploy;
+- ein gezielter read-only Smoke für das geänderte Verhalten, falls der Deploy-Smoke es nicht bereits abdeckt.
+
+### Externer Write
+
+- Zielressource und stabile Identität vorher lesen;
+- genau einen begrenzten Write ausführen;
+- sofort zurücklesen;
+- Rollback oder Cleanup sicherstellen;
+- beim ersten unerwarteten Verhalten stoppen.
+
+Es gibt kein allgemeines E3-/E4-Programm und keinen eigenen Workflow nur für einen einmaligen Nachweis. Ein einmaliger Testharness wird nach Abschluss entfernt; dauerhafte Sicherung erfolgt als kleiner lokaler Contract-Test.
+
+## 6. Fehlerbudget
 
 ```text
-Feature-Branch -> PR nach staging -> Staging-Evidence -> staging -> main
+unerwartetes Verhalten
+-> stoppen
+-> Zustand sichern
+-> Ursache bestimmen
+-> vor dem nächsten Write korrigieren
 ```
 
-### Kontrollierte einzelne Live-Eventpflege
+- Keine wiederholten Merge-/Deploy-Schleifen zur Suche nach dem richtigen Design.
+- Vor dem Merge darf der Feature-Branch anhand roter Tests korrigiert werden.
+- Nach einem roten realen Lauf gibt es höchstens eine klar begründete Korrektur; sonst Revert oder neue Architekturentscheidung.
+- Keine manuelle Datenkorrektur zum künstlichen Grünmachen.
 
-Eine direkte Mutation in `Events` ist nur zulässig, wenn der Nutzer das konkrete Event ausdrücklich beauftragt hat und alle Bedingungen erfüllt sind:
+## 7. Git- und Releasepfad
 
-- stabile Event-ID und eindeutige Zielzeile;
-- vollständiger Vorherzustand;
-- nur deklarierte Felder;
-- fachliche und Schema-Guards;
-- sofortiges Rücklesen;
-- unveränderte Nicht-Zielfelder;
-- klarer Rollback;
-- read-only Prüfung von Feed und Detailseite;
-- kein zweiter Versuch bei unerwartetem Verhalten.
+- Feature-Branch -> PR nach `staging`.
+- Release ausschließlich `staging -> main`.
+- Keine Feature-Branch-Deploys.
+- Kein Force-Push.
+- Keine Secrets im Repo oder Chat.
+- Ein normaler Merge nach `staging` erzeugt genau einen Deploy. Zusätzliche Observer- oder Verification-Deploys sind ausgeschlossen.
 
-Dies ist eine deterministische Admin-Mutation, kein Live-Test und kein allgemeiner Entwicklungsweg.
+## 8. Dokumentation
 
-### Kleiner direkter Main-Hotfix
+Kanonische Lesereihenfolge:
 
-Ein direkter Main-Hotfix ist nur nach ausdrücklicher Nutzerbeauftragung und nur bei vollständig erfülltem Vertrag zulässig:
+1. `AI_ENTRYPOINT.md`
+2. `docs/workpacks/active/CURRENT_WORKPACK.md`
+3. `docs/architecture/SYSTEM_MAP.md`
+4. fachlicher Domain-Router und Owner-Dateien
+5. `ENGINEERING.md`
+6. `docs/external-resource-matrix.md`, falls externe Ressourcen betroffen sind
 
-- konkreter belegter Produktionsfehler;
-- aktueller `main`-SHA als Baseline;
-- isoliert, reversibel, höchstens drei zusammengehörige Owner-Dateien und im Regelfall höchstens 100 geänderte Zeilen;
-- kein Feature, Refactoring, Workflow, Security-, Berechtigungs-, Deploy-, Environment- oder Governance-Umbau;
-- passende Checks vor dem Write;
-- dedizierter Ruleset-Bypass für einen gezielt freigegebenen KI-Hotfix-Akteur;
-- Deploy- und E6-Live-Smoke danach;
-- Revert vor einem zweiten Reparaturpatch.
+Git bewahrt Historie. Veraltete aktuelle Aussagen und einmalige Prozessdokumente werden aus dem Arbeitsbaum entfernt statt durch weitere Register und Audits verwaltet.
 
-Solange der dedizierte Ruleset-Bypass nicht eingerichtet ist, ist dieser Pfad technisch gesperrt. Ein breiter `staging -> main`-Merge darf nicht als Ersatzhotfix verwendet werden.
+## 9. Definition of Done
 
-## 5. Risikoklassen und proportionaler Prüfpfad
+Ein Workpack ist abgeschlossen, wenn:
 
-| Klasse | Typische Änderung | Mindestpfad |
-|---|---|---|
-| `R1 lokal und reversibel` | Doku, Copy, kleiner statischer Owner-Fix | Gate A, B, passende Abnahme |
-| `R2 deployte Runtime ohne externen Write` | API, Rendering, Feed, Cache, Build, Deploy | Gate A–D inklusive E3 |
-| `R3 externe Mutation oder gemeinsamer Zustand` | Sheets, DB, Mail, Payment, Veröffentlichung | Gate A–D inklusive E4 vor echtem Fachfall |
-
-Die KI klassifiziert selbst. Risiko, Scope, benötigte Evidence und Rollback stehen im Workpack und PR.
-
-Die Tiefe der Analyse folgt dem Risiko und der tatsächlichen Architekturwirkung:
-
-- `R1`: aktueller Owner, begrenzter Diff, passende statische Prüfung und direkte Abnahme;
-- `R2`: vollständiger Runtimevertrag, E2, Deploy und fachfallfreie E3-Evidence, sofern nicht der Fachfall selbst Prüfgegenstand ist;
-- `R3`: vollständiger Ressourcen-, Identitäts-, Transaktions-, Rücklese- und Cleanup-Vertrag plus E4;
-- eine Vollinventur aller Pfade ist nur erforderlich, wenn konkurrierende Owner, Trigger, Writer, Resolver oder Runtimepfade tatsächlich betroffen sind.
-
-Keine Vollinventur und kein Meta-Workpack nur aus Vorsicht, wenn Scope, Owner und Zielverhalten bereits eindeutig belegt sind.
-
-## 6. Vier Gates
-
-### Gate A – Verstehen und Evidence entwerfen
-
-Vor dem Patch müssen Zielzustand, Ausgangs-SHA, Fakten/Hypothesen, Owner, erlaubter und gesperrter Scope, externe Ressourcen, Evidence und Rollback feststehen.
-
-Für `R2` und `R3` ist das Evidence-Design Teil der Lösung und muss vor dem ersten Patch konkret beantworten:
-
-- welcher Host, Endpoint, Trigger oder Workflow den Nachweis erzeugt;
-- welche Umgebung, Quelle, Zielressource, Identität und welcher Operationsplan erwartet werden;
-- welche exakten positiven und negativen Assertions gelten;
-- welche Daten dafür zwingend existieren müssen;
-- ob der Nachweis von einem zufällig vorhandenen echten Fachdatensatz abhängt;
-- welche Contract-, Fixture- oder Replay-Prüfung die späteren E3-/E4-Assertions bereits in E2 absichert;
-- welche Postconditions, Cleanup- und Revertbedingungen gelten.
-
-Technische Runtime- oder Infrastruktur-Evidence ist fachfallfrei zu entwerfen, solange nicht ausdrücklich der echte Fachfall selbst der Prüfgegenstand ist. Fehlen geeignete Daten, wird kein zufälliger oder eingefrorener Fachfall als technisches Prüfobjekt verwendet.
-
-Bei ungeklärter realer Mutation ist nur read-only Forensik oder Observability zulässig.
-
-### Gate B – Bauen und statisch beweisen
-
-- Branch/Diff gegen den maßgeblichen Ausgangsstand;
-- nur deklarierter Scope;
-- Syntax-, Unit-, Contract-, Replay-, Build- und relevante CI-Tests;
-- keine externe Mutation durch normale Implementierungsschritte.
-
-Ein grüner PR beweist höchstens E2.
-
-Vor der Integration eines `R2`- oder `R3`-Workpacks gilt zusätzlich das Runtime-Design-Gate:
-
-- alle späteren E3-/E4-Assertions sind bereits eindeutig und maschinenprüfbar definiert;
-- der vorgesehene Runtime-Aufruf kann den Zielzustand tatsächlich beweisen;
-- notwendige Fixtures, Replays und Negativfälle sind vorhanden oder ihre begründete Nichtanwendbarkeit ist dokumentiert;
-- der Nachweis hängt nicht unbeabsichtigt vom aktuellen Inhalt eines echten Fachfalls ab.
-
-Ist dieses Gate nicht erfüllt, wird nicht nach `staging` integriert.
-
-### Gate C – Reale Runtime beweisen
-
-Für R2/R3 mindestens:
-
-- deployter Build-SHA;
-- Host und Endpoint;
-- konfigurierte und aufgelöste Umgebung;
-- Quell- und Zielressourcen;
-- tatsächlicher Operationsplan;
-- read-only Preflight.
-
-Für wiederverwendbare R3-Pfade zusätzlich: isolierter synthetischer Staging-Write, Rücklesen, Teilfehler-/Retry-Nachweis und Cleanup vor einem echten Fachfall.
-
-### Gate D – Abnehmen und abschließen
-
-- technische Postconditions;
-- genau eine fachliche/visuelle Abnahme, falls erforderlich;
-- `CURRENT_WORKPACK.md` auf den Folgezustand setzen;
-- Evidence-Index nur bei neuem Beweis aktualisieren;
-- PR-, Branch-, Lock- und Rollbackstatus klären;
-- genau den nächsten zulässigen Schritt nennen.
-
-## 7. Evidence-Stufen
-
-| Stufe | Beweis |
-|---|---|
-| `E0` | Hypothese |
-| `E1` | aktueller Code/Diff |
-| `E2` | automatisierter Test, CI oder Replay |
-| `E3` | deployte read-only Runtime-Evidence |
-| `E4` | isolierter realer Staging-Write oder deterministische kontrollierte Admin-Mutation mit Rücklesen |
-| `E5` | echter fachlicher Staging-Fall |
-| `E6` | read-only Live-Smoke |
-
-Keine Erfolgsbehauptung bei Teilmutation oder fehlender erforderlicher Evidence.
-
-## 8. Fehlerbudget und Stop-the-line
-
-Beim ersten unerwarteten realen Verhalten:
-
-```text
-Schreiben stoppen
--> Zustand und Evidence sichern
--> nicht wiederholen
--> Root Cause oder fehlende Observability bestimmen
-```
-
-Regeln:
-
-1. eine technische Hypothese gleichzeitig;
-2. kein zweiter Write ohne neue Evidence;
-3. nach einer fehlgeschlagenen Integration ist höchstens eine eng begrenzte Korrekturrunde im selben Workpack zulässig;
-4. scheitert auch diese Runde oder war eine tragende Annahme falsch, folgt kein weiterer Reparatur-PR, sondern Revert-, Architektur- oder Workpack-Neuentscheidung;
-5. mehrere aufeinanderfolgende Merge-/Deploy-Runden zur schrittweisen Suche nach dem richtigen Prüfdesign sind unzulässig;
-6. keine manuelle Datenkorrektur zum künstlichen Grünmachen;
-7. Revert vor Nachpatchen bei einem direkten Main-Hotfix.
-
-Vor der ersten Integration darf der Feature-Branch innerhalb des vereinbarten Scopes anhand neuer E1-/E2-Evidence korrigiert werden. Das Korrekturbudget begrenzt nachgelagerte Runtime-Try-and-Error-Schleifen, nicht sorgfältige Vorabvalidierung.
-
-## 9. Dokumentations- und Implementierungsvertrag
-
-Für jede Änderung gilt:
-
-1. Der PR benennt, ob `IST`, dauerhafter Vertrag, `ZIEL`, Evidence oder Historie betroffen sind.
-2. Code und zugehörige Dokumentation werden im selben Workpack konsistent geändert; reine Statushistorie kommt nicht in stabile Verträge.
-3. Eine geplante Funktion darf weder in `Produktvertrag.md` noch in einer IST-Aussage als umgesetzt erscheinen.
-4. `CURRENT_WORKPACK.md` wird bei operativen Zustandswechseln ersetzt, nicht ergänzt.
-5. Neue dauerhafte Regeln gehören genau in den fachlichen Owner; Evidence und Entscheidungen bleiben getrennte Dokumenttypen.
-6. Neue Root-Markdown-Dateien sind nur mit registrierter Rolle zulässig. Historische Dateien dürfen keinen aktuellen Lesepfad bilden.
-7. Vor Abschluss laufen Vollinventur und Governance-Audit aus `Project Guardrails` grün.
-8. Abgeschlossene Governance wird nicht durch weitere allgemeine Optimierungsdokumente fortgesetzt; neue Prozessregeln benötigen eine konkrete belegte Ursache.
-
-## 10. Nutzerinteraktion
-
-Die KI ermittelt selbst, was über Repo, CI, Logs und read-only Dienste zugänglich ist. Eine unvermeidbare Nutzeraktion enthält genau einen Schritt, technische Begründung, erwartetes Ergebnis und klare Nicht-Aktionen.
-
-Screenshots dienen visueller/fachlicher Abnahme oder fehlenden Schnittstellen, nicht als Ersatz für automatisierbare Runtime-Evidence.
+- der kleinste vollständige Patch integriert ist;
+- `PR Gate` grün war;
+- der normale Staging-Deploy grün ist, sofern Runtime betroffen ist;
+- die konkrete Zielwirkung geprüft wurde;
+- temporäre Test- oder Workflowinfrastruktur entfernt ist;
+- `CURRENT_WORKPACK.md` den echten Folgezustand zeigt;
+- kein unnötiger Folge-Workpack erzeugt wurde.
