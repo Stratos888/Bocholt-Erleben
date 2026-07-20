@@ -1,0 +1,14 @@
+name: Control Center E4 Synthetic Proof
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  blocked-placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail closed until exact operator anchor is installed
+        run: exit 1
