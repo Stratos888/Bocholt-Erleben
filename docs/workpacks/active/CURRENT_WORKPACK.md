@@ -2,62 +2,20 @@
 
 Stand: 2026-07-20
 
-Diese Datei ist der einzige operative technische Projektstatus. Aktuelle SHAs, PRs und Action-Läufe werden bei jeder Aufgabe direkt aus GitHub gelesen.
-
-## Aktiver Implementierungs-Workpack
+## Aktiver Workpack
 
 **Keiner.**
 
-Die Repository- und Workflowvereinfachung ist der aktuelle abgeschlossene Zielzustand.
+## Aktuelle Locks
 
-## Verbindlicher Arbeitsmodus
+**Keine.**
 
-```text
-ein primärer Entwicklungs-Chat
--> ein Workpack
--> ein Feature-Branch
--> ein PR nach staging
--> ein normaler Staging-Deploy
--> Abschluss
-```
+## Empfohlener nächster Workpack
 
-- keine parallelen Änderungen an denselben Ownern oder externen Ressourcen;
-- keine zusätzlichen Observer-, Verification- oder Einmal-Workflows;
-- kein allgemeiner Governance- oder Dokumentations-Workpack ohne konkreten aktuellen Befund;
-- Tests laufen über den einzigen Required Check `PR Gate`;
-- Runtimeänderungen erhalten nach dem Merge genau einen normalen Staging-Deploy.
+**Event-Builder-Kompatibilität als kleiner lokaler Contract-Test.**
 
-## Dauerhafte Workflowtopologie
+## Aktivierungszustand
 
-1. `PR Gate`
-2. `Deploy to STRATO`
-3. `Content Quality Audit`
-4. `Growth Intelligence Backlog`
-5. `Inbox Cleanup (Archive)`
-6. `Weekly KI Websearch → Manual Inbox`
-7. `Manual KI Event Intake`
+**Empfohlen, noch nicht aktiviert.**
 
-## Abgeschlossener synthetischer Writeback-Nachweis
-
-Der einmalige synthetische Lauf auf `staging` belegte:
-
-- Success-Write nach `Events_Staging`;
-- idempotenten Replay;
-- kontrollierten fehlgeschlagenen Operationszustand;
-- Resume ohne Eventduplikat;
-- vollständigen Sheet- und Datenbank-Cleanup;
-- unveränderte Live-Ressourcen und unveränderte Nicht-Testdaten.
-
-Der zusätzlich erzwungene Feed-Deploy scheiterte beim Event-Build, während der anschließende Cleanup-Deploy grün war. Daraus folgt kein weiterer E4-Lauf. Die temporäre E3-/E4-Infrastruktur wird entfernt. Die verbleibende fachliche Lücke lautet separat:
-
-> Ein vom Control Center akzeptierter Eventdatensatz muss vom normalen Event-Builder verarbeitet werden können.
-
-Diese Lücke wird erst als kleiner lokaler Build-Contract bearbeitet, wenn sie als nächster Produkt-/Risikoworkpack priorisiert wird.
-
-## Aktive Locks
-
-Keine.
-
-## Nächster zulässiger Schritt
-
-Einen neuen Workpack ausschließlich nach Produktwirkung oder konkretem Risiko priorisieren. Keine weitere allgemeine Prozess-, Workflow- oder Dokumentationsoptimierung ohne neuen belegten Bedarf.
+Der Workpack wird erst durch eine ausdrückliche Aktivierung in dieser Datei und einen eigenen Feature-Branch gestartet. Bis dahin erfolgen keine Implementierung und kein externer Write. Die allgemeine Prozess-, Workflow- und Dokumentationsoptimierung ist abgeschlossen und wird ohne neuen konkret belegten Bedarf nicht wieder aufgenommen.
