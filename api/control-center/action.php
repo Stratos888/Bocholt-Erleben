@@ -76,6 +76,17 @@ try {
 
     $sourceSystem = (string)$case['source_system'];
     $editorialAction = in_array($action, ['approve','reject','snooze'], true);
+
+    // The approval gate must use the current authoritative Inbox row and a
+    // fresh effective Event inventory, not the possibly older local case copy.
+    if ($sourceSystem === 'inbox_feed' && $action === 'approve') {
+        $currentSource = be_cc_inbox_direct_current_source($case);
+        $case['source_payload_json'] = json_encode(
+            (array)$currentSource['source_payload'],
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+        );
+    }
+
     $decision = $editorialAction ? be_cc_editorial_validate_action($case, $action, $payload) : null;
     if (is_array($decision)) {
         $payload = array_merge($payload, [
