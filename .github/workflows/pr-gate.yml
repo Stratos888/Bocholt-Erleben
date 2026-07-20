@@ -45,9 +45,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Validate backend contracts
+      - name: Validate routing and data contracts
         shell: bash
-        run: bash scripts/validate-repo.sh backend
+        run: bash scripts/validate-repo.sh routing
+
+      - name: Validate PHP syntax
+        shell: bash
+        run: bash scripts/validate-repo.sh php-syntax
+
+      - name: Validate Control Center contracts
+        shell: bash
+        run: bash scripts/validate-repo.sh php-tests
 
       - name: Validate frontend contracts
         shell: bash
