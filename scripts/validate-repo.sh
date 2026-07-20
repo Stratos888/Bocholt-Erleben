@@ -66,6 +66,7 @@ validate_repository() {
   python3 tools/audit-css-governance.py
   python3 tests/test_event_visual_gap_backlog.py
   python3 tests/test_events_overlay_merge.py
+  python3 tests/test_event_builder_control_center_contract.py
 }
 
 case "$section" in

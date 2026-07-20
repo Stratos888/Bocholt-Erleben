@@ -4,9 +4,8 @@ Diese Datei aktiviert keinen Workpack. Der operative Status steht in `docs/workp
 
 ## Mögliche nächste Workpacks
 
-1. Event-Builder-Kompatibilität als kleiner lokaler Contract-Test.
-2. `SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md` nach aktueller Suchbaseline.
-3. Startpartner-Wachstumspilot aus `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md` operationalisieren.
+1. `SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md` nach aktueller Suchbaseline.
+2. Startpartner-Wachstumspilot aus `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md` operationalisieren.
 
 Die Priorität wird erst bei Aktivierung anhand Produktwirkung und konkretem Risiko festgelegt.
 
