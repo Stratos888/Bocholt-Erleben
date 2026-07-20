@@ -5,6 +5,7 @@ require_once __DIR__ . '/_sources.php';
 require_once __DIR__ . '/_editorial_contracts.php';
 require_once __DIR__ . '/_inbox_tab.php';
 require_once __DIR__ . '/_inbox_schema.php';
+require_once __DIR__ . '/_event_identity.php';
 
 function be_cc_sync_sheet_inbox(): array
 {
@@ -27,6 +28,9 @@ function be_cc_sync_sheet_inbox(): array
         return '';
     };
 
+    // One authoritative inventory snapshot per synchronization. Staging uses
+    // Events plus the Events_Staging overlay; live uses Events only.
+    $eventInventory = be_cc_event_identity_current_events();
     $seen = $upserted = $reconciled = 0;
     foreach ((array)$table['rows'] as $row) {
         if (!is_array($row)) continue;
@@ -48,6 +52,7 @@ function be_cc_sync_sheet_inbox(): array
         $payload = $row;
         unset($payload['_raw']);
         $payload['sheet_tab'] = $tab;
+        $payload = be_cc_event_identity_enrich($payload, $eventInventory, true);
         $review = be_cc_event_candidate_review_contract($payload);
         $openCount = count((array)($review['decision_gate']['blockers'] ?? []));
         be_cc_upsert_source_case([
