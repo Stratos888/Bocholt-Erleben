@@ -9,6 +9,7 @@ Diese Datei ist der einzige operative technische Projektstatus. Offene PRs, aktu
 **Control Center: genau ein isolierter synthetischer E4-Staging-Beweis**
 
 - Detailvertrag: `docs/workpacks/active/CONTROL-CENTER-E4-SYNTHETIC-2026-07-20.md`
+- Domain-Router: `docs/domains/control-center.md`
 - Risikoklasse: `R3`
 - Aktivierungsbaseline von `staging`: `80655c5e730565e43faaa51af9d96b2d02fb8057`
 - aktuelles Gate: `B` – Implementierung und E2 vor Integration
@@ -37,7 +38,7 @@ Die allgemeine Dokumentations-Governance, die semantische Vollklassifikation, di
 
 Die Statuskontexte `deploy/staging-observed` und `control-center/runtime-preflight-e3` bleiben verbindlich. `Staging Verification` ist read-only und darf E4 weder aufrufen noch dispatchen.
 
-## Aktiver Ressourcen- und Owner-Lock
+## Aktiver Ressourcen-Lock
 
 Bis zum dokumentierten Abschluss dieses Workpacks gilt exklusiv:
 
@@ -97,7 +98,7 @@ weitere Writes stoppen
 
 Manuelle Datenkorrekturen zum künstlichen Grünmachen sind ausgeschlossen.
 
-## Nächster zulässiger Schritt
+## Nächster erlaubter Schritt
 
 Den aktiven Workpack auf dem Feature-Branch vollständig durch E2 validieren, nach `staging` integrieren und die read-only E3-Postconditions für den finalen Merge-SHA bestätigen.
 
