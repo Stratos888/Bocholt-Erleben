@@ -218,7 +218,7 @@ def compare_event_identity(candidate_item: Mapping[str, Any], existing_item: Map
             match_type = "event_id_conflict"
             reason = "Die stabile Event-ID ist bereits belegt, aber Titel, Termin oder Quelle passen nicht sicher zusammen."
             confidence = "high"
-    elif same_title and (same_location or details["city_score"] == 1.0):
+    elif same_title and (same_location or same_url):
         status = "exact"
         match_type = "same_title_and_date"
         reason = "Titel und Termin stimmen mit einem vorhandenen Event überein."
