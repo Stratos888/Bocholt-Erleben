@@ -108,6 +108,7 @@ Zusätzliche Deployobserver, Runtimeverification-Workflows und synthetische Folg
 | `PR Gate` | Branchpolicy und Repositorytests |
 | `Deploy to STRATO` | Feed-Build und Deploy |
 | `Content Quality Audit` | Inhaltsqualität |
+| `Growth Intelligence Backlog` | Growth-/SEO-Signale |
 | `Inbox Cleanup (Archive)` | Inbox-Archivierung |
 | `Weekly KI Websearch → Manual Inbox` | Eventkandidatensuche |
 | `Manual KI Event Intake` | Kandidaten-Handoff |
