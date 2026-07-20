@@ -53,7 +53,11 @@ jobs:
         shell: bash
         run: bash scripts/validate-repo.sh php-syntax
 
-      - name: Validate Control Center contracts
+      - name: Validate runtime preflight contract
+        shell: bash
+        run: bash scripts/validate-repo.sh preflight
+
+      - name: Validate remaining Control Center contracts
         shell: bash
         run: bash scripts/validate-repo.sh php-tests
 
