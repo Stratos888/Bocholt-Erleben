@@ -47,27 +47,23 @@ $assert(
     'Live-Approve muss den verifizierten Live-Writer auswählen.'
 );
 
-$source = [
-    'submission_kind'=>'event',
-    'id_suggestion'=>'synthetic-contract-event',
-    'title'=>'Synthetischer Contract-Test',
-    'date'=>'2026-12-20',
-    'time'=>'19:00',
-    'time_status'=>'fixed_time',
-    'time_details'=>'19:00–20:00 Uhr',
-    'city'=>'Bocholt',
-    'location'=>'Testort',
-    'kategorie_suggestion'=>'Kultur & Kunst',
-    'source_url'=>'https://example.invalid/synthetic-contract-event',
-    'description'=>'Vollständiger synthetischer Datensatz für den lokalen Preflight-Vertrag.',
-    'final_description'=>'Vollständiger synthetischer Datensatz für den lokalen Preflight-Vertrag.',
-    'visual_key'=>'art_exhibition_gallery',
-];
+$fixtures = json_decode(
+    (string)file_get_contents(__DIR__ . '/fixtures/control_center_editorial_cases.json'),
+    true,
+    512,
+    JSON_THROW_ON_ERROR
+);
+$source = (array)($fixtures['event_cases'][0]['payload'] ?? []);
+$source['submission_kind'] = 'event';
+$source['final_description'] = (string)($source['description'] ?? '');
+$eventId = (string)($source['id_suggestion'] ?? '');
+$assert($eventId !== '', 'Das kanonische Ready-Fixture benötigt eine stabile Event-ID.');
+
 $case = [
     'id'=>'case-synthetic-contract',
     'source_system'=>'inbox_feed',
-    'source_reference'=>'sheet:Inbox_Staging:synthetic-contract-event',
-    'object_id'=>'synthetic-contract-event',
+    'source_reference'=>'sheet:Inbox_Staging:' . $eventId,
+    'object_id'=>$eventId,
     'title'=>'Synthetischen Testfall prüfen',
     'source_payload_json'=>json_encode($source, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
 ];
@@ -79,7 +75,7 @@ $sourceSnapshot = [
 ];
 $targetSnapshot = [
     'tab'=>'Events_Staging',
-    'event_id'=>'synthetic-contract-event',
+    'event_id'=>$eventId,
     'resolution_status'=>'absent',
     'row_number'=>0,
     'identical'=>false,
