@@ -6,99 +6,111 @@ Diese Datei ist der einzige operative technische Projektstatus. Offene PRs, aktu
 
 ## Aktiver Implementierungs-Workpack
 
-**Keiner.**
+**Control Center: genau ein isolierter synthetischer E4-Staging-Beweis**
 
-Die Dokumentations-Governance, die semantische Vollklassifikation, die Control-Center-Workflow-Konsolidierung und die Evidence-first-Härtung des Ausführungsmodells sind abgeschlossen. Ergebnisse und Grenzen stehen in:
+- Detailvertrag: `docs/workpacks/active/CONTROL-CENTER-E4-SYNTHETIC-2026-07-20.md`
+- Risikoklasse: `R3`
+- Aktivierungsbaseline von `staging`: `80655c5e730565e43faaa51af9d96b2d02fb8057`
+- aktuelles Gate: `B` – Implementierung und E2 vor Integration
+- erreichte Evidence vor Aktivierung: E1, E2 und fachfallfreies read-only E3
+- Ziel dieses Workpacks: genau ein synthetischer E4-Lauf mit Write, Rücklesen, idempotentem Replay, kontrolliertem Teilfehler, Wiederaufnahme, Staging-Feed-Beweis und vollständigem Cleanup
 
-- `docs/workpacks/completed/DOCUMENTATION-GOVERNANCE-HARDENING-2026-07-19.md`
-- `docs/workpacks/completed/DOCUMENTATION-SEMANTIC-CLASSIFICATION-2026-07-19.md`
-- `docs/workpacks/completed/CONTROL-CENTER-WORKFLOW-CONSOLIDATION-2026-07-19.md`
-- `docs/workpacks/completed/EXECUTION-MODEL-EVIDENCE-DESIGN-2026-07-20.md`
-- `docs/evidence/control-center-workflow-inventory-2026-07-19.md`
+Die allgemeine Dokumentations-Governance, die semantische Vollklassifikation, die Control-Center-Workflow-Konsolidierung und die Evidence-first-Härtung des Ausführungsmodells bleiben abgeschlossen. Es wird kein weiterer allgemeiner Governance- oder Prozessoptimierungs-Workpack eröffnet.
 
-Es wird kein weiterer allgemeiner Governance-, Dokumentations- oder Prozessoptimierungs-Workpack eröffnet, solange keine neue konkrete und belegte Lücke vorliegt.
+## Verbindlicher Evidence-first-Modus
 
-## Verbindlicher Ausführungsmodus
+1. Evidence-Design ist vollständig vor dem ersten Patch festgelegt.
+2. Der E4-Beweis ist vollständig synthetisch und fachfallfrei.
+3. Technische Assertions, Negativfälle, Cleanup und Revert stehen im aktiven Detailvertrag.
+4. Vor Integration muss das Runtime-Design-Gate über `Control Center CI`, `Project Guardrails` und `PR Gate` grün sein.
+5. Nach einer fehlgeschlagenen Integration ist höchstens eine eng begrenzte Korrekturrunde zulässig.
+6. Nach einem fehlgeschlagenen E4-Lauf gibt es keine Wiederholung; es folgt eine Revert-, Architektur- oder Workpack-Neuentscheidung.
 
-Für folgende Workpacks gilt ab jetzt:
-
-1. Evidence-Design ist bei `R2` und `R3` vor dem ersten Patch vollständig Teil von Gate A.
-2. Technische Runtime-Evidence ist fachfallfrei, solange nicht der echte Fachfall selbst Prüfgegenstand ist.
-3. Der Prüfaufwand bleibt proportional; Vollinventuren gibt es nur bei tatsächlich konkurrierenden Pfaden.
-4. Vor Integration eines `R2`-/`R3`-Workpacks muss das Runtime-Design-Gate erfüllt sein.
-5. Nach einer fehlgeschlagenen Integration ist höchstens eine eng begrenzte Korrekturrunde zulässig; danach folgt eine Revert-, Architektur- oder Workpack-Neuentscheidung.
-6. Nach erfüllter Evidence wird der Workpack abgeschlossen und die Arbeit kehrt zum nächsten produkt- oder risikowirksamen Ziel zurück.
-
-Der vollständige Vertrag steht in `AI_ENTRYPOINT.md`; das PR-Template macht ihn für jeden neuen Workpack explizit.
-
-## Integrierter Workflowzustand
-
-Autoritative technische Kette:
+## Autoritative technische Kette
 
 1. `PR Gate` – Always-run-Integration und Branchpolicy.
 2. `Project Guardrails` – Architektur-, Dokumentations- und Workflowtopologie-Governance.
 3. `Control Center CI` – vollständige E1/E2-Prüfung je relevantem PR.
 4. `Deploy to STRATO` – einziger Deploypfad.
 5. `Staging Verification` – gemeinsame read-only Deploy-/Build-/E3-Evidence.
-6. `Control Center E4 Synthetic Proof` – getrennte, weiterhin gesperrte R3-Capability.
+6. `Control Center E4 Synthetic Proof` – getrennte, manuelle und SHA-gebundene R3-Capability.
 
-Die Statuskontexte `deploy/staging-observed` und `control-center/runtime-preflight-e3` bleiben verbindlich. Content-, Growth-, Inbox-, KI- und Content-Ops-Betriebsworkflows bleiben fachlich getrennt.
+Die Statuskontexte `deploy/staging-observed` und `control-center/runtime-preflight-e3` bleiben verbindlich. `Staging Verification` ist read-only und darf E4 weder aufrufen noch dispatchen.
 
-## Pausierter Runtime-Workpack
+## Aktiver Ressourcen- und Owner-Lock
 
-- **Programm:** Control Center Runtime-Verlässlichkeit
-- **Nächster Workpack:** genau ein isolierter synthetischer E4-Staging-Write mit Wiederaufnahme, Rücklesen und Cleanup
-- **Status:** noch nicht aktiviert
-- **Risikoklasse:** R3
-- **Erreichte Evidence:** E1, E2 und read-only E3
-- **Fehlende Evidence:** E4
+Bis zum dokumentierten Abschluss dieses Workpacks gilt exklusiv:
 
-Belegt beziehungsweise vorgeschrieben:
+- keine parallele Control-Center-Workflow- oder Writeränderung;
+- keine parallele Mutation in `Inbox_Staging`, `Events_Staging` oder der Staging-Control-Center-DB;
+- keine E4-Ausführung außerhalb des einen dokumentierten Runs;
+- kein CityArt-Fachklick und kein anderer echter Fachfall;
+- keine Mutation in `Inbox` oder `Events`;
+- kein Live-Deploy und keine Live-Schreibaktion;
+- kein zusätzlicher Trigger-, Observer- oder One-off-Workflow.
 
-- der E4-Harness ist statisch integriert und selbstgetestet;
-- die normale Staging-Verifikation ist read-only;
-- `staging` löst `Inbox_Staging -> Events_Staging` auf;
-- kein synthetischer E4-Lauf wurde gestartet;
-- keine synthetischen Restdaten und keine Live-Mutation wurden erzeugt.
+Erlaubter externer Zugriff im E4-Lauf:
 
-## Ressourcen-Lock
+- `Inbox_Staging`, `Events_Staging` und synthetische Staging-DB-Datensätze: `controlled-staging-write`;
+- `Inbox`, `Events` und Live-Feed: ausschließlich read-only für Unverändert-Nachweise;
+- STRATO Staging: sequenzielle Deploys für Initial-, synthetischen und bereinigten Feedzustand.
 
-Bis zur ausdrücklichen Aktivierung eines separaten R3-Workpacks gilt:
+## Geplanter Operatorpfad
 
-- keine E4-Ausführung;
-- kein CityArt-Fachklick;
-- keine Mutation in `Inbox_Staging`, `Events_Staging`, `Inbox` oder `Events` im Control-Center-Testpfad;
-- kein zusätzlicher Trigger-, Observer- oder One-off-Workflow;
-- keine parallele Control-Center-Workflowänderung.
+Der manuelle E4-Workflow benötigt einen Workflowanker auf dem Default-Branch `main`. Der zulässige Weg ist:
 
-Eine ausdrücklich beauftragte deterministische einzelne Live-Eventpflege nach `AI_ENTRYPOINT.md` ist kein Control-Center-Test und wird separat exklusiv gelockt.
+1. hardened E4-Workflow und Harness nach grüner E2-Prüfung nach `staging` integrieren;
+2. Staging-Deploy und read-only E3 für den finalen Merge-SHA bestätigen;
+3. ausschließlich die identische Workflowdatei als engen Operatoranker nach `main` bringen;
+4. den Workflow auf `main` mit dem exakten aktuellen 40-stelligen `staging`-SHA und der Bestätigung `RUN_ONE_SYNTHETIC_E4` starten;
+5. der Job checkt genau diesen Staging-Commit aus und stoppt, falls `staging` inzwischen weitergelaufen ist.
 
-## Nächster erlaubter Schritt
+Der Main-Operatoranker ist kein Live-Release. Ein breiter `staging -> main`-Merge ist nicht Teil dieses Workpacks.
 
-Einen separaten R3-Workpack für genau einen isolierten synthetischen E4-Staging-Lauf erstellen und vor dem ersten Patch gegen den aktuellen `staging`-Stand mit dem neuen Evidence-first-Vertrag validieren.
+## E4-Erfolgskriterien
 
-Der Workpack muss insbesondere vor der Implementierung klären:
+Der Workpack ist nur grün, wenn das Evidence-Artefakt mindestens bestätigt:
 
-- wie der Workflow auf dem Default-Branch sicher bedienbar wird, ohne E4 vorzeitig freizuschalten;
-- exakte synthetische Identität;
-- `Inbox_Staging`- und `Events_Staging`-Vorherzustand;
-- Write-, Resume-, Rücklese- und Cleanup-Postconditions;
-- positiven und negativen E4-Assertions sowie ihren E2-Contract-/Replay-Nachweis;
-- exklusiven Ressourcen-Lock;
-- sofortigen Stop bei jeder Abweichung;
-- Revert- oder Architekturentscheidung, falls eine begrenzte Korrekturrunde nicht ausreicht.
+- fachfallfreie synthetische Identitäten;
+- korrekter aktueller Staging-SHA, Host, Build und Ressourcenpfad;
+- Success-Write und idempotenter Replay;
+- fail-closed Teilfehler und erfolgreiche Wiederaufnahme ohne Duplikat;
+- beide synthetischen Events genau einmal im Staging-Feed;
+- kein synthetischer Eintrag im Live-Feed;
+- vollständiger Sheet-, DB- und Feed-Cleanup;
+- unveränderte Nicht-Testdaten in Staging;
+- unveränderte Live-Sheets;
+- keine synthetischen Restdaten;
+- `result=success` und keine Cleanup-Fehler.
 
-## Verbindliche Folgefolge
+## Stop-the-line
 
-1. Separaten R3-Workpack für genau einen synthetischen E4-Lauf aktivieren.
-2. Nur bei grünem E4 über genau einen echten CityArt-Staging-Fall entscheiden.
-3. Danach einen Produktworkpack aus `docs/workpacks/queued/INDEX.md` aktivieren.
+Beim ersten unerwarteten realen Verhalten:
 
-## Dokumentationsstatus
+```text
+weitere Writes stoppen
+-> Evidence sichern
+-> nur Cleanup versuchen
+-> keinen zweiten E4-Lauf starten
+-> Revert-, Architektur- oder Workpack-Neuentscheidung
+```
 
-- Dokumentrollen und Rangfolge: `docs/README.md`
-- vollständiger Rollenvertrag: `docs/DOCUMENT_REGISTRY.md`
-- Control-Center-Einstieg: `docs/domains/control-center.md`
-- technische Queue: `docs/workpacks/queued/INDEX.md`
-- aktueller Proofstand: `TEST_STATUS.md`
-- Architektur- und Produktzielentscheidungen bleiben getrennt von diesem operativen Status.
+Manuelle Datenkorrekturen zum künstlichen Grünmachen sind ausgeschlossen.
+
+## Nächster zulässiger Schritt
+
+Den aktiven Workpack auf dem Feature-Branch vollständig durch E2 validieren, nach `staging` integrieren und die read-only E3-Postconditions für den finalen Merge-SHA bestätigen.
+
+Erst danach darf der enge Default-Branch-Operatoranker eingerichtet und genau ein synthetischer E4-Lauf gestartet werden.
+
+## Nicht Teil dieses Workpacks
+
+- echter CityArt-Staging-Fall;
+- sonstiger echter Fachfall;
+- Produkt-, UI-, SEO-, Content- oder Visualänderung;
+- allgemeine Workflowkonsolidierung;
+- Live-Release oder Live-Write.
+
+## Folgezustand
+
+Nach einem vollständig grünen und bereinigten E4 wird gesondert entschieden, ob ein echter CityArt-Staging-Fall noch zusätzliche E5-Evidence benötigt. Er wird nicht automatisch ausgeführt. Danach wird wieder ein produktwirksamer Workpack aus `docs/workpacks/queued/INDEX.md` aktiviert.
