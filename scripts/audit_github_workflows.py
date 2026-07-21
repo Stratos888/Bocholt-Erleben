@@ -8,7 +8,7 @@ from pathlib import Path
 
 WORKFLOW_DIR = Path(".github/workflows")
 EXPECTED_WORKFLOWS = {
-    "bathing-water-guard-v1.yml",
+    "bathing-water-guard.yml",
     "content-quality-audit.yml",
     "deploy-strato.yml",
     "growth-intelligence-backlog.yml",
