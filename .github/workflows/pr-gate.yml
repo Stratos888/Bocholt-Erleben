@@ -45,23 +45,9 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Capture repository validation
-        id: repository_validation
-        continue-on-error: true
+      - name: Validate repository tools
         shell: bash
-        run: bash scripts/validate-repo.sh repository > repository-validation.log 2>&1
-
-      - name: Upload repository validation diagnostic
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: repository-validation-diagnostic
-          path: repository-validation.log
-          if-no-files-found: error
-
-      - name: Fail on repository validation error
-        if: steps.repository_validation.outcome != 'success'
-        run: exit 1
+        run: bash scripts/validate-repo.sh repository
 
       - name: Validate backend and data contracts
         shell: bash
