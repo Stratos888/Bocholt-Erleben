@@ -4,30 +4,32 @@ Stand: 2026-07-21
 
 ## Aktiver Workpack
 
-**Keiner.**
+**Security – CodeQL Browser-Secret-Cleanup.**
+
+Owner:
+
+- Branch: `agent/security-codeql-session-cleanup`
+- Detail: `docs/workpacks/active/SECURITY-codeql-browser-secret-cleanup-2026-07-21.md`
 
 ## Aktuelle Locks
 
-**Keine.**
+- `js/control-center/shared.js`
+- `js/control-center/app.js`
+- `intern/index.html`
+- `intern/work.html`
+- Badegewässer-Proof-/Discovery-Artefakte
+- `tests/control_center_frontend_contract_test.mjs`
+- kanonischer Workpackstatus
+
+Andere schreibende Chats dürfen diese Owner bis zum Abschluss nicht verändern.
 
 ## Zuletzt abgeschlossen
 
 **GitHub-Actions-Vollinventur und Workflow-Cleanup.**
 
-Ergebnis:
+Ergebnis: sieben dauerhafte Workflows und fail-closed Workflow-Allowlist.
 
-- alle zwölf vorhandenen Workflowdateien vollständig klassifiziert;
-- fünf überholte, doppelte oder integrierte Workflowdateien entfernt;
-- KI-Suche und Live-Inbox-Intake in einem fachlichen Owner zusammengeführt;
-- Inbox→Events-Import und Archivierung in `Inbox Operations` zusammengeführt;
-- Badegewässer-Guard als einziger saisonaler Owner normalisiert;
-- endgültiger Bestand: sieben Workflows;
-- exakte Workflow-Allowlist wird fail-closed im bestehenden `PR Gate` geprüft.
+## Danach empfohlen
 
-## Empfohlener nächster Workpack
-
-**Search-Intent und statische Renderingbasis – SEO-Recovery nach aktueller Suchbaseline.**
-
-## Aktivierungszustand
-
-**Empfohlen, noch nicht aktiviert.**
+1. GitHub-Environments `staging` und `live` sowie Secret-Trennung;
+2. anschließend Search-Intent und statische Renderingbasis – SEO-Recovery.
