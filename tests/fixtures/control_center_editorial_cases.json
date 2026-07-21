@@ -5,60 +5,67 @@
       "ready": true,
       "payload": {
         "id_suggestion": "event-test-1",
-        "title": "Sommerabend am Aasee",
+        "title": "Kunstmarkt am Rathaus",
         "date": "2026-08-08",
         "time": "18:00",
+        "time_status": "fixed_time",
         "city": "Bocholt",
-        "location": "Aasee",
-        "kategorie_suggestion": "Musik & Bühne",
+        "location": "Markt vor dem Historischen Rathaus",
+        "kategorie_suggestion": "Kultur & Kunst",
         "source_name": "Stadt Bocholt",
-        "source_url": "https://www.bocholt.de/veranstaltungskalender/sommerabend",
-        "description": "Ein öffentlicher Sommerabend mit Musik am Bocholter Aasee.",
-        "visual_key": "music-stage",
-        "visual_motif": "open-air-stage"
+        "source_quality": "official",
+        "source_url": "https://www.bocholt.de/veranstaltungskalender/kunstmarkt",
+        "description": "Ein öffentlicher Kunstmarkt auf dem Bocholter Marktplatz.",
+        "visual_key": "art_exhibition_gallery",
+        "visual_motif": "art_market",
+        "visual_asset_id": "motif-gap-art-market-01",
+        "visual_asset_role": "specific"
       }
     },
     {
       "name": "multi_day_without_end",
       "ready": false,
-      "blocker": "missing_conditional",
+      "blocker": "missing_end_date",
+      "task_id": "schedule.multi_day",
       "payload": {
         "title": "Kulturfestival",
         "date": "2026-09-04",
         "is_multi_day": true,
-        "time_reason": "Tageszeiten unterscheiden sich.",
+        "time_status": "all_day",
         "city": "Bocholt",
         "location": "Innenstadt",
         "category": "Kultur & Kunst",
         "source_url": "https://example.org/kulturfestival",
         "description": "Mehrere Kulturangebote in der Innenstadt.",
-        "visual_key": "culture-art",
-        "visual_motif": "city-culture"
+        "visual_key": "art_exhibition_gallery",
+        "visual_motif": "art_market",
+        "visual_asset_id": "motif-gap-art-market-01"
       }
     },
     {
-      "name": "missing_time_with_reason",
-      "ready": true,
-      "warning": "time_not_fixed",
+      "name": "legacy_time_reason_needs_typing",
+      "ready": false,
+      "blocker": "time_missing",
+      "task_id": "time.status",
       "payload": {
         "title": "Stadtfest",
         "date": "2026-09-12",
-        "endDate": "2026-09-13",
-        "is_multi_day": true,
         "time_reason": "Das Programm nennt je Tag unterschiedliche Beginnzeiten.",
         "city": "Bocholt",
         "location": "Innenstadt",
         "category": "Märkte & Feste",
         "source_url": "https://example.org/stadtfest",
-        "description": "Ein zweitägiges Stadtfest mit Programm in der Innenstadt.",
-        "visual_key": "city-festival",
-        "visual_motif": "festival-crowd"
+        "description": "Ein Stadtfest mit Programm in der Innenstadt.",
+        "visual_key": "art_exhibition_gallery",
+        "visual_motif": "art_market",
+        "visual_asset_id": "motif-gap-art-market-01"
       }
     },
     {
       "name": "missing_source",
       "ready": false,
-      "blocker": "missing_required",
+      "blocker": "missing_source_url",
+      "task_id": "field.source_url",
       "payload": {
         "title": "Familienfest",
         "date": "2026-08-22",
@@ -67,14 +74,16 @@
         "location": "Marktplatz",
         "category": "Kinder & Familie",
         "description": "Ein Familienfest auf dem Marktplatz.",
-        "visual_key": "family-festival",
-        "visual_motif": "family-activities"
+        "visual_key": "art_exhibition_gallery",
+        "visual_motif": "art_market",
+        "visual_asset_id": "motif-gap-art-market-01"
       }
     },
     {
       "name": "hard_duplicate",
       "ready": false,
       "blocker": "hard_duplicate",
+      "task_id": "dedupe.decision",
       "payload": {
         "title": "Open Air",
         "date": "2026-08-29",
@@ -84,9 +93,49 @@
         "category": "Musik & Bühne",
         "source_url": "https://example.org/open-air",
         "description": "Ein öffentliches Open-Air-Konzert auf dem Marktplatz.",
-        "visual_key": "music-stage",
-        "visual_motif": "open-air-stage",
+        "visual_key": "art_exhibition_gallery",
+        "visual_motif": "art_market",
+        "visual_asset_id": "motif-gap-art-market-01",
         "matched_event_id": "existing-open-air"
+      }
+    },
+    {
+      "name": "cityart_exact_asset",
+      "ready": false,
+      "blocker": "visual_suggestion_ready",
+      "task_id": "visual.asset",
+      "payload": {
+        "id_suggestion": "cityart-2026",
+        "title": "Bocholter Kulturtage 2026 - Kunstmarkt CityArt",
+        "date": "2026-08-30",
+        "city": "Bocholt",
+        "location": "Markt vor dem Historischen Rathaus",
+        "category": "Kinder & Familie",
+        "source_name": "Stadt Bocholt",
+        "source_url": "https://www.bocholt.de/cityart",
+        "description": "Kunstmarkt und künstlerische Mitmach-Stände.",
+        "visual_key": "art_exhibition_gallery"
+      }
+    },
+    {
+      "name": "time_not_published_waiting",
+      "ready": false,
+      "blocker": "time_not_published",
+      "task_id": "time.status",
+      "task_state": "waiting_external",
+      "payload": {
+        "title": "Programm folgt",
+        "date": "2026-10-01",
+        "time_status": "time_not_published",
+        "next_review_at": "2026-09-01",
+        "city": "Bocholt",
+        "location": "Innenstadt",
+        "category": "Kultur",
+        "source_url": "https://example.org/programm",
+        "description": "Die Veranstaltung wird später konkretisiert.",
+        "visual_key": "art_exhibition_gallery",
+        "visual_motif": "art_market",
+        "visual_asset_id": "motif-gap-art-market-01"
       }
     }
   ]

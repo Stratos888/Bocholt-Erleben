@@ -11,7 +11,6 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   validate:
@@ -19,77 +18,41 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Enforce serial branch path
-        id: policy
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const pr = context.payload.pull_request;
-            const currentRepository = `${context.repo.owner}/${context.repo.repo}`;
-            const headRepository = String(pr?.head?.repo?.full_name || "");
-            const baseRef = String(pr?.base?.ref || "");
-            const headRef = String(pr?.head?.ref || "");
-            const baseSha = String(pr?.base?.sha || "");
-
-            if (headRepository !== currentRepository) {
-              core.setFailed("External repository PRs are not allowed.");
-              return;
-            }
-
-            if (baseRef === "staging" || (baseRef === "main" && headRef === "staging")) {
-              core.setOutput("mode", "normal");
-              return;
-            }
-
-            const cleanupBranch = "agent/remove-obsolete-e4-main";
-            const cleanupBase = "2a3f79c2e00946cfae9d2a2bd4468190e575149a";
-            const cleanupPaths = new Set([
-              ".github/workflows/control-center-e4-synthetic.yml",
-              ".github/workflows/pr-gate.yml",
-            ]);
-
-            if (baseRef !== "main" || headRef !== cleanupBranch || baseSha !== cleanupBase) {
-              core.setFailed("Allowed paths: feature branch -> staging, staging -> main.");
-              return;
-            }
-
-            const files = await github.paginate(github.rest.pulls.listFiles, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr.number,
-              per_page: 100,
-            });
-            const paths = files.map((file) => String(file.filename || "")).sort();
-            const exactScope = paths.length === cleanupPaths.size
-              && paths.every((path) => cleanupPaths.has(path));
-            if (!exactScope) {
-              core.setFailed(`Main workflow cleanup scope mismatch: ${paths.join(", ")}`);
-              return;
-            }
-
-            core.setOutput("mode", "expired-main-cleanup");
-
       - name: Checkout
-        if: steps.policy.outputs.mode == 'normal'
         uses: actions/checkout@v4
 
+      - name: Enforce serial branch path
+        shell: bash
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          CURRENT_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          test "$HEAD_REPOSITORY" = "$CURRENT_REPOSITORY"
+          if [ "$BASE_REF" = "staging" ]; then
+            exit 0
+          fi
+          if [ "$BASE_REF" = "main" ] && [ "$HEAD_REF" = "staging" ]; then
+            exit 0
+          fi
+          echo "Allowed paths: feature branch -> staging, staging -> main."
+          exit 1
+
       - name: Setup Python
-        if: steps.policy.outputs.mode == 'normal'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Validate backend and data contracts
-        if: steps.policy.outputs.mode == 'normal'
         shell: bash
         run: bash scripts/validate-repo.sh backend
 
       - name: Validate frontend contracts
-        if: steps.policy.outputs.mode == 'normal'
         shell: bash
         run: bash scripts/validate-repo.sh frontend
 
       - name: Validate repository tools
-        if: steps.policy.outputs.mode == 'normal'
         shell: bash
         run: bash scripts/validate-repo.sh repository

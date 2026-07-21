@@ -39,6 +39,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # === BEGIN BLOCK: FAIL_CLOSED_DEPLOY_BRANCH_ROUTING_V1 | Zweck: autorisiert ausschließlich main/live und staging/staging vor Python, Secrets oder externen Zugriffen; Umfang: zentrale Branch-, Environment- und Inbox-Tab-Aufloesung ===
+      - name: Authorize deploy branch before external access
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash scripts/resolve-deploy-target.sh "${GITHUB_REF_NAME}" "${GITHUB_ENV}"
+      # === END BLOCK: FAIL_CLOSED_DEPLOY_BRANCH_ROUTING_V1 ===
+
       # === BEGIN BLOCK: BUILD EVENTS + INBOX FEEDS (TSV -> JSON, fail-fast where needed) ===
       # Zweck:
       # - Google Sheet / Tab "Events" ist die einzige Quelle für redaktionelle Events.
@@ -87,147 +95,136 @@ jobs:
             exit 1
           fi
 
-          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
-            INBOX_TAB_NAME="Inbox_Staging"
-          else
-            INBOX_TAB_NAME="Inbox"
-          fi
+          case "${DEPLOY_ENV_NAME:-}:${INBOX_TAB_NAME:-}:${EVENTS_TAB_NAME:-}" in
+            live:Inbox:Events|staging:Inbox_Staging:Events_Staging) ;;
+            *)
+              echo "❌ Sheet targets were not authorized as one environment-consistent tuple."
+              echo "Environment=${DEPLOY_ENV_NAME:-missing} Inbox=${INBOX_TAB_NAME:-missing} Events=${EVENTS_TAB_NAME:-missing}"
+              exit 1
+              ;;
+          esac
 
           echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
-          echo "INBOX_TAB_NAME=$INBOX_TAB_NAME" >> "$GITHUB_ENV"
-          echo "✅ Google Sheet target resolved for ${GITHUB_REF_NAME}."
+          echo "✅ Google Sheet targets resolved for ${GITHUB_REF_NAME}."
           echo "Inbox tab: $INBOX_TAB_NAME"
+          echo "Events tab: $EVENTS_TAB_NAME"
       # === END BLOCK: DEPLOY_SHEET_AND_INBOX_TAB_TARGET_V2 ===
 
-      - name: Export Events tab to data/events.tsv (fail-fast, retry-hardened)
+      - name: Export environment-safe Events feed to data/events.tsv
         timeout-minutes: 6
         shell: bash
         env:
           SHEET_ID: ${{ env.BE_SHEET_ID }}
+          EVENTS_TAB_NAME: ${{ env.EVENTS_TAB_NAME }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
-          set -e
+          set -euo pipefail
           python - <<'PY'
-          # === BEGIN BLOCK: EVENTS_TAB_EXPORT_RETRY_HARDENED ===
-          import csv, json, os, sys, time, socket, ssl
+          import csv
+          import json
+          import os
+          import socket
+          import ssl
+          import sys
+          import time
+
           from google.oauth2 import service_account
           from googleapiclient.discovery import build
           from googleapiclient.errors import HttpError
 
-          def fail(msg):
-              print(f"❌ {msg}", file=sys.stderr)
+          from scripts.merge_events_overlay import merge_event_rows
+
+
+          def fail(message):
+              print(f"❌ {message}", file=sys.stderr)
               sys.exit(1)
 
+
           sheet_id = os.environ.get("SHEET_ID", "").strip()
-          sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+          events_tab = os.environ.get("EVENTS_TAB_NAME", "").strip()
+          service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
 
           if not sheet_id:
               fail("ENV SHEET_ID fehlt.")
-          if not sa_json:
-              fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
+          if events_tab not in {"Events", "Events_Staging"}:
+              fail(f"Nicht autorisiertes Events-Ziel: {events_tab or 'missing'}")
+          if not service_account_json:
+              fail("GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
 
           try:
-              sa_info = json.loads(sa_json)
+              service_account_info = json.loads(service_account_json)
           except Exception:
               fail("GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.")
 
           socket.setdefaulttimeout(90)
+          credentials = service_account.Credentials.from_service_account_info(
+              service_account_info,
+              scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"],
+          )
+          service = build("sheets", "v4", credentials=credentials, cache_discovery=False)
 
-          scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-          creds = service_account.Credentials.from_service_account_info(sa_info, scopes=scopes)
-          service = build("sheets", "v4", credentials=creds, cache_discovery=False)
 
           def fetch_values_with_retry(range_name, label, attempts=4):
-              last_exc = None
-
+              last_error = None
               for attempt in range(1, attempts + 1):
                   try:
                       print(f"↻ {label}: Versuch {attempt}/{attempts}")
-                      res = service.spreadsheets().values().get(
+                      response = service.spreadsheets().values().get(
                           spreadsheetId=sheet_id,
                           range=range_name,
-                          majorDimension="ROWS"
+                          majorDimension="ROWS",
                       ).execute(num_retries=4)
-                      return res.get("values", []) or []
-
-                  except HttpError as exc:
-                      status = getattr(exc.resp, "status", None)
-                      retryable = status in (408, 429, 500, 502, 503, 504)
-                      last_exc = exc
-
-                      if (not retryable) or attempt >= attempts:
+                      return response.get("values", []) or []
+                  except HttpError as error:
+                      status = getattr(error.resp, "status", None)
+                      last_error = error
+                      if status not in (408, 429, 500, 502, 503, 504) or attempt >= attempts:
                           raise
-
-                      wait_s = attempt * 5
-                      print(f"⚠️ {label}: HttpError {status}, Retry in {wait_s}s", file=sys.stderr)
-                      time.sleep(wait_s)
-
-                  except (TimeoutError, socket.timeout, ssl.SSLError, OSError) as exc:
-                      last_exc = exc
-
+                  except (TimeoutError, socket.timeout, ssl.SSLError, OSError) as error:
+                      last_error = error
                       if attempt >= attempts:
                           raise
+                  wait_seconds = attempt * 5
+                  print(f"⚠️ {label}: Retry in {wait_seconds}s", file=sys.stderr)
+                  time.sleep(wait_seconds)
+              raise last_error or RuntimeError(f"{label}: unbekannter Exportfehler")
 
-                      wait_s = attempt * 5
-                      print(f"⚠️ {label}: {type(exc).__name__}, Retry in {wait_s}s", file=sys.stderr)
-                      time.sleep(wait_s)
 
-              raise last_exc or RuntimeError(f"{label}: unbekannter Exportfehler")
+          base_values = fetch_values_with_retry("Events!A:ZZ", "Events-Basis")
+          if not base_values:
+              fail("Events-Basis ist leer oder nicht lesbar.")
 
-          rng = "Events!A:ZZ"
-          values = fetch_values_with_retry(rng, "Events-Tab")
+          overlay_values = None
+          if events_tab == "Events_Staging":
+              overlay_values = fetch_values_with_retry("Events_Staging!A:ZZ", "Events-Staging-Overlay")
+              if not overlay_values:
+                  fail("Events_Staging ist leer oder nicht lesbar.")
 
-          if not values:
-              fail("Events-Tab ist leer oder nicht lesbar.")
-
-          header = [h.strip() for h in (values[0] or [])]
-          required = ["id", "title", "date", "city", "location", "kategorie"]
-          missing = [c for c in required if c not in header]
-          if missing:
-              fail(f"Events-Header unvollständig. Fehlende Spalten: {missing}. Header={header}")
-
-          rows = []
-          for r in values[1:]:
-              r = (r or [])
-              row = [(r[i].strip() if i < len(r) and r[i] is not None else "") for i in range(len(header))]
-              if any(v for v in row):
-                  rows.append(row)
+          try:
+              header, rows, stats = merge_event_rows(
+                  base_values[0],
+                  base_values[1:],
+                  overlay_values[0] if overlay_values is not None else None,
+                  overlay_values[1:] if overlay_values is not None else None,
+              )
+          except ValueError as error:
+              fail(str(error))
 
           if not rows:
-              fail("Events-Tab enthält keine Datenzeilen (nur Header).")
+              fail("Der zusammengeführte Events-Bestand enthält keine Datenzeilen.")
 
-          out_path = "data/events.tsv"
-          with open(out_path, "w", encoding="utf-8", newline="") as f:
-              w = csv.writer(f, delimiter="\t", lineterminator="\n")
-              w.writerow(header)
-              w.writerows(rows)
+          with open("data/events.tsv", "w", encoding="utf-8", newline="") as handle:
+              writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
+              writer.writerow(header)
+              writer.writerows(rows)
 
-          print(f"✅ Export OK: {len(rows)} Zeilen nach {out_path}")
-          # === END BLOCK: EVENTS_TAB_EXPORT_RETRY_HARDENED ===
+          print(
+              "✅ Events export OK: "
+              f"target={events_tab} base={stats['base']} overlay={stats['overlay']} "
+              f"replaced={stats['replaced']} appended={stats['appended']} total={len(rows)}"
+          )
           PY
           test -s data/events.tsv
-      # === BEGIN BLOCK: DEPLOY_ENV_DECISION_V4 | Zweck: main/live und staging nutzen denselben funktionierenden SFTP-Server/User; nur das Zielverzeichnis unterscheidet sich wieder ===
-      - name: Decide deploy target
-        shell: bash
-        run: |
-          set -e
-
-          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
-            TARGET_DIR="staging"
-            ENV_NAME="staging"
-          else
-            TARGET_DIR="."
-            ENV_NAME="live"
-          fi
-
-          echo "DEPLOY_TARGET_DIR=$TARGET_DIR" >> "$GITHUB_ENV"
-          echo "DEPLOY_ENV_NAME=$ENV_NAME" >> "$GITHUB_ENV"
-
-          echo "Branch: ${GITHUB_REF_NAME}"
-          echo "Deploy target dir: $TARGET_DIR"
-          echo "Environment: $ENV_NAME"
-      # === END BLOCK: DEPLOY_ENV_DECISION_V4 ===
-
       - name: Resolve public site origin for generated event assets
         shell: bash
         run: |
