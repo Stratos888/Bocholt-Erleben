@@ -52,7 +52,7 @@ def main() -> None:
     ])
     assert rows[0]["id"] == "x"
 
-    workflow = (ROOT / ".github" / "workflows" / "manual-ki-intake.yml").read_text(encoding="utf-8")
+    workflow = (ROOT / ".github" / "workflows" / "weekly-ki-websearch-to-manual-inbox.yml").read_text(encoding="utf-8")
     intake_script = (ROOT / "scripts" / "manual_ki_event_intake.py").read_text(encoding="utf-8")
     assert "python scripts/manual_ki_event_intake.py" in workflow
     assert "EVENTS_TAB: Events" in workflow

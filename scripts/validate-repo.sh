@@ -8,6 +8,7 @@ section="${1:-all}"
 PREFLIGHT_TEST="tests/control_center_runtime_preflight_contract_test.php"
 
 validate_routing() {
+  python3 scripts/audit_github_workflows.py
   bash tests/test_deploy_branch_routing.sh
   for file in \
     data/control_center_repo_workpacks.json \
