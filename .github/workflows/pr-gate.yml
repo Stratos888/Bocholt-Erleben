@@ -18,23 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Inventory workflow files before checkout
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const headSha = String(context.payload.pull_request?.head?.sha || "");
-            const response = await github.rest.git.getTree({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tree_sha: headSha,
-              recursive: "true",
-            });
-            const paths = response.data.tree
-              .map((entry) => String(entry.path || ""))
-              .filter((path) => /^\.github\/workflows\/[^/]+\.ya?ml$/.test(path))
-              .sort();
-            core.setFailed(`WORKFLOW_INVENTORY=${paths.join(",")}`);
-
       - name: Checkout
         uses: actions/checkout@v4
 
