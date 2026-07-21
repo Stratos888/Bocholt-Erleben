@@ -62,6 +62,7 @@ validate_frontend() {
 
 validate_repository() {
   echo "== Repository tools and generators =="
+  python3 scripts/audit_github_workflows.py
   python3 -m compileall -q scripts tools
   python3 scripts/audit_control_center_product_contract.py
   python3 scripts/audit_control_center_editorial_contracts.py
