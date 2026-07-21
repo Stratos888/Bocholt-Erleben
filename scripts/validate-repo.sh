@@ -8,6 +8,7 @@ section="${1:-all}"
 PREFLIGHT_TEST="tests/control_center_runtime_preflight_contract_test.php"
 
 validate_routing() {
+  python3 scripts/audit_github_workflows.py
   bash tests/test_deploy_branch_routing.sh
   for file in \
     data/control_center_repo_workpacks.json \
@@ -62,7 +63,6 @@ validate_frontend() {
 
 validate_repository() {
   echo "== Repository tools and generators =="
-  python3 scripts/audit_github_workflows.py
   python3 -m compileall -q scripts tools
   python3 scripts/audit_control_center_product_contract.py
   python3 scripts/audit_control_center_editorial_contracts.py
