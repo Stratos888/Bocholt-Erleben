@@ -4,29 +4,36 @@ Stand: 2026-07-21
 
 ## Aktiver Workpack
 
-**Keiner.**
+**SEO Recovery – Search Intent und statische Renderingbasis.**
+
+Kanonischer Auftrag:
+
+- `docs/workpacks/queued/SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md`
+
+Der dort dokumentierte Workpack ist durch diese Datei aktiviert. Die Umsetzung beginnt mit **Gate A**. Vor dessen vollständigem Abschluss erfolgt kein fachlicher Patch.
 
 ## Aktuelle Locks
 
-**Keine.**
+- genau ein schreibender Chat beziehungsweise Agent für den SEO-Workpack;
+- parallele Chats dürfen analysieren, aber keine Repository-Änderungen vornehmen;
+- Feature-Branch erst nach geprüftem aktuellen `staging`-Stand und vollständigem Gate A;
+- kein direkter Commit nach `staging` oder `main`.
 
 ## Zuletzt abgeschlossen
 
-**Security – CodeQL Browser-Speicherbereinigung.**
+**Allgemeine Repository-, Dokumentations-, Sicherheits- und Arbeitsweisenoptimierung.**
 
 Ergebnis:
 
-- kein Review-Passwort mehr in `localStorage` oder `sessionStorage`;
-- alte gespeicherte Zugangsschlüssel werden vor dem App-Start entfernt;
-- abgelöste interne Oberflächen leiten zur kanonischen Steuerzentrale;
-- abgeschlossene Badegewässer-Proof-/Discovery-Artefakte entfernt;
-- erneute persistente Speicherung wird im bestehenden `PR Gate` fail-closed geprüft;
-- keine externen Daten-, Secret- oder Live-Schreibaktionen.
+- kanonischer Einstieg, Workpack-Steuerung und Proofindex konsolidiert;
+- allgemeine Meta-Optimierung beendet und bis zu neuer konkreter Evidenz eingefroren;
+- geschützte Releasefolge `Feature-Branch -> staging -> main` mit verpflichtendem `PR Gate`;
+- Rulesets, CodeQL, Dependabot, Secret Scanning und Push Protection aktiv;
+- Deployjob mit `contents: read` den geschützten Environments `staging` und `main` zugeordnet;
+- Staging- und Live-Deploy einschließlich Smoke-Tests erfolgreich validiert;
+- `STAGING_REVIEW_PASSWORD` ausschließlich im Environment `staging`; Login nach Entfernung des gleichnamigen Repository-Secrets erfolgreich;
+- übrige bestehende Repository-Secrets bleiben bewusst unverändert; neue umgebungsspezifische Secrets werden direkt im passenden Environment angelegt.
 
-## Empfohlener nächster Workpack
+## Genau nächster Schritt
 
-**GitHub-Environments `staging` und `live` sowie saubere Secret-Trennung.**
-
-Danach:
-
-**Search-Intent und statische Renderingbasis – SEO-Recovery nach aktueller Suchbaseline.**
+Gate A des SEO-Workpacks gegen den dann aktuellen Branch-, Such-, Daten-, Rendering-, Schema- und Indexierungsstand vollständig erheben und dokumentieren.
