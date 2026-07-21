@@ -1,6 +1,6 @@
 # Aktueller Proofindex – Bocholt erleben
 
-Stand: 2026-07-20
+Stand: 2026-07-21
 
 Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Historie liegt in Git und den jeweiligen Action-Artefakten.
 
@@ -19,9 +19,13 @@ Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Histor
 
 | Bereich | Evidence | Status |
 |---|---:|---|
-| Branch- und Deployrouting | E2 | nur `staging` und `main` dürfen deployen; Releasepfad `staging -> main` |
+| Branch- und Deployrouting | E2 | nur `staging` und `main` dürfen deployen; Releasepfad `Feature-Branch -> staging -> main` |
 | PR-Integration | E2 | ein Required Check `PR Gate` führt die Repositorytests aus |
-| Staging-Deploy | E3 | normaler Deploy enthält Build- und HTTP-Smoke |
+| Geschützte Deploy-Environments | E2 | Deployjob nutzt abhängig vom Branch ausschließlich `staging` oder `main`; Branchregeln sind aktiv; `GITHUB_TOKEN` ist auf `contents: read` begrenzt |
+| Staging-Deploy | E3 | normaler Deploy über Environment `staging` einschließlich Build-, HTTP- und Browser-Smoke erfolgreich |
+| Staging-Secret-Isolation | E3 | `STAGING_REVIEW_PASSWORD` liegt ausschließlich im Environment `staging`; nach Löschen des gleichnamigen Repository-Secrets blieben Deploy und Login erfolgreich |
+| Live-Deploy | E6 | validierter Stand über `staging -> main` veröffentlicht; Live-Deploy, HTTP-/Browser-Smoke und manueller Funktionstest erfolgreich |
+| Branch-Inhaltsgleichheit | E1 | `main` und `staging` besitzen nach dem Release denselben Dateiinhalt; Unterschiede bestehen nur in der Merge-Historie |
 | Control-Center-Writeback | E4 | Success, Replay, kontrollierter Fehler, Resume und Cleanup synthetisch belegt |
 | Live-Unverändertheit beim E4 | E4 | Live-Sheet und Live-Feed blieben unverändert |
 | Event-Builder-Kompatibilität | E2 | eine vom echten Control-Center-Writer erzeugte Zeile mit `11:00–18:00 Uhr` wird vom normalen Event-Builder vollständig verarbeitet |
