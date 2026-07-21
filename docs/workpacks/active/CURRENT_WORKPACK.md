@@ -9,8 +9,9 @@ Stand: 2026-07-21
 Ziel:
 
 - der Nutzer nennt nur ein gewünschtes Ergebnis, ein Problem oder fragt offen nach dem besten nächsten Schritt;
-- der primäre Chat ermittelt daraus selbst Ziel, Priorität, Scope, Werkzeug und vollständigen Übergabeprompt;
-- Work, Codex und Chat werden ohne Doppelarbeit nach ihrer jeweiligen Stärke eingesetzt;
+- die zuerst angesprochene KI ermittelt daraus selbst Ziel, Priorität, Aufgabengröße, Scope und Werkzeug;
+- kleine Aufgaben bleiben im Chat;
+- große Workpacks werden durch Work orchestriert, durch Codex technisch umgesetzt und durch Chat unabhängig geprüft;
 - genau ein schreibender Agent bleibt verbindlich;
 - nach einem erfolgreichen realen Pilot wird die allgemeine Arbeitsweisenoptimierung endgültig eingefroren.
 
@@ -27,33 +28,40 @@ Der vorbereitete Workpack
 
 wird als reale Pilotaufgabe verwendet, ist aber **noch nicht zur Umsetzung freigegeben**.
 
-Die Werkzeugaufteilung wird durch den primären Chat automatisch festgelegt:
+Die KI legt die Werkzeugaufteilung automatisch fest. Für diesen großen Workpack ist der vorgesehene Zielablauf:
 
-1. Work bearbeitet nur den externen beziehungsweise fachlichen Rechercheteil, sofern dafür ein klarer Mehrwert besteht;
-2. Codex bearbeitet den Repository-Teil zunächst read-only;
-3. Chat verbindet beide Ergebnisse, entscheidet über Gate A und formuliert erst danach gegebenenfalls den schreibenden Codex-Auftrag;
-4. bis zum vollständigen Abschluss von Gate A erfolgt kein fachlicher SEO-Patch.
+1. ein neuer Chat prüft den aktuellen Repository- und Workpack-Stand und erkennt den SEO-Pilot als großen, mehrstufigen Workpack;
+2. Chat übergibt mit einem vollständigen Startprompt an Work;
+3. Work übernimmt Gesamtziel, Gate-Steuerung, externe Evidenz und Orchestrierung;
+4. Work gibt Codex einen klar abgegrenzten read-only Auftrag für Build-, Daten-, Rendering-, Schema- und Indexierungsanalyse;
+5. Work führt die Teilbefunde zusammen und übergibt nur echte Entscheidungen an Chat;
+6. Chat prüft Gate A unabhängig und entscheidet über den nachfolgenden schreibenden Codex-Auftrag;
+7. bis zum vollständigen Abschluss von Gate A erfolgt kein fachlicher SEO-Patch.
 
 ## Erfolgskriterien
 
 - der Nutzer musste weder Werkzeug noch technischen Scope auswählen;
-- keine manuelle Repository-Datei oder kein ZIP musste bereitgestellt werden;
-- keine Analyse wurde unnötig in Work und Codex dupliziert;
+- die KI leitete das operative Ziel aus Nutzeranliegen, Repository und Projektkontext ab;
+- keine manuelle Repository-Datei und kein ZIP musste bereitgestellt werden;
+- Work und Codex analysierten keine Bereiche unnötig doppelt;
+- Work lieferte vollständige, selbstständig ausführbare Übergabeprompts;
 - genau ein Agent schrieb ins Repository;
 - keine ungeplante Datei lag im Diff;
 - keine Grundsatzkorrektur wurde erst nach Beginn der Umsetzung nötig;
 - `PR Gate` war vor jedem Merge grün;
 - keine reale Try-and-Error-Schleife nach dem Staging-Merge;
-- der primäre Chat lieferte bei jedem notwendigen Werkzeugwechsel einen vollständig kopierbaren Startprompt und genau einen nächsten Schritt.
+- Chat wiederholte nicht die vollständige Work-/Codex-Analyse, sondern prüfte gezielt Entscheidungen, Diff und Wirkung;
+- jede Instanz lieferte genau einen nächsten Schritt.
 
 Eine kurze Abschlussbewertung in dieser Datei genügt. Kein Dashboard, kein zusätzlicher Workflow und kein separates Meta-Dokument.
 
 ## Aktuelle Locks
 
-- dieser Chat ist bis zum Merge des Routing-Patches der einzige schreibende Agent;
-- nach dem Merge steuert genau ein primärer Chat den Pilot;
+- dieser Chat ist bis zum Merge des korrigierten Routing-Patches der einzige schreibende Agent;
+- nach dem Merge übernimmt Work die Orchestrierung des großen SEO-Piloten;
 - Work bleibt repositoryseitig read-only;
 - Codex bleibt bis zur Gate-A-Entscheidung repositoryseitig read-only;
+- Chat bleibt Prüf- und Entscheidungsinstanz;
 - keine parallelen Änderungen an zentralen Ownern;
 - kein direkter Commit nach `staging` oder `main`;
 - kein Live-Write und keine Veröffentlichung im Pilot ohne separate Freigabe.
@@ -74,4 +82,4 @@ Ergebnis:
 
 ## Genau nächster Schritt
 
-Den Routing-Patch über `PR Gate` nach `staging` integrieren. Danach startet ein neuer primärer Chat den SEO-Gate-A-Pilot und gibt selbst vor, welcher Teil in Work, Codex oder Chat ausgeführt wird.
+Den korrigierten Routing-Patch über `PR Gate` nach `staging` integrieren. Danach startet ein neuer Chat mit einer offenen Fortsetzungsfrage; die KI muss daraus selbst den SEO-Pilot erkennen und an Work routen.
