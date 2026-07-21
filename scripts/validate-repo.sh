@@ -59,6 +59,7 @@ validate_frontend() {
     node --input-type=module --check < "$file"
   done
   node tests/control_center_frontend_contract_test.mjs
+  node tests/control_center_browser_secret_contract_test.mjs
 }
 
 validate_repository() {

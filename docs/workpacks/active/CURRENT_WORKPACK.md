@@ -12,22 +12,21 @@ Stand: 2026-07-21
 
 ## Zuletzt abgeschlossen
 
-**GitHub-Actions-Vollinventur und Workflow-Cleanup.**
+**Security – CodeQL Browser-Speicherbereinigung.**
 
 Ergebnis:
 
-- alle zwölf vorhandenen Workflowdateien vollständig klassifiziert;
-- fünf überholte, doppelte oder integrierte Workflowdateien entfernt;
-- KI-Suche und Live-Inbox-Intake in einem fachlichen Owner zusammengeführt;
-- Inbox→Events-Import und Archivierung in `Inbox Operations` zusammengeführt;
-- Badegewässer-Guard als einziger saisonaler Owner normalisiert;
-- endgültiger Bestand: sieben Workflows;
-- exakte Workflow-Allowlist wird fail-closed im bestehenden `PR Gate` geprüft.
+- kein Review-Passwort mehr in `localStorage` oder `sessionStorage`;
+- alte gespeicherte Zugangsschlüssel werden vor dem App-Start entfernt;
+- abgelöste interne Oberflächen leiten zur kanonischen Steuerzentrale;
+- abgeschlossene Badegewässer-Proof-/Discovery-Artefakte entfernt;
+- erneute persistente Speicherung wird im bestehenden `PR Gate` fail-closed geprüft;
+- keine externen Daten-, Secret- oder Live-Schreibaktionen.
 
 ## Empfohlener nächster Workpack
 
+**GitHub-Environments `staging` und `live` sowie saubere Secret-Trennung.**
+
+Danach:
+
 **Search-Intent und statische Renderingbasis – SEO-Recovery nach aktueller Suchbaseline.**
-
-## Aktivierungszustand
-
-**Empfohlen, noch nicht aktiviert.**

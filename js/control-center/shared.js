@@ -1,5 +1,5 @@
 export const state = {
-  password: sessionStorage.getItem('be_cc_password') || '',
+  password: '',
   view: 'overview', cases: [], overview: null, development: null,
   developmentMode: 'project', reviewGroup: 'all', reviewIndex: 0,
   managementType: 'events', managementQuery: '',
@@ -82,9 +82,10 @@ export async function api(path, options = {}) {
   const controller = new AbortController();
   const timer = window.setTimeout(() => controller.abort(), timeoutMs);
   try {
+    const headers = { 'Content-Type':'application/json', ...(fetchOptions.headers || {}) };
+    if (state.password) headers['X-BE-Review-Password'] = state.password;
     const response = await fetch(appPath(path), {
-      ...fetchOptions, signal: controller.signal, cache:'no-store',
-      headers: { 'Content-Type':'application/json', 'X-BE-Review-Password':state.password, ...(fetchOptions.headers || {}) },
+      ...fetchOptions, credentials:'same-origin', signal:controller.signal, cache:'no-store', headers,
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok && !(allowAccepted && response.status === 202)) {
