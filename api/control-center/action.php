@@ -8,6 +8,12 @@ require_once __DIR__ . '/_submission_source.php';
 require_once __DIR__ . '/_process_chain.php';
 require_once __DIR__ . '/_editorial_runtime.php';
 require_once __DIR__ . '/_inbox_decision_writeback.php';
+require_once __DIR__ . '/_verified_source_writeback.php';
+require_once __DIR__ . '/_staging_events_writeback.php';
+require_once __DIR__ . '/_runtime_preflight.php';
+require_once __DIR__ . '/_activity_audit_writeback.php';
+require_once __DIR__ . '/_source_reconciliation.php';
+require_once __DIR__ . '/_event_review_writeback.php';
 
 be_require_review_access();
 
@@ -64,22 +70,30 @@ try {
     if ($action === 'recheck') {
         $verification = be_cc_recheck_source_case($case);
         $result = be_cc_apply_action($caseId, 'complete', ['verification'=>$verification]);
-        be_json_response(200, ['status'=>'ok','data'=>$result + ['verification'=>$verification]]);
+        $local = be_cc_assert_case_postcondition($pdo, $caseId, 'done');
+        be_json_response(200, ['status'=>'ok','data'=>$result + ['verification'=>$verification,'completion'=>['complete'=>true,'source_verified'=>true,'local'=>$local]]]);
     }
 
     $sourceSystem = (string)$case['source_system'];
     $editorialAction = in_array($action, ['approve','reject','snooze'], true);
+
+    // The approval gate must use the current authoritative Inbox row and a
+    // fresh effective Event inventory, not the possibly older local case copy.
+    if ($sourceSystem === 'inbox_feed' && $action === 'approve') {
+        $currentSource = be_cc_inbox_direct_current_source($case);
+        $case['source_payload_json'] = json_encode(
+            (array)$currentSource['source_payload'],
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+        );
+    }
+
     $decision = $editorialAction ? be_cc_editorial_validate_action($case, $action, $payload) : null;
     if (is_array($decision)) {
         $payload = array_merge($payload, [
-            'decision_class'=>$decision['decision_class'],
-            'decision_note'=>$decision['decision_note'],
-            'suppress_until'=>$decision['suppress_until'],
-            'recheck_at'=>$decision['recheck_at'],
-            'reopen_policy'=>$decision['reopen_policy'],
-            'source_fingerprint'=>$decision['source_fingerprint'],
-            'content_fingerprint'=>$decision['content_fingerprint'],
-            'event_updates'=>$decision['event_updates'],
+            'decision_class'=>$decision['decision_class'],'decision_note'=>$decision['decision_note'],
+            'suppress_until'=>$decision['suppress_until'],'recheck_at'=>$decision['recheck_at'],
+            'reopen_policy'=>$decision['reopen_policy'],'source_fingerprint'=>$decision['source_fingerprint'],
+            'content_fingerprint'=>$decision['content_fingerprint'],'event_updates'=>$decision['event_updates'],
         ]);
     }
 
@@ -98,10 +112,18 @@ try {
         throw new RuntimeException('Dieser Vorgang wird bereits verarbeitet.');
     }
 
+    if ($sourceSystem === 'inbox_feed' && $action === 'resolve_review_task') {
+        $result = be_cc_resolve_event_review_task($pdo, $case, $payload, $operationId);
+        if (empty($result['completion']['source_verified'])) throw new RuntimeException('Die Event-Teilaktion wurde von der führenden Quelle nicht bestätigt.');
+        be_cc_operation_finish($pdo, $operationId, 'completed', $result);
+        be_json_response(200, ['status'=>'ok','data'=>$result]);
+    }
+
     $effectiveAction = $action;
-    $writebackMeta = [];
+    $writebackMeta = ['source_verified' => true, 'transport' => 'local_only'];
     if ($sourceSystem === 'submission_db') {
-        $effectiveAction = be_cc_writeback_submission($case, $action, $payload);
+        $writebackMeta = be_cc_writeback_submission($case, $action, $payload);
+        $effectiveAction = trim((string)($writebackMeta['effective_action'] ?? $action));
     } elseif ($sourceSystem === 'growth_backlog' && in_array($action, ['edit_source','complete','reject'], true)) {
         be_cc_apply_source_writeback($case, $action, $payload);
         if ($action === 'edit_source') {
@@ -119,16 +141,30 @@ try {
             be_json_response(200, ['status'=>'ok','data'=>$result]);
         }
     } elseif ($sourceSystem === 'inbox_feed' && $editorialAction) {
-        $writebackMeta = in_array($action, ['reject','snooze'], true)
-            ? be_cc_writeback_inbox_decision_direct($case, $action, $decision)
-            : be_cc_writeback_inbox_stable($case, $action, $payload, $decision);
+        $eventsTab = be_cc_events_tab_name();
+        $writer = be_cc_inbox_writer_name($action, $eventsTab);
+        if ($writer === 'be_cc_writeback_staging_inbox_approve_verified') {
+            $writebackMeta = be_cc_writeback_staging_inbox_approve_verified($case, $payload, $decision);
+        } elseif ($writer === 'be_cc_writeback_inbox_approve_verified') {
+            $writebackMeta = be_cc_writeback_inbox_approve_verified($case, $payload, $decision);
+        } elseif ($writer === 'be_cc_writeback_inbox_decision_direct') {
+            $writebackMeta = be_cc_writeback_inbox_decision_direct($case, $action, $decision);
+            $writebackMeta['source_verified'] = true;
+        } else {
+            throw new DomainException('Für diese Umgebung ist kein sicherer Inbox-Writer definiert.');
+        }
     } elseif ($sourceSystem === 'content_audit' && $editorialAction) {
-        $writebackMeta = be_cc_writeback_audit_stable($case, $action, $payload, $decision);
+        $auditSource = be_cc_editorial_payload($case);
+        $contentType = be_cc_source_state_token($auditSource['content_type'] ?? $case['object_type'] ?? 'event');
+        $writebackMeta = $contentType === 'activity'
+            ? be_cc_writeback_activity_audit_verified($case, $action, $payload, $decision)
+            : be_cc_writeback_audit_verified($case, $action, $payload, $decision);
         be_cc_record_editorial_feedback($pdo, $case, $decision, $payload);
     } elseif ($editorialAction) {
         be_cc_apply_source_writeback($case, $action, $payload);
     }
 
+    if (empty($writebackMeta['source_verified'])) throw new RuntimeException('Der Quell-Writeback wurde nicht bestätigt.');
     be_cc_operation_finish($pdo, $operationId, 'source_written', ['writeback'=>$writebackMeta]);
     $payload['writeback'] = $writebackMeta;
     if ($effectiveAction === 'wait' && (string)$case['case_type'] === 'intake') {
@@ -137,6 +173,11 @@ try {
     } else {
         $result = be_cc_apply_action($caseId, $effectiveAction, $payload);
     }
+
+    $expectedState = be_cc_action_expected_local_state($action, $effectiveAction);
+    $local = $expectedState !== null ? be_cc_assert_case_postcondition($pdo, $caseId, $expectedState) : ['verified'=>true,'state'=>$result['state'] ?? ''];
+    $result['writeback'] = $writebackMeta;
+    $result['completion'] = ['complete'=>true,'source_verified'=>true,'local'=>$local];
     be_cc_operation_finish($pdo, $operationId, 'completed', $result);
     be_json_response(200, ['status'=>'ok','data'=>$result]);
 } catch (InvalidArgumentException|DomainException $error) {

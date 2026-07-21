@@ -1,4 +1,4 @@
-import { state, els, escapeHtml, asArray, formatDate, formatDateTime, appPath, api, backlogCases } from './shared.js?v=2026-07-15-control-center-editorial-v1';
+import { state, els, escapeHtml, asArray, formatDate, formatDateTime, appPath, api, backlogCases } from './shared.js?v=2026-07-16-e2e-state-v5';
 const trendClass = trend => ['improved','stable','worsened','attention','insufficient'].includes(trend) ? trend : 'insufficient';
 const metricValue = value => Number.isInteger(Number(value)) ? String(Number(value)) : String(Number(value || 0).toFixed(1));
 function metricCard(title,value,text,tone='') { return `<article class="cc-metric ${tone ? `cc-metric--${tone}` : ''}"><span>${escapeHtml(title)}</span><strong>${escapeHtml(value)}</strong><p>${escapeHtml(text)}</p></article>`; }

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "review_threshold": 0.79,
+  "weights": {
+    "title": 0.76,
+    "location": 0.08,
+    "city": 0.06,
+    "source_host": 0.10
+  },
+  "min_shared_title_tokens": 2,
+  "single_token_title_cap": 0.58,
+  "stopwords": [
+    "am", "an", "auf", "aus", "bei", "das", "der", "die", "ein", "eine", "einer", "eines",
+    "event", "fuer", "im", "in", "mit", "und", "veranstaltung", "vom", "von", "zum", "zur",
+    "bocholt", "bocholter", "kulturtage"
+  ],
+  "token_aliases": {
+    "bocholts": "bocholt",
+    "bocholter": "bocholt"
+  },
+  "tracking_parameters": [
+    "fbclid", "gclid", "mc_cid", "mc_eid", "ref", "ref_src"
+  ]
+}

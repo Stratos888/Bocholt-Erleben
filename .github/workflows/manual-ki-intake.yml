@@ -1,16 +1,9 @@
-# === BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (sheet-first, one-click handoff to review) ===
-# Datei: .github/workflows/manual-ki-intake.yml
-# Zweck:
-# - Liest data/inbox_manual.json aus dem Repo
-# - Appendet neue review-Zeilen direkt in den Google-Sheet-Tab "Inbox"
-# - Leert danach data/inbox_manual.json
-# - Startet anschließend den Deploy explizit per workflow_dispatch
-# Umfang:
-# - Ein manueller Start reicht nach dem Copy-Paste in data/inbox_manual.json
-# - Kein Vertrauen auf indirekte Push-Trigger zwischen Workflows
-# - Dedupe gegen bestehende Inbox-Sheet-Zeilen
-# - Fail-fast bei JSON-/Sheet-/Auth-Fehlern
-# === END BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (sheet-first, one-click handoff to review) ===
+# === BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW ===
+# Liest den manuellen KI-Puffer, prüft Kandidaten gegen den aktuellen Eventbestand,
+# schreibt nur neue beziehungsweise explizit zu prüfende Kandidaten in die Live-Inbox
+# und leert anschließend den Puffer. Semantische Dubletten werden nicht still
+# verworfen, sondern mit Match-Evidence an die Steuerzentrale übergeben.
+# === END BLOCK: MANUAL KI EVENT INTAKE WORKFLOW ===
 
 name: Manual KI Event Intake
 
@@ -26,29 +19,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # === BEGIN BLOCK: CHECKOUT REPOSITORY ===
-      # === END BLOCK: CHECKOUT REPOSITORY ===
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # === BEGIN BLOCK: SETUP PYTHON ===
-      # === END BLOCK: SETUP PYTHON ===
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # === BEGIN BLOCK: INSTALL GOOGLE SHEETS DEPENDENCIES ===
-      # === END BLOCK: INSTALL GOOGLE SHEETS DEPENDENCIES ===
       - name: Install dependencies
         run: |
           set -e
           python -m pip install --upgrade pip
           pip install google-api-python-client google-auth pymysql
 
-      # === BEGIN BLOCK: MANUAL_KI_INTAKE_PRODUCTION_BRANCH_GUARD_V1 | Zweck: verhindert, dass echte KI-Kandidaten aus staging in die Review-Kette laufen; Umfang: bricht Manual-KI-Intake außerhalb main hart ab ===
       - name: Guard production KI intake branch
         run: |
           set -e
@@ -56,442 +42,33 @@ jobs:
             echo "❌ Manual KI Event Intake darf nur auf main laufen. Staging ist nur für Tests."
             exit 1
           fi
-      # === END BLOCK: MANUAL_KI_INTAKE_PRODUCTION_BRANCH_GUARD_V1 ===
 
-      # === BEGIN BLOCK: APPEND_MANUAL_JSON_TO_LIVE_GOOGLE_SHEET_INBOX_V2 | Zweck: schreibt echte KI-Kandidaten ausschließlich auf main in den Live-Inbox-Tab und repariert den Run-Block; Umfang: ersetzt nur den Step-Kopf bis zum Python-Aufruf ===
-      - name: Append manual inbox JSON to Google Sheet Inbox
+      - name: Validate and append manual KI candidates
         id: append_inbox_sheet
         env:
           SHEET_ID: ${{ secrets.LIVE_SHEET_ID || secrets.SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          INBOX_TAB: Inbox
+          EVENTS_TAB: Events
         run: |
           set -e
-          # === END BLOCK: APPEND_MANUAL_JSON_TO_LIVE_GOOGLE_SHEET_INBOX_V2 ===
-          python - <<'PY'
-          import json
-          import os
-          import re
-          import sys
-          from datetime import datetime
-          from pathlib import Path
-          from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+          python scripts/manual_ki_event_intake.py
 
-          from google.oauth2 import service_account
-          from googleapiclient.discovery import build
-
-          ROOT = Path.cwd()
-          # === BEGIN BLOCK: MANUAL_INTAKE_VISUAL_KEY_HELPER_IMPORT_V1 | Zweck: nutzt zentrale Event-Visual-Key-Logik auch im Sheet-Handoff; Umfang: ergänzt nur Importpfad und Import ===
-          sys.path.insert(0, str(ROOT / "scripts"))
-
-          from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
-          from event_visual_motifs import infer_event_visual_fit
-          from event_description_quality import evaluate_event_description
-          # === END BLOCK: MANUAL_INTAKE_VISUAL_KEY_HELPER_IMPORT_V1 ===
-          MANUAL_JSON_PATH = ROOT / "data" / "inbox_manual.json"
-          MANUAL_INTAKE_SUMMARY_PATH = ROOT / "data" / "manual-ki-intake-summary.json"
-
-          INBOX_COLUMNS = [
-              "status",
-              "id_suggestion",
-              "title",
-              "date",
-              "endDate",
-              "time",
-              "city",
-              "location",
-              "kategorie_suggestion",
-              "url",
-              "description",
-              "source_name",
-              "source_url",
-              "match_score",
-              "matched_event_id",
-              "notes",
-              "visual_key",
-              "created_at",
-          ]
-
-          OPTIONAL_VISUAL_INBOX_COLUMNS = [
-              "visual_motif",
-              "visual_asset_status",
-          ]
-
-          REQUIRED_JSON_KEYS = [
-              "title",
-              "date",
-              "city",
-              "location",
-              "source_name",
-              "source_url",
-          ]
-
-          def fail(msg: str) -> None:
-              print(f"❌ {msg}", file=sys.stderr)
-              sys.exit(1)
-
-          def info(msg: str) -> None:
-              print(f"ℹ️  {msg}")
-
-          def set_output(name: str, value: str) -> None:
-              output_path = os.environ.get("GITHUB_OUTPUT", "").strip()
-              if output_path:
-                  with open(output_path, "a", encoding="utf-8") as f:
-                      f.write(f"{name}={value}\n")
-
-          # === BEGIN BLOCK: MANUAL_INTAKE_CONTENT_OPS_SUMMARY_V1 | Zweck: stellt Append-/Skip-Wirkung fuer Content-Ops-Impact-Metriken maschinenlesbar bereit; Umfang: schreibt nur lokales JSON-Artefakt fuer Folge-Step, keine fachlichen Daten ===
-          def write_intake_summary(**kwargs) -> None:
-              payload = {
-                  "generated_at_utc": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
-                  "source": "manual-ki-intake",
-                  **kwargs,
-              }
-              MANUAL_INTAKE_SUMMARY_PATH.parent.mkdir(parents=True, exist_ok=True)
-              MANUAL_INTAKE_SUMMARY_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-          # === END BLOCK: MANUAL_INTAKE_CONTENT_OPS_SUMMARY_V1 ===
-
-          def norm(s: str) -> str:
-              return (s or "").strip()
-
-          def norm_key(s: str) -> str:
-              return re.sub(r"\s+", " ", norm(s)).lower()
-
-          def canonical_url(raw: str) -> str:
-              raw = norm(raw)
-              if not raw:
-                  return ""
-              try:
-                  parsed = urlparse(raw)
-              except Exception:
-                  return raw
-              query_pairs = []
-              for key, value in parse_qsl(parsed.query, keep_blank_values=True):
-                  k = key.lower().strip()
-                  if k.startswith("utm_") or k in {"fbclid", "gclid", "mc_cid", "mc_eid", "ref", "ref_src"}:
-                      continue
-                  query_pairs.append((key, value))
-              cleaned = parsed._replace(
-                  scheme=(parsed.scheme or "https").lower(),
-                  netloc=parsed.netloc.lower(),
-                  query=urlencode(query_pairs, doseq=True),
-                  fragment="",
-              )
-              return urlunparse(cleaned).rstrip("/")
-
-          def dedupe_fp(title: str, date_value: str, location: str) -> str:
-              return "|".join([
-                  norm_key(title),
-                  norm(date_value),
-                  norm_key(location),
-              ])
-
-          if not MANUAL_JSON_PATH.exists():
-              fail(f"Manual-JSON fehlt: {MANUAL_JSON_PATH}")
-
-          try:
-              raw = json.loads(MANUAL_JSON_PATH.read_text(encoding="utf-8"))
-          except Exception as e:
-              fail(f"Manual-JSON ist ungültig: {e}")
-
-          if not isinstance(raw, list):
-              fail("data/inbox_manual.json muss ein JSON-Array sein.")
-
-          if not raw:
-              info("data/inbox_manual.json ist leer. Nichts zu importieren.")
-              write_intake_summary(input_count=0, appended_count=0, skipped_count=0, skip_reasons={}, skipped_details=[])
-              set_output("appended_count", "0")
-              sys.exit(0)
-
-          sheet_id = os.environ.get("SHEET_ID", "").strip()
-          sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
-          if not sheet_id:
-              fail("ENV SHEET_ID fehlt.")
-          if not sa_json:
-              fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
-
-          try:
-              sa_info = json.loads(sa_json)
-          except Exception:
-              fail("GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.")
-
-          scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-          creds = service_account.Credentials.from_service_account_info(sa_info, scopes=scopes)
-          service = build("sheets", "v4", credentials=creds, cache_discovery=False)
-
-          res = service.spreadsheets().values().get(
-              spreadsheetId=sheet_id,
-              range="Inbox!A:ZZ"
-          ).execute()
-
-          values = res.get("values", []) or []
-          if not values:
-              fail("Inbox-Tab ist leer oder nicht lesbar.")
-
-          header = [str(h).strip() for h in (values[0] or [])]
-          missing_columns = [col for col in INBOX_COLUMNS if col not in header]
-          if missing_columns:
-              fail(f"Inbox-Header unvollständig. Fehlende Spalten: {missing_columns}")
-
-          missing_optional_visual_columns = [col for col in OPTIONAL_VISUAL_INBOX_COLUMNS if col not in header]
-          if missing_optional_visual_columns:
-              info(f"Optionale Visual-Review-Spalten fehlen noch und werden daher nicht befüllt: {missing_optional_visual_columns}")
-
-          # === BEGIN BLOCK: MANUAL_INTAKE_VISUAL_KEY_DROPDOWN_V1 | Zweck: macht KI-Bildzuordnung in der Inbox sichtbar, auswählbar und fehlerarm editierbar; Umfang: setzt Google-Sheets-Dropdown aus data/event_visual_pool.json für Inbox.visual_key ===
-          pool_path = ROOT / "data" / "event_visual_pool.json"
-          try:
-              pool_data = json.loads(pool_path.read_text(encoding="utf-8"))
-          except Exception as e:
-              fail(f"Event-Visual-Pool ist ungültig oder nicht lesbar: {e}")
-
-          visual_key_options = sorted((pool_data.get("pools") or {}).keys())
-          if not visual_key_options:
-              fail("Event-Visual-Pool enthält keine auswählbaren Keys unter 'pools'.")
-
-          sheet_meta = service.spreadsheets().get(spreadsheetId=sheet_id).execute()
-          inbox_sheet_id = None
-          for sheet in sheet_meta.get("sheets", []):
-              props = sheet.get("properties", {})
-              if props.get("title") == "Inbox":
-                  inbox_sheet_id = props.get("sheetId")
-                  break
-          if inbox_sheet_id is None:
-              fail("Inbox-Tab wurde in der Sheet-Metadatenabfrage nicht gefunden.")
-
-          visual_key_col_index = header.index("visual_key")
-          service.spreadsheets().batchUpdate(
-              spreadsheetId=sheet_id,
-              body={
-                  "requests": [
-                      {
-                          "setDataValidation": {
-                              "range": {
-                                  "sheetId": inbox_sheet_id,
-                                  "startRowIndex": 1,
-                                  "startColumnIndex": visual_key_col_index,
-                                  "endColumnIndex": visual_key_col_index + 1,
-                              },
-                              "rule": {
-                                  "condition": {
-                                      "type": "ONE_OF_LIST",
-                                      "values": [{"userEnteredValue": key} for key in visual_key_options],
-                                  },
-                                  "strict": True,
-                                  "showCustomUi": True,
-                              },
-                          }
-                      }
-                  ]
-              },
-          ).execute()
-          info(f"visual_key-Dropdown in Inbox gesetzt: {len(visual_key_options)} Optionen")
-          # === END BLOCK: MANUAL_INTAKE_VISUAL_KEY_DROPDOWN_V1 ===
-
-          existing_rows = []
-          for r in values[1:]:
-              row = [(r[i].strip() if i < len(r) and r[i] is not None else "") for i in range(len(header))]
-              if any(v for v in row):
-                  existing_rows.append(dict(zip(header, row)))
-
-          # === BEGIN BLOCK: MANUAL_INTAKE_SOURCE_DATE_DEDUPE_AND_SKIP_DIAGNOSTICS_V2 | Zweck: gleiche source_url für unterschiedliche Event-Daten erlauben, Append-Dubletten verhindern und Skip-Gründe loggen | Umfang: ersetzt Dedupe-, Loop- und Append-Abschnitt vollständig ===
-          existing_source_date_keys = set()
-          existing_fps = set()
-
-          for row in existing_rows:
-              source_url = canonical_url(row.get("source_url", ""))
-              date_value = norm(row.get("date", ""))
-              source_date_key = "|".join([norm_key(source_url), date_value]) if source_url and date_value else ""
-
-              if source_date_key:
-                  existing_source_date_keys.add(source_date_key)
-
-              fp = dedupe_fp(
-                  row.get("title", ""),
-                  row.get("date", ""),
-                  row.get("location", ""),
-              )
-              if fp != "||":
-                  existing_fps.add(fp)
-
-          created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-          rows_to_append = []
-          skip_reasons = {}
-          skipped_details = []
-
-          def mark_skipped(item, reason):
-              skip_reasons[reason] = skip_reasons.get(reason, 0) + 1
-              skipped_details.append({
-                  "reason": reason,
-                  "title": norm(item.get("title", "")),
-                  "date": norm(item.get("date", "")),
-                  "source_url": canonical_url(item.get("source_url", "")),
-              })
-
-          for idx, item in enumerate(raw, start=1):
-              if not isinstance(item, dict):
-                  fail(f"Element #{idx} ist kein Objekt.")
-
-              normalized = {}
-              for key, value in item.items():
-                  if value is None:
-                      normalized[str(key)] = ""
-                  elif isinstance(value, (str, int, float, bool)):
-                      normalized[str(key)] = str(value).strip()
-                  else:
-                      fail(f"Element #{idx}: Feld '{key}' ist kein skalarer Wert.")
-
-              # === BEGIN BLOCK: MANUAL_INTAKE_NORMALIZE_STATUS_CREATED_AT_V1 | Zweck: importierte Manual-KI-Zeilen sicher als Review-Fälle mit Zeitstempel schreiben | Umfang: ergänzt Status/created_at und kanonisiert URLs ===
-              normalized["status"] = "review"
-              normalized["created_at"] = norm(normalized.get("created_at", "")) or created_at
-              normalized["url"] = canonical_url(normalized.get("url", ""))
-              normalized["source_url"] = canonical_url(normalized.get("source_url", "")) or normalized["url"]
-              # === BEGIN BLOCK: MANUAL_INTAKE_VISUAL_KEY_HANDOFF_V1 | Zweck: garantiert Visual-Key beim Append in die Sheet-Inbox; Umfang: normalisiert vorhandenen Key oder inferiert deterministisch aus Eventdaten ===
-              local_visual_key = infer_event_visual_key(
-                  title=normalized.get("title", ""),
-                  description=normalized.get("description", ""),
-                  category=normalized.get("kategorie_suggestion", ""),
-                  location=normalized.get("location", ""),
-              )
-              model_visual_key = normalize_event_visual_key(normalized.get("visual_key", ""))
-              visual_key_for_fit = local_visual_key or model_visual_key
-              fit = infer_event_visual_fit(
-                  title=normalized.get("title", ""),
-                  description=normalized.get("description", ""),
-                  category=normalized.get("kategorie_suggestion", ""),
-                  location=normalized.get("location", ""),
-                  visual_key=visual_key_for_fit,
-                  visual_motif=normalized.get("visual_motif", ""),
-                  pool_payload=pool_data,
-              )
-              normalized["visual_key"] = fit.get("visual_key", "") or visual_key_for_fit
-              normalized["visual_motif"] = fit.get("visual_motif", "")
-              normalized["visual_asset_status"] = fit.get("visual_asset_status", "")
-              # === END BLOCK: MANUAL_INTAKE_VISUAL_KEY_HANDOFF_V1 ===
-              # === END BLOCK: MANUAL_INTAKE_NORMALIZE_STATUS_CREATED_AT_V1 ===
-
-              missing_required = [k for k in REQUIRED_JSON_KEYS if not norm(normalized.get(k, ""))]
-              if missing_required:
-                  fail(f"Element #{idx}: missing_required={','.join(missing_required)}")
-
-              date_value = norm(normalized.get("date", ""))
-              if date_value and not re.match(r"^\d{4}-\d{2}-\d{2}$", date_value):
-                  fail(f"Element #{idx}: invalid_date_format")
-
-              end_date_value = norm(normalized.get("endDate", ""))
-              if end_date_value and not re.match(r"^\d{4}-\d{2}-\d{2}$", end_date_value):
-                  fail(f"Element #{idx}: invalid_endDate_format")
-
-              # === BEGIN BLOCK: MANUAL_INTAKE_DESCRIPTION_QUALITY_GUARD_V1 | Zweck: verhindert Quellenleaks, KI-Prosa und Werbesprache schon vor dem Inbox-Append; Umfang: schlechte Beschreibungen werden nicht angehaengt ===
-              desc_result = evaluate_event_description({
-                  "title": normalized.get("title", ""),
-                  "description": normalized.get("description", ""),
-                  "date": date_value,
-                  "time": normalized.get("time", ""),
-                  "city": normalized.get("city", ""),
-                  "location": normalized.get("location", ""),
-                  "kategorie": normalized.get("kategorie_suggestion", ""),
-              })
-              if desc_result.blocking:
-                  mark_skipped(normalized, "description_quality:" + ",".join(desc_result.issue_codes[:3]))
-                  continue
-              # === END BLOCK: MANUAL_INTAKE_DESCRIPTION_QUALITY_GUARD_V1 ===
-
-              source_date_key = "|".join([
-                  norm_key(normalized["source_url"]),
-                  date_value,
-              ]) if normalized["source_url"] and date_value else ""
-
-              fp = dedupe_fp(
-                  normalized.get("title", ""),
-                  normalized.get("date", ""),
-                  normalized.get("location", ""),
-              )
-
-              if source_date_key and source_date_key in existing_source_date_keys:
-                  mark_skipped(normalized, "duplicate_source_date")
-                  continue
-
-              if fp != "||" and fp in existing_fps:
-                  mark_skipped(normalized, "duplicate_title_date_location")
-                  continue
-
-              row_map = {col: "" for col in header}
-              for col in header:
-                  if col in normalized:
-                      row_map[col] = normalized[col]
-
-              rows_to_append.append([row_map.get(col, "") for col in header])
-
-              if source_date_key:
-                  existing_source_date_keys.add(source_date_key)
-              if fp != "||":
-                  existing_fps.add(fp)
-
-          skipped = len(skipped_details)
-          info(f"Append OK: appended={len(rows_to_append)} skipped={skipped} skip_reasons={json.dumps(skip_reasons, ensure_ascii=False)}")
-          if skipped_details:
-              info("Skipped details:")
-              for item in skipped_details[:40]:
-                  info(json.dumps(item, ensure_ascii=False))
-
-          if not rows_to_append:
-              info(f"Keine neuen Zeilen zum Appenden. skipped={skipped}")
-              write_intake_summary(
-                  input_count=len(raw),
-                  appended_count=0,
-                  skipped_count=skipped,
-                  skip_reasons=skip_reasons,
-                  skipped_details=skipped_details[:80],
-              )
-              set_output("appended_count", "0")
-              sys.exit(0)
-
-          service.spreadsheets().values().append(
-              spreadsheetId=sheet_id,
-              range="Inbox!A1",
-              valueInputOption="RAW",
-              insertDataOption="INSERT_ROWS",
-              body={"values": rows_to_append},
-          ).execute()
-
-          info(f"Append OK: appended={len(rows_to_append)} skipped={skipped}")
-          write_intake_summary(
-              input_count=len(raw),
-              appended_count=len(rows_to_append),
-              skipped_count=skipped,
-              skip_reasons=skip_reasons,
-              skipped_details=skipped_details[:80],
-          )
-          set_output("appended_count", str(len(rows_to_append)))
-          # === END BLOCK: MANUAL_INTAKE_SOURCE_DATE_DEDUPE_AND_SKIP_DIAGNOSTICS_V2 ===
-          PY
-
-      # === BEGIN BLOCK: NOTIFY INBOX PUSH AFTER SHEET APPEND_V1 ===
-      # Zweck:
-      # - Sendet nach tatsächlich angehängten KI-Inbox-Zeilen genau eine einfache Pushmeldung.
-      # - Best-effort: Push-Ausfall darf Intake/Deploy nicht blockieren.
-      # Umfang:
-      # - Nur zusätzlicher API-Call; keine Änderung am Sheet-Append.
-      # === END BLOCK: NOTIFY INBOX PUSH AFTER SHEET APPEND_V1 ===
       - name: Notify inbox push after appended KI candidates
         if: steps.append_inbox_sheet.outputs.appended_count != '0'
         env:
           LIVE_PUSH_SECRET: ${{ secrets.LIVE_PUSH_SECRET }}
-          STAGING_PUSH_SECRET: ${{ secrets.STAGING_PUSH_SECRET }}
           APPENDED_COUNT: ${{ steps.append_inbox_sheet.outputs.appended_count }}
         run: |
           set -e
-
-          # === BEGIN BLOCK: KI_INTAKE_LIVE_PUSH_ONLY_V1 | Zweck: echte KI-Kandidaten melden ausschließlich die Live-Inbox; Umfang: ersetzt staging/live Push-Weiche ===
-          PUSH_URL="https://bocholt-erleben.de/api/push/notify-inbox.php"
-          PUSH_SECRET="${LIVE_PUSH_SECRET:-}"
-          # === END BLOCK: KI_INTAKE_LIVE_PUSH_ONLY_V1 ===
-
-          if [ -z "${PUSH_SECRET}" ]; then
+          if [ -z "${LIVE_PUSH_SECRET:-}" ]; then
             echo "ℹ️ Push secret not configured. Skipping inbox push."
             exit 0
           fi
 
           payload=$(python - <<'PY'
-          import json, os
+          import json
+          import os
           print(json.dumps({
               "source_type": "ki_inbox",
               "source_key": f"manual-ki-intake:{os.environ.get('GITHUB_RUN_ID', '')}:{os.environ.get('APPENDED_COUNT', '0')}",
@@ -499,23 +76,20 @@ jobs:
           PY
           )
 
-          curl -sS -X POST "$PUSH_URL" \
+          curl -sS -X POST "https://bocholt-erleben.de/api/push/notify-inbox.php" \
             -H "Content-Type: application/json" \
-            -H "X-BE-Push-Secret: ${PUSH_SECRET}" \
+            -H "X-BE-Push-Secret: ${LIVE_PUSH_SECRET}" \
             --data "$payload" \
             --max-time 15 || echo "⚠️ Inbox push call failed, intake continues."
-      # === BEGIN BLOCK: RESET MANUAL INPUT BUFFER IN REPO + DEPLOY FLAG ===
-      # === END BLOCK: RESET MANUAL INPUT BUFFER IN REPO + DEPLOY FLAG ===
+
       - name: Reset manual inbox buffer
         id: reset_manual_buffer
         run: |
           set -e
-
           printf '[]\n' > data/inbox_manual.json
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           git add data/inbox_manual.json
 
           if git diff --cached --quiet; then
@@ -527,7 +101,6 @@ jobs:
             echo "did_commit=true" >> "$GITHUB_OUTPUT"
           fi
 
-      # === BEGIN BLOCK: CONTENT_OPS_RECORD_MANUAL_INTAKE_IMPACT_V1 | Zweck: persistiert Append-/Skip-/Reset-Wirkung des KI-Intake fuer Verwaltungs-Metriken; Umfang: keine Aenderung am Deploy-Trigger ===
       - name: Record Content Ops manual intake impact
         if: always()
         shell: bash
@@ -554,16 +127,7 @@ jobs:
             data/manual-ki-intake-summary.json
             data/content-ops/*.json
           if-no-files-found: ignore
-      # === END BLOCK: CONTENT_OPS_RECORD_MANUAL_INTAKE_IMPACT_V1 ===
 
-      # === BEGIN BLOCK: TRIGGER DEPLOY TO STRATO AFTER SUCCESSFUL SHEET APPEND ===
-      # Zweck:
-      # - Startet nach erfolgreichem Sheet-Append den Deploy explizit per workflow_dispatch
-      # - Nutzt denselben Ref wie der Intake-Run
-      # - Verwendet bewusst ein separates Dispatch-Token statt GITHUB_TOKEN
-      # Umfang:
-      # - Nur Trigger; Deploy-Logik bleibt im bestehenden Workflow
-      # === END BLOCK: TRIGGER DEPLOY TO STRATO AFTER SUCCESSFUL SHEET APPEND ===
       - name: Trigger Deploy to STRATO
         if: steps.reset_manual_buffer.outputs.did_commit == 'true'
         env:
@@ -572,7 +136,6 @@ jobs:
           TARGET_REF: main
         run: |
           set -e
-
           if [ -z "${WORKFLOW_DISPATCH_TOKEN}" ]; then
             echo "❌ Secret WORKFLOW_DISPATCH_TOKEN fehlt."
             exit 1

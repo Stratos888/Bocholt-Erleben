@@ -1,8 +1,37 @@
 # COMMERCIAL_STRATEGY — BOCHOLT ERLEBEN
 
-Stand: 2026-07-06
+Stand: 2026-07-18
 
-Status: strategische Arbeitsgrundlage, kein Vertrag und keine juristische Leistungsbeschreibung. `Produktvertrag.md` bleibt fuer Vertragslogik massgeblich. Diese Datei steuert die kommerzielle Produktausrichtung und die naechsten Workpacks.
+Status: strategische Arbeitsgrundlage, kein Vertrag und keine juristische Leistungsbeschreibung. `Produktvertrag.md` bleibt fuer bereits umgesetzte Vertragslogik massgeblich. Diese Datei steuert die kommerzielle Produktausrichtung und die naechsten Workpacks.
+
+<!-- === BEGIN BLOCK: COMMERCIAL_STARTPARTNER_GROWTH_PILOT_TARGET_2026_07_18 | Zweck: verankert den validierten Startpartner-Zielzustand als begrenzten hybriden Wachstumspiloten; Umfang: Akquise, Reichweite, Kapazitaet, Stop-Regel und Produktuebergang; noch keine Implementierungsbehauptung === -->
+## Aktuelle Leitentscheidung – Startpartner als Wachstumspilot
+
+Der Startpartner-Funnel wird nicht als rein passiver kostenloser Anfrageweg und nicht als dauerhaft offener Gratis-Tarif weitergedacht.
+
+Der validierte Zielzustand ist ein einmaliger, begrenzter und kuratierter sechsmonatiger Wachstumspilot mit hybridem Zugang:
+
+- Selbstmeldungen ueber die oeffentliche Startpartner-Seite bleiben moeglich.
+- Bocholt erleben darf besonders passende Partner gezielt ansprechen.
+- Beide Wege fuehren in denselben Qualifizierungs-, Aufnahme-, Aktivierungs- und Abschlussprozess.
+- Partner werden nach Inhaltshebel, Reichweitenhebel, Nutzerbedarf, Pflegefaehigkeit, Kooperationsbereitschaft, Tarifpotenzial und Betreuungsaufwand ausgewaehlt.
+- Bocholt erleben liefert Aufbereitung, Pflegeweg, Anbieterzugang und Wirkungsmessung.
+- Der Partner liefert verlaessliche Inhalte, einen Ansprechpartner und einen vereinbarten Beitrag zur Bekanntmachung von Bocholt erleben.
+- Die erste belastbare Kohorte ist auf maximal acht gleichzeitig aktive Partner begrenzt.
+- Bei etwa 80 Prozent belegter Betreuungskapazitaet greift ein Aufnahmestopp; geeignete Kandidaten wechseln auf eine Warteliste.
+- Die sechs Monate beginnen erst nach technischer und inhaltlicher Aktivierung, nicht mit der Anfrage oder Zusage.
+- Nach dem Pilot folgt eine ausdrueckliche Tarifentscheidung oder ein geordnetes Ende; keine automatische kostenpflichtige Umwandlung.
+
+Die kostenlose Aufnahme endet, sobald mindestens sechs Partner den Pilot vollstaendig oder nahezu vollstaendig durchlaufen haben, mindestens drei Partnerarten getestet wurden, fuer mindestens vier Partner belastbare Wirkungsdaten vorliegen und Aufwand, Tarifpassung sowie Fortfuehrungsentscheidungen bewertet werden koennen.
+
+Eine geringe Zahlungsquote verlaengert den Gratis-Test nicht automatisch. In diesem Fall werden Zielgruppe, Nutzen, Leistung, Preis oder Prozess geprueft, bevor weitere kostenlose Partner aufgenommen werden.
+
+Vollstaendige fachliche Referenz:
+
+`docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`
+
+Bis zur technischen Umsetzung bleibt dieser Block ein freigegebener Zielzustand und keine Behauptung, dass der interne Lebenszyklus bereits produktiv vorhanden ist.
+<!-- === END BLOCK: COMMERCIAL_STARTPARTNER_GROWTH_PILOT_TARGET_2026_07_18 === -->
 
 ## 1. Strategischer Kern
 

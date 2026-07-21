@@ -2664,16 +2664,6 @@
       "description": "Der Märchenspielplatz in Suderwick bietet Holzspielgeräte, Rutsche, Schaukeln und ein Spielehaus.",
       "url": "https://dinxperwick.info/de/suderwicker-maerchenspielplatz-eroeffnet/",
       "website_label": "Website / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Indian%20Boundary%20Park%20-%20Wooden%20Playground%201.jpg",
-      "image_quality": "usable",
-      "image_position_x": "50%",
-      "image_position_y": "50%",
-      "image_source_page": "https://commons.wikimedia.org/wiki/File:Indian_Boundary_Park_-_Wooden_Playground_1.jpg",
-      "image_author": "Chicagoshim",
-      "image_license": "CC BY-SA 4.0",
-      "image_credit": "Chicagoshim, CC BY-SA 4.0, via Wikimedia Commons",
-      "image_is_symbolic": true,
-      "image_note": "Symbolbild",
       "tags": [
         "Holzspielgeräte",
         "Rutsche",
@@ -2737,7 +2727,9 @@
           "Kurz & spontan",
           "Spielplatz"
         ]
-      }
+      },
+      "image_suppressed": true,
+      "image_suppressed_reason": "Kein fachlich passendes und freigegebenes Bild vorhanden."
     },
     {
       "id": "buergerpark-rhede",

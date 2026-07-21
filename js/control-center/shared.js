@@ -130,7 +130,14 @@ export function fact(label, content, url = '') {
   return `<div><dt>${escapeHtml(label)}</dt><dd>${output}</dd></div>`;
 }
 
-export function activeCases() { return state.cases.filter(item => !['done','rejected','parked','information'].includes(item.state)); }
+export function caseIsReviewVisible(item, now = new Date()) {
+  if (!item || ['done','rejected','parked','information'].includes(item.state)) return false;
+  if (item.state !== 'snoozed') return true;
+  if (!item.snoozed_until) return false;
+  const deadline = new Date(String(item.snoozed_until).replace(' ', 'T'));
+  return !Number.isNaN(deadline.getTime()) && deadline <= now;
+}
+export function activeCases() { return state.cases.filter(caseIsReviewVisible); }
 export function backlogCases() { return activeCases().filter(item => item.case_kind === 'backlog_item'); }
 export function reviewGroup(item) { return item.type === 'task' ? 'system' : (item.queue_group || 'other'); }
 export function allReviewCases() { return activeCases().filter(item => item.type === 'intake' || (item.type === 'task' && item.case_kind !== 'backlog_item')); }
