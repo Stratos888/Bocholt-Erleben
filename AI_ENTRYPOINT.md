@@ -17,13 +17,14 @@ Alte Chats, Memory, ZIPs und historische Dokumente sind Kontext. Der aktuelle Re
 ## 2. Verbindlicher Arbeitsmodus
 
 ```text
-ein primärer Steuerungs-Chat
--> ein aktiver Workpack
+erste KI-Instanz
+-> Ziel und Aufgabengröße automatisch ermitteln
+-> klein: Chat führt
+-> großer Workpack: Work orchestriert
+-> Codex ist der technische Repository-Agent
+-> Chat prüft und entscheidet
 -> genau ein schreibender Agent
--> ein Feature-Branch
--> ein PR nach staging
--> ein normaler Staging-Deploy
--> Abschluss
+-> Feature-Branch -> staging -> main
 ```
 
 - Standardmäßig gibt es nur einen schreibenden Agenten.
@@ -37,7 +38,7 @@ Der Nutzer muss kein technisches Ziel, keinen Workpack und kein Werkzeug auswäh
 
 ### Konkreter Nutzerwunsch
 
-Nennt der Nutzer ein fachliches Ergebnis, Problem oder eine gewünschte Wirkung, übernimmt die KI dieses Anliegen und ermittelt selbst:
+Nennt der Nutzer ein fachliches Ergebnis, Problem oder eine gewünschte Wirkung, übernimmt die führende KI-Instanz dieses Anliegen und ermittelt selbst:
 
 1. den belegten Ausgangszustand;
 2. das konkrete operative Ziel;
@@ -48,7 +49,7 @@ Nennt der Nutzer ein fachliches Ergebnis, Problem oder eine gewünschte Wirkung,
 
 ### Offene Fortsetzungsfrage
 
-Fragt der Nutzer beispielsweise `Wie machen wir weiter?`, `Was ist jetzt sinnvoll?` oder bittet um die beste nächste Maßnahme, ermittelt die KI das Ziel selbst aus:
+Fragt der Nutzer beispielsweise `Wie machen wir weiter?`, `Was ist jetzt sinnvoll?` oder bittet um die beste nächste Maßnahme, ermittelt die führende KI-Instanz das Ziel selbst aus:
 
 - Projektzweck und Produktziel;
 - aktuellem `staging`-Stand;
@@ -67,41 +68,49 @@ Ein ausdrücklich genanntes Nutzerziel hat Vorrang vor einer automatisch abgelei
 
 ### Chat
 
-Chat ist die Standardoberfläche für:
+Chat ist die erste Anlaufstelle und führt kleine oder klar begrenzte Aufgaben direkt. Chat übernimmt außerdem:
 
-- Zielklärung und notwendige fachliche Entscheidungen;
+- die initiale Größen- und Werkzeugentscheidung;
 - kurze Analysen und direkte Antworten;
+- notwendige fachliche Entscheidungen;
 - Screenshot-, Staging- und Live-Abnahmen;
-- Zusammenführung von Work- und Codex-Ergebnissen;
+- unabhängige Prüfung von Work- und Codex-Ergebnissen;
 - Scope-, Merge- und Releaseentscheidungen;
-- Statussteuerung und genau nächsten Schritt.
+- den genau nächsten Schritt.
+
+Bei einem großen, mehrstufigen Workpack bleibt Chat nicht die dauerhafte Orchestrierungsebene, sondern übergibt mit einem vollständigen Prompt an Work.
 
 ### Work
 
-Work wird nur eingesetzt, wenn eine längere, mehrstufige fachliche oder externe Analyse einen klaren Mehrwert hat, insbesondere für:
+Work ist die führende Steuerungs- und Orchestrierungsebene für große, klar abgegrenzte Workpacks. Work übernimmt insbesondere:
 
-- Web- und Quellenrecherche;
-- Auswertung mehrerer Dateien, Exporte oder verbundener Informationsquellen;
-- Berichte, Tabellen, Präsentationen oder andere fertige Ergebnisartefakte;
-- eigenständige Analysepakete ohne Repository-Schreibauftrag.
+- den Gesamtauftrag und den Premium-Zielzustand;
+- die mehrstufige Planung und Gate-Steuerung;
+- fachliche und externe Recherche;
+- die Trennung zwischen externem, fachlichem und technischem Scope;
+- die Erstellung vollständiger Codex-Aufträge;
+- die Zusammenführung der Teilbefunde;
+- die Statusführung bis zur Chat-Abnahme.
 
-Work ist für dieses Projekt standardmäßig repositoryseitig read-only. Ist Work nicht verfügbar, übernimmt Chat diesen Teil und kennzeichnet den Fallback.
+Work bleibt repositoryseitig standardmäßig read-only und delegiert technische Repository-Arbeit an Codex. Ist Work in der Oberfläche nicht verfügbar, übernimmt Chat diese Orchestrierung transparent als Fallback.
 
 ### Codex
 
-Codex ist das Standardwerkzeug für:
+Codex ist das Standardwerkzeug für technische Repository-Arbeit:
 
-- technische Repository-Analyse;
-- Ursachenanalyse in Code, Build, Tests und Datenflüssen;
+- Repository- und Ursachenanalyse;
+- Analyse von Code, Build, Tests und Datenflüssen;
 - Code-, Test- und substanzielle Repository-Dokumentationsänderungen;
 - Ausführung von Befehlen und Tests;
 - Vorbereitung eines reviewfähigen Pull Requests.
 
-Codex liest zuerst `AGENTS.md` und die dort gerouteten kanonischen Dateien.
+Codex liest zuerst `AGENTS.md` und die dort gerouteten kanonischen Dateien. Codex bestimmt nicht eigenständig einen konkurrierenden Produkt- oder Workpack-Scope, sondern arbeitet innerhalb des von Chat beziehungsweise Work festgelegten Auftrags.
 
-### Routingpflicht des primären Chats
+### Verbindliches Routing
 
-Wenn ein Wechsel der Oberfläche sinnvoll ist, liefert der primäre Chat ohne Rückfrage:
+Die zuerst angesprochene KI entscheidet ohne Rückfrage, ob sie selbst weiterarbeitet oder an Work beziehungsweise Codex übergibt.
+
+Bei einem Wechsel liefert sie:
 
 1. die nächste Oberfläche: `Chat`, `Work` oder `Codex`;
 2. einen kurzen Grund;
@@ -109,14 +118,15 @@ Wenn ein Wechsel der Oberfläche sinnvoll ist, liefert der primäre Chat ohne R�
 4. das erwartete Ergebnis;
 5. genau die Informationen oder Dateien, die der Nutzer noch bereitstellen muss.
 
-Der Nutzer wird nicht aufgefordert, selbst zwischen Werkzeugen abzuwägen oder einen technischen Auftrag zu formulieren.
+Sobald Work einen großen Workpack übernommen hat, steuert Work die weiteren Übergaben an Codex und Chat. Der Nutzer wird nicht aufgefordert, selbst zwischen Werkzeugen abzuwägen oder einen technischen Auftrag zu formulieren.
 
 ### Keine Doppelarbeit
 
 - Dieselbe Analyse wird nicht parallel in Work und Codex wiederholt.
-- Bei kombinierten Aufgaben trennt Chat die Scopes: Work bearbeitet den externen beziehungsweise fachlichen Teil, Codex den Repository-Teil.
-- Ergebnisse werden im primären Chat zusammengeführt, bevor ein schreibender Codex-Auftrag beginnt.
-- Codex-Verlauf und Chatverlauf werden nicht als gegenseitig bekannt vorausgesetzt; jeder Übergabeprompt ist selbstständig ausführbar.
+- Work bearbeitet Gesamtziel, externe Evidenz und Orchestrierung; Codex bearbeitet den eindeutig zugewiesenen Repository-Scope.
+- Chat führt eine unabhängige, proportionale Abnahme durch und wiederholt keine vollständige Voranalyse.
+- Vor einem schreibenden Codex-Auftrag müssen Ziel, Scope und Akzeptanz durch die führende Instanz eindeutig sein.
+- Work-, Codex- und Chatverläufe werden nicht als gegenseitig bekannt vorausgesetzt; jeder Übergabeprompt ist selbstständig ausführbar.
 
 ## 5. Arbeitsmandat
 
