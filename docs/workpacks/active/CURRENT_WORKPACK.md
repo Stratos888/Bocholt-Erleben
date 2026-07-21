@@ -4,27 +4,30 @@ Stand: 2026-07-21
 
 ## Aktiver Workpack
 
-**GitHub-Actions-Vollinventur und Workflow-Cleanup.**
-
-Ziel ist eine exakt klassifizierte, minimal notwendige Workflowmenge. Doppelte Prüfpfade, abgelaufene Einmal-Workflows, reine Beobachter und direkte Repository-Writer ohne dauerhaften Owner werden entfernt oder in den bestehenden fachlichen Owner integriert.
+**Keiner.**
 
 ## Aktuelle Locks
 
-- `.github/workflows/**`
-- `scripts/validate-repo.sh`
-- `scripts/audit_github_workflows.py`
-- `docs/github-actions-trigger-policy.md`
-- `docs/workpacks/active/GITHUB-ACTIONS-workflow-inventory-cleanup-2026-07-21.md`
+**Keine.**
 
-Schreibowner ist ausschließlich der Branch `agent/workflow-inventory-cleanup`.
+## Zuletzt abgeschlossen
 
-## Ausführungsregeln
+**GitHub-Actions-Vollinventur und Workflow-Cleanup.**
 
-- Keine produktiven Workflow-Ausführungen oder externen Schreibtests im Workpack.
-- Fachlich notwendige Automatisierung bleibt erhalten.
-- Workflowdateien werden nur behalten, wenn Owner, Trigger und dauerhafter Nutzen belegt sind.
-- Der bestehende `PR Gate` erzwingt anschließend die exakte Workflow-Allowlist.
+Ergebnis:
 
-## Danach empfohlener Workpack
+- alle zwölf vorhandenen Workflowdateien vollständig klassifiziert;
+- fünf überholte, doppelte oder integrierte Workflowdateien entfernt;
+- KI-Suche und Live-Inbox-Intake in einem fachlichen Owner zusammengeführt;
+- Inbox→Events-Import und Archivierung in `Inbox Operations` zusammengeführt;
+- Badegewässer-Guard als einziger saisonaler Owner normalisiert;
+- endgültiger Bestand: sieben Workflows;
+- exakte Workflow-Allowlist wird fail-closed im bestehenden `PR Gate` geprüft.
+
+## Empfohlener nächster Workpack
 
 **Search-Intent und statische Renderingbasis – SEO-Recovery nach aktueller Suchbaseline.**
+
+## Aktivierungszustand
+
+**Empfohlen, noch nicht aktiviert.**
