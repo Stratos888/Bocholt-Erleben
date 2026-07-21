@@ -57,9 +57,8 @@ Eine kurze Abschlussbewertung in dieser Datei genügt. Kein Dashboard, kein zus�
 
 ## Aktuelle Locks
 
-- dieser Chat ist bis zum Merge des korrigierten Routing-Patches der einzige schreibende Agent;
-- nach dem Merge übernimmt Work die Orchestrierung des großen SEO-Piloten;
-- Work bleibt repositoryseitig read-only;
+- bis zum Abschluss von Gate A gibt es keinen schreibenden SEO-Agenten;
+- Work übernimmt die Orchestrierung des großen SEO-Piloten und bleibt repositoryseitig read-only;
 - Codex bleibt bis zur Gate-A-Entscheidung repositoryseitig read-only;
 - Chat bleibt Prüf- und Entscheidungsinstanz;
 - keine parallelen Änderungen an zentralen Ownern;
@@ -82,4 +81,4 @@ Ergebnis:
 
 ## Genau nächster Schritt
 
-Den korrigierten Routing-Patch über `PR Gate` nach `staging` integrieren. Danach startet ein neuer Chat mit einer offenen Fortsetzungsfrage; die KI muss daraus selbst den SEO-Pilot erkennen und an Work routen.
+Einen neuen Chat im Projekt mit einer offenen Fortsetzungsfrage starten. Die KI muss den aktiven SEO-Pilot aus Repository und Projektkontext selbst erkennen und einen vollständigen Startprompt für Work liefern.
