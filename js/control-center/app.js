@@ -1,4 +1,4 @@
-import { state, els, escapeHtml, clean, setStatus, appPath, api, openDialog, closeDialog, reviewGroup, allReviewCases } from './shared.js?v=2026-07-21-browser-secret-v1';
+import { state, els, escapeHtml, clean, setStatus, appPath, api, openDialog, closeDialog, reviewGroup, allReviewCases } from './shared.js?v=2026-07-16-e2e-state-v5';
 import { configureReview, renderReview } from './review.js?v=2026-07-17-review-presentation-v1';
 import { configureBacklog, renderBacklog } from './backlog.js?v=2026-07-16-e2e-state-v5';
 import { renderManage } from './manage.js?v=2026-07-16-e2e-state-v5';
