@@ -45,6 +45,10 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Validate repository tools
+        shell: bash
+        run: bash scripts/validate-repo.sh repository
+
       - name: Validate backend and data contracts
         shell: bash
         run: bash scripts/validate-repo.sh backend
@@ -52,7 +56,3 @@ jobs:
       - name: Validate frontend contracts
         shell: bash
         run: bash scripts/validate-repo.sh frontend
-
-      - name: Validate repository tools
-        shell: bash
-        run: bash scripts/validate-repo.sh repository

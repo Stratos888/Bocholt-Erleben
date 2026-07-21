@@ -1,17 +1,4 @@
-# === BEGIN BLOCK: WEEKLY KI WEBSEARCH TO MANUAL INBOX WORKFLOW (schedule + dispatch -> generate inbox_manual.json + trigger intake) ===
-# Datei: .github/workflows/weekly-ki-websearch-to-manual-inbox.yml
-# Zweck:
-# - Startet die echte KI-Eventsuche automatisch 1x pro Woche
-# - Nutzt den neuen Responses/Web-Search-Runner
-# - Schreibt data/inbox_manual.json zurück ins Repo
-# - Triggert danach automatisch den bestehenden Workflow "Manual KI Event Intake"
-# Umfang:
-# - Kein Parser-/Venue-Suchkern
-# - Handoff in den bestehenden Intake-Flow direkt nach erfolgreichem Commit
-# - Downstream-Dispatch bewusst per separatem Dispatch-Token statt GITHUB_TOKEN
-# === END BLOCK: WEEKLY KI WEBSEARCH TO MANUAL INBOX WORKFLOW (schedule + dispatch -> generate inbox_manual.json + trigger intake) ===
-
-name: Weekly KI Websearch → Manual Inbox
+name: Weekly KI Websearch → Live Inbox
 
 on:
   workflow_dispatch:
@@ -20,188 +7,152 @@ on:
     - cron: "15 5 * * 2"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: weekly-ki-websearch-manual-inbox
+  group: weekly-ki-websearch-live-inbox
   cancel-in-progress: false
 
 jobs:
-  weekly_ki_websearch_manual_inbox:
-    name: Generate data/inbox_manual.json via weekly KI web search
+  weekly_ki_event_discovery:
+    name: Discover and append verified KI event candidates
     runs-on: ubuntu-latest
+    timeout-minutes: 35
 
     steps:
-      # === BEGIN BLOCK: CHECKOUT REPOSITORY (input + commit target) ===
-      # === END BLOCK: CHECKOUT REPOSITORY (input + commit target) ===
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # === BEGIN BLOCK: SETUP PYTHON RUNTIME (runner execution runtime) ===
-      # === END BLOCK: SETUP PYTHON RUNTIME (runner execution runtime) ===
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # === BEGIN BLOCK: INSTALL RUNNER DEPENDENCIES (responses api + google sheets) ===
-      # === END BLOCK: INSTALL RUNNER DEPENDENCIES (responses api + google sheets) ===
       - name: Install dependencies
         run: |
           set -e
           python -m pip install --upgrade pip
           pip install google-api-python-client google-auth openai pymysql
 
-      # === BEGIN BLOCK: WEEKLY_KI_PRODUCTION_BRANCH_GUARD_V1 | Zweck: verhindert echte KI-Eventproduktion auf staging; Umfang: bricht Weekly-KI außerhalb main hart ab ===
       - name: Guard production KI branch
         run: |
           set -e
           if [ "${GITHUB_REF_NAME}" != "main" ]; then
-            echo "❌ Weekly KI Websearch darf nur auf main laufen. Staging ist nur für Tests."
+            echo "❌ Weekly KI Websearch darf nur auf main laufen."
             exit 1
           fi
-      # === END BLOCK: WEEKLY_KI_PRODUCTION_BRANCH_GUARD_V1 ===
 
-      # === BEGIN BLOCK: RUN WEEKLY KI WEBSEARCH GENERATOR WITH SOURCE LEARNING ===
-      # === END BLOCK: RUN WEEKLY KI WEBSEARCH GENERATOR WITH SOURCE LEARNING ===
-      - name: Run weekly KI websearch to manual inbox
+      - name: Generate weekly KI candidates
+        id: generate_candidates
         env:
           SHEET_ID: ${{ secrets.LIVE_SHEET_ID || secrets.SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-
           OPENAI_MODEL: gpt-5.4
           EVENT_RULEBOOK_PATH: bocholt-erleben_eventsuche_regelwerk_v3.md
           MANUAL_INBOX_JSON_PATH: data/inbox_manual.json
           SOURCE_CANDIDATES_JSON_PATH: data/source_candidates.json
-
           TAB_EVENTS: Events
           TAB_INBOX: Inbox
           TAB_ARCHIVE: Inbox_Archive
           TAB_CONTENT_SEARCH_FEEDBACK: Content_Search_Feedback
-
           MAX_NEW_CANDIDATES: "24"
           SEARCH_WINDOW_DAYS: "210"
           ALLOW_RADIUS_KM: "20"
-
-          # === BEGIN BLOCK: WEEKLY_PENDING_BUFFERS_WARN_ENV_V2 | Zweck: offene Inbox und bestehender Manual-Puffer nur als Dedupe-Bestand nutzen, nicht als Lauf-Blocker | Umfang: ersetzt Pending-Env-Konfiguration ===
           WARN_ON_PENDING_INBOX: "true"
           FAIL_ON_PENDING_MANUAL: "false"
-          # === END BLOCK: WEEKLY_PENDING_BUFFERS_WARN_ENV_V2 ===
         run: |
           set -e
           python scripts/weekly-ki-websearch-to-manual-inbox.py
-
-          echo "=== inbox_manual.json (head) ==="
-          head -n 200 data/inbox_manual.json || true
-
-          echo "=== source_candidates.json (head) ==="
-          head -n 200 data/source_candidates.json || true
-
-          echo "=== weekly_event_diagnostics.json ==="
-          cat .tmp/weekly-ki-eventsuche/weekly_event_diagnostics.json || true
-      # === BEGIN BLOCK: UPLOAD WEEKLY EVENT DIAGNOSTICS ARTIFACT_V1 ===
-      # Zweck:
-      # - Macht Diagnose-JSON aus dem Weekly-Lauf direkt als GitHub-Artefakt verfügbar
-      # - Beeinflusst nicht Commit, Intake oder Deploy
-      # Umfang:
-      # - Nur Observability
-      # === END BLOCK: UPLOAD WEEKLY EVENT DIAGNOSTICS ARTIFACT_V1 ===
-      - name: Upload weekly event diagnostics
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: weekly-event-diagnostics
-          path: .tmp/weekly-ki-eventsuche/weekly_event_diagnostics.json
-          if-no-files-found: ignore
-      # === BEGIN BLOCK: COMMIT WEEKLY OUTPUTS AND EXPOSE MANUAL BUFFER STATE_V2 | Zweck: committet Weekly-Outputs und meldet zusätzlich, ob nach dem Lauf Manual-JSON-Einträge für den Intake vorhanden sind | Umfang: ersetzt Commit-Step vollständig ===
-      # === END BLOCK: COMMIT WEEKLY OUTPUTS AND EXPOSE MANUAL BUFFER STATE_V2 ===
-      - name: Commit generated manual inbox and source candidates
-        id: commit_manual_json
-        run: |
-          set -e
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add data/inbox_manual.json data/source_candidates.json
-
-          if git diff --cached --quiet -- data/inbox_manual.json; then
-            echo "manual_changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "manual_changed=true" >> "$GITHUB_OUTPUT"
-          fi
 
           MANUAL_HAS_ITEMS="$(python - <<'PY'
           import json
           from pathlib import Path
 
           path = Path("data/inbox_manual.json")
-          raw = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
-          print("true" if isinstance(raw, list) and len(raw) > 0 else "false")
+          payload = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+          print("true" if isinstance(payload, list) and payload else "false")
           PY
           )"
           echo "manual_has_items=${MANUAL_HAS_ITEMS}" >> "$GITHUB_OUTPUT"
 
-          if git diff --cached --quiet; then
-            echo "No generated inbox/source changes to commit."
-            echo "did_commit=false" >> "$GITHUB_OUTPUT"
+      - name: Append generated candidates to live Inbox
+        id: append_inbox_sheet
+        if: steps.generate_candidates.outputs.manual_has_items == 'true'
+        env:
+          SHEET_ID: ${{ secrets.LIVE_SHEET_ID || secrets.SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          INBOX_TAB: Inbox
+          EVENTS_TAB: Events
+        run: |
+          set -e
+          python scripts/manual_ki_event_intake.py
+
+      - name: Notify inbox push after appended KI candidates
+        if: steps.generate_candidates.outputs.manual_has_items == 'true' && steps.append_inbox_sheet.outputs.appended_count != '0'
+        env:
+          LIVE_PUSH_SECRET: ${{ secrets.LIVE_PUSH_SECRET }}
+          APPENDED_COUNT: ${{ steps.append_inbox_sheet.outputs.appended_count }}
+        run: |
+          set -e
+          if [ -z "${LIVE_PUSH_SECRET:-}" ]; then
+            echo "ℹ️ Push secret not configured. Skipping inbox push."
             exit 0
           fi
 
-          git commit -m "chore: generate weekly KI websearch outputs"
-          git push
-          echo "did_commit=true" >> "$GITHUB_OUTPUT"
+          payload=$(python - <<'PY'
+          import json
+          import os
+          print(json.dumps({
+              "source_type": "ki_inbox",
+              "source_key": f"weekly-ki:{os.environ.get('GITHUB_RUN_ID', '')}:{os.environ.get('APPENDED_COUNT', '0')}",
+          }))
+          PY
+          )
 
-      # === BEGIN BLOCK: CONTENT_OPS_RECORD_WEEKLY_KI_IMPACT_V1 | Zweck: persistiert Suchlauf-Wirkung, Drop-Gruende, Feedback-Anwendung und Review-Puffer als Verwaltungs-Metriken; Umfang: keine Aenderung an Kandidaten-/Intake-Logik ===
+          curl -sS -X POST "https://bocholt-erleben.de/api/push/notify-inbox.php" \
+            -H "Content-Type: application/json" \
+            -H "X-BE-Push-Secret: ${LIVE_PUSH_SECRET}" \
+            --data "$payload" \
+            --max-time 15 || echo "⚠️ Inbox push call failed, intake continues."
+
       - name: Record Content Ops weekly KI impact
         if: always()
-        shell: bash
         env:
           BE_ENVIRONMENT: live
           GITHUB_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          WEEKLY_DID_COMMIT: ${{ steps.commit_manual_json.outputs.did_commit }}
-          WEEKLY_MANUAL_HAS_ITEMS: ${{ steps.commit_manual_json.outputs.manual_has_items }}
+          WEEKLY_DID_COMMIT: "false"
+          WEEKLY_MANUAL_HAS_ITEMS: ${{ steps.generate_candidates.outputs.manual_has_items || 'false' }}
           LIVE_DB_HOST: ${{ secrets.LIVE_DB_HOST }}
           LIVE_DB_NAME: ${{ secrets.LIVE_DB_NAME }}
           LIVE_DB_USER: ${{ secrets.LIVE_DB_USER }}
           LIVE_DB_PASSWORD: ${{ secrets.LIVE_DB_PASSWORD }}
           LIVE_DB_PORT: ${{ secrets.LIVE_DB_PORT }}
-        run: |
-          set -e
-          python scripts/content-ops-control.py record-weekly-ki
-      # === END BLOCK: CONTENT_OPS_RECORD_WEEKLY_KI_IMPACT_V1 ===
+        run: python scripts/content-ops-control.py record-weekly-ki
 
-      - name: Upload weekly content ops impact
-        uses: actions/upload-artifact@v4
+      - name: Record Content Ops intake impact
         if: always()
-        with:
-          name: weekly-content-ops-impact
-          path: data/content-ops/*.json
-          if-no-files-found: ignore
-
-      # === BEGIN BLOCK: TRIGGER MANUAL KI EVENT INTAKE WHEN BUFFER HAS ITEMS_V2 | Zweck: startet Intake auch dann, wenn bestehende Manual-JSON-Einträge unverändert geblieben sind | Umfang: ersetzt Trigger-Bedingung ===
-      # === END BLOCK: TRIGGER MANUAL KI EVENT INTAKE WHEN BUFFER HAS ITEMS_V2 ===
-      - name: Trigger Manual KI Event Intake
-        if: steps.commit_manual_json.outputs.manual_has_items == 'true'
         env:
-          WORKFLOW_DISPATCH_TOKEN: ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          TARGET_REF: main
-        run: |
-          set -e
+          BE_ENVIRONMENT: live
+          GITHUB_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          APPENDED_COUNT: ${{ steps.append_inbox_sheet.outputs.appended_count || '0' }}
+          RESET_DID_COMMIT: "false"
+          LIVE_DB_HOST: ${{ secrets.LIVE_DB_HOST }}
+          LIVE_DB_NAME: ${{ secrets.LIVE_DB_NAME }}
+          LIVE_DB_USER: ${{ secrets.LIVE_DB_USER }}
+          LIVE_DB_PASSWORD: ${{ secrets.LIVE_DB_PASSWORD }}
+          LIVE_DB_PORT: ${{ secrets.LIVE_DB_PORT }}
+        run: python scripts/content-ops-control.py record-manual-intake
 
-          if [ -z "${WORKFLOW_DISPATCH_TOKEN}" ]; then
-            echo "❌ Secret WORKFLOW_DISPATCH_TOKEN fehlt."
-            exit 1
-          fi
-
-          curl -sS -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${WORKFLOW_DISPATCH_TOKEN}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/manual-ki-intake.yml/dispatches" \
-            -d "{\"ref\":\"${TARGET_REF}\"}"
-
-          echo "✅ Manual KI Event Intake workflow dispatched."
+      - name: Upload weekly KI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-ki-event-discovery
+          path: |
+            data/inbox_manual.json
+            data/source_candidates.json
+            data/manual-ki-intake-summary.json
+            data/content-ops/*.json
+            .tmp/weekly-ki-eventsuche/weekly_event_diagnostics.json
+          if-no-files-found: warn

@@ -16,21 +16,16 @@ on:
         required: false
         default: ""
   schedule:
-    # Daily during the usual bathing season. On the default branch this writes a
-    # generated frontend status file, but never edits redactional offers.json.
+    # Daily during the bathing season. This is the single owner of the generated
+    # frontend bathing-water status file and never edits redactional offers.json.
     - cron: "17 5 * 5-9 *"
-  push:
-    paths:
-      - "scripts/check-bathing-water-status.py"
-      - ".github/workflows/bathing-water-guard-v1.yml"
-      - "BATHING_WATER_GUARD_V1.md"
-      - "ACTIVITY_SEASONAL_HIGHLIGHTS.md"
-      - "js/activity-highlights.js"
-      - "js/offers-main.js"
-      - "js/today-home.js"
 
 permissions:
   contents: write
+
+concurrency:
+  group: bathing-water-guard-main
+  cancel-in-progress: false
 
 defaults:
   run:
@@ -43,6 +38,14 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Guard production status branch
+        run: |
+          set -e
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "❌ Bathing Water Guard darf nur auf main laufen."
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -79,7 +82,6 @@ jobs:
           if-no-files-found: error
 
       - name: Commit generated frontend status file when changed
-        if: github.event_name != 'pull_request'
         run: |
           set -e
           if git diff --quiet -- data/bathing_water_status.json; then
