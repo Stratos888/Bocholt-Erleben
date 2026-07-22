@@ -376,6 +376,10 @@ jobs:
           echo "=== generated event detail page count ==="
           find events -name .generated-event-detail | wc -l
 
+      - name: Render deterministic static landing-page content
+        shell: bash
+        run: node scripts/render-static-content.mjs
+
       - name: Build inbox.json from inbox.tsv
         shell: bash
         run: |

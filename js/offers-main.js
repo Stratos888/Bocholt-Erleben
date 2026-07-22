@@ -117,7 +117,10 @@ const OffersApp = {
 
       const rawOffers = Array.isArray(data) ? data : (Array.isArray(data?.offers) ? data.offers : []);
 
-      this.offers = rawOffers
+      const neutralOffers = window.NeutralSelection
+        ? window.NeutralSelection.selectActivities(rawOffers, { limit: rawOffers.length })
+        : rawOffers;
+      this.offers = neutralOffers
         .map((raw, index) => this.normalizeOffer(raw, index))
         .filter(Boolean);
 

@@ -1425,3 +1425,55 @@ body.page-route-today footer {
   }
 }
 /* === END BLOCK: TODAY_DESKTOP_PREMIUM_SHELL_CONTRACT_V3 === */
+
+/* Crawlbare Intent-Navigation im Today-Hero: kompakt, tokenbasiert und mobile-first. */
+body.page-route-today .today-intent-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  max-width: 27.5rem;
+  gap: var(--space-sm);
+  margin: 0;
+}
+
+body.page-route-today .today-intent-nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 2.25rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-panel-strong);
+  border-radius: var(--btb-item-radius);
+  background: var(--surface-panel-row-info);
+  color: var(--color-text-primary);
+  font-size: 0.82rem;
+  font-weight: 760;
+  line-height: 1.2;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+body.page-route-today .today-intent-nav__link:hover {
+  border-color: var(--color-text-secondary);
+  background: var(--surface-panel);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+body.page-route-today .today-intent-nav__link:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 359px) {
+  body.page-route-today .today-intent-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.page-route-today .today-intent-nav__link {
+    width: 100%;
+  }
+}

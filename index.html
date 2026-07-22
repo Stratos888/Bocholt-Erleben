@@ -122,7 +122,11 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
         <span>Dein schneller Blick auf Bocholt</span>
       </div>
       <h1 id="today-title" class="today-title">Heute rund um Bocholt</h1>
-      <p class="today-lead">Drei Vorschläge für heute.</p>
+      <p class="today-lead">Events und Aktivitäten für heute in Bocholt – direkt entdecken oder persönlich verfeinern.</p>
+      <nav class="today-intent-nav" aria-label="Weitere Angebote entdecken">
+        <a class="today-intent-nav__link" href="/events/">Alle Veranstaltungen</a>
+        <a class="today-intent-nav__link" href="/aktivitaeten/">Aktivitäten und Freizeitideen</a>
+      </nav>
       <div id="today-weather-note" class="today-weather-note" aria-live="polite">
         <span>Wetterlage wird geprüft</span>
       </div>
@@ -135,7 +139,12 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
       <h2 class="today-section-title">Unsere Auswahl</h2>
       <div id="today-status" class="today-status" aria-live="polite">Lade Vorschläge …</div>
     </div>
-    <div id="today-feed" class="today-feed"></div>
+    <div id="today-feed" class="today-feed" data-static-feed>
+      <!-- STATIC:TODAY:START -->
+      <article class="today-card static-content-card" data-item-id="static-events"><h3><a href="/events/">Veranstaltungen in Bocholt</a></h3><p>Aktuelle Termine, Märkte, Kultur und Familienevents.</p></article>
+      <article class="today-card static-content-card" data-item-id="static-activities"><h3><a href="/aktivitaeten/">Aktivitäten in Bocholt</a></h3><p>Natur, Kultur und Freizeitideen für heute.</p></article>
+      <!-- STATIC:TODAY:END -->
+    </div>
   </section>
 </main>
 <!-- === END BLOCK: TODAY_HOME_SHELL_V1 === -->
@@ -250,7 +259,8 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
 <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7"></script>
 <script src="/js/feedback.js?v=2026-04-17-1"></script>
 
-<script src="/js/today-home.js?v=2026-07-01-weather-temperature-v1"></script>
+<script src="/js/neutral-selection.js?v=2026-07-22-seo-recovery-v1"></script>
+<script src="/js/today-home.js?v=2026-07-22-seo-recovery-v1"></script>
 <!-- === END BLOCK: TODAY_HOME_JS_INCLUDES_V1 === -->
 
 
