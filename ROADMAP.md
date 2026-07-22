@@ -25,18 +25,17 @@ Erreicht:
 - unbekannte Eintrittslagen führen nicht zu erfundenen Preisen, Verfügbarkeiten oder Ticket-URLs;
 - die zusätzlichen Hero-Links wurden vollständig entfernt und der ursprüngliche Seitencharakter wiederhergestellt.
 
-Technischer Abschluss auf Staging:
+Finaler technischer und operativer Abschluss:
 
-- SHA `2ee2990bb06ee03ac8248e47150bb12de8a1c74e`;
-- PR Gate #219 grün;
-- normaler Staging-Deploy grün;
-- mobile Sichtprüfung bei 327 × 779 Pixeln grün.
+- Staging-SHA `2ee2990bb06ee03ac8248e47150bb12de8a1c74e` einschließlich grünem PR Gate #219 und grünem Staging-Deploy;
+- Main-SHA `5490b0fe7416d39e675796a9759b1ef5fef20b5f` einschließlich grünem PR Gate #221 und grünem Main-Deploy;
+- `main` und `staging` besitzen denselben Dateiinhalt;
+- mobile Sichtprüfung bei 327 × 779 Pixeln grün;
+- Live-Seitenquelltext enthält statischen Inhaltskontext und beide Hauptlinks jeweils genau einmal.
 
-Getrennte Nacharbeiten:
+Zeitversetzte Nacharbeiten:
 
-- finalen Staging-Stand regulär nach `main` veröffentlichen;
-- read-only Live-E6 durchführen;
-- Search-Console-Validierung des `offers`-Befunds starten;
+- Search-Console-Validierung des `offers`-Befunds starten und beobachten;
 - erste Wirkung nach mindestens 14 Tagen und führend nach 28 Tagen bewerten.
 
 Eine Rankingverbesserung wird nicht aus CI, einem einzelnen Tag oder dem bloßen technischen Abschluss abgeleitet.
