@@ -140,7 +140,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
       <!-- === BEGIN BLOCK: DESKTOP_HERO_COPY_TEXT_V3 (natural wraps) === -->
       <div class="desktop-entry__content">
         <h1 class="desktop-entry__title">Veranstaltungen in Bocholt</h1>
-        <p class="desktop-entry__text">Alle Events, Märkte und Veranstaltungen in Bocholt aktuell an einem Ort.</p>
+        <p class="desktop-entry__text">Alle Events, Märkte und Veranstaltungen in Bocholt aktuell an einem Ort. <a href="/aktivitaeten/">Dauerhafte Freizeitideen</a> findest du bei den Aktivitäten.</p>
       </div>
       <!-- === END BLOCK: DESKTOP_HERO_COPY_TEXT_V3 (natural wraps) === -->
     </div>
@@ -279,7 +279,9 @@ Umfang: Entfernt die <section class="intro"> vollständig.
 <!-- === BEGIN BLOCK: EVENTS_SECTION_FEED_ONLY_V1 | Zweck: entfernt den Veranstalter-CTA aus dem Feed, damit der Feed nur noch echte Event-Gruppen enthält; Umfang: ersetzt den bisherigen Mobile-Service-Card-Block direkt vor dem Event-Feed === -->
 <section class="events-section">
   <div id="event-cards" class="event-cards-grid">
-    <!-- Event cards werden hier dynamisch eingefügt -->
+    <!-- STATIC:EVENTS:START -->
+    <article class="event-card static-content-card" data-item-id="events-entry"><h3><a href="/">Heute in Bocholt</a></h3><p>Der aktuelle Eventkern wird beim Build aus dem freigegebenen Feed erzeugt.</p></article>
+    <!-- STATIC:EVENTS:END -->
   </div>
 </section>
 <!-- === END BLOCK: EVENTS_SECTION_FEED_ONLY_V1 === -->
@@ -400,6 +402,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
 <script src="/js/seo-schema.js?v=2026-02-04-1"></script>
 <script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
+<script src="/js/neutral-selection.js?v=2026-07-22-seo-recovery-v1"></script>
 <script src="/js/bottom-tabbar.js?v=2026-05-29-today-nav-v1"></script>
 <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7"></script>
 <script src="/js/feedback.js?v=2026-04-17-1"></script>

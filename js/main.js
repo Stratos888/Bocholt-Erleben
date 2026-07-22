@@ -147,7 +147,10 @@ Umfang: Ersetzt nur diesen Loading-Start-Block.
             const sheetEvents = extractEvents(sheetPayload).map(normalizeEvent);
             const approvedSubmissionEvents = extractEvents(approvedSubmissionPayload).map(normalizeEvent);
 
-            this.events = dedupeMergedEvents([...sheetEvents, ...approvedSubmissionEvents]);
+            const mergedEvents = dedupeMergedEvents([...sheetEvents, ...approvedSubmissionEvents]);
+            this.events = window.NeutralSelection
+                ? window.NeutralSelection.selectEvents(mergedEvents, { limit: mergedEvents.length })
+                : mergedEvents;
             this.eventVisualPool = eventVisualPoolPayload;
 
             if (typeof EventCards !== "undefined" && typeof EventCards.setVisualPools === "function") {

@@ -55,6 +55,9 @@ validate_frontend() {
   node --check js/control-center-environment.js
   node --check js/control-center.js
   node --check js/control-center-seo-embed.js
+  node --check js/neutral-selection.js
+  node --check js/seo-schema.js
+  node --check scripts/render-static-content.mjs
   for file in js/control-center/*.js; do
     node --input-type=module --check < "$file"
   done
@@ -72,6 +75,11 @@ validate_repository() {
   python3 tests/test_events_overlay_merge.py
   python3 tests/test_event_builder_control_center_contract.py
   python3 tests/test_event_identity.py
+  node tests/neutral-selection.test.mjs
+  node tests/static-render-fixture.test.mjs
+  python3 tests/test_seo_static_contract.py
+  python3 tests/test_event_offer_contract.py
+  python3 tests/test_event_detail_schema_contract.py
 }
 
 case "$section" in
