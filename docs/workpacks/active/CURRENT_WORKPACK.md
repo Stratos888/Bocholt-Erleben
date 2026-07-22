@@ -6,22 +6,24 @@ Stand: 2026-07-22
 
 **Keiner.**
 
-Der Produkt-Workpack **SEO Recovery – Search Intent und statische Renderingbasis** ist technisch und fachlich auf `staging` abgeschlossen.
+Der Produkt-Workpack **SEO Recovery – Search Intent und statische Renderingbasis** ist technisch, fachlich und im Livebetrieb abgeschlossen.
 
 Kanonischer Abschlussnachweis:
 
-- Staging-SHA: `2ee2990bb06ee03ac8248e47150bb12de8a1c74e`;
-- PR Gate #219: grün;
-- normaler Staging-Deploy: grün;
-- mobile Sichtprüfung bei 327 × 779 Pixeln: grün;
-- keine zusätzlichen Hero-Zeilen oder visuelle CTA-Regression;
-- tatsächlicher statischer Renderer-Output enthält direkte crawlbare Hauptlinks zu `/events/` und `/aktivitaeten/`.
+- finaler Main-SHA: `5490b0fe7416d39e675796a9759b1ef5fef20b5f`;
+- Main-PR-Gate #221: grün;
+- normaler Main-Deploy: grün;
+- `main` und `staging` besitzen denselben Dateiinhalt;
+- Live-Seitenquelltext der Startseite enthält `data-static-event-context` genau einmal;
+- Live-Seitenquelltext enthält `Alle Events ansehen` genau einmal;
+- Live-Seitenquelltext enthält `Aktivitäten entdecken` genau einmal;
+- keine zusätzlichen Hero-Zeilen oder visuelle CTA-Regression.
 
 Der ausführliche Abschluss steht in:
 
 - `docs/workpacks/completed/SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md`
 
-## Ergebnis
+## Erreichtes Produktziel
 
 Umgesetzt und belegt sind:
 
@@ -40,23 +42,18 @@ Umgesetzt und belegt sind:
 
 Der Pilot war **fachlich brauchbar, aber nicht vollständig erfolgreich**.
 
-Erfüllt wurden insbesondere automatische Zielableitung, selbstständige Repository- und Sheet-Nutzung, klare Trennung von Orchestrierung, technischer Umsetzung und unabhängiger Prüfung sowie grüne PR Gates vor jedem Merge.
+Automatische Zielableitung, Repositoryzugriff, Werkzeugaufteilung und PR-Gates funktionierten. Nicht erfüllt wurden die Effizienzkriterien „keine Grundsatzkorrektur nach Umsetzungsbeginn“ und „keine reale Try-and-Error-Schleife nach dem Staging-Merge“. Die zusätzlichen Hero-Links mussten nach mehreren visuellen Korrekturrunden vollständig zurückgebaut werden; die letzte No-JS-Linklücke wurde erst in der Abschlussprüfung entdeckt.
 
-Nicht erfüllt wurden die Effizienzkriterien „keine Grundsatzkorrektur nach Umsetzungsbeginn“ und „keine reale Try-and-Error-Schleife nach dem Staging-Merge“. Die zusätzlichen Hero-Links mussten nach mehreren visuellen Korrekturrunden vollständig zurückgebaut werden; die letzte No-JS-Linklücke wurde erst in der Abschlussprüfung entdeckt.
+Daraus folgt keine neue allgemeine Prozessoptimierungsrunde. Die konkreten Lücken sind durch Renderer-Fixturetests, Offer-/Schema-Contracts und die strengere visuelle Abnahme abgesichert.
 
-Daraus folgt keine neue allgemeine Prozessoptimierungsrunde. Die konkreten Lücken sind stattdessen in Renderer-Fixturetests, Offer-/Schema-Contracts und der strengeren visuellen Abnahme abgesichert.
-
-## Getrennte Nacharbeiten
+## Zeitversetzte Nacharbeiten
 
 Diese Punkte sind kein offener Implementierungs-Workpack:
 
-- den finalen Staging-Stand regulär nach `main` veröffentlichen;
-- danach read-only Live-E6 für HTML, Hauptlinks, Sitemap, Robots und repräsentative Eventdetailseiten durchführen;
-- in Google Search Console die Validierung des Befunds `Feld "offers" fehlt` nach dem finalen Live-Release starten;
-- Suchwirkung getrennt nach 14 und 28 Tagen anhand Impressionen, Klicks, CTR und Position bewerten.
-
-Zeitversetzte Search-Console- und Rankingdaten sind keine rückwirkende technische Abnahme und begründen ohne konkreten neuen Befund keine weitere SEO-Strukturänderung.
+- in Google Search Console die Validierung des Befunds `Feld "offers" fehlt` starten und beobachten;
+- Suchwirkung nach mindestens 14 und 28 Tagen anhand Impressionen, Klicks, CTR und Position bewerten;
+- ohne konkreten neuen Befund keine weitere SEO-Strukturänderung durchführen.
 
 ## Genau nächster Schritt
 
-Den Dokumentationsabschluss über den normalen PR-Pfad nach `staging` integrieren und anschließend den vollständig geprüften Staging-Stand nach `main` veröffentlichen.
+In Google Search Console die Validierung des Befunds `Feld "offers" fehlt` starten.

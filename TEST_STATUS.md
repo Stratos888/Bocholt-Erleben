@@ -24,16 +24,16 @@ Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Histor
 | Geschützte Deploy-Environments | E2 | Deployjob nutzt abhängig vom Branch ausschließlich `staging` oder `main`; Branchregeln sind aktiv; `GITHUB_TOKEN` ist auf `contents: read` begrenzt |
 | Staging-Deploy | E3 | normaler Deploy über Environment `staging` einschließlich Build-, HTTP- und Browser-Smoke erfolgreich |
 | Staging-Secret-Isolation | E3 | `STAGING_REVIEW_PASSWORD` liegt ausschließlich im Environment `staging`; nach Löschen des gleichnamigen Repository-Secrets blieben Deploy und Login erfolgreich |
-| Live-Deploy | E6 | der SEO-Kernstand aus PR #155 und der Hero-Rückbau aus PR #157 wurden erfolgreich veröffentlicht; der finale No-JS-Hauptlinkfix aus PR #158 folgt mit dem nächsten regulären Release |
-| Branch-Inhaltsgleichheit | E1 | `staging` ist aktuell durch den finalen No-JS-Hauptlinkfix und den Dokumentationsabschluss vor `main`; Dateigleichheit wird nach dem nächsten normalen Release wiederhergestellt |
+| Live-Deploy | E6 | finaler SEO-Abschluss über PR #160 veröffentlicht; Main-SHA `5490b0fe7416d39e675796a9759b1ef5fef20b5f`; normaler Main-Deploy grün |
+| Branch-Inhaltsgleichheit | E1 | `main` und `staging` besitzen denselben Dateiinhalt; Unterschiede bestehen nur in der Merge-Historie |
 | SEO Intent- und Renderingvertrag | E2 | gemeinsame neutrale Auswahl, Berliner Kalendertag, Mehrtagesevents, Ausschluss vergangener/ungültiger Inhalte, stabile Sortierung, echte Renderer-Fixtures und fail-closed leere Datenkerne im `PR Gate` |
-| SEO Stagingabschluss | E3 | SHA `2ee2990bb06ee03ac8248e47150bb12de8a1c74e`; PR Gate #219 und normaler Deploy grün; mobile Sichtprüfung 327 × 779 Pixel grün; keine zusätzlichen Hero-Zeilen oder CTA-Regression |
-| Statischer Startseitenkern | E2/E3 | tatsächlicher Renderer-Output enthält Event-/Activity-Inhalte sowie direkte crawlbare Links zu `/events/` und `/aktivitaeten/`; `today-intent-nav` bleibt ausgeschlossen |
+| SEO Stagingabschluss | E3 | Staging-SHA `2ee2990bb06ee03ac8248e47150bb12de8a1c74e`; PR Gate #219 und normaler Deploy grün; mobile Sichtprüfung 327 × 779 Pixel grün; keine zusätzlichen Hero-Zeilen oder CTA-Regression |
+| Statischer Startseitenkern live | E6 | Live-Seitenquelltext enthält `data-static-event-context`, `Alle Events ansehen` und `Aktivitäten entdecken` jeweils genau einmal; der statische Kern und beide Hauptlinks werden tatsächlich ausgeliefert |
 | Event-/Offer-Vertrag | E2 | Quellen- und Ticket-URLs getrennt; kostenlose Offers `0 EUR`; kostenpflichtige Offers nur mit Preis, Währung und Ticket-URL; ungültige Preise, URLs, Availability und `validFrom` werden verworfen |
 | Event-Schema und Detailseiten | E2 | Event-JSON-LD nur auf geeigneten eindeutigen Detailseiten; mehrere Ticketarten sichtbar und schema-deckungsgleich; unbekannte Eintrittslage bleibt indexierbare HTML-Seite ohne synthetisches Event-Markup |
 | Sammelseiten-Schema | E2 | `/events/` und andere Sammelseiten geben keine einzelnen Event-Entitäten als Ersatz für Detailseiten aus |
 | Robots, Sitemap und Canonical | E2/E3 | umgebungsabhängige Robots- und Sitemaptemplates, Canonical-Contracts und Ergänzung generierter Eventdetailseiten sind im Deploypfad abgesichert |
-| Search-Console-Offervalidierung | ausstehend | nach dem finalen Live-Release die Validierung für `Feld "offers" fehlt` starten; zeitversetzter externer Status ist kein technischer Staging-Blocker |
+| Search-Console-Offervalidierung | ausstehend | Validierung für `Feld "offers" fehlt` nach dem Live-Abschluss starten und zeitversetzt beobachten |
 | SEO-Wirkungsmessung | ausstehend | erste Tendenz nach mindestens 14 Tagen, führende Bewertung nach 28 Tagen; Impressionen, Klicks, CTR und Position getrennt bewerten |
 | Control-Center-Writeback | E4 | Success, Replay, kontrollierter Fehler, Resume und Cleanup synthetisch belegt |
 | Live-Unverändertheit beim E4 | E4 | Live-Sheet und Live-Feed blieben unverändert |
@@ -44,7 +44,7 @@ Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Histor
 
 ## SEO-Abschlussgrenze
 
-Der Produkt-Workpack ist mit E1, E2 und Staging-E3 technisch abgeschlossen. Live-E6, Search-Console-Validierung und 14-/28-Tage-Messung bleiben getrennte Nacharbeiten. Aus dem technischen Abschluss wird keine bereits eingetretene Rankingverbesserung abgeleitet.
+Der Produkt-Workpack ist mit E1, E2, Staging-E3 und Live-E6 abgeschlossen. Search-Console-Validierung und 14-/28-Tage-Messung bleiben zeitversetzte Nacharbeiten. Aus dem technischen Abschluss wird keine bereits eingetretene Rankingverbesserung abgeleitet.
 
 Der parallel geprüfte Werkzeugsteuerungs-Pilot war nur teilweise erfolgreich: Zielableitung, Werkzeugaufteilung und PR-Gates funktionierten, die Kriterien „keine Grundsatzkorrektur“ und „keine reale Try-and-Error-Schleife“ wurden wegen der visuellen Linkkorrekturen nicht erreicht.
 
