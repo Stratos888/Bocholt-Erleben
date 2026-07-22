@@ -19,24 +19,15 @@ Erreicht:
 - das tatsächliche initiale HTML enthält H1, sinnvollen Inhaltskern und crawlbare Hauptlinks;
 - JavaScript reichert denselben Ausgangszustand progressiv an;
 - Build und Browser verwenden dieselbe neutrale Grundauswahl;
-- es gibt keine zweite SEO-Rankinglogik und keinen Bot-Sonderpfad;
 - Event-JSON-LD liegt nur auf geeigneten eindeutigen Detailseiten;
 - Offers werden ausschließlich aus belegten Eintritts- und Ticketdaten erzeugt;
 - unbekannte Eintrittslagen führen nicht zu erfundenen Preisen, Verfügbarkeiten oder Ticket-URLs;
-- die zusätzlichen Hero-Links wurden vollständig entfernt und der ursprüngliche Seitencharakter wiederhergestellt.
+- Staging-E3 und Live-E6 sind geschlossen;
+- die zusätzlichen Hero-Links wurden vollständig entfernt.
 
-Finaler technischer und operativer Abschluss:
+Zeitversetzte Nacharbeit:
 
-- Staging-SHA `2ee2990bb06ee03ac8248e47150bb12de8a1c74e` einschließlich grünem PR Gate #219 und grünem Staging-Deploy;
-- Main-SHA `5490b0fe7416d39e675796a9759b1ef5fef20b5f` einschließlich grünem PR Gate #221 und grünem Main-Deploy;
-- `main` und `staging` besitzen denselben Dateiinhalt;
-- mobile Sichtprüfung bei 327 × 779 Pixeln grün;
-- Live-Seitenquelltext enthält statischen Inhaltskontext und beide Hauptlinks jeweils genau einmal.
-
-Zeitversetzte Nacharbeiten:
-
-- Search-Console-Validierung des `offers`-Befunds starten und beobachten;
-- erste Wirkung nach mindestens 14 Tagen und führend nach 28 Tagen bewerten.
+- erste SEO-Wirkung nach mindestens 14 Tagen und führend nach 28 Tagen bewerten.
 
 Eine Rankingverbesserung wird nicht aus CI, einem einzelnen Tag oder dem bloßen technischen Abschluss abgeleitet.
 
@@ -45,7 +36,40 @@ Referenzen:
 - `docs/decisions/2026-07-18-search-intent-und-static-rendering.md`;
 - `docs/workpacks/completed/SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md`.
 
-## 2. Bereites nächstes Produktziel
+## 2. Bereites nächstes Qualitäts-Workpack
+
+### SEO Structured Data – Search-Console-Warnungen
+
+Problem:
+
+Google Search Console zeigt nach dem abgeschlossenen SEO-Release weiterhin nicht kritische Warnungen zu `performer`, `organizer`, `offers`, `price`, `priceCurrency` und `validFrom`. Der sichtbare Search-Console-Stand kann historisches Markup, bewusst fehlende optionale Werte, reale Datenlücken oder technische Mappingfehler enthalten. Diese Ursachen dürfen nicht vermischt werden.
+
+Ziel:
+
+- alle Warnungsklassen vollständig auf betroffene URLs auflösen;
+- je URL aktuellen Live-Crawlstand, ausgeliefertes JSON-LD, sichtbaren Seiteninhalt und kanonische Quelldaten vergleichen;
+- jede Warnung als historisch, bewusst akzeptiert, Datenlücke oder technischer Fehler klassifizieren;
+- nur belegte Fehler minimal korrigieren;
+- keine Organizer-, Performer-, Preis-, Währungs-, `validFrom`-, Availability- oder Ticketwerte erfinden;
+- nur sachlich geeignete Search-Console-Validierungen starten.
+
+Bekannte Ausgangsevidence vom 2026-07-22:
+
+- `performer` fehlt: 2 Elemente;
+- `organizer` fehlt: 2 Elemente;
+- `priceCurrency` fehlt in `offers`: 1 Element;
+- `validFrom` fehlt in `offers`: 1 Element;
+- `price` fehlt in `offers`: 1 Element;
+- `offers` fehlt: 1 Element;
+- bekannte Beispiel-URL: `https://bocholt-erleben.de/events/2-bocholter-vereinsmesse-in-den-shopping-arkaden-2026-09-27/`.
+
+Der Workpack beginnt ausschließlich read-only. Der abgeschlossene SEO-Recovery-Workpack bleibt geschlossen.
+
+Referenz:
+
+- `docs/workpacks/queued/SEO-STRUCTURED-DATA-search-console-warnings-2026-07-22.md`.
+
+## 3. Danach mögliches Produktziel
 
 ### Startpartner-Wachstumspilot operationalisieren
 
@@ -76,7 +100,7 @@ Referenz:
 
 `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`
 
-## 3. Danach folgende Produktketten
+## 4. Danach folgende Produktketten
 
 ### Anbieterwert weiter stärken
 
@@ -98,16 +122,15 @@ Referenz:
 - keine schwere Account-/Sync-Logik ohne belegten Bedarf;
 - neue Personalisierung nur mit klarem Nutzerwert und Datenschutzvertrag.
 
-## 4. Laufende Betriebsaufgaben
+## 5. Laufende Betriebsaufgaben
 
 - Deploy-, HTTP- und Browser-Smokes grün halten;
 - regulären Weekly-KI-Lauf auf Vorlauf, Drop-Gründe und begrenztes Feedback prüfen;
 - Search-, Content- und Visual-Reports als Evidence und priorisierte Ausnahmen nutzen;
-- Suchwirkung nach SEO-Änderungen mit Baseline sowie 14-/28-Tage-Fenstern bewerten;
-- Search-Console-Validierung des Event-/Offer-Befunds getrennt vom Ranking beobachten;
+- Suchwirkung nach SEO-Änderungen mit 14-/28-Tage-Fenstern bewerten;
 - keine Erfolgsbehauptung aus einzelnen Tagen oder bloßen CI-Markern.
 
-## 5. Nicht als nächstes starten
+## 6. Nicht als nächstes starten
 
 - allgemeine UI-Neugestaltung ohne konkreten Fehler;
 - zusätzliche Workflow-, Observer- oder Dokumentationsschichten ohne neuen belegten Bedarf;
@@ -115,14 +138,14 @@ Referenz:
 - gekaufte Empfehlungen oder Zwei-Klassen-Darstellung;
 - Display-Werbung als Kernmodell;
 - neues kostenloses Anbieterformular neben Tipp- und bezahltem Weg;
-- große SEO-Massenrunde statt konkreter datenbasierter Nachprüfung;
+- große SEO-Massenrunde statt URL-genauer Structured-Data-Prüfung;
 - neues Framework ohne belegte Notwendigkeit;
 - neue Bildproduktion ohne konkreten Visual-Gap;
 - große CSS-/JS-Sanierung ohne Produkt- und Ownerbezug.
 
-## 6. Aktivierungsregel
+## 7. Aktivierungsregel
 
-Ein Produktziel wird erst aktiver Workpack, wenn:
+Ein Workpack wird erst aktiv, wenn:
 
 - aktueller Repo-, Runtime- und Datenstand geprüft wurde;
 - Ziel, Scope, Risiko, Owner, Evidence und Rollback dokumentiert sind;
