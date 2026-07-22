@@ -1,33 +1,54 @@
 # Roadmap – Bocholt erleben
 
-Stand: 2026-07-20  
+Stand: 2026-07-22  
 Status: priorisierte Produktziele; kein operativer Workpack-Status
 
 Der aktuelle technische Schritt steht in `docs/workpacks/active/CURRENT_WORKPACK.md`. Die technische Warteschlange steht in `docs/workpacks/queued/INDEX.md`.
 
 Die allgemeine Prozess-, Workflow- und Dokumentationsoptimierung ist abgeschlossen. Sie wird nur bei einem neuen konkret belegten Bedarf erneut als Workpack aktiviert.
 
-## 1. Bereite Produktziele
+## 1. Abgeschlossen – Wirkungsmessung läuft
 
-### A. Search-Intent und statische Renderingbasis
+### SEO Recovery: Search-Intent und statische Renderingbasis
 
-Problem: Die Today-Home bietet guten Produktnutzen, liefert im initialen HTML aber zu wenig Suchsemantik und crawlbare Einstiege. Gleichzeitig hat die historisch starke Homepage ihre frühere Veranstaltungsintention verloren.
-
-Ziel:
+Erreicht:
 
 - `/` bleibt kuratierter Heute-Einstieg;
-- `/events/` bleibt vollständige Veranstaltungs-Landingpage;
-- `/aktivitaeten/` bleibt dauerhafte Freizeit-/Aktivitäts-Landingpage;
-- initiales HTML enthält sinnvolle H1, Copy, Links und einen kleinen Inhaltskern;
+- `/events/` ist die vollständige Veranstaltungs-Landingpage;
+- `/aktivitaeten/` ist die dauerhafte Freizeit-/Aktivitäts-Landingpage;
+- das tatsächliche initiale HTML enthält H1, sinnvollen Inhaltskern und crawlbare Hauptlinks;
 - JavaScript reichert denselben Ausgangszustand progressiv an;
-- keine zweite SEO-Rankinglogik und kein Bot-Sonderpfad.
+- Build und Browser verwenden dieselbe neutrale Grundauswahl;
+- es gibt keine zweite SEO-Rankinglogik und keinen Bot-Sonderpfad;
+- Event-JSON-LD liegt nur auf geeigneten eindeutigen Detailseiten;
+- Offers werden ausschließlich aus belegten Eintritts- und Ticketdaten erzeugt;
+- unbekannte Eintrittslagen führen nicht zu erfundenen Preisen, Verfügbarkeiten oder Ticket-URLs;
+- die zusätzlichen Hero-Links wurden vollständig entfernt und der ursprüngliche Seitencharakter wiederhergestellt.
+
+Technischer Abschluss auf Staging:
+
+- SHA `2ee2990bb06ee03ac8248e47150bb12de8a1c74e`;
+- PR Gate #219 grün;
+- normaler Staging-Deploy grün;
+- mobile Sichtprüfung bei 327 × 779 Pixeln grün.
+
+Getrennte Nacharbeiten:
+
+- finalen Staging-Stand regulär nach `main` veröffentlichen;
+- read-only Live-E6 durchführen;
+- Search-Console-Validierung des `offers`-Befunds starten;
+- erste Wirkung nach mindestens 14 Tagen und führend nach 28 Tagen bewerten.
+
+Eine Rankingverbesserung wird nicht aus CI, einem einzelnen Tag oder dem bloßen technischen Abschluss abgeleitet.
 
 Referenzen:
 
-- `docs/decisions/2026-07-18-search-intent-und-static-rendering.md`
-- `docs/workpacks/queued/SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md`
+- `docs/decisions/2026-07-18-search-intent-und-static-rendering.md`;
+- `docs/workpacks/completed/SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md`.
 
-### B. Startpartner-Wachstumspilot operationalisieren
+## 2. Bereites nächstes Produktziel
+
+### Startpartner-Wachstumspilot operationalisieren
 
 Problem: Öffentliche Akquiseoberfläche und fachlicher Zielzustand sind vorhanden, aber der interne End-to-End-Lebenszyklus von Kandidat bis Pilotabschluss ist noch nicht vollständig umgesetzt.
 
@@ -56,7 +77,7 @@ Referenz:
 
 `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`
 
-## 2. Danach folgende Produktketten
+## 3. Danach folgende Produktketten
 
 ### Anbieterwert weiter stärken
 
@@ -78,15 +99,16 @@ Referenz:
 - keine schwere Account-/Sync-Logik ohne belegten Bedarf;
 - neue Personalisierung nur mit klarem Nutzerwert und Datenschutzvertrag.
 
-## 3. Laufende Betriebsaufgaben
+## 4. Laufende Betriebsaufgaben
 
 - Deploy-, HTTP- und Browser-Smokes grün halten;
 - regulären Weekly-KI-Lauf auf Vorlauf, Drop-Gründe und begrenztes Feedback prüfen;
 - Search-, Content- und Visual-Reports als Evidence und priorisierte Ausnahmen nutzen;
 - Suchwirkung nach SEO-Änderungen mit Baseline sowie 14-/28-Tage-Fenstern bewerten;
+- Search-Console-Validierung des Event-/Offer-Befunds getrennt vom Ranking beobachten;
 - keine Erfolgsbehauptung aus einzelnen Tagen oder bloßen CI-Markern.
 
-## 4. Nicht als nächstes starten
+## 5. Nicht als nächstes starten
 
 - allgemeine UI-Neugestaltung ohne konkreten Fehler;
 - zusätzliche Workflow-, Observer- oder Dokumentationsschichten ohne neuen belegten Bedarf;
@@ -94,12 +116,12 @@ Referenz:
 - gekaufte Empfehlungen oder Zwei-Klassen-Darstellung;
 - Display-Werbung als Kernmodell;
 - neues kostenloses Anbieterformular neben Tipp- und bezahltem Weg;
-- große SEO-Massenrunde statt klarer Intent-/Renderingkorrektur;
+- große SEO-Massenrunde statt konkreter datenbasierter Nachprüfung;
 - neues Framework ohne belegte Notwendigkeit;
 - neue Bildproduktion ohne konkreten Visual-Gap;
 - große CSS-/JS-Sanierung ohne Produkt- und Ownerbezug.
 
-## 5. Aktivierungsregel
+## 6. Aktivierungsregel
 
 Ein Produktziel wird erst aktiver Workpack, wenn:
 
