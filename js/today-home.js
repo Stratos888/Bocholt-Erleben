@@ -1643,16 +1643,22 @@
       fetchJsonNoStore("/data/bathing_water_status.json", false)
     ]);
 
-    state.events = dedupeEvents([
+    const mergedEvents = dedupeEvents([
       ...extractEvents(eventPayload),
       ...extractEvents(approvedPayload)
     ]);
+    state.events = window.NeutralSelection
+      ? window.NeutralSelection.selectEvents(mergedEvents, { limit: mergedEvents.length })
+      : mergedEvents;
 
     if (typeof window.BEActivityHighlights?.setStatusOverrides === "function") {
       window.BEActivityHighlights.setStatusOverrides(bathingStatusPayload);
     }
 
-    state.offers = extractOffers(offerPayload);
+    const extractedOffers = extractOffers(offerPayload);
+    state.offers = window.NeutralSelection
+      ? window.NeutralSelection.selectActivities(extractedOffers, { limit: extractedOffers.length })
+      : extractedOffers;
     state.eventVisualPools = buildReadyEventVisualPools(visualPoolPayload);
     state.activityVisualPoolsByOfferId = buildReadyActivityVisualPoolsByOfferId(activityVisualPoolPayload);
   }

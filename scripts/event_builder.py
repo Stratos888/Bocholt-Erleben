@@ -28,6 +28,7 @@ from typing import Dict, List, Tuple, Optional
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key, resolve_event_visual_key, should_prefer_inferred_event_visual_key
 from event_visual_motifs import infer_event_visual_motif, normalize_event_visual_motif
 from event_description_quality import apply_description_override, load_description_overrides
+from event_public_contract import PUBLIC_FIELDS, normalize_public_event
 
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "events.tsv"
@@ -123,6 +124,7 @@ class EventRow:
     recommendation_weight: str
     visual_key: str
     visual_motif: str
+    public: Dict[str, object]
 
 
 def fail(msg: str) -> None:
@@ -480,6 +482,7 @@ def main() -> None:
                 recommendation_weight=optional_text(data, "recommendation_weight"),
                 visual_key=visual_key,
                 visual_motif=visual_motif,
+                public=normalize_public_event(data),
             )
         )
 
@@ -508,6 +511,12 @@ def main() -> None:
             item["endDate"] = e.endDate
         if e.url:
             item["url"] = e.url
+        for key in PUBLIC_FIELDS:
+            value = e.public.get(key)
+            if value:
+                item[key] = value
+        if e.public.get("ticket_offers"):
+            item["ticket_offers"] = e.public["ticket_offers"]
         if e.description:
             item["description"] = e.description
         if e.visual_key:

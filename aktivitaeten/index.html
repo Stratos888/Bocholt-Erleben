@@ -113,7 +113,7 @@ Umfang:
           <!-- === BEGIN BLOCK: ACTIVITIES_HERO_COPY_TEXT_V3 (single content owner) === -->
           <div class="desktop-entry__content">
             <h1 class="desktop-entry__title">Aktivitäten in Bocholt</h1>
-            <p class="desktop-entry__text">Freizeitideen, Natur, Kultur und Unternehmungen in Bocholt und Umgebung – passend zu deiner Situation.</p>
+            <p class="desktop-entry__text">Freizeitideen, Natur, Kultur und Unternehmungen in Bocholt und Umgebung – passend zu deiner Situation. <a href="/events/">Aktuelle Veranstaltungen</a> stehen im Eventkalender.</p>
           </div>
           <!-- === END BLOCK: ACTIVITIES_HERO_COPY_TEXT_V3 (single content owner) === -->
         </div>
@@ -295,7 +295,11 @@ Umfang:
   </div>
 
   <section class="events-section activity-feed-section" aria-label="Aktivitäten">
-    <div id="offer-cards" class="event-cards-grid activity-cards-grid"></div>
+    <div id="offer-cards" class="event-cards-grid activity-cards-grid" data-static-feed>
+      <!-- STATIC:ACTIVITIES:START -->
+      <article class="event-card activity-card--rich static-content-card" data-item-id="activities-entry"><h3>Freizeitideen in Bocholt</h3><p>Der aktuelle Activitykern wird beim Build aus den freigegebenen Aktivitäten erzeugt.</p><p><a href="/">Heute entdecken</a> · <a href="/events/">Veranstaltungen ansehen</a></p></article>
+      <!-- STATIC:ACTIVITIES:END -->
+    </div>
   </section>
 
   <!-- === BEGIN BLOCK: ACTIVITIES_INITIAL_SKELETON_SEED_V1 | Zweck: zeigt auf /aktivitaeten/ bereits während HTML-Parse sofort Skeleton-Cards im Feed, damit der erste Wechsel per Bottom Tab Bar nicht leer/spinnerlastig wirkt | Umfang: genau ein früher Inline-Seed für #offer-cards vor den defer-Skripten === -->
@@ -382,7 +386,8 @@ Zweck:
 <script src="/js/activity-highlights.js?v=2026-06-26-seasonal-highlights-v1" defer></script>
 <script src="/js/offers.js?v=2026-06-30-activity-favorites-silent-priority" defer></script>
 <script src="/js/offers-details.js?v=2026-06-30-activity-favorites-silent-priority" defer></script>
-<script src="/js/offers-main.js?v=2026-06-30-activity-favorites-silent-priority" defer></script>
+<script src="/js/neutral-selection.js?v=2026-07-22-seo-recovery-v1" defer></script>
+<script src="/js/offers-main.js?v=2026-07-22-seo-recovery-v1" defer></script>
 <!-- === END BLOCK: JS INCLUDES (activities page final order V3) === -->
 </body>
 </html>

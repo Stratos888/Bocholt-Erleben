@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
+from event_public_contract import build_offer_schema, normalize_public_event
 
 ROOT = Path(__file__).resolve().parents[1]
 EVENTS_JSON = ROOT / "data" / "events.json"
@@ -59,6 +60,7 @@ class DetailEvent:
     image_alt: str
     is_past: bool
     noindex: bool
+    public: Dict[str, Any]
 
 
 def normalize_text(value: Any) -> str:
@@ -361,6 +363,7 @@ def build_detail_event(raw: Dict[str, Any], is_past: bool, noindex: bool, visual
         image_alt=image_alt,
         is_past=is_past,
         noindex=noindex,
+        public=normalize_public_event(raw),
     )
 
 
@@ -447,12 +450,15 @@ def json_ld(event: DetailEvent) -> str:
     }
     if event.description:
         payload["description"] = truncate(event.description, 280)
-    if event.external_url:
-        payload["offers"] = {
-            "@type": "Offer",
-            "url": event.external_url,
-            "availability": "https://schema.org/InStock",
-        }
+    offers = build_offer_schema(event.public)
+    if offers:
+        payload["offers"] = offers[0] if len(offers) == 1 else offers
+    if event.public.get("organizer_name"):
+        payload["organizer"] = {"@type": "Organization", "name": event.public["organizer_name"]}
+        if event.public.get("organizer_url"): payload["organizer"]["url"] = event.public["organizer_url"]
+    if event.public.get("performer_name"):
+        payload["performer"] = {"@type": "PerformingGroup", "name": event.public["performer_name"]}
+        if event.public.get("performer_url"): payload["performer"]["url"] = event.public["performer_url"]
     return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
@@ -495,6 +501,18 @@ def render_page(event: DetailEvent) -> str:
               {source_link_html}
             </div>
         """
+
+    admission_html = ""
+    admission_status = normalize_text(event.public.get("admission_status"))
+    ticket_url = normalize_http_url(event.public.get("ticket_url"))
+    price = normalize_text(event.public.get("price"))
+    currency = normalize_text(event.public.get("price_currency"))
+    if admission_status == "free":
+        admission_html = '<p class="event-admission" data-admission-status="free"><strong>Eintritt:</strong> kostenlos</p>'
+    elif admission_status == "paid":
+        price_label = f"{escape(price)} {escape(currency)}" if price and currency else "kostenpflichtig; Preis siehe Ticketanbieter"
+        ticket_link = f' <a href="{escape(ticket_url)}" target="_blank" rel="noopener">Tickets</a>' if ticket_url else ""
+        admission_html = f'<p class="event-admission" data-admission-status="paid"><strong>Eintritt:</strong> {price_label}{ticket_link}</p>'
 
     location_meta_html = ""
     if maps_url and not event.is_past:
@@ -627,6 +645,7 @@ def render_page(event: DetailEvent) -> str:
               {expired_notice}
             </div>
             {description_html}
+            {admission_html}
             {trust_links_html}
           </div>
         </div>

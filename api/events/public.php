@@ -61,7 +61,6 @@ function public_events_normalize_row(array $row): array
 {
     $sourceUrl = trim((string)($row['event_url'] ?? ''));
     $ticketUrl = trim((string)($row['ticket_url'] ?? ''));
-    $url = $ticketUrl !== '' ? $ticketUrl : $sourceUrl;
     $address = trim((string)($row['location_address'] ?? ''));
     $event = [
         'id' => 'submission-' . (string)$row['id'],
@@ -77,8 +76,20 @@ function public_events_normalize_row(array $row): array
         'description' => trim((string)($row['description_text'] ?? '')),
         'source_url' => $sourceUrl,
         'ticket_url' => $ticketUrl,
+        'admission_status' => 'unknown',
+        'price' => '',
+        'price_currency' => '',
+        'availability' => '',
+        'valid_from' => '',
+        'organizer_name' => trim((string)($row['organization_name_snapshot'] ?? '')),
+        'organizer_url' => '',
+        'performer_name' => '',
+        'performer_url' => '',
+        'offer_verified_at' => '',
+        'offer_source_url' => '',
+        'schema_eligible' => false,
     ];
-    if ($url !== '') $event['url'] = $url;
+    if ($sourceUrl !== '') $event['url'] = $sourceUrl;
     $visualFields = public_events_visual_fields_for_submission($row);
     if ($visualFields !== []) $event += $visualFields;
     $reportingTarget = public_events_reporting_target($row);
