@@ -1,7 +1,7 @@
 # Completed Workpack: SEO Recovery – Search Intent und statische Renderingbasis
 
 Stand: 2026-07-22  
-Status: technisch und fachlich auf Staging abgeschlossen  
+Status: technisch, fachlich und im Livebetrieb abgeschlossen  
 Risikoklasse: R2
 
 ## Ausgangslage
@@ -45,16 +45,7 @@ Die drei Hauptseiten besitzen einen echten initialen Inhaltskern. Build und Brow
 
 ## Event-/Offer-Vertrag
 
-Der öffentliche Vertrag trennt insbesondere:
-
-- Quellen-URL;
-- Eintrittsstatus;
-- Preis und Währung;
-- Ticket-URL;
-- Verfügbarkeit;
-- `validFrom`;
-- Organizer und Performer einschließlich explizitem Typ;
-- mehrere belegte Ticketangebote.
+Der öffentliche Vertrag trennt Quellen-URL, Eintrittsstatus, Preis, Währung, Ticket-URL, Verfügbarkeit, `validFrom`, Organizer, Performer und mehrere belegte Ticketangebote.
 
 Wahrheitsregeln:
 
@@ -74,7 +65,9 @@ Der konkrete Zaubershow-Fall bleibt damit eine indexierbare HTML-Detailseite, oh
 - Implementierung über PR #151 einschließlich technischer Nachschärfung;
 - visuelle Regressionen über PR #153 und #154 untersucht und anschließend mit PR #156 vollständig zurückgebaut;
 - finale No-JS-Hauptlinklücke mit PR #158 geschlossen;
-- finaler Staging-SHA: `2ee2990bb06ee03ac8248e47150bb12de8a1c74e`.
+- Dokumentationsabschluss über PR #159;
+- finaler Release über PR #160;
+- finaler Main-SHA: `5490b0fe7416d39e675796a9759b1ef5fef20b5f`.
 
 ### E2
 
@@ -92,12 +85,22 @@ Abgedeckt sind unter anderem Berliner Kalendertag, Mehrtagesevents, abgelaufene 
 
 ### E3
 
-- PR Gate #219 für den finalen technischen Fix: grün;
+- PR Gate #219 für den finalen technischen Staging-Fix: grün;
 - normaler Deploy des Staging-SHA `2ee2990bb06ee03ac8248e47150bb12de8a1c74e`: grün;
 - Startseite bei 327 × 779 Pixeln visuell geprüft;
 - keine zusätzlichen Hero-Zeilen;
 - keine CTA-/Kartenregression und kein horizontaler Overflow;
 - normaler Browserzustand zeigt keine doppelten Karten oder Links.
+
+### E6
+
+- Main-PR-Gate #221: grün;
+- normaler Main-Deploy des SHA `5490b0fe7416d39e675796a9759b1ef5fef20b5f`: grün;
+- `main` und `staging` besitzen denselben Dateiinhalt;
+- Live-Seitenquelltext der Startseite enthält `data-static-event-context` genau einmal;
+- Live-Seitenquelltext enthält `Alle Events ansehen` genau einmal;
+- Live-Seitenquelltext enthält `Aktivitäten entdecken` genau einmal;
+- damit werden der statische Startseitenkern und beide Hauptlinks tatsächlich ausgeliefert, ohne Duplikat oder Rückkehr der entfernten Hero-Navigation.
 
 ## Abschlussbewertung
 
@@ -109,25 +112,22 @@ Abgedeckt sind unter anderem Berliner Kalendertag, Mehrtagesevents, abgelaufene 
 | Today-Home funktional erhalten | erfüllt |
 | `/events/` und `/aktivitaeten/` eindeutig abgegrenzt | erfüllt |
 | wahrheitsgetreuer Event-/Offer-Vertrag | erfüllt |
-| E1, E2 und Staging-E3 | erfüllt |
+| E1, E2, Staging-E3 und Live-E6 | erfüllt |
 | genau eine visuelle Korrekturrunde | nicht erfüllt |
 | keine Try-and-Error-Schleife nach Staging-Merge | nicht erfüllt |
-| finale Live-E6 und Search-Console-Validierung | getrennte Nacharbeit |
+| Search-Console-Validierung | zeitversetzte Nacharbeit |
 | 14-/28-Tage-Wirkungsmessung | zeitversetzte Nacharbeit |
 
 Das Produktziel ist erreicht. Die nicht erfüllten Effizienzkriterien betreffen den gleichzeitig durchgeführten Werkzeugsteuerungs-Pilot und verhindern keine technische Workpack-Schließung. Sie werden nicht beschönigt und lösen keine neue allgemeine Prozessrunde aus.
 
-## Getrennte Nacharbeiten
+## Zeitversetzte Nacharbeiten
 
-Nach dem regulären Release nach `main`:
-
-1. read-only Live-E6 für HTML, Hauptlinks, Sitemap, Robots und repräsentative Detailseiten;
-2. Search-Console-Validierung für `Feld "offers" fehlt` starten und Status zeitversetzt dokumentieren;
-3. erste Suchwirkung nach mindestens 14 Tagen, führende Bewertung nach 28 Tagen;
-4. Impressionen, Klicks, CTR und Position getrennt bewerten.
+1. Search-Console-Validierung für `Feld "offers" fehlt` starten und Status zeitversetzt dokumentieren;
+2. erste Suchwirkung nach mindestens 14 Tagen, führende Bewertung nach 28 Tagen;
+3. Impressionen, Klicks, CTR und Position getrennt bewerten.
 
 Rankingverbesserung und Search-Console-Neubewertung sind keine rückwirkenden technischen Postconditions. Ohne konkreten neuen Befund erfolgt keine weitere SEO-Strukturänderung.
 
 ## Rollback
 
-Der SEO-Release kann über den jeweiligen Main-Merge-Commit revertiert und anschließend über den normalen `Deploy to STRATO`-Pfad erneut veröffentlicht werden. Sheet-, DB- und externe Daten wurden durch diesen Workpack nicht geschrieben.
+Der SEO-Release kann über den Main-Merge-Commit `5490b0fe7416d39e675796a9759b1ef5fef20b5f` revertiert und anschließend über den normalen `Deploy to STRATO`-Pfad erneut veröffentlicht werden. Sheet-, DB- und externe Daten wurden durch diesen Workpack nicht geschrieben.
