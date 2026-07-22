@@ -20,6 +20,11 @@ const fixture = (events, offers, now = "2026-07-22T10:00:00Z") => {
   const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
   return { root, run, home: read("index.html"), events: read("events/index.html"), activities: read("aktivitaeten/index.html") };
 };
+const assertHomeMainLinks = (html) => {
+  assert.match(html, /class="today-more__link" href="\/events\/"/);
+  assert.match(html, /class="today-more__link" href="\/aktivitaeten\/"/);
+  assert.doesNotMatch(html, /today-intent-nav/);
+};
 const activity = { id: "aasee", title: "Aasee erleben", description: "Freizeit am Wasser" };
 const today = { id: "today", title: "Heute", date: "2026-07-22", location: "Bocholt" };
 const future = { id: "future", title: "Später", date: "2026-07-23", location: "Bocholt", score: 99 };
@@ -28,15 +33,18 @@ assert.equal(result.run.status, 0, result.run.stderr);
 assert.match(result.home, /data-static-event-context="today"/);
 assert.match(result.home, /data-item-id="today"/);
 assert.doesNotMatch(result.home, /data-item-id="future"/);
+assertHomeMainLinks(result.home);
 assert.match(result.events, /href="\/events\/future\/"/);
 assert.match(result.activities, /Aasee erleben/);
 result = fixture([future], [activity]);
 assert.equal(result.run.status, 0, result.run.stderr);
 assert.match(result.home, /Nächste Termine/);
 assert.match(result.home, /data-static-event-context="upcoming"/);
+assertHomeMainLinks(result.home);
 result = fixture([{ id: "berlin-day", title: "Berliner Tag", date: "2026-03-29", location: "Bocholt" }], [activity], "2026-03-28T23:30:00Z");
 assert.equal(result.run.status, 0, result.run.stderr);
 assert.match(result.home, /data-static-event-context="today"/);
+assertHomeMainLinks(result.home);
 for (const [events, offers] of [[[], [activity]], [[future], []]]) {
   result = fixture(events, offers);
   assert.notEqual(result.run.status, 0);
