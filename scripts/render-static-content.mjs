@@ -21,6 +21,23 @@ const replace = (file, marker, html) => {
 const detail = (event) => `/events/${encodeURIComponent(event.id)}/`;
 const eventCards = (events) => events.map((event) => `<article class="event-card static-content-card" data-item-id="${esc(event.id)}"><h3><a href="${detail(event)}">${esc(event.title)}</a></h3><p>${esc(event.date)} · ${esc(event.location || event.city || "Bocholt")}</p></article>`).join("\n");
 const activityCards = (items) => items.map((item) => `<article class="event-card activity-card--rich static-content-card" data-item-id="${esc(item.id)}"><h3>${esc(item.title || item.name)}</h3><p>${esc(item.description || item.short_description || item.category || "Freizeitidee in Bocholt")}</p></article>`).join("\n");
+const homeMainLinks = `
+<section class="today-more static-content-main-links" aria-label="Mehr entdecken">
+  <a class="today-more__link" href="/events/">
+    <span class="today-more__icon" data-ui-icon="calendar-days" aria-hidden="true"></span>
+    <span class="today-more__copy">
+      <span class="today-more__label">Alle Events ansehen</span>
+      <span class="today-more__hint">Termine, Märkte, Kultur und mehr</span>
+    </span>
+  </a>
+  <a class="today-more__link" href="/aktivitaeten/">
+    <span class="today-more__icon" data-ui-icon="compass" aria-hidden="true"></span>
+    <span class="today-more__copy">
+      <span class="today-more__label">Aktivitäten entdecken</span>
+      <span class="today-more__hint">Orte, Natur, Familie und Ausflüge</span>
+    </span>
+  </a>
+</section>`.trim();
 
 const rawEvents = read("data/events.json");
 const events = selection.selectEvents(rawEvents, { now: process.env.STATIC_RENDER_NOW, timeZone: "Europe/Berlin", limit: 8 });
@@ -32,4 +49,4 @@ const homeEvents = todayEvents.length ? todayEvents : events.slice(0, 3);
 const homeHeading = todayEvents.length ? "Heute in Bocholt" : "Nächste Termine";
 replace("events/index.html", "EVENTS", eventCards(events));
 replace("aktivitaeten/index.html", "ACTIVITIES", activityCards(offers));
-replace("index.html", "TODAY", `<section data-static-event-context="${todayEvents.length ? "today" : "upcoming"}"><h3>${homeHeading}</h3>${eventCards(homeEvents)}</section>` + activityCards(offers.slice(0, 3)));
+replace("index.html", "TODAY", `<section data-static-event-context="${todayEvents.length ? "today" : "upcoming"}"><h3>${homeHeading}</h3>${eventCards(homeEvents)}</section>` + activityCards(offers.slice(0, 3)) + homeMainLinks);
