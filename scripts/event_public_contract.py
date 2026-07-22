@@ -2,20 +2,54 @@
 from __future__ import annotations
 
 import json
+import ipaddress
+import math
+import re
+from datetime import datetime
+from urllib.parse import urlparse
 from typing import Any, Dict, List
 
 PUBLIC_FIELDS = (
     "source_url", "admission_status", "price", "price_currency", "ticket_url",
     "availability", "valid_from", "organizer_name", "organizer_url",
-    "performer_name", "performer_url", "offer_verified_at", "offer_source_url",
+    "performer_name", "performer_url", "organizer_type", "performer_type",
+    "offer_verified_at", "offer_source_url",
 )
 
 def _text(value: Any) -> str:
     return "" if value is None else str(value).strip()
 
+def public_http_url(value: Any) -> str:
+    raw = _text(value)
+    try: parsed = urlparse(raw)
+    except ValueError: return ""
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password:
+        return ""
+    host = parsed.hostname.lower().rstrip(".")
+    if host == "localhost" or host.endswith(".localhost"): return ""
+    try:
+        if not ipaddress.ip_address(host).is_global: return ""
+    except ValueError:
+        if "." not in host: return ""
+    return raw
+
+def iso_datetime(value: Any) -> str:
+    raw = _text(value)
+    if not raw: return ""
+    try: datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError: return ""
+    return raw
+
+def numeric_price(value: Any) -> float | int | None:
+    try: number = float(_text(value).replace(",", "."))
+    except ValueError: return None
+    if not math.isfinite(number) or number < 0: return None
+    return int(number) if number.is_integer() else number
+
 def normalize_public_event(raw: Dict[str, Any]) -> Dict[str, Any]:
     out = {key: _text(raw.get(key)) for key in PUBLIC_FIELDS}
     out["source_url"] = out["source_url"] or _text(raw.get("url"))
+    out["ticket_url"] = public_http_url(out["ticket_url"])
     if out["admission_status"] not in {"free", "paid", "unknown"}:
         out["admission_status"] = "unknown"
     # An informational source URL is never promoted to a ticket URL.
@@ -34,21 +68,22 @@ def build_offer_schema(public: Dict[str, Any]) -> List[Dict[str, Any]]:
     result: List[Dict[str, Any]] = []
     for candidate in candidates:
         if not isinstance(candidate, dict): continue
-        ticket_url = _text(candidate.get("ticket_url"))
-        price = _text(candidate.get("price"))
+        ticket_url = public_http_url(candidate.get("ticket_url"))
+        price = numeric_price(candidate.get("price"))
         currency = _text(candidate.get("price_currency"))
         if status == "free":
             offer: Dict[str, Any] = {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}
-        elif status == "paid" and price and currency and ticket_url:
-            try: numeric_price: Any = float(price.replace(",", "."))
-            except ValueError: continue
-            offer = {"@type": "Offer", "price": numeric_price, "priceCurrency": currency, "url": ticket_url}
+        elif status == "paid" and price is not None and re.fullmatch(r"[A-Z]{3}", currency) and ticket_url:
+            offer = {"@type": "Offer", "price": price, "priceCurrency": currency, "url": ticket_url}
         else:
             continue
         availability = _text(candidate.get("availability"))
-        if availability:
-            offer["availability"] = availability if availability.startswith("http") else f"https://schema.org/{availability}"
-        valid_from = _text(candidate.get("valid_from"))
+        if availability in {"InStock", "SoldOut", "PreOrder"}:
+            offer["availability"] = f"https://schema.org/{availability}"
+        valid_from = iso_datetime(candidate.get("valid_from"))
         if valid_from: offer["validFrom"] = valid_from
         result.append(offer)
     return result
+
+def schema_eligible(public: Dict[str, Any]) -> bool:
+    return bool(build_offer_schema(public))

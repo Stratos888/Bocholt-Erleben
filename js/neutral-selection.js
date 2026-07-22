@@ -8,6 +8,15 @@
   const isoDate = (value) => /^\d{4}-\d{2}-\d{2}$/.test(text(value)) ? text(value) : "";
   const identity = (item) => text(item && item.id);
 
+  function localDate(now, timeZone) {
+    const instant = now instanceof Date ? now : new Date(now || Date.now());
+    if (Number.isNaN(instant.getTime())) throw new TypeError("Invalid instant");
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timeZone || "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit"
+    }).formatToParts(instant).reduce((out, part) => ((out[part.type] = part.value), out), {});
+    return `${parts.year}-${parts.month}-${parts.day}`;
+  }
+
   function isCurrentEvent(item, today) {
     if (!identity(item) || !text(item.title)) return false;
     const start = isoDate(item.date);
@@ -25,7 +34,7 @@
 
   function selectEvents(items, options) {
     const opts = options || {};
-    const today = isoDate(opts.today) || new Date().toISOString().slice(0, 10);
+    const today = isoDate(opts.today) || localDate(opts.now, opts.timeZone);
     const limit = Number.isInteger(opts.limit) ? opts.limit : 6;
     const seen = new Set();
     return (Array.isArray(items) ? items : [])
@@ -37,6 +46,14 @@
       })
       .sort((a, b) => baseScore(b) - baseScore(a) || text(a.date).localeCompare(text(b.date)) || identity(a).localeCompare(identity(b)))
       .slice(0, limit);
+  }
+
+  function selectTodayEvents(items, options) {
+    const opts = options || {};
+    const today = isoDate(opts.today) || localDate(opts.now, opts.timeZone);
+    return selectEvents(items, { ...opts, today, limit: Number.MAX_SAFE_INTEGER })
+      .filter((item) => text(item.date) <= today && (isoDate(item.endDate || item.end_date) || text(item.date)) >= today)
+      .slice(0, Number.isInteger(opts.limit) ? opts.limit : 3);
   }
 
   function selectActivities(items, options) {
@@ -53,5 +70,5 @@
       .slice(0, limit);
   }
 
-  return { identity, isCurrentEvent, baseScore, selectEvents, selectActivities };
+  return { identity, localDate, isCurrentEvent, baseScore, selectEvents, selectTodayEvents, selectActivities };
 });

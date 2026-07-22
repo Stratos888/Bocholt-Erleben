@@ -28,7 +28,7 @@ from typing import Dict, List, Tuple, Optional
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key, resolve_event_visual_key, should_prefer_inferred_event_visual_key
 from event_visual_motifs import infer_event_visual_motif, normalize_event_visual_motif
 from event_description_quality import apply_description_override, load_description_overrides
-from event_public_contract import PUBLIC_FIELDS, normalize_public_event
+from event_public_contract import PUBLIC_FIELDS, normalize_public_event, schema_eligible
 
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "events.tsv"
@@ -517,6 +517,7 @@ def main() -> None:
                 item[key] = value
         if e.public.get("ticket_offers"):
             item["ticket_offers"] = e.public["ticket_offers"]
+        item["schema_eligible"] = schema_eligible(e.public)
         if e.description:
             item["description"] = e.description
         if e.visual_key:

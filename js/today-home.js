@@ -958,6 +958,12 @@
   function isTodayEventCandidate(item, now) {
     if (item?.type !== "event") return false;
 
+    if (window.NeutralSelection) {
+      return window.NeutralSelection.selectTodayEvents([item], {
+        now: now || new Date(), timeZone: "Europe/Berlin", limit: 1
+      }).length === 1;
+    }
+
     const today = startOfDay(now || new Date());
     const start = parseLocalDate(item.date);
     const end = parseLocalDate(item.endDate || item.date) || start;

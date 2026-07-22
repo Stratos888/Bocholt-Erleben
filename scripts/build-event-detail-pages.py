@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
-from event_public_contract import build_offer_schema, normalize_public_event
+from event_public_contract import build_offer_schema, normalize_public_event, public_http_url, schema_eligible
 
 ROOT = Path(__file__).resolve().parents[1]
 EVENTS_JSON = ROOT / "data" / "events.json"
@@ -453,12 +453,16 @@ def json_ld(event: DetailEvent) -> str:
     offers = build_offer_schema(event.public)
     if offers:
         payload["offers"] = offers[0] if len(offers) == 1 else offers
-    if event.public.get("organizer_name"):
-        payload["organizer"] = {"@type": "Organization", "name": event.public["organizer_name"]}
-        if event.public.get("organizer_url"): payload["organizer"]["url"] = event.public["organizer_url"]
-    if event.public.get("performer_name"):
-        payload["performer"] = {"@type": "PerformingGroup", "name": event.public["performer_name"]}
-        if event.public.get("performer_url"): payload["performer"]["url"] = event.public["performer_url"]
+    organizer_type = normalize_text(event.public.get("organizer_type"))
+    if event.public.get("organizer_name") and organizer_type in {"Organization", "Person"}:
+        payload["organizer"] = {"@type": organizer_type, "name": event.public["organizer_name"]}
+        organizer_url = public_http_url(event.public.get("organizer_url"))
+        if organizer_url: payload["organizer"]["url"] = organizer_url
+    performer_type = normalize_text(event.public.get("performer_type"))
+    if event.public.get("performer_name") and performer_type in {"Person", "PerformingGroup", "MusicGroup"}:
+        payload["performer"] = {"@type": performer_type, "name": event.public["performer_name"]}
+        performer_url = public_http_url(event.public.get("performer_url"))
+        if performer_url: payload["performer"]["url"] = performer_url
     return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
@@ -504,15 +508,20 @@ def render_page(event: DetailEvent) -> str:
 
     admission_html = ""
     admission_status = normalize_text(event.public.get("admission_status"))
-    ticket_url = normalize_http_url(event.public.get("ticket_url"))
-    price = normalize_text(event.public.get("price"))
-    currency = normalize_text(event.public.get("price_currency"))
-    if admission_status == "free":
-        admission_html = '<p class="event-admission" data-admission-status="free"><strong>Eintritt:</strong> kostenlos</p>'
+    schema_offers = build_offer_schema(event.public)
+    if admission_status == "paid" and schema_offers:
+        rows = []
+        for offer in schema_offers:
+            extras = []
+            if offer.get("availability"): extras.append(offer["availability"].rsplit("/", 1)[-1])
+            if offer.get("validFrom"): extras.append(f"gültig ab {offer['validFrom']}")
+            extra = f" · {' · '.join(extras)}" if extras else ""
+            rows.append(f'<li>{escape(offer["price"])} {escape(offer["priceCurrency"])}{extra} <a href="{escape(offer["url"])}" target="_blank" rel="noopener">Tickets</a></li>')
+        admission_html = f'<section class="event-admission" data-admission-status="paid"><strong>Eintritt und Tickets:</strong><ul>{"".join(rows)}</ul></section>'
+    elif admission_status == "free" and schema_offers:
+        admission_html = '<p class="event-admission" data-admission-status="free"><strong>Eintritt:</strong> kostenlos · 0 EUR</p>'
     elif admission_status == "paid":
-        price_label = f"{escape(price)} {escape(currency)}" if price and currency else "kostenpflichtig; Preis siehe Ticketanbieter"
-        ticket_link = f' <a href="{escape(ticket_url)}" target="_blank" rel="noopener">Tickets</a>' if ticket_url else ""
-        admission_html = f'<p class="event-admission" data-admission-status="paid"><strong>Eintritt:</strong> {price_label}{ticket_link}</p>'
+        admission_html = '<p class="event-admission" data-admission-status="paid"><strong>Eintritt:</strong> kostenpflichtig; keine verifizierten Ticketdaten vorhanden</p>'
 
     location_meta_html = ""
     if maps_url and not event.is_past:
@@ -584,6 +593,10 @@ def render_page(event: DetailEvent) -> str:
         </div>
     """
 
+    schema_html = ""
+    if schema_eligible(event.public):
+        schema_html = f'<script type="application/ld+json">\n{json_ld(event)}\n</script>'
+
     return f"""<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -610,9 +623,7 @@ def render_page(event: DetailEvent) -> str:
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="/css/style.css?v={STYLE_VERSION}">
 <link rel="stylesheet" href="/css/pages.css?v={DETAIL_PAGE_CSS_VERSION}">
-<script type="application/ld+json">
-{json_ld(event)}
-</script>
+{schema_html}
 </head>
 <body class="page-route-events event-detail-page">
 <header class="app-header">
