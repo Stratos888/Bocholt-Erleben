@@ -6,54 +6,50 @@ Stand: 2026-07-22
 
 **Keiner.**
 
+## Zuletzt abgeschlossen
+
 Der Produkt-Workpack **SEO Recovery – Search Intent und statische Renderingbasis** ist technisch, fachlich und im Livebetrieb abgeschlossen.
 
-Kanonischer Abschlussnachweis:
-
-- finaler Main-SHA: `5490b0fe7416d39e675796a9759b1ef5fef20b5f`;
-- Main-PR-Gate #221: grün;
-- normaler Main-Deploy: grün;
-- `main` und `staging` besitzen denselben Dateiinhalt;
-- Live-Seitenquelltext der Startseite enthält `data-static-event-context` genau einmal;
-- Live-Seitenquelltext enthält `Alle Events ansehen` genau einmal;
-- Live-Seitenquelltext enthält `Aktivitäten entdecken` genau einmal;
-- keine zusätzlichen Hero-Zeilen oder visuelle CTA-Regression.
-
-Der ausführliche Abschluss steht in:
+Kanonischer Abschluss:
 
 - `docs/workpacks/completed/SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md`
 
-## Erreichtes Produktziel
-
-Umgesetzt und belegt sind:
+Belegt sind insbesondere:
 
 - eindeutige Intentrollen für `/`, `/events/` und `/aktivitaeten/`;
-- nicht leerer statischer Inhaltskern aus den kanonischen Deploydaten;
-- gemeinsame deterministische Grundauswahl für Build und Browser;
-- Progressive Enhancement ohne zweite Rankingmatrix und ohne doppelten Feed;
-- Event-JSON-LD ausschließlich auf geeigneten eindeutigen Detailseiten;
-- wahrheitsgetreuer Event-/Offer-Vertrag ohne erfundene Preise, Verfügbarkeiten oder Ticket-URLs;
-- kostenlose Offers mit numerischem `0` und `EUR`;
-- kostenpflichtige Offers nur bei belegtem Preis, Währung und Ticket-URL;
-- unbekannte Eintrittslage als indexierbare HTML-Detailseite ohne synthetisches Event-Markup;
-- Robots-, Sitemap-, Canonical-, No-JS-, Fixture- und Schema-Contracts im zentralen `PR Gate`.
+- echter statischer Inhaltskern und Progressive Enhancement;
+- gemeinsame deterministische Build-/Browserauswahl;
+- Event-JSON-LD ausschließlich auf geeigneten Detailseiten;
+- wahrheitsgetreuer Event-/Offer-Vertrag;
+- Staging-E3 und Live-E6;
+- keine zusätzlichen Hero-Zeilen oder visuelle CTA-Regression.
 
-## Bewertung des Werkzeugsteuerungs-Piloten
+Die 14-/28-Tage-Rankingmessung bleibt eine zeitversetzte Betriebsaufgabe und öffnet den Workpack nicht erneut.
 
-Der Pilot war **fachlich brauchbar, aber nicht vollständig erfolgreich**.
+## Nächster vorbereiteter Workpack
 
-Automatische Zielableitung, Repositoryzugriff, Werkzeugaufteilung und PR-Gates funktionierten. Nicht erfüllt wurden die Effizienzkriterien „keine Grundsatzkorrektur nach Umsetzungsbeginn“ und „keine reale Try-and-Error-Schleife nach dem Staging-Merge“. Die zusätzlichen Hero-Links mussten nach mehreren visuellen Korrekturrunden vollständig zurückgebaut werden; die letzte No-JS-Linklücke wurde erst in der Abschlussprüfung entdeckt.
+**SEO Structured Data – Search-Console-Warnungen**
 
-Daraus folgt keine neue allgemeine Prozessoptimierungsrunde. Die konkreten Lücken sind durch Renderer-Fixturetests, Offer-/Schema-Contracts und die strengere visuelle Abnahme abgesichert.
+Kanonische Queue-Datei:
 
-## Zeitversetzte Nacharbeiten
+- `docs/workpacks/queued/SEO-STRUCTURED-DATA-search-console-warnings-2026-07-22.md`
 
-Diese Punkte sind kein offener Implementierungs-Workpack:
+Belegter Auslöser ist die Search-Console-Liste vom 2026-07-22 mit Warnungen zu `performer`, `organizer`, `offers`, `price`, `priceCurrency` und `validFrom`. Mindestens eine konkret angezeigte Beispiel-URL ist:
 
-- in Google Search Console die Validierung des Befunds `Feld "offers" fehlt` starten und beobachten;
-- Suchwirkung nach mindestens 14 und 28 Tagen anhand Impressionen, Klicks, CTR und Position bewerten;
-- ohne konkreten neuen Befund keine weitere SEO-Strukturänderung durchführen.
+- `https://bocholt-erleben.de/events/2-bocholter-vereinsmesse-in-den-shopping-arkaden-2026-09-27/`
+
+Der Folge-Workpack bleibt eigenständig und öffnet den abgeschlossenen SEO-Recovery-Workpack nicht erneut.
+
+## Aktuelle Grenze
+
+Der vorbereitete Workpack ist **noch nicht aktiv**. Bis zur ausdrücklichen Aktivierung gelten:
+
+- keine Repository- oder Eventdatenänderung;
+- keine pauschale Validierung aller Search-Console-Warnungen;
+- keine erfundenen Organizer-, Performer-, Preis-, Währungs-, `validFrom`-, Availability- oder Ticketwerte;
+- keine Änderung an Startseite, statischem Rendering, Auswahl oder allgemeiner UI;
+- der Startpartner-Wachstumspilot bleibt der danach mögliche Produkt-Workpack.
 
 ## Genau nächster Schritt
 
-In Google Search Console die Validierung des Befunds `Feld "offers" fehlt` starten.
+Bei späterer Aktivierung einen neuen read-only Gate-A-Chat starten und zunächst den vollständigen Search-Console-Export aller betroffenen URLs gegen aktuelles Live-JSON-LD, sichtbaren Seiteninhalt und kanonische Quelldaten stellen.

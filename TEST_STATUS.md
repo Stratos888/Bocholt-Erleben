@@ -33,7 +33,8 @@ Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Histor
 | Event-Schema und Detailseiten | E2 | Event-JSON-LD nur auf geeigneten eindeutigen Detailseiten; mehrere Ticketarten sichtbar und schema-deckungsgleich; unbekannte Eintrittslage bleibt indexierbare HTML-Seite ohne synthetisches Event-Markup |
 | Sammelseiten-Schema | E2 | `/events/` und andere Sammelseiten geben keine einzelnen Event-Entitäten als Ersatz für Detailseiten aus |
 | Robots, Sitemap und Canonical | E2/E3 | umgebungsabhängige Robots- und Sitemaptemplates, Canonical-Contracts und Ergänzung generierter Eventdetailseiten sind im Deploypfad abgesichert |
-| Search-Console-Offervalidierung | ausstehend | Validierung für `Feld "offers" fehlt` nach dem Live-Abschluss starten und zeitversetzt beobachten |
+| Search-Console-Structured-Data-Baseline | externer Befund | am 2026-07-22 sichtbar: `performer` 2, `organizer` 2, `priceCurrency` 1, `validFrom` 1, `price` 1 und `offers` 1; bekannte Beispiel-URL ist die 2. Bocholter Vereinsmesse; vollständige URL-/Live-/Quellenauflösung als eigener Queue-Workpack eingeplant |
+| Search-Console-Validierungen | nicht gestartet | keine pauschale Validierung vor URL-genauer Klassifizierung als historisch, bewusst akzeptiert, Datenlücke oder technischer Fehler |
 | SEO-Wirkungsmessung | ausstehend | erste Tendenz nach mindestens 14 Tagen, führende Bewertung nach 28 Tagen; Impressionen, Klicks, CTR und Position getrennt bewerten |
 | Control-Center-Writeback | E4 | Success, Replay, kontrollierter Fehler, Resume und Cleanup synthetisch belegt |
 | Live-Unverändertheit beim E4 | E4 | Live-Sheet und Live-Feed blieben unverändert |
@@ -44,7 +45,9 @@ Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Histor
 
 ## SEO-Abschlussgrenze
 
-Der Produkt-Workpack ist mit E1, E2, Staging-E3 und Live-E6 abgeschlossen. Search-Console-Validierung und 14-/28-Tage-Messung bleiben zeitversetzte Nacharbeiten. Aus dem technischen Abschluss wird keine bereits eingetretene Rankingverbesserung abgeleitet.
+Der Produkt-Workpack **SEO Recovery – Search Intent und statische Renderingbasis** ist mit E1, E2, Staging-E3 und Live-E6 abgeschlossen. Die neue Search-Console-Warnungsliste ist ein eigenständiger, noch nicht aktiver Folge-Workpack und öffnet den abgeschlossenen Workpack nicht erneut.
+
+Die 14-/28-Tage-Rankingmessung bleibt eine zeitversetzte Betriebsaufgabe. Aus dem technischen Abschluss wird keine bereits eingetretene Rankingverbesserung abgeleitet.
 
 Der parallel geprüfte Werkzeugsteuerungs-Pilot war nur teilweise erfolgreich: Zielableitung, Werkzeugaufteilung und PR-Gates funktionierten, die Kriterien „keine Grundsatzkorrektur“ und „keine reale Try-and-Error-Schleife“ wurden wegen der visuellen Linkkorrekturen nicht erreicht.
 
