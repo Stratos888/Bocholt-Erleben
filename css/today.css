@@ -1425,3 +1425,36 @@ body.page-route-today footer {
   }
 }
 /* === END BLOCK: TODAY_DESKTOP_PREMIUM_SHELL_CONTRACT_V3 === */
+
+/* Kompakte, crawlbare Direktnavigation im Today-Hero. */
+body.page-route-today .today-intent-nav {
+  position: relative;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.8rem;
+  max-width: 100%;
+  min-width: 0;
+  margin-top: 0.15rem;
+}
+
+body.page-route-today .today-intent-nav__link {
+  min-width: 0;
+  color: var(--cmp-inline-link-color);
+  font-size: 0.88rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+body.page-route-today .today-intent-nav__link:hover {
+  color: var(--cmp-inline-link-color-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+body.page-route-today .today-intent-nav__link:focus-visible {
+  outline: 3px solid var(--cmp-link-focus-ring);
+  outline-offset: 2px;
+}
