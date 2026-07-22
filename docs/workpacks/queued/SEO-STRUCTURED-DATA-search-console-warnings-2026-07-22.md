@@ -14,6 +14,32 @@ nicht erneut.
 
 Der vorherige Workpack hat Search-Intent, statisches Rendering, Event-Detailseiten und den wahrheitsgetreuen Offer-Vertrag technisch und im Livebetrieb abgeschlossen. Der neue Workpack behandelt ausschließlich die danach in Google Search Console sichtbar gebliebenen Warnungen zu strukturierten Eventdaten.
 
+Diese Datei enthält den dauerhaften Scope, Wahrheitsvertrag und die Definition of Done. Operativer Status, Entscheidungen und Evidence stehen ausschließlich in GitHub-Issue **#165**.
+
+## Erster Test des vereinfachten Arbeitsmodells
+
+Für diesen Workpack gilt verbindlich:
+
+```text
+Chat führt
+-> Gate A vollständig read-only
+-> Work nur bei mindestens zwei belegten unabhängigen Liefersträngen
+-> falls Patch nötig: ein Codex-Task, ein Feature-Branch, ein PR nach staging
+-> ein Staging-Deploy und ein gezielter Smoke
+-> ein Release-PR nach main und ein Live-Smoke
+-> operativer Status ausschließlich in Issue #165
+```
+
+Zusätzlich:
+
+- ein großer einzelner Repository-Patch aktiviert Work nicht;
+- Codex ist der einzige Repository-Schreiber;
+- Korrekturen vor dem Staging-Merge bleiben im selben Task, Branch und PR;
+- nach dem Staging-Merge ist höchstens eine klar begründete Korrektur zulässig;
+- der Nutzer wird nur für private Search-Console-Evidence oder echte fachliche Entscheidungen benötigt;
+- Repository-Dokumentation wird während des Workpacks nicht fortlaufend geändert;
+- dauerhaftes Wissensdelta wird genau einmal am Ende dokumentiert.
+
 ## Belegter Auslöser
 
 Google Search Console zeigte am 2026-07-22 unter **Verbesserungen -> Ereignisse** folgende nicht kritische Warnungen:
@@ -72,7 +98,7 @@ Insbesondere gilt:
 
 ## Gate A – ausschließlich read-only
 
-Vor jeder Repository- oder Datenänderung vollständig dokumentieren:
+Vor jeder Repository- oder Datenänderung vollständig im Issue #165 dokumentieren:
 
 1. aktuellen `staging`-SHA, `main`-SHA und offene Pull Requests;
 2. vollständigen Search-Console-Export aller sechs Warnungsklassen;
@@ -107,6 +133,22 @@ Bis Gate A geschlossen ist:
 | Event-JSON-LD ist wegen unvollständiger Kerndaten nicht vertretbar | Event-Markup für diese Seite fail-closed unterdrücken |
 | sichtbare Seite und JSON-LD widersprechen sich | technischer Fehler; vor Google-Validierung korrigieren |
 
+## Abnahmevertrag vor einem Codex-Auftrag
+
+Gate A muss vor jedem Write einen geschlossenen Abnahmevertrag liefern:
+
+1. exakter fachlicher Fehler;
+2. Nicht-Ziele und gesperrter Scope;
+3. zulässige sichtbare Änderungen;
+4. unveränderte Seiten und Datenpfade;
+5. owning Dateien und Komponenten;
+6. konkrete Positiv- und Negativtests;
+7. Evidence aus dem tatsächlichen Build- und Live-Pfad;
+8. Definition of Done;
+9. Rollback.
+
+Ohne geschlossenen Vertrag bleibt der Workpack read-only. Falls kein technischer Fehler belegt ist, gibt es keinen Codex-Auftrag.
+
 ## Voraussichtliche Owner
 
 Nur nach Gate-A-Befund und nur soweit tatsächlich betroffen:
@@ -139,6 +181,7 @@ Nur nach Gate-A-Befund und nur soweit tatsächlich betroffen:
 - aktuelles Live-JSON-LD je betroffener URL;
 - Vergleich mit sichtbarem Seiteninhalt und kanonischer Quelle;
 - Klassifizierung jeder Warnung;
+- geschlossener Abnahmevertrag oder belegte Entscheidung `kein Patch`;
 - klarer Diff und Rollback für jeden tatsächlich erforderlichen Fix.
 
 ### E2
@@ -150,6 +193,7 @@ Falls ein Patch nötig ist:
 - kostenlose und kostenpflichtige Offers weiterhin quellentreu;
 - mehrere Ticketarten weiterhin deckungsgleich;
 - unbekannte Felder bleiben fail-closed;
+- tatsächlicher Detailseiten-Output wird geprüft, nicht nur Templates;
 - vollständiges `PR Gate` grün.
 
 ### E3
@@ -159,7 +203,8 @@ Auf Staging nur für geänderte Fälle:
 - tatsächliches JSON-LD entspricht den belegten Quelldaten;
 - sichtbare Seite und Schema stimmen überein;
 - keine Regression anderer Eventdetailseiten;
-- normaler Deploy-, HTTP- und Browser-Smoke grün.
+- normaler Deploy-, HTTP- und Browser-Smoke grün;
+- nur ein gezielter Staging-Smoke außerhalb der regulären Deployprüfung.
 
 ### E6
 
@@ -168,7 +213,7 @@ Nach regulärem Release:
 - read-only Live-URL-Test der korrigierten beziehungsweise bewusst unveränderten Beispiele;
 - nur tatsächlich behobene oder historisch veraltete Search-Console-Befunde zur Überprüfung einreichen;
 - Validierungsstatus zeitversetzt beobachten;
-- optionale, fachlich unbehebbare Warnungen ausdrücklich dokumentieren.
+- optionale, fachlich unbehebbare Warnungen ausdrücklich im Issue dokumentieren.
 
 ## Definition of Done
 
@@ -179,8 +224,10 @@ Nach regulärem Release:
 - notwendige Korrekturen sind über E1, E2, E3 und E6 belegt;
 - nur sachlich geeignete Search-Console-Validierungen wurden gestartet;
 - verbleibende Warnungen sind begründet und kein stiller Qualitätsrest;
+- Issue #165 enthält finalen Status, Entscheidungen, Evidence und nächsten Zustand;
 - der abgeschlossene SEO-Recovery-Workpack bleibt geschlossen;
-- die 14-/28-Tage-Rankingmessung bleibt getrennt.
+- die 14-/28-Tage-Rankingmessung bleibt getrennt;
+- dauerhaftes Wissensdelta wurde höchstens einmal am Ende dokumentiert.
 
 ## Rollback
 
@@ -194,8 +241,15 @@ integriert und können über den jeweiligen Merge-Commit revertiert werden. Sear
 
 ## Aktivierung
 
-Dieser Workpack wird erst aktiv, wenn `docs/workpacks/active/CURRENT_WORKPACK.md` ausdrücklich auf ihn gesetzt wird.
+Der Workpack wird ohne Repository-Statuscommit aktiviert:
+
+1. Nutzer startet den Workpack ausdrücklich im neuen Chat;
+2. Issue #165 wird von `QUEUED` auf `ACTIVE` gesetzt;
+3. Gate A läuft ausschließlich read-only;
+4. das Issue bleibt der einzige operative Status- und Evidence-Owner.
+
+Work wird nur nach einem belegten Gate-A-Befund aktiviert, der mindestens zwei unabhängige Lieferstränge oder mehrere getrennte Codex-Aufträge erfordert.
 
 ## Genau nächster Schritt bei Aktivierung
 
-Einen neuen read-only Gate-A-Chat starten, den aktuellen Repositoryzustand prüfen und anschließend den vollständigen Search-Console-Export mit allen betroffenen URLs gegen das aktuelle Live-JSON-LD und die kanonischen Quelldaten stellen.
+Im neuen Chat `AI_ENTRYPOINT.md`, `CURRENT_WORKPACK.md`, Issue #165 und diese Datei lesen. Danach den aktuellen Repositoryzustand prüfen und den vollständigen Search-Console-Export mit allen betroffenen URLs gegen Live-JSON-LD, sichtbaren Seiteninhalt und kanonische Quelldaten stellen.
