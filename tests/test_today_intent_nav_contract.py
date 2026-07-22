@@ -30,6 +30,19 @@ class IntentNavParser(HTMLParser):
             self.nav_depth -= 1
 
 
+def rule_body(css, selector):
+    match = re.search(rf"{re.escape(selector)}\s*\{{(?P<body>[^}}]*)\}}", css, re.S)
+    assert match, f"missing CSS rule for {selector}"
+    return match.group("body")
+
+
+def declarations(rule):
+    return {
+        name.strip(): value.strip()
+        for name, value in re.findall(r"([\w-]+)\s*:\s*([^;]+);", rule)
+    }
+
+
 html = (ROOT / "index.html").read_text(encoding="utf-8")
 css = (ROOT / "css/today.css").read_text(encoding="utf-8")
 parser = IntentNavParser()
@@ -41,21 +54,30 @@ assert parser.links == [
     ("/aktivitaeten/", {"today-intent-nav__link"}),
 ], "intent links or targets changed"
 
-nav_rule = re.search(r"\.today-intent-nav\s*\{(?P<body>[^}]*)\}", css, re.S)
-link_rule = re.search(r"\.today-intent-nav__link\s*\{(?P<body>[^}]*)\}", css, re.S)
-focus_rule = re.search(r"\.today-intent-nav__link:focus-visible\s*\{(?P<body>[^}]*)\}", css, re.S)
-assert nav_rule and link_rule and focus_rule, "targeted nav styles are incomplete"
+nav = declarations(rule_body(css, ".today-intent-nav"))
+link_rule = rule_body(css, ".today-intent-nav__link")
+link = declarations(link_rule)
+focus = declarations(rule_body(css, ".today-intent-nav__link:focus-visible"))
 
-nav_css = nav_rule.group("body")
-link_css = link_rule.group("body")
-assert "flex-direction: column" in nav_css and "width: 100%" in nav_css
-assert "min-width: 0" in nav_css and "max-width:" in nav_css, "327px overflow guard missing"
-assert "min-width: 0" in link_css and "overflow-wrap: anywhere" in link_css
-assert "min-height: 44px" in link_css, "touch target is too small"
-assert "color: var(" in link_css and "text-decoration: none" in link_css
-assert "outline:" in focus_rule.group("body"), "visible keyboard focus missing"
+assert nav.get("display") == "flex" and "wrap" in nav.get("flex-flow", ""), "nav must wrap compactly"
+assert nav.get("max-width") == "100%" and nav.get("min-width") == "0", "327px overflow guard missing"
+assert link.get("min-width") == "0" and link.get("overflow-wrap") == "anywhere", "long links can overflow"
+assert link.get("color", "").startswith("var("), "link must use the project link color"
+assert link.get("text-decoration") == "none", "browser-default underline must be removed"
+assert focus.get("outline", "none") != "none", "visible keyboard focus missing"
 
-hidden_patterns = ("display: none", "visibility: hidden", "opacity: 0", "position: absolute")
-assert not any(pattern in nav_css or pattern in link_css for pattern in hidden_patterns), "intent links are hidden"
+cta_properties = ("width", "min-height", "padding", "border", "background", "box-shadow")
+assert not any(prop in link for prop in cta_properties), "links must not become full-width CTA surfaces"
+assert not any(prop in nav for prop in ("background", "border", "box-shadow")), "nav must remain visually quiet"
+
+hidden_values = {
+    "display": "none",
+    "visibility": "hidden",
+    "opacity": "0",
+    "position": "absolute",
+}
+assert not any(nav.get(prop) == value or link.get(prop) == value for prop, value in hidden_values.items()), (
+    "intent links are hidden"
+)
 
 print("Today intent navigation contract: OK")

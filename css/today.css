@@ -1430,51 +1430,31 @@ body.page-route-today footer {
 body.page-route-today .today-intent-nav {
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.4rem;
-  width: 100%;
-  max-width: 27.5rem;
+  flex-flow: row wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.8rem;
+  max-width: 100%;
   min-width: 0;
-  margin-top: 0.25rem;
+  margin-top: 0.15rem;
 }
 
 body.page-route-today .today-intent-nav__link {
-  display: inline-flex;
-  align-items: center;
   min-width: 0;
-  min-height: 44px;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid var(--home-action-border);
-  border-radius: var(--ui-radius-sm);
-  background: linear-gradient(180deg, var(--home-action-bg-start), var(--home-action-bg-end));
-  color: var(--cmp-link-color);
-  box-shadow: var(--home-action-shadow);
+  color: var(--cmp-inline-link-color);
   font-size: 0.88rem;
-  font-weight: 720;
-  line-height: 1.25;
+  font-weight: 650;
+  line-height: 1.35;
   text-decoration: none;
   overflow-wrap: anywhere;
 }
 
 body.page-route-today .today-intent-nav__link:hover {
   color: var(--cmp-inline-link-color-hover);
-  border-color: var(--ui-border-strong);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
 }
 
 body.page-route-today .today-intent-nav__link:focus-visible {
   outline: 3px solid var(--cmp-link-focus-ring);
   outline-offset: 2px;
-}
-
-@media (min-width: 480px) {
-  body.page-route-today .today-intent-nav {
-    flex-flow: row wrap;
-    align-items: center;
-    width: fit-content;
-  }
-
-  body.page-route-today .today-intent-nav__link {
-    flex: 0 1 auto;
-  }
 }
