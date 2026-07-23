@@ -63,6 +63,7 @@ validate_frontend() {
   done
   node tests/control_center_frontend_contract_test.mjs
   node tests/control_center_browser_secret_contract_test.mjs
+  python3 tests/test_responsive_grid_cache_contract.py
 }
 
 validate_repository() {
