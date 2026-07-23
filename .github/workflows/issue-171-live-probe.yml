@@ -1,0 +1,45 @@
+name: Probe issue 171 live deployment
+
+on:
+  push:
+    branches:
+      - fix/issue-171-responsive-grid-cache
+    paths:
+      - .github/workflows/issue-171-live-probe.yml
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout evidence branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/issue-171-responsive-grid-cache
+
+      - name: Probe live build and CSS
+        shell: bash
+        run: |
+          set -u
+          mkdir -p artifacts
+          build="$(curl --silent --show-error --max-time 30 'https://bocholt-erleben.de/meta/build.txt?issue171-probe=1' | tr -d '\r\n' || true)"
+          css="$(curl --silent --show-error --max-time 30 'https://bocholt-erleben.de/css/home.css?issue171-probe=1' || true)"
+          {
+            echo "checked_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "build=${build:-unavailable}"
+            if grep -Fq '@media (min-width: 1100px)' <<<"$css"; then echo 'new_two_column_contract=yes'; else echo 'new_two_column_contract=no'; fi
+            if grep -Fq '@media (min-width: 900px) and (max-width: 1279.98px)' <<<"$css"; then echo 'old_single_column_contract=yes'; else echo 'old_single_column_contract=no'; fi
+            echo "css_bytes=${#css}"
+          } > artifacts/issue-171-live-probe.txt
+
+      - name: Commit probe evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/issue-171-live-probe.txt
+          git commit -m "test: record issue 171 live deployment probe"
+          git push origin HEAD:fix/issue-171-responsive-grid-cache
