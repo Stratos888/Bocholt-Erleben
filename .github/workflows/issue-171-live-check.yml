@@ -20,21 +20,23 @@ jobs:
           ref: fix/issue-171-responsive-grid-cache
           fetch-depth: 0
 
-      - name: Wait for main build on live
+      - name: Wait for responsive contract on live
         shell: bash
         run: |
           set -euo pipefail
-          expected='23b56b8691d0'
+          old_build='eb5e0f87199d'
           for attempt in $(seq 1 36); do
             current="$(curl --fail --silent --show-error --max-time 20 "https://bocholt-erleben.de/meta/build.txt?issue171=${attempt}" | tr -d '\r\n' || true)"
-            if [ "$current" = "$expected" ]; then
-              echo "Live serves expected build $current."
+            css="$(curl --fail --silent --show-error --max-time 20 "https://bocholt-erleben.de/css/home.css?issue171=${attempt}" || true)"
+            if [ -n "$current" ] && [ "$current" != "$old_build" ] && grep -Fq '@media (min-width: 1100px)' <<<"$css" && ! grep -Fq '@media (min-width: 900px) and (max-width: 1279.98px)' <<<"$css"; then
+              printf '%s\n' "$current" > /tmp/live-build.txt
+              echo "Live serves responsive contract with build $current."
               exit 0
             fi
-            echo "Attempt $attempt/36: live build is '${current:-unavailable}', expected '$expected'."
+            echo "Attempt $attempt/36: live build is '${current:-unavailable}', responsive contract not complete yet."
             sleep 10
           done
-          echo "Live did not serve the expected main build within six minutes." >&2
+          echo "Live did not serve the responsive contract within six minutes." >&2
           exit 1
 
       - name: Install browser runtime
@@ -49,21 +51,24 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts
+          export LIVE_BUILD="$(cat /tmp/live-build.txt)"
           node --input-type=module <<'JS'
           import fs from 'node:fs/promises';
           import { chromium } from 'playwright';
 
           const baseUrl = 'https://bocholt-erleben.de';
-          const expectedBuild = '23b56b8691d0';
+          const expectedBuild = String(process.env.LIVE_BUILD || '').trim();
           const widths = [1099, 1100, 1366];
+          if (!expectedBuild) throw new Error('LIVE_BUILD is empty.');
           const browser = await chromium.launch({ headless: true });
           const results = [];
 
           async function measure(page, width, phase) {
             const consoleErrors = [];
-            page.on('console', (message) => {
+            const listener = (message) => {
               if (message.type() === 'error') consoleErrors.push(message.text());
-            });
+            };
+            page.on('console', listener);
             const response = await page.goto(`${baseUrl}/events/?issue171=${phase}-${Date.now()}-${width}`, {
               waitUntil: 'domcontentloaded',
               timeout: 30000,
@@ -107,9 +112,10 @@ jobs:
               throw new Error(`${phase} ${width}: horizontal overflow ${metrics.scrollWidth}/${metrics.clientWidth}`);
             }
             if (!metrics.styleHref.includes(`v=${expectedBuild}`)) {
-              throw new Error(`${phase} ${width}: style.css does not carry live build ID: ${metrics.styleHref}`);
+              throw new Error(`${phase} ${width}: style.css does not carry live build ID ${expectedBuild}: ${metrics.styleHref}`);
             }
             results.push({ phase, width, expectedColumns, ...metrics, consoleErrors });
+            page.off('console', listener);
           }
 
           try {
@@ -132,13 +138,18 @@ jobs:
             const warmPage = await warmContext.newPage();
             await measure(warmPage, 1366, 'warm-install');
             await warmPage.evaluate(async () => {
-              if ('serviceWorker' in navigator) await navigator.serviceWorker.ready;
+              if (!('serviceWorker' in navigator)) throw new Error('Service worker API unavailable.');
+              await Promise.race([
+                navigator.serviceWorker.ready,
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Service worker readiness timeout')), 15000)),
+              ]);
             });
             await warmPage.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
             await warmPage.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
             await measure(warmPage, 1366, 'warm-controlled');
-            const controlled = results.at(-1)?.serviceWorkerController === true;
-            if (!controlled) throw new Error('Warm live context is not controlled by the production service worker.');
+            if (results.at(-1)?.serviceWorkerController !== true) {
+              throw new Error('Warm live context is not controlled by the production service worker.');
+            }
             await warmContext.close();
           } finally {
             await browser.close();
@@ -146,7 +157,7 @@ jobs:
 
           const buildResponse = await fetch(`${baseUrl}/meta/build.txt?issue171=${Date.now()}`, { cache: 'no-store' });
           const build = (await buildResponse.text()).trim();
-          if (build !== expectedBuild) throw new Error(`Unexpected live build ${build}`);
+          if (build !== expectedBuild) throw new Error(`Live build changed during smoke: ${expectedBuild} -> ${build}`);
 
           await fs.writeFile(
             'artifacts/issue-171-live-evidence.json',
