@@ -6,7 +6,7 @@ RUNNER="$ROOT/scripts/run_strato_sftp_phase.sh"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-mkdir -p "$TMP/payload"
+mkdir -p "$TMP/payload" "$TMP/control"
 printf 'payload\n' > "$TMP/payload/file.txt"
 printf 'rm -f "obsolete.txt"\n' > "$TMP/delete.lftp"
 
@@ -34,6 +34,8 @@ run_env=(
   "STRATO_FTP_PASSWORD=test-password"
   "DEPLOY_TARGET_DIR=target"
   "STRATO_SFTP_RETRY_BASE_SECONDS=0"
+  "STRATO_SFTP_MAX_PARALLEL=2"
+  "RUNNER_TEMP=$TMP/control"
   "LFTP_BIN=$FAKE_LFTP"
   "FAKE_LFTP_ARGS_DIR=$TMP"
 )
@@ -45,12 +47,12 @@ env \
   "STRATO_SFTP_PHASE_ATTEMPTS=4" \
   "FAKE_LFTP_COUNT_FILE=$TMP/count-success" \
   "FAKE_LFTP_FAIL_UNTIL=2" \
-  bash "$RUNNER" "$TMP/payload" 3 "$TMP/delete.lftp"
+  bash "$RUNNER" "$TMP/payload" 8 "$TMP/delete.lftp"
 
 [ "$(cat "$TMP/count-success")" = "3" ]
 grep -Fq 'sftp://sftp.example.invalid' "$TMP/args-3.txt"
-grep -Fq 'set sftp:connect-program "ssh -a -x -4"' "$TMP/stdin-3.txt"
-grep -Fq "mirror -R --parallel=3 --verbose $TMP/payload/ ." "$TMP/stdin-3.txt"
+grep -Fq "set sftp:connect-program \"ssh -a -x -4 -o ControlMaster=auto -o ControlPersist=600 -o ControlPath=$TMP/control/be-strato-sftp-%C\"" "$TMP/stdin-3.txt"
+grep -Fq "mirror -R --parallel=2 --verbose $TMP/payload/ ." "$TMP/stdin-3.txt"
 grep -Fq 'rm -f "obsolete.txt"' "$TMP/stdin-3.txt"
 
 # Persistent failures must stop exactly at the configured attempt budget.
@@ -73,6 +75,7 @@ if env \
   "STRATO_FTP_SERVER=sftp.example.invalid" \
   "STRATO_FTP_USERNAME=test-user" \
   "DEPLOY_TARGET_DIR=target" \
+  "RUNNER_TEMP=$TMP/control" \
   "LFTP_BIN=$FAKE_LFTP" \
   "FAKE_LFTP_ARGS_DIR=$TMP" \
   "FAKE_LFTP_COUNT_FILE=$TMP/count-preflight" \
@@ -82,4 +85,4 @@ if env \
 fi
 [ "$(cat "$TMP/count-preflight")" = "0" ]
 
-echo "STRATO SFTP phase retry contract: OK"
+echo "STRATO SFTP phase retry and reuse contract: OK"
