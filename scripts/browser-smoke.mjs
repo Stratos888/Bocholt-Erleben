@@ -343,28 +343,63 @@ async function checkRoute(page, baseUrl, route, timeoutMs) {
 
 async function checkEventCardNavigation(page, baseUrl, profileName, timeoutMs) {
   await gotoReady(page, baseUrl, '/events/', timeoutMs);
-  const card = page.locator('#event-cards .event-card[data-event-detail-url]').first();
+  const card = page.locator('#event-cards .event-card').filter({ hasText: 'Kinderzaubershow' }).first();
   await card.waitFor({ state: 'visible', timeout: timeoutMs });
 
-  const detailLink = card.locator('a.event-card-detail-link[href]').first();
-  await detailLink.waitFor({ state: 'visible', timeout: timeoutMs });
-  const target = await detailLink.getAttribute('href');
-  if (!target) throw new Error('Eventkarte besitzt keinen echten internen Detail-Link.');
+  if (profileName === 'desktop') {
+    const outboundLink = card.locator('a.event-card-primary-hitarea[href]').first();
+    await outboundLink.waitFor({ state: 'visible', timeout: timeoutMs });
+    const target = await outboundLink.getAttribute('href');
+    if (!target || !target.includes('yuki-magazin.de/veranstaltungen/du-wunderst-mich')) {
+      throw new Error('Zaubershowkarte besitzt nicht den belegten externen Direktlink.');
+    }
 
-  const expectedPath = new URL(target, baseUrl).pathname;
-  const title = card.locator('h3').first();
-  await title.click({ timeout: 7000 });
-  await page.waitForURL((url) => url.pathname === expectedPath, { timeout: timeoutMs });
-  await expectAnySelectorCount(page, ['main', 'article', '[data-event-detail-page]']);
+    const grid = card.locator('xpath=..');
+    const layout = await Promise.all([
+      grid.evaluate((element) => getComputedStyle(element).gridTemplateColumns),
+      grid.evaluate((element) => element.getBoundingClientRect().width),
+      card.evaluate((element) => element.getBoundingClientRect().width),
+    ]);
+    if (layout[0].split(' ').length !== 2 || layout[2] >= layout[1] * 0.75) {
+      throw new Error(`Desktop-Eventgrid ist nicht zweispaltig: columns=${layout[0]}, card=${layout[2]}, grid=${layout[1]}`);
+    }
 
-  await gotoReady(page, baseUrl, '/events/', timeoutMs);
-  const keyboardLink = page.locator('#event-cards .event-card a.event-card-detail-link[href]').first();
-  await keyboardLink.focus();
-  await page.keyboard.press('Enter');
-  await page.waitForURL((url) => url.pathname === expectedPath, { timeout: timeoutMs });
-  await expectAnySelectorCount(page, ['main', 'article', '[data-event-detail-page]']);
+    await page.route('https://yuki-magazin.de/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'text/html', body: '<main>Outbound test target</main>' })
+    );
+    await outboundLink.click({ timeout: 7000 });
+    await page.waitForURL(/yuki-magazin\.de\/veranstaltungen\/du-wunderst-mich/, { timeout: timeoutMs });
+    if (!page.url().includes('yuki-magazin.de/veranstaltungen/du-wunderst-mich')) {
+      throw new Error(`Desktop-Klick öffnet falsches Ziel: ${page.url()}`);
+    }
+
+    await gotoReady(page, baseUrl, '/events/', timeoutMs);
+    const keyboardLink = page.locator('#event-cards .event-card').filter({ hasText: 'Kinderzaubershow' })
+      .first().locator('a.event-card-primary-hitarea[href]').first();
+    await keyboardLink.focus();
+    await page.keyboard.press('Enter');
+    await page.waitForURL(/yuki-magazin\.de\/veranstaltungen\/du-wunderst-mich/, { timeout: timeoutMs });
+    if (!page.url().includes('yuki-magazin.de/veranstaltungen/du-wunderst-mich')) {
+      throw new Error(`Desktop-Tastatur öffnet falsches Ziel: ${page.url()}`);
+    }
+  } else {
+    if (await card.locator('a.event-card-primary-hitarea:visible').count()) {
+      throw new Error('Der Desktop-Direktlink darf die mobile Karte nicht überlagern.');
+    }
+
+    await card.locator('h3').click({ timeout: 7000 });
+    await expectVisible(page, '#event-detail-panel:not(.hidden)');
+
+    await page.locator('#event-detail-panel .detail-panel-close').click().catch(async () => {
+      await page.keyboard.press('Escape');
+    });
+    await card.focus();
+    await page.keyboard.press('Enter');
+    await expectVisible(page, '#event-detail-panel:not(.hidden)');
+  }
+
   await ensureNoFatal(page);
-  console.log(`ℹ️ ${profileName}: Karten- und Tastaturnavigation führen intern`);
+  console.log(`ℹ️ ${profileName}: Eventkarten-Navigationsvertrag erfüllt`);
 }
 
 async function checkBottomNavigation(page, baseUrl, timeoutMs) {
