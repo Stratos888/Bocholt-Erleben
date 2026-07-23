@@ -1,0 +1,43 @@
+name: Finalize deploy release coherence
+
+on:
+  push:
+    branches:
+      - fix/deploy-release-coherence
+    paths:
+      - .github/workflows/finalize-deploy-release-coherence.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/deploy-release-coherence
+          fetch-depth: 0
+
+      - name: Apply validated deploy patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/apply_deploy_release_coherence_patch.py
+          git diff --check
+
+      - name: Commit and publish serially
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/deploy-strato.yml
+          git commit -m "fix: publish coherent build and service-worker release"
+          for attempt in 1 2 3 4; do
+            if git pull --rebase origin fix/deploy-release-coherence && git push origin HEAD:fix/deploy-release-coherence; then
+              exit 0
+            fi
+            sleep 3
+          done
+          exit 1
