@@ -916,9 +916,6 @@ function createCard(event, visualUsage = null) {
     : null;
 
   const internalDetailUrl = resolveEventDetailUrl(event);
-  card.setAttribute("role", "link");
-  card.tabIndex = 0;
-  card.setAttribute("aria-label", `Eventdetails öffnen: ${event?.title || ""}`);
   if (internalDetailUrl) {
     card.dataset.eventDetailUrl = internalDetailUrl;
     card.dataset.desktopBehavior = "internal-detail";
@@ -926,6 +923,16 @@ function createCard(event, visualUsage = null) {
 
   const actions = document.createElement("div");
   actions.className = "event-card-actions";
+
+  if (internalDetailUrl) {
+    const detailLink = document.createElement("a");
+    detailLink.className = "event-card-action event-card-detail-link";
+    detailLink.href = internalDetailUrl;
+    detailLink.textContent = "Details";
+    detailLink.setAttribute("aria-label", `Eventdetails öffnen: ${event?.title || "Event"}`);
+    detailLink.addEventListener("click", (e) => e.stopPropagation());
+    actions.appendChild(detailLink);
+  }
 
   if (primaryUrl) {
     const primaryLink = document.createElement("a");
@@ -1055,39 +1062,24 @@ function createCard(event, visualUsage = null) {
 
   card.appendChild(body);
 
-  /* === BEGIN BLOCK: CANONICAL_INTERNAL_EVENT_NAVIGATION_V4 | Purpose: every card has a reliable internal target; mobile keeps the detail panel while desktop and keyboard use the canonical detail page === */
+  /* === BEGIN BLOCK: CANONICAL_INTERNAL_EVENT_NAVIGATION_V5 | Purpose: card activation uses the canonical internal detail page on every viewport; the real detail link preserves navigation without JavaScript === */
   const openCard = (e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
 
-    if (!isDesktopViewport() && window.DetailPanel?.show) {
-      window.DetailPanel.show({
-        ...event,
-        resolvedVisual: cardVisual
-      });
-      return;
-    }
-
     if (internalDetailUrl) {
       window.location.assign(internalDetailUrl);
     }
   };
-  /* === END BLOCK: CANONICAL_INTERNAL_EVENT_NAVIGATION_V4 === */
+  /* === END BLOCK: CANONICAL_INTERNAL_EVENT_NAVIGATION_V5 === */
 
   card.addEventListener("click", (e) => {
-    if (e.target.closest("[data-image-credit-access]")) {
-      e.stopPropagation();
+    if (e.target.closest("a, button, [data-image-credit-access]")) {
       return;
     }
 
-    openCard(e);
-  });
-
-  card.addEventListener("keydown", (e) => {
-    if (e.target.closest("[data-image-credit-access]")) return;
-    if (e.key !== "Enter" && e.key !== " ") return;
     openCard(e);
   });
 
