@@ -925,6 +925,23 @@ function createCard(event, visualUsage = null) {
   const actions = document.createElement("div");
   actions.className = "event-card-actions";
 
+  const desktopPrimaryLink = primaryUrl ? document.createElement("a") : null;
+  if (desktopPrimaryLink) {
+    desktopPrimaryLink.className = "event-card-primary-hitarea";
+    desktopPrimaryLink.href = primaryUrl;
+    desktopPrimaryLink.rel = "external";
+    desktopPrimaryLink.setAttribute("aria-label", `Zur Veranstaltung: ${event?.title || "Event"}`);
+    desktopPrimaryLink.addEventListener("click", () => {
+      if (
+        primaryOutboundPayload &&
+        window.BEAnalytics &&
+        typeof window.BEAnalytics.trackOutboundClick === "function"
+      ) {
+        window.BEAnalytics.trackOutboundClick(primaryOutboundPayload);
+      }
+    });
+  }
+
   if (primaryUrl) {
     const primaryLink = document.createElement("a");
     primaryLink.className = "event-card-action event-card-action--primary";
@@ -1013,6 +1030,7 @@ function createCard(event, visualUsage = null) {
   if (quietMeta.textContent) body.appendChild(quietMeta);
   if (actions.childNodes.length) body.appendChild(actions);
 
+  if (desktopPrimaryLink) card.appendChild(desktopPrimaryLink);
   card.appendChild(badge);
 
   if (cardVisual) {
@@ -1053,7 +1071,7 @@ function createCard(event, visualUsage = null) {
 
   card.appendChild(body);
 
-  /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 | Purpose: behebt den Syntaxfehler in openCard und erhält das gewünschte Verhalten bei Event-Cards: Desktop öffnet extern, Mobile nutzt das Detailpanel | Scope: ersetzt nur openCard innerhalb createCard === */
+  /* === BEGIN BLOCK: RESPONSIVE_EVENT_CARD_NAVIGATION_V6 | Purpose: desktop uses the source-backed outbound link while mobile keeps the established detail panel === */
   const openCard = (e) => {
     if (e) {
       e.preventDefault();
@@ -1079,11 +1097,10 @@ function createCard(event, visualUsage = null) {
       openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
     }
   };
-  /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 === */
+  /* === END BLOCK: RESPONSIVE_EVENT_CARD_NAVIGATION_V6 === */
 
   card.addEventListener("click", (e) => {
-    if (e.target.closest("[data-image-credit-access]")) {
-      e.stopPropagation();
+    if (e.target.closest("a, button, [data-image-credit-access]")) {
       return;
     }
 
@@ -1091,7 +1108,7 @@ function createCard(event, visualUsage = null) {
   });
 
   card.addEventListener("keydown", (e) => {
-    if (e.target.closest("[data-image-credit-access]")) return;
+    if (e.target.closest("a, button, [data-image-credit-access]")) return;
     if (e.key !== "Enter" && e.key !== " ") return;
     openCard(e);
   });
@@ -1446,8 +1463,6 @@ Umfang: Fügt renderSkeleton(count) hinzu (Rendering-only).
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
-
-
 
 
 

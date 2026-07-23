@@ -65,9 +65,14 @@
 
 /* === BEGIN BLOCK: HOME_SHARED_MOBILE_FEED_TOKEN_CONSUMERS_V1 | Zweck: zieht die wiederkehrenden Mobile-Feed-/Card-/Badge-/Copy-Surfaces der Events-/Aktivitäten-Hauptseiten auf zentrale Home-Surface-Tokens, ohne die validierte Mobile-Optik zu verändern; Umfang: Basis- und Mobile-Card-Flächen im Feed-Owner === */
 .event-card{
+  position: relative;
   background: linear-gradient(180deg, var(--home-panel-bg-start) 0%, var(--home-panel-bg-end) 100%);
   border-color: var(--home-panel-border);
   box-shadow: var(--home-panel-shadow);
+}
+
+.event-card-primary-hitarea{
+  display: none;
 }
 
 .event-card::before{
@@ -211,6 +216,25 @@
 */
 
 @media (min-width: 900px) {
+  .event-card-primary-hitarea{
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: block;
+    border-radius: inherit;
+  }
+
+  .event-card-primary-hitarea:focus-visible{
+    outline: 3px solid var(--cmp-focus-ring-brand);
+    outline-offset: 3px;
+  }
+
+  .event-card-actions,
+  .event-card [data-image-credit-access]{
+    position: relative;
+    z-index: 3;
+  }
+
   .desktop-hero,
   .events-section{
     max-width: 1128px;
@@ -4759,47 +4783,6 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,0.36),
       inset 0 12px 22px rgba(247,249,242,0.060);
-  }
-}
-
-@media (min-width: 1280px){
-  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card:only-child){
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) > .event-card.event-card--with-media{
-    display: grid;
-    grid-template-columns: minmax(0, 0.98fr) minmax(0, 1.02fr);
-    min-height: 304px;
-  }
-
-  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) > .event-card.event-card--with-media > .event-card-media{
-    grid-column: 1;
-    grid-row: 1 / -1;
-    height: 100%;
-    min-height: 304px;
-    aspect-ratio: auto;
-    border-radius: calc(var(--radius-eventcard) - 1px) 0 0 calc(var(--radius-eventcard) - 1px);
-  }
-
-  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) > .event-card.event-card--with-media > .event-card-body{
-    grid-column: 2;
-    grid-row: 1;
-    align-self: stretch;
-    align-content: center;
-    padding: 28px 32px 28px 30px;
-    gap: 11px;
-  }
-
-  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) .event-title{
-    font-size: clamp(1.28rem, 1.02rem + 0.46vw, 1.52rem);
-    line-height: 1.15;
-  }
-
-  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) .event-card-desc{
-    -webkit-line-clamp: 4;
-    font-size: 1rem;
-    line-height: 1.48;
   }
 }
 
