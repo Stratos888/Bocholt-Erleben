@@ -21,4 +21,12 @@ invalid_availability = build_offer_schema(normalize_public_event({"admission_sta
 assert "availability" not in invalid_availability
 assert "validFrom" not in build_offer_schema(normalize_public_event({"admission_status": "free", "valid_from": "tomorrow"}))[0]
 assert not schema_eligible(normalize_public_event({"id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2026-09-04"}))
+kinder = normalize_public_event({"id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2026-09-04", "url": "https://yuki-magazin.de/veranstaltungen/du-wunderst-mich-die-kinderzaubershow-mit-endrik-thier/"})
+assert (kinder["performer_name"], kinder["performer_type"]) == ("Endrik Thier", "Person")
+assert (kinder["organizer_name"], kinder["organizer_type"]) == ("Förderverein der Kita St. Josef", "Organization")
+assert (kinder["price"], kinder["price_currency"]) == ("4", "EUR")
+assert kinder["ticket_url"] == "" and build_offer_schema(kinder) == []
+messe = normalize_public_event({"id": "2-bocholter-vereinsmesse-in-den-shopping-arkaden-2026-09-27", "url": "https://www.bocholt.de/veranstaltungskalender/2-bocholter-vereinsmesse-in-den-shopping-arkaden"})
+assert (messe["organizer_name"], messe["organizer_type"]) == ("Stadt Bocholt – Freiwilligen-Agentur", "Organization")
+assert messe["performer_name"] == "" and messe["price"] == "" and build_offer_schema(messe) == []
 print("event offer contract: OK")
