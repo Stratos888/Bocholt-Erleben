@@ -26,11 +26,11 @@ PLAN_BLOCK = '''      # === BEGIN BLOCK: ORDERED_DEPLOY_RELEASE_PLAN_V1 ===
             echo '{}' > "$REMOTE"
           fi
           echo "DEPLOY_MODE=$MODE" >> "$GITHUB_ENV"
-          python3 scripts/prepare_deploy_delta.py \\
-            --source deploy \\
-            --remote-manifest "$REMOTE" \\
-            --mode "$MODE" \\
-            --build-id "$BUILD_ID" \\
+          python3 scripts/prepare_deploy_delta.py \
+            --source deploy \
+            --remote-manifest "$REMOTE" \
+            --mode "$MODE" \
+            --build-id "$BUILD_ID" \
             --environment "$DEPLOY_ENV_NAME"
           cat deploy-plan.json
       # === END BLOCK: ORDERED_DEPLOY_RELEASE_PLAN_V1 ==='''
@@ -116,7 +116,7 @@ UPLOAD_BLOCK = '''      # === BEGIN BLOCK: STRATO_ORDERED_RELEASE_UPLOAD_V1 ===
         run: |
           set -euo pipefail
           for attempt in $(seq 1 12); do
-            current="$(curl -fsSL --connect-timeout 10 --max-time 20 "${SITE_ORIGIN}/meta/build.txt?deploy_run=${GITHUB_RUN_ID}-${attempt}" | tr -d '\\r\\n' || true)"
+            current="$(curl -fsSL --connect-timeout 10 --max-time 20 "${SITE_ORIGIN}/meta/build.txt?deploy_run=${GITHUB_RUN_ID}-${attempt}" | tr -d '\r\n' || true)"
             [ "$current" = "$BUILD_ID" ] && exit 0
             echo "Build marker attempt $attempt/12: '${current:-unavailable}', expected '$BUILD_ID'."
             sleep 5
@@ -156,7 +156,13 @@ UPLOAD_BLOCK = '''      # === BEGIN BLOCK: STRATO_ORDERED_RELEASE_UPLOAD_V1 ===
 
 
 def replace_once(text: str, pattern: str, replacement: str, label: str) -> str:
-    updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+    updated, count = re.subn(
+        pattern,
+        lambda _match: replacement,
+        text,
+        count=1,
+        flags=re.S,
+    )
     if count != 1:
         raise SystemExit(f'Expected exactly one {label}, replaced {count}')
     return updated
