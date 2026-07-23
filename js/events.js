@@ -924,14 +924,13 @@ function createCard(event, visualUsage = null) {
   const actions = document.createElement("div");
   actions.className = "event-card-actions";
 
-  if (internalDetailUrl) {
-    const detailLink = document.createElement("a");
+  const detailLink = internalDetailUrl ? document.createElement("a") : null;
+  if (detailLink) {
     detailLink.className = "event-card-action event-card-detail-link";
     detailLink.href = internalDetailUrl;
     detailLink.textContent = "Details";
     detailLink.setAttribute("aria-label", `Eventdetails öffnen: ${event?.title || "Event"}`);
     detailLink.addEventListener("click", (e) => e.stopPropagation());
-    actions.appendChild(detailLink);
   }
 
   if (primaryUrl) {
@@ -1020,6 +1019,7 @@ function createCard(event, visualUsage = null) {
   if (meta.textContent) body.appendChild(meta);
   if (descText) body.appendChild(desc);
   if (quietMeta.textContent) body.appendChild(quietMeta);
+  if (detailLink) body.appendChild(detailLink);
   if (actions.childNodes.length) body.appendChild(actions);
 
   card.appendChild(badge);
