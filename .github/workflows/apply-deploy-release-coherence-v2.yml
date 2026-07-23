@@ -19,7 +19,18 @@ jobs:
           ref: fix/deploy-release-coherence
           fetch-depth: 0
       - name: Apply patch
-        run: python3 scripts/apply_deploy_release_coherence_patch.py
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/apply_deploy_release_coherence_patch.py')
+          text = path.read_text(encoding='utf-8')
+          old = 're.subn(pattern, replacement, text, count=1, flags=re.S)'
+          new = 're.subn(pattern, lambda _match: replacement, text, count=1, flags=re.S)'
+          if text.count(old) != 1:
+              raise SystemExit('Expected one literal replacement helper target')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+          python3 scripts/apply_deploy_release_coherence_patch.py
       - name: Validate patch
         run: |
           python3 -m py_compile scripts/prepare_deploy_delta.py tests/test_deploy_release_coherence.py
