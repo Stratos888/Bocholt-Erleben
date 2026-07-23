@@ -38,4 +38,5 @@ jobs:
           git add .github/workflows/deploy-strato.yml
           git diff --cached --check
           git commit -m "fix: publish coherent build and service-worker release"
+          git pull --rebase origin fix/deploy-release-coherence
           git push origin HEAD:fix/deploy-release-coherence
