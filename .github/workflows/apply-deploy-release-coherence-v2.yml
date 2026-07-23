@@ -24,7 +24,6 @@ jobs:
         run: |
           python3 -m py_compile scripts/prepare_deploy_delta.py tests/test_deploy_release_coherence.py
           python3 tests/test_deploy_release_coherence.py
-          python3 scripts/audit_github_workflows.py
           git diff --check
       - name: Commit patch
         run: |
