@@ -1,0 +1,52 @@
+name: Diagnose deploy patch helper
+
+on:
+  push:
+    branches:
+      - fix/deploy-release-coherence
+    paths:
+      - .github/workflows/diagnose-deploy-patch-helper.yml
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/deploy-release-coherence
+          fetch-depth: 0
+      - name: Run helper and record result
+        shell: bash
+        run: |
+          set +e
+          mkdir -p artifacts
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/apply_deploy_release_coherence_patch.py')
+          text = path.read_text(encoding='utf-8')
+          old = 're.subn(pattern, replacement, text, count=1, flags=re.S)'
+          new = 're.subn(pattern, lambda _match: replacement, text, count=1, flags=re.S)'
+          if text.count(old) == 1:
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+          {
+            echo '=== py_compile ==='
+            python3 -m py_compile scripts/apply_deploy_release_coherence_patch.py
+            echo "compile_status=$?"
+            echo '=== patch ==='
+            python3 scripts/apply_deploy_release_coherence_patch.py
+            echo "patch_status=$?"
+            echo '=== changed markers ==='
+            grep -nE 'ORDERED_DEPLOY_RELEASE_PLAN|STRATO_ORDERED_RELEASE_UPLOAD|STAGING_CONTENT_HASH_DELTA|STRATO_UPLOAD_DELTA' .github/workflows/deploy-strato.yml
+            echo '=== diff check ==='
+            git diff --check
+            echo "diff_status=$?"
+          } > artifacts/deploy-patch-helper-diagnostic.txt 2>&1
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/deploy-patch-helper-diagnostic.txt
+          git commit -m "test: record deploy patch helper diagnostic"
+          git push origin HEAD:fix/deploy-release-coherence
