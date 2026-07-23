@@ -47,6 +47,25 @@ def run_full_plan(temp: Path, build_id: str = "abc123") -> tuple[Path, dict]:
     return source, summary
 
 
+def require_workflow_release_order() -> None:
+    workflow = (ROOT / ".github/workflows/deploy-strato.yml").read_text(encoding="utf-8")
+    ordered_steps = [
+        "- name: Publish HTML entry files",
+        "- name: Verify HTML asset keys before build cutover",
+        "- name: Publish build marker after HTML verification",
+        "- name: Verify public build marker",
+        "- name: Publish version-stamped service worker last",
+        "- name: Verify service-worker build stamp",
+        "- name: Publish deploy manifest after release verification",
+    ]
+    positions = []
+    for step in ordered_steps:
+        require(workflow.count(step) == 1, f"workflow must contain exactly one step: {step}")
+        positions.append(workflow.index(step))
+    require(positions == sorted(positions), "deploy release steps must remain in fail-closed order")
+    require("mirror -R --verbose deploy-manifest/ ." in workflow, "manifest must use its isolated payload")
+
+
 def main() -> None:
     with tempfile.TemporaryDirectory(prefix="be-deploy-plan-") as temp_name:
         temp = Path(temp_name)
@@ -56,9 +75,16 @@ def main() -> None:
         require((temp / "deploy-assets/api/_config.php").is_file(), "private config must be in assets phase")
         require((temp / "deploy-entry/index.html").is_file(), "HTML must be in entry phase")
         require((temp / "deploy-entry/events/index.html").is_file(), "nested HTML must be in entry phase")
-        require((temp / "deploy-entry/meta/deploy-manifest.json").is_file(), "manifest must ship with entry phase")
         require((temp / "deploy-marker/meta/build.txt").is_file(), "build marker must be isolated")
         require((temp / "deploy-worker/service-worker.js").is_file(), "service worker must be isolated")
+        require(
+            (temp / "deploy-manifest/meta/deploy-manifest.json").is_file(),
+            "manifest must be isolated for last publication",
+        )
+        require(
+            not (temp / "deploy-entry/meta/deploy-manifest.json").exists(),
+            "HTML phase must not publish the success manifest",
+        )
         require(not (temp / "deploy-entry/meta/build.txt").exists(), "entry phase must not publish build marker")
         require(not (temp / "deploy-assets/service-worker.js").exists(), "assets phase must not publish service worker")
 
@@ -66,12 +92,19 @@ def main() -> None:
         require("// DEPLOY_BUILD_ID: abc123" in worker, "service worker must change for every build")
         require(summary["phases"]["marker"] == ["meta/build.txt"], "marker phase must contain only build.txt")
         require(summary["phases"]["worker"] == ["service-worker.js"], "worker phase must contain only service worker")
+        require(
+            summary["phases"]["manifest"] == ["meta/deploy-manifest.json"],
+            "manifest phase must contain only the success manifest",
+        )
 
         first_manifest = json.loads(
-            (temp / "deploy-entry/meta/deploy-manifest.json").read_text(encoding="utf-8")
+            (temp / "deploy-manifest/meta/deploy-manifest.json").read_text(encoding="utf-8")
         )
         require(first_manifest["build"] == "abc123", "manifest build must match deploy build")
-        require(first_manifest["files"]["service-worker.js"] == deploy_plan.sha256(source / "service-worker.js"), "manifest must hash stamped worker")
+        require(
+            first_manifest["files"]["service-worker.js"] == deploy_plan.sha256(source / "service-worker.js"),
+            "manifest must hash stamped worker",
+        )
 
         remote = temp / "remote-same.json"
         write(remote, json.dumps(first_manifest) + "\n")
@@ -85,9 +118,13 @@ def main() -> None:
             environment="staging",
             output_root=same_root,
         )
-        require(same_summary["phases"]["marker"] == [], "same build must not republish marker")
-        require(same_summary["phases"]["worker"] == [], "same build must not republish worker")
+        require(same_summary["phases"]["marker"] == [], "same successful build need not republish marker")
+        require(same_summary["phases"]["worker"] == [], "same successful build need not republish worker")
         require("api/_config.php" in same_summary["phases"]["assets"], "private config must always refresh")
+        require(
+            same_summary["phases"]["manifest"] == ["meta/deploy-manifest.json"],
+            "every completed run must have a final manifest payload",
+        )
 
         write(source / "meta/build.txt", "def456\n")
         write(source / "index.html", '<link href="/css/style.css?v=def456">')
@@ -105,12 +142,13 @@ def main() -> None:
         )
         require("index.html" in next_summary["phases"]["entry"], "new build must publish HTML before marker")
         require("meta/build.txt" in next_summary["phases"]["marker"], "new build must publish marker separately")
-        require("service-worker.js" in next_summary["phases"]["worker"], "new build must publish a changed worker last")
+        require("service-worker.js" in next_summary["phases"]["worker"], "new build must publish a changed worker")
         require(
             "// DEPLOY_BUILD_ID: def456" in (next_root / "deploy-worker/service-worker.js").read_text(encoding="utf-8"),
             "next worker must carry next build marker",
         )
 
+    require_workflow_release_order()
     print("Deploy release coherence contract: OK")
 
 
