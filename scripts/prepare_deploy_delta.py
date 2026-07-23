@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Build a fail-closed, ordered STRATO deploy payload.
 
-The deploy is split into four phases:
+The deploy is split into five phases:
 1. ordinary assets;
-2. HTML plus deploy manifest;
+2. HTML entry files;
 3. the public build marker;
-4. the service worker, stamped per build so existing browsers install a new worker.
+4. the service worker, stamped per build so existing browsers install a new worker;
+5. the deploy manifest, published only after the release phases were verified.
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ from pathlib import Path
 EXCLUDED_FROM_MANIFEST = {"meta/deploy-manifest.json"}
 BUILD_MARKER = "meta/build.txt"
 SERVICE_WORKER = "service-worker.js"
+DEPLOY_MANIFEST = "meta/deploy-manifest.json"
 
 
 def sha256(path: Path) -> str:
@@ -84,6 +86,7 @@ def prepare_deploy_plan(
         "entry": output_root / "deploy-entry",
         "marker": output_root / "deploy-marker",
         "worker": output_root / "deploy-worker",
+        "manifest": output_root / "deploy-manifest",
     }
     for destination in destinations.values():
         shutil.rmtree(destination, ignore_errors=True)
@@ -124,12 +127,13 @@ def prepare_deploy_plan(
         "environment": environment,
         "files": current,
     }
-    manifest_path = destinations["entry"] / "meta" / "deploy-manifest.json"
+    manifest_path = destinations["manifest"] / DEPLOY_MANIFEST
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(
         json.dumps(manifest, sort_keys=True, indent=2) + "\n",
         encoding="utf-8",
     )
+    phase_files["manifest"].append(DEPLOY_MANIFEST)
 
     delete_lines = []
     for relative in sorted(deleted):
