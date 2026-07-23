@@ -1,0 +1,50 @@
+name: Run observable final deploy writer
+
+on:
+  push:
+    branches:
+      - fix/deploy-release-coherence
+    paths:
+      - .github/workflows/finalize-deploy-release-coherence-v3.yml
+
+permissions:
+  contents: write
+
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/deploy-release-coherence
+          fetch-depth: 0
+
+      - name: Patch and record
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/apply_deploy_release_coherence_patch.py
+          git diff --check
+          mkdir -p artifacts
+          {
+            echo 'writer_status=patched'
+            grep -n 'ORDERED_DEPLOY_RELEASE_PLAN_V1' .github/workflows/deploy-strato.yml
+            grep -n 'STRATO_ORDERED_RELEASE_UPLOAD_V1' .github/workflows/deploy-strato.yml
+          } > artifacts/deploy-final-writer-result.txt
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/deploy-strato.yml artifacts/deploy-final-writer-result.txt
+          git commit -m "fix: publish coherent build and service-worker release"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin fix/deploy-release-coherence || true
+            if git push origin HEAD:fix/deploy-release-coherence; then
+              exit 0
+            fi
+            sleep 3
+          done
+          exit 1
