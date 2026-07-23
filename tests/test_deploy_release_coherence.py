@@ -63,7 +63,16 @@ def require_workflow_release_order() -> None:
         require(workflow.count(step) == 1, f"workflow must contain exactly one step: {step}")
         positions.append(workflow.index(step))
     require(positions == sorted(positions), "deploy release steps must remain in fail-closed order")
-    require("mirror -R --verbose deploy-manifest/ ." in workflow, "manifest must use its isolated payload")
+
+    phase_calls = [
+        "bash scripts/run_strato_sftp_phase.sh deploy-assets 8 deploy-delete.lftp",
+        "bash scripts/run_strato_sftp_phase.sh deploy-entry 6",
+        "bash scripts/run_strato_sftp_phase.sh deploy-marker 1",
+        "bash scripts/run_strato_sftp_phase.sh deploy-worker 1",
+        "bash scripts/run_strato_sftp_phase.sh deploy-manifest 1",
+    ]
+    for call in phase_calls:
+        require(workflow.count(call) == 1, f"workflow must use resilient SFTP runner exactly once: {call}")
 
 
 def main() -> None:
