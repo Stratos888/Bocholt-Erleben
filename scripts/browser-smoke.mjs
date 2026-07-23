@@ -334,6 +334,26 @@ async function checkRoute(page, baseUrl, route, timeoutMs) {
   if (route.dynamicAny) await expectAnySelectorCount(page, route.dynamicAny);
 }
 
+async function checkEventCardNavigation(page, baseUrl, profileName, timeoutMs) {
+  await gotoReady(page, baseUrl, '/events/', timeoutMs);
+  const card = page.locator('#event-cards .event-card[data-event-detail-url]').first();
+  await card.waitFor({ state: 'visible', timeout: timeoutMs });
+  const target = await card.getAttribute('data-event-detail-url');
+  if (!target) throw new Error('Eventkarte besitzt kein kanonisches internes Detailziel.');
+
+  if (profileName === 'desktop') {
+    const expectedPath = new URL(target, baseUrl).pathname;
+    await card.click({ timeout: 7000 });
+    await page.waitForURL((url) => url.pathname === expectedPath, { timeout: timeoutMs });
+    await expectAnySelectorCount(page, ['main', 'article', '[data-event-detail-page]']);
+    return;
+  }
+
+  await card.click({ timeout: 7000 });
+  await page.locator('[role="dialog"], .detail-panel, .event-detail').filter({ visible: true }).first()
+    .waitFor({ state: 'visible', timeout: timeoutMs });
+}
+
 async function checkBottomNavigation(page, baseUrl, timeoutMs) {
   await gotoReady(page, baseUrl, '/', timeoutMs);
   await expectVisible(page, '#bottom-tabbar-root');
@@ -589,6 +609,10 @@ async function runProfile(browser, baseUrl, profileName, args, results) {
         await checkRoute(page, baseUrl, route, args.timeoutMs);
       });
     }
+
+    await runChecked('Eventkarten-Navigation', '/events/', async () => {
+      await checkEventCardNavigation(page, baseUrl, profileName, args.timeoutMs);
+    });
 
     await runChecked('Activity-Favoriten lokal', '/aktivitaeten/', async () => {
       await checkActivityFavorites(page, baseUrl, args.timeoutMs);
