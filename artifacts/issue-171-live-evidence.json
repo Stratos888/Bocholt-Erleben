@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-07-23T12:28:30.335Z",
+  "baseUrl": "https://bocholt-erleben.de",
+  "build": "eb5e0f87199d",
+  "rawCssHasNewContract": true,
+  "rawCssHasOldContract": false,
+  "results": [
+    {
+      "phase": "fresh",
+      "display": "grid",
+      "gridTemplateColumns": "568px 568px",
+      "styleHref": "https://bocholt-erleben.de/css/style.css?v=eb5e0f87199d",
+      "serviceWorkerController": false,
+      "serviceWorkerScopes": [
+        "https://bocholt-erleben.de/"
+      ],
+      "cacheNames": [
+        "be-static-eb5e0f87199d"
+      ],
+      "documentClientWidth": 1366,
+      "documentScrollWidth": 1366
+    },
+    {
+      "phase": "warm-controlled",
+      "display": "grid",
+      "gridTemplateColumns": "568px 568px",
+      "styleHref": "https://bocholt-erleben.de/css/style.css?v=eb5e0f87199d",
+      "serviceWorkerController": true,
+      "serviceWorkerScopes": [
+        "https://bocholt-erleben.de/"
+      ],
+      "cacheNames": [
+        "be-static-eb5e0f87199d",
+        "be-runtime-eb5e0f87199d"
+      ],
+      "documentClientWidth": 1366,
+      "documentScrollWidth": 1366
+    }
+  ]
+}
