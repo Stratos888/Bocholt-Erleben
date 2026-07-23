@@ -915,12 +915,14 @@ function createCard(event, visualUsage = null) {
       }
     : null;
 
-  card.setAttribute("role", "button");
-  card.setAttribute(
-    "aria-label",
-    primaryUrl ? `Event öffnen: ${event?.title || ""}` : `Event anzeigen: ${event?.title || ""}`
-  );
-  if (primaryUrl) card.dataset.desktopBehavior = "direct-link";
+  const internalDetailUrl = resolveEventDetailUrl(event);
+  card.setAttribute("role", "link");
+  card.tabIndex = 0;
+  card.setAttribute("aria-label", `Eventdetails öffnen: ${event?.title || ""}`);
+  if (internalDetailUrl) {
+    card.dataset.eventDetailUrl = internalDetailUrl;
+    card.dataset.desktopBehavior = "internal-detail";
+  }
 
   const actions = document.createElement("div");
   actions.className = "event-card-actions";
@@ -1053,21 +1055,14 @@ function createCard(event, visualUsage = null) {
 
   card.appendChild(body);
 
-  /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 | Purpose: behebt den Syntaxfehler in openCard und erhält das gewünschte Verhalten bei Event-Cards: Desktop öffnet extern, Mobile nutzt das Detailpanel | Scope: ersetzt nur openCard innerhalb createCard === */
+  /* === BEGIN BLOCK: CANONICAL_INTERNAL_EVENT_NAVIGATION_V4 | Purpose: every card has a reliable internal target; mobile keeps the detail panel while desktop and keyboard use the canonical detail page === */
   const openCard = (e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
 
-    if (isDesktopViewport()) {
-      if (primaryUrl) {
-        openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
-      }
-      return;
-    }
-
-    if (window.DetailPanel?.show) {
+    if (!isDesktopViewport() && window.DetailPanel?.show) {
       window.DetailPanel.show({
         ...event,
         resolvedVisual: cardVisual
@@ -1075,11 +1070,11 @@ function createCard(event, visualUsage = null) {
       return;
     }
 
-    if (primaryUrl) {
-      openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
+    if (internalDetailUrl) {
+      window.location.assign(internalDetailUrl);
     }
   };
-  /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 === */
+  /* === END BLOCK: CANONICAL_INTERNAL_EVENT_NAVIGATION_V4 === */
 
   card.addEventListener("click", (e) => {
     if (e.target.closest("[data-image-credit-access]")) {
