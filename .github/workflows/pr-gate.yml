@@ -68,7 +68,31 @@ jobs:
           npm install --no-save --no-package-lock playwright@1.54.1
           npx playwright install --with-deps chromium
 
-      - name: Run browser-smoke against PR build
+      - name: Build deterministic event-navigation fixture
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          event = {
+              "id": "browser-smoke-event-2099-09-27",
+              "title": "Browser-Smoke Event",
+              "date": "2099-09-27",
+              "time": "14:00",
+              "location": "Bocholt",
+              "city": "Bocholt",
+              "category": "Familie",
+              "description": "Deterministischer PR-Gate-Navigationstest.",
+              "url": "https://example.com/browser-smoke-source"
+          }
+          Path("data/events.json").write_text(
+              json.dumps([event], ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8"
+          )
+          PY
+          SITE_ORIGIN=http://127.0.0.1:8765 python3 scripts/build-event-detail-pages.py
+
+      - name: Run focused browser-smoke against PR build
         shell: bash
         run: |
           set -euo pipefail
@@ -82,4 +106,4 @@ jobs:
             sleep 1
           done
           curl --fail --silent http://127.0.0.1:8765/events/ >/dev/null
-          node scripts/browser-smoke.mjs             --base-url http://127.0.0.1:8765             --profile all             --out-dir /tmp/browser-smoke
+          node scripts/browser-smoke.mjs --base-url http://127.0.0.1:8765 --profile all --check event-navigation --out-dir /tmp/browser-smoke
