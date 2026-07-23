@@ -131,7 +131,7 @@ def main() -> None:
         "title": "2. Bocholter Vereinsmesse in den Shopping Arkaden",
         "date": "2099-09-27", "time": "13:00–18:00 Uhr",
         "location": "Shopping Arkaden",
-        "source_url": "https://www.bocholt.de/veranstaltungskalender/vereinsmesse",
+        "url": "https://www.bocholt.de/veranstaltungskalender/vereinsmesse",
     })
     duplicate_b = dict(duplicate_a)
     duplicate_b.update({
