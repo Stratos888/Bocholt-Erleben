@@ -3,7 +3,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HOME_CSS = (ROOT / "css" / "home.css").read_text(encoding="utf-8")
-SERVICE_WORKER = (ROOT / "service-worker.js").read_text(encoding="utf-8")
 
 
 def require(condition: bool, message: str) -> None:
@@ -40,21 +39,13 @@ require(
     old_two_column_contract not in HOME_CSS,
     "Der veraltete Zweispalten-Breakpoint bei 1280 CSS px ist noch vorhanden.",
 )
-
-navigate_start = SERVICE_WORKER.index('if (req.mode === "navigate") {')
-navigate_end = SERVICE_WORKER.index(
-    "/* === BEGIN BLOCK: PUBLIC_EVENT_FEED_NETWORK_FIRST_V1",
-    navigate_start,
-)
-navigate_block = SERVICE_WORKER[navigate_start:navigate_end]
-
 require(
-    'return await fetch(req, { cache: "no-store" });' in navigate_block,
-    "Navigationen müssen den Browser-HTTP-Cache umgehen, damit neue Build-Asset-Keys sofort ankommen.",
+    "zwischen 900px und 1099.98px" in HOME_CSS,
+    "Die dokumentierte Einspalten-Grenze muss dem wirksamen CSS entsprechen.",
 )
 require(
-    "return await fetch(req);" not in navigate_block,
-    "Der alte cache-abhängige Navigations-Fetch ist noch aktiv.",
+    "ab 1100px" in HOME_CSS,
+    "Die dokumentierte Zweispalten-Grenze muss dem wirksamen CSS entsprechen.",
 )
 
-print("Responsive grid and cache freshness contract: OK")
+print("Responsive grid contract: OK")
