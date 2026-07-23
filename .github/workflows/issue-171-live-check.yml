@@ -1,0 +1,166 @@
+name: Check issue 171 on live
+
+on:
+  push:
+    branches:
+      - fix/issue-171-responsive-grid-cache
+    paths:
+      - .github/workflows/issue-171-live-check.yml
+
+permissions:
+  contents: write
+
+jobs:
+  live-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout evidence branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/issue-171-responsive-grid-cache
+          fetch-depth: 0
+
+      - name: Wait for main build on live
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected='23b56b8691d0'
+          for attempt in $(seq 1 36); do
+            current="$(curl --fail --silent --show-error --max-time 20 "https://bocholt-erleben.de/meta/build.txt?issue171=${attempt}" | tr -d '\r\n' || true)"
+            if [ "$current" = "$expected" ]; then
+              echo "Live serves expected build $current."
+              exit 0
+            fi
+            echo "Attempt $attempt/36: live build is '${current:-unavailable}', expected '$expected'."
+            sleep 10
+          done
+          echo "Live did not serve the expected main build within six minutes." >&2
+          exit 1
+
+      - name: Install browser runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock playwright@1.54.1
+          npx playwright install --with-deps chromium
+
+      - name: Validate fresh and warm live contexts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          node --input-type=module <<'JS'
+          import fs from 'node:fs/promises';
+          import { chromium } from 'playwright';
+
+          const baseUrl = 'https://bocholt-erleben.de';
+          const expectedBuild = '23b56b8691d0';
+          const widths = [1099, 1100, 1366];
+          const browser = await chromium.launch({ headless: true });
+          const results = [];
+
+          async function measure(page, width, phase) {
+            const consoleErrors = [];
+            page.on('console', (message) => {
+              if (message.type() === 'error') consoleErrors.push(message.text());
+            });
+            const response = await page.goto(`${baseUrl}/events/?issue171=${phase}-${Date.now()}-${width}`, {
+              waitUntil: 'domcontentloaded',
+              timeout: 30000,
+            });
+            if (!response || response.status() >= 500) {
+              throw new Error(`${phase} ${width}: HTTP ${response?.status() ?? 'no response'}`);
+            }
+            await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+            const grid = page.locator('.events-feed-group__grid').first();
+            await grid.waitFor({ state: 'visible', timeout: 20000 });
+            const card = grid.locator('.event-card').first();
+            await card.waitFor({ state: 'visible', timeout: 10000 });
+
+            const metrics = await page.evaluate(() => {
+              const gridElement = document.querySelector('.events-feed-group__grid');
+              const cardElement = gridElement?.querySelector('.event-card');
+              const styleLink = document.querySelector('link[rel="stylesheet"][href*="/css/style.css"]');
+              if (!gridElement || !cardElement || !styleLink) throw new Error('Required live elements missing');
+              const style = getComputedStyle(gridElement);
+              const columns = style.gridTemplateColumns === 'none'
+                ? []
+                : style.gridTemplateColumns.split(/\s+/).filter(Boolean);
+              return {
+                display: style.display,
+                gridTemplateColumns: style.gridTemplateColumns,
+                computedColumns: style.display === 'grid' ? columns.length : 1,
+                gridWidth: Math.round(gridElement.getBoundingClientRect().width * 100) / 100,
+                cardWidth: Math.round(cardElement.getBoundingClientRect().width * 100) / 100,
+                clientWidth: document.documentElement.clientWidth,
+                scrollWidth: document.documentElement.scrollWidth,
+                styleHref: styleLink.href,
+                serviceWorkerController: Boolean(navigator.serviceWorker?.controller),
+              };
+            });
+
+            const expectedColumns = width >= 1100 ? 2 : 1;
+            if (metrics.computedColumns !== expectedColumns) {
+              throw new Error(`${phase} ${width}: expected ${expectedColumns} columns, got ${metrics.computedColumns}`);
+            }
+            if (metrics.scrollWidth > metrics.clientWidth + 1) {
+              throw new Error(`${phase} ${width}: horizontal overflow ${metrics.scrollWidth}/${metrics.clientWidth}`);
+            }
+            if (!metrics.styleHref.includes(`v=${expectedBuild}`)) {
+              throw new Error(`${phase} ${width}: style.css does not carry live build ID: ${metrics.styleHref}`);
+            }
+            results.push({ phase, width, expectedColumns, ...metrics, consoleErrors });
+          }
+
+          try {
+            for (const width of widths) {
+              const context = await browser.newContext({
+                viewport: { width, height: 900 },
+                deviceScaleFactor: 1,
+                ignoreHTTPSErrors: true,
+              });
+              const page = await context.newPage();
+              await measure(page, width, 'fresh');
+              await context.close();
+            }
+
+            const warmContext = await browser.newContext({
+              viewport: { width: 1366, height: 900 },
+              deviceScaleFactor: 1,
+              ignoreHTTPSErrors: true,
+            });
+            const warmPage = await warmContext.newPage();
+            await measure(warmPage, 1366, 'warm-install');
+            await warmPage.evaluate(async () => {
+              if ('serviceWorker' in navigator) await navigator.serviceWorker.ready;
+            });
+            await warmPage.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
+            await warmPage.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+            await measure(warmPage, 1366, 'warm-controlled');
+            const controlled = results.at(-1)?.serviceWorkerController === true;
+            if (!controlled) throw new Error('Warm live context is not controlled by the production service worker.');
+            await warmContext.close();
+          } finally {
+            await browser.close();
+          }
+
+          const buildResponse = await fetch(`${baseUrl}/meta/build.txt?issue171=${Date.now()}`, { cache: 'no-store' });
+          const build = (await buildResponse.text()).trim();
+          if (build !== expectedBuild) throw new Error(`Unexpected live build ${build}`);
+
+          await fs.writeFile(
+            'artifacts/issue-171-live-evidence.json',
+            `${JSON.stringify({ checkedAt: new Date().toISOString(), baseUrl, build, results }, null, 2)}\n`,
+            'utf8',
+          );
+          JS
+
+      - name: Commit live evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/issue-171-live-evidence.json
+          git commit -m "test: record issue 171 live release evidence"
+          git push origin HEAD:fix/issue-171-responsive-grid-cache
