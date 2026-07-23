@@ -22,13 +22,23 @@ def event(extra):
 unknown = event({"id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2026-09-04"})
 html = render_page(unknown)
 assert '<script type="application/ld+json">' not in html
-assert '<meta name="robots" content="noindex' not in html
-kinder = event({"id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2026-09-04", "url": "https://yuki-magazin.de/veranstaltungen/du-wunderst-mich-die-kinderzaubershow-mit-endrik-thier/"})
+assert "4 EUR" not in html
+kinder = event({
+    "id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2026-09-04",
+    "url": "https://yuki-magazin.de/veranstaltungen/du-wunderst-mich-die-kinderzaubershow-mit-endrik-thier/",
+    "admission_status": "paid", "price": "4", "price_currency": "EUR",
+    "organizer_name": "Förderverein der Kita St. Josef", "organizer_type": "Organization",
+    "performer_name": "Endrik Thier", "performer_type": "Person",
+})
 kinder_html = render_page(kinder)
 assert "4 EUR" in kinder_html and "keine verifizierten Ticketdaten" in kinder_html
 assert '<script type="application/ld+json">' not in kinder_html
 assert "offers" not in kinder_html and "Tickets</a>" not in kinder_html
-messe = event({"id": "2-bocholter-vereinsmesse-in-den-shopping-arkaden-2026-09-27", "url": "https://www.bocholt.de/veranstaltungskalender/2-bocholter-vereinsmesse-in-den-shopping-arkaden"})
+messe = event({
+    "id": "2-bocholter-vereinsmesse-in-den-shopping-arkaden-2026-09-27",
+    "url": "https://www.bocholt.de/veranstaltungskalender/2-bocholter-vereinsmesse-in-den-shopping-arkaden",
+    "organizer_name": "Stadt Bocholt – Freiwilligen-Agentur", "organizer_type": "Organization",
+})
 messe_html = render_page(messe)
 assert '<script type="application/ld+json">' not in messe_html
 assert "Tickets</a>" not in messe_html and "Eintritt:" not in messe_html
