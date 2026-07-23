@@ -1,5 +1,6 @@
 name: Finalize deploy release coherence
 
+# one-shot trigger: v2
 on:
   push:
     branches:
