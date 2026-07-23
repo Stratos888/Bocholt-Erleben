@@ -95,6 +95,7 @@ function parseArgs(argv) {
     profile: 'all',
     outDir: 'artifacts/browser-smoke',
     expectedBuild: '',
+    check: 'all',
     timeoutMs: 18000,
   };
 
@@ -113,6 +114,9 @@ function parseArgs(argv) {
     } else if (value === '--expected-build') {
       args.expectedBuild = next || '';
       i += 1;
+    } else if (value === '--check') {
+      args.check = next || 'all';
+      i += 1;
     } else if (value === '--timeout-ms') {
       args.timeoutMs = Number(next || args.timeoutMs);
       i += 1;
@@ -128,6 +132,9 @@ function parseArgs(argv) {
   }
   if (args.profile !== 'all' && !PROFILES[args.profile]) {
     throw new Error('--profile muss all, desktop oder mobile sein.');
+  }
+  if (!['all', 'event-navigation'].includes(args.check)) {
+    throw new Error('--check muss all oder event-navigation sein.');
   }
   return args;
 }
@@ -610,6 +617,13 @@ async function runProfile(browser, baseUrl, profileName, args, results) {
   }
 
   try {
+    if (args.check === 'event-navigation') {
+      await runChecked('Eventkarten-Navigation', '/events/', async () => {
+        await checkEventCardNavigation(page, baseUrl, profileName, args.timeoutMs);
+      });
+      return;
+    }
+
     for (const route of ROUTE_CHECKS) {
       await runChecked(route.name, route.path, async () => {
         await checkRoute(page, baseUrl, route, args.timeoutMs);
