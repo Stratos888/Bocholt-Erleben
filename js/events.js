@@ -915,22 +915,31 @@ function createCard(event, visualUsage = null) {
       }
     : null;
 
-  const internalDetailUrl = resolveEventDetailUrl(event);
-  if (internalDetailUrl) {
-    card.dataset.eventDetailUrl = internalDetailUrl;
-    card.dataset.desktopBehavior = "internal-detail";
-  }
+  card.setAttribute("role", "button");
+  card.setAttribute(
+    "aria-label",
+    primaryUrl ? `Event öffnen: ${event?.title || ""}` : `Event anzeigen: ${event?.title || ""}`
+  );
+  if (primaryUrl) card.dataset.desktopBehavior = "direct-link";
 
   const actions = document.createElement("div");
   actions.className = "event-card-actions";
 
-  const detailLink = internalDetailUrl ? document.createElement("a") : null;
-  if (detailLink) {
-    detailLink.className = "event-card-action event-card-detail-link";
-    detailLink.href = internalDetailUrl;
-    detailLink.textContent = "Details";
-    detailLink.setAttribute("aria-label", `Eventdetails öffnen: ${event?.title || "Event"}`);
-    detailLink.addEventListener("click", (e) => e.stopPropagation());
+  const desktopPrimaryLink = primaryUrl ? document.createElement("a") : null;
+  if (desktopPrimaryLink) {
+    desktopPrimaryLink.className = "event-card-primary-hitarea";
+    desktopPrimaryLink.href = primaryUrl;
+    desktopPrimaryLink.rel = "external";
+    desktopPrimaryLink.setAttribute("aria-label", `Zur Veranstaltung: ${event?.title || "Event"}`);
+    desktopPrimaryLink.addEventListener("click", () => {
+      if (
+        primaryOutboundPayload &&
+        window.BEAnalytics &&
+        typeof window.BEAnalytics.trackOutboundClick === "function"
+      ) {
+        window.BEAnalytics.trackOutboundClick(primaryOutboundPayload);
+      }
+    });
   }
 
   if (primaryUrl) {
@@ -1019,9 +1028,9 @@ function createCard(event, visualUsage = null) {
   if (meta.textContent) body.appendChild(meta);
   if (descText) body.appendChild(desc);
   if (quietMeta.textContent) body.appendChild(quietMeta);
-  if (detailLink) body.appendChild(detailLink);
   if (actions.childNodes.length) body.appendChild(actions);
 
+  if (desktopPrimaryLink) card.appendChild(desktopPrimaryLink);
   card.appendChild(badge);
 
   if (cardVisual) {
@@ -1062,24 +1071,45 @@ function createCard(event, visualUsage = null) {
 
   card.appendChild(body);
 
-  /* === BEGIN BLOCK: CANONICAL_INTERNAL_EVENT_NAVIGATION_V5 | Purpose: card activation uses the canonical internal detail page on every viewport; the real detail link preserves navigation without JavaScript === */
+  /* === BEGIN BLOCK: RESPONSIVE_EVENT_CARD_NAVIGATION_V6 | Purpose: desktop uses the source-backed outbound link while mobile keeps the established detail panel === */
   const openCard = (e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
 
-    if (internalDetailUrl) {
-      window.location.assign(internalDetailUrl);
+    if (isDesktopViewport()) {
+      if (primaryUrl) {
+        openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
+      }
+      return;
+    }
+
+    if (window.DetailPanel?.show) {
+      window.DetailPanel.show({
+        ...event,
+        resolvedVisual: cardVisual
+      });
+      return;
+    }
+
+    if (primaryUrl) {
+      openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
     }
   };
-  /* === END BLOCK: CANONICAL_INTERNAL_EVENT_NAVIGATION_V5 === */
+  /* === END BLOCK: RESPONSIVE_EVENT_CARD_NAVIGATION_V6 === */
 
   card.addEventListener("click", (e) => {
     if (e.target.closest("a, button, [data-image-credit-access]")) {
       return;
     }
 
+    openCard(e);
+  });
+
+  card.addEventListener("keydown", (e) => {
+    if (e.target.closest("a, button, [data-image-credit-access]")) return;
+    if (e.key !== "Enter" && e.key !== " ") return;
     openCard(e);
   });
 
@@ -1433,8 +1463,6 @@ Umfang: Fügt renderSkeleton(count) hinzu (Rendering-only).
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
-
-
 
 
 
