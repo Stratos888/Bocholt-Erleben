@@ -1026,19 +1026,7 @@ jobs:
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
         run: |
           set -euo pipefail
-          DEL="$(cat deploy-delete.lftp 2>/dev/null || true)"
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
-          set sftp:auto-confirm yes
-          set cmd:fail-exit yes
-          set net:timeout 25
-          set net:max-retries 4
-          set net:reconnect-interval-base 2
-          set net:reconnect-interval-max 15
-          cd $DEPLOY_TARGET_DIR
-          mirror -R --parallel=8 --verbose deploy-assets/ .
-          $DEL
-          bye
-          LFTP
+          bash scripts/run_strato_sftp_phase.sh deploy-assets 8 deploy-delete.lftp
 
       - name: Publish HTML entry files
         timeout-minutes: 30
@@ -1049,17 +1037,7 @@ jobs:
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
         run: |
           set -euo pipefail
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
-          set sftp:auto-confirm yes
-          set cmd:fail-exit yes
-          set net:timeout 25
-          set net:max-retries 4
-          set net:reconnect-interval-base 2
-          set net:reconnect-interval-max 15
-          cd $DEPLOY_TARGET_DIR
-          mirror -R --parallel=6 --verbose deploy-entry/ .
-          bye
-          LFTP
+          bash scripts/run_strato_sftp_phase.sh deploy-entry 6
 
       - name: Verify HTML asset keys before build cutover
         shell: bash
@@ -1074,7 +1052,7 @@ jobs:
           done
 
       - name: Publish build marker after HTML verification
-        timeout-minutes: 5
+        timeout-minutes: 15
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
@@ -1082,15 +1060,7 @@ jobs:
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
         run: |
           set -euo pipefail
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
-          set sftp:auto-confirm yes
-          set cmd:fail-exit yes
-          set net:timeout 25
-          set net:max-retries 4
-          cd $DEPLOY_TARGET_DIR
-          mirror -R --verbose deploy-marker/ .
-          bye
-          LFTP
+          bash scripts/run_strato_sftp_phase.sh deploy-marker 1
 
       - name: Verify public build marker
         shell: bash
@@ -1106,7 +1076,7 @@ jobs:
           exit 1
 
       - name: Publish version-stamped service worker last
-        timeout-minutes: 5
+        timeout-minutes: 15
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
@@ -1114,15 +1084,7 @@ jobs:
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
         run: |
           set -euo pipefail
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
-          set sftp:auto-confirm yes
-          set cmd:fail-exit yes
-          set net:timeout 25
-          set net:max-retries 4
-          cd $DEPLOY_TARGET_DIR
-          mirror -R --verbose deploy-worker/ .
-          bye
-          LFTP
+          bash scripts/run_strato_sftp_phase.sh deploy-worker 1
 
       - name: Verify service-worker build stamp
         shell: bash
@@ -1179,7 +1141,7 @@ jobs:
             --out-dir artifacts/browser-smoke
 
       - name: Publish deploy manifest after release verification
-        timeout-minutes: 5
+        timeout-minutes: 15
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
@@ -1187,15 +1149,7 @@ jobs:
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
         run: |
           set -euo pipefail
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
-          set sftp:auto-confirm yes
-          set cmd:fail-exit yes
-          set net:timeout 25
-          set net:max-retries 4
-          cd $DEPLOY_TARGET_DIR
-          mirror -R --verbose deploy-manifest/ .
-          bye
-          LFTP
+          bash scripts/run_strato_sftp_phase.sh deploy-manifest 1
 
       - name: Add browser smoke summary
         if: always()
