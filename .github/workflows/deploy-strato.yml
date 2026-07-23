@@ -1001,7 +1001,12 @@ jobs:
             echo '{}' > "$REMOTE"
           fi
           echo "DEPLOY_MODE=$MODE" >> "$GITHUB_ENV"
-          python3 scripts/prepare_deploy_delta.py             --source deploy             --remote-manifest "$REMOTE"             --mode "$MODE"             --build-id "$BUILD_ID"             --environment "$DEPLOY_ENV_NAME"
+          python3 scripts/prepare_deploy_delta.py \
+            --source deploy \
+            --remote-manifest "$REMOTE" \
+            --mode "$MODE" \
+            --build-id "$BUILD_ID" \
+            --environment "$DEPLOY_ENV_NAME"
           cat deploy-plan.json
       # === END BLOCK: ORDERED_DEPLOY_RELEASE_PLAN_V1 ===
 
@@ -1035,7 +1040,7 @@ jobs:
           bye
           LFTP
 
-      - name: Publish HTML and deploy manifest
+      - name: Publish HTML entry files
         timeout-minutes: 30
         shell: bash
         env:
@@ -1172,6 +1177,25 @@ jobs:
             --profile all \
             --expected-build "$BUILD_ID" \
             --out-dir artifacts/browser-smoke
+
+      - name: Publish deploy manifest after release verification
+        timeout-minutes: 5
+        shell: bash
+        env:
+          STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
+          STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
+          STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+        run: |
+          set -euo pipefail
+          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
+          set sftp:auto-confirm yes
+          set cmd:fail-exit yes
+          set net:timeout 25
+          set net:max-retries 4
+          cd $DEPLOY_TARGET_DIR
+          mirror -R --verbose deploy-manifest/ .
+          bye
+          LFTP
 
       - name: Add browser smoke summary
         if: always()
