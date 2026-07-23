@@ -350,7 +350,7 @@ async function checkEventCardNavigation(page, baseUrl, profileName, timeoutMs) {
   }
 
   await card.click({ timeout: 7000 });
-  await page.locator('[role="dialog"], .detail-panel, .event-detail').filter({ visible: true }).first()
+  await page.locator('[role="dialog"]:visible, .detail-panel:visible, .event-detail:visible').first()
     .waitFor({ state: 'visible', timeout: timeoutMs });
 }
 
