@@ -1,4 +1,4 @@
-name: Probe deploy fix branch runner
+name: Apply final deploy release patch
 
 on:
   push:
@@ -11,17 +11,36 @@ permissions:
   contents: write
 
 jobs:
-  probe:
+  apply:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: fix/deploy-release-coherence
-      - run: |
-          mkdir -p artifacts
-          printf 'runner_ok=yes\ncommit=%s\n' "$GITHUB_SHA" > artifacts/deploy-fix-runner-probe.txt
+          fetch-depth: 0
+
+      - name: Apply and verify bounded patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/apply_deploy_release_coherence_patch.py
+          git diff --check
+          grep -q 'ORDERED_DEPLOY_RELEASE_PLAN_V1' .github/workflows/deploy-strato.yml
+          grep -q 'STRATO_ORDERED_RELEASE_UPLOAD_V1' .github/workflows/deploy-strato.yml
+
+      - name: Commit through proven branch writer
+        shell: bash
+        run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add artifacts/deploy-fix-runner-probe.txt
-          git commit -m "test: record deploy fix runner probe"
-          git push origin HEAD:fix/deploy-release-coherence
+          git add .github/workflows/deploy-strato.yml
+          git commit -m "fix: publish coherent build and service-worker release"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin fix/deploy-release-coherence || true
+            if git push origin HEAD:fix/deploy-release-coherence; then
+              exit 0
+            fi
+            sleep 3
+          done
+          exit 1
