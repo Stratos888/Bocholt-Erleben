@@ -2,26 +2,16 @@
 
 Diese Datei enthält nur priorisierte dauerhafte Scopes. Operativer Status, Entscheidungen und Evidence stehen im jeweiligen GitHub-Issue.
 
-## Nächster vorbereiteter Qualitäts-Workpack
+## Nächster vorbereiteter Produkt-Workpack
 
-1. **SEO Structured Data – Search-Console-Warnungen**
-   - dauerhafter Scope: `SEO-STRUCTURED-DATA-search-console-warnings-2026-07-22.md`;
-   - operativer Owner: GitHub-Issue **#165**;
-   - alle Search-Console-Warnungen und betroffenen URLs read-only auflösen;
-   - historischen Crawlstand, bewusste optionale Lücke, Datenlücke und technischen Fehler unterscheiden;
-   - nur belegte Fehler korrigieren;
-   - keine Organizer-, Performer-, Preis-, Währungs-, `validFrom`-, Availability- oder Ticketwerte erfinden.
+1. **Responsive Eventdarstellung**
+   - operativer Owner: GitHub-Issue **#171**;
+   - Status: `QUEUED`;
+   - während Issue #172 keine Produkt-, CSS-, UI- oder Responsive-Umsetzung.
 
-Der Workpack ist eingeplant, aber nicht aktiv. Bis zur ausdrücklichen Aktivierung werden weder Code- oder Datenänderungen noch pauschale Search-Console-Validierungen durchgeführt.
-
-Er ist zugleich der erste Test des vereinfachten Arbeitsmodells:
-
-- Chat führt;
-- Work nur bei belegten unabhängigen Liefersträngen;
-- Codex ist der einzige Repository-Schreiber;
-- Normalfall: ein Codex-Task, ein PR nach `staging`, ein Staging-Deploy und ein Release-PR nach `main`;
-- operativer Fortschritt ausschließlich in Issue #165;
-- dauerhaftes Wissensdelta genau einmal am Ende dokumentieren.
+Der Structured-Data-Workpack aus Issue #165 ist abgeschlossen und gehört nicht
+mehr in die Queue. Issue #171 bleibt bis zur ausdrücklichen Aktivierung fachlich
+unverändert.
 
 ## Danach möglicher Produkt-Workpack
 

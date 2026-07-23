@@ -60,6 +60,11 @@ Neue Workflows sind nur zulässig, wenn keine bestehende Rolle die Aufgabe über
 ## 5. Tests und Evidence
 
 - Tests beweisen Verhalten, nicht Dateinamen oder Kommentare.
+- Der aktive schreibende Workpack besitzt genau einen maschinenlesbaren Vertrag
+  unter `docs/workpacks/active/acceptance-contract.json`; sein Diff-Scope und
+  seine Evidence-Grenzen werden über `scripts/validate-repo.sh` fail-closed geprüft.
+- Synthetische Fixtures sind nur begrenzte Zusatz-Evidence und ersetzen nie die
+  getrennte Prüfung des vorhandenen Repository-, Build- oder Feed-Outputs.
 - Der PR besitzt genau einen Required Check: `PR Gate`.
 - `scripts/validate-repo.sh` ist der zentrale lokale und CI-Einstieg für Syntax-, Unit- und Contracttests.
 - Fachlich notwendige Tests bleiben erhalten, auch wenn ihre früheren Top-Level-Workflows entfernt werden.

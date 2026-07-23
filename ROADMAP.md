@@ -1,6 +1,6 @@
 # Roadmap – Bocholt erleben
 
-Stand: 2026-07-22  
+Stand: 2026-07-23
 Status: priorisierte Produktziele; kein operativer Workpack-Status
 
 Der aktuelle technische Schritt steht in `docs/workpacks/active/CURRENT_WORKPACK.md`. Die technische Warteschlange steht in `docs/workpacks/queued/INDEX.md`.
@@ -36,7 +36,7 @@ Referenzen:
 - `docs/decisions/2026-07-18-search-intent-und-static-rendering.md`;
 - `docs/workpacks/completed/SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md`.
 
-## 2. Bereites nächstes Qualitäts-Workpack
+## 2. Abgeschlossen – Structured-Data-Reparatur
 
 ### SEO Structured Data – Search-Console-Warnungen
 
@@ -63,13 +63,22 @@ Bekannte Ausgangsevidence vom 2026-07-22:
 - `offers` fehlt: 1 Element;
 - bekannte Beispiel-URL: `https://bocholt-erleben.de/events/2-bocholter-vereinsmesse-in-den-shopping-arkaden-2026-09-27/`.
 
-Der Workpack beginnt ausschließlich read-only. Der abgeschlossene SEO-Recovery-Workpack bleibt geschlossen.
+Der Workpack wurde über PRs #168 bis #170 abgeschlossen und mit Main-SHA
+`eb5e0f87199d03879d8ae62085e2ae7a52bdf252` veröffentlicht. Der abgeschlossene
+SEO-Recovery-Workpack bleibt geschlossen.
 
 Referenz:
 
 - `docs/workpacks/queued/SEO-STRUCTURED-DATA-search-console-warnings-2026-07-22.md`.
 
-## 3. Danach mögliches Produktziel
+## 3. Nächster vorbereiteter Produkt-Workpack
+
+### Responsive Eventdarstellung
+
+Issue #171 bleibt `QUEUED`. Der fachliche Scope wird durch die
+Arbeitsprozess-Härtung aus Issue #172 weder umgesetzt noch erweitert.
+
+## 4. Danach mögliches Produktziel
 
 ### Startpartner-Wachstumspilot operationalisieren
 
@@ -100,7 +109,7 @@ Referenz:
 
 `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`
 
-## 4. Danach folgende Produktketten
+## 5. Danach folgende Produktketten
 
 ### Anbieterwert weiter stärken
 
@@ -122,7 +131,7 @@ Referenz:
 - keine schwere Account-/Sync-Logik ohne belegten Bedarf;
 - neue Personalisierung nur mit klarem Nutzerwert und Datenschutzvertrag.
 
-## 5. Laufende Betriebsaufgaben
+## 6. Laufende Betriebsaufgaben
 
 - Deploy-, HTTP- und Browser-Smokes grün halten;
 - regulären Weekly-KI-Lauf auf Vorlauf, Drop-Gründe und begrenztes Feedback prüfen;
@@ -130,7 +139,7 @@ Referenz:
 - Suchwirkung nach SEO-Änderungen mit 14-/28-Tage-Fenstern bewerten;
 - keine Erfolgsbehauptung aus einzelnen Tagen oder bloßen CI-Markern.
 
-## 6. Nicht als nächstes starten
+## 7. Nicht als nächstes starten
 
 - allgemeine UI-Neugestaltung ohne konkreten Fehler;
 - zusätzliche Workflow-, Observer- oder Dokumentationsschichten ohne neuen belegten Bedarf;
@@ -143,7 +152,7 @@ Referenz:
 - neue Bildproduktion ohne konkreten Visual-Gap;
 - große CSS-/JS-Sanierung ohne Produkt- und Ownerbezug.
 
-## 7. Aktivierungsregel
+## 8. Aktivierungsregel
 
 Ein Workpack wird erst aktiv, wenn:
 

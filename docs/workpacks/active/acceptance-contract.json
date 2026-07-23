@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "workpack_issue": 172,
+  "status": "READY_FOR_CODEX",
+  "gate_a": "APPROVED",
+  "objective": "Beweisbare, fail-closed Abnahme-, Diff-, Evidence- und Abschluss-Gates im bestehenden PR-Pruefpfad.",
+  "non_goals": [
+    "Produkt-, CSS- oder UI-Aenderungen",
+    "Responsive-Implementierung aus Issue 171",
+    "Event-, Inbox-, Google-Sheet-, STRATO- oder Search-Console-Mutationen"
+  ],
+  "allowed_paths": [
+    "docs/workpacks/active/acceptance-contract.json",
+    "scripts/validate_acceptance_contract.py",
+    "scripts/run-event-navigation-smokes.sh",
+    "tests/test_acceptance_contract.py",
+    "scripts/validate-repo.sh",
+    ".github/workflows/pr-gate.yml",
+    "AI_ENTRYPOINT.md",
+    "ENGINEERING.md",
+    "docs/workpacks/active/CURRENT_WORKPACK.md",
+    "docs/workpacks/queued/INDEX.md",
+    "ROADMAP.md",
+    "TEST_STATUS.md"
+  ],
+  "owners": [
+    "Arbeitsprozess",
+    "PR-Pruefung",
+    "Proofstand",
+    "Produktprioritaet"
+  ],
+  "locked_paths": [
+    "css/**",
+    "js/**",
+    "data/**",
+    "api/**",
+    "steuerzentrale/**",
+    ".github/workflows/deploy-*.yml"
+  ],
+  "allowed_visible_changes": ["Keine sichtbare Produktaenderung"],
+  "unchanged_contracts": [
+    "Produktdarstellung und Responsive-Verhalten",
+    "Event-, Inbox- und externe Daten",
+    "Deployrouting staging nach main"
+  ],
+  "scope_classes": {
+    "ui": false,
+    "rendering": false,
+    "data": false,
+    "external_resources": false,
+    "documentation": true
+  },
+  "visible_contract": {
+    "reference": "Vorhandener Repository- und Build-Output bleibt unveraendert",
+    "viewports": ["desktop-1366x900", "mobile-390x844"],
+    "above_the_fold": "Keine sichtbare Aenderung erlaubt",
+    "new_visible_elements": false,
+    "javascript_states": ["enabled", "disabled-not-applicable-no-product-change"]
+  },
+  "real_evidence": [
+    {
+      "name": "repository-feed-availability-and-navigation",
+      "command": "bash scripts/run-event-navigation-smokes.sh real",
+      "evidence_scope": "Prueft den vorhandenen data/events.json-Output ohne Ersatz; Navigation nur wenn der reale Feed vorhanden ist, sonst explizit NOT_PROVEN"
+    }
+  ],
+  "synthetic_evidence": [
+    {
+      "name": "bounded-magic-show-fixture",
+      "command": "bash scripts/run-event-navigation-smokes.sh fixture",
+      "evidence_scope": "Nur die deterministische Ein-Event-Fixture; kein Beweis fuer den Repository-Feed"
+    }
+  ],
+  "external_writes": [
+    {
+      "resource": "all-external-resources",
+      "access_class": "none",
+      "stable_identity": "not-applicable",
+      "before_state": "not-applicable",
+      "exact_mutation": "none",
+      "readback": "not-applicable",
+      "rollback": "not-applicable"
+    }
+  ],
+  "definition_of_done": [
+    "Zentraler Validator lokal und im bestehenden PR Gate aktiv",
+    "Positive und negative Verhaltenstests fuer die Fehler-Injektionsmatrix gruen",
+    "Realer Feed- und begrenzter Fixture-Smoke getrennt und checkout-neutral",
+    "Router, Queue, Roadmap und Proofindex konsistent"
+  ],
+  "rollback": "Den einzelnen Governance-Commit beziehungsweise PR zuruecknehmen; keine Datenmigration oder externe Mutation.",
+  "error_budget": {
+    "maximum_real_corrections": 1,
+    "real_corrections": 0,
+    "unexpected_real_findings": []
+  },
+  "completion": {
+    "claimed": false,
+    "proven": [
+      "Lokale Contracttests pruefen fail-closed Verhalten",
+      "Realer Repository-Feed und synthetischer Browserpfad werden getrennt behandelt"
+    ],
+    "not_proven": [
+      "PR Gate in GitHub vor dem ersten Push",
+      "Staging- oder Live-Deployment"
+    ],
+    "evidence_scope": [
+      "Lokaler Repository-Diff und lokale Tests auf dem Feature-Branch",
+      "Keine externe Runtime- oder Release-Evidence"
+    ]
+  },
+  "completion_state": {
+    "issue": "READY_FOR_CODEX",
+    "router": "ACTIVE",
+    "queue": "NOT_QUEUED",
+    "proof_index": "IN_PROGRESS"
+  }
+}

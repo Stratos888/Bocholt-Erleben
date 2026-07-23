@@ -1,6 +1,6 @@
 # Aktueller Proofindex – Bocholt erleben
 
-Stand: 2026-07-22
+Stand: 2026-07-23
 
 Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Historie liegt in Git und den jeweiligen Action-Artefakten.
 
@@ -24,7 +24,7 @@ Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Histor
 | Geschützte Deploy-Environments | E2 | Deployjob nutzt abhängig vom Branch ausschließlich `staging` oder `main`; Branchregeln sind aktiv; `GITHUB_TOKEN` ist auf `contents: read` begrenzt |
 | Staging-Deploy | E3 | normaler Deploy über Environment `staging` einschließlich Build-, HTTP- und Browser-Smoke erfolgreich |
 | Staging-Secret-Isolation | E3 | `STAGING_REVIEW_PASSWORD` liegt ausschließlich im Environment `staging`; nach Löschen des gleichnamigen Repository-Secrets blieben Deploy und Login erfolgreich |
-| Live-Deploy | E6 | finaler SEO-Abschluss über PR #160 veröffentlicht; Main-SHA `5490b0fe7416d39e675796a9759b1ef5fef20b5f`; normaler Main-Deploy grün |
+| Live-Deploy | E6 | Structured-Data- und Eventdarstellungsabschluss über PRs #168 bis #170 veröffentlicht; Main-SHA `eb5e0f87199d03879d8ae62085e2ae7a52bdf252`; normaler Main-Deploy grün |
 | Branch-Inhaltsgleichheit | E1 | `main` und `staging` besitzen denselben Dateiinhalt; Unterschiede bestehen nur in der Merge-Historie |
 | SEO Intent- und Renderingvertrag | E2 | gemeinsame neutrale Auswahl, Berliner Kalendertag, Mehrtagesevents, Ausschluss vergangener/ungültiger Inhalte, stabile Sortierung, echte Renderer-Fixtures und fail-closed leere Datenkerne im `PR Gate` |
 | SEO Stagingabschluss | E3 | Staging-SHA `2ee2990bb06ee03ac8248e47150bb12de8a1c74e`; PR Gate #219 und normaler Deploy grün; mobile Sichtprüfung 327 × 779 Pixel grün; keine zusätzlichen Hero-Zeilen oder CTA-Regression |
@@ -33,8 +33,8 @@ Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Histor
 | Event-Schema und Detailseiten | E2 | Event-JSON-LD nur auf geeigneten eindeutigen Detailseiten; mehrere Ticketarten sichtbar und schema-deckungsgleich; unbekannte Eintrittslage bleibt indexierbare HTML-Seite ohne synthetisches Event-Markup |
 | Sammelseiten-Schema | E2 | `/events/` und andere Sammelseiten geben keine einzelnen Event-Entitäten als Ersatz für Detailseiten aus |
 | Robots, Sitemap und Canonical | E2/E3 | umgebungsabhängige Robots- und Sitemaptemplates, Canonical-Contracts und Ergänzung generierter Eventdetailseiten sind im Deploypfad abgesichert |
-| Search-Console-Structured-Data-Baseline | externer Befund | am 2026-07-22 sichtbar: `performer` 2, `organizer` 2, `priceCurrency` 1, `validFrom` 1, `price` 1 und `offers` 1; bekannte Beispiel-URL ist die 2. Bocholter Vereinsmesse; vollständige URL-/Live-/Quellenauflösung als eigener Queue-Workpack eingeplant |
-| Search-Console-Validierungen | nicht gestartet | keine pauschale Validierung vor URL-genauer Klassifizierung als historisch, bewusst akzeptiert, Datenlücke oder technischer Fehler |
+| Structured-Data-Reparatur | E1/E2/E6 | PRs #168 bis #170 schließen quellengestützte Eventdaten-, Detailseiten-, Offer- und Navigationsverträge; veröffentlicht mit Main-SHA `eb5e0f87199d03879d8ae62085e2ae7a52bdf252` |
+| Arbeitsprozess-Härtung #172 | E1 | in Umsetzung; lokale und CI-Evidence dürfen erst nach grünem Contract- und PR-Gate als E2 gelten |
 | SEO-Wirkungsmessung | ausstehend | erste Tendenz nach mindestens 14 Tagen, führende Bewertung nach 28 Tagen; Impressionen, Klicks, CTR und Position getrennt bewerten |
 | Control-Center-Writeback | E4 | Success, Replay, kontrollierter Fehler, Resume und Cleanup synthetisch belegt |
 | Live-Unverändertheit beim E4 | E4 | Live-Sheet und Live-Feed blieben unverändert |

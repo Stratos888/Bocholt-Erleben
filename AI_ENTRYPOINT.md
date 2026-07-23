@@ -91,6 +91,11 @@ Repository-Dateien enthalten nur dauerhafte Regeln, Architektur, Datenverträge,
 
 ## 5. Verbindlicher Abnahmevertrag vor Codex
 
+Der genau eine kanonische maschinenlesbare Vertrag des aktiven schreibenden
+Workpacks liegt unter `docs/workpacks/active/acceptance-contract.json`. Der
+zentrale Validator prüft ihn und den tatsächlichen PR-Diff fail-closed; das
+GitHub-Issue bleibt Owner für operativen Status und Evidence.
+
 Vor jedem schreibenden Codex-Auftrag müssen feststehen:
 
 1. fachliches Ziel;
