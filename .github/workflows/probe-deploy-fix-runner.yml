@@ -1,0 +1,27 @@
+name: Probe deploy fix branch runner
+
+on:
+  push:
+    branches:
+      - fix/deploy-release-coherence
+    paths:
+      - .github/workflows/probe-deploy-fix-runner.yml
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/deploy-release-coherence
+      - run: |
+          mkdir -p artifacts
+          printf 'runner_ok=yes\ncommit=%s\n' "$GITHUB_SHA" > artifacts/deploy-fix-runner-probe.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/deploy-fix-runner-probe.txt
+          git commit -m "test: record deploy fix runner probe"
+          git push origin HEAD:fix/deploy-release-coherence
