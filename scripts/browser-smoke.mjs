@@ -338,20 +338,26 @@ async function checkEventCardNavigation(page, baseUrl, profileName, timeoutMs) {
   await gotoReady(page, baseUrl, '/events/', timeoutMs);
   const card = page.locator('#event-cards .event-card[data-event-detail-url]').first();
   await card.waitFor({ state: 'visible', timeout: timeoutMs });
-  const target = await card.getAttribute('data-event-detail-url');
-  if (!target) throw new Error('Eventkarte besitzt kein kanonisches internes Detailziel.');
 
-  if (profileName === 'desktop') {
-    const expectedPath = new URL(target, baseUrl).pathname;
-    await card.click({ timeout: 7000 });
-    await page.waitForURL((url) => url.pathname === expectedPath, { timeout: timeoutMs });
-    await expectAnySelectorCount(page, ['main', 'article', '[data-event-detail-page]']);
-    return;
-  }
+  const detailLink = card.locator('a.event-card-detail-link[href]').first();
+  await detailLink.waitFor({ state: 'visible', timeout: timeoutMs });
+  const target = await detailLink.getAttribute('href');
+  if (!target) throw new Error('Eventkarte besitzt keinen echten internen Detail-Link.');
 
-  await card.click({ timeout: 7000 });
-  await page.locator('[role="dialog"]:visible, .detail-panel:visible, .event-detail:visible').first()
-    .waitFor({ state: 'visible', timeout: timeoutMs });
+  const expectedPath = new URL(target, baseUrl).pathname;
+  const title = card.locator('h3').first();
+  await title.click({ timeout: 7000 });
+  await page.waitForURL((url) => url.pathname === expectedPath, { timeout: timeoutMs });
+  await expectAnySelectorCount(page, ['main', 'article', '[data-event-detail-page]']);
+
+  await gotoReady(page, baseUrl, '/events/', timeoutMs);
+  const keyboardLink = page.locator('#event-cards .event-card a.event-card-detail-link[href]').first();
+  await keyboardLink.focus();
+  await page.keyboard.press('Enter');
+  await page.waitForURL((url) => url.pathname === expectedPath, { timeout: timeoutMs });
+  await expectAnySelectorCount(page, ['main', 'article', '[data-event-detail-page]']);
+  await ensureNoFatal(page);
+  console.log(`ℹ️ ${profileName}: Karten- und Tastaturnavigation führen intern`);
 }
 
 async function checkBottomNavigation(page, baseUrl, timeoutMs) {
