@@ -75,15 +75,15 @@ jobs:
           import json
           from pathlib import Path
           event = {
-              "id": "browser-smoke-event-2099-09-27",
-              "title": "Browser-Smoke Event",
+              "id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2099-09-27",
+              "title": "Du wunderst mich – Die Kinderzaubershow mit Endrik Thier",
               "date": "2099-09-27",
               "time": "14:00",
               "location": "Bocholt",
               "city": "Bocholt",
               "category": "Familie",
               "description": "Deterministischer PR-Gate-Navigationstest.",
-              "url": "https://example.com/browser-smoke-source"
+              "url": "https://yuki-magazin.de/veranstaltungen/du-wunderst-mich-die-kinderzaubershow-mit-endrik-thier/"
           }
           Path("data/events.json").write_text(
               json.dumps([event], ensure_ascii=False, indent=2) + "\n",
