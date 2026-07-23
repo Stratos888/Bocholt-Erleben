@@ -125,6 +125,34 @@ def main() -> None:
     if item.get("detail_url") != f"https://staging.bocholt-erleben.de/events/{expected_id}/":
         fail("Der Event-Builder erzeugte keine korrekte Staging-Detail-URL.")
 
+    duplicate_a = dict(event)
+    duplicate_a.update({
+        "id": "2-bocholter-vereinsmesse-in-den-shopping-arkaden-2099-09-27",
+        "title": "2. Bocholter Vereinsmesse in den Shopping Arkaden",
+        "date": "2099-09-27", "time": "13:00–18:00 Uhr",
+        "location": "Shopping Arkaden",
+        "source_url": "https://www.bocholt.de/veranstaltungskalender/vereinsmesse",
+    })
+    duplicate_b = dict(duplicate_a)
+    duplicate_b.update({
+        "id": "2-bocholter-vereinsmesse-2099-09-27",
+        "title": "2. Bocholter Vereinsmesse",
+        "time": "12:00–17:00 Uhr",
+        "location": "Shopping-Arkaden",
+    })
+    with tempfile.TemporaryDirectory(prefix="be-event-builder-duplicate-") as temp_dir:
+        temp = Path(temp_dir)
+        tsv_path, json_path = temp / "events.tsv", temp / "events.json"
+        with tsv_path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=columns, delimiter="\t", lineterminator="\n")
+            writer.writeheader()
+            writer.writerows([duplicate_a, duplicate_b])
+        env = os.environ.copy()
+        env.update({"BE_EVENT_BUILDER_TSV_PATH": str(tsv_path), "BE_EVENT_BUILDER_JSON_PATH": str(json_path)})
+        result = subprocess.run([sys.executable, str(BUILDER)], cwd=ROOT, env=env, text=True, encoding="utf-8", capture_output=True)
+        if result.returncode == 0 or "semantische Event-Dublette" not in result.stderr:
+            fail(f"Semantische Vereinsmesse-Dublette wurde nicht fail-closed blockiert:\n{result.stdout}\n{result.stderr}")
+
     print("=== Event Builder / Control Center Contract: OK ===")
 
 
