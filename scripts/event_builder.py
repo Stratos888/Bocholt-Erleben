@@ -29,6 +29,7 @@ from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
 from event_visual_motifs import infer_event_visual_motif, normalize_event_visual_motif
 from event_description_quality import apply_description_override, load_description_overrides
 from event_public_contract import PUBLIC_FIELDS, normalize_public_event, schema_eligible
+from event_identity import find_best_event_match
 
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "events.tsv"
@@ -328,6 +329,7 @@ def main() -> None:
     seen_ids = set()
     seen_fingerprints = set()
     seen_url_occurrences = set()
+    published_identity_rows: List[Dict[str, str]] = []
     skipped_expired_events = 0
 
     today_date = datetime.now().date()
@@ -461,6 +463,16 @@ def main() -> None:
             location=data["location"],
             visual_key=visual_key,
         )
+
+        identity_match = find_best_event_match(data, published_identity_rows)
+        if identity_match.get("status") in {"possible", "exact", "identity_conflict"}:
+            fail(
+                f"Zeile {idx}: semantische Event-Dublette zu "
+                f"{identity_match.get('matched_event_id')!r} "
+                f"({identity_match.get('reason') or identity_match.get('status')}). "
+                "Bitte die kanonischen Zeilen in Events beziehungsweise Events_Staging klären."
+            )
+        published_identity_rows.append(dict(data))
 
         events.append(
             EventRow(

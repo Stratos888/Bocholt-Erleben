@@ -23,6 +23,15 @@ unknown = event({"id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2026-09-0
 html = render_page(unknown)
 assert '<script type="application/ld+json">' not in html
 assert '<meta name="robots" content="noindex' not in html
+kinder = event({"id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2026-09-04", "url": "https://yuki-magazin.de/veranstaltungen/du-wunderst-mich-die-kinderzaubershow-mit-endrik-thier/"})
+kinder_html = render_page(kinder)
+assert "4 EUR" in kinder_html and "keine verifizierten Ticketdaten" in kinder_html
+assert '<script type="application/ld+json">' not in kinder_html
+assert "offers" not in kinder_html and "Tickets</a>" not in kinder_html
+messe = event({"id": "2-bocholter-vereinsmesse-in-den-shopping-arkaden-2026-09-27", "url": "https://www.bocholt.de/veranstaltungskalender/2-bocholter-vereinsmesse-in-den-shopping-arkaden"})
+messe_html = render_page(messe)
+assert '<script type="application/ld+json">' not in messe_html
+assert "Tickets</a>" not in messe_html and "Eintritt:" not in messe_html
 free = event({"admission_status": "free"})
 assert json.loads(json_ld(free))["offers"] == {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}
 paid = event({"admission_status": "paid", "price": "12.5", "price_currency": "EUR", "ticket_url": "https://tickets.example/a", "availability": "InStock", "valid_from": "2026-08-01T10:00:00+02:00"})

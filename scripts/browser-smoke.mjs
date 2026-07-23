@@ -95,6 +95,7 @@ function parseArgs(argv) {
     profile: 'all',
     outDir: 'artifacts/browser-smoke',
     expectedBuild: '',
+    check: 'all',
     timeoutMs: 18000,
   };
 
@@ -113,6 +114,9 @@ function parseArgs(argv) {
     } else if (value === '--expected-build') {
       args.expectedBuild = next || '';
       i += 1;
+    } else if (value === '--check') {
+      args.check = next || 'all';
+      i += 1;
     } else if (value === '--timeout-ms') {
       args.timeoutMs = Number(next || args.timeoutMs);
       i += 1;
@@ -128,6 +132,9 @@ function parseArgs(argv) {
   }
   if (args.profile !== 'all' && !PROFILES[args.profile]) {
     throw new Error('--profile muss all, desktop oder mobile sein.');
+  }
+  if (!['all', 'event-navigation'].includes(args.check)) {
+    throw new Error('--check muss all oder event-navigation sein.');
   }
   return args;
 }
@@ -332,6 +339,67 @@ async function checkRoute(page, baseUrl, route, timeoutMs) {
   }
   if (route.anyText) await expectAnyText(page, route.anyText);
   if (route.dynamicAny) await expectAnySelectorCount(page, route.dynamicAny);
+}
+
+async function checkEventCardNavigation(page, baseUrl, profileName, timeoutMs) {
+  await gotoReady(page, baseUrl, '/events/', timeoutMs);
+  const card = page.locator('#event-cards .event-card').filter({ hasText: 'Kinderzaubershow' }).first();
+  await card.waitFor({ state: 'visible', timeout: timeoutMs });
+
+  if (profileName === 'desktop') {
+    const outboundLink = card.locator('a.event-card-primary-hitarea[href]').first();
+    await outboundLink.waitFor({ state: 'visible', timeout: timeoutMs });
+    const target = await outboundLink.getAttribute('href');
+    if (!target || !target.includes('yuki-magazin.de/veranstaltungen/du-wunderst-mich')) {
+      throw new Error('Zaubershowkarte besitzt nicht den belegten externen Direktlink.');
+    }
+
+    const grid = card.locator('xpath=..');
+    const layout = await Promise.all([
+      grid.evaluate((element) => getComputedStyle(element).gridTemplateColumns),
+      grid.evaluate((element) => element.getBoundingClientRect().width),
+      card.evaluate((element) => element.getBoundingClientRect().width),
+    ]);
+    if (layout[0].split(' ').length !== 2 || layout[2] >= layout[1] * 0.75) {
+      throw new Error(`Desktop-Eventgrid ist nicht zweispaltig: columns=${layout[0]}, card=${layout[2]}, grid=${layout[1]}`);
+    }
+
+    await page.route('https://yuki-magazin.de/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'text/html', body: '<main>Outbound test target</main>' })
+    );
+    await outboundLink.click({ timeout: 7000 });
+    await page.waitForURL(/yuki-magazin\.de\/veranstaltungen\/du-wunderst-mich/, { timeout: timeoutMs });
+    if (!page.url().includes('yuki-magazin.de/veranstaltungen/du-wunderst-mich')) {
+      throw new Error(`Desktop-Klick öffnet falsches Ziel: ${page.url()}`);
+    }
+
+    await gotoReady(page, baseUrl, '/events/', timeoutMs);
+    const keyboardLink = page.locator('#event-cards .event-card').filter({ hasText: 'Kinderzaubershow' })
+      .first().locator('a.event-card-primary-hitarea[href]').first();
+    await keyboardLink.focus();
+    await page.keyboard.press('Enter');
+    await page.waitForURL(/yuki-magazin\.de\/veranstaltungen\/du-wunderst-mich/, { timeout: timeoutMs });
+    if (!page.url().includes('yuki-magazin.de/veranstaltungen/du-wunderst-mich')) {
+      throw new Error(`Desktop-Tastatur öffnet falsches Ziel: ${page.url()}`);
+    }
+  } else {
+    if (await card.locator('a.event-card-primary-hitarea:visible').count()) {
+      throw new Error('Der Desktop-Direktlink darf die mobile Karte nicht überlagern.');
+    }
+
+    await card.locator('h3').click({ timeout: 7000 });
+    await expectVisible(page, '#event-detail-panel:not(.hidden)');
+
+    await page.locator('#event-detail-panel .detail-panel-close').click().catch(async () => {
+      await page.keyboard.press('Escape');
+    });
+    await card.focus();
+    await page.keyboard.press('Enter');
+    await expectVisible(page, '#event-detail-panel:not(.hidden)');
+  }
+
+  await ensureNoFatal(page);
+  console.log(`ℹ️ ${profileName}: Eventkarten-Navigationsvertrag erfüllt`);
 }
 
 async function checkBottomNavigation(page, baseUrl, timeoutMs) {
@@ -584,11 +652,22 @@ async function runProfile(browser, baseUrl, profileName, args, results) {
   }
 
   try {
+    if (args.check === 'event-navigation') {
+      await runChecked('Eventkarten-Navigation', '/events/', async () => {
+        await checkEventCardNavigation(page, baseUrl, profileName, args.timeoutMs);
+      });
+      return;
+    }
+
     for (const route of ROUTE_CHECKS) {
       await runChecked(route.name, route.path, async () => {
         await checkRoute(page, baseUrl, route, args.timeoutMs);
       });
     }
+
+    await runChecked('Eventkarten-Navigation', '/events/', async () => {
+      await checkEventCardNavigation(page, baseUrl, profileName, args.timeoutMs);
+    });
 
     await runChecked('Activity-Favoriten lokal', '/aktivitaeten/', async () => {
       await checkActivityFavorites(page, baseUrl, args.timeoutMs);

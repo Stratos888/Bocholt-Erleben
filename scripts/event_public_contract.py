@@ -16,6 +16,26 @@ PUBLIC_FIELDS = (
     "offer_verified_at", "offer_source_url",
 )
 
+# Source-backed corrections for the two editorial Sheet rows whose public
+# contract fields were empty at the 2026-07-22 Search Console review.  Keep
+# these keyed by the stable event id: generated events.tsv/events.json files
+# are deploy artifacts and must not become a second source of truth.
+CURATED_PUBLIC_FIELDS_BY_EVENT_ID = {
+    "du-wunderst-mich-kinderzaubershow-endrik-thier-2026-09-04": {
+        "admission_status": "paid",
+        "price": "4",
+        "price_currency": "EUR",
+        "organizer_name": "Förderverein der Kita St. Josef",
+        "organizer_type": "Organization",
+        "performer_name": "Endrik Thier",
+        "performer_type": "Person",
+    },
+    "2-bocholter-vereinsmesse-in-den-shopping-arkaden-2026-09-27": {
+        "organizer_name": "Stadt Bocholt – Freiwilligen-Agentur",
+        "organizer_type": "Organization",
+    },
+}
+
 def _text(value: Any) -> str:
     return "" if value is None else str(value).strip()
 
@@ -47,7 +67,11 @@ def numeric_price(value: Any) -> float | int | None:
     return int(number) if number.is_integer() else number
 
 def normalize_public_event(raw: Dict[str, Any]) -> Dict[str, Any]:
+    curated = CURATED_PUBLIC_FIELDS_BY_EVENT_ID.get(_text(raw.get("id")), {})
     out = {key: _text(raw.get(key)) for key in PUBLIC_FIELDS}
+    for key, value in curated.items():
+        if not out[key]:
+            out[key] = value
     out["source_url"] = out["source_url"] or _text(raw.get("url"))
     out["ticket_url"] = public_http_url(out["ticket_url"])
     if out["admission_status"] not in {"free", "paid", "unknown"}:

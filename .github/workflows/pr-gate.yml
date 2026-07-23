@@ -56,3 +56,54 @@ jobs:
       - name: Validate frontend contracts
         shell: bash
         run: bash scripts/validate-repo.sh frontend
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install browser-smoke runtime
+        shell: bash
+        run: |
+          npm install --no-save --no-package-lock playwright@1.54.1
+          npx playwright install --with-deps chromium
+
+      - name: Build deterministic event-navigation fixture
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          event = {
+              "id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2099-09-27",
+              "title": "Du wunderst mich – Die Kinderzaubershow mit Endrik Thier",
+              "date": "2099-09-27",
+              "time": "14:00",
+              "location": "Bocholt",
+              "city": "Bocholt",
+              "category": "Familie",
+              "description": "Deterministischer PR-Gate-Navigationstest.",
+              "url": "https://yuki-magazin.de/veranstaltungen/du-wunderst-mich-die-kinderzaubershow-mit-endrik-thier/"
+          }
+          Path("data/events.json").write_text(
+              json.dumps([event], ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8"
+          )
+          PY
+          SITE_ORIGIN=http://127.0.0.1:8765 python3 scripts/build-event-detail-pages.py
+
+      - name: Run focused browser-smoke against PR build
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 >/tmp/bocholt-erleben-pr-gate-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8765/events/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8765/events/ >/dev/null
+          node scripts/browser-smoke.mjs --base-url http://127.0.0.1:8765 --profile all --check event-navigation --out-dir /tmp/browser-smoke

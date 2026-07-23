@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
-from event_public_contract import build_offer_schema, normalize_public_event, public_http_url, schema_eligible
+from event_public_contract import build_offer_schema, normalize_public_event, numeric_price, public_http_url, schema_eligible
 
 ROOT = Path(__file__).resolve().parents[1]
 EVENTS_JSON = ROOT / "data" / "events.json"
@@ -521,7 +521,10 @@ def render_page(event: DetailEvent) -> str:
     elif admission_status == "free" and schema_offers:
         admission_html = '<p class="event-admission" data-admission-status="free"><strong>Eintritt:</strong> kostenlos · 0 EUR</p>'
     elif admission_status == "paid":
-        admission_html = '<p class="event-admission" data-admission-status="paid"><strong>Eintritt:</strong> kostenpflichtig; keine verifizierten Ticketdaten vorhanden</p>'
+        price = numeric_price(event.public.get("price"))
+        currency = normalize_text(event.public.get("price_currency"))
+        price_text = f"{price} {currency}; " if price is not None and re.fullmatch(r"[A-Z]{3}", currency) else "kostenpflichtig; "
+        admission_html = f'<p class="event-admission" data-admission-status="paid"><strong>Eintritt:</strong> {escape(price_text)}keine verifizierten Ticketdaten vorhanden</p>'
 
     location_meta_html = ""
     if maps_url and not event.is_past:
