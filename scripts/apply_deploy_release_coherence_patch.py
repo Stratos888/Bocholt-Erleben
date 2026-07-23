@@ -116,7 +116,7 @@ UPLOAD_BLOCK = '''      # === BEGIN BLOCK: STRATO_ORDERED_RELEASE_UPLOAD_V1 ===
         run: |
           set -euo pipefail
           for attempt in $(seq 1 12); do
-            current="$(curl -fsSL --connect-timeout 10 --max-time 20 "${SITE_ORIGIN}/meta/build.txt?deploy_run=${GITHUB_RUN_ID}-${attempt}" | tr -d '\r\n' || true)"
+            current="$(curl -fsSL --connect-timeout 10 --max-time 20 "${SITE_ORIGIN}/meta/build.txt?deploy_run=${GITHUB_RUN_ID}-${attempt}" | tr -d '\\r\\n' || true)"
             [ "$current" = "$BUILD_ID" ] && exit 0
             echo "Build marker attempt $attempt/12: '${current:-unavailable}', expected '$BUILD_ID'."
             sleep 5
