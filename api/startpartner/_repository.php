@@ -216,4 +216,3 @@ function be_startpartner_find_candidate_row(PDO $pdo, string $field, string $val
     $row = $statement->fetch(PDO::FETCH_ASSOC);
     return is_array($row) ? $row : null;
 }
-
