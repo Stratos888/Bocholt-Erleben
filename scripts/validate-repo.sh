@@ -69,6 +69,8 @@ validate_frontend() {
 validate_repository() {
   echo "== Repository tools and generators =="
   python3 -m compileall -q scripts tools
+  python3 tests/test_pr_contract.py
+  python3 tests/test_deploy_run_status.py
   python3 tests/test_deploy_release_coherence.py
   bash tests/test_strato_sftp_phase_retry.sh
   python3 scripts/audit_control_center_product_contract.py
