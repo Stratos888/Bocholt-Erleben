@@ -3,7 +3,7 @@ name: PR Gate
 on:
   pull_request:
     branches: ["staging", "main"]
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
 
 concurrency:
   group: pr-gate-${{ github.event.pull_request.number }}
@@ -11,6 +11,7 @@ concurrency:
 
 permissions:
   contents: read
+  issues: read
 
 jobs:
   validate:
@@ -20,6 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Enforce serial branch path
         shell: bash
@@ -45,17 +48,22 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Validate repository tools
+      - name: Validate active workpack PR contract
         shell: bash
-        run: bash scripts/validate-repo.sh repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/validate_pr_contract.py
 
-      - name: Validate backend and data contracts
+      - name: Check patch whitespace
         shell: bash
-        run: bash scripts/validate-repo.sh backend
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: git diff --check "$BASE_SHA...$HEAD_SHA"
 
-      - name: Validate frontend contracts
+      - name: Validate full repository
         shell: bash
-        run: bash scripts/validate-repo.sh frontend
+        run: bash scripts/validate-repo.sh
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -68,42 +76,16 @@ jobs:
           npm install --no-save --no-package-lock playwright@1.54.1
           npx playwright install --with-deps chromium
 
-      - name: Build deterministic event-navigation fixture
+      - name: Run bounded synthetic event-navigation contract
         shell: bash
-        run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          event = {
-              "id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2099-09-27",
-              "title": "Du wunderst mich – Die Kinderzaubershow mit Endrik Thier",
-              "date": "2099-09-27",
-              "time": "14:00",
-              "location": "Bocholt",
-              "city": "Bocholt",
-              "category": "Familie",
-              "description": "Deterministischer PR-Gate-Navigationstest.",
-              "url": "https://yuki-magazin.de/veranstaltungen/du-wunderst-mich-die-kinderzaubershow-mit-endrik-thier/"
-          }
-          Path("data/events.json").write_text(
-              json.dumps([event], ensure_ascii=False, indent=2) + "\n",
-              encoding="utf-8"
-          )
-          PY
-          SITE_ORIGIN=http://127.0.0.1:8765 python3 scripts/build-event-detail-pages.py
+        env:
+          SMOKE_OUT_DIR: ${{ runner.temp }}/browser-smoke-synthetic
+        run: bash scripts/run-event-navigation-fixture-smoke.sh
 
-      - name: Run focused browser-smoke against PR build
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 -m http.server 8765 >/tmp/bocholt-erleben-pr-gate-server.log 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
-          for attempt in {1..20}; do
-            if curl --fail --silent http://127.0.0.1:8765/events/ >/dev/null; then
-              break
-            fi
-            sleep 1
-          done
-          curl --fail --silent http://127.0.0.1:8765/events/ >/dev/null
-          node scripts/browser-smoke.mjs --base-url http://127.0.0.1:8765 --profile all --check event-navigation --out-dir /tmp/browser-smoke
+      - name: Upload bounded synthetic browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-event-navigation-${{ github.event.pull_request.number }}
+          path: ${{ runner.temp }}/browser-smoke-synthetic/
+          if-no-files-found: warn
