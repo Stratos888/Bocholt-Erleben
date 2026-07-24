@@ -24,7 +24,6 @@ const BE_STARTPARTNER_TERMINAL_STATUSES = [
 ];
 const BE_STARTPARTNER_ALLOWED_ENVIRONMENTS = ['staging', 'development', 'dev', 'local', 'test'];
 const BE_STARTPARTNER_MAX_CONTACTS = 5;
-const BE_STARTPARTNER_RETENTION_REVIEW_DAYS = 180;
 
 function be_startpartner_require_gate1_environment(): void
 {
@@ -104,6 +103,27 @@ function be_startpartner_normalize_url(mixed $value): ?string
         throw new InvalidArgumentException('website_url is too long.');
     }
     return $url;
+}
+
+function be_startpartner_normalize_retention_review_at(mixed $value): string
+{
+    $text = trim((string)$value);
+    if ($text === '') {
+        throw new InvalidArgumentException('retention_review_at is required.');
+    }
+
+    try {
+        $reviewAt = new DateTimeImmutable($text);
+    } catch (Throwable) {
+        throw new InvalidArgumentException('retention_review_at is invalid.');
+    }
+
+    $reviewAt = $reviewAt->setTimezone(new DateTimeZone('UTC'));
+    if ($reviewAt <= new DateTimeImmutable('now', new DateTimeZone('UTC'))) {
+        throw new InvalidArgumentException('retention_review_at must be in the future.');
+    }
+
+    return $reviewAt->format('Y-m-d H:i:s');
 }
 
 function be_startpartner_validate_enum_value(string $value, array $allowed, string $field): string
@@ -227,11 +247,23 @@ function be_startpartner_normalize_intake(array $input): array
 
     $organizationNormalized = be_startpartner_normalize_organization((string)$organizationName);
     $identityKey = hash('sha256', $organizationNormalized . '|' . $primaryContact['email_normalized']);
+    $retentionReviewAt = be_startpartner_normalize_retention_review_at($input['retention_review_at'] ?? null);
 
+    $canonicalContacts = array_map(
+        static fn(array $contact): array => [
+            'contact_name' => $contact['contact_name'],
+            'contact_role' => $contact['contact_role'],
+            'email_normalized' => $contact['email_normalized'],
+            'phone' => $contact['phone'],
+            'is_primary' => $contact['is_primary'],
+        ],
+        $contacts
+    );
     $canonicalPayload = [
         'source' => $source,
+        'source_reference' => be_startpartner_clean_text($input['source_reference'] ?? null, 191, 'source_reference'),
         'organization_name_normalized' => $organizationNormalized,
-        'primary_email' => $primaryContact['email_normalized'],
+        'contacts' => $canonicalContacts,
         'website_url' => be_startpartner_normalize_url($input['website_url'] ?? $input['website'] ?? null),
         'description_text' => be_startpartner_clean_text(
             $input['description_text'] ?? $input['description'] ?? null,
@@ -239,8 +271,14 @@ function be_startpartner_normalize_intake(array $input): array
             'description_text'
         ),
         'desired_content_scope' => $desiredContentScope,
+        'privacy_policy_version' => $privacyPolicyVersion,
         'form_version' => $formVersion,
+        'retention_review_at' => $retentionReviewAt,
     ];
+    $canonicalJson = json_encode(
+        $canonicalPayload,
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+    );
 
     $idempotencyValue = trim((string)($input['idempotency_key'] ?? ''));
     if ($idempotencyValue !== '') {
@@ -248,15 +286,12 @@ function be_startpartner_normalize_intake(array $input): array
             throw new InvalidArgumentException('idempotency_key length is invalid.');
         }
     } else {
-        $idempotencyValue = json_encode(
-            $canonicalPayload,
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
-        );
+        $idempotencyValue = $canonicalJson;
     }
 
     return [
         'source' => $source,
-        'source_reference' => be_startpartner_clean_text($input['source_reference'] ?? null, 191, 'source_reference'),
+        'source_reference' => $canonicalPayload['source_reference'],
         'organization_name' => $organizationName,
         'organization_name_normalized' => $organizationNormalized,
         'website_url' => $canonicalPayload['website_url'],
@@ -264,11 +299,10 @@ function be_startpartner_normalize_intake(array $input): array
         'desired_content_scope' => $desiredContentScope,
         'identity_key' => $identityKey,
         'idempotency_key_hash' => hash('sha256', $source . '|' . $idempotencyValue),
+        'request_fingerprint' => hash('sha256', $canonicalJson),
         'privacy_policy_version' => $privacyPolicyVersion,
         'form_version' => $formVersion,
-        'retention_review_at' => (new DateTimeImmutable('now', new DateTimeZone('UTC')))
-            ->modify('+' . BE_STARTPARTNER_RETENTION_REVIEW_DAYS . ' days')
-            ->format('Y-m-d H:i:s'),
+        'retention_review_at' => $retentionReviewAt,
         'contacts' => $contacts,
     ];
 }
@@ -314,10 +348,9 @@ function be_startpartner_next_action(string $candidateStatus): string
         'qualified' => 'Aufnahme, Warteliste oder regulären Produktweg entscheiden.',
         'waitlisted' => 'Kapazität und erneuten Prüfzeitpunkt beobachten.',
         'routed_to_regular_product' => 'Regulären Produktweg außerhalb dieses Gate-1-Prozesses fortführen.',
-        'rejected' => 'Vorgang ist abgelehnt; Aufbewahrungsfrist beachten.',
-        'withdrawn' => 'Rückzug dokumentiert; Aufbewahrungsfrist beachten.',
-        'expired' => 'Aufbewahrungs- oder Reaktivierungsentscheidung treffen.',
+        'rejected' => 'Vorgang ist abgelehnt; Review- und Löschentscheidung beachten.',
+        'withdrawn' => 'Rückzug dokumentiert; Review- und Löschentscheidung beachten.',
+        'expired' => 'Aufbewahrungs-, Lösch- oder Reaktivierungsentscheidung treffen.',
         default => throw new DomainException('Unsupported candidate status.'),
     };
 }
-
