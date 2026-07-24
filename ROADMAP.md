@@ -1,79 +1,84 @@
 # Roadmap – Bocholt erleben
 
-Stand: 2026-07-22  
+Stand: 2026-07-24  
 Status: priorisierte Produktziele; kein operativer Workpack-Status
 
-Der aktuelle technische Schritt steht in `docs/workpacks/active/CURRENT_WORKPACK.md`. Die technische Warteschlange steht in `docs/workpacks/queued/INDEX.md`.
+Der operative Schritt steht ausschließlich im genau einen offenen GitHub-Issue mit `[ACTIVE WORKPACK]`. `docs/workpacks/active/CURRENT_WORKPACK.md` ist der statusfreie Router. Diese Roadmap nennt Produktziele und Kandidaten, keine laufenden SHAs, Gates oder Zwischenstände.
 
-Die allgemeine Prozess-, Workflow- und Dokumentationsoptimierung ist abgeschlossen. Sie wird nur bei einem neuen konkret belegten Bedarf erneut als Workpack aktiviert.
+## 1. Zuletzt abgeschlossene Grundlagen
 
-## 1. Abgeschlossen – Wirkungsmessung läuft
-
-### SEO Recovery: Search-Intent und statische Renderingbasis
+### SEO, strukturierte Daten und statisches Rendering
 
 Erreicht:
 
 - `/` bleibt kuratierter Heute-Einstieg;
 - `/events/` ist die vollständige Veranstaltungs-Landingpage;
 - `/aktivitaeten/` ist die dauerhafte Freizeit-/Aktivitäts-Landingpage;
-- das tatsächliche initiale HTML enthält H1, sinnvollen Inhaltskern und crawlbare Hauptlinks;
+- initiales HTML enthält H1, Inhaltskern und crawlbare Hauptlinks;
 - JavaScript reichert denselben Ausgangszustand progressiv an;
-- Build und Browser verwenden dieselbe neutrale Grundauswahl;
-- Event-JSON-LD liegt nur auf geeigneten eindeutigen Detailseiten;
+- Event-JSON-LD erscheint nur auf geeigneten eindeutigen Detailseiten;
 - Offers werden ausschließlich aus belegten Eintritts- und Ticketdaten erzeugt;
-- unbekannte Eintrittslagen führen nicht zu erfundenen Preisen, Verfügbarkeiten oder Ticket-URLs;
-- Staging-E3 und Live-E6 sind geschlossen;
-- die zusätzlichen Hero-Links wurden vollständig entfernt.
+- Search-Console-Warnungen wurden URL- und quellenbezogen bearbeitet, ohne erfundene Werte.
 
-Zeitversetzte Nacharbeit:
-
-- erste SEO-Wirkung nach mindestens 14 Tagen und führend nach 28 Tagen bewerten.
-
-Eine Rankingverbesserung wird nicht aus CI, einem einzelnen Tag oder dem bloßen technischen Abschluss abgeleitet.
-
-Referenzen:
+Dauerhafte Referenzen:
 
 - `docs/decisions/2026-07-18-search-intent-und-static-rendering.md`;
-- `docs/workpacks/completed/SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md`.
+- `docs/workpacks/completed/SEO-RECOVERY-search-intent-static-rendering-2026-07-18.md`;
+- `docs/workpacks/completed/SEO-STRUCTURED-DATA-search-console-warnings-2026-07-22.md`.
 
-## 2. Bereites nächstes Qualitäts-Workpack
+Zeitversetzte Google-Neubewertung bleibt laufender Betrieb und öffnet abgeschlossene Workpacks nicht erneut.
 
-### SEO Structured Data – Search-Console-Warnungen
+### Responsive Event-Grid und Releasezuverlässigkeit
+
+Erreicht:
+
+- eine Spalte bis `1099.98 CSS px`;
+- zwei Spalten ab `1100 CSS px`;
+- geordneter und kohärenter Asset-/HTML-/Marker-/Service-Worker-/Manifest-Cutover;
+- gehärtete STRATO-SFTP-Phasen;
+- Warm-Service-Worker- und Live-Grid-Nachweis;
+- automatische Auffindbarkeit von Push-Deploys über Commitstatus.
+
+### Arbeitsprozess und Dokumentation
+
+Erreicht:
+
+- genau ein aktives Workpack-Issue als operativer Owner;
+- maschinenlesbarer, vorab eingefrorener PR-Scope;
+- ein Required Check `PR Gate`;
+- checkout-neutrale synthetische Browser-Evidence;
+- genau ein Repository-Schreiber;
+- systematische Dokumentations-Reconciliation;
+- keine ZIP- oder Downloadartefakte als Nutzerlieferung ohne ausdrücklichen Auftrag.
+
+Prozessoptimierung wird nur bei einem neuen konkret belegten Engpass wieder als Workpack aktiviert.
+
+## 2. Aktuelle Produktkandidaten
+
+Die nächste Umsetzung wird nicht aus einer veralteten Repository-Queue übernommen. Vor Aktivierung werden aktueller Repo-, Runtime-, Daten- und Produktstand read-only neu bewertet.
+
+### Mobile Ausnahmeprüfung kompakter priorisieren
 
 Problem:
 
-Google Search Console zeigt nach dem abgeschlossenen SEO-Release weiterhin nicht kritische Warnungen zu `performer`, `organizer`, `offers`, `price`, `priceCurrency` und `validFrom`. Der sichtbare Search-Console-Stand kann historisches Markup, bewusst fehlende optionale Werte, reale Datenlücken oder technische Mappingfehler enthalten. Diese Ursachen dürfen nicht vermischt werden.
+- auf kleinen Bildschirmen stehen Status, Vergleich, Evidence und mehrere Aktionen zu lang und nahezu gleichrangig untereinander;
+- die eigentliche Entscheidung ist nicht schnell genug erfassbar.
 
 Ziel:
 
-- alle Warnungsklassen vollständig auf betroffene URLs auflösen;
-- je URL aktuellen Live-Crawlstand, ausgeliefertes JSON-LD, sichtbaren Seiteninhalt und kanonische Quelldaten vergleichen;
-- jede Warnung als historisch, bewusst akzeptiert, Datenlücke oder technischer Fehler klassifizieren;
-- nur belegte Fehler minimal korrigieren;
-- keine Organizer-, Performer-, Preis-, Währungs-, `validFrom`-, Availability- oder Ticketwerte erfinden;
-- nur sachlich geeignete Search-Console-Validierungen starten.
+- Entscheidung und Kandidat-gegen-Bestand-Vergleich zuerst;
+- genau eine klare Hauptaktion;
+- Neben-, Warte- und destruktive Aktionen sauber getrennt;
+- vollständige Evidence weiterhin erreichbar;
+- fachliche Identitäts-, Persistenz- und Desktopverträge unverändert.
 
-Bekannte Ausgangsevidence vom 2026-07-22:
-
-- `performer` fehlt: 2 Elemente;
-- `organizer` fehlt: 2 Elemente;
-- `priceCurrency` fehlt in `offers`: 1 Element;
-- `validFrom` fehlt in `offers`: 1 Element;
-- `price` fehlt in `offers`: 1 Element;
-- `offers` fehlt: 1 Element;
-- bekannte Beispiel-URL: `https://bocholt-erleben.de/events/2-bocholter-vereinsmesse-in-den-shopping-arkaden-2026-09-27/`.
-
-Der Workpack beginnt ausschließlich read-only. Der abgeschlossene SEO-Recovery-Workpack bleibt geschlossen.
-
-Referenz:
-
-- `docs/workpacks/queued/SEO-STRUCTURED-DATA-search-console-warnings-2026-07-22.md`.
-
-## 3. Danach mögliches Produktziel
+Vor Umsetzung sind aktueller mobiler Referenzzustand, zulässige sichtbare Änderungen, Viewports und alle Reviewzustände zu schließen.
 
 ### Startpartner-Wachstumspilot operationalisieren
 
-Problem: Öffentliche Akquiseoberfläche und fachlicher Zielzustand sind vorhanden, aber der interne End-to-End-Lebenszyklus von Kandidat bis Pilotabschluss ist noch nicht vollständig umgesetzt.
+Problem:
+
+Die öffentliche Akquiseoberfläche und der fachliche Zielzustand sind vorhanden, aber der interne End-to-End-Lebenszyklus von Kandidat bis Pilotabschluss ist noch nicht vollständig umgesetzt.
 
 Ziel:
 
@@ -96,11 +101,9 @@ Verbindlich:
 - keine automatische kostenpflichtige Umwandlung;
 - keine breite Akquise vor geschlossenem E2E-Prozess.
 
-Referenz:
+Referenz: `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`.
 
-`docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`
-
-## 4. Danach folgende Produktketten
+## 3. Danach folgende Produktketten
 
 ### Anbieterwert weiter stärken
 
@@ -114,7 +117,7 @@ Referenz:
 - schlechte Beschreibungen upstream verhindern;
 - unsichere Quellen und Fakten als typisierte Reviewfälle führen;
 - konkrete Visual-Gaps gezielt lösen;
-- keine neue allgemeine Bildproduktion ohne belegten Bedarf.
+- keine allgemeine Bildproduktion ohne belegten Bedarf.
 
 ### Nutzerbindung gezielt ausbauen
 
@@ -122,7 +125,7 @@ Referenz:
 - keine schwere Account-/Sync-Logik ohne belegten Bedarf;
 - neue Personalisierung nur mit klarem Nutzerwert und Datenschutzvertrag.
 
-## 5. Laufende Betriebsaufgaben
+## 4. Laufende Betriebsaufgaben
 
 - Deploy-, HTTP- und Browser-Smokes grün halten;
 - regulären Weekly-KI-Lauf auf Vorlauf, Drop-Gründe und begrenztes Feedback prüfen;
@@ -130,24 +133,28 @@ Referenz:
 - Suchwirkung nach SEO-Änderungen mit 14-/28-Tage-Fenstern bewerten;
 - keine Erfolgsbehauptung aus einzelnen Tagen oder bloßen CI-Markern.
 
-## 6. Nicht als nächstes starten
+## 5. Nicht ohne neuen belegten Bedarf starten
 
-- allgemeine UI-Neugestaltung ohne konkreten Fehler;
-- zusätzliche Workflow-, Observer- oder Dokumentationsschichten ohne neuen belegten Bedarf;
-- parallele schreibende Control-Center-Workpacks;
+- allgemeine UI-Neugestaltung;
+- zusätzliche Workflow-, Observer- oder Dokumentationsschichten;
+- parallele schreibende Workpacks an denselben Ownern;
 - gekaufte Empfehlungen oder Zwei-Klassen-Darstellung;
 - Display-Werbung als Kernmodell;
 - neues kostenloses Anbieterformular neben Tipp- und bezahltem Weg;
-- große SEO-Massenrunde statt URL-genauer Structured-Data-Prüfung;
-- neues Framework ohne belegte Notwendigkeit;
+- große SEO-Massenrunde;
+- neues Framework;
 - neue Bildproduktion ohne konkreten Visual-Gap;
 - große CSS-/JS-Sanierung ohne Produkt- und Ownerbezug.
 
-## 7. Aktivierungsregel
+## 6. Aktivierungsregel
 
 Ein Workpack wird erst aktiv, wenn:
 
 - aktueller Repo-, Runtime- und Datenstand geprüft wurde;
-- Ziel, Scope, Risiko, Owner, Evidence und Rollback dokumentiert sind;
+- Produktwirkung und Priorität gegenüber den anderen Kandidaten bestätigt sind;
+- Ziel, Scope, Risiko, Owner, Evidence, Dokumentationsdelta und Rollback dokumentiert sind;
 - es keine konkurrierende zentrale Änderung gibt;
-- `CURRENT_WORKPACK.md` genau auf diesen Workpack gesetzt wurde.
+- genau ein offenes GitHub-Issue den Marker `[ACTIVE WORKPACK]` trägt;
+- Gate A geschlossen ist.
+
+Die Aktivierung verändert keine Roadmap- oder Routerdatei. Operativer Fortschritt bleibt vollständig im Issue.
