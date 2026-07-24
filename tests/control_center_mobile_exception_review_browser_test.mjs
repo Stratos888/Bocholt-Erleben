@@ -38,6 +38,7 @@ async function mobileDuplicate(browser,viewport,name){
   assert(await summary.getAttribute('aria-expanded')==='false',`${name}: geschlossene Entscheidungsebene meldet aria-expanded nicht korrekt`);
   await summary.focus(); await summary.press('Enter');
   assert(await decision.getAttribute('open')!==null,`${name}: Entscheidungsebene ist nicht per Tastatur bedienbar`);
+  await page.waitForFunction(()=>document.querySelector('.cc-mobile-decision--choices > summary')?.getAttribute('aria-expanded')==='true');
   assert(await summary.getAttribute('aria-expanded')==='true',`${name}: geöffnete Entscheidungsebene meldet aria-expanded nicht korrekt`);
   assert(await decision.locator('[data-review-task-resolution]:visible').count()===4,`${name}: vollständige Dublettenaktionen fehlen`);
   assert(await decision.locator('.cc-button--danger:visible').count()===1,`${name}: destruktive Aktion ist nicht getrennt gekennzeichnet`);
