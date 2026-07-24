@@ -3,6 +3,96 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_repository.php';
 
+function be_startpartner_existing_request_fingerprint(PDO $pdo, array $row): string
+{
+    $contactsStatement = $pdo->prepare(
+        'SELECT contact_name, contact_role, email_normalized, phone, is_primary
+         FROM startpartner_candidate_contacts
+         WHERE candidate_id = :candidate_id
+         ORDER BY is_primary DESC, id ASC'
+    );
+    $contactsStatement->execute(['candidate_id' => (string)$row['id']]);
+    $contacts = array_map(
+        static fn(array $contact): array => [
+            'contact_name' => $contact['contact_name'] ?? null,
+            'contact_role' => $contact['contact_role'] ?? null,
+            'email_normalized' => (string)$contact['email_normalized'],
+            'phone' => $contact['phone'] ?? null,
+            'is_primary' => (bool)$contact['is_primary'],
+        ],
+        $contactsStatement->fetchAll(PDO::FETCH_ASSOC)
+    );
+
+    $payload = [
+        'source' => (string)$row['source'],
+        'source_reference' => $row['source_reference'] ?? null,
+        'organization_name_normalized' => (string)$row['organization_name_normalized'],
+        'contacts' => $contacts,
+        'website_url' => $row['website_url'] ?? null,
+        'description_text' => $row['description_text'] ?? null,
+        'desired_content_scope' => (string)$row['desired_content_scope'],
+        'privacy_policy_version' => $row['privacy_policy_version'] ?? null,
+        'form_version' => (string)$row['form_version'],
+        'retention_review_at' => (string)$row['retention_review_at'],
+    ];
+
+    return hash(
+        'sha256',
+        json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)
+    );
+}
+
+function be_startpartner_assert_idempotent_replay_matches(PDO $pdo, array $row, array $normalized): void
+{
+    $existingFingerprint = be_startpartner_existing_request_fingerprint($pdo, $row);
+    if (!hash_equals($existingFingerprint, (string)$normalized['request_fingerprint'])) {
+        throw new DomainException('Idempotency-Key was already used with a different request payload.');
+    }
+}
+
+function be_startpartner_record_duplicate_after_race(
+    PDO $pdo,
+    array $normalized,
+    string $actorType,
+    ?string $actorReference
+): ?array {
+    $pdo->beginTransaction();
+    try {
+        $duplicate = be_startpartner_find_candidate_row(
+            $pdo,
+            'identity_key',
+            (string)$normalized['identity_key'],
+            true
+        );
+        if ($duplicate === null) {
+            $pdo->rollBack();
+            return null;
+        }
+
+        be_startpartner_record_event(
+            $pdo,
+            (string)$duplicate['id'],
+            'duplicate_intake_observed',
+            (string)$duplicate['status'],
+            (string)$duplicate['status'],
+            $actorType,
+            $actorReference,
+            [
+                'source' => $normalized['source'],
+                'source_reference' => $normalized['source_reference'],
+                'detected_after_unique_conflict' => true,
+            ]
+        );
+        $pdo->commit();
+        return $duplicate;
+    } catch (Throwable $error) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $error;
+    }
+}
+
 function be_startpartner_create_candidate(
     PDO $pdo,
     array $input,
@@ -26,6 +116,7 @@ function be_startpartner_create_candidate(
             true
         );
         if ($replayed !== null) {
+            be_startpartner_assert_idempotent_replay_matches($pdo, $replayed, $normalized);
             $pdo->commit();
             return [
                 'candidate' => be_startpartner_candidate_from_row($pdo, $replayed),
@@ -53,6 +144,7 @@ function be_startpartner_create_candidate(
                 [
                     'source' => $normalized['source'],
                     'source_reference' => $normalized['source_reference'],
+                    'detected_after_unique_conflict' => false,
                 ]
             );
             $pdo->commit();
@@ -168,6 +260,7 @@ function be_startpartner_create_candidate(
                 $normalized['idempotency_key_hash']
             );
             if ($replayed !== null) {
+                be_startpartner_assert_idempotent_replay_matches($pdo, $replayed, $normalized);
                 return [
                     'candidate' => be_startpartner_candidate_from_row($pdo, $replayed),
                     'created' => false,
@@ -175,10 +268,12 @@ function be_startpartner_create_candidate(
                     'duplicate_identity' => false,
                 ];
             }
-            $duplicate = be_startpartner_find_candidate_row(
+
+            $duplicate = be_startpartner_record_duplicate_after_race(
                 $pdo,
-                'identity_key',
-                $normalized['identity_key']
+                $normalized,
+                $actorType,
+                $actorReference
             );
             if ($duplicate !== null) {
                 return [
