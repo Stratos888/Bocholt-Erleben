@@ -23,14 +23,14 @@ Es ist keine Behauptung, dass der Zielprozess bereits technisch vorhanden oder p
 
 Kanonische Rollen:
 
-- `Produktvertrag.md` definiert ausschließlich bereits gültige Produktmechanik. Bis zur technischen und öffentlichen Umsetzung bleibt der Startpartner-Pilot dort bewusst nur außerhalb der aktiven Tarifmechanik.
+- `Produktvertrag.md` definiert ausschließlich bereits gültige Produktmechanik. Bis zur technischen und öffentlichen Umsetzung bleibt der Startpartner-Pilot dort bewusst außerhalb der aktiven Tarifmechanik.
 - `COMMERCIAL_STRATEGY.md` begründet das kommerzielle Modell.
 - `ROADMAP.md` priorisiert die Umsetzung.
 - `docs/architecture/SYSTEM_MAP.md` beschreibt Systemrollen, Datenhoheit und Projektionen.
 - `docs/external-resource-matrix.md` beschreibt externe Ressourcen und Schreibgrenzen.
 - dieses Dokument definiert den vollständigen fachlichen und architektonischen Zielzustand.
 
-Ein späterer Teil-Workpack darf nicht als vollständige Umsetzung bezeichnet werden, solange die Gesamtabnahme aus Abschnitt 31 nicht erfüllt ist.
+Ein späterer Teil-Workpack darf nicht als vollständige Umsetzung bezeichnet werden, solange die Gesamtabnahme aus Abschnitt 35 nicht erfüllt ist.
 
 ## 2. Belegter aktueller Ausgangszustand
 
@@ -537,14 +537,14 @@ Ein reguläres Produkt ist vorzuziehen, wenn:
 
 Maximal acht Partner dürfen gleichzeitig einen Platz belegen.
 
-Als belegter Platz zählen Piloten in:
+Als belegter Platz zählen:
 
-- `accepted_pending_terms`;
-- `onboarding`;
-- `activation_ready`;
-- `active`;
-- `paused`;
-- `closing`.
+- Kandidaten im Zustand `accepted_pending_terms`;
+- Piloten in `onboarding`;
+- Piloten in `activation_ready`;
+- Piloten in `active`;
+- Piloten in `paused`;
+- Piloten in `closing`.
 
 ### 14.2 Operativer Aufnahmestopp
 
@@ -726,15 +726,34 @@ Bestehende `publication_entitlements` dürfen wiederverwendet werden, wenn:
 
 Ist das bestehende Schema dafür nicht eindeutig, erhält die Pilotberechtigung einen eigenen Owner und projiziert nur benötigte Berechtigungen in bestehende Systeme.
 
-### 19.3 Serviceumfang
+### 19.3 Serviceumfang und Tarifspiegel
 
 Jeder Pilot erhält einen ausdrücklich festgelegten Umfang, der den voraussichtlich passenden regulären Produkten entspricht.
 
-Mögliche Scopes:
+Vor der Annahme werden ein oder mehrere reguläre Zielmodelle als `target_plan_key` dokumentiert. Der kostenlose Pilot spiegelt deren fachlichen Leistungsumfang, ohne bereits ein kostenpflichtiges Produkt zu erzeugen.
 
-- Event-Veröffentlichungen;
-- Aktivitätspräsenzen;
-- kombinierter Event- und Aktivitätsumfang;
+Standardspiegel:
+
+| Zielmodell | Pilotumfang |
+|---|---|
+| `starter` | bis zu 3 redaktionell freigegebene Event-Veröffentlichungen je Pilotmonat |
+| `active` | bis zu 8 redaktionell freigegebene Event-Veröffentlichungen je Pilotmonat |
+| `unlimited` | viele Termine im ausdrücklich dokumentierten üblichen Rahmen; kein uneingeschränktes Leistungsversprechen |
+| `activity_basic` | 1 gleichzeitig veröffentlichte Aktivitätspräsenz |
+| `activity_plus` | bis zu 3 gleichzeitig veröffentlichte Aktivitätspräsenzen |
+| Kombination | Summe der ausdrücklich vereinbarten Event- und Aktivitätsscopes |
+
+Pilotmonate beginnen am lokalen Aktivierungsdatum und laufen jeweils bis zum Vortag desselben Kalendertags im Folgemonat. Existiert der Tag im Folgemonat nicht, gilt dessen letzter Kalendertag. Der sechste Pilotmonat endet am geplanten Pilotenddatum.
+
+Für `unlimited` werden vor Aktivierung zusätzlich dokumentiert:
+
+- erwartete monatliche Terminmenge;
+- Quellenumfang;
+- zulässiger redaktioneller Betreuungsrahmen;
+- Überprüfungsregel bei erheblicher Überschreitung.
+
+Mögliche zusätzliche Scopes:
+
 - Prüfung einer automatischen Eventquelle;
 - Änderungs-, Absage- und Aktualisierungsservice;
 - Anbieterportal und Wirkungsmessung.
@@ -748,7 +767,11 @@ Mindestens zu dokumentieren:
 - Aktivitätsumfang;
 - Quellenumfang;
 - Betreuungsumfang;
-- ausgeschlossene Leistungen.
+- ausgeschlossene Leistungen;
+- Periodenlogik;
+- Vorgehen bei Überschreitung.
+
+Abweichungen vom Standardspiegel benötigen eine ausdrückliche Begründung, einen konkreten Erkenntniszweck und klar begrenzte Limits.
 
 ## 20. Onboarding
 
@@ -960,6 +983,23 @@ Ein Mailfehler darf den fachlichen Zustand nicht stillschweigend als erfolgreich
 
 Staging verwendet ausschließlich Testempfänger oder einen sicheren No-Send-Modus.
 
+### 24.1 Fristen und Erinnerungsgrenzen
+
+Für fehlende Qualifizierungsinformationen gilt standardmäßig:
+
+- Rückmeldefrist: 14 Kalendertage;
+- erste Erinnerung frühestens nach 7 Tagen;
+- zweite und letzte Erinnerung frühestens nach 12 Tagen;
+- ab Tag 15 bewusste Entscheidung `expired`, `waitlisted` oder manuell begründete Fristverlängerung.
+
+Für bestätigungsbedürftige Pilotbedingungen innerhalb der 30-tägigen Platzreservierung gilt:
+
+- erste Erinnerung frühestens nach 7 Tagen;
+- zweite und letzte Erinnerung frühestens nach 21 Tagen;
+- vor Ablauf der Reservierung eine bewusste Freigabe-, Verlängerungs- oder Endentscheidung.
+
+Für jeden Kommunikationsanlass werden höchstens zwei automatische Erinnerungen versendet. Weitere Kontakte benötigen eine bewusste manuelle Entscheidung. Zustellfehler zählen nicht als erfolgreiche Erinnerung.
+
 ## 25. Kontrollpunkte
 
 ### Aktivierung
@@ -1030,7 +1070,7 @@ Jeder Kontrollpunkt besitzt Status `scheduled`, `due`, `completed`, `skipped_wit
 ### Fehlende Rückmeldung
 
 - konkrete Rückfrage und Frist dokumentieren;
-- höchstens begrenzte Erinnerungen;
+- höchstens die in Abschnitt 24.1 definierten zwei Erinnerungen;
 - danach bewusst `expired`, `waitlisted` oder `withdrawn`;
 - keine endlose offene Reservierung.
 
