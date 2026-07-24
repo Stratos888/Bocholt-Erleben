@@ -39,6 +39,18 @@ Erreicht:
 - Warm-Service-Worker- und Live-Grid-Nachweis;
 - automatische Auffindbarkeit von Push-Deploys über Commitstatus.
 
+### Mobile Ausnahmeprüfung in der Steuerzentrale
+
+Erreicht:
+
+- Status, belegter Kandidat-gegen-Bestand-Vergleich und genau eine unmittelbare Entscheidungsebene stehen mobil zuerst;
+- Evidence und Nebenaktionen bleiben vollständig erreichbar, aber nachrangig;
+- Ready-, Warte-, Konflikt-, Fehler- und destruktive Zustände bleiben fachlich unverändert;
+- mobile Viewports `360x780` und `390x844` sowie Desktop `1440x900` sind dauerhaft im PR Gate abgedeckt;
+- Staging- und Live-Release wurden vollständig grün abgeschlossen.
+
+Operative Evidence bleibt im abgeschlossenen Issue #128.
+
 ### Arbeitsprozess und Dokumentation
 
 Erreicht:
@@ -53,55 +65,74 @@ Erreicht:
 
 Prozessoptimierung wird nur bei einem neuen konkret belegten Engpass wieder als Workpack aktiviert.
 
-## 2. Aktuelle Produktkandidaten
+## 2. Nächste Produktkette: Startpartner-Wachstumspilot
 
-Die nächste Umsetzung wird nicht aus einer veralteten Repository-Queue übernommen. Vor Aktivierung werden aktueller Repo-, Runtime-, Daten- und Produktstand read-only neu bewertet.
+### Problem
 
-### Mobile Ausnahmeprüfung kompakter priorisieren
+Die öffentliche Startpartner-Anfrage und ein strategischer Zielzustand sind vorhanden. Der vollständige interne End-to-End-Prozess ist jedoch noch nicht technisch umgesetzt und darf nicht auf einen bloßen Kandidaten- oder Aufnahmeprozess verkürzt werden.
 
-Problem:
-
-- auf kleinen Bildschirmen stehen Status, Vergleich, Evidence und mehrere Aktionen zu lang und nahezu gleichrangig untereinander;
-- die eigentliche Entscheidung ist nicht schnell genug erfassbar.
-
-Ziel:
-
-- Entscheidung und Kandidat-gegen-Bestand-Vergleich zuerst;
-- genau eine klare Hauptaktion;
-- Neben-, Warte- und destruktive Aktionen sauber getrennt;
-- vollständige Evidence weiterhin erreichbar;
-- fachliche Identitäts-, Persistenz- und Desktopverträge unverändert.
-
-Vor Umsetzung sind aktueller mobiler Referenzzustand, zulässige sichtbare Änderungen, Viewports und alle Reviewzustände zu schließen.
-
-### Startpartner-Wachstumspilot operationalisieren
-
-Problem:
-
-Die öffentliche Akquiseoberfläche und der fachliche Zielzustand sind vorhanden, aber der interne End-to-End-Lebenszyklus von Kandidat bis Pilotabschluss ist noch nicht vollständig umgesetzt.
-
-Ziel:
+Noch zu schließen sind zusammenhängend:
 
 ```text
-Kandidat
--> Qualifizierung
--> Aufnahme oder Warteliste/Ablehnung
+Selbstmeldung oder gezielte Ansprache
+-> Kandidat und Qualifizierung
+-> Kapazität und Aufnahmeentscheidung
+-> Pilotbedingungen und ausdrückliche Bestätigung
+-> Organizer und kostenlose Pilotberechtigung
 -> Onboarding und Aktivierung
--> sechsmonatiger Pilot
--> Zwischen- und Abschlussauswertung
+-> Inhalte, Quellen und Wirkungsmessung
+-> sechsmonatiger Betrieb mit Kontrollpunkten
+-> Abschlussauswertung
 -> ausdrückliche Tarifentscheidung oder geordnetes Ende
+-> Kohorten- und Stop-Regel
 ```
 
-Verbindlich:
+### Produktziel
 
-- Inbound und gezielte Ansprache nutzen denselben Prozess;
-- maximal acht gleichzeitig aktive Partner in der ersten Kohorte;
-- Kapazitätsstopp bei etwa 80 Prozent;
-- sechs Monate ab tatsächlicher Aktivierung;
-- keine automatische kostenpflichtige Umwandlung;
-- keine breite Akquise vor geschlossenem E2E-Prozess.
+Bocholt erleben gewinnt eine kleine Zahl strategisch geeigneter Veranstalter und Anbieter, die:
 
-Referenz: `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`.
+- hochwertige Inhalte beitragen;
+- eigene lokale Zielgruppen aktivieren;
+- einen stabilen Pflege- oder Quellenweg besitzen;
+- messbaren Anbieterwert erhalten;
+- nach sechs Monaten bewusst über einen regulären Anbieterweg entscheiden.
+
+### Verbindliche Produktgrenzen
+
+- Der öffentliche Weg bleibt eine Anfrage und keine automatische Aufnahme.
+- Selbstmeldung und aktive Ansprache verwenden denselben fachlichen Kandidatenprozess.
+- Eine Anfrage erzeugt weder Anbieteraccount noch Berechtigung noch Zahlung.
+- Der kostenlose Pilot startet erst nach ausdrücklicher Aufnahme und bestätigten Pilotbedingungen.
+- Der Pilot verwendet keine Stripe-Subscription und benötigt keine Zahlungsart.
+- Die kostenlose Leistung wird als befristete Pilotberechtigung mit eindeutigem Serviceumfang geführt.
+- Die Laufzeit beträgt sechs Kalendermonate ab belegter Aktivierung.
+- Maximal acht Plätze dürfen gleichzeitig belegt sein.
+- Der konservative Soft-Stop greift bei sechs belegten Plätzen; geeignete weitere Kandidaten gehen auf die Warteliste.
+- Redaktionelle Prüfung und öffentliche Qualitätsparität gelten unverändert.
+- Partnerdistribution, Inhalte, Aufwand und Wirkung werden nachvollziehbar gemessen.
+- Ein regulärer Tarif entsteht ausschließlich durch neue ausdrückliche Zustimmung.
+- Ohne Zustimmung endet die kostenlose Leistung geordnet.
+- Keine aktive breite Akquise vor dem vollständigen E2E-Nachweis.
+
+Vollständige Referenz:
+
+`docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`
+
+### Umsetzungsfolge
+
+Die Produktkette wird in fachlich geschlossenen Gates umgesetzt:
+
+1. Produkt-, Rechts-, Daten- und Cutover-Vertrag;
+2. Kandidat und gemeinsamer Intake;
+3. Qualifizierung, Entscheidung, Kapazität und Warteliste;
+4. Pilotbedingungen, Organizer und kostenlose Pilotberechtigung;
+5. Onboarding, Inhalte, Messung und Aktivierung;
+6. Betrieb, Kommunikation, Kontrollpunkte und Ausnahmen;
+7. Abschluss, ausdrückliche Konversion oder geordnetes Ende;
+8. vollständiger synthetischer Staging-E2E-Nachweis;
+9. erst danach bewusste Freigabe der ersten echten Partneransprache.
+
+Ein einzelnes frühes Gate ist kein operationalisierter Startpartner-Wachstumspilot.
 
 ## 3. Danach folgende Produktketten
 
@@ -110,7 +141,8 @@ Referenz: `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`.
 - objektgenaue Wirkung verständlich und belastbar halten;
 - Änderungen, Absagen und Pflege vereinfachen;
 - regelmäßige Quellenübernahme als Service ausbauen;
-- Aktivitätspräsenz als Dauerprodukt weiterentwickeln.
+- Aktivitätspräsenz als Dauerprodukt weiterentwickeln;
+- Erkenntnisse aus dem Startpartner-Pilot in Tarif, Leistung und Betreuung überführen.
 
 ### Content- und Visualqualität ausnahmebasiert sichern
 
@@ -140,7 +172,9 @@ Referenz: `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md`.
 - parallele schreibende Workpacks an denselben Ownern;
 - gekaufte Empfehlungen oder Zwei-Klassen-Darstellung;
 - Display-Werbung als Kernmodell;
-- neues kostenloses Anbieterformular neben Tipp- und bezahltem Weg;
+- neues kostenloses Anbieterformular neben Tipp-, Startpartner- und bezahltem Weg;
+- aktive Startpartner-Massenakquise vor geschlossenem E2E-Prozess;
+- Stripe-Testabo oder automatische kostenpflichtige Verlängerung für Startpartner;
 - große SEO-Massenrunde;
 - neues Framework;
 - neue Bildproduktion ohne konkreten Visual-Gap;
@@ -157,4 +191,11 @@ Ein Workpack wird erst aktiv, wenn:
 - genau ein offenes GitHub-Issue den Marker `[ACTIVE WORKPACK]` trägt;
 - Gate A geschlossen ist.
 
-Die Aktivierung verändert keine Roadmap- oder Routerdatei. Operativer Fortschritt bleibt vollständig im Issue.
+Für den Startpartner-Wachstumspiloten gilt zusätzlich:
+
+- jeder Teil-Workpack referenziert den vollständigen E2E-Zielvertrag;
+- der Teilumfang und die bewusst noch offenen nachfolgenden Gates werden ausdrücklich benannt;
+- keine Teilintegration darf aktive Akquise freigeben;
+- externe Nachrichten, Accounts, Berechtigungen, Zahlungen und Veröffentlichungen benötigen eigene kontrollierte Verträge.
+
+Die Aktivierung verändert keine Routerdatei. Operativer Fortschritt bleibt vollständig im Issue.

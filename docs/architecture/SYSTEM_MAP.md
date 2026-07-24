@@ -10,6 +10,9 @@ Diese Datei beschreibt stabile Systeme, Datenhoheit, Umgebungen und kritische Da
 | Webziel | STRATO-Verzeichnis `staging` | STRATO-Webroot `.` | `.github/workflows/deploy-strato.yml` |
 | öffentliche URL | `https://staging.bocholt-erleben.de/` | `https://bocholt-erleben.de/` | Hosting/DNS |
 | Steuerzentrale | `/steuerzentrale/` | `/steuerzentrale/` | `steuerzentrale/**`, `js/control-center/**`, `api/control-center/**` |
+| Anbieterbereich | Staging-Portal und Staging-DB | Live-Portal und Live-DB | `fuer-veranstalter/**`, `js/organizer-portal.js`, `api/organizer-portal/**` |
+| Startpartner-Anfrage aktuell | öffentliche Staging-Route mit Formspree-Ziel | öffentliche Live-Route mit Formspree-Ziel | `startpartner/**`, `js/startpartner-funnel.js`, Formspree |
+| Startpartner-Zielprozess | synthetische Staging-Kandidaten und -Piloten | produktive Kandidaten und Piloten erst nach Freigabe | zukünftige fachliche Startpartner-Owner in Submission-/Anbieter-DB |
 
 Nur `staging` und `main` dürfen deployen. Feature-Branches besitzen keine externe Umgebung.
 
@@ -19,6 +22,7 @@ Nur `staging` und `main` dürfen deployen. Feature-Branches besitzen keine exter
 
 - statisches HTML, CSS und JavaScript;
 - Today-, Event- und Activity-Oberflächen;
+- öffentliche Einreichungs-, Anbieter- und Startpartnerseiten;
 - generierte Event-/Inbox-Daten und freigegebene DB-Submissions.
 
 ### Steuerzentrale
@@ -31,8 +35,28 @@ Nur `staging` und `main` dürfen deployen. Feature-Branches besitzen keine exter
 ### Anbieterbereich und Submissions
 
 - DB-/API-owned;
-- Einreichungen, Anbieterstatus, Produkte, Zahlung und Wirkungsmessung;
+- Organizer, Portalzugang, Einreichungen, Anbieterstatus, Produkte, Zahlung und Wirkungsmessung;
 - Mail, Zahlung und Veröffentlichung sind externe Nebenwirkungen.
+
+### Startpartner-Wachstumspilot
+
+Im aktuellen Zustand existiert nur eine öffentliche Anfrage über Formspree und ein dokumentierter Zielzustand.
+
+Im Zielzustand umfasst die Domäne:
+
+- Kandidat und Deduplizierung;
+- Qualifizierung und Aufnahmeentscheidung;
+- Kapazität, Reservierung und Warteliste;
+- Pilotbedingungen und Bestätigung;
+- Pilot, Serviceumfang und kostenlose Berechtigung;
+- Organizer- und Portalverknüpfung;
+- Onboarding, Aktivierung und Laufzeit;
+- Inhalts- und Quellenzuordnung;
+- Wirkungsmessung;
+- Kommunikation und Kontrollpunkte;
+- Abschluss, Konversion oder geordnetes Ende.
+
+Die fachliche Startpartner-Domäne ist Source of Truth. `control_cases` ist nur operative Aufgaben- und Entscheidungsprojektion.
 
 ### Visual-System
 
@@ -49,6 +73,14 @@ Nur `staging` und `main` dürfen deployen. Feature-Branches besitzen keine exter
 | offene Inbox | `Inbox_Staging` / `Inbox` | Control-Center-Fälle und Ansichten |
 | Inbox-Archiv | `Inbox_Archive_Staging` / `Inbox_Archive` | Archiv |
 | DB-Submissions | Submission-Datenbank | Public-API und Feed-Ergänzung |
+| Organizer und Portal | Anbieter-Datenbank | Anbieterbereich und Statusansichten |
+| reguläre Mitgliedschaften | Stripe plus Subscription-Datenbank | Tarifstatus und reguläre Berechtigungen |
+| Veröffentlichungsberechtigungen | Entitlement-Datenbank | zulässige Einreichungs-/Veröffentlichungsumfänge |
+| Wirkungsmessung | `value_metric_daily` und zugehörige Attributionsdaten | Anbieterwirkung und Auswertungen |
+| Startpartner-Anfrage aktuell | Formspree-Übermittlung | E-Mail/Formspree-Ansicht; kein kanonischer eigener Kandidat |
+| Startpartner-Kandidat im Ziel | eigene fachliche Kandidatentabelle | Control-Center-Aufgabe, Kommunikation, Entscheidung |
+| Startpartner-Pilot im Ziel | eigene fachliche Pilottabelle | Portalstatus, Berechtigung, Kontrollpunkte, Abschluss |
+| Startpartner-Pilotberechtigung im Ziel | befristeter Pilotgrant oder eindeutig pilotfähiges Entitlement | bestehende Submission-/Publikationspfade |
 | Activities | Repo-/JSON-Owner | öffentliche Activity-Ausgabe |
 | Visuals | Visual-Pool und freigegebene Assets | Karten-/Detaildarstellung |
 
@@ -87,7 +119,132 @@ live:    Inbox         -> Events
 
 Preflight und Ausführung verwenden denselben Environment- und Writer-Resolver.
 
-## 6. Entwicklungs-, Release- und Beobachtungspfad
+## 6. Startpartner-Pfad – aktueller Zustand
+
+```text
+/startpartner/
+-> Browservalidierung
+-> Formspree
+-> externe Übermittlung / Nachricht
+-> manuelle Bearbeitung außerhalb eines kanonischen eigenen Kandidatenmodells
+```
+
+Belegte Grenze:
+
+- keine automatische Organizer-Anlage;
+- keine Pilotvereinbarung;
+- keine kostenlose Berechtigung;
+- keine Stripe-Subscription;
+- keine Veröffentlichung;
+- keine eigene strukturierte Kandidaten-Source-of-Truth.
+
+Formspree ist ein Übergangswriter und muss vor dem Ziel-Cutover als externe Ressource behandelt werden.
+
+## 7. Startpartner-Pfad – Zielzustand
+
+```text
+Selbstmeldung oder interne Identifizierung
+-> First-Party-Kandidaten-API / fachliche Kandidaten-Source-of-Truth
+-> Deduplizierung und Audit
+-> control_case als operative Projektion
+-> Qualifizierung und Kapazitätsprüfung
+-> Aufnahmeentscheidung
+-> Pilotbedingungen und ausdrückliche Bestätigung
+-> Organizer anlegen oder verknüpfen
+-> StartpartnerPilot anlegen
+-> befristete kostenlose Pilotberechtigung
+-> Onboarding
+-> Submissions / Quellen / redaktionelle Prüfung
+-> Event- oder Activity-Projektion
+-> Organizer-, Pilot- und Inhaltsattribution in value_metric_daily
+-> Aktivierung und sechsmonatige Laufzeit
+-> Kontrollpunkte und Kommunikation
+-> Abschlussbericht
+-> ausdrücklicher regulärer Checkout oder geordnetes Ende
+```
+
+### Source-of-Truth-Regeln
+
+- Kandidat und Pilot besitzen eigene fachliche Datenowner.
+- `control_cases` besitzt Aufgabenstatus, nicht den vollständigen Fachvertrag.
+- `organizers` besitzt die Anbieteridentität erst nach Annahme.
+- `subscriptions` besitzt ausschließlich reguläre Stripe-Mitgliedschaften.
+- Eine kostenlose Pilotberechtigung darf keine Stripe-Testsubscription vortäuschen.
+- Ein Startpartnerinhalt verwendet die vorhandenen Submission-, Review- und Veröffentlichungsowner.
+- Wirkungsmessung verwendet vorhandene Metrikowner mit zusätzlicher stabiler Pilotattribution.
+- Formspree wird nach belegtem Cutover als Writer abgeschaltet; kein dauerhafter Dual-Write.
+
+### Aktivierungsgrenze
+
+Der Pilot beginnt erst, wenn:
+
+- Portalzugang funktioniert;
+- Pilotberechtigung aktiv und zurückgelesen ist;
+- mindestens ein relevanter Inhalt veröffentlicht ist;
+- Messzuordnung funktioniert;
+- Partnerdistribution vorbereitet ist.
+
+Anfrage, Aufnahmeentscheidung oder Accountanlage allein starten die sechs Monate nicht.
+
+## 8. Startpartner-Datenbeziehungen
+
+```text
+StartpartnerCandidate
+  -> CandidateDecision
+  -> CandidateCommunication
+  -> control_case projection
+
+accepted candidate
+  -> Organizer
+  -> StartpartnerPilot
+       -> PilotScope / PilotEntitlement
+       -> StartpartnerCheckpoint
+       -> StartpartnerCommunication
+       -> StartpartnerContentLink
+            -> Submission
+            -> Event / Activity
+       -> StartpartnerMetricSnapshot
+            -> value_metric_daily
+       -> FinalDecision
+            -> regular Subscription / Entitlement
+            -> or ordered end
+```
+
+Pflichtidentitäten:
+
+- Candidate-ID;
+- Pilot-ID;
+- Organizer-ID;
+- Submission- oder Content-ID;
+- Reporting-Target-ID;
+- externe Anfrage-/Kommunikationsreferenz, falls vorhanden.
+
+## 9. Startpartner-Nebenwirkungen
+
+Mögliche echte Nebenwirkungen:
+
+- Nachricht an Kandidat oder Partner;
+- Organizer-Anlage;
+- Magic-Link-Mail;
+- Pilotberechtigung;
+- Submission;
+- Veröffentlichung;
+- regulärer Stripe-Checkout;
+- Deaktivierung oder Ende einer Berechtigung.
+
+Jede Nebenwirkung benötigt:
+
+- stabile Identität;
+- Vorherzustand;
+- erwartete Mutation;
+- Rücklesen;
+- unveränderte Nicht-Zielfelder;
+- Rollback oder geordneten Cleanup;
+- eindeutige Environmentbindung.
+
+Kein späterer Implementierungs-Workpack darf mehrere dieser Nebenwirkungen ohne geschlossenen E2E- und Fehlervertrag zusammenfassen.
+
+## 10. Entwicklungs-, Release- und Beobachtungspfad
 
 ```text
 Feature-Branch
@@ -110,7 +267,7 @@ Feature-Branch
 
 Zusätzliche Deploytrigger, Runtimeverification-Workflows und synthetische Folge-Deploys gehören nicht zur Standardarchitektur.
 
-## 7. Dauerhafte Workflowrollen
+## 11. Dauerhafte Workflowrollen
 
 | Workflow | Rolle |
 |---|---|
@@ -123,7 +280,9 @@ Zusätzliche Deploytrigger, Runtimeverification-Workflows und synthetische Folge
 | `Weekly KI Websearch → Manual Inbox` | Eventkandidatensuche |
 | `Manual KI Event Intake` | Kandidaten-Handoff |
 
-## 8. Owner-Übersicht
+Für Startpartner wird kein neuer dauerhafter GitHub-Workflow angelegt, solange der bestehende Web-/API-/Control-Center-Pfad die Aufgabe übernehmen kann. Fristen und Kontrollpunkte gehören in die fachliche Daten- und Aufgabenlogik, nicht in zusätzliche Repository-Observer.
+
+## 12. Owner-Übersicht
 
 | Domäne | Primäre Owner |
 |---|---|
@@ -137,12 +296,17 @@ Zusätzliche Deploytrigger, Runtimeverification-Workflows und synthetische Folge
 | Deploy-Run-Auffindbarkeit | `.github/workflows/deploy-run-status.yml`, `scripts/publish_deploy_run_status.py` |
 | Control-Center UI | `steuerzentrale/**`, `js/control-center/**` |
 | Control-Center Runtime | `api/control-center/**` |
+| Anbieterportal | `fuer-veranstalter/**`, `js/organizer-portal.js`, `api/organizer-portal/**` |
+| Organizer/Submission/Subscription | `api/**`, `api/sql/**`, Submission-/Anbieter-DB |
+| Startpartner öffentliche Anfrage aktuell | `startpartner/**`, `js/startpartner-funnel.js`, Formspree |
+| Startpartner fachlicher Zielvertrag | `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md` |
+| Startpartner Kandidat/Pilot künftig | neue eindeutig benannte fachliche API-/SQL-Owner innerhalb der bestehenden Anbieter-/Submission-Domäne |
 | Eventfeed | Deployworkflow, Eventgeneratoren, `api/events/**` |
 | Produktziel | `MASTER.md`, `Produktvertrag.md`, `COMMERCIAL_STRATEGY.md` |
 | Produktpriorität | `ROADMAP.md` |
 | Proofstand | `TEST_STATUS.md` |
 
-## 9. Prüfung vor kritischen Änderungen
+## 13. Prüfung vor kritischen Änderungen
 
 1. Wer besitzt den Ursprungswert?
 2. Welche Projektionen existieren?
@@ -153,5 +317,8 @@ Zusätzliche Deploytrigger, Runtimeverification-Workflows und synthetische Folge
 7. Wie erfolgt Rollback oder Cleanup?
 8. Ist ein anderer Chat oder Workpack am selben Owner aktiv?
 9. Welche dauerhafte Dokumentation besitzt die geänderte Realität?
+10. Wird ein fachlicher Startpartnerzustand fälschlich nur in `control_cases`, Mail oder Formspree gehalten?
+11. Entsteht versehentlich eine Stripe-Subscription oder Zahlungswirkung für den kostenlosen Pilot?
+12. Sind Kandidat, Pilot, Organizer, Inhalt und Messung über stabile IDs verbunden?
 
 Ist eine Antwort nicht belegbar, folgt read-only Analyse statt Mutation.
