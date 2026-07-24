@@ -4,15 +4,15 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-command -v docker >/dev/null 2>&1 || { echo "Docker is required for the Startpartner MySQL contract." >&2; exit 2; }
-command -v php >/dev/null 2>&1 || { echo "PHP is required for the Startpartner MySQL contract." >&2; exit 2; }
+command -v docker >/dev/null 2>&1 || { printf '%s\n' 'Docker is required for the Startpartner MySQL contract.' >&2; exit 2; }
+command -v php >/dev/null 2>&1 || { printf '%s\n' 'PHP is required for the Startpartner MySQL contract.' >&2; exit 2; }
 
 if ! php -r 'exit(extension_loaded("pdo_mysql") ? 0 : 1);'; then
   if command -v sudo >/dev/null 2>&1; then
     sudo apt-get update -qq
     sudo apt-get install -y -qq php-mysql
   else
-    echo "pdo_mysql is required and could not be installed." >&2
+    printf '%s\n' 'pdo_mysql is required and could not be installed.' >&2
     exit 2
   fi
 fi
@@ -29,12 +29,12 @@ docker run -d --name "$CONTAINER" \
   -p 127.0.0.1::3306 \
   mariadb:11.4 >/dev/null
 
-for attempt in $(seq 1 60); do
+for attempt in {1..60}; do
   if docker exec "$CONTAINER" mariadb-admin ping -uroot -pcontract-root --silent >/dev/null 2>&1; then
     break
   fi
   if [ "$attempt" -eq 60 ]; then
-    echo "MariaDB contract container did not become ready." >&2
+    printf '%s\n' 'MariaDB contract container did not become ready.' >&2
     exit 1
   fi
   sleep 1
@@ -42,7 +42,7 @@ done
 
 apply_sql() {
   local file="$1"
-  echo "Applying $file"
+  printf 'Applying %s\n' "$file"
   docker exec -i "$CONTAINER" mariadb -uroot -pcontract-root be_contract < "$file"
 }
 
@@ -66,8 +66,8 @@ apply_sql api/sql/008_startpartner_candidates.sql
 
 PORT="$(docker inspect -f '{{(index (index .NetworkSettings.Ports "3306/tcp") 0).HostPort}}' "$CONTAINER")"
 export STARTPARTNER_TEST_DSN="mysql:host=127.0.0.1;port=${PORT};dbname=be_contract;charset=utf8mb4"
-export STARTPARTNER_TEST_USER="root"
-export STARTPARTNER_TEST_PASSWORD="contract-root"
+export STARTPARTNER_TEST_USER='root'
+export STARTPARTNER_TEST_PASSWORD='contract-root'
 php tests/startpartner_mysql_contract_test.php
 
-echo "=== Startpartner MySQL Migration and Runtime Contract: OK ==="
+printf '%s\n' '=== Startpartner MySQL Migration and Runtime Contract: OK ==='
