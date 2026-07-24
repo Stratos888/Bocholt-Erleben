@@ -1,6 +1,6 @@
 # ENGINEERING – Bocholt erleben
 
-Diese Datei enthält nur dauerhafte technische Regeln. Arbeitsablauf und Werkzeugwahl stehen in `AI_ENTRYPOINT.md`. Operativer Workpack-Status und Zwischen-Evidence stehen im zuständigen GitHub-Issue.
+Diese Datei enthält dauerhafte technische Regeln. Arbeitsablauf, Werkzeugwahl, Nutzerartefakte und Dokumentations-Reconciliation stehen in `AI_ENTRYPOINT.md`. Operativer Workpack-Status und Zwischen-Evidence stehen im zuständigen GitHub-Issue.
 
 ## 1. Quellen der Wahrheit
 
@@ -43,43 +43,54 @@ live:    Inbox         -> Events
 - Externe Writes benötigen stabile Identität, Vorherzustand, begrenzte Mutation, Rücklesen und Rollback/Cleanup.
 - Beim ersten unerwarteten realen Verhalten wird nicht erneut geschrieben.
 
-## 4. Workflows
-
-Dauerhafte Workflowrollen:
+## 4. Dauerhafte Workflowrollen
 
 1. `PR Gate` – einziger Entwicklungs- und Integrationscheck;
-2. `Deploy to STRATO` – einziger Deploy- und Feed-Build-Pfad;
-3. `Content Quality Audit` – fachlicher Inhaltsaudit;
-4. `Growth Intelligence Backlog` – fachliche Growth-/SEO-Signale;
-5. `Inbox Cleanup (Archive)` – fachliche Inbox-Pflege;
-6. `Weekly KI Websearch → Manual Inbox` – fachliche Kandidatensuche;
-7. `Manual KI Event Intake` – fachlicher Intake-Handoff.
+2. `Deploy to STRATO` – einziger Feed-Build- und Deploypfad;
+3. `Publish Deploy Run Status` – passiver Commitstatus für Run-Auffindbarkeit und Ergebnis, ohne Deploy oder Fachwrite;
+4. `Content Quality Audit` – fachlicher Inhaltsaudit;
+5. `Growth Intelligence Backlog` – fachliche Growth-/SEO-Signale;
+6. `Inbox Cleanup (Archive)` – fachliche Inbox-Pflege;
+7. `Weekly KI Websearch → Manual Inbox` – fachliche Kandidatensuche;
+8. `Manual KI Event Intake` – fachlicher Intake-Handoff.
 
-Neue Workflows sind nur zulässig, wenn keine bestehende Rolle die Aufgabe übernehmen kann und der Workflow dauerhaft produktiv gebraucht wird. Reine Aggregatoren, Observer, Governance-Workflows und einmalige Testharnesses gehören nicht in die dauerhafte Topologie.
+Neue Workflows sind nur zulässig, wenn keine bestehende Rolle die Aufgabe übernehmen kann und der Workflow dauerhaft produktiv gebraucht wird.
+
+Ein passiver Observability-Workflow ist nur zulässig, wenn er einen sonst nicht zuverlässig erreichbaren technischen Zustand sichtbar macht, keine Fachressource verändert, keinen Deploy auslöst, minimale Rechte besitzt und im Workflow-Inventar registriert ist. `Publish Deploy Run Status` ist die einzige derzeit zugelassene Rolle dieser Art.
+
+Reine Aggregatoren, zusätzliche Deploy-Trigger, temporäre Observer, Governance-Workflows und einmalige Testharnesses gehören nicht in die dauerhafte Topologie.
 
 ## 5. Tests und Evidence
 
-- Tests beweisen Verhalten, nicht Dateinamen oder Kommentare.
+- Tests beweisen Verhalten, nicht nur Dateinamen oder Kommentare.
 - Der PR besitzt genau einen Required Check: `PR Gate`.
 - `scripts/validate-repo.sh` ist der zentrale lokale und CI-Einstieg für Syntax-, Unit- und Contracttests.
-- Fachlich notwendige Tests bleiben erhalten, auch wenn ihre früheren Top-Level-Workflows entfernt werden.
-- Ein temporärer Runtime-Test wird nach dem Nachweis auf einen kleinen lokalen Contract-Test reduziert oder vollständig entfernt.
+- Fachlich notwendige Tests bleiben erhalten, auch wenn frühere Top-Level-Workflows entfernt werden.
+- Ein temporärer Runtime-Test wird nach dem Nachweis auf einen lokalen Contracttest reduziert oder entfernt.
 - Ein roter Test wird vor dem Merge behoben; reale Try-and-Error-Schleifen nach dem Merge sind ausgeschlossen.
-- Build-, Render- und Generatoränderungen werden gegen den tatsächlich erzeugten Output geprüft, nicht nur gegen Eingabevorlagen oder statische Marker.
-- UI-Änderungen benötigen vor dem Staging-Merge einen Browser- oder Screenshotnachweis für die vereinbarten Viewports.
+- Build-, Render- und Generatoränderungen werden gegen den tatsächlich erzeugten Output geprüft.
+- UI-Änderungen benötigen vor dem Staging-Merge Browser- oder Screenshot-Evidence für die vereinbarten Viewports.
 - Progressive Enhancement wird bei relevantem Scope mit und ohne JavaScript geprüft.
 - Evidence gehört in PR, Action oder Workpack-Issue; sie wird nicht in mehreren Statusdateien dupliziert.
+
+### Artifact-Grenze
+
+- Actions-Artefakte bleiben interne maschinelle Evidence.
+- Chat oder Codex liest sie nur, wenn Summary und Logs nicht genügen.
+- Nutzerseitig werden Ergebnisse berichtet, nicht automatisch ZIP-Dateien oder Downloadlinks geliefert.
+- Screenshots werden nicht auf Vorrat produziert.
 
 ## 6. Deploy- und Releasebudget
 
 - Nur `staging` und `main` dürfen deployen.
 - Normalfall: ein Implementierungs-PR nach `staging`, ein normaler Staging-Deploy, ein gezielter Smoke, ein Release-PR nach `main`, ein normaler Main-Deploy und ein Live-Smoke.
-- Ein Merge nach `staging` erzeugt genau einen normalen Deploy.
-- Keine zusätzlichen Deploy-Observer oder synthetischen Folge-Deploys.
+- Ein Merge nach `staging` erzeugt genau einen normalen Deploy, sofern der Workflow für den geänderten Pfad ausgelöst wird.
+- Keine zusätzlichen Deploys oder synthetischen Folge-Deploys ohne konkret unbelegtes Risiko.
+- `Publish Deploy Run Status` beobachtet ausschließlich vorhandene Runs und erzeugt keinen Deploy.
 - Der Deploy bleibt fail-fast, wenn Sheet-Export, Feed-Build oder Upload scheitert.
-- Nach einem erfolgreichen Deploy genügt der enthaltene Build-/HTTP-Smoke; zusätzliche Runtimeverification wird nur für ein konkret nicht abgedecktes Risiko temporär und aufgabenbezogen ausgeführt.
+- Nach erfolgreichem Deploy genügt der enthaltene Build-/HTTP-/Browser-Smoke, sofern kein konkret nicht abgedecktes Risiko besteht.
 - Korrekturen vor dem Staging-Merge bleiben im selben Feature-Branch und PR.
-- Nach dem Staging-Merge ist höchstens eine klar begründete Korrektur zulässig. Danach wird gestoppt und Ziel oder Architektur neu entschieden.
+- Nach dem Staging-Merge ist höchstens eine klar begründete Korrektur zulässig.
 - Scheduled Deploy bleibt notwendig, damit Sheet-basierte Eventdaten ohne Codeänderung veröffentlicht werden.
 
 ## 7. UI, CSS und Inhalte
@@ -89,39 +100,39 @@ Neue Workflows sind nur zulässig, wenn keine bestehende Rolle die Aufgabe über
 - Bild-, Content- oder Datenprobleme werden upstream gelöst, nicht per CSS kaschiert.
 - Eventbeschreibungen folgen `EVENT_DESCRIPTION_STANDARD.md`.
 - KI-Ausgaben überschreiben fachliche Quellen nie ungeprüft.
-- Vor UI-Umsetzung muss ausdrücklich feststehen, welche sichtbaren Änderungen zulässig sind und welche Bereiche unverändert bleiben.
+- Vor UI-Umsetzung muss feststehen, welche sichtbaren Änderungen zulässig sind und welche Bereiche unverändert bleiben.
 - Ist keine sichtbare Produktänderung Teil des Ziels, darf ein technischer Patch keine neue sichtbare Oberfläche einführen.
 
 ## 8. Git- und Schreibdisziplin
 
-- Standard: genau ein Codex-Task -> ein Feature-Branch -> ein PR nach `staging` -> später `staging -> main`.
+- Standard: ein Workpack -> genau ein Repository-Schreiber -> ein Feature-Branch -> ein PR nach `staging` -> später `staging -> main`.
+- Chat darf kleine vollständig kontrollierbare Text-/Konfigurationsänderungen schreiben; Codex ist bevorzugt für Code, große Diffs und patchintensive Owner.
 - Kein Force-Push und kein Force-Reset.
 - Keine Feature-Branch-Deploys.
 - Keine Secrets oder Zugangsdaten im Repository oder Chat.
 - Datei- und Workflowlöschungen sind erwünscht, wenn der Pfad nicht mehr gebraucht wird und Git die Historie bewahrt.
 - Keine neue große Änderung auf einen ungeklärten Zwischenstand stapeln.
-- Dieselbe Ursache erhält vor dem Staging-Merge keinen zweiten Branch, PR oder Codex-Task.
+- Dieselbe Ursache erhält vor dem Staging-Merge keinen zweiten Branch, PR oder Schreiber.
 
-## 9. Dokumentation
+## 9. Dokumentationsrollen
 
-Kanonische Rollen:
-
-- `AI_ENTRYPOINT.md` – Arbeitsmodell und Werkzeugwahl;
+- `AI_ENTRYPOINT.md` – Arbeitsmodell, Werkzeugwahl, Nutzerartefakte und Reconciliation;
 - `AGENTS.md` – kurzer Codex-Router;
 - `CURRENT_WORKPACK.md` – stabiler Router zum operativen GitHub-Issue;
 - GitHub-Issue – operativer Status, Entscheidungen, Evidence und nächster Schritt;
-- `SYSTEM_MAP.md` – Systeme und Datenflüsse;
-- `ENGINEERING.md` – technische Regeln;
+- `SYSTEM_MAP.md` – Systeme, Datenflüsse und technische Owner;
+- `ENGINEERING.md` – technische Regeln und Workflowrollen;
 - `external-resource-matrix.md` – externe Ressourcen;
-- `MASTER.md` und `ROADMAP.md` – Produktziel und Prioritäten;
-- Workpack-Datei – dauerhafter Scope, Wahrheitsvertrag und Definition of Done.
+- `MASTER.md`, `Produktvertrag.md`, `COMMERCIAL_STRATEGY.md` – Produktvertrag;
+- `ROADMAP.md` – Produktprioritäten und Kandidaten;
+- `TEST_STATUS.md` – dauerhafte Prooffähigkeiten und Evidence-Grenzen.
 
 Regeln:
 
-- keine Abschlussdokumentation während der Umsetzung;
-- Repository-Dokumentation einmal am Ende und nur bei dauerhaftem Wissensdelta;
+- keine Abschlusschronik während der Umsetzung;
+- Repository-Dokumentation einmal und nur bei dauerhaftem Wissensdelta;
 - Roadmap nur bei echter Prioritäts- oder Zieländerung;
 - `TEST_STATUS.md` nur bei dauerhafter Änderung von Testabdeckung oder Evidence-Grenze;
-- reine Statusdokumentation erzeugt keinen eigenen Releasezyklus;
 - veraltete aktuelle Aussagen werden ersetzt; Git enthält die Historie;
-- kein zusätzliches Dokumentregister und kein Dokumentations-Governance-Workflow.
+- kein zusätzliches Dokumentregister und kein Dokumentations-Governance-Workflow;
+- vor Issue-Abschluss wird die Owner-Matrix aus `AI_ENTRYPOINT.md` geprüft.
