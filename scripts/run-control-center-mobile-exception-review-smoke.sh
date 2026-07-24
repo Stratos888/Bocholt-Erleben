@@ -19,7 +19,7 @@ python3 -m http.server "$port" --bind 127.0.0.1 --directory "$ROOT" >"$TMP/http-
 for _ in {1..30}; do curl --fail --silent "http://127.0.0.1:$port/tests/fixtures/control_center_mobile_exception_review.html" >/dev/null && break; sleep 1; done
 curl --fail --silent "http://127.0.0.1:$port/tests/fixtures/control_center_mobile_exception_review.html" >/dev/null || { cat "$TMP/http-server.log" >&2; exit 1; }
 rm -rf "$SMOKE_OUT_DIR"; mkdir -p "$SMOKE_OUT_DIR"
-node "$ROOT/tests/control_center_mobile_exception_review_browser_test.mjs" --base-url "http://127.0.0.1:$port" --out-dir "$SMOKE_OUT_DIR"
+node "$ROOT/tests/control_center_mobile_exception_review_browser_test.mjs" --base-url "http://127.0.0.1:$port" --out-dir "$SMOKE_OUT_DIR" 2>&1 | tee "$SMOKE_OUT_DIR/browser-test.log"
 cleanup; trap - EXIT
 after_snapshot="$(snapshot_checkout)"
 if [ "$before_snapshot" != "$after_snapshot" ]; then echo "CONTROL_CENTER_MOBILE_EXCEPTION_REVIEW: checkout changed during smoke" >&2; exit 1; fi
