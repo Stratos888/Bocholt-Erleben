@@ -1,6 +1,6 @@
 # Completed Workpack – SEO Structured Data und Search-Console-Warnungen
 
-Abgeschlossen: 2026-07-23  
+Abgeschlossen: 2026-07-23
 Operativer Evidence-Owner: GitHub-Issue #165
 
 ## Ziel
