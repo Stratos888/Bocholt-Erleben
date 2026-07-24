@@ -1,6 +1,6 @@
 # Roadmap – Bocholt erleben
 
-Stand: 2026-07-24  
+Stand: 2026-07-24
 Status: priorisierte Produktziele; kein operativer Workpack-Status
 
 Der operative Schritt steht ausschließlich im genau einen offenen GitHub-Issue mit `[ACTIVE WORKPACK]`. `docs/workpacks/active/CURRENT_WORKPACK.md` ist der statusfreie Router. Diese Roadmap nennt Produktziele und Kandidaten, keine laufenden SHAs, Gates oder Zwischenstände.
