@@ -68,7 +68,9 @@ jobs:
           print(f"Endpoint file: {endpoint_file}")
           print(f"Synthetic marker: {marker}")
           PY
-          if php -l "evidence-upload/api/internal/$EVIDENCE_ENDPOINT_FILE" > artifacts/gate1-staging/php-lint.txt 2>&1; then
+          runner_file="$(find evidence-upload/api/internal -maxdepth 1 -type f -name 'gate1-evidence-*.php' -print -quit)"
+          [ -n "$runner_file" ]
+          if php -l "$runner_file" > artifacts/gate1-staging/php-lint.txt 2>&1; then
             cat artifacts/gate1-staging/php-lint.txt
           else
             cat artifacts/gate1-staging/php-lint.txt
