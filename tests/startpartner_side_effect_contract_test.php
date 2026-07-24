@@ -35,6 +35,7 @@ foreach ([
 $intake = (string)file_get_contents($root . '/api/startpartner/intake.php');
 $candidates = (string)file_get_contents($root . '/api/startpartner/candidates.php');
 $triage = (string)file_get_contents($root . '/api/startpartner/triage.php');
+$contract = (string)file_get_contents($root . '/api/startpartner/_contract.php');
 $domain = (string)file_get_contents($root . '/api/startpartner/_domain.php');
 $repository = (string)file_get_contents($root . '/api/startpartner/_repository.php');
 $schema = (string)file_get_contents($root . '/api/startpartner/_schema.php');
@@ -46,6 +47,14 @@ $assert(str_contains($candidates, 'be_require_review_access'), 'Kandidatenliste 
 $assert(str_contains($triage, 'be_require_review_access'), 'Triage muss geschützt sein.');
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
+
+$assert(!str_contains($contract, 'BE_STARTPARTNER_RETENTION_REVIEW_DAYS'), 'Gate 1 darf keine juristisch ungeklärte Aufbewahrungsdauer fest verdrahten.');
+$assert(!preg_match('/RETENTION[^\n]*180|180[^\n]*RETENTION/i', $contract), 'Gate 1 darf 180 Tage nicht als Aufbewahrungsregel codieren.');
+$assert(str_contains($contract, 'be_startpartner_normalize_retention_review_at'), 'Retention-Review muss als expliziter kontrollierter Eingang validiert werden.');
+$assert(str_contains($domain, 'be_startpartner_assert_idempotent_replay_matches'), 'Idempotente Wiederholung muss den normalisierten Payload abgleichen.');
+$assert(str_contains($domain, 'Idempotency-Key was already used with a different request payload.'), 'Abweichender Payload mit gleichem Idempotency-Key muss als Konflikt enden.');
+$assert(str_contains($domain, "'detected_after_unique_conflict' => true"), 'Konkurrierende Dubletten müssen denselben nachvollziehbaren Auditpfad besitzen.');
+$assert(str_contains($domain, 'be_startpartner_record_duplicate_after_race'), 'Unique-Konflikte müssen in einem eigenen atomaren Auditpfad nachgelesen werden.');
 
 $publicHtml = (string)file_get_contents($root . '/startpartner/index.html');
 $publicJs = (string)file_get_contents($root . '/js/startpartner-funnel.js');
