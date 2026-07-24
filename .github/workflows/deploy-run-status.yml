@@ -1,0 +1,41 @@
+name: Publish Deploy Run Status
+
+on:
+  workflow_run:
+    workflows: ["Deploy to STRATO"]
+    types: [in_progress, completed]
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: deploy-run-status-${{ github.event.workflow_run.id }}-${{ github.event.action }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish deploy run locator
+    if: >-
+      github.event.workflow_run.repository.full_name == github.repository &&
+      (github.event.workflow_run.head_branch == 'main' ||
+       github.event.workflow_run.head_branch == 'staging')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout trusted default-branch publisher
+        uses: actions/checkout@v4
+
+      - name: Publish commit status with deploy run link
+        env:
+          DEPLOY_STATUS_TOKEN: ${{ github.token }}
+          DEPLOY_RUN_REPOSITORY: ${{ github.event.workflow_run.repository.full_name }}
+          DEPLOY_RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          DEPLOY_RUN_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          DEPLOY_RUN_EVENT: ${{ github.event.workflow_run.event }}
+          DEPLOY_RUN_ID: ${{ github.event.workflow_run.id }}
+          DEPLOY_RUN_URL: ${{ github.event.workflow_run.html_url }}
+          DEPLOY_RUN_ACTION: ${{ github.event.action }}
+          DEPLOY_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          GITHUB_API_URL: ${{ github.api_url }}
+        run: python3 scripts/publish_deploy_run_status.py

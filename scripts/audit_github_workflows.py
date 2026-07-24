@@ -10,6 +10,7 @@ WORKFLOW_DIR = Path(".github/workflows")
 EXPECTED_WORKFLOWS = {
     "bathing-water-guard.yml",
     "content-quality-audit.yml",
+    "deploy-run-status.yml",
     "deploy-strato.yml",
     "growth-intelligence-backlog.yml",
     "inbox-cleanup.yml",
