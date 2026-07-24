@@ -1,8 +1,8 @@
 # Aktueller Proofindex – Bocholt erleben
 
-Stand: 2026-07-22
+Stand: 2026-07-24
 
-Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Historie liegt in Git und den jeweiligen Action-Artefakten.
+Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence-Grenzen. Operative Zwischenstände, vollständige Logs und laufende Run-IDs stehen im jeweiligen Workpack-Issue und in GitHub Actions.
 
 ## Evidence-Legende
 
@@ -10,61 +10,55 @@ Diese Datei enthält nur den aktuell relevanten Proofstand. Ausführliche Histor
 |---|---|
 | E1 | aktueller Code oder Diff |
 | E2 | automatisierter lokaler/CI-Test |
-| E3 | deployter read-only Nachweis |
-| E4 | begrenzter realer Write mit Rücklesen und Cleanup |
+| E3 | deployter read-only Staging-Nachweis |
+| E4 | begrenzter realer Staging-Write mit Rücklesen und Cleanup |
 | E5 | echter fachlicher Staging-Fall |
 | E6 | read-only Live-Smoke |
 
 ## Aktueller Proofstand
 
-| Bereich | Evidence | Status |
+| Bereich | Evidence | Dauerhaft belegter Stand |
 |---|---:|---|
 | Branch- und Deployrouting | E2 | nur `staging` und `main` dürfen deployen; Releasepfad `Feature-Branch -> staging -> main` |
-| PR-Integration | E2 | ein Required Check `PR Gate` führt die Repositorytests aus |
-| Geschützte Deploy-Environments | E2 | Deployjob nutzt abhängig vom Branch ausschließlich `staging` oder `main`; Branchregeln sind aktiv; `GITHUB_TOKEN` ist auf `contents: read` begrenzt |
-| Staging-Deploy | E3 | normaler Deploy über Environment `staging` einschließlich Build-, HTTP- und Browser-Smoke erfolgreich |
-| Staging-Secret-Isolation | E3 | `STAGING_REVIEW_PASSWORD` liegt ausschließlich im Environment `staging`; nach Löschen des gleichnamigen Repository-Secrets blieben Deploy und Login erfolgreich |
-| Live-Deploy | E6 | finaler SEO-Abschluss über PR #160 veröffentlicht; Main-SHA `5490b0fe7416d39e675796a9759b1ef5fef20b5f`; normaler Main-Deploy grün |
-| Branch-Inhaltsgleichheit | E1 | `main` und `staging` besitzen denselben Dateiinhalt; Unterschiede bestehen nur in der Merge-Historie |
-| SEO Intent- und Renderingvertrag | E2 | gemeinsame neutrale Auswahl, Berliner Kalendertag, Mehrtagesevents, Ausschluss vergangener/ungültiger Inhalte, stabile Sortierung, echte Renderer-Fixtures und fail-closed leere Datenkerne im `PR Gate` |
-| SEO Stagingabschluss | E3 | Staging-SHA `2ee2990bb06ee03ac8248e47150bb12de8a1c74e`; PR Gate #219 und normaler Deploy grün; mobile Sichtprüfung 327 × 779 Pixel grün; keine zusätzlichen Hero-Zeilen oder CTA-Regression |
-| Statischer Startseitenkern live | E6 | Live-Seitenquelltext enthält `data-static-event-context`, `Alle Events ansehen` und `Aktivitäten entdecken` jeweils genau einmal; der statische Kern und beide Hauptlinks werden tatsächlich ausgeliefert |
-| Event-/Offer-Vertrag | E2 | Quellen- und Ticket-URLs getrennt; kostenlose Offers `0 EUR`; kostenpflichtige Offers nur mit Preis, Währung und Ticket-URL; ungültige Preise, URLs, Availability und `validFrom` werden verworfen |
-| Event-Schema und Detailseiten | E2 | Event-JSON-LD nur auf geeigneten eindeutigen Detailseiten; mehrere Ticketarten sichtbar und schema-deckungsgleich; unbekannte Eintrittslage bleibt indexierbare HTML-Seite ohne synthetisches Event-Markup |
-| Sammelseiten-Schema | E2 | `/events/` und andere Sammelseiten geben keine einzelnen Event-Entitäten als Ersatz für Detailseiten aus |
-| Robots, Sitemap und Canonical | E2/E3 | umgebungsabhängige Robots- und Sitemaptemplates, Canonical-Contracts und Ergänzung generierter Eventdetailseiten sind im Deploypfad abgesichert |
-| Search-Console-Structured-Data-Baseline | externer Befund | am 2026-07-22 sichtbar: `performer` 2, `organizer` 2, `priceCurrency` 1, `validFrom` 1, `price` 1 und `offers` 1; bekannte Beispiel-URL ist die 2. Bocholter Vereinsmesse; vollständige URL-/Live-/Quellenauflösung als eigener Queue-Workpack eingeplant |
-| Search-Console-Validierungen | nicht gestartet | keine pauschale Validierung vor URL-genauer Klassifizierung als historisch, bewusst akzeptiert, Datenlücke oder technischer Fehler |
-| SEO-Wirkungsmessung | ausstehend | erste Tendenz nach mindestens 14 Tagen, führende Bewertung nach 28 Tagen; Impressionen, Klicks, CTR und Position getrennt bewerten |
-| Control-Center-Writeback | E4 | Success, Replay, kontrollierter Fehler, Resume und Cleanup synthetisch belegt |
-| Live-Unverändertheit beim E4 | E4 | Live-Sheet und Live-Feed blieben unverändert |
-| Event-Builder-Kompatibilität | E2 | eine vom echten Control-Center-Writer erzeugte Zeile mit `11:00–18:00 Uhr` wird vom normalen Event-Builder vollständig verarbeitet |
-| Event-Identität und Dubletten-Preflight | E2 | gemeinsamer Python-/PHP-Vertrag; CityArt-Semantik, Shared-URL, getrennte Programmpunkte, ID-Konflikt, Same-ID-Resume, Staging-Overlay und Approval-Wiring sind im `PR Gate` grün |
-| echter Control-Center-Fachfall | nicht erforderlich | kein echter Fall wurde für den technischen Nachweis verändert |
-| Weekly-KI-/Inbox-Betrieb | laufender Betrieb | anhand der jeweiligen fachlichen Action-Läufe bewerten |
+| Aktiver Workpack | E2 | genau ein offenes Issue mit `[ACTIVE WORKPACK]`; kein oder mehrere Treffer stoppen Repository-Writes fail-closed |
+| PR-Scope-Vertrag | E2 | PR referenziert Revision und Hash des aktiven Issue-Vertrags; vollständiger Diff einschließlich Löschungen wird gegen `allowed_paths` und `locked_paths` geprüft |
+| PR-Integration | E2 | ein Required Check `PR Gate` führt Contract-, Diff-, Repository- und synthetische Browserprüfung aus |
+| Checkout-neutrale Browser-Evidence | E2 | synthetische Event-Navigation läuft in temporärem Verzeichnis und verändert den Repository-Checkout nicht |
+| Deploy-Run-Locator | E2/E6 | `Publish Deploy Run Status` schreibt branch- und eventbezogen `pending`, `success`, `failure` oder `error` mit exaktem Actions-Link auf den Commit |
+| Automatische Main-Run-Auffindbarkeit | E6 | Main-SHA `6e3d869ba65d4c9d27970a3c325896ccd00702c1` wurde ohne Codespace über `deploy-strato/main/push` dem Run `30076982983` zugeordnet; Status wechselte `pending -> success` |
+| Release-Kohärenz | E2/E3/E6 | Assets, HTML, Build-Marker, Service Worker und Manifest werden geordnet veröffentlicht und vor Abschluss gegeneinander geprüft |
+| STRATO-SFTP-Härtung | E2/E3/E6 | phasenbezogene Retries, IPv4, maximal zwei parallele Transfers und wiederverwendete SSH-Verbindung sind deterministisch und real belegt |
+| Aktueller Live-Deploy | E6 | Run `30076982983` bestand alle 65 Schritte; Browser-Smoke 26/26 OK, 0 Fehler, 0 Warnungen |
+| Branch-Inhaltsgleichheit | E1 | `main` und `staging` besitzen nach dem Release denselben Dateiinhalt; Unterschiede dürfen nur aus Merge-Historie bestehen |
+| Responsive Event-Grid | E2/E6 | eine Spalte bis `1099.98 CSS px`, zwei Spalten ab `1100 CSS px`, keine dritte Spalte und kein horizontaler Überlauf |
+| Warm Service Worker | E6 | aktiver produktiver Controller, aktueller Worker-Stempel und ausschließlich aktueller Cache wurden real bestätigt |
+| SEO Intent und statisches Rendering | E2/E3/E6 | initiales HTML, progressive Anreicherung, Landingpages, Canonicals, Robots und Sitemap folgen demselben aktuellen Daten- und Auswahlvertrag |
+| Event-/Offer-Vertrag | E2/E6 | Event-JSON-LD nur auf geeigneten Detailseiten; kostenlose und kostenpflichtige Offers ausschließlich aus belegten Daten; unbekannte Werte bleiben fail-closed |
+| Structured-Data-Warnungen | E2/E6 | URL- und quellenbezogene Korrektur ohne erfundene Organizer-, Performer-, Preis-, Währungs-, `validFrom`-, Availability- oder Ticketwerte |
+| Event-Identität und Dubletten-Preflight | E2 | gemeinsamer Python-/PHP-Vertrag, Same-ID-Resume, Staging-Overlay und Approval-Wiring im PR Gate |
+| Control-Center-Writeback | E4 | Success, Replay, kontrollierter Fehler, Resume, Rücklesen und Cleanup synthetisch belegt; Live blieb unverändert |
+| Event-Builder-Kompatibilität | E2 | vom Control-Center-Writer erzeugte Zeitformate werden vom normalen Event-Builder verarbeitet |
+| Externe Live-Writes | Grenze | keine Live-Testschreibaktion; echte Live-Admin-Mutation nur nach ausdrücklicher Freigabe und Write-Vertrag |
 
-## SEO-Abschlussgrenze
+## Prozessnachweis
 
-Der Produkt-Workpack **SEO Recovery – Search Intent und statische Renderingbasis** ist mit E1, E2, Staging-E3 und Live-E6 abgeschlossen. Die neue Search-Console-Warnungsliste ist ein eigenständiger, noch nicht aktiver Folge-Workpack und öffnet den abgeschlossenen Workpack nicht erneut.
+Die Einführung des issue-verankerten PR-Vertrags stoppte zwei reale Fehler vor dem Merge:
 
-Die 14-/28-Tage-Rankingmessung bleibt eine zeitversetzte Betriebsaufgabe. Aus dem technischen Abschluss wird keine bereits eingetretene Rankingverbesserung abgeleitet.
+1. einen unvollständigen PR-Evidence-Block;
+2. einen neuen, noch nicht im fail-closed Workflow-Inventar registrierten Workflow.
 
-Der parallel geprüfte Werkzeugsteuerungs-Pilot war nur teilweise erfolgreich: Zielableitung, Werkzeugaufteilung und PR-Gates funktionierten, die Kriterien „keine Grundsatzkorrektur“ und „keine reale Try-and-Error-Schleife“ wurden wegen der visuellen Linkkorrekturen nicht erreicht.
+Erst nach expliziter Vertragsrevision und vollständigem Neu-Lauf wurde freigegeben. Damit ist belegt, dass der Prozess echten Scope und Verhalten prüft statt nur Dokumentationsmarker.
 
-## E4-Ergebnis
+## Artifact-Grenze
 
-Der synthetische Lauf für Build `6702fd5c12a0` bestätigte:
+GitHub-Actions-Artefakte bleiben interne maschinelle Evidence. Chat oder Codex prüft sie nur, wenn Summary und Logs nicht ausreichen. Nutzerseitig werden Ergebnisse und Grenzen berichtet; ZIP-Dateien oder Downloadlinks werden ohne ausdrücklichen Auftrag nicht geliefert.
 
-- `Inbox_Staging -> Events_Staging`;
-- genau ein Success-Event trotz Replay;
-- fail-closed Retry der fehlgeschlagenen Operation;
-- erfolgreiche Wiederaufnahme ohne Duplikat;
-- zwei gelöschte Inboxzeilen, zwei gelöschte Eventzeilen, zwei gelöschte Cases und drei gelöschte Operationszustände;
-- keine synthetischen Reste;
-- unveränderte Live- und Nicht-Testdaten.
+## Zeitversetzte Evidence
 
-Der damalige gekoppelte Feed-Build scheiterte an der unterschiedlichen Zeitformat-Akzeptanz von Control-Center-Writer und Event-Builder. Der lokale E2-Contract schließt diese Lücke dauerhaft; der E4-Writeback-Beweis wird nicht wiederholt.
+- Search-Console-Neubewertungen und SEO-Wirkung bleiben externe zeitversetzte Betriebsaufgaben.
+- Eine technische Veröffentlichung beweist keine bereits eingetretene Rankingverbesserung.
+- Weekly-KI-, Content-, Search- und Visualsignale werden anhand der jeweils owning Fachläufe bewertet.
 
 ## Pflege
 
-`TEST_STATUS.md` wird nur geändert, wenn sich ein relevanter Proofstand oder eine konkrete Evidence-Lücke ändert. Keine kompletten Logs, Patchchroniken oder Prozessinventuren hier ablegen.
+`TEST_STATUS.md` wird nur geändert, wenn sich eine dauerhafte Testabdeckung, Prooffähigkeit oder Evidence-Grenze ändert. Keine kompletten Logs, Patchchroniken oder allgemeinen Workpack-Abschlüsse hier ablegen.
