@@ -13,9 +13,6 @@ jobs:
     if: github.head_ref == 'evidence/startpartner-gate1-staging-write-2026-07-24'
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    environment:
-      name: staging
-      url: https://staging.bocholt-erleben.de
 
     steps:
       - name: Checkout evidence branch
