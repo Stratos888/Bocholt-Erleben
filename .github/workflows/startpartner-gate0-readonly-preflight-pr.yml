@@ -45,6 +45,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p evidence
           python - <<'PYEXTRACT'
           from pathlib import Path
           import textwrap
@@ -66,7 +67,6 @@ jobs:
           python /tmp/startpartner_gate0_readonly_db_preflight.py 2>&1 | tee /tmp/startpartner-gate0-preflight.log
           status=${PIPESTATUS[0]}
           set -e
-          mkdir -p evidence
           python - <<'PYREDACT'
           import os
           from pathlib import Path
