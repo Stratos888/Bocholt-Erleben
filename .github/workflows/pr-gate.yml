@@ -63,7 +63,17 @@ jobs:
 
       - name: Validate full repository
         shell: bash
-        run: bash scripts/validate-repo.sh
+        run: |
+          set -o pipefail
+          bash scripts/validate-repo.sh 2>&1 | tee "${RUNNER_TEMP}/repository-validation.log"
+
+      - name: Upload repository validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-validation-${{ github.event.pull_request.number }}
+          path: ${{ runner.temp }}/repository-validation.log
+          if-no-files-found: warn
 
       - name: Setup Node
         uses: actions/setup-node@v4
