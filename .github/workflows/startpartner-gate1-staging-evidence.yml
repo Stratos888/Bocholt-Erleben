@@ -68,7 +68,12 @@ jobs:
           print(f"Endpoint file: {endpoint_file}")
           print(f"Synthetic marker: {marker}")
           PY
-          php -l "evidence-upload/api/internal/$EVIDENCE_ENDPOINT_FILE"
+          if php -l "evidence-upload/api/internal/$EVIDENCE_ENDPOINT_FILE" > artifacts/gate1-staging/php-lint.txt 2>&1; then
+            cat artifacts/gate1-staging/php-lint.txt
+          else
+            cat artifacts/gate1-staging/php-lint.txt
+            exit 1
+          fi
 
       - name: Install lftp
         shell: bash
@@ -141,7 +146,8 @@ jobs:
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
         run: |
           set +e
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
+          if command -v lftp >/dev/null 2>&1 && [ -n "${EVIDENCE_ENDPOINT_FILE:-}" ]; then
+            lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
           set sftp:auto-confirm yes
           set cmd:fail-exit no
           set net:timeout 20
@@ -149,9 +155,17 @@ jobs:
           rm api/internal/$EVIDENCE_ENDPOINT_FILE
           bye
           LFTP
-          cleanup_status=$?
+            cleanup_status=$?
+          else
+            cleanup_status=0
+          fi
           set -e
+          mkdir -p artifacts/gate1-staging
           printf 'sftp_cleanup_status=%s\n' "$cleanup_status" > artifacts/gate1-staging/cleanup.txt
+          if [ -z "${EVIDENCE_URL:-}" ]; then
+            printf 'endpoint_not_rendered=true\nendpoint_removed=true\n' >> artifacts/gate1-staging/cleanup.txt
+            exit 0
+          fi
           for attempt in $(seq 1 8); do
             endpoint_status="$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 "$EVIDENCE_URL?cleanup=$attempt" || true)"
             printf 'attempt=%s status=%s\n' "$attempt" "$endpoint_status" >> artifacts/gate1-staging/cleanup.txt
