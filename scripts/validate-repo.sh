@@ -70,6 +70,7 @@ validate_repository() {
   echo "== Repository tools and generators =="
   python3 -m compileall -q scripts tools
   python3 tests/test_deploy_release_coherence.py
+  bash tests/test_strato_sftp_phase_retry.sh
   python3 scripts/audit_control_center_product_contract.py
   python3 scripts/audit_control_center_editorial_contracts.py
   python3 tools/audit-css-governance.py
