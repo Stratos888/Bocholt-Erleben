@@ -85,7 +85,7 @@ try{
   assert(await waitingRun.page.locator('[data-review-action="approve"]:visible').count()===0,'waiting: irreführende Freigabe sichtbar');
   await waitingRun.context.close(); results.push({name:'mobile-waiting',status:'OK'});
   const failedRun=await openScenario(browser,'failed',{width:360,height:780},'mobile-360x780-failed-verification');
-  assert((await failedRun.page.locator('.cc-review-task--failed_verification:visible').innerText()).includes('Prüfung fehlgeschlagen'),'failed_verification: Zustand fehlt');
+  assert((await failedRun.page.locator('.cc-review-task--failed_verification:visible').innerText()).toLocaleLowerCase('de-DE').includes('prüfung fehlgeschlagen'),'failed_verification: Zustand fehlt');
   assert(await failedRun.page.locator('.cc-mobile-decision [data-review-task-resolution="retry_verification"]:visible').count()===1,'failed_verification: vorhandene Wiederholungsaktion fehlt');
   assert(await failedRun.page.locator('[data-review-action="approve"]:visible').count()===0,'failed_verification: irreführende Freigabe sichtbar');
   await failedRun.context.close(); results.push({name:'failed-verification',status:'OK'});
