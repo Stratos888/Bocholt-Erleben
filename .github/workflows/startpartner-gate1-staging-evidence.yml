@@ -51,10 +51,6 @@ jobs:
 
           template = Path("tools/startpartner-gate1-staging-evidence.php.tpl").read_text(encoding="utf-8")
           rendered = template.replace("__TOKEN_HASH__", token_hash)
-          rendered = rendered.replace("dirname(__DIR__, 2) . '/_bootstrap.php'", "dirname(__DIR__) . '/_bootstrap.php'")
-          rendered = rendered.replace("dirname(__DIR__, 2) . '/startpartner/_domain.php'", "dirname(__DIR__) . '/startpartner/_domain.php'")
-          rendered = rendered.replace("dirname(__DIR__, 2) . '/sql/", "dirname(__DIR__) . '/sql/")
-
           output = Path("evidence-upload/api/internal") / endpoint_file
           output.write_text(rendered, encoding="utf-8")
 
@@ -70,12 +66,7 @@ jobs:
           PY
           runner_file="$(find evidence-upload/api/internal -maxdepth 1 -type f -name 'gate1-evidence-*.php' -print -quit)"
           [ -n "$runner_file" ]
-          if php -l "$runner_file" > artifacts/gate1-staging/php-lint.txt 2>&1; then
-            cat artifacts/gate1-staging/php-lint.txt
-          else
-            cat artifacts/gate1-staging/php-lint.txt
-            exit 1
-          fi
+          php -l "$runner_file" | tee artifacts/gate1-staging/php-lint.txt
 
       - name: Install lftp
         shell: bash
@@ -94,52 +85,265 @@ jobs:
         run: |
           set -euo pipefail
           bash scripts/run_strato_sftp_phase.sh evidence-upload 1
+          printf 'EVIDENCE_UPLOADED=true\n' >> "$GITHUB_ENV"
 
-      - name: Execute migration and synthetic lifecycle
-        id: execute
+      - name: Execute protected HTTP lifecycle
         shell: bash
         run: |
           set -euo pipefail
-          http_code="$(curl -sS \
-            --connect-timeout 15 \
-            --max-time 150 \
-            -o artifacts/gate1-staging/result.json \
-            -w '%{http_code}' \
-            -X POST \
-            -H "X-Gate1-Evidence-Token: $EVIDENCE_TOKEN" \
-            -H "X-Gate1-Evidence-Marker: $EVIDENCE_MARKER" \
-            -H "X-Gate1-Evidence-Run: $GITHUB_RUN_ID" \
-            "$EVIDENCE_URL")"
-          printf '%s\n' "$http_code" > artifacts/gate1-staging/http-status.txt
-          cat artifacts/gate1-staging/result.json
+          mkdir -p artifacts/gate1-staging/http
+          actual_base='https://staging.bocholt-erleben.de/api/startpartner'
+          idempotency_key="gate1-http-${EVIDENCE_MARKER}-${GITHUB_RUN_ID}"
+
           python3 - <<'PY'
+          import datetime as dt
           import json
+          import os
           from pathlib import Path
 
-          status = Path("artifacts/gate1-staging/http-status.txt").read_text().strip()
-          payload = json.loads(Path("artifacts/gate1-staging/result.json").read_text())
-          assert status == "200", (status, payload)
-          assert payload.get("status") == "ok", payload
-          assert payload.get("environment") == "staging", payload
-          assert payload.get("created") is True, payload
-          assert payload.get("idempotent_replay") is True, payload
-          assert payload.get("conflicting_replay_rejected") is True, payload
-          assert payload.get("duplicate_identity") is True, payload
-          assert payload.get("final_candidate_status") == "waitlisted", payload
-          assert payload.get("candidate_rows") == 1, payload
-          assert payload.get("contact_rows") == 2, payload
-          assert payload.get("candidate_event_rows") == 4, payload
-          assert payload.get("control_case", {}).get("state") == "parked", payload
-          assert payload.get("control_case", {}).get("source_reference_matches_candidate") is True, payload
-          assert payload.get("locked_table_counts_before") == payload.get("locked_table_counts_after_write"), payload
-          assert payload.get("cleanup") == {"candidate_rows": 0, "control_case_rows": 0}, payload
-          assert payload.get("cleanup_errors") == [], payload
-          assert payload.get("self_deleted") is True, payload
-          assert payload.get("migrations") == ["007_runtime_schema_reconciliation", "008_startpartner_candidates"], payload
+          marker = os.environ["EVIDENCE_MARKER"]
+          retention = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=30)).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+          payload = {
+              "source": "targeted_outreach",
+              "source_reference": "gate1-http-evidence-" + os.environ["GITHUB_RUN_ID"],
+              "organization_name": marker,
+              "contacts": [
+                  {
+                      "contact_name": "Synthetic Primary",
+                      "contact_role": "Evidence",
+                      "email": marker.lower() + "@example.org",
+                      "is_primary": True,
+                  },
+                  {
+                      "contact_name": "Synthetic Secondary",
+                      "contact_role": "Evidence",
+                      "email": "second-" + marker.lower() + "@example.org",
+                      "is_primary": False,
+                  },
+              ],
+              "website_url": "https://example.org/" + marker.lower(),
+              "description_text": "Synthetic Gate 1 protected HTTP evidence only.",
+              "desired_content_scope": "both",
+              "form_version": "gate1-http-evidence-v1",
+              "retention_review_at": retention,
+          }
+          root = Path("artifacts/gate1-staging/http")
+          root.joinpath("intake.json").write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+          conflict = dict(payload)
+          conflict["description_text"] = "Conflicting synthetic protected HTTP payload."
+          root.joinpath("conflict.json").write_text(json.dumps(conflict, ensure_ascii=False), encoding="utf-8")
+          root.joinpath("triage-qualified.json").write_text(json.dumps({"status": "qualified"}), encoding="utf-8")
+          root.joinpath("triage-waitlisted.json").write_text(json.dumps({"status": "waitlisted", "reason": "Synthetic capacity evidence."}), encoding="utf-8")
           PY
-          sha256sum artifacts/gate1-staging/result.json > artifacts/gate1-staging/result.sha256
 
-      - name: Remove temporary host runner and prove 404
+          request_json() {
+            local name="$1"
+            local method="$2"
+            local url="$3"
+            local body_file="${4:-}"
+            local idempotency="${5:-}"
+            local args=(
+              -sS
+              --connect-timeout 15
+              --max-time 120
+              -o "artifacts/gate1-staging/http/${name}.json"
+              -w '%{http_code}'
+              -X "$method"
+              -H 'Accept: application/json'
+              -H "X-Gate1-Evidence-Token: $EVIDENCE_TOKEN"
+              -H "X-Gate1-Evidence-Marker: $EVIDENCE_MARKER"
+            )
+            if [ -n "$body_file" ]; then
+              args+=( -H 'Content-Type: application/json' --data-binary "@$body_file" )
+            fi
+            if [ -n "$idempotency" ]; then
+              args+=( -H "Idempotency-Key: $idempotency" )
+            fi
+            curl "${args[@]}" "$url" > "artifacts/gate1-staging/http/${name}.status"
+          }
+
+          request_public() {
+            local name="$1"
+            local method="$2"
+            local url="$3"
+            local body_file="${4:-}"
+            local args=(
+              -sS
+              --connect-timeout 15
+              --max-time 60
+              -o "artifacts/gate1-staging/http/${name}.json"
+              -w '%{http_code}'
+              -X "$method"
+              -H 'Accept: application/json'
+            )
+            if [ -n "$body_file" ]; then
+              args+=( -H 'Content-Type: application/json' --data-binary "@$body_file" )
+            fi
+            curl "${args[@]}" "$url" > "artifacts/gate1-staging/http/${name}.status"
+          }
+
+          request_public unauthorized-intake POST "$actual_base/intake.php" artifacts/gate1-staging/http/intake.json
+          request_public unauthorized-candidates GET "$actual_base/candidates.php"
+          request_public unauthorized-triage POST "$actual_base/triage.php" artifacts/gate1-staging/http/triage-qualified.json
+          request_public unauthorized-runner GET "$EVIDENCE_URL"
+
+          request_json migration POST "$EVIDENCE_URL?action=migrate"
+          request_json inspect-before GET "$EVIDENCE_URL?action=inspect"
+          request_json create POST "$EVIDENCE_URL?action=intake" artifacts/gate1-staging/http/intake.json "$idempotency_key"
+
+          candidate_id="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('artifacts/gate1-staging/http/create.json').read_text())
+          print(payload.get('data', {}).get('candidate', {}).get('id', ''))
+          PY
+          )"
+          [ -n "$candidate_id" ]
+          printf '%s\n' "$candidate_id" > artifacts/gate1-staging/http/candidate-id.txt
+
+          request_json replay POST "$EVIDENCE_URL?action=intake" artifacts/gate1-staging/http/intake.json "$idempotency_key"
+          request_json conflict POST "$EVIDENCE_URL?action=intake" artifacts/gate1-staging/http/conflict.json "$idempotency_key"
+          request_json duplicate POST "$EVIDENCE_URL?action=intake" artifacts/gate1-staging/http/intake.json "${idempotency_key}-duplicate"
+          request_json readback-created GET "$EVIDENCE_URL?action=candidates&id=$candidate_id"
+
+          python3 - <<PY
+          import json
+          from pathlib import Path
+          for name in ('triage-qualified', 'triage-waitlisted'):
+              path = Path(f'artifacts/gate1-staging/http/{name}.json')
+              payload = json.loads(path.read_text())
+              payload['candidate_id'] = '$candidate_id'
+              path.write_text(json.dumps(payload), encoding='utf-8')
+          PY
+
+          request_json triage-qualified POST "$EVIDENCE_URL?action=triage" artifacts/gate1-staging/http/triage-qualified.json
+          request_json triage-waitlisted POST "$EVIDENCE_URL?action=triage" artifacts/gate1-staging/http/triage-waitlisted.json
+          request_json readback-final GET "$EVIDENCE_URL?action=candidates&id=$candidate_id"
+          request_json inspect-after GET "$EVIDENCE_URL?action=inspect"
+
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path('artifacts/gate1-staging/http')
+          def status(name):
+              return root.joinpath(name + '.status').read_text().strip()
+          def data(name):
+              return json.loads(root.joinpath(name + '.json').read_text())
+
+          assert status('unauthorized-intake') == '401'
+          assert status('unauthorized-candidates') == '401'
+          assert status('unauthorized-triage') == '401'
+          assert status('unauthorized-runner') == '404'
+          assert status('migration') == '200'
+          assert status('inspect-before') == '200'
+          assert status('create') == '201'
+          assert status('replay') == '200'
+          assert status('conflict') == '422'
+          assert status('duplicate') == '200'
+          assert status('readback-created') == '200'
+          assert status('triage-qualified') == '200'
+          assert status('triage-waitlisted') == '200'
+          assert status('readback-final') == '200'
+          assert status('inspect-after') == '200'
+
+          migration = data('migration')
+          before = data('inspect-before')['inspection']
+          created = data('create')['data']
+          replay = data('replay')['data']
+          conflict = data('conflict')
+          duplicate = data('duplicate')['data']
+          created_readback = data('readback-created')['data']
+          final_readback = data('readback-final')['data']
+          after = data('inspect-after')['inspection']
+          candidate_id = root.joinpath('candidate-id.txt').read_text().strip()
+
+          assert migration['status'] == 'ok'
+          assert all(migration['tables_after'].values())
+          assert migration['inspection']['migrations'] == ['007_runtime_schema_reconciliation', '008_startpartner_candidates']
+          assert before['candidate_rows'] == 0
+          assert before['control_case_rows'] == 0
+          assert created['created'] is True
+          assert created['idempotent_replay'] is False
+          assert created['duplicate_identity'] is False
+          assert created['candidate']['id'] == candidate_id
+          assert replay['created'] is False
+          assert replay['idempotent_replay'] is True
+          assert replay['candidate']['id'] == candidate_id
+          assert conflict['status'] == 'error'
+          assert 'different request payload' in conflict['message']
+          assert duplicate['created'] is False
+          assert duplicate['duplicate_identity'] is True
+          assert duplicate['candidate']['id'] == candidate_id
+          assert created_readback['id'] == candidate_id
+          assert final_readback['id'] == candidate_id
+          assert final_readback['status'] == 'waitlisted'
+          assert len(final_readback['contacts']) == 2
+          assert len(final_readback['events']) == 4
+          assert after['candidate_rows'] == 1
+          assert after['contact_rows'] == 2
+          assert after['candidate_event_rows'] == 4
+          assert after['control_case_rows'] == 1
+          assert after['control_case']['state'] == 'parked'
+          assert after['control_case']['decision_ready'] == 0
+          assert after['control_case']['source_system'] == 'startpartner_candidate'
+          assert after['control_case']['source_reference_matches_candidate'] is True
+          assert before['locked_table_counts'] == after['locked_table_counts']
+          assert after['migrations'] == ['007_runtime_schema_reconciliation', '008_startpartner_candidates']
+
+          result = {
+              'status': 'ok',
+              'gate': 'startpartner_gate1_protected_http_lifecycle',
+              'environment': 'staging',
+              'run_reference': os.environ['GITHUB_RUN_ID'],
+              'marker': os.environ['EVIDENCE_MARKER'],
+              'candidate_id': candidate_id,
+              'unauthorized_statuses': {
+                  'intake': 401,
+                  'candidates': 401,
+                  'triage': 401,
+                  'temporary_runner': 404,
+              },
+              'authorized_statuses': {
+                  'migration': 200,
+                  'create': 201,
+                  'replay': 200,
+                  'conflict': 422,
+                  'duplicate': 200,
+                  'readback_created': 200,
+                  'triage_qualified': 200,
+                  'triage_waitlisted': 200,
+                  'readback_final': 200,
+                  'inspect_after': 200,
+              },
+              'migrations': after['migrations'],
+              'created': True,
+              'idempotent_replay': True,
+              'conflicting_replay_rejected': True,
+              'duplicate_identity': True,
+              'final_candidate_status': 'waitlisted',
+              'candidate_rows': after['candidate_rows'],
+              'contact_rows': after['contact_rows'],
+              'candidate_event_rows': after['candidate_event_rows'],
+              'control_case': after['control_case'],
+              'locked_table_counts_before': before['locked_table_counts'],
+              'locked_table_counts_after_write': after['locked_table_counts'],
+              'forbidden_external_effects': {
+                  'mail': 'not_called_by_gate1_endpoints',
+                  'stripe': 'not_called_by_gate1_endpoints',
+                  'publication': 'not_called_by_gate1_endpoints',
+              },
+          }
+          result_path = Path('artifacts/gate1-staging/result.json')
+          result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          digest = hashlib.sha256(result_path.read_bytes()).hexdigest()
+          Path('artifacts/gate1-staging/result.sha256').write_text(f'{digest}  result.json\n', encoding='utf-8')
+          print(json.dumps(result, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Cleanup synthetic data and temporary host runner
         if: always()
         shell: bash
         env:
@@ -148,6 +352,41 @@ jobs:
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
         run: |
           set +e
+          mkdir -p artifacts/gate1-staging
+          cleanup_http_status='not_attempted'
+          cleanup_payload_ok='false'
+
+          if [ "${EVIDENCE_UPLOADED:-false}" = 'true' ]; then
+            cleanup_http_status="$(curl -sS \
+              --connect-timeout 15 \
+              --max-time 120 \
+              -o artifacts/gate1-staging/cleanup-response.json \
+              -w '%{http_code}' \
+              -X POST \
+              -H 'Accept: application/json' \
+              -H "X-Gate1-Evidence-Token: $EVIDENCE_TOKEN" \
+              -H "X-Gate1-Evidence-Marker: $EVIDENCE_MARKER" \
+              "$EVIDENCE_URL?action=cleanup" || true)"
+            if [ "$cleanup_http_status" = '200' ]; then
+              python3 - <<'PY'
+              import json
+              from pathlib import Path
+              payload = json.loads(Path('artifacts/gate1-staging/cleanup-response.json').read_text())
+              assert payload.get('status') == 'ok', payload
+              assert payload.get('candidate_rows') == 0, payload
+              assert payload.get('contact_rows') == 0, payload
+              assert payload.get('candidate_event_rows') == 0, payload
+              assert payload.get('control_case_rows') == 0, payload
+              assert payload.get('self_deleted') is True, payload
+              PY
+              [ "$?" -eq 0 ] && cleanup_payload_ok='true'
+            fi
+          else
+            printf '{"status":"not_uploaded"}\n' > artifacts/gate1-staging/cleanup-response.json
+            cleanup_payload_ok='true'
+          fi
+
+          sftp_cleanup_status=0
           if command -v lftp >/dev/null 2>&1 && [ -n "${EVIDENCE_ENDPOINT_FILE:-}" ]; then
             lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
           set sftp:auto-confirm yes
@@ -157,28 +396,30 @@ jobs:
           rm api/internal/$EVIDENCE_ENDPOINT_FILE
           bye
           LFTP
-            cleanup_status=$?
-          else
-            cleanup_status=0
+            sftp_cleanup_status=$?
           fi
-          set -e
-          mkdir -p artifacts/gate1-staging
-          printf 'sftp_cleanup_status=%s\n' "$cleanup_status" > artifacts/gate1-staging/cleanup.txt
-          if [ -z "${EVIDENCE_URL:-}" ]; then
-            printf 'endpoint_not_rendered=true\nendpoint_removed=true\n' >> artifacts/gate1-staging/cleanup.txt
-            exit 0
-          fi
+
+          endpoint_removed='false'
           for attempt in $(seq 1 8); do
             endpoint_status="$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 "$EVIDENCE_URL?cleanup=$attempt" || true)"
-            printf 'attempt=%s status=%s\n' "$attempt" "$endpoint_status" >> artifacts/gate1-staging/cleanup.txt
-            if [ "$endpoint_status" = "404" ]; then
-              printf 'endpoint_removed=true\n' >> artifacts/gate1-staging/cleanup.txt
-              exit 0
+            printf 'attempt=%s status=%s\n' "$attempt" "$endpoint_status" >> artifacts/gate1-staging/cleanup-attempts.txt
+            if [ "$endpoint_status" = '404' ]; then
+              endpoint_removed='true'
+              break
             fi
             sleep 3
           done
-          printf 'endpoint_removed=false\n' >> artifacts/gate1-staging/cleanup.txt
-          exit 1
+
+          {
+            printf 'cleanup_http_status=%s\n' "$cleanup_http_status"
+            printf 'cleanup_payload_ok=%s\n' "$cleanup_payload_ok"
+            printf 'sftp_cleanup_status=%s\n' "$sftp_cleanup_status"
+            printf 'endpoint_removed=%s\n' "$endpoint_removed"
+          } > artifacts/gate1-staging/cleanup.txt
+
+          set -e
+          [ "$cleanup_payload_ok" = 'true' ]
+          [ "$endpoint_removed" = 'true' ]
 
       - name: Upload Gate 1 staging evidence
         if: always()
