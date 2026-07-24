@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "owner": "api/sql",
+  "migrations": [
+    {"key": "001_publish_funnel_core", "file": "001_publish_funnel_core.sql", "mode": "legacy_one_shot"},
+    {"key": "002_organizer_portal_core", "file": "002_organizer_portal_core.sql", "mode": "legacy_one_shot"},
+    {"key": "003_submission_intake_origin_location_review", "file": "003_submission_intake_origin_location_review.sql", "mode": "legacy_one_shot"},
+    {"key": "004_submission_organizer_edit_tracking", "file": "004_submission_organizer_edit_tracking.sql", "mode": "legacy_one_shot"},
+    {"key": "005_inbox_push_notifications", "file": "005_inbox_push_notifications.sql", "mode": "idempotent_create"},
+    {"key": "006_single_event_review_before_payment", "file": "006_single_event_review_before_payment.sql", "mode": "legacy_one_shot"},
+    {"key": "007_runtime_schema_reconciliation", "file": "007_runtime_schema_reconciliation.sql", "mode": "idempotent_reconciliation"},
+    {"key": "008_startpartner_candidates", "file": "008_startpartner_candidates.sql", "mode": "idempotent_create"}
+  ]
+}

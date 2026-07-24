@@ -17,14 +17,15 @@ validate_routing() {
     data/event_identity_contract.json \
     data/event_visual_pool.json \
     tests/fixtures/control_center_editorial_cases.json \
-    tests/fixtures/event_identity_cases.json; do
+    tests/fixtures/event_identity_cases.json \
+    api/sql/000_manifest.json; do
     python3 -m json.tool "$file" >/dev/null
   done
 }
 
 validate_php_syntax() {
   find api -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null
-  for file in tests/control_center*.php; do
+  for file in tests/control_center*.php tests/startpartner_*.php; do
     php -l "$file" >/dev/null
   done
 }
@@ -40,6 +41,12 @@ validate_php_tests() {
     fi
     php "$file"
   done
+  php tests/startpartner_domain_contract_test.php
+  php tests/startpartner_side_effect_contract_test.php
+}
+
+validate_startpartner_mysql() {
+  bash tests/run_startpartner_mysql_contract.sh
 }
 
 validate_backend() {
@@ -48,6 +55,7 @@ validate_backend() {
   validate_php_syntax
   validate_preflight
   validate_php_tests
+  validate_startpartner_mysql
 }
 
 validate_frontend() {
@@ -93,6 +101,7 @@ case "$section" in
   php-syntax) validate_php_syntax ;;
   preflight) validate_preflight ;;
   php-tests) validate_php_tests ;;
+  startpartner-mysql) validate_startpartner_mysql ;;
   frontend) validate_frontend ;;
   repository) validate_repository ;;
   all)
