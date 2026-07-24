@@ -35,8 +35,10 @@ async function mobileDuplicate(browser,viewport,name){
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth);
   assert(!overflow,`${name}: horizontaler Überlauf`);
   const summary=decision.locator('summary');
+  assert(await summary.getAttribute('aria-expanded')==='false',`${name}: geschlossene Entscheidungsebene meldet aria-expanded nicht korrekt`);
   await summary.focus(); await summary.press('Enter');
   assert(await decision.getAttribute('open')!==null,`${name}: Entscheidungsebene ist nicht per Tastatur bedienbar`);
+  assert(await summary.getAttribute('aria-expanded')==='true',`${name}: geöffnete Entscheidungsebene meldet aria-expanded nicht korrekt`);
   assert(await decision.locator('[data-review-task-resolution]:visible').count()===4,`${name}: vollständige Dublettenaktionen fehlen`);
   assert(await decision.locator('.cc-button--danger:visible').count()===1,`${name}: destruktive Aktion ist nicht getrennt gekennzeichnet`);
   await context.close(); results.push({name,status:'OK'});
