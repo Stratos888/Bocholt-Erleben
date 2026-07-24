@@ -1,0 +1,89 @@
+name: Startpartner Gate 0 read-only DB preflight PR
+
+on:
+  pull_request:
+    branches:
+      - staging
+    paths:
+      - ".github/workflows/startpartner-gate0-readonly-preflight.yml"
+      - ".github/workflows/startpartner-gate0-readonly-preflight-pr.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    if: github.head_ref == 'evidence/startpartner-gate0-readonly-preflight-2026-07-24'
+    name: Read-only schema and aggregate inventory
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      STAGING_DB_HOST: ${{ secrets.STAGING_DB_HOST }}
+      STAGING_DB_PORT: ${{ secrets.STAGING_DB_PORT }}
+      STAGING_DB_NAME: ${{ secrets.STAGING_DB_NAME }}
+      STAGING_DB_USER: ${{ secrets.STAGING_DB_USER }}
+      STAGING_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+      LIVE_DB_HOST: ${{ secrets.LIVE_DB_HOST }}
+      LIVE_DB_PORT: ${{ secrets.LIVE_DB_PORT }}
+      LIVE_DB_NAME: ${{ secrets.LIVE_DB_NAME }}
+      LIVE_DB_USER: ${{ secrets.LIVE_DB_USER }}
+      LIVE_DB_PASSWORD: ${{ secrets.LIVE_DB_PASSWORD }}
+    steps:
+      - name: Checkout evidence branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install read-only client dependency
+        shell: bash
+        run: python -m pip install --disable-pip-version-check pymysql==1.1.1
+
+      - name: Extract and run redacted read-only preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PYEXTRACT'
+          from pathlib import Path
+          import textwrap
+
+          source = Path('.github/workflows/startpartner-gate0-readonly-preflight.yml').read_text(encoding='utf-8').splitlines()
+          start = next(index for index, line in enumerate(source) if line.strip() == "python - <<'PY'")
+          end = next(index for index in range(start + 1, len(source)) if source[index].strip() == 'PY')
+          script = textwrap.dedent('\n'.join(source[start + 1:end])) + '\n'
+          Path('/tmp/startpartner_gate0_readonly_db_preflight.py').write_text(script, encoding='utf-8')
+          PYEXTRACT
+          python -m py_compile /tmp/startpartner_gate0_readonly_db_preflight.py
+          python /tmp/startpartner_gate0_readonly_db_preflight.py
+
+      - name: Upload redacted preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: startpartner-gate0-readonly-db-preflight-${{ github.run_id }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Enforce successful inventory
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('evidence/startpartner-gate0-db-preflight.json')
+          if not path.is_file():
+              raise SystemExit('Evidence file missing')
+          report = json.loads(path.read_text(encoding='utf-8'))
+          print(f"overall_status={report.get('overall_status')}")
+          for item in report.get('environments', []):
+              existing = sum(1 for table in item.get('tables', {}).values() if table.get('exists'))
+              print(f"{item.get('environment')}: status={item.get('status')} existing_tables={existing}/{len(item.get('tables', {}))}")
+          if report.get('overall_status') != 'PASS':
+              raise SystemExit(1)
+          PY
