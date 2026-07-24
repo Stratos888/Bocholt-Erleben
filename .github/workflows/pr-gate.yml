@@ -82,10 +82,24 @@ jobs:
           SMOKE_OUT_DIR: ${{ runner.temp }}/browser-smoke-synthetic
         run: bash scripts/run-event-navigation-fixture-smoke.sh
 
+      - name: Run bounded mobile exception-review contract
+        shell: bash
+        env:
+          SMOKE_OUT_DIR: ${{ runner.temp }}/browser-smoke-control-center-mobile
+        run: bash scripts/run-control-center-mobile-exception-review-smoke.sh
+
       - name: Upload bounded synthetic browser evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: synthetic-event-navigation-${{ github.event.pull_request.number }}
           path: ${{ runner.temp }}/browser-smoke-synthetic/
+          if-no-files-found: warn
+
+      - name: Upload mobile exception-review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: control-center-mobile-exception-review-${{ github.event.pull_request.number }}
+          path: ${{ runner.temp }}/browser-smoke-control-center-mobile/
           if-no-files-found: warn
