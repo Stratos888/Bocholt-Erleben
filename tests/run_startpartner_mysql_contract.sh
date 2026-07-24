@@ -30,11 +30,12 @@ docker run -d --name "$CONTAINER" \
   mariadb:11.4 >/dev/null
 
 for attempt in {1..60}; do
-  if docker exec "$CONTAINER" mariadb-admin ping -uroot -pcontract-root --silent >/dev/null 2>&1; then
+  if docker exec "$CONTAINER" mariadb -uroot -pcontract-root -Nse 'SELECT 1' be_contract >/dev/null 2>&1; then
     break
   fi
   if [ "$attempt" -eq 60 ]; then
-    printf '%s\n' 'MariaDB contract container did not become ready.' >&2
+    printf '%s\n' 'MariaDB contract container did not become ready with authenticated database access.' >&2
+    docker logs "$CONTAINER" >&2 || true
     exit 1
   fi
   sleep 1
