@@ -53,10 +53,24 @@ jobs:
           start = next(index for index, line in enumerate(source) if line.strip() == "python - <<'PY'")
           end = next(index for index in range(start + 1, len(source)) if source[index].strip() == 'PY')
           script = textwrap.dedent('\n'.join(source[start + 1:end])) + '\n'
+          script = script.replace('import os\n', 'import os\nfrom decimal import Decimal\n', 1)
+          script = script.replace(
+              '    if isinstance(value, bytes):\n        return value.decode("utf-8", errors="replace")',
+              '    if isinstance(value, Decimal):\n        return str(value)\n    if isinstance(value, bytes):\n        return value.decode("utf-8", errors="replace")',
+              1,
+          )
           Path('/tmp/startpartner_gate0_readonly_db_preflight.py').write_text(script, encoding='utf-8')
           PYEXTRACT
           python -m py_compile /tmp/startpartner_gate0_readonly_db_preflight.py
-          python /tmp/startpartner_gate0_readonly_db_preflight.py
+          set +e
+          python /tmp/startpartner_gate0_readonly_db_preflight.py 2>&1 | tee /tmp/startpartner-gate0-preflight.log
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" -ne 0 ]; then
+            mkdir -p evidence
+            printf 'execution_status=FAIL\nexit_code=%s\n' "$status" > evidence/startpartner-gate0-execution-status.txt
+          fi
+          exit "$status"
 
       - name: Upload redacted preflight evidence
         if: always()
