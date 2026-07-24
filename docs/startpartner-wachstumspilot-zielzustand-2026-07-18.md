@@ -1,7 +1,7 @@
 # Startpartner-Wachstumspilot – vollständiger End-to-End-Zielvertrag
 
-Stand: 2026-07-24  
-Status: fachlich und architektonisch konsolidierter Zielzustand; noch nicht vollständig implementiert  
+Stand: 2026-07-24
+Status: fachlich und architektonisch konsolidierter Zielzustand; noch nicht vollständig implementiert
 Geltungsbereich: Akquise, Kandidatensteuerung, Aufnahme, Pilotvereinbarung, Anbieterzugang, kostenlose Pilotberechtigung, Onboarding, Aktivierung, Inhalte, Wirkungsmessung, Betreuung, Abschluss und Übergang in reguläre Produkte
 
 ## 1. Rolle und Verbindlichkeit
