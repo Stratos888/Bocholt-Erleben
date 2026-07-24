@@ -66,8 +66,26 @@ jobs:
           python /tmp/startpartner_gate0_readonly_db_preflight.py 2>&1 | tee /tmp/startpartner-gate0-preflight.log
           status=${PIPESTATUS[0]}
           set -e
+          mkdir -p evidence
+          python - <<'PYREDACT'
+          import os
+          from pathlib import Path
+
+          source = Path('/tmp/startpartner-gate0-preflight.log')
+          text = source.read_text(encoding='utf-8', errors='replace') if source.is_file() else 'preflight log missing\n'
+          secret_keys = [
+              'STAGING_DB_HOST', 'STAGING_DB_PORT', 'STAGING_DB_NAME', 'STAGING_DB_USER', 'STAGING_DB_PASSWORD',
+              'LIVE_DB_HOST', 'LIVE_DB_PORT', 'LIVE_DB_NAME', 'LIVE_DB_USER', 'LIVE_DB_PASSWORD',
+          ]
+          for key in secret_keys:
+              value = os.environ.get(key, '')
+              if value:
+                  text = text.replace(value, '***')
+          lines = text.splitlines()
+          diagnostic = '\n'.join(lines[-120:]) + ('\n' if lines else '')
+          Path('evidence/startpartner-gate0-redacted-diagnostic.txt').write_text(diagnostic, encoding='utf-8')
+          PYREDACT
           if [ "$status" -ne 0 ]; then
-            mkdir -p evidence
             printf 'execution_status=FAIL\nexit_code=%s\n' "$status" > evidence/startpartner-gate0-execution-status.txt
           fi
           exit "$status"
