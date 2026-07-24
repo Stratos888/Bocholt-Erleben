@@ -17,6 +17,7 @@ $expectException = static function(callable $callback, string $message) use (&$f
     }
 };
 
+$retentionReviewAt = (new DateTimeImmutable('+30 days', new DateTimeZone('UTC')))->format(DateTimeInterface::ATOM);
 $normalized = be_startpartner_normalize_intake([
     'source' => 'self_service',
     'organization_name' => '  Beispiel-Verein e. V.  ',
@@ -28,6 +29,7 @@ $normalized = be_startpartner_normalize_intake([
     'privacy_confirmed' => true,
     'privacy_policy_version' => 'privacy-2026-07',
     'form_version' => 'gate1-v1',
+    'retention_review_at' => $retentionReviewAt,
     'idempotency_key' => 'domain-contract-0001',
 ]);
 
@@ -39,6 +41,8 @@ $assert($normalized['website_url'] === 'https://example.org/start', 'Website mus
 $assert($normalized['description_text'] === 'Ein lokales Angebot.', 'Freitext muss deterministisch normalisiert werden.');
 $assert(strlen($normalized['identity_key']) === 64, 'Identity-Key muss SHA-256 sein.');
 $assert(strlen($normalized['idempotency_key_hash']) === 64, 'Idempotency-Key muss gehasht gespeichert werden.');
+$assert(strlen($normalized['request_fingerprint']) === 64, 'Der normalisierte Request benötigt einen stabilen Fingerprint.');
+$assert($normalized['retention_review_at'] === (new DateTimeImmutable($retentionReviewAt))->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s'), 'Retention-Review muss explizit übernommen und nach UTC normalisiert werden.');
 $assert(!array_key_exists('privacy_confirmed', $normalized), 'Ein bloßes Checkbox-Flag darf nicht als Vertragsnachweis gespeichert werden.');
 
 $sameIdentity = be_startpartner_normalize_intake([
@@ -49,6 +53,7 @@ $sameIdentity = be_startpartner_normalize_intake([
         ['email' => 'zweite@example.org'],
     ],
     'form_version' => 'gate1-v1',
+    'retention_review_at' => $retentionReviewAt,
     'idempotency_key' => 'domain-contract-0002',
 ]);
 $assert($sameIdentity['identity_key'] === $normalized['identity_key'], 'Großschreibung und Trennzeichen dürfen keine neue Identität erzeugen.');
@@ -59,7 +64,21 @@ $expectException(static fn() => be_startpartner_normalize_intake([
     'source' => 'self_service',
     'organization_name' => 'Ohne Datenschutz',
     'email' => 'valid@example.org',
+    'retention_review_at' => $retentionReviewAt,
 ]), 'Self-Service ohne Datenschutzversion muss abgelehnt werden.');
+$expectException(static fn() => be_startpartner_normalize_intake([
+    'source' => 'targeted_outreach',
+    'organization_name' => 'Ohne Review-Zeitpunkt',
+    'email' => 'valid@example.org',
+    'idempotency_key' => 'domain-contract-0003',
+]), 'Ein technisch erfundener Aufbewahrungszeitraum darf nicht automatisch gesetzt werden.');
+$expectException(static fn() => be_startpartner_normalize_intake([
+    'source' => 'targeted_outreach',
+    'organization_name' => 'Vergangener Review-Zeitpunkt',
+    'email' => 'valid@example.org',
+    'retention_review_at' => '2020-01-01T00:00:00Z',
+    'idempotency_key' => 'domain-contract-0004',
+]), 'Ein vergangener Retention-Review-Zeitpunkt muss abgelehnt werden.');
 $expectException(static fn() => be_startpartner_normalize_intake([
     'source' => 'targeted_outreach',
     'organization_name' => 'Doppelte Kontakte',
@@ -67,7 +86,8 @@ $expectException(static fn() => be_startpartner_normalize_intake([
         ['email' => 'same@example.org', 'is_primary' => true],
         ['email' => 'SAME@example.org'],
     ],
-    'idempotency_key' => 'domain-contract-0003',
+    'retention_review_at' => $retentionReviewAt,
+    'idempotency_key' => 'domain-contract-0005',
 ]), 'Doppelte normalisierte Kontaktadressen müssen abgelehnt werden.');
 $expectException(static fn() => be_startpartner_normalize_intake([
     'source' => 'targeted_outreach',
@@ -76,7 +96,8 @@ $expectException(static fn() => be_startpartner_normalize_intake([
         ['email' => 'one@example.org', 'is_primary' => true],
         ['email' => 'two@example.org', 'is_primary' => true],
     ],
-    'idempotency_key' => 'domain-contract-0004',
+    'retention_review_at' => $retentionReviewAt,
+    'idempotency_key' => 'domain-contract-0006',
 ]), 'Mehr als ein Primärkontakt muss abgelehnt werden.');
 
 $assert(be_startpartner_transition_allowed('new', 'qualified'), 'new -> qualified muss erlaubt sein.');
