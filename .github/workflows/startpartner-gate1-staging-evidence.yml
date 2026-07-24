@@ -1,0 +1,177 @@
+name: Startpartner Gate 1 Staging Evidence
+
+on:
+  pull_request:
+    branches: [staging]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  staging-evidence:
+    if: github.head_ref == 'evidence/startpartner-gate1-staging-write-2026-07-24'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: staging
+      url: https://staging.bocholt-erleben.de
+
+    steps:
+      - name: Checkout evidence branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Enforce non-mergeable evidence scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          [ "${{ github.event.pull_request.base.ref }}" = "staging" ]
+          [ "${{ github.event.pull_request.base.sha }}" = "dd4c4dd43ddcdde952c6f8ee2f0ef3ae7f8c72f6" ]
+          mapfile -t changed < <(git diff --name-only "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}")
+          printf '%s\n' "${changed[@]}"
+          [ "${#changed[@]}" -eq 2 ]
+          printf '%s\n' "${changed[@]}" | grep -Fxq '.github/workflows/startpartner-gate1-staging-evidence.yml'
+          printf '%s\n' "${changed[@]}" | grep -Fxq 'tools/startpartner-gate1-staging-evidence.php.tpl'
+
+      - name: Render random token-protected host runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence-upload/api/internal artifacts/gate1-staging
+          python3 - <<'PY'
+          import hashlib
+          import os
+          import secrets
+          from pathlib import Path
+
+          token = secrets.token_urlsafe(48)
+          endpoint_file = f"gate1-evidence-{secrets.token_hex(20)}.php"
+          marker = "GATE1_SYNTHETIC_194_" + secrets.token_hex(8).upper()
+          token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+          template = Path("tools/startpartner-gate1-staging-evidence.php.tpl").read_text(encoding="utf-8")
+          rendered = template.replace("__TOKEN_HASH__", token_hash)
+          rendered = rendered.replace("dirname(__DIR__, 2) . '/_bootstrap.php'", "dirname(__DIR__) . '/_bootstrap.php'")
+          rendered = rendered.replace("dirname(__DIR__, 2) . '/startpartner/_domain.php'", "dirname(__DIR__) . '/startpartner/_domain.php'")
+          rendered = rendered.replace("dirname(__DIR__, 2) . '/sql/", "dirname(__DIR__) . '/sql/")
+
+          output = Path("evidence-upload/api/internal") / endpoint_file
+          output.write_text(rendered, encoding="utf-8")
+
+          env_file = Path(os.environ["GITHUB_ENV"])
+          with env_file.open("a", encoding="utf-8") as handle:
+              handle.write(f"EVIDENCE_TOKEN={token}\n")
+              handle.write(f"EVIDENCE_ENDPOINT_FILE={endpoint_file}\n")
+              handle.write(f"EVIDENCE_MARKER={marker}\n")
+              handle.write(f"EVIDENCE_URL=https://staging.bocholt-erleben.de/api/internal/{endpoint_file}\n")
+          print(f"::add-mask::{token}")
+          print(f"Endpoint file: {endpoint_file}")
+          print(f"Synthetic marker: {marker}")
+          PY
+          php -l "evidence-upload/api/internal/$EVIDENCE_ENDPOINT_FILE"
+
+      - name: Install lftp
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+
+      - name: Upload temporary runner to staging only
+        shell: bash
+        env:
+          STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
+          STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
+          STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+          DEPLOY_TARGET_DIR: staging
+        run: |
+          set -euo pipefail
+          bash scripts/run_strato_sftp_phase.sh evidence-upload 1
+
+      - name: Execute migration and synthetic lifecycle
+        id: execute
+        shell: bash
+        run: |
+          set -euo pipefail
+          http_code="$(curl -sS \
+            --connect-timeout 15 \
+            --max-time 150 \
+            -o artifacts/gate1-staging/result.json \
+            -w '%{http_code}' \
+            -X POST \
+            -H "X-Gate1-Evidence-Token: $EVIDENCE_TOKEN" \
+            -H "X-Gate1-Evidence-Marker: $EVIDENCE_MARKER" \
+            -H "X-Gate1-Evidence-Run: $GITHUB_RUN_ID" \
+            "$EVIDENCE_URL")"
+          printf '%s\n' "$http_code" > artifacts/gate1-staging/http-status.txt
+          cat artifacts/gate1-staging/result.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          status = Path("artifacts/gate1-staging/http-status.txt").read_text().strip()
+          payload = json.loads(Path("artifacts/gate1-staging/result.json").read_text())
+          assert status == "200", (status, payload)
+          assert payload.get("status") == "ok", payload
+          assert payload.get("environment") == "staging", payload
+          assert payload.get("created") is True, payload
+          assert payload.get("idempotent_replay") is True, payload
+          assert payload.get("conflicting_replay_rejected") is True, payload
+          assert payload.get("duplicate_identity") is True, payload
+          assert payload.get("final_candidate_status") == "waitlisted", payload
+          assert payload.get("candidate_rows") == 1, payload
+          assert payload.get("contact_rows") == 2, payload
+          assert payload.get("candidate_event_rows") == 4, payload
+          assert payload.get("control_case", {}).get("state") == "parked", payload
+          assert payload.get("control_case", {}).get("source_reference_matches_candidate") is True, payload
+          assert payload.get("locked_table_counts_before") == payload.get("locked_table_counts_after_write"), payload
+          assert payload.get("cleanup") == {"candidate_rows": 0, "control_case_rows": 0}, payload
+          assert payload.get("cleanup_errors") == [], payload
+          assert payload.get("self_deleted") is True, payload
+          assert payload.get("migrations") == ["007_runtime_schema_reconciliation", "008_startpartner_candidates"], payload
+          PY
+          sha256sum artifacts/gate1-staging/result.json > artifacts/gate1-staging/result.sha256
+
+      - name: Remove temporary host runner and prove 404
+        if: always()
+        shell: bash
+        env:
+          STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
+          STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
+          STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+        run: |
+          set +e
+          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
+          set sftp:auto-confirm yes
+          set cmd:fail-exit no
+          set net:timeout 20
+          cd staging
+          rm api/internal/$EVIDENCE_ENDPOINT_FILE
+          bye
+          LFTP
+          cleanup_status=$?
+          set -e
+          printf 'sftp_cleanup_status=%s\n' "$cleanup_status" > artifacts/gate1-staging/cleanup.txt
+          for attempt in $(seq 1 8); do
+            endpoint_status="$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 "$EVIDENCE_URL?cleanup=$attempt" || true)"
+            printf 'attempt=%s status=%s\n' "$attempt" "$endpoint_status" >> artifacts/gate1-staging/cleanup.txt
+            if [ "$endpoint_status" = "404" ]; then
+              printf 'endpoint_removed=true\n' >> artifacts/gate1-staging/cleanup.txt
+              exit 0
+            fi
+            sleep 3
+          done
+          printf 'endpoint_removed=false\n' >> artifacts/gate1-staging/cleanup.txt
+          exit 1
+
+      - name: Upload Gate 1 staging evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: startpartner-gate1-staging-evidence-${{ github.run_id }}
+          path: artifacts/gate1-staging/
+          if-no-files-found: error
+          retention-days: 90
