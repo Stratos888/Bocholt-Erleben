@@ -1,6 +1,6 @@
 # System Map – Bocholt erleben
 
-Diese Datei beschreibt stabile Systeme, Datenhoheit, Umgebungen und kritische Datenflüsse. Operative Blocker und der aktuelle Workpack stehen ausschließlich in `docs/workpacks/active/CURRENT_WORKPACK.md`.
+Diese Datei beschreibt stabile Systeme, Datenhoheit, Umgebungen und kritische Datenflüsse. Operativer Status steht ausschließlich im aktiven GitHub-Issue; `docs/workpacks/active/CURRENT_WORKPACK.md` ist nur der Router dorthin.
 
 ## 1. Repository und Umgebungen
 
@@ -87,26 +87,36 @@ live:    Inbox         -> Events
 
 Preflight und Ausführung verwenden denselben Environment- und Writer-Resolver.
 
-## 6. Entwicklungs- und Deploypfad
+## 6. Entwicklungs-, Release- und Beobachtungspfad
 
 ```text
 Feature-Branch
 -> PR nach staging
 -> ein Required Check: PR Gate
 -> Merge nach staging
--> genau ein Deploy to STRATO
--> Build-/HTTP-Smoke
--> später staging -> main
+-> Deploy to STRATO
+-> Build-/HTTP-/Browser-Smoke
+-> Publish Deploy Run Status am Commit
+-> später Release-PR staging -> main
+-> Main-Deploy und Live-Smoke
 ```
 
-Zusätzliche Deployobserver, Runtimeverification-Workflows und synthetische Folge-Deploys gehören nicht zur Standardarchitektur.
+`Publish Deploy Run Status` ist passiv:
+
+- beobachtet ausschließlich `Deploy to STRATO`;
+- schreibt `pending`, `success`, `failure` oder `error` auf den betroffenen Commit;
+- verlinkt den exakten Actions-Run;
+- erzeugt selbst keinen Deploy und verändert keine Fachressource.
+
+Zusätzliche Deploytrigger, Runtimeverification-Workflows und synthetische Folge-Deploys gehören nicht zur Standardarchitektur.
 
 ## 7. Dauerhafte Workflowrollen
 
 | Workflow | Rolle |
 |---|---|
-| `PR Gate` | Branchpolicy und Repositorytests |
-| `Deploy to STRATO` | Feed-Build und Deploy |
+| `PR Gate` | Branchpolicy, Workpack-Vertrag und Repositorytests |
+| `Deploy to STRATO` | Feed-Build, geordneter Release und Runtime-Smokes |
+| `Publish Deploy Run Status` | passiver Commitstatus und automatische Run-Auffindbarkeit |
 | `Content Quality Audit` | Inhaltsqualität |
 | `Growth Intelligence Backlog` | Growth-/SEO-Signale |
 | `Inbox Cleanup (Archive)` | Inbox-Archivierung |
@@ -118,15 +128,18 @@ Zusätzliche Deployobserver, Runtimeverification-Workflows und synthetische Folg
 | Domäne | Primäre Owner |
 |---|---|
 | Arbeitsprozess | `AI_ENTRYPOINT.md`, `CURRENT_WORKPACK.md` |
+| Codex-Routing | `AGENTS.md` |
 | Architektur | `docs/architecture/SYSTEM_MAP.md` |
 | technische Regeln | `ENGINEERING.md` |
 | externe Ressourcen | `docs/external-resource-matrix.md` |
-| PR-Prüfung | `.github/workflows/pr-gate.yml`, `scripts/validate-repo.sh` |
+| PR-Prüfung | `.github/workflows/pr-gate.yml`, `scripts/validate_pr_contract.py`, `scripts/validate-repo.sh` |
 | Deploy/Branchrouting | `.github/workflows/deploy-strato.yml`, `scripts/resolve-deploy-target.sh` |
+| Deploy-Run-Auffindbarkeit | `.github/workflows/deploy-run-status.yml`, `scripts/publish_deploy_run_status.py` |
 | Control-Center UI | `steuerzentrale/**`, `js/control-center/**` |
 | Control-Center Runtime | `api/control-center/**` |
 | Eventfeed | Deployworkflow, Eventgeneratoren, `api/events/**` |
-| Produktziel und Priorität | `MASTER.md`, `COMMERCIAL_STRATEGY.md`, `ROADMAP.md` |
+| Produktziel | `MASTER.md`, `Produktvertrag.md`, `COMMERCIAL_STRATEGY.md` |
+| Produktpriorität | `ROADMAP.md` |
 | Proofstand | `TEST_STATUS.md` |
 
 ## 9. Prüfung vor kritischen Änderungen
@@ -139,5 +152,6 @@ Zusätzliche Deployobserver, Runtimeverification-Workflows und synthetische Folg
 6. Wie wird ein Teilfehler sichtbar?
 7. Wie erfolgt Rollback oder Cleanup?
 8. Ist ein anderer Chat oder Workpack am selben Owner aktiv?
+9. Welche dauerhafte Dokumentation besitzt die geänderte Realität?
 
 Ist eine Antwort nicht belegbar, folgt read-only Analyse statt Mutation.

@@ -1,46 +1,36 @@
-# Workpack-Queue
+# Workpack-Kandidaten – Routingregel
 
-Diese Datei enthält nur priorisierte dauerhafte Scopes. Operativer Status, Entscheidungen und Evidence stehen im jeweiligen GitHub-Issue.
+Diese Datei ist kein operatives Backlog und enthält bewusst keine Issue-Nummern, Aktivstatus oder nächsten technischen Schritt.
 
-## Nächster vorbereiteter Qualitäts-Workpack
+## Source of Truth
 
-1. **SEO Structured Data – Search-Console-Warnungen**
-   - dauerhafter Scope: `SEO-STRUCTURED-DATA-search-console-warnings-2026-07-22.md`;
-   - operativer Owner: GitHub-Issue **#165**;
-   - alle Search-Console-Warnungen und betroffenen URLs read-only auflösen;
-   - historischen Crawlstand, bewusste optionale Lücke, Datenlücke und technischen Fehler unterscheiden;
-   - nur belegte Fehler korrigieren;
-   - keine Organizer-, Performer-, Preis-, Währungs-, `validFrom`-, Availability- oder Ticketwerte erfinden.
+- Produktprioritäten und dauerhafte Kandidaten stehen in `ROADMAP.md`.
+- Konkrete offene Beobachtungen und vorbereitete Aufgaben stehen als GitHub-Issues.
+- Genau ein offenes Issue mit `[ACTIVE WORKPACK]` ist der operative Scope-, Status- und Evidence-Owner.
+- `docs/workpacks/active/CURRENT_WORKPACK.md` ist nur der statusfreie Router zu diesem Issue.
 
-Der Workpack ist eingeplant, aber nicht aktiv. Bis zur ausdrücklichen Aktivierung werden weder Code- oder Datenänderungen noch pauschale Search-Console-Validierungen durchgeführt.
+## Aktivierung
 
-Er ist zugleich der erste Test des vereinfachten Arbeitsmodells:
+Vor einer Aktivierung:
 
-- Chat führt;
-- Work nur bei belegten unabhängigen Liefersträngen;
-- Codex ist der einzige Repository-Schreiber;
-- Normalfall: ein Codex-Task, ein PR nach `staging`, ein Staging-Deploy und ein Release-PR nach `main`;
-- operativer Fortschritt ausschließlich in Issue #165;
-- dauerhaftes Wissensdelta genau einmal am Ende dokumentieren.
+1. aktuellen Repo-, Runtime- und Datenstand read-only prüfen;
+2. Produktwirkung und Priorität neu bestätigen;
+3. Ziel, Nicht-Ziele, Owner, erlaubte und gesperrte Pfade, Tests, Evidence, Dokumentationsdelta und Rollback schließen;
+4. konkurrierende zentrale Änderungen ausschließen;
+5. genau ein Issue mit `[ACTIVE WORKPACK]` markieren;
+6. Gate A schließen.
 
-## Danach möglicher Produkt-Workpack
+Eine Aktivierung verändert diese Datei nicht. Operativer Fortschritt wird nicht in Repository-Queue-Dateien gespiegelt.
 
-2. Startpartner-Wachstumspilot aus `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md` operationalisieren.
+## Historische Scope-Dateien
 
-Die Priorität wird bei Aktivierung anhand Produktwirkung, aktuellem Repositorystand und konkretem Risiko erneut bestätigt.
-
-## Laufender Betrieb
-
-- Weekly-KI-Ergebnisse konkret bewerten;
-- Content-, Visual- und Quellenhinweise ausnahmebasiert bearbeiten;
-- normalen Deploy-Smoke grün halten;
-- SEO-Wirkung nach 14 und 28 Tagen getrennt messen;
-- keine weitere Prozess- oder Workflowoptimierung ohne neuen belegten Engpass.
+Frühere Dateien unter `docs/workpacks/queued/` sind keine aktuelle Routingquelle. Abgeschlossene langlebige Erkenntnisse liegen kompakt unter `docs/workpacks/completed/`; vollständige operative Evidence bleibt im abgeschlossenen GitHub-Issue und in Git.
 
 ## Regeln
 
 - genau ein aktiver schreibender Workpack;
-- vor Aktivierung den aktuellen `staging`-Stand prüfen;
-- Produktwirkung hat Vorrang vor Meta-Arbeit;
+- genau ein Repository-Schreiber;
 - parallele Arbeit nur bei vollständig getrennten Ownern und externen Ressourcen;
-- Queue-Dateien nicht als laufendes Statusjournal verwenden.
+- Produktwirkung hat Vorrang vor Meta-Arbeit;
+- keine neue Prozess-, Workflow- oder Dokumentationsschicht ohne belegten Engpass;
+- keine abgeschlossene Issue als nächsten Workpack in Repository-Dateien führen.
