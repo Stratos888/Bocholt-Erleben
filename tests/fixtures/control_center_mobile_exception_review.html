@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mobile Ausnahmeprüfung – synthetische Fixture</title>
+  <link rel="stylesheet" href="../../css/style.css?v=2026-07-24-mobile-exception-review-v1">
+</head>
+<body class="cc-page">
+  <header class="cc-header"><div><p class="cc-eyebrow">Bocholt erleben</p><h1 id="cc-title">Prüfen</h1></div></header>
+  <main class="cc-main"><section id="cc-content"><div class="cc-status" id="cc-status"></div><div id="cc-view"></div></section></main>
+  <nav class="cc-nav" aria-label="Steuerzentrale"><button type="button" data-view="overview"><span>Übersicht</span></button><button type="button" data-view="review" class="is-active"><span>Prüfen</span><b id="cc-badge-review" hidden></b></button><button type="button" data-view="backlog"><span>Backlog</span><b id="cc-badge-backlog" hidden></b></button><button type="button" data-view="manage"><span>Verwaltung</span></button><button type="button" data-view="development"><span>Entwicklung</span></button></nav>
+  <dialog id="cc-dialog"><div id="cc-dialog-body"></div><button id="cc-dialog-close">Schließen</button></dialog>
+  <form id="cc-auth-form" hidden><input id="cc-password"><button id="cc-refresh"></button><button id="cc-menu-button"></button></form><section id="cc-auth" hidden></section>
+  <script type="module">
+    import { state } from '../../js/control-center/shared.js?v=2026-07-16-e2e-state-v5';
+    import { configureReviewRenderer, renderReview } from '../../js/control-center/review-render.js?v=2026-07-24-mobile-exception-review-v1';
+
+    const scenario = new URLSearchParams(location.search).get('scenario') || 'duplicate';
+    const baseReview = {
+      facts: { title:'Sommerabend im TextilWerk', date:'2026-08-15', location:'TextilWerk', city:'Bocholt', time_details:'18:00–21:00 Uhr' },
+      description: { final:'Synthetische, deterministische Prüffassung.' },
+      source: { name:'Offizielle Veranstaltungsseite', url:'https://example.org/source', event_url:'https://example.org/event' },
+      classification: { category:'Kultur' }, visual:{}, field_evidence:{}, dedupe:{ score:'0.96', url:'https://example.org/existing' },
+      summary: { open_task_count:1, headline:'Noch 1 Punkt klären' },
+      decision_gate: { ready:false },
+    };
+    const duplicateTask = {
+      task_id:'dedupe.decision', task_revision:'fixture-r1', finding_code:'hard_duplicate', state:'conflict',
+      title:'Mögliche Dublette entscheiden', message:'Ein vorhandenes Event stimmt in wesentlichen Merkmalen überein.',
+      evidence:{ status:'conflict', confidence:'high', explanation:'Titel, Datum und Ort stimmen weitgehend überein.', score:'0.96', source_url:'https://example.org/existing', matched_title:'Sommerabend im Textilwerk', matched_date:'2026-08-15', matched_location:'TextilWerk · Bocholt', matched_time:'20:00 Uhr' },
+      actions:[
+        {key:'reject_duplicate',label:'Dublette ablehnen',tone:'danger'},
+        {key:'mark_distinct',label:'Eigenständiger Termin'},
+        {key:'merge_existing',label:'Bestehendes Event ergänzen',tone:'secondary'},
+        {key:'snooze_case',label:'Unklar – zurückstellen'},
+      ],
+    };
+    let review = structuredClone(baseReview);
+    let item = { id:'fixture-event', type:'intake', queue_group:'new_content', case_kind:'event_candidate', state:'decision_required', title:review.facts.title, display_status:'Entscheidung erforderlich', review_contract:review, source_links:[{label:'Prüfquelle',url:'https://example.org/source'}] };
+    if (scenario === 'ready') {
+      review.summary={open_task_count:0,headline:'Event entscheidungsreif'}; review.decision_gate={ready:true}; review.review_tasks=[]; item.display_status='Entscheidungsreif';
+    } else if (scenario === 'waiting') {
+      review.review_tasks=[{...duplicateTask,task_id:'visual.waiting',finding_code:'visual_waiting',state:'waiting_external',title:'Bildprüfung läuft',message:'Ein Folgeprozess erstellt das freigegebene Bild.',actions:[{key:'snooze_case',label:'Später erneut prüfen'}]}];
+      item.waiting_for='Bildprüfung läuft im Folgeprozess.';
+    } else if (scenario === 'failed') {
+      review.review_tasks=[{...duplicateTask,task_id:'source.verification',finding_code:'failed_verification',state:'failed_verification',title:'Prüfung erneut ausführen',message:'Die automatische Verifikation ist fehlgeschlagen.',actions:[{key:'retry_verification',label:'Erneut prüfen'}]}];
+    } else {
+      review.review_tasks=[duplicateTask];
+    }
+    item.review_contract=review;
+    state.reviewGroup='all'; state.reviewIndex=0; state.cases=[item];
+    window.__fixtureActions=[];
+    configureReviewRenderer({handleAction:async(...args)=>window.__fixtureActions.push(args)});
+    renderReview();
+    document.documentElement.dataset.fixtureReady='true';
+  </script>
+</body>
+</html>
