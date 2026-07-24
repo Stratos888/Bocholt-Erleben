@@ -24,6 +24,7 @@ Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence
 | PR-Scope-Vertrag | E2 | PR referenziert Revision und Hash des aktiven Issue-Vertrags; vollständiger Diff einschließlich Löschungen wird gegen `allowed_paths` und `locked_paths` geprüft |
 | PR-Integration | E2 | ein Required Check `PR Gate` führt Contract-, Diff-, Repository- und synthetische Browserprüfung aus |
 | Checkout-neutrale Browser-Evidence | E2 | synthetische Event-Navigation läuft in temporärem Verzeichnis und verändert den Repository-Checkout nicht |
+| Mobile Ausnahmeprüfung | E2 | begrenzte Playwright-Fixture prüft 360×780 und 390×844 auf priorisierten Treffervergleich, genau eine unmittelbare Entscheidungsebene, eingeklappte Evidence, Überlauf und Navigationsüberdeckung sowie 1440×900 auf unveränderte Desktopstruktur |
 | Deploy-Run-Locator | E2/E6 | `Publish Deploy Run Status` schreibt branch- und eventbezogen `pending`, `success`, `failure` oder `error` mit exaktem Actions-Link auf den Commit |
 | Automatische Main-Run-Auffindbarkeit | E6 | Main-SHA `6e3d869ba65d4c9d27970a3c325896ccd00702c1` wurde ohne Codespace über `deploy-strato/main/push` dem Run `30076982983` zugeordnet; Status wechselte `pending -> success` |
 | Release-Kohärenz | E2/E3/E6 | Assets, HTML, Build-Marker, Service Worker und Manifest werden geordnet veröffentlicht und vor Abschluss gegeneinander geprüft |
