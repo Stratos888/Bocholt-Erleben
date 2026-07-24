@@ -8,7 +8,7 @@ Gate 1 is staging-only and requires review access. The public `/startpartner/` f
 
 ## Source of truth
 
-- `startpartner_candidates`: organization identity, origin, Gate-1 status, retention review, privacy/form versions and idempotency identity.
+- `startpartner_candidates`: organization identity, origin, Gate-1 status, explicit retention-review checkpoint, privacy/form versions and idempotency identity.
 - `startpartner_candidate_contacts`: one or more contacts with exactly one primary contact enforced by the domain service and unique database key.
 - `startpartner_candidate_events`: append-only audit events written in the same transaction as candidate and status mutations.
 - `control_cases`: operational projection only, keyed by `source_system=startpartner_candidate` and `source_reference=<candidate UUID>`.
@@ -23,6 +23,10 @@ Gate 1 is staging-only and requires review access. The public `/startpartner/` f
 - `triage.php`: review-protected POST for the frozen Gate-1 state transitions.
 
 The domain performs no runtime DDL. Apply `api/sql/007_runtime_schema_reconciliation.sql` and `api/sql/008_startpartner_candidates.sql` through the controlled migration path before activating the endpoints on staging.
+
+`retention_review_at` is an explicit operational review checkpoint supplied by the controlled caller. Gate 1 does not define a legal retention period and must not infer one from code.
+
+An `Idempotency-Key` may be replayed only with the same normalized request. Reuse with a different payload is a conflict and must not silently return the previous candidate.
 
 ## Explicitly deferred
 
