@@ -12,12 +12,13 @@ const sheetInboxSource=read('api/control-center/_sheet_inbox_source.php'),submis
 const backlogApi=read('api/growth-backlog/list.php'),backlogLib=read('api/growth-backlog-lib.php'),backlogCreate=read('api/growth-backlog/create.php'),backlogUpdate=read('api/growth-backlog/update.php');
 const errors=[];
 const buildKey='2026-07-24-mobile-exception-review-v1';
+const cssGovernanceKey='2026-06-22-css-governance-v1';
 for(const asset of ['control-center-environment.js','control-center.js','control-center-seo-embed.js'])if(!html.includes(asset))errors.push(`required script missing: ${asset}`);
 for(const asset of ['control-center-source-editors.js','control-center-final-bridge.js','control-center-stability.js','control-center-publication.js','control-center-development.js','control-center-integrations.js'])if(html.includes(asset))errors.push(`overlay controller still loaded: ${asset}`);
 for(const marker of ['control-center/app.js','import(path)','2026-07-16-exception-review-v1',buildKey])if(!loader.includes(marker))errors.push(`module loader missing: ${marker}`);
 if(!html.includes(`control-center.js?v=${buildKey}`))errors.push('top-level control-center script cache key is stale');
-if(!html.includes(`style.css?v=${buildKey}`))errors.push('top-level control-center stylesheet cache key is stale');
-if(!style.includes(`control-center-exception-review.css?v=${buildKey}`))errors.push('exception-review stylesheet cache key is stale');
+if(!html.includes(`style.css?v=${cssGovernanceKey}`))errors.push('top-level control-center stylesheet must keep the CSS governance key');
+if(!style.includes(`control-center-exception-review.css?v=${cssGovernanceKey}`))errors.push('exception-review stylesheet must keep the CSS governance key');
 if(!app.includes(`review.js?v=${buildKey}`))errors.push('app review-module cache key is stale');
 if(!moduleSources.review.includes(`review-render.js?v=${buildKey}`))errors.push('review renderer cache key is stale');
 for(const marker of ['edit_and_approve','decision_class','operation_id','Ablehnungsgrund auswählen','source_fingerprint','content_fingerprint','current_description_hash','data-manage-details','Live öffnen','Öffentliche Wirkung wird geprüft · Versuch','be_cc_draft:','Automatisierte Verbesserung','Promise.allSettled','resolve_review_task','task_revision','data-review-task-resolution','visual_asset_id'])if(!modules.includes(marker)&&!caseApi.includes(marker))errors.push(`frontend contract missing: ${marker}`);
@@ -31,7 +32,7 @@ for(const marker of ['why_relevant','recommended_action','expected_benefit','typ
 for(const marker of ["['edit', 'complete', 'reopen']",'expected_updated_at',"'status' => 'open'","'status' => 'completed'"])if(!backlogUpdate.includes(marker))errors.push(`two-status backlog update contract missing: ${marker}`);
 for(const forbidden of ['data-backlog-action','submitBacklog(','handleBacklog(','backlogCases()','<article class="cc-roadmap-item','cc-roadmap-summary','Informations- und Reihenfolgeansicht','Punkte insgesamt'])if(backlog.includes(forbidden))errors.push(`backlog contains obsolete work-queue or header-block marker: ${forbidden}`);
 for(const marker of ['timeoutMs:70000','assertCompletion','throwOnError:true','vollständig geprüft','Entscheidung wurde gespeichert, aber die Ansicht konnte nicht konsistent aktualisiert werden','Teilaktion wird gespeichert, zurückgelesen und neu bewertet'])if(!reviewActions.includes(marker))errors.push(`end-to-end review feedback missing: ${marker}`);
-for(const marker of ['Offene Prüfaufgaben','Geprüfte Gesamtfassung','Event entscheidungsreif','data-review-task-resolution','Kandidat und Bestand','Entscheidung auswählen','matched_title','matched_date','matched_location','formatMatchScore','trueWaiting','cc-mobile-priority'])if(!reviewRender.includes(marker))errors.push(`exception review renderer missing: ${marker}`);
+for(const marker of ['Offene Prüfaufgaben','Geprüfte Gesamtfassung','Event entscheidungsreif','data-review-task-resolution','Kandidat und Bestand','Entscheidung auswählen','matched_title','matched_date','matched_location','formatMatchScore','trueWaiting','cc-mobile-priority','aria-expanded'])if(!reviewRender.includes(marker))errors.push(`exception review renderer missing: ${marker}`);
 if(reviewRender.includes('matched_time'))errors.push('existing-event time must not be rendered without an API contract');
 for(const marker of ['caseIsReviewVisible','snoozed_until','activeCases()'])if(!shared.includes(marker))errors.push(`review visibility contract missing: ${marker}`);
 for(const marker of ["await api('/api/control-center/overview.php'","/api/control-center/cases.php?active=1",'throwOnError'])if(!app.includes(marker))errors.push(`serialized load contract missing: ${marker}`);
