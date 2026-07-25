@@ -28,7 +28,7 @@ export const els = {
 };
 
 export const reviewLabels = {
-  all: 'Alle', new_content: 'Neue Inhalte', quality: 'Qualität', provider: 'Anbieter',
+  all: 'Alle', startpartner: 'Startpartner', new_content: 'Neue Inhalte', quality: 'Qualität', provider: 'Anbieter',
   approvals: 'Freigaben', system: 'System', other: 'Sonstige',
 };
 
@@ -91,7 +91,8 @@ export async function api(path, options = {}) {
     if (!response.ok && !(allowAccepted && response.status === 202)) {
       const error = new Error(payload.message || 'Anfrage fehlgeschlagen.');
       error.status = response.status;
-      error.data = payload.data || null;
+      error.data = payload.data || payload.current || null;
+      error.code = payload.code || '';
       throw error;
     }
     return payload.data || {};
