@@ -300,12 +300,19 @@ function be_startpartner_list_candidates(PDO $pdo, array $filters = []): array
     $params = [];
 
     if (!empty($filters['status'])) {
+        $requestedStatus = trim((string)$filters['status']);
+        if ($requestedStatus === 'decision_ready') {
+            $persistedStatus = 'decision_ready';
+        } else {
+            $legacyStatus = be_startpartner_validate_enum_value(
+                $requestedStatus,
+                BE_STARTPARTNER_STATUSES,
+                'status'
+            );
+            $persistedStatus = $legacyStatus === 'qualified' ? 'decision_ready' : $legacyStatus;
+        }
         $where[] = 'status = :status';
-        $params['status'] = be_startpartner_validate_enum_value(
-            trim((string)$filters['status']),
-            BE_STARTPARTNER_STATUSES,
-            'status'
-        );
+        $params['status'] = $persistedStatus;
     }
     if (!empty($filters['source'])) {
         $where[] = 'source = :source';
@@ -350,10 +357,11 @@ function be_startpartner_triage_candidate(
     string $actorReference = 'operator'
 ): array {
     be_startpartner_require_schema($pdo);
-    $toStatus = be_startpartner_validate_enum_value($toStatus, BE_STARTPARTNER_STATUSES, 'status');
+    $requestedStatus = be_startpartner_validate_enum_value($toStatus, BE_STARTPARTNER_STATUSES, 'status');
+    $persistedStatus = $requestedStatus === 'qualified' ? 'decision_ready' : $requestedStatus;
     $reason = be_startpartner_clean_text($reason, 500, 'reason');
 
-    if (in_array($toStatus, ['needs_information', 'waitlisted', 'routed_to_regular_product', 'rejected', 'withdrawn', 'expired'], true) && $reason === null) {
+    if (in_array($requestedStatus, ['needs_information', 'waitlisted', 'routed_to_regular_product', 'rejected', 'withdrawn', 'expired'], true) && $reason === null) {
         throw new InvalidArgumentException('reason is required for this status.');
     }
 
@@ -364,11 +372,12 @@ function be_startpartner_triage_candidate(
             throw new RuntimeException('Candidate not found.');
         }
         $fromStatus = (string)$row['status'];
-        if (!be_startpartner_transition_allowed($fromStatus, $toStatus)) {
-            throw new DomainException("Transition {$fromStatus} -> {$toStatus} is not allowed.");
+        $legacyFromStatus = $fromStatus === 'decision_ready' ? 'qualified' : $fromStatus;
+        if (!be_startpartner_transition_allowed($legacyFromStatus, $requestedStatus)) {
+            throw new DomainException("Transition {$fromStatus} -> {$persistedStatus} is not allowed.");
         }
 
-        $closedAt = in_array($toStatus, BE_STARTPARTNER_TERMINAL_STATUSES, true)
+        $closedAt = in_array($requestedStatus, BE_STARTPARTNER_TERMINAL_STATUSES, true)
             ? gmdate('Y-m-d H:i:s')
             : null;
         $update = $pdo->prepare(
@@ -380,7 +389,7 @@ function be_startpartner_triage_candidate(
              WHERE id = :id'
         );
         $update->execute([
-            'status' => $toStatus,
+            'status' => $persistedStatus,
             'status_reason' => $reason,
             'closed_at' => $closedAt,
             'id' => $candidateId,
@@ -391,10 +400,10 @@ function be_startpartner_triage_candidate(
             $candidateId,
             'status_changed',
             $fromStatus,
-            $toStatus,
+            $persistedStatus,
             'operator',
             $actorReference,
-            ['reason' => $reason]
+            ['reason' => $reason, 'legacy_requested_status' => $requestedStatus]
         );
         be_startpartner_upsert_control_case(
             $pdo,
@@ -402,7 +411,7 @@ function be_startpartner_triage_candidate(
             (string)$row['organization_name'],
             (string)$row['source'],
             (string)$row['desired_content_scope'],
-            $toStatus,
+            $requestedStatus,
             $reason,
             $actorReference
         );
