@@ -50,8 +50,9 @@ async function startpartnerState(browser,scenario,viewport,name,markers,primaryL
   const priority=page.locator('.cc-startpartner-priority:visible');
   assert(await priority.count()===1,`${name}: priorisierte Startpartner-Ebene fehlt`);
   const text=await page.locator('.cc-startpartner-review').innerText();
-  for(const marker of markers)assert(text.includes(marker),`${name}: Marker fehlt: ${marker}`);
-  assert(!text.includes('Pilot aktiv')&&!text.includes('Aufgenommen'),`${name}: UI behauptet unzulässige Aktivierung`);
+  const normalizedText=text.toLocaleLowerCase('de-DE');
+  for(const marker of markers)assert(normalizedText.includes(marker.toLocaleLowerCase('de-DE')),`${name}: Marker fehlt: ${marker}`);
+  assert(!normalizedText.includes('pilot aktiv')&&!normalizedText.includes('aufgenommen'),`${name}: UI behauptet unzulässige Aktivierung`);
   assert((await priority.locator('.cc-startpartner-primary').innerText())===primaryLabel,`${name}: falsche Hauptaktion`);
   assert(await page.locator('.cc-startpartner-evidence[open]').count()===0,`${name}: Evidence muss initial eingeklappt sein`);
   assert(await page.locator('.cc-mobile-case-options[open]').count()===0,`${name}: Nebenoptionen müssen initial eingeklappt sein`);
@@ -60,7 +61,8 @@ async function startpartnerState(browser,scenario,viewport,name,markers,primaryL
   if(viewport.width<760){
     const priorityBox=await priority.boundingBox();const navBox=await page.locator('.cc-nav').boundingBox();
     assert(priorityBox&&navBox&&priorityBox.y+priorityBox.height<=navBox.y,`${name}: Status, Blocker, Hauptaktion, Fälligkeit oder Kapazität werden von der Navigation verdeckt`);
-    for(const label of ['Fälligkeit','Bearbeiter','Kapazität'])assert((await priority.innerText()).includes(label),`${name}: mobile Priorität fehlt: ${label}`);
+    const priorityText=(await priority.innerText()).toLocaleLowerCase('de-DE');
+    for(const label of ['Fälligkeit','Bearbeiter','Kapazität'])assert(priorityText.includes(label.toLocaleLowerCase('de-DE')),`${name}: mobile Priorität fehlt: ${label}`);
   }
   await context.close();results.push({name,status:'OK'});
 }
