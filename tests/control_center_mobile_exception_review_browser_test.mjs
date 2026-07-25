@@ -10,9 +10,10 @@ if(!baseUrl||!outDir){console.error('Usage: node tests/control_center_mobile_exc
 fs.mkdirSync(outDir,{recursive:true});
 const results=[];
 function assert(condition,message){if(!condition)throw new Error(message);}
-async function openScenario(browser,scenario,viewport,name){
+async function openScenario(browser,scenario,viewport,name,beforeGoto=null){
   const context=await browser.newContext({viewport});
   const page=await context.newPage();
+  if(beforeGoto)await beforeGoto(page);
   await page.goto(`${baseUrl}/tests/fixtures/control_center_mobile_exception_review.html?scenario=${scenario}`,{waitUntil:'networkidle'});
   await page.waitForSelector('html[data-fixture-ready="true"]');
   await page.screenshot({path:path.join(outDir,`${name}.png`),fullPage:true});
@@ -43,6 +44,44 @@ async function mobileDuplicate(browser,viewport,name){
   assert(await decision.locator('[data-review-task-resolution]:visible').count()===4,`${name}: vollständige Dublettenaktionen fehlen`);
   assert(await decision.locator('.cc-button--danger:visible').count()===1,`${name}: destruktive Aktion ist nicht getrennt gekennzeichnet`);
   await context.close(); results.push({name,status:'OK'});
+}
+async function startpartnerState(browser,scenario,viewport,name,markers,primaryLabel){
+  const {page,context}=await openScenario(browser,scenario,viewport,name);
+  const priority=page.locator('.cc-startpartner-priority:visible');
+  assert(await priority.count()===1,`${name}: priorisierte Startpartner-Ebene fehlt`);
+  const text=await page.locator('.cc-startpartner-review').innerText();
+  for(const marker of markers)assert(text.includes(marker),`${name}: Marker fehlt: ${marker}`);
+  assert(!text.includes('Pilot aktiv')&&!text.includes('Aufgenommen'),`${name}: UI behauptet unzulässige Aktivierung`);
+  assert((await priority.locator('.cc-startpartner-primary').innerText())===primaryLabel,`${name}: falsche Hauptaktion`);
+  assert(await page.locator('.cc-startpartner-evidence[open]').count()===0,`${name}: Evidence muss initial eingeklappt sein`);
+  assert(await page.locator('.cc-mobile-case-options[open]').count()===0,`${name}: Nebenoptionen müssen initial eingeklappt sein`);
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth);
+  assert(!overflow,`${name}: horizontaler Überlauf`);
+  if(viewport.width<760){
+    const priorityBox=await priority.boundingBox();const navBox=await page.locator('.cc-nav').boundingBox();
+    assert(priorityBox&&navBox&&priorityBox.y+priorityBox.height<=navBox.y,`${name}: Status, Blocker, Hauptaktion, Fälligkeit oder Kapazität werden von der Navigation verdeckt`);
+    for(const label of ['Fälligkeit','Bearbeiter','Kapazität'])assert((await priority.innerText()).includes(label),`${name}: mobile Priorität fehlt: ${label}`);
+  }
+  await context.close();results.push({name,status:'OK'});
+}
+function latestCandidate(){return {id:'19900000-0000-0000-0000-000000009999',organization_name:'GATE2_SYNTHETIC_199_Bocholt Kulturverein',source:'targeted_outreach',desired_content_scope:'both',status:'new',revision:1,assigned_to:'M. Muster',next_review_at:'2026-08-02 10:00:00',website_url:'https://example.org/startpartner',contacts:[],qualifications:[],readiness:{ready:false,assessed_count:0,total_count:14,blockers:[{dimension:'local_relevance',message:'Bewertung fehlt.'}]},capacity:{active_reservations:2,hard_stop_at:8,soft_stop:false,hard_stop:false},reservations:[],active_reservation:null,waitlist:null,decision:null,events:[]};}
+async function startpartnerMutation(browser,conflict){
+  const name=conflict?'startpartner-stale-conflict':'startpartner-successful-readback';
+  const {page,context}=await openScenario(browser,'startpartner-mutation',{width:390,height:844},name,async current=>{
+    await current.route('**/api/control-center/case.php*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'ok',data:{id:'fixture-startpartner',startpartner_candidate:latestCandidate()}})}));
+    await current.route('**/api/startpartner/action.php',route=>route.fulfill(conflict?{status:409,contentType:'application/json',body:JSON.stringify({status:'error',code:'STARTPARTNER_CONFLICT',message:'Zwischenzeitlich geändert.',current:{revision:2}})}:{status:200,contentType:'application/json',body:JSON.stringify({status:'ok',data:{candidate:{...latestCandidate(),status:'prequalifying',revision:2},operation_id:'gate2:199:fixture',idempotent_replay:false}})}));
+  });
+  await page.locator('.cc-startpartner-primary').click();
+  await page.locator('#sp-confirm').click();
+  await page.waitForFunction(()=>window.__fixtureReloads===1);
+  if(conflict){
+    assert(await page.locator('#cc-dialog-message').innerText()==='Zwischenzeitlich geändert. Die Ansicht wurde neu geladen; bitte prüfe den aktuellen Stand.','stale conflict: klare Konfliktmeldung fehlt');
+    assert(await page.locator('#cc-dialog[open]').count()===1,'stale conflict: Dialog muss zur erneuten Prüfung offen bleiben');
+  }else{
+    assert(await page.locator('#cc-dialog[open]').count()===0,'successful readback: Dialog wurde nach vollständigem Reload nicht geschlossen');
+    assert((await page.locator('#cc-status').innerText()).includes('vollständiger Serverzustand neu geladen'),'successful readback: eindeutige Rückmeldung fehlt');
+  }
+  await context.close();results.push({name,status:'OK'});
 }
 async function shellContracts(browser){
   const noJsContext=await browser.newContext({viewport:{width:360,height:780},javaScriptEnabled:false});
@@ -97,7 +136,16 @@ try{
   assert(await desktopRun.page.locator('.cc-action-primary--event-candidate:visible').count()===1,'desktop: bestehende Fall-Hauptaktion fehlt');
   assert(await desktopRun.page.locator('.cc-actions--secondary-desktop:visible').count()===1,'desktop: bestehende Nebenaktionen fehlen');
   await desktopRun.context.close(); results.push({name:'desktop-contract',status:'OK'});
+
+  await startpartnerState(browser,'startpartner-blocked',{width:360,height:780},'startpartner-mobile-360x780-blocked',['Qualifizierung','Lokaler Bezug','Mindestanforderung nicht erfüllt.','Fälligkeit','Kapazität'],'Höchsten Blocker bearbeiten');
+  await startpartnerState(browser,'startpartner-ready',{width:390,height:844},'startpartner-mobile-390x844-ready',['Entscheidungsreif','Alle 14 Dimensionen','4 von 8 Plätzen reserviert'],'Platz reservieren');
+  await startpartnerState(browser,'startpartner-soft',{width:768,height:1024},'startpartner-tablet-768x1024-soft-stop',['Entscheidungsreif','Ausnahmebegründung erforderlich','6 von 8 Plätzen reserviert'],'Platz reservieren');
+  await startpartnerState(browser,'startpartner-hard',{width:360,height:780},'startpartner-mobile-360x780-hard-stop',['Entscheidungsreif','harte Grenze erreicht','8 von 8 Plätzen reserviert'],'Auf Warteliste setzen');
+  await startpartnerState(browser,'startpartner-reserved',{width:1440,height:900},'startpartner-desktop-1440x900-reserved',['Platz reserviert · Bedingungen offen','Aktive Reservierung','Bedingungen und Pilotaktivierung sind ausdrücklich noch offen.'],'Reservierung prüfen');
+  await startpartnerState(browser,'startpartner-waitlisted',{width:390,height:844},'startpartner-mobile-390x844-waitlisted',['Warteliste','Neubewertung','Hoher lokaler Mehrwert.'],'Warteliste aktualisieren');
+  await startpartnerMutation(browser,false);
+  await startpartnerMutation(browser,true);
   await shellContracts(browser);
 }finally{await browser.close();}
 fs.writeFileSync(path.join(outDir,'summary.json'),JSON.stringify({status:'OK',results},null,2)+'\n');
-console.log('=== Control Center Mobile Exception Review Browser Contract: OK ===');
+console.log('=== Control Center Mobile Exception Review and Startpartner Browser Contract: OK ===');
