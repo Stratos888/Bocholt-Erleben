@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/_domain.php';
+require_once __DIR__ . '/_gate2_domain.php';
 
 be_startpartner_require_gate1_environment();
 be_require_review_access();
@@ -14,13 +14,18 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
 try {
     $candidateId = trim((string)($_GET['id'] ?? ''));
     $data = $candidateId !== ''
-        ? be_startpartner_get_candidate(be_db(), $candidateId)
+        ? be_startpartner_gate2_candidate_detail(be_db(), $candidateId)
         : [
-            'items' => be_startpartner_list_candidates(be_db(), [
+            'items' => be_startpartner_gate2_list_candidates(be_db(), [
                 'status' => trim((string)($_GET['status'] ?? '')),
                 'source' => trim((string)($_GET['source'] ?? '')),
+                'scope' => trim((string)($_GET['scope'] ?? '')),
+                'assigned_to' => trim((string)($_GET['assigned_to'] ?? '')),
+                'decision_ready' => trim((string)($_GET['decision_ready'] ?? '')),
+                'overdue' => !empty($_GET['overdue']),
                 'limit' => (int)($_GET['limit'] ?? 100),
             ]),
+            'capacity' => be_startpartner_gate2_capacity(be_db()),
         ];
 
     if (isset($data['items'])) {
