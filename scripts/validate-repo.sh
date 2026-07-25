@@ -47,6 +47,7 @@ validate_php_tests() {
 
 validate_startpartner_mysql() {
   bash tests/run_startpartner_mysql_contract.sh
+  bash tests/run_startpartner_gate2_mysql_contract.sh
 }
 
 validate_backend() {

@@ -86,7 +86,11 @@ CREATE TABLE IF NOT EXISTS control_operations (
     completed_at DATETIME NULL,
     PRIMARY KEY (operation_id),
     KEY idx_control_operations_case (case_id, created_at),
-    KEY idx_control_operations_status (status, updated_at)
+    KEY idx_control_operations_status (status, updated_at),
+    CONSTRAINT fk_control_operations_case
+        FOREIGN KEY (case_id) REFERENCES control_cases(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS control_editorial_feedback (
@@ -108,8 +112,60 @@ CREATE TABLE IF NOT EXISTS control_editorial_feedback (
     PRIMARY KEY (id),
     KEY idx_control_editorial_feedback_case (case_id, created_at),
     KEY idx_control_editorial_feedback_status (status, created_at),
-    KEY idx_control_editorial_feedback_issue (issue_code, created_at)
+    KEY idx_control_editorial_feedback_issue (issue_code, created_at),
+    CONSTRAINT fk_control_editorial_feedback_case
+        FOREIGN KEY (case_id) REFERENCES control_cases(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Existing Runtime-DDL installations already own the tables but not every
+-- relationship. Reconcile the constraints without touching business rows.
+SET @be_sql := (
+    SELECT IF(
+        COUNT(*) = 0,
+        'ALTER TABLE control_case_events ADD CONSTRAINT fk_control_case_events_case FOREIGN KEY (case_id) REFERENCES control_cases(id) ON UPDATE CASCADE ON DELETE CASCADE',
+        'SELECT 1'
+    )
+    FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+    WHERE CONSTRAINT_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'control_case_events'
+      AND CONSTRAINT_NAME = 'fk_control_case_events_case'
+);
+PREPARE be_stmt FROM @be_sql;
+EXECUTE be_stmt;
+DEALLOCATE PREPARE be_stmt;
+
+SET @be_sql := (
+    SELECT IF(
+        COUNT(*) = 0,
+        'ALTER TABLE control_operations ADD CONSTRAINT fk_control_operations_case FOREIGN KEY (case_id) REFERENCES control_cases(id) ON UPDATE CASCADE ON DELETE CASCADE',
+        'SELECT 1'
+    )
+    FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+    WHERE CONSTRAINT_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'control_operations'
+      AND CONSTRAINT_NAME = 'fk_control_operations_case'
+);
+PREPARE be_stmt FROM @be_sql;
+EXECUTE be_stmt;
+DEALLOCATE PREPARE be_stmt;
+
+SET @be_sql := (
+    SELECT IF(
+        COUNT(*) = 0,
+        'ALTER TABLE control_editorial_feedback ADD CONSTRAINT fk_control_editorial_feedback_case FOREIGN KEY (case_id) REFERENCES control_cases(id) ON UPDATE CASCADE ON DELETE CASCADE',
+        'SELECT 1'
+    )
+    FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+    WHERE CONSTRAINT_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'control_editorial_feedback'
+      AND CONSTRAINT_NAME = 'fk_control_editorial_feedback_case'
+);
+PREPARE be_stmt FROM @be_sql;
+EXECUTE be_stmt;
+DEALLOCATE PREPARE be_stmt;
 
 INSERT INTO app_schema_migrations (migration_key, description)
 VALUES (

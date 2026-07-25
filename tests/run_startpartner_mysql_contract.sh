@@ -57,13 +57,14 @@ for file in \
   api/sql/006_single_event_review_before_payment.sql \
   api/sql/007_runtime_schema_reconciliation.sql \
   api/sql/008_startpartner_candidates.sql \
-  sql/009_control_center_cases.sql; do
+  api/sql/009_control_center_runtime_schema.sql; do
   apply_sql "$file"
 done
 
-# Gate-1 migrations must be safe to re-run against the same installed schema.
+# Gate-1 and Control-Center migrations must be safe to re-run against the same installed schema.
 apply_sql api/sql/007_runtime_schema_reconciliation.sql
 apply_sql api/sql/008_startpartner_candidates.sql
+apply_sql api/sql/009_control_center_runtime_schema.sql
 
 PORT="$(docker inspect -f '{{(index (index .NetworkSettings.Ports "3306/tcp") 0).HostPort}}' "$CONTAINER")"
 export STARTPARTNER_TEST_DSN="mysql:host=127.0.0.1;port=${PORT};dbname=be_contract;charset=utf8mb4"
