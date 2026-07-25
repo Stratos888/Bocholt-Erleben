@@ -74,11 +74,16 @@ $insertCandidate = static function(string $name, string $status = 'new') use ($d
         'identity_key' => hash('sha256', 'identity|' . $id),
         'idempotency_key_hash' => hash('sha256', 'idempotency|' . $id),
     ]);
+    $email = strtolower($name) . '-' . substr($id, -4) . '@example.org';
     $db->prepare(
         'INSERT INTO startpartner_candidate_contacts (
             candidate_id, email, email_normalized, is_primary
-         ) VALUES (:candidate_id, :email, :email, 1)'
-    )->execute(['candidate_id' => $id, 'email' => strtolower($name) . '-' . substr($id, -4) . '@example.org']);
+         ) VALUES (:candidate_id, :email, :email_normalized, 1)'
+    )->execute([
+        'candidate_id' => $id,
+        'email' => $email,
+        'email_normalized' => $email,
+    ]);
     $createdIds[] = $id;
     return $id;
 };
