@@ -70,7 +70,12 @@ $manifest = json_decode(
     JSON_THROW_ON_ERROR
 );
 $files = array_column((array)($manifest['migrations'] ?? []), 'file');
-$assert(array_slice($files, -2) === ['007_runtime_schema_reconciliation.sql', '008_startpartner_candidates.sql'], 'Manifest muss Reconciliation vor Kandidatenschema ausführen.');
+$reconciliationIndex = array_search('007_runtime_schema_reconciliation.sql', $files, true);
+$candidateIndex = array_search('008_startpartner_candidates.sql', $files, true);
+$assert(
+    $reconciliationIndex !== false && $candidateIndex === $reconciliationIndex + 1,
+    'Manifest muss Reconciliation unmittelbar vor Kandidatenschema ausführen.'
+);
 
 if ($failures !== []) {
     fwrite(STDERR, "=== Startpartner Side-Effect Contract: FAILED ===\n");
