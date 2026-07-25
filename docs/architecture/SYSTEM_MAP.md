@@ -40,23 +40,19 @@ Nur `staging` und `main` dürfen deployen. Feature-Branches besitzen keine exter
 
 ### Startpartner-Wachstumspilot
 
-Im aktuellen Zustand existiert nur eine öffentliche Anfrage über Formspree und ein dokumentierter Zielzustand.
+Der öffentliche Anfragepfad bleibt unverändert Formspree-owned. Zusätzlich besitzt die interne Staging-/Dev-Domäne einen geschützten Kandidatenprozess bis `accepted_pending_terms`:
 
-Im Zielzustand umfasst die Domäne:
+- Kandidat, Kontakte, Deduplizierung und unveränderlicher Auditstream;
+- monoton steigende Candidate-Revision und payloadgebundene Operations-Idempotenz;
+- 14 normalisierte Qualifikationsdimensionen und deterministische Entscheidungsreife;
+- append-only Entscheidungen;
+- Kapazität, historisierte Reservierungen und normalisierte Warteliste;
+- atomare `control_cases`-Projektion;
+- Startpartner-Prüfbereich innerhalb der vorhandenen Steuerzentrale.
 
-- Kandidat und Deduplizierung;
-- Qualifizierung und Aufnahmeentscheidung;
-- Kapazität, Reservierung und Warteliste;
-- Pilotbedingungen und Bestätigung;
-- Pilot, Serviceumfang und kostenlose Berechtigung;
-- Organizer- und Portalverknüpfung;
-- Onboarding, Aktivierung und Laufzeit;
-- Inhalts- und Quellenzuordnung;
-- Wirkungsmessung;
-- Kommunikation und Kontrollpunkte;
-- Abschluss, Konversion oder geordnetes Ende.
+Noch nicht Teil des aktuellen Systems sind Pilotbedingungen und Bestätigung, Pilotobjekt, Organizer- und Portalverknüpfung, kostenlose Berechtigung, Onboarding, Aktivierung, Laufzeit, Inhaltszuordnung, Wirkungsmessung, Kommunikation, Abschluss oder Konversion.
 
-Die fachliche Startpartner-Domäne ist Source of Truth. `control_cases` ist nur operative Aufgaben- und Entscheidungsprojektion.
+Die fachliche Startpartner-Domäne ist Source of Truth. `control_cases` ist ausschließlich operative Aufgaben- und Entscheidungsprojektion und kein paralleler Writer.
 
 ### Visual-System
 
@@ -77,9 +73,9 @@ Die fachliche Startpartner-Domäne ist Source of Truth. `control_cases` ist nur 
 | reguläre Mitgliedschaften | Stripe plus Subscription-Datenbank | Tarifstatus und reguläre Berechtigungen |
 | Veröffentlichungsberechtigungen | Entitlement-Datenbank | zulässige Einreichungs-/Veröffentlichungsumfänge |
 | Wirkungsmessung | `value_metric_daily` und zugehörige Attributionsdaten | Anbieterwirkung und Auswertungen |
-| Startpartner-Anfrage aktuell | Formspree-Übermittlung | E-Mail/Formspree-Ansicht; kein kanonischer eigener Kandidat |
-| Startpartner-Kandidat im Ziel | eigene fachliche Kandidatentabelle | Control-Center-Aufgabe, Kommunikation, Entscheidung |
-| Startpartner-Pilot im Ziel | eigene fachliche Pilottabelle | Portalstatus, Berechtigung, Kontrollpunkte, Abschluss |
+| Startpartner-Anfrage öffentlich | Formspree-Übermittlung | E-Mail/Formspree-Ansicht; kein automatischer First-Party-Intake |
+| Startpartner-Kandidat intern | `startpartner_candidates` plus Contacts, Events, Qualifications, Decisions, Reservations, Waitlist und Operations | geschützte Startpartner-APIs und atomare `control_cases`-Projektion |
+| Startpartner-Pilot im Ziel | zukünftige eigene fachliche Pilottabelle | Portalstatus, Berechtigung, Kontrollpunkte, Abschluss |
 | Startpartner-Pilotberechtigung im Ziel | befristeter Pilotgrant oder eindeutig pilotfähiges Entitlement | bestehende Submission-/Publikationspfade |
 | Activities | Repo-/JSON-Owner | öffentliche Activity-Ausgabe |
 | Visuals | Visual-Pool und freigegebene Assets | Karten-/Detaildarstellung |
@@ -129,18 +125,33 @@ Preflight und Ausführung verwenden denselben Environment- und Writer-Resolver.
 -> manuelle Bearbeitung außerhalb eines kanonischen eigenen Kandidatenmodells
 ```
 
-Belegte Grenze:
+Belegte Grenze des öffentlichen Pfads:
 
 - keine automatische Organizer-Anlage;
 - keine Pilotvereinbarung;
 - keine kostenlose Berechtigung;
 - keine Stripe-Subscription;
 - keine Veröffentlichung;
-- keine eigene strukturierte Kandidaten-Source-of-Truth.
+- kein öffentlicher First-Party-Kandidatenwrite.
 
-Formspree ist ein Übergangswriter und muss vor dem Ziel-Cutover als externe Ressource behandelt werden.
+Der geschützte interne Staging-/Dev-Pfad lautet:
 
-## 7. Startpartner-Pfad – Zielzustand
+```text
+interner Gate-1-Intake oder vorhandener Kandidat
+-> startpartner_candidates / contacts / events
+-> Profil und 14 Qualifikationsdimensionen
+-> Entscheidungsreife und append-only Entscheidung
+-> Kapazitätsprüfung
+-> Reservierung oder Warteliste
+-> atomare control_case-Projektion
+-> Startpartner-Review in der Steuerzentrale
+```
+
+Jede Gate-2-Mutation benötigt Reviewzugang, `operation_id`, `expected_revision` und `operator_name`. Ein stale write endet mit HTTP `409`; ein identischer Retry liefert das gespeicherte Ergebnis. Der generische Control-Center-Writer weist Startpartner-Fälle ab.
+
+Formspree bleibt ein externer Übergangswriter und muss vor einem späteren öffentlichen Cutover separat behandelt werden.
+
+## 7. Startpartner-Pfad – weiterer Zielzustand ab Gate 3
 
 ```text
 Selbstmeldung oder interne Identifizierung
@@ -190,11 +201,16 @@ Anfrage, Aufnahmeentscheidung oder Accountanlage allein starten die sechs Monate
 
 ```text
 StartpartnerCandidate
+  -> CandidateContact
+  -> CandidateQualification
   -> CandidateDecision
-  -> CandidateCommunication
+  -> CandidateReservation
+  -> CandidateWaitlist
+  -> CandidateOperation
+  -> CandidateEvent
   -> control_case projection
 
-accepted candidate
+accepted and explicitly confirmed candidate in a later gate
   -> Organizer
   -> StartpartnerPilot
        -> PilotScope / PilotEntitlement
@@ -291,7 +307,6 @@ Für Startpartner wird kein neuer dauerhafter GitHub-Workflow angelegt, solange 
 | Architektur | `docs/architecture/SYSTEM_MAP.md` |
 | technische Regeln | `ENGINEERING.md` |
 | externe Ressourcen | `docs/external-resource-matrix.md` |
-| PR-Prüfung | `.github/workflows/pr-gate.yml`, `scripts/validate_pr_contract.py`, `scripts/validate-repo.sh` |
 | Deploy/Branchrouting | `.github/workflows/deploy-strato.yml`, `scripts/resolve-deploy-target.sh` |
 | Deploy-Run-Auffindbarkeit | `.github/workflows/deploy-run-status.yml`, `scripts/publish_deploy_run_status.py` |
 | Control-Center UI | `steuerzentrale/**`, `js/control-center/**` |
@@ -300,7 +315,8 @@ Für Startpartner wird kein neuer dauerhafter GitHub-Workflow angelegt, solange 
 | Organizer/Submission/Subscription | `api/**`, `api/sql/**`, Submission-/Anbieter-DB |
 | Startpartner öffentliche Anfrage aktuell | `startpartner/**`, `js/startpartner-funnel.js`, Formspree |
 | Startpartner fachlicher Zielvertrag | `docs/startpartner-wachstumspilot-zielzustand-2026-07-18.md` |
-| Startpartner Kandidat/Pilot künftig | neue eindeutig benannte fachliche API-/SQL-Owner innerhalb der bestehenden Anbieter-/Submission-Domäne |
+| Startpartner Kandidat Gate 1/2 | `api/startpartner/**`, `api/sql/008_startpartner_candidates.sql`, `api/sql/010_startpartner_gate2_qualification_capacity.sql`; `control_cases` nur als Projektion |
+| Startpartner Pilot künftig | neue eindeutig benannte Pilot-, Berechtigungs-, Kommunikations- und Messowner innerhalb der bestehenden Anbieter-/Submission-Domäne |
 | Eventfeed | Deployworkflow, Eventgeneratoren, `api/events/**` |
 | Produktziel | `MASTER.md`, `Produktvertrag.md`, `COMMERCIAL_STRATEGY.md` |
 | Produktpriorität | `ROADMAP.md` |
