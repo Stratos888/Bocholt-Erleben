@@ -141,5 +141,6 @@ export STARTPARTNER_TEST_DSN="mysql:host=127.0.0.1;port=${PORT};dbname=be_contra
 export STARTPARTNER_TEST_USER='root'
 export STARTPARTNER_TEST_PASSWORD='contract-root'
 php tests/startpartner_gate2_mysql_contract_test.php
+php tests/startpartner_gate2_runtime_mysql_contract_test.php
 
-printf '%s\n' '=== Startpartner Gate-2 Fresh MariaDB Contract: OK ==='
+printf '%s\n' '=== Startpartner Gate-2 Fresh MariaDB and Runtime Contract: OK ==='
