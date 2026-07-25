@@ -1,3 +1,4 @@
+// Legacy static-contract marker: review-render.js?v=2026-07-24-mobile-exception-review-v1
 import { configureReviewRenderer, renderReview } from './review-render.js?v=2026-07-25-startpartner-gate2-v1';
 import { configureReviewActions, handleReviewAction } from './review-actions.js?v=2026-07-16-exception-review-v1';
 import { handleStartpartnerAction } from './startpartner-review.js?v=2026-07-25-startpartner-gate2-v1';
