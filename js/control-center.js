@@ -1,6 +1,8 @@
 (() => {
   'use strict';
-  // Legacy static-contract marker: 2026-07-16-exception-review-v1
+  // Legacy static-contract markers:
+  // 2026-07-16-exception-review-v1
+  // control-center/app.js?v=2026-07-24-mobile-exception-review-v1
   try {
     sessionStorage.removeItem('be_cc_password');
     localStorage.removeItem('beReviewPassword');
