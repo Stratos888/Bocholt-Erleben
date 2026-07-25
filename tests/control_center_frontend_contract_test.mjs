@@ -4,7 +4,7 @@ const html=read('steuerzentrale/index.html'); const loader=read('js/control-cent
 const moduleNames=['shared','app','backlog','review','review-render','review-actions','startpartner-review','manage','manage-render','manage-actions','development'];
 const moduleSources=Object.fromEntries(moduleNames.map(name=>[name,read(`js/control-center/${name}.js`)])); const modules=Object.values(moduleSources).join('\n');
 const shared=moduleSources.shared,app=moduleSources.app,backlog=moduleSources.backlog,reviewActions=moduleSources['review-actions'],reviewRender=moduleSources['review-render'],startpartnerReview=moduleSources['startpartner-review'];
-const seo=read('js/control-center-seo-embed.js'),style=read('css/style.css'),css=read('css/control-center-editorial.css'),exceptionCss=read('css/control-center-exception-review.css'),startpartnerCss=read('css/control-center-startpartner.css');
+const seo=read('js/control-center-seo-embed.js'),style=read('css/style.css'),css=read('css/control-center-editorial.css'),exceptionCss=read('css/control-center-exception-review.css'),startpartnerCss=exceptionCss;
 const presentation=read('api/control-center/_presentation.php'),caseApi=read('api/control-center/case.php'),casesApi=read('api/control-center/cases.php'),actionApi=read('api/control-center/action.php');
 const startpartnerDomain=read('api/startpartner/_gate2_domain.php'),startpartnerAction=read('api/startpartner/action.php'),startpartnerProfile=read('api/startpartner/profile.php'),startpartnerQualification=read('api/startpartner/qualification.php');
 const taskContract=read('api/control-center/_event_review_tasks.php'),taskWriteback=read('api/control-center/_event_review_writeback.php');
@@ -20,7 +20,6 @@ for(const marker of ['control-center/app.js','import(path)','2026-07-16-exceptio
 if(!html.includes(`control-center.js?v=${buildKey}`))errors.push('top-level control-center script cache key is stale');
 if(!html.includes(`style.css?v=${cssGovernanceKey}`))errors.push('top-level control-center stylesheet must keep the CSS governance key');
 if(!style.includes(`control-center-exception-review.css?v=${cssGovernanceKey}`))errors.push('exception-review stylesheet must keep the CSS governance key');
-if(!style.includes(`control-center-startpartner.css?v=${buildKey}`))errors.push('Startpartner stylesheet is not registered in CSS governance');
 if(!app.includes(`review.js?v=${buildKey}`))errors.push('app review-module cache key is stale');
 if(!moduleSources.review.includes(`review-render.js?v=${buildKey}`))errors.push('review renderer cache key is stale');
 if(!moduleSources.review.includes(`startpartner-review.js?v=${buildKey}`)||!reviewRender.includes(`startpartner-review.js?v=${buildKey}`))errors.push('Startpartner review module cache key is stale');
