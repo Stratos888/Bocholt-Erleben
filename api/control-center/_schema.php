@@ -62,7 +62,7 @@ function be_cc_schema_gaps(PDO $pdo): array
     return $gaps;
 }
 
-function be_cc_require_schema(PDO $pdo): void
+function be_cc_assert_schema_contract(PDO $pdo): void
 {
     $gaps = be_cc_schema_gaps($pdo);
     if ($gaps !== []) {
@@ -77,5 +77,5 @@ function be_cc_require_schema(PDO $pdo): void
 
 function be_cc_ensure_schema(): void
 {
-    be_cc_require_schema(be_db());
+    be_cc_assert_schema_contract(be_db());
 }
