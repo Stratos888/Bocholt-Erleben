@@ -12,13 +12,14 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
 $expectedStartpartnerFiles = [
     '_schema.php', '_contract.php', '_repository.php', '_domain.php', '_gate2_domain.php',
     'intake.php', 'candidates.php', 'profile.php', 'qualification.php', 'action.php', 'capacity.php',
+    'gate2-staging-smoke-199.php',
 ];
 $startpartnerFiles = glob($root . '/api/startpartner/*.php') ?: [];
 $actualNames = array_map('basename', $startpartnerFiles);
 sort($actualNames);
 $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
-$assert($actualNames === $expectedNames, 'Startpartner muss genau die kanonischen Gate-1- und Gate-2-Owner besitzen.');
+$assert($actualNames === $expectedNames, 'Startpartner muss genau die kanonischen Gate-1-/Gate-2-Owner und den zeitlich begrenzten Evidence-Endpunkt besitzen.');
 $assert(!is_file($root . '/api/startpartner/triage.php'), 'Der parallele Gate-1-Triage-Writer muss entfernt sein.');
 
 $combined = '';
@@ -54,6 +55,7 @@ $domain = (string)file_get_contents($root . '/api/startpartner/_domain.php');
 $repository = (string)file_get_contents($root . '/api/startpartner/_repository.php');
 $schema = (string)file_get_contents($root . '/api/startpartner/_schema.php');
 $controlAction = (string)file_get_contents($root . '/api/control-center/action.php');
+$stagingSmoke = (string)file_get_contents($root . '/api/startpartner/gate2-staging-smoke-199.php');
 
 $assert(str_contains($intake, 'be_startpartner_require_gate1_environment'), 'Intake muss außerhalb Staging/Dev fail-closed sein.');
 $assert(str_contains($intake, 'be_require_review_access'), 'Gate-1-Intake muss bis zum öffentlichen Cutover vollständig geschützt sein.');
@@ -77,6 +79,16 @@ $assert(str_contains($gate2Domain, 'be_startpartner_gate2_project_control_case')
 $assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate'"), 'Der generische Control-Center-Writer muss Startpartner-Fälle abweisen.');
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
+
+$assert(str_contains($stagingSmoke, "be_app_env_value() !== 'staging'"), 'Evidence-Endpunkt muss außerhalb Staging unsichtbar bleiben.');
+$assert(str_contains($stagingSmoke, 'BE_GATE2_SMOKE_TOKEN_HASH'), 'Evidence-Endpunkt muss tokengebunden sein.');
+$assert(str_contains($stagingSmoke, "GET_LOCK('bocholt_gate2_staging_smoke_199'"), 'Evidence-Endpunkt muss einen exklusiven DB-Lock besitzen.');
+$assert(str_contains($stagingSmoke, 'be_gate2_smoke_locked_counts'), 'Evidence-Endpunkt muss gesperrte Tabellen vor und nach dem Lauf vergleichen.');
+$assert(str_contains($stagingSmoke, 'be_gate2_smoke_cleanup'), 'Evidence-Endpunkt muss einen garantierten Cleanup besitzen.');
+$assert(str_contains($stagingSmoke, 'GATE2_SYNTHETIC_199_'), 'Evidence-Endpunkt muss stabile synthetische Identitäten verwenden.');
+$assert(str_contains($stagingSmoke, '009_control_center_runtime_schema.sql'), 'Evidence-Endpunkt muss ausschließlich die versionierte Control-Center-Migration anwenden.');
+$assert(str_contains($stagingSmoke, '010_startpartner_gate2_qualification_capacity.sql'), 'Evidence-Endpunkt muss ausschließlich die versionierte Gate-2-Migration anwenden.');
+$assert(!str_contains($stagingSmoke, 'BE_GATE2_SMOKE_TOKEN_HASH = ' . "'oud"), 'Der Klartexttoken darf nicht im Repository stehen.');
 
 $assert(!str_contains($contract, 'BE_STARTPARTNER_RETENTION_REVIEW_DAYS'), 'Gate 1 darf keine juristisch ungeklärte Aufbewahrungsdauer fest verdrahten.');
 $assert(!preg_match('/RETENTION[^\n]*180|180[^\n]*RETENTION/i', $contract), 'Gate 1 darf 180 Tage nicht als Aufbewahrungsregel codieren.');
