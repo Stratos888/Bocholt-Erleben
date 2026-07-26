@@ -19,16 +19,16 @@ $actualNames = array_map('basename', $startpartnerFiles);
 sort($actualNames);
 $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
-$assert($actualNames === $expectedNames, 'Startpartner muss genau die kanonischen Gate-1-/Gate-2-Owner und den zeitlich begrenzten read-only Status-Endpunkt besitzen.');
+$assert($actualNames === $expectedNames, 'Startpartner muss genau die kanonischen Gate-1-/Gate-2-Owner und den zeitlich begrenzten Staging-Migrations-/Status-Endpunkt besitzen.');
 $assert(!is_file($root . '/api/startpartner/triage.php'), 'Der parallele Gate-1-Triage-Writer muss entfernt sein.');
-$assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-199.php'), 'Der schreibfähige Lifecycle-Endpunkt muss vor der Diagnose entfernt sein.');
-$assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-auto-199.php'), 'Der schreibfähige Deploy-Adapter muss vor der Diagnose entfernt sein.');
+$assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-199.php'), 'Der schreibfähige Lifecycle-Endpunkt muss entfernt bleiben.');
+$assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-auto-199.php'), 'Der schreibfähige Deploy-Lifecycle-Adapter muss entfernt bleiben.');
 
 $combined = '';
 foreach ($startpartnerFiles as $file) {
     $source = (string)file_get_contents($file);
     $combined .= "\n" . $source;
-    $assert(!preg_match('/\b(CREATE|ALTER|DROP)\s+TABLE\b/i', $source), basename($file) . ' darf kein Runtime-DDL enthalten.');
+    $assert(!preg_match('/\b(CREATE|ALTER|DROP)\s+TABLE\b/i', $source), basename($file) . ' darf kein eingebettetes Runtime-DDL enthalten.');
 }
 
 foreach ([
@@ -83,19 +83,27 @@ $assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
 
-$assert(str_contains($stagingStatus, "be_app_env_value() !== 'staging'"), 'Status-Endpunkt muss außerhalb Staging unsichtbar bleiben.');
-$assert(str_contains($stagingStatus, 'Bocholt-Erleben-Deploy-Smoke/1.0'), 'Status-Endpunkt muss den kanonischen Smoke-User-Agent verlangen.');
-$assert(str_contains($stagingStatus, 'HTTP_X_BE_EXPECTED_BUILD'), 'Status-Endpunkt muss den exakten Build-Marker verlangen.');
-$assert(str_contains($stagingStatus, 'SELECT COUNT(*)'), 'Status-Endpunkt darf ausschließlich read-only zählen.');
-$assert(!preg_match('/\b(INSERT|UPDATE|DELETE|REPLACE)\b/i', $stagingStatus), 'Status-Endpunkt darf keine Datenmutation enthalten.');
-$assert(str_contains($stagingStatus, 'GATE2_SYNTHETIC_199_%'), 'Status-Endpunkt muss ausschließlich die stabilen synthetischen Identitäten prüfen.');
-$assert(str_contains($stagingStatus, "'009'"), 'Status-Endpunkt muss Migration 009 prüfen.');
-$assert(str_contains($stagingStatus, "'010'"), 'Status-Endpunkt muss Migration 010 prüfen.');
+$assert(str_contains($stagingStatus, "be_app_env_value() !== 'staging'"), 'Staging-Endpunkt muss außerhalb Staging unsichtbar bleiben.');
+$assert(str_contains($stagingStatus, 'Bocholt-Erleben-Deploy-Smoke/1.0'), 'Migrationspfad muss den kanonischen Smoke-User-Agent verlangen.');
+$assert(str_contains($stagingStatus, 'HTTP_X_BE_EXPECTED_BUILD'), 'Migrationspfad muss den exakten Build-Marker verlangen.');
+$assert(str_contains($stagingStatus, 'if ($deployAuthorized)'), 'Nur der buildgebundene Deploy-Smoke darf Migrationen anwenden.');
+$assert(str_contains($stagingStatus, 'SELECT GET_LOCK'), 'Migrationspfad muss einen exklusiven Datenbank-Lock verwenden.');
+$assert(str_contains($stagingStatus, 'SELECT RELEASE_LOCK'), 'Migrationspfad muss den Datenbank-Lock freigeben.');
+$assert(str_contains($stagingStatus, 'be_gate2_status_apply_migration'), 'Migrationspfad muss den versionierten SQL-Owner ausführen.');
+$assert(str_contains($stagingStatus, '009_control_center_runtime_schema.sql'), 'Migrationspfad darf Migration 009 anwenden.');
+$assert(str_contains($stagingStatus, '010_startpartner_gate2_qualification_capacity.sql'), 'Migrationspfad darf Migration 010 anwenden.');
+foreach (range(1, 8) as $number) {
+    $prefix = str_pad((string)$number, 3, '0', STR_PAD_LEFT) . '_';
+    $assert(!str_contains($stagingStatus, "'file' => '{$prefix}"), "Migrationspfad darf Migration {$prefix} nicht als auszuführenden Owner registrieren.");
+}
+$assert(str_contains($stagingStatus, "be_gate2_status_migration_count(\$pdo, '008_startpartner_candidates')"), 'Migration 008 muss als unveränderte Vorbedingung belegt sein.');
+$assert(str_contains($stagingStatus, 'GATE2_SYNTHETIC_199_%'), 'Statusprüfung muss ausschließlich die stabilen synthetischen Identitäten prüfen.');
+$assert(str_contains($stagingStatus, "'migration_action'"), 'Antwort muss offenlegen, ob Migrationen angewendet oder nur gelesen wurden.');
 
-$assert(str_contains($deploySmoke, 'def check_gate2_staging_cleanup_status'), 'Deploy-Smoke muss die read-only Cleanup-Diagnose besitzen.');
-$assert(str_contains($deploySmoke, '/api/startpartner/gate2-staging-status-199.php'), 'Deploy-Smoke muss ausschließlich den read-only Status-Endpunkt aufrufen.');
+$assert(str_contains($deploySmoke, 'def check_gate2_staging_cleanup_status'), 'Deploy-Smoke muss die Gate-2-Migrations- und Cleanup-Prüfung besitzen.');
+$assert(str_contains($deploySmoke, '/api/startpartner/gate2-staging-status-199.php'), 'Deploy-Smoke muss ausschließlich den buildgebundenen Staging-Endpunkt aufrufen.');
 $assert(str_contains($deploySmoke, 'residue.get("total") != 0'), 'Deploy-Smoke muss Zero-Residue fail-fast prüfen.');
-$assert(!str_contains($deploySmoke, 'gate2-staging-smoke-auto-199.php'), 'Deploy-Smoke darf während der Diagnose keinen Lifecycle auslösen.');
+$assert(!str_contains($deploySmoke, 'gate2-staging-smoke-auto-199.php'), 'Deploy-Smoke darf keinen Lifecycle auslösen.');
 
 $assert(!str_contains($contract, 'BE_STARTPARTNER_RETENTION_REVIEW_DAYS'), 'Gate 1 darf keine juristisch ungeklärte Aufbewahrungsdauer fest verdrahten.');
 $assert(!preg_match('/RETENTION[^\n]*180|180[^\n]*RETENTION/i', $contract), 'Gate 1 darf 180 Tage nicht als Aufbewahrungsregel codieren.');
