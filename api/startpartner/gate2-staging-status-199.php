@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/_bootstrap.php';
 
+const BE_GATE2_STATUS_TOKEN_HASH = '921e687a88b06ddb2124766a0be0c43e5875309c393f3ed91219470100053243';
+
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 
@@ -14,12 +16,14 @@ $userAgent = trim((string)($_SERVER['HTTP_USER_AGENT'] ?? ''));
 $expectedBuild = trim((string)($_SERVER['HTTP_X_BE_EXPECTED_BUILD'] ?? ''));
 $buildPath = dirname(__DIR__, 2) . '/meta/build.txt';
 $deployedBuild = is_file($buildPath) ? trim((string)file_get_contents($buildPath)) : '';
-if (
-    $userAgent !== 'Bocholt-Erleben-Deploy-Smoke/1.0' ||
-    $expectedBuild === '' ||
-    $deployedBuild === '' ||
-    !hash_equals($deployedBuild, $expectedBuild)
-) {
+$deployAuthorized = $userAgent === 'Bocholt-Erleben-Deploy-Smoke/1.0'
+    && $expectedBuild !== ''
+    && $deployedBuild !== ''
+    && hash_equals($deployedBuild, $expectedBuild);
+$diagnosticToken = trim((string)($_GET['diagnostic_token'] ?? ''));
+$diagnosticAuthorized = $diagnosticToken !== ''
+    && hash_equals(BE_GATE2_STATUS_TOKEN_HASH, hash('sha256', $diagnosticToken));
+if (!$deployAuthorized && !$diagnosticAuthorized) {
     be_json_response(404, ['status' => 'error', 'message' => 'Not found.']);
 }
 
