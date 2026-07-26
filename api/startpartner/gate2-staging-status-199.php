@@ -38,6 +38,13 @@ if (!$deployAuthorized && !$diagnosticAuthorized) {
     be_json_response(404, ['status' => 'error', 'message' => 'Not found.']);
 }
 
+function be_gate2_status_scalar(PDOStatement $statement): mixed
+{
+    $value = $statement->fetchColumn();
+    $statement->closeCursor();
+    return $value;
+}
+
 function be_gate2_status_table_exists(PDO $pdo, string $table): bool
 {
     $statement = $pdo->prepare(
@@ -45,7 +52,7 @@ function be_gate2_status_table_exists(PDO $pdo, string $table): bool
          WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table_name'
     );
     $statement->execute(['table_name' => $table]);
-    return (int)$statement->fetchColumn() === 1;
+    return (int)be_gate2_status_scalar($statement) === 1;
 }
 
 function be_gate2_status_count(PDO $pdo, string $table, string $where = '1=1', array $params = []): int
@@ -55,7 +62,7 @@ function be_gate2_status_count(PDO $pdo, string $table, string $where = '1=1', a
     }
     $statement = $pdo->prepare('SELECT COUNT(*) FROM `' . str_replace('`', '``', $table) . '` WHERE ' . $where);
     $statement->execute($params);
-    return (int)$statement->fetchColumn();
+    return (int)be_gate2_status_scalar($statement);
 }
 
 function be_gate2_status_migration_count(PDO $pdo, string $migrationKey): int
@@ -169,6 +176,7 @@ function be_gate2_status_release_lock(PDO $pdo): void
 {
     $statement = $pdo->prepare('SELECT RELEASE_LOCK(:lock_name)');
     $statement->execute(['lock_name' => BE_GATE2_MIGRATION_LOCK]);
+    be_gate2_status_scalar($statement);
 }
 
 $pdo = be_db();
@@ -184,7 +192,7 @@ try {
 
         $lockStatement = $pdo->prepare('SELECT GET_LOCK(:lock_name, 0)');
         $lockStatement->execute(['lock_name' => BE_GATE2_MIGRATION_LOCK]);
-        $lockAcquired = (int)$lockStatement->fetchColumn() === 1;
+        $lockAcquired = (int)be_gate2_status_scalar($lockStatement) === 1;
         if (!$lockAcquired) {
             throw new RuntimeException('Gate-2 migration lock is already held.');
         }
