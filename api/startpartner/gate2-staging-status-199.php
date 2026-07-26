@@ -157,6 +157,21 @@ function be_gate2_status_split_sql(string $sql): array
     return $statements;
 }
 
+function be_gate2_status_execute_statement(PDO $pdo, string $sql): void
+{
+    $statement = $pdo->prepare($sql);
+    try {
+        $statement->execute();
+        do {
+            if ($statement->columnCount() > 0) {
+                $statement->fetchAll(PDO::FETCH_NUM);
+            }
+        } while ($statement->nextRowset());
+    } finally {
+        $statement->closeCursor();
+    }
+}
+
 function be_gate2_status_apply_migration(PDO $pdo, string $filename): array
 {
     $path = dirname(__DIR__) . '/sql/' . $filename;
@@ -167,7 +182,7 @@ function be_gate2_status_apply_migration(PDO $pdo, string $filename): array
 
     $statements = be_gate2_status_split_sql($sql);
     foreach ($statements as $statement) {
-        $pdo->exec($statement);
+        be_gate2_status_execute_statement($pdo, $statement);
     }
     return ['file' => $filename, 'statements' => count($statements)];
 }
