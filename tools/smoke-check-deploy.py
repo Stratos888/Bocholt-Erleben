@@ -8,6 +8,7 @@ import re
 import sys
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin
@@ -381,6 +382,12 @@ def check_gate2_staging_cleanup_status(base_url: str, expected_build: str | None
         timeout=60,
     )
     payload = parse_json(result)
+    artifact_dir = Path("artifacts/browser-smoke")
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+    (artifact_dir / "gate2-cleanup-diagnostic-199.json").write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     require_status(result, {200}, label)
 
     migrations = payload.get("migrations")
