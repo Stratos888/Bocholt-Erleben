@@ -45,6 +45,8 @@ $assert(!str_contains($gate2Migration, 'CREATE INDEX IF NOT EXISTS'), 'Migration
 $assert(str_contains($gate2Migration, 'INFORMATION_SCHEMA.COLUMNS'), 'Migration 010 muss Spalten portabel reconciliieren.');
 $assert(str_contains($gate2Migration, 'INFORMATION_SCHEMA.STATISTICS'), 'Migration 010 muss Indizes portabel reconciliieren.');
 $assert(str_contains($gate2Migration, 'PREPARE be_stmt FROM @be_sql'), 'Migration 010 muss dieselbe bewährte dynamische Reconciliation wie Migration 007 nutzen.');
+$assert(!str_contains($gate2Migration, 'candidate_revision_after BIGINT UNSIGNED NULL CHECK'), 'Spaltenlokaler CHECK darf keine andere Spalte referenzieren.');
+$assert(str_contains($gate2Migration, 'CONSTRAINT chk_startpartner_operations_revision_order CHECK'), 'Revisionsreihenfolge benötigt einen portablen Tabellen-CHECK.');
 
 $combined = implode("\n", [$gate2Domain, $profile, $qualification, $action, $capacity, $candidates]);
 foreach ([

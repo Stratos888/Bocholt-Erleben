@@ -198,13 +198,16 @@ CREATE TABLE IF NOT EXISTS startpartner_candidate_operations (
     result_json JSON NULL,
     error_text TEXT NULL,
     candidate_revision_before BIGINT UNSIGNED NOT NULL CHECK (candidate_revision_before >= 1),
-    candidate_revision_after BIGINT UNSIGNED NULL CHECK (candidate_revision_after IS NULL OR candidate_revision_after >= candidate_revision_before),
+    candidate_revision_after BIGINT UNSIGNED NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     completed_at DATETIME NULL,
     PRIMARY KEY (operation_id),
     KEY idx_startpartner_operations_candidate (candidate_id, created_at),
     KEY idx_startpartner_operations_status (status, updated_at),
+    CONSTRAINT chk_startpartner_operations_revision_order CHECK (
+        candidate_revision_after IS NULL OR candidate_revision_after >= candidate_revision_before
+    ),
     CONSTRAINT fk_startpartner_operations_candidate
         FOREIGN KEY (candidate_id) REFERENCES startpartner_candidates(id)
         ON UPDATE CASCADE ON DELETE CASCADE
