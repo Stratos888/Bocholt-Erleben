@@ -366,6 +366,55 @@ def check_push_endpoints_protected(base_url: str) -> None:
     )
 
 
+def check_gate2_staging_lifecycle(base_url: str, expected_build: str | None) -> None:
+    if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
+        return
+
+    build_id = (expected_build or "").strip()
+    if not build_id:
+        raise AssertionError("Gate-2-Staging-Lifecycle benötigt den erwarteten Build-Marker.")
+
+    label = "Gate-2-Staging-Lifecycle #199"
+    result = request_url(
+        build_url(base_url, "/api/startpartner/gate2-staging-smoke-auto-199.php"),
+        headers={"X-BE-Expected-Build": build_id},
+        timeout=300,
+    )
+    payload = parse_json(result)
+    require_status(result, {200}, label)
+
+    cleanup = payload.get("cleanup")
+    before = payload.get("before")
+    after = payload.get("after")
+    readback = payload.get("readback")
+    if payload.get("status") != "PASS":
+        raise AssertionError(f"{label}: Status ist nicht PASS: {payload}")
+    if not isinstance(cleanup, dict) or cleanup.get("residue", {}).get("total") != 0:
+        raise AssertionError(f"{label}: synthetischer Cleanup ist nicht rückstandsfrei: {cleanup}")
+    if not isinstance(before, dict) or not isinstance(after, dict) or before.get("locked_counts") != after.get("locked_counts"):
+        raise AssertionError(f"{label}: gesperrte Tabellen sind vor/nach dem Lauf nicht identisch.")
+    if after.get("migration_009") != 1 or after.get("migration_010") != 1:
+        raise AssertionError(f"{label}: Migrationen 009/010 sind nicht eindeutig registriert: {after}")
+    if not isinstance(readback, dict):
+        raise AssertionError(f"{label}: Readback fehlt.")
+    if readback.get("qualification_count") != 14:
+        raise AssertionError(f"{label}: nicht alle 14 Qualifikationsdimensionen wurden zurückgelesen.")
+    if readback.get("capacity_active") != 8 or readback.get("capacity_hard_stop") is not True:
+        raise AssertionError(f"{label}: Hard-Stop-Evidence ist unvollständig: {readback}")
+    if readback.get("intake_replay") is not True or readback.get("profile_replay") is not True:
+        raise AssertionError(f"{label}: Replay-Evidence ist unvollständig: {readback}")
+    if readback.get("stale_conflict_code") != "STARTPARTNER_CONFLICT":
+        raise AssertionError(f"{label}: stale-write Konfliktcode fehlt: {readback}")
+    if readback.get("control_center_case_kind") != "startpartner_candidate":
+        raise AssertionError(f"{label}: Control-Center-Readback ist unvollständig: {readback}")
+
+    print(
+        "✅ Gate-2-Staging-Lifecycle #199: "
+        f"Migrationen 009/010, 14 Dimensionen, Hard-Stop 8, Replay, Konflikt, "
+        f"Control-Center-Readback und Cleanup residue=0; Evidence={json.dumps(payload, ensure_ascii=False, sort_keys=True)}"
+    )
+
+
 def run(args: argparse.Namespace) -> None:
     base_url = normalize_base_url(args.base_url)
 
@@ -382,6 +431,7 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_checkout_validation(base_url),
         lambda: check_review_endpoint_protected(base_url),
         lambda: check_push_endpoints_protected(base_url),
+        lambda: check_gate2_staging_lifecycle(base_url, args.expected_build),
     ]
 
     print(f"=== Deploy-Smoke-Check: {base_url} ===")
