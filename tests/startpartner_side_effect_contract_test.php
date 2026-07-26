@@ -19,7 +19,7 @@ $actualNames = array_map('basename', $startpartnerFiles);
 sort($actualNames);
 $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
-$assert($actualNames === $expectedNames, 'Startpartner muss genau die kanonischen Gate-1-/Gate-2-Owner und den zeitlich begrenzten Staging-Migrations-/Status-Endpunkt besitzen.');
+$assert($actualNames === $expectedNames, 'Startpartner muss genau die kanonischen Gate-1-/Gate-2-Owner und den zeitlich begrenzten read-only Staging-Status-Endpunkt besitzen.');
 $assert(!is_file($root . '/api/startpartner/triage.php'), 'Der parallele Gate-1-Triage-Writer muss entfernt sein.');
 $assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-199.php'), 'Der schreibfähige Lifecycle-Endpunkt muss entfernt bleiben.');
 $assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-auto-199.php'), 'Der schreibfähige Deploy-Lifecycle-Adapter muss entfernt bleiben.');
@@ -84,31 +84,21 @@ $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"),
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
 
 $assert(str_contains($stagingStatus, "be_app_env_value() !== 'staging'"), 'Staging-Endpunkt muss außerhalb Staging unsichtbar bleiben.');
-$assert(str_contains($stagingStatus, 'Bocholt-Erleben-Deploy-Smoke/1.0'), 'Migrationspfad muss den kanonischen Smoke-User-Agent verlangen.');
-$assert(str_contains($stagingStatus, 'HTTP_X_BE_EXPECTED_BUILD'), 'Migrationspfad muss den exakten Build-Marker verlangen.');
-$assert(str_contains($stagingStatus, 'if ($deployAuthorized)'), 'Nur der buildgebundene Deploy-Smoke darf Migrationen anwenden.');
-$assert(str_contains($stagingStatus, 'SELECT GET_LOCK'), 'Migrationspfad muss einen exklusiven Datenbank-Lock verwenden.');
-$assert(str_contains($stagingStatus, 'SELECT RELEASE_LOCK'), 'Migrationspfad muss den Datenbank-Lock freigeben.');
-$assert(str_contains($stagingStatus, 'function be_gate2_status_scalar'), 'Native PDO-SELECTs benötigen einen gemeinsamen vollständig konsumierenden Scalar-Reader.');
-$assert(str_contains($stagingStatus, '$statement->closeCursor()'), 'Jeder native PDO-SELECT-Cursor muss vor dem nächsten Statement geschlossen werden.');
-$assert(str_contains($stagingStatus, 'be_gate2_status_scalar($lockStatement)'), 'Auch GET_LOCK muss vollständig konsumiert und geschlossen werden.');
-$assert(str_contains($stagingStatus, 'function be_gate2_status_execute_statement'), 'Jedes parameterlose Migrationsstatement benötigt einen konsumierenden Executor.');
-$assert(str_contains($stagingStatus, '$statement->fetchAll(PDO::FETCH_NUM)'), 'Resultsets aus dynamischem EXECUTE müssen vollständig konsumiert werden.');
-$assert(str_contains($stagingStatus, '$statement->nextRowset()'), 'Alle Resultsets eines Migrationsstatements müssen konsumiert werden.');
-$assert(!str_contains($stagingStatus, '$pdo->exec($statement)'), 'Migrationen dürfen nicht über PDO::exec mit unvollständig konsumierten Resultsets laufen.');
-$assert(str_contains($stagingStatus, 'be_gate2_status_apply_migration'), 'Migrationspfad muss den versionierten SQL-Owner ausführen.');
-$assert(str_contains($stagingStatus, '009_control_center_runtime_schema.sql'), 'Migrationspfad darf Migration 009 anwenden.');
-$assert(str_contains($stagingStatus, '010_startpartner_gate2_qualification_capacity.sql'), 'Migrationspfad darf Migration 010 anwenden.');
-foreach (range(1, 8) as $number) {
-    $prefix = str_pad((string)$number, 3, '0', STR_PAD_LEFT) . '_';
-    $assert(!str_contains($stagingStatus, "'file' => '{$prefix}"), "Migrationspfad darf Migration {$prefix} nicht als auszuführenden Owner registrieren.");
-}
-$assert(str_contains($stagingStatus, "be_gate2_status_migration_count(\$pdo, '008_startpartner_candidates')"), 'Migration 008 muss als unveränderte Vorbedingung belegt sein.');
+$assert(str_contains($stagingStatus, 'Bocholt-Erleben-Deploy-Smoke/1.0'), 'Statuspfad muss den kanonischen Smoke-User-Agent verlangen.');
+$assert(str_contains($stagingStatus, 'HTTP_X_BE_EXPECTED_BUILD'), 'Statuspfad muss den exakten Build-Marker verlangen.');
+$assert(str_contains($stagingStatus, 'function be_gate2_status_scalar'), 'Native PDO-SELECTs benötigen einen vollständig konsumierenden Scalar-Reader.');
+$assert(str_contains($stagingStatus, '$statement->closeCursor()'), 'Read-only PDO-SELECT-Cursor müssen geschlossen werden.');
+$assert(str_contains($stagingStatus, "'migration_action' => 'read_only'"), 'Statusantwort muss den read-only Zustand eindeutig ausweisen.');
+$assert(str_contains($stagingStatus, "'applied_migrations' => []"), 'Read-only Status darf keine angewendeten Migrationen behaupten.');
+$assert(!str_contains($stagingStatus, 'GET_LOCK'), 'Read-only Status darf keinen Migrationslock anfordern.');
+$assert(!str_contains($stagingStatus, 'RELEASE_LOCK'), 'Read-only Status darf keinen Migrationslock freigeben.');
+$assert(!str_contains($stagingStatus, 'be_gate2_status_apply_migration'), 'Read-only Status darf keine Migration ausführen.');
+$assert(!str_contains($stagingStatus, 'be_gate2_status_execute_statement'), 'Read-only Status darf keinen SQL-Executor besitzen.');
+$assert(!str_contains($stagingStatus, '.sql'), 'Read-only Status darf keine SQL-Migrationsdatei referenzieren.');
 $assert(str_contains($stagingStatus, 'GATE2_SYNTHETIC_199_%'), 'Statusprüfung muss ausschließlich die stabilen synthetischen Identitäten prüfen.');
-$assert(str_contains($stagingStatus, "'migration_action'"), 'Antwort muss offenlegen, ob Migrationen angewendet oder nur gelesen wurden.');
 
 $assert(str_contains($deploySmoke, 'def check_gate2_staging_cleanup_status'), 'Deploy-Smoke muss die Gate-2-Migrations- und Cleanup-Prüfung besitzen.');
-$assert(str_contains($deploySmoke, '/api/startpartner/gate2-staging-status-199.php'), 'Deploy-Smoke muss ausschließlich den buildgebundenen Staging-Endpunkt aufrufen.');
+$assert(str_contains($deploySmoke, '/api/startpartner/gate2-staging-status-199.php'), 'Deploy-Smoke muss ausschließlich den read-only Staging-Status aufrufen.');
 $assert(str_contains($deploySmoke, 'residue.get("total") != 0'), 'Deploy-Smoke muss Zero-Residue fail-fast prüfen.');
 $assert(!str_contains($deploySmoke, 'gate2-staging-smoke-auto-199.php'), 'Deploy-Smoke darf keinen Lifecycle auslösen.');
 
