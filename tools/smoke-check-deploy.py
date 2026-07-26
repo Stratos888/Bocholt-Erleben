@@ -8,7 +8,6 @@ import re
 import sys
 import time
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin
@@ -148,7 +147,9 @@ def is_download_document_url(value: Any) -> bool:
         return True
     if DOWNLOAD_QUERY_RE.search(url):
         return True
-    if "/bocholt_media/" in url and any(ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+    if "/bocholt_media/" in url and any(
+        ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")
+    ):
         return True
     return False
 
@@ -167,7 +168,11 @@ def check_html_page(base_url: str, path: str, label: str) -> None:
 
     content_type = result.headers.get("content-type", "")
     body_lower = result.body.lower()
-    if "text/html" not in content_type.lower() and "<!doctype html" not in body_lower and "<html" not in body_lower:
+    if (
+        "text/html" not in content_type.lower()
+        and "<!doctype html" not in body_lower
+        and "<html" not in body_lower
+    ):
         raise AssertionError(f"{label}: Antwort sieht nicht wie HTML aus. Content-Type: {content_type}")
 
     print(f"✅ {label}: HTTP 200 HTML")
@@ -250,18 +255,25 @@ def check_event_feed_details(base_url: str) -> None:
     if unsafe_sources:
         raise AssertionError(f"{label}: direkte Datei-/Download-URLs im Public-Feed: {unsafe_sources[:3]}")
     if wrong_origin:
-        raise AssertionError(f"{label}: detail_url zeigt nicht auf aktuelle Deploy-Basis {base_origin}: {wrong_origin[:3]}")
+        raise AssertionError(
+            f"{label}: detail_url zeigt nicht auf aktuelle Deploy-Basis {base_origin}: {wrong_origin[:3]}"
+        )
     if not detail_candidates:
         raise AssertionError(f"{label}: kein Event mit detail_path/detail_url gefunden.")
 
-    sample = next((item for item in detail_candidates if str(item.get("url") or "").strip()), detail_candidates[0])
+    sample = next(
+        (item for item in detail_candidates if str(item.get("url") or "").strip()),
+        detail_candidates[0],
+    )
     sample_path = str(sample.get("detail_path"))
     sample_result = request_with_retries(build_url(base_url, sample_path))
     require_status(sample_result, {200}, f"Event-Detailseite ({sample.get('id', 'sample')})")
     sample_html = sample_result.body
     sample_html_lower = sample_html.lower()
     if "text/html" not in sample_result.headers.get("content-type", "").lower() and "<html" not in sample_html_lower:
-        raise AssertionError(f"Event-Detailseite ({sample.get('id', 'sample')}): Antwort sieht nicht wie HTML aus.")
+        raise AssertionError(
+            f"Event-Detailseite ({sample.get('id', 'sample')}): Antwort sieht nicht wie HTML aus."
+        )
     forbidden_fragments = [
         "event-detail-back",
         "event-detail-action--primary",
@@ -367,45 +379,25 @@ def check_push_endpoints_protected(base_url: str) -> None:
     )
 
 
-def check_gate2_staging_cleanup_status(base_url: str, expected_build: str | None) -> None:
+def check_removed_gate2_temporary_endpoints(base_url: str) -> None:
     if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
         return
 
-    build_id = (expected_build or "").strip()
-    if not build_id:
-        raise AssertionError("Gate-2-Cleanup-Diagnose benötigt den erwarteten Build-Marker.")
+    endpoints = [
+        (
+            "/api/startpartner/gate2-staging-status-199.php",
+            "Entfernter Gate-2-Status-Endpunkt",
+        ),
+        (
+            "/api/startpartner/gate2-staging-lifecycle-199.php",
+            "Entfernter Gate-2-Lifecycle-Endpunkt",
+        ),
+    ]
+    for path, label in endpoints:
+        result = request_url(build_url(base_url, path), timeout=20)
+        require_status(result, {404}, label)
 
-    label = "Gate-2-Cleanup-Diagnose #199"
-    result = request_url(
-        build_url(base_url, "/api/startpartner/gate2-staging-status-199.php"),
-        headers={"X-BE-Expected-Build": build_id},
-        timeout=60,
-    )
-    payload = parse_json(result)
-    artifact_dir = Path("artifacts/browser-smoke")
-    artifact_dir.mkdir(parents=True, exist_ok=True)
-    (artifact_dir / "gate2-cleanup-diagnostic-199.json").write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    require_status(result, {200}, label)
-
-    migrations = payload.get("migrations")
-    residue = payload.get("residue")
-    if payload.get("status") != "PASS":
-        raise AssertionError(f"{label}: Status ist nicht PASS: {payload}")
-    if not isinstance(migrations, dict) or migrations.get("009") != 1 or migrations.get("010") != 1:
-        raise AssertionError(f"{label}: Migrationen 009/010 sind nicht eindeutig registriert: {migrations}")
-    if not isinstance(residue, dict) or residue.get("total") != 0:
-        raise AssertionError(f"{label}: synthetischer Cleanup ist nicht rückstandsfrei: {residue}")
-    if payload.get("missing_tables") != [] or payload.get("positive_residue") != []:
-        raise AssertionError(f"{label}: Tabellen- oder Residue-Abweichung: {payload}")
-
-    print(
-        "✅ Gate-2-Cleanup-Diagnose #199: Migrationen 009/010 registriert und "
-        f"sämtliche synthetischen Domain-/Operations-/Projektionszeilen residue=0; "
-        f"Evidence={json.dumps(payload, ensure_ascii=False, sort_keys=True)}"
-    )
+    print("✅ Gate-2-Evidence-Endpunkte: beide URLs liefern HTTP 404")
 
 
 def run(args: argparse.Namespace) -> None:
@@ -418,13 +410,17 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_event_feed_details(base_url),
         lambda: check_html_page(base_url, "/aktivitaeten/", "Aktivitäten-Seite"),
         lambda: check_html_page(base_url, "/bildnachweise/", "Bildnachweise-Seite"),
-        lambda: check_html_page(base_url, "/events-veroeffentlichen/einreichen/", "Event-Einreichen-Seite"),
+        lambda: check_html_page(
+            base_url,
+            "/events-veroeffentlichen/einreichen/",
+            "Event-Einreichen-Seite",
+        ),
         lambda: check_status_api(base_url),
         lambda: check_public_events_api(base_url),
         lambda: check_checkout_validation(base_url),
         lambda: check_review_endpoint_protected(base_url),
         lambda: check_push_endpoints_protected(base_url),
-        lambda: check_gate2_staging_cleanup_status(base_url, args.expected_build),
+        lambda: check_removed_gate2_temporary_endpoints(base_url),
     ]
 
     print(f"=== Deploy-Smoke-Check: {base_url} ===")
@@ -436,9 +432,19 @@ def run(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Prueft zentrale Bocholt-Erleben-Endpunkte nach einem STRATO-Deploy.")
-    parser.add_argument("--base-url", required=True, help="Deploy-Basis-URL, z. B. https://staging.bocholt-erleben.de")
-    parser.add_argument("--expected-build", default="", help="Optional: erwarteter Inhalt von /meta/build.txt")
+    parser = argparse.ArgumentParser(
+        description="Prueft zentrale Bocholt-Erleben-Endpunkte nach einem STRATO-Deploy."
+    )
+    parser.add_argument(
+        "--base-url",
+        required=True,
+        help="Deploy-Basis-URL, z. B. https://staging.bocholt-erleben.de",
+    )
+    parser.add_argument(
+        "--expected-build",
+        default="",
+        help="Optional: erwarteter Inhalt von /meta/build.txt",
+    )
     args = parser.parse_args()
 
     try:
