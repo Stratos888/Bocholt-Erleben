@@ -12,7 +12,7 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
 $expectedStartpartnerFiles = [
     '_schema.php', '_contract.php', '_repository.php', '_domain.php', '_gate2_domain.php',
     'intake.php', 'candidates.php', 'profile.php', 'qualification.php', 'action.php', 'capacity.php',
-    'gate2-staging-status-199.php', 'gate2-staging-lifecycle-199.php',
+    'gate2-staging-status-199.php',
 ];
 $startpartnerFiles = glob($root . '/api/startpartner/*.php') ?: [];
 $actualNames = array_map('basename', $startpartnerFiles);
@@ -21,11 +21,12 @@ $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
 $assert(
     $actualNames === $expectedNames,
-    'Startpartner muss genau die kanonischen Gate-1-/Gate-2-Owner sowie die zeitlich begrenzten Status- und finalen Lifecycle-Endpunkte besitzen.'
+    'Startpartner muss genau die kanonischen Gate-1-/Gate-2-Owner und den zeitlich begrenzten Cleanup-Status besitzen.'
 );
 $assert(!is_file($root . '/api/startpartner/triage.php'), 'Der parallele Gate-1-Triage-Writer muss entfernt sein.');
 $assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-199.php'), 'Der fehlerhafte erste Lifecycle-Endpunkt muss entfernt bleiben.');
-$assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-auto-199.php'), 'Der fehlerhafte erste Deploy-Lifecycle-Adapter muss entfernt bleiben.');
+$assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-auto-199.php'), 'Der fehlerhafte erste Lifecycle-Adapter muss entfernt bleiben.');
+$assert(!is_file($root . '/api/startpartner/gate2-staging-lifecycle-199.php'), 'Der erfolgreich abgeschlossene finale Lifecycle-Endpunkt muss entfernt sein.');
 
 $combined = '';
 foreach ($startpartnerFiles as $file) {
@@ -61,7 +62,6 @@ $repository = (string)file_get_contents($root . '/api/startpartner/_repository.p
 $schema = (string)file_get_contents($root . '/api/startpartner/_schema.php');
 $controlAction = (string)file_get_contents($root . '/api/control-center/action.php');
 $stagingStatus = (string)file_get_contents($root . '/api/startpartner/gate2-staging-status-199.php');
-$finalLifecycle = (string)file_get_contents($root . '/api/startpartner/gate2-staging-lifecycle-199.php');
 $deploySmoke = (string)file_get_contents($root . '/tools/smoke-check-deploy.py');
 
 $assert(str_contains($intake, 'be_startpartner_require_gate1_environment'), 'Intake muss außerhalb Staging/Dev fail-closed sein.');
@@ -87,46 +87,38 @@ $assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
 
-$assert(str_contains($stagingStatus, "be_app_env_value() !== 'staging'"), 'Staging-Endpunkt muss außerhalb Staging unsichtbar bleiben.');
-$assert(str_contains($stagingStatus, 'Bocholt-Erleben-Deploy-Smoke/1.0'), 'Statuspfad muss den kanonischen Smoke-User-Agent verlangen.');
-$assert(str_contains($stagingStatus, 'HTTP_X_BE_EXPECTED_BUILD'), 'Statuspfad muss den exakten Build-Marker verlangen.');
+$assert(str_contains($stagingStatus, "be_app_env_value() !== 'staging'"), 'Cleanup-Status muss außerhalb Staging unsichtbar bleiben.');
+$assert(str_contains($stagingStatus, 'Bocholt-Erleben-Deploy-Smoke/1.0'), 'Cleanup-Status muss den kanonischen Deploy-Smoke verlangen.');
+$assert(str_contains($stagingStatus, 'HTTP_X_BE_EXPECTED_BUILD'), 'Cleanup-Status muss an den exakten Build-Marker gebunden sein.');
 $assert(str_contains($stagingStatus, 'function be_gate2_status_scalar'), 'Native PDO-SELECTs benötigen einen vollständig konsumierenden Scalar-Reader.');
-$assert(str_contains($stagingStatus, '$statement->closeCursor()'), 'Read-only PDO-SELECT-Cursor müssen geschlossen werden.');
-$assert(str_contains($stagingStatus, "'migration_action' => 'read_only'"), 'Statusantwort muss den read-only Migrationszustand eindeutig ausweisen.');
-$assert(str_contains($stagingStatus, "'applied_migrations' => []"), 'Statuspfad darf keine angewendeten Migrationen behaupten.');
-$assert(!str_contains($stagingStatus, 'GET_LOCK'), 'Statuspfad darf selbst keinen Lifecycle-Lock anfordern.');
-$assert(!str_contains($stagingStatus, 'RELEASE_LOCK'), 'Statuspfad darf selbst keinen Lifecycle-Lock freigeben.');
-$assert(!str_contains($stagingStatus, '.sql'), 'Statuspfad darf keine SQL-Migrationsdatei referenzieren.');
-$assert(str_contains($stagingStatus, "require_once __DIR__ . '/gate2-staging-lifecycle-199.php'"), 'Nur der autorisierte Deploy-Statuspfad darf den finalen Lifecycle aufrufen.');
-$assert(str_contains($stagingStatus, '$deployAuthorized'), 'Diagnosezugriff darf den finalen Lifecycle nicht auslösen.');
-$assert(str_contains($stagingStatus, "'completion_marker'"), 'Statusantwort muss den Completion-Marker zurücklesen.');
-$assert(str_contains($stagingStatus, "'lifecycle' => \$lifecycle"), 'Statusantwort muss die vollständige Lifecycle-Evidence enthalten.');
-$assert(str_contains($stagingStatus, 'GATE2_SYNTHETIC_199_%'), 'Statusprüfung muss ausschließlich die stabilen synthetischen Identitäten prüfen.');
+$assert(str_contains($stagingStatus, '$statement->closeCursor()'), 'Native PDO-SELECT-Cursor müssen geschlossen werden.');
+$assert(str_contains($stagingStatus, "BE_GATE2_COMPLETION_MARKER = '199_gate2_staging_lifecycle_completed'"), 'Cleanup muss ausschließlich den belegten Completion-Marker besitzen.');
+$assert(str_contains($stagingStatus, 'SELECT GET_LOCK(:lock_name, 0)'), 'Marker-Cleanup benötigt einen exklusiven DB-Lock.');
+$assert(str_contains($stagingStatus, 'SELECT RELEASE_LOCK(:lock_name)'), 'Marker-Cleanup muss den DB-Lock freigeben.');
+$assert(str_contains($stagingStatus, 'DELETE FROM app_schema_migrations WHERE migration_key = :marker_key'), 'Cleanup darf ausschließlich den Completion-Marker löschen.');
+$assert(substr_count($stagingStatus, 'DELETE FROM') === 1, 'Cleanup-Status darf genau eine DELETE-Anweisung besitzen.');
+foreach ([
+    'DELETE FROM startpartner_',
+    'DELETE FROM control_',
+    'DELETE FROM organizers',
+    'DELETE FROM submissions',
+    'DELETE FROM subscriptions',
+    'DELETE FROM publication_',
+] as $forbiddenDelete) {
+    $assert(!str_contains($stagingStatus, $forbiddenDelete), "Cleanup-Status enthält verbotenen Delete: {$forbiddenDelete}");
+}
+$assert(str_contains($stagingStatus, '$deployAuthorized'), 'Diagnosezugriff darf den Marker-Cleanup nicht auslösen.');
+$assert(str_contains($stagingStatus, "'cleanup_action'"), 'Cleanup-Antwort muss ihre Aktion explizit ausweisen.');
+$assert(str_contains($stagingStatus, "'marker_cleanup'"), 'Cleanup-Antwort muss Before-/After-Evidence liefern.');
+$assert(str_contains($stagingStatus, "'lifecycle_endpoint_present'"), 'Cleanup-Antwort muss die Entfernung des Lifecycle-Endpunkts beweisen.');
+$assert(!str_contains($stagingStatus, 'gate2-staging-lifecycle-199.php\';'), 'Cleanup-Status darf den Lifecycle nicht mehr einbinden.');
+$assert(!str_contains($stagingStatus, '.sql'), 'Cleanup-Status darf keine SQL-Migrationsdatei referenzieren.');
+$assert(str_contains($stagingStatus, 'GATE2_SYNTHETIC_199_%'), 'Cleanup muss weiterhin sämtliche stabilen synthetischen Identitäten auf Residue prüfen.');
 
-$assert(str_contains($finalLifecycle, "be_app_env_value() !== 'staging'"), 'Finaler Lifecycle muss außerhalb Staging unsichtbar bleiben.');
-$assert(str_contains($finalLifecycle, 'Bocholt-Erleben-Deploy-Smoke/1.0'), 'Finaler Lifecycle muss den kanonischen Deploy-Smoke verlangen.');
-$assert(str_contains($finalLifecycle, 'HTTP_X_BE_EXPECTED_BUILD'), 'Finaler Lifecycle muss an den exakten Build-Marker gebunden sein.');
-$assert(str_contains($finalLifecycle, "BE_GATE2_FINAL_PREFIX = 'GATE2_SYNTHETIC_199_FINAL_'"), 'Finaler Lifecycle benötigt den eindeutigen finalen Kandidatenpräfix.');
-$assert(str_contains($finalLifecycle, "BE_GATE2_FINAL_OPERATION_PREFIX = 'gate2:199:staging-final-'"), 'Finaler Lifecycle benötigt den eindeutigen finalen Operationspräfix.');
-$assert(str_contains($finalLifecycle, "BE_GATE2_FINAL_MARKER = '199_gate2_staging_lifecycle_completed'"), 'Finaler Lifecycle benötigt einen persistenten Completion-Marker.');
-$assert(str_contains($finalLifecycle, 'SELECT GET_LOCK(:lock_name, 0)'), 'Finaler Lifecycle benötigt einen exklusiven DB-Lock.');
-$assert(str_contains($finalLifecycle, 'SELECT RELEASE_LOCK(:lock_name)'), 'Finaler Lifecycle muss seinen DB-Lock freigeben.');
-$assert(str_contains($finalLifecycle, "'email_normalized' => strtolower(\$email)"), 'Kapazitäts-Fixture muss getrennte native PDO-Parameter verwenden.');
-$assert(!str_contains($finalLifecycle, ':email, :email, 1'), 'Doppelt verwendeter nativer PDO-Parameter darf nicht zurückkehren.');
-$assert(str_contains($finalLifecycle, 'be_gate2_final_locked_counts'), 'Finaler Lifecycle muss gesperrte Tabellen vergleichen.');
-$assert(str_contains($finalLifecycle, 'be_gate2_final_cleanup'), 'Finaler Lifecycle muss garantierten Cleanup besitzen.');
-$assert(str_contains($finalLifecycle, "'attempt' => 2"), 'Finaler Lifecycle muss eindeutig als zweiter und letzter Versuch markiert sein.');
-$assert(str_contains($finalLifecycle, 'Control Center projection revision is stale.'), 'Control-Center-Projektion muss gegen die aktuelle Candidate-Revision geprüft werden.');
-$assert(str_contains($finalLifecycle, 'count($qualification'), 'Finaler Lifecycle muss alle 14 Qualifikationsdimensionen prüfen.');
-$assert(str_contains($finalLifecycle, 'Soft stop without exception reason'), 'Soft-Stop ohne Begründung muss geprüft werden.');
-$assert(str_contains($finalLifecycle, 'Hard stop'), 'Hard-Stop acht muss geprüft werden.');
-$assert(!str_contains($finalLifecycle, 'apply_migration'), 'Finaler Lifecycle darf keine Migration anwenden.');
-$assert(!str_contains($finalLifecycle, '.sql'), 'Finaler Lifecycle darf keine SQL-Migrationsdatei referenzieren.');
-
-$assert(str_contains($deploySmoke, 'def check_gate2_staging_cleanup_status'), 'Deploy-Smoke muss die Gate-2-Migrations- und Cleanup-Prüfung besitzen.');
-$assert(str_contains($deploySmoke, '/api/startpartner/gate2-staging-status-199.php'), 'Deploy-Smoke muss ausschließlich den staging-only Statuspfad aufrufen.');
+$assert(str_contains($deploySmoke, 'def check_gate2_staging_cleanup_status'), 'Deploy-Smoke muss Marker-Cleanup und Zero-Residue prüfen.');
+$assert(str_contains($deploySmoke, '/api/startpartner/gate2-staging-status-199.php'), 'Deploy-Smoke muss ausschließlich den staging-only Cleanup-Status aufrufen.');
 $assert(str_contains($deploySmoke, 'residue.get("total") != 0'), 'Deploy-Smoke muss Zero-Residue fail-fast prüfen.');
-$assert(!str_contains($deploySmoke, 'gate2-staging-lifecycle-199.php'), 'Deploy-Smoke darf den Lifecycle nicht außerhalb des Statuspfads direkt aufrufen.');
+$assert(!str_contains($deploySmoke, 'gate2-staging-lifecycle-199.php'), 'Deploy-Smoke darf den entfernten Lifecycle nicht direkt aufrufen.');
 
 $assert(!str_contains($contract, 'BE_STARTPARTNER_RETENTION_REVIEW_DAYS'), 'Gate 1 darf keine juristisch ungeklärte Aufbewahrungsdauer fest verdrahten.');
 $assert(!preg_match('/RETENTION[^\n]*180|180[^\n]*RETENTION/i', $contract), 'Gate 1 darf 180 Tage nicht als Aufbewahrungsregel codieren.');
