@@ -12,15 +12,17 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
 $expectedStartpartnerFiles = [
     '_schema.php', '_contract.php', '_repository.php', '_domain.php', '_gate2_domain.php',
     'intake.php', 'candidates.php', 'profile.php', 'qualification.php', 'action.php', 'capacity.php',
-    'gate2-staging-smoke-199.php', 'gate2-staging-smoke-auto-199.php',
+    'gate2-staging-status-199.php',
 ];
 $startpartnerFiles = glob($root . '/api/startpartner/*.php') ?: [];
 $actualNames = array_map('basename', $startpartnerFiles);
 sort($actualNames);
 $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
-$assert($actualNames === $expectedNames, 'Startpartner muss genau die kanonischen Gate-1-/Gate-2-Owner und die zeitlich begrenzten Evidence-Endpunkte besitzen.');
+$assert($actualNames === $expectedNames, 'Startpartner muss genau die kanonischen Gate-1-/Gate-2-Owner und den zeitlich begrenzten read-only Status-Endpunkt besitzen.');
 $assert(!is_file($root . '/api/startpartner/triage.php'), 'Der parallele Gate-1-Triage-Writer muss entfernt sein.');
+$assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-199.php'), 'Der schreibfähige Lifecycle-Endpunkt muss vor der Diagnose entfernt sein.');
+$assert(!is_file($root . '/api/startpartner/gate2-staging-smoke-auto-199.php'), 'Der schreibfähige Deploy-Adapter muss vor der Diagnose entfernt sein.');
 
 $combined = '';
 foreach ($startpartnerFiles as $file) {
@@ -55,8 +57,7 @@ $domain = (string)file_get_contents($root . '/api/startpartner/_domain.php');
 $repository = (string)file_get_contents($root . '/api/startpartner/_repository.php');
 $schema = (string)file_get_contents($root . '/api/startpartner/_schema.php');
 $controlAction = (string)file_get_contents($root . '/api/control-center/action.php');
-$stagingSmoke = (string)file_get_contents($root . '/api/startpartner/gate2-staging-smoke-199.php');
-$stagingSmokeAuto = (string)file_get_contents($root . '/api/startpartner/gate2-staging-smoke-auto-199.php');
+$stagingStatus = (string)file_get_contents($root . '/api/startpartner/gate2-staging-status-199.php');
 $deploySmoke = (string)file_get_contents($root . '/tools/smoke-check-deploy.py');
 
 $assert(str_contains($intake, 'be_startpartner_require_gate1_environment'), 'Intake muss außerhalb Staging/Dev fail-closed sein.');
@@ -82,28 +83,19 @@ $assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
 
-$assert(str_contains($stagingSmoke, "be_app_env_value() !== 'staging'"), 'Evidence-Endpunkt muss außerhalb Staging unsichtbar bleiben.');
-$assert(str_contains($stagingSmoke, 'BE_GATE2_SMOKE_TOKEN_HASH'), 'Evidence-Endpunkt muss tokengebunden sein.');
-$assert(str_contains($stagingSmoke, "GET_LOCK('bocholt_gate2_staging_smoke_199'"), 'Evidence-Endpunkt muss einen exklusiven DB-Lock besitzen.');
-$assert(str_contains($stagingSmoke, 'be_gate2_smoke_locked_counts'), 'Evidence-Endpunkt muss gesperrte Tabellen vor und nach dem Lauf vergleichen.');
-$assert(str_contains($stagingSmoke, 'be_gate2_smoke_cleanup'), 'Evidence-Endpunkt muss einen garantierten Cleanup besitzen.');
-$assert(str_contains($stagingSmoke, 'GATE2_SYNTHETIC_199_'), 'Evidence-Endpunkt muss stabile synthetische Identitäten verwenden.');
-$assert(str_contains($stagingSmoke, '009_control_center_runtime_schema.sql'), 'Evidence-Endpunkt muss ausschließlich die versionierte Control-Center-Migration anwenden.');
-$assert(str_contains($stagingSmoke, '010_startpartner_gate2_qualification_capacity.sql'), 'Evidence-Endpunkt muss ausschließlich die versionierte Gate-2-Migration anwenden.');
-$assert(!str_contains($stagingSmoke, 'BE_GATE2_SMOKE_TOKEN_HASH = ' . "'oud"), 'Der Klartexttoken darf nicht im fachlichen Evidence-Endpunkt stehen.');
+$assert(str_contains($stagingStatus, "be_app_env_value() !== 'staging'"), 'Status-Endpunkt muss außerhalb Staging unsichtbar bleiben.');
+$assert(str_contains($stagingStatus, 'Bocholt-Erleben-Deploy-Smoke/1.0'), 'Status-Endpunkt muss den kanonischen Smoke-User-Agent verlangen.');
+$assert(str_contains($stagingStatus, 'HTTP_X_BE_EXPECTED_BUILD'), 'Status-Endpunkt muss den exakten Build-Marker verlangen.');
+$assert(str_contains($stagingStatus, 'SELECT COUNT(*)'), 'Status-Endpunkt darf ausschließlich read-only zählen.');
+$assert(!preg_match('/\b(INSERT|UPDATE|DELETE|REPLACE)\b/i', $stagingStatus), 'Status-Endpunkt darf keine Datenmutation enthalten.');
+$assert(str_contains($stagingStatus, 'GATE2_SYNTHETIC_199_%'), 'Status-Endpunkt muss ausschließlich die stabilen synthetischen Identitäten prüfen.');
+$assert(str_contains($stagingStatus, "'009'"), 'Status-Endpunkt muss Migration 009 prüfen.');
+$assert(str_contains($stagingStatus, "'010'"), 'Status-Endpunkt muss Migration 010 prüfen.');
 
-$assert(str_contains($stagingSmokeAuto, "be_app_env_value() !== 'staging'"), 'Deploy-Smoke-Adapter muss außerhalb Staging unsichtbar bleiben.');
-$assert(str_contains($stagingSmokeAuto, "Bocholt-Erleben-Deploy-Smoke/1.0"), 'Deploy-Smoke-Adapter muss den kanonischen Smoke-User-Agent verlangen.');
-$assert(str_contains($stagingSmokeAuto, 'HTTP_X_BE_EXPECTED_BUILD'), 'Deploy-Smoke-Adapter muss den exakten Build-Marker verlangen.');
-$assert(str_contains($stagingSmokeAuto, "'/meta/build.txt'"), 'Deploy-Smoke-Adapter muss den deployten Build serverseitig zurücklesen.');
-$assert(str_contains($stagingSmokeAuto, "require __DIR__ . '/gate2-staging-smoke-199.php'"), 'Deploy-Smoke-Adapter darf keinen parallelen Lifecycle besitzen.');
-
-$assert(str_contains($deploySmoke, 'def check_gate2_staging_lifecycle'), 'Deploy-Smoke muss den Gate-2-Lifecycle explizit besitzen.');
-$assert(str_contains($deploySmoke, '/api/startpartner/gate2-staging-smoke-auto-199.php'), 'Deploy-Smoke muss ausschließlich den staging-only Adapter aufrufen.');
-$assert(str_contains($deploySmoke, 'headers={"X-BE-Expected-Build": build_id}'), 'Deploy-Smoke muss den exakten Build-Marker mitsenden.');
-$assert(str_contains($deploySmoke, 'result = request_url('), 'Gate-2-Lifecycle muss als einzelner Request ohne Retry ausgeführt werden.');
-$assert(str_contains($deploySmoke, 'cleanup.get("residue", {}).get("total") != 0'), 'Deploy-Smoke muss Zero-Residue-Cleanup fail-fast prüfen.');
-$assert(str_contains($deploySmoke, 'before.get("locked_counts") != after.get("locked_counts")'), 'Deploy-Smoke muss gesperrte Tabellen vor/nach dem Lauf vergleichen.');
+$assert(str_contains($deploySmoke, 'def check_gate2_staging_cleanup_status'), 'Deploy-Smoke muss die read-only Cleanup-Diagnose besitzen.');
+$assert(str_contains($deploySmoke, '/api/startpartner/gate2-staging-status-199.php'), 'Deploy-Smoke muss ausschließlich den read-only Status-Endpunkt aufrufen.');
+$assert(str_contains($deploySmoke, 'residue.get("total") != 0'), 'Deploy-Smoke muss Zero-Residue fail-fast prüfen.');
+$assert(!str_contains($deploySmoke, 'gate2-staging-smoke-auto-199.php'), 'Deploy-Smoke darf während der Diagnose keinen Lifecycle auslösen.');
 
 $assert(!str_contains($contract, 'BE_STARTPARTNER_RETENTION_REVIEW_DAYS'), 'Gate 1 darf keine juristisch ungeklärte Aufbewahrungsdauer fest verdrahten.');
 $assert(!preg_match('/RETENTION[^\n]*180|180[^\n]*RETENTION/i', $contract), 'Gate 1 darf 180 Tage nicht als Aufbewahrungsregel codieren.');
