@@ -4,6 +4,8 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/_bootstrap.php';
 
 const BE_GATE2_STATUS_TOKEN_HASH = '921e687a88b06ddb2124766a0be0c43e5875309c393f3ed91219470100053243';
+const BE_GATE2_COMPLETION_MARKER = '199_gate2_staging_lifecycle_completed';
+const BE_GATE2_CLEANUP_LOCK = 'bocholt_gate2_staging_cleanup_199';
 const BE_GATE2_MIGRATIONS = [
     '009' => '009_control_center_runtime_schema',
     '010' => '010_startpartner_gate2_qualification_capacity',
@@ -82,7 +84,6 @@ function be_gate2_status_residue(PDO $pdo): array
         SELECT id FROM startpartner_candidates
         WHERE organization_name LIKE :candidate_prefix
     )';
-
     $residue = [
         'candidates' => be_gate2_status_count(
             $pdo,
@@ -153,12 +154,55 @@ function be_gate2_status_residue(PDO $pdo): array
     return $residue;
 }
 
-$pdo = be_db();
-$lifecycle = null;
-if ($deployAuthorized) {
-    require_once __DIR__ . '/gate2-staging-lifecycle-199.php';
-    $lifecycle = be_gate2_final_run($pdo);
+function be_gate2_status_remove_completion_marker(PDO $pdo): array
+{
+    $lockStatement = $pdo->prepare('SELECT GET_LOCK(:lock_name, 0)');
+    $lockStatement->execute(['lock_name' => BE_GATE2_CLEANUP_LOCK]);
+    if ((int)be_gate2_status_scalar($lockStatement) !== 1) {
+        throw new RuntimeException('Gate 2 cleanup lock is unavailable.');
+    }
+
+    try {
+        $before = be_gate2_status_migration_count($pdo, BE_GATE2_COMPLETION_MARKER);
+        if (!in_array($before, [0, 1], true)) {
+            throw new RuntimeException('Gate 2 completion marker count is invalid.');
+        }
+
+        $deletedRows = 0;
+        if ($before === 1) {
+            $statement = $pdo->prepare(
+                'DELETE FROM app_schema_migrations WHERE migration_key = :marker_key'
+            );
+            $statement->execute(['marker_key' => BE_GATE2_COMPLETION_MARKER]);
+            $deletedRows = $statement->rowCount();
+        }
+        $after = be_gate2_status_migration_count($pdo, BE_GATE2_COMPLETION_MARKER);
+        if ($after !== 0) {
+            throw new RuntimeException('Gate 2 completion marker was not removed.');
+        }
+
+        return [
+            'status' => $before === 1 ? 'removed' : 'already_removed',
+            'before' => $before,
+            'deleted_rows' => $deletedRows,
+            'after' => $after,
+        ];
+    } finally {
+        $releaseStatement = $pdo->prepare('SELECT RELEASE_LOCK(:lock_name)');
+        $releaseStatement->execute(['lock_name' => BE_GATE2_CLEANUP_LOCK]);
+        be_gate2_status_scalar($releaseStatement);
+    }
 }
+
+$pdo = be_db();
+$markerCleanup = $deployAuthorized
+    ? be_gate2_status_remove_completion_marker($pdo)
+    : [
+        'status' => 'read_only',
+        'before' => be_gate2_status_migration_count($pdo, BE_GATE2_COMPLETION_MARKER),
+        'deleted_rows' => 0,
+        'after' => be_gate2_status_migration_count($pdo, BE_GATE2_COMPLETION_MARKER),
+    ];
 
 $migrations = [];
 foreach (BE_GATE2_MIGRATIONS as $number => $migrationKey) {
@@ -173,18 +217,13 @@ $positiveResidue = array_filter(
     $residue,
     static fn(int $count): bool => $count > 0
 );
-$completionMarker = be_gate2_status_migration_count(
-    $pdo,
-    '199_gate2_staging_lifecycle_completed'
-);
-$lifecycleAccepted = !$deployAuthorized
-    || in_array((string)($lifecycle['status'] ?? ''), ['PASS', 'ALREADY_COMPLETED'], true);
+$lifecycleEndpointPresent = is_file(__DIR__ . '/gate2-staging-lifecycle-199.php');
 $status = $migrations['009'] === 1
     && $migrations['010'] === 1
     && $missingTables === []
     && ($residue['total'] ?? -1) === 0
-    && $lifecycleAccepted
-    && (!$deployAuthorized || $completionMarker === 1)
+    && (int)$markerCleanup['after'] === 0
+    && $lifecycleEndpointPresent === false
         ? 'PASS'
         : 'FAIL';
 
@@ -193,13 +232,12 @@ be_json_response($status === 'PASS' ? 200 : 500, [
     'workpack_issue' => 199,
     'environment' => be_app_env_value(),
     'deployed_build' => $deployedBuild,
-    'migration_action' => 'read_only',
-    'applied_migrations' => [],
+    'cleanup_action' => $deployAuthorized ? 'remove_completion_marker' : 'read_only',
+    'marker_cleanup' => $markerCleanup,
+    'lifecycle_endpoint_present' => $lifecycleEndpointPresent,
     'migrations' => $migrations,
-    'completion_marker' => $completionMarker,
     'residue' => $residue,
     'missing_tables' => $missingTables,
     'positive_residue' => $positiveResidue,
-    'lifecycle' => $lifecycle,
     'checked_at' => gmdate(DateTimeInterface::ATOM),
 ]);
