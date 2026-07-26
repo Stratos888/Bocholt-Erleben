@@ -89,6 +89,9 @@ $assert(str_contains($stagingStatus, 'HTTP_X_BE_EXPECTED_BUILD'), 'Migrationspfa
 $assert(str_contains($stagingStatus, 'if ($deployAuthorized)'), 'Nur der buildgebundene Deploy-Smoke darf Migrationen anwenden.');
 $assert(str_contains($stagingStatus, 'SELECT GET_LOCK'), 'Migrationspfad muss einen exklusiven Datenbank-Lock verwenden.');
 $assert(str_contains($stagingStatus, 'SELECT RELEASE_LOCK'), 'Migrationspfad muss den Datenbank-Lock freigeben.');
+$assert(str_contains($stagingStatus, 'function be_gate2_status_scalar'), 'Native PDO-SELECTs benötigen einen gemeinsamen vollständig konsumierenden Scalar-Reader.');
+$assert(str_contains($stagingStatus, '$statement->closeCursor()'), 'Jeder native PDO-SELECT-Cursor muss vor dem nächsten Statement geschlossen werden.');
+$assert(str_contains($stagingStatus, 'be_gate2_status_scalar($lockStatement)'), 'Auch GET_LOCK muss vollständig konsumiert und geschlossen werden.');
 $assert(str_contains($stagingStatus, 'be_gate2_status_apply_migration'), 'Migrationspfad muss den versionierten SQL-Owner ausführen.');
 $assert(str_contains($stagingStatus, '009_control_center_runtime_schema.sql'), 'Migrationspfad darf Migration 009 anwenden.');
 $assert(str_contains($stagingStatus, '010_startpartner_gate2_qualification_capacity.sql'), 'Migrationspfad darf Migration 010 anwenden.');
