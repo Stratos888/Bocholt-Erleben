@@ -1,6 +1,6 @@
 # Aktueller Proofindex – Bocholt erleben
 
-Stand: 2026-07-24
+Stand: 2026-07-26
 
 Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence-Grenzen. Operative Zwischenstände, vollständige Logs und laufende Run-IDs stehen im jeweiligen Workpack-Issue und in GitHub Actions.
 
@@ -38,10 +38,10 @@ Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence
 | Structured-Data-Warnungen | E2/E6 | URL- und quellenbezogene Korrektur ohne erfundene Organizer-, Performer-, Preis-, Währungs-, `validFrom`-, Availability- oder Ticketwerte |
 | Event-Identität und Dubletten-Preflight | E2 | gemeinsamer Python-/PHP-Vertrag, Same-ID-Resume, Staging-Overlay und Approval-Wiring im PR Gate |
 | Control-Center-Writeback | E4 | Success, Replay, kontrollierter Fehler, Resume, Rücklesen und Cleanup synthetisch belegt; Live blieb unverändert |
-| Startpartner Gate-2-Schema | E2 | versionierte Kette `008` bis `010`, reine Runtime-Schemaprüfung, frische MariaDB 11.4, sichere Wiederholung, Fremdschlüssel, Kaskaden, Candidate-Revision und unveränderte gesperrte Tabellen |
-| Startpartner Gate-2-Domäne | E2 | 14 Dimensionen, Readiness-Blocker, State Machine, stale-write `409`, payloadgebundener Replay, Profil-Deduplizierung, Entscheidungen, Warteliste, Reservierung, Verlängerung, Soft-Stop sechs, Hard-Stop acht, atomare Projektion und Cleanup |
-| Startpartner interne Premium-UI | E2 | eigener Review-Bereich ohne neue Hauptnavigation; Status, Blocker, Hauptaktion, Fälligkeit, Bearbeiter und Kapazität bei 360×780, 390×844, 768×1024 und 1440×900; Konflikt-, Readback-, No-JS-, Modul- und API-Fehlerzustände |
-| Startpartner Staging-Lifecycle | Grenze | noch keine Gate-2-Migration oder synthetische Mutation auf Staging; E4 erst nach grünem Merge/Deploy mit `GATE2_SYNTHETIC_199_`-Identitäten und vollständigem Zero-Residue-Cleanup |
+| Startpartner Gate-2-Schema | E2/E4 | versionierte Kette `008` bis `010`, reine Runtime-Schemaprüfung, frische MariaDB 11.4 und realer Staging-Preflight auf MySQL 8.0.36; sichere Wiederholung, Fremdschlüssel, Kaskaden, Candidate-Revision und unveränderte gesperrte Tabellen belegt |
+| Startpartner Gate-2-Domäne | E2/E4 | 14 Dimensionen, Readiness-Blocker, State Machine, stale-write `409`, payloadgebundener Replay, Profil-Deduplizierung, Entscheidungen, Warteliste, Reservierung, Verlängerung, Soft-Stop sechs, begründete siebte Reservierung, Hard-Stop acht, atomare Projektion und Cleanup real auf Staging belegt |
+| Startpartner interne Premium-UI | E2/E4 | eigener Review-Bereich ohne neue Hauptnavigation; Status, Blocker, Hauptaktion, Fälligkeit, Bearbeiter und Kapazität bei 360×780, 390×844, 768×1024 und 1440×900; Konflikt-, Readback-, No-JS-, Modul- und API-Fehlerzustände sowie aktuelle Control-Center-Revision belegt |
+| Startpartner Staging-Lifecycle | E4 | finaler Lifecycle-Versuch 2 über den normalen Staging-Deploy erfolgreich: Migrationen `009`/`010`, Profilrevision, Replay, Payload-Konflikt, stale `409`, 14 Dimensionen, Entscheidung, Reservierungshistorie, Warteliste, Soft-/Hard-Stop und Control-Center-Readback; gesperrte Tabellen unverändert, Kapazität wieder null und vollständiges Zero-Residue-Cleanup. Completion-Marker und sämtliche temporären Evidence-Endpunkte wurden anschließend entfernt; beide ehemaligen URLs lieferten HTTP 404. |
 | Event-Builder-Kompatibilität | E2 | vom Control-Center-Writer erzeugte Zeitformate werden vom normalen Event-Builder verarbeitet |
 | Externe Live-Writes | Grenze | keine Live-Testschreibaktion; echte Live-Admin-Mutation nur nach ausdrücklicher Freigabe und Write-Vertrag |
 
