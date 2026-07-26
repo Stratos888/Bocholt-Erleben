@@ -20,7 +20,7 @@ $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
 $assert(
     $actualNames === $expectedNames,
-    'Startpartner muss nach dem Gate-2-Rückbau ausschließlich die kanonischen Runtime-Owner besitzen.'
+    'Startpartner muss nach Gate 2 ausschließlich die kanonischen Runtime-Owner besitzen.'
 );
 foreach ([
     'triage.php',
@@ -90,13 +90,17 @@ $assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
 
-$assert(str_contains($deploySmoke, 'def check_removed_gate2_temporary_endpoints'), 'Der erste statische Rückbau-Deploy muss beide entfernten Evidence-URLs auf HTTP 404 prüfen.');
-$assert(str_contains($deploySmoke, '/api/startpartner/gate2-staging-status-199.php'), 'Der entfernte Status-Endpunkt muss im Rückbau-Deploy negativ geprüft werden.');
-$assert(str_contains($deploySmoke, '/api/startpartner/gate2-staging-lifecycle-199.php'), 'Der entfernte Lifecycle-Endpunkt muss im Rückbau-Deploy negativ geprüft werden.');
-$assert(str_contains($deploySmoke, 'require_status(result, {404}, label)'), 'Die Rückbauprüfung muss exakt HTTP 404 verlangen.');
-$assert(!str_contains($deploySmoke, 'check_gate2_staging_cleanup_status'), 'Die frühere Diagnoseauswertung muss entfernt sein.');
-$assert(!str_contains($deploySmoke, 'gate2-cleanup-diagnostic-199.json'), 'Das temporäre Diagnose-Artefakt darf nicht mehr erzeugt werden.');
-$assert(!str_contains($deploySmoke, 'X-BE-Expected-Build'), 'Der entfernte Gate-2-Statuspfad darf keinen Build-Header mehr benötigen.');
+foreach ([
+    'gate2-staging-status-199.php',
+    'gate2-staging-lifecycle-199.php',
+    'gate2-cleanup-diagnostic-199.json',
+    'check_gate2_staging_cleanup_status',
+    'check_removed_gate2_temporary_endpoints',
+    'GATE2_SYNTHETIC_199_',
+    '199_gate2_staging_lifecycle_completed',
+] as $removedEvidenceToken) {
+    $assert(!str_contains($deploySmoke, $removedEvidenceToken), "Generischer Deploy-Smoke enthält noch temporäre Gate-2-Evidence: {$removedEvidenceToken}");
+}
 
 $assert(!str_contains($contract, 'BE_STARTPARTNER_RETENTION_REVIEW_DAYS'), 'Gate 1 darf keine juristisch ungeklärte Aufbewahrungsdauer fest verdrahten.');
 $assert(!preg_match('/RETENTION[^\n]*180|180[^\n]*RETENTION/i', $contract), 'Gate 1 darf 180 Tage nicht als Aufbewahrungsregel codieren.');

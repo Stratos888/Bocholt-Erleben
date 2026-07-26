@@ -379,27 +379,6 @@ def check_push_endpoints_protected(base_url: str) -> None:
     )
 
 
-def check_removed_gate2_temporary_endpoints(base_url: str) -> None:
-    if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
-        return
-
-    endpoints = [
-        (
-            "/api/startpartner/gate2-staging-status-199.php",
-            "Entfernter Gate-2-Status-Endpunkt",
-        ),
-        (
-            "/api/startpartner/gate2-staging-lifecycle-199.php",
-            "Entfernter Gate-2-Lifecycle-Endpunkt",
-        ),
-    ]
-    for path, label in endpoints:
-        result = request_url(build_url(base_url, path), timeout=20)
-        require_status(result, {404}, label)
-
-    print("✅ Gate-2-Evidence-Endpunkte: beide URLs liefern HTTP 404")
-
-
 def run(args: argparse.Namespace) -> None:
     base_url = normalize_base_url(args.base_url)
 
@@ -420,7 +399,6 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_checkout_validation(base_url),
         lambda: check_review_endpoint_protected(base_url),
         lambda: check_push_endpoints_protected(base_url),
-        lambda: check_removed_gate2_temporary_endpoints(base_url),
     ]
 
     print(f"=== Deploy-Smoke-Check: {base_url} ===")
