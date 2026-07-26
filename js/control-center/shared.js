@@ -28,7 +28,7 @@ export const els = {
 };
 
 export const reviewLabels = {
-  all: 'Alle', new_content: 'Neue Inhalte', quality: 'Qualität', provider: 'Anbieter',
+  all: 'Alle', startpartner: 'Startpartner', new_content: 'Neue Inhalte', quality: 'Qualität', provider: 'Anbieter',
   approvals: 'Freigaben', system: 'System', other: 'Sonstige',
 };
 
@@ -91,7 +91,8 @@ export async function api(path, options = {}) {
     if (!response.ok && !(allowAccepted && response.status === 202)) {
       const error = new Error(payload.message || 'Anfrage fehlgeschlagen.');
       error.status = response.status;
-      error.data = payload.data || null;
+      error.data = payload.data || payload.current || null;
+      error.code = payload.code || '';
       throw error;
     }
     return payload.data || {};
@@ -132,7 +133,12 @@ export function fact(label, content, url = '') {
 }
 
 export function caseIsReviewVisible(item, now = new Date()) {
-  if (!item || ['done','rejected','parked','information'].includes(item.state)) return false;
+  if (!item) return false;
+  if (item.case_kind === 'startpartner_candidate') {
+    const status = item.startpartner_candidate?.status || item.decision_context?.candidate_status || '';
+    return !['routed_to_regular_product','rejected','withdrawn','expired'].includes(status);
+  }
+  if (['done','rejected','parked','information'].includes(item.state)) return false;
   if (item.state !== 'snoozed') return true;
   if (!item.snoozed_until) return false;
   const deadline = new Date(String(item.snoozed_until).replace(' ', 'T'));

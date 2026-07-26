@@ -43,10 +43,13 @@ validate_php_tests() {
   done
   php tests/startpartner_domain_contract_test.php
   php tests/startpartner_side_effect_contract_test.php
+  php tests/startpartner_gate2_domain_contract_test.php
+  php tests/startpartner_gate2_side_effect_contract_test.php
 }
 
 validate_startpartner_mysql() {
   bash tests/run_startpartner_mysql_contract.sh
+  bash tests/run_startpartner_gate2_mysql_contract.sh
 }
 
 validate_backend() {

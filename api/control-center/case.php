@@ -3,6 +3,7 @@ declare(strict_types=1);
 require __DIR__ . '/_domain.php';
 require_once __DIR__ . '/_content_source.php';
 require_once __DIR__ . '/_editorial_contracts.php';
+require_once dirname(__DIR__) . '/startpartner/_gate2_domain.php';
 be_require_review_access();
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') { header('Allow: GET'); be_json_response(405, ['status'=>'error','message'=>'Method not allowed.']); }
 function be_cc_safe_description_suggestion(array $event): string {
@@ -17,6 +18,19 @@ try {
     be_cc_require_schema(); $id=trim((string)($_GET['id']??'')); if($id==='')throw new InvalidArgumentException('Case id is required.');
     $stmt=be_db()->prepare('SELECT * FROM control_cases WHERE id = :id'); $stmt->execute(['id'=>$id]); $row=$stmt->fetch(); if(!$row)throw new RuntimeException('Case not found.');
     $item=be_cc_case_from_row($row); $payload=json_decode((string)($row['source_payload_json']??''),true); $payload=is_array($payload)?$payload:[];
+    if((string)($row['source_system']??'')==='startpartner_candidate'){
+        $candidateId=trim((string)($row['object_id']??$payload['candidate_id']??$row['source_reference']??''));
+        if($candidateId==='')throw new RuntimeException('Startpartner candidate reference is missing.');
+        $candidate=be_startpartner_gate2_candidate_detail(be_db(),$candidateId,true);
+        $item['startpartner_candidate']=$candidate;
+        $item['decision_context']=array_merge((array)($item['decision_context']??[]),[
+            'candidate_id'=>$candidate['id'],'candidate_status'=>$candidate['status'],
+            'candidate_revision'=>$candidate['revision'],'readiness'=>$candidate['readiness'],
+            'capacity'=>$candidate['capacity'],'assigned_to'=>$candidate['assigned_to'],
+            'next_review_at'=>$candidate['next_review_at'],
+        ]);
+        $item['decision_ready']=(bool)($candidate['readiness']['ready']??false);
+    }
     if((string)($row['source_system']??'')==='inbox_feed'){
         $review=be_cc_event_candidate_review_contract($payload); $item['review_contract']=$review; $item['decision_context']['review_contract']=$review; $item['decision_ready']=(bool)($review['decision_gate']['ready']??false);
     }

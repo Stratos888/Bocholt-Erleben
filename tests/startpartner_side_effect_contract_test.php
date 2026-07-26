@@ -9,8 +9,18 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
     }
 };
 
+$expectedStartpartnerFiles = [
+    '_schema.php', '_contract.php', '_repository.php', '_domain.php', '_gate2_domain.php',
+    'intake.php', 'candidates.php', 'profile.php', 'qualification.php', 'action.php', 'capacity.php',
+];
 $startpartnerFiles = glob($root . '/api/startpartner/*.php') ?: [];
-$assert(count($startpartnerFiles) === 7, 'Gate 1 muss genau Schema, Contract, Repository, Domain und drei Endpunkte besitzen.');
+$actualNames = array_map('basename', $startpartnerFiles);
+sort($actualNames);
+$expectedNames = $expectedStartpartnerFiles;
+sort($expectedNames);
+$assert($actualNames === $expectedNames, 'Startpartner muss genau die kanonischen Gate-1- und Gate-2-Owner besitzen.');
+$assert(!is_file($root . '/api/startpartner/triage.php'), 'Der parallele Gate-1-Triage-Writer muss entfernt sein.');
+
 $combined = '';
 foreach ($startpartnerFiles as $file) {
     $source = (string)file_get_contents($file);
@@ -34,17 +44,37 @@ foreach ([
 
 $intake = (string)file_get_contents($root . '/api/startpartner/intake.php');
 $candidates = (string)file_get_contents($root . '/api/startpartner/candidates.php');
-$triage = (string)file_get_contents($root . '/api/startpartner/triage.php');
+$profile = (string)file_get_contents($root . '/api/startpartner/profile.php');
+$qualification = (string)file_get_contents($root . '/api/startpartner/qualification.php');
+$action = (string)file_get_contents($root . '/api/startpartner/action.php');
+$capacity = (string)file_get_contents($root . '/api/startpartner/capacity.php');
+$gate2Domain = (string)file_get_contents($root . '/api/startpartner/_gate2_domain.php');
 $contract = (string)file_get_contents($root . '/api/startpartner/_contract.php');
 $domain = (string)file_get_contents($root . '/api/startpartner/_domain.php');
 $repository = (string)file_get_contents($root . '/api/startpartner/_repository.php');
 $schema = (string)file_get_contents($root . '/api/startpartner/_schema.php');
+$controlAction = (string)file_get_contents($root . '/api/control-center/action.php');
 
 $assert(str_contains($intake, 'be_startpartner_require_gate1_environment'), 'Intake muss außerhalb Staging/Dev fail-closed sein.');
 $assert(str_contains($intake, 'be_require_review_access'), 'Gate-1-Intake muss bis zum öffentlichen Cutover vollständig geschützt sein.');
 $assert(str_contains($intake, "\$actorType = \$source === 'targeted_outreach' ? 'operator' : 'self_service'"), 'Beide Quellen müssen denselben Intake-Endpunkt mit korrektem Actor-Typ verwenden.');
-$assert(str_contains($candidates, 'be_require_review_access'), 'Kandidatenliste muss geschützt sein.');
-$assert(str_contains($triage, 'be_require_review_access'), 'Triage muss geschützt sein.');
+foreach ([
+    'candidates.php' => $candidates,
+    'profile.php' => $profile,
+    'qualification.php' => $qualification,
+    'action.php' => $action,
+    'capacity.php' => $capacity,
+] as $name => $source) {
+    $assert(str_contains($source, 'be_require_review_access'), "{$name} muss geschützt sein.");
+    $assert(str_contains($source, 'be_startpartner_require_gate1_environment'), "{$name} muss außerhalb Staging/Dev fail-closed sein.");
+}
+$assert(str_contains($profile, 'BeStartpartnerConflictException'), 'Profiländerungen müssen Konflikte als HTTP 409 behandeln.');
+$assert(str_contains($qualification, 'BeStartpartnerConflictException'), 'Qualifikationsänderungen müssen Konflikte als HTTP 409 behandeln.');
+$assert(str_contains($action, 'BeStartpartnerConflictException'), 'Fachaktionen müssen Konflikte als HTTP 409 behandeln.');
+$assert(str_contains($gate2Domain, 'expected_revision'), 'Jede Gate-2-Mutation benötigt eine erwartete Candidate-Revision.');
+$assert(str_contains($gate2Domain, 'payload_hash'), 'Gate-2-Operationen müssen payloadgebunden sein.');
+$assert(str_contains($gate2Domain, 'be_startpartner_gate2_project_control_case'), 'Control-Center-Projektion muss aus der Startpartner-Domäne erfolgen.');
+$assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate'"), 'Der generische Control-Center-Writer muss Startpartner-Fälle abweisen.');
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
 
@@ -58,7 +88,7 @@ $assert(str_contains($domain, 'be_startpartner_record_duplicate_after_race'), 'U
 
 $publicHtml = (string)file_get_contents($root . '/startpartner/index.html');
 $publicJs = (string)file_get_contents($root . '/js/startpartner-funnel.js');
-$assert(str_contains($publicHtml, 'https://formspree.io/f/mrerpwjy'), 'Öffentliche Route muss in Gate 1 bei Formspree bleiben.');
+$assert(str_contains($publicHtml, 'https://formspree.io/f/mrerpwjy'), 'Öffentliche Route muss in Gate 2 bei Formspree bleiben.');
 $assert(str_contains($publicHtml, 'startpartner_6_months_limited'), 'Öffentlicher Lead-Typ muss unverändert bleiben.');
 $assert(str_contains($publicJs, 'fetch('), 'Bestehender Formspree-Clientpfad muss unverändert vorhanden sein.');
 $assert(!str_contains($publicHtml, '/api/startpartner/intake.php'), 'Öffentliches Formular darf noch nicht auf First Party umgestellt werden.');
@@ -70,7 +100,12 @@ $manifest = json_decode(
     JSON_THROW_ON_ERROR
 );
 $files = array_column((array)($manifest['migrations'] ?? []), 'file');
-$assert(array_slice($files, -2) === ['007_runtime_schema_reconciliation.sql', '008_startpartner_candidates.sql'], 'Manifest muss Reconciliation vor Kandidatenschema ausführen.');
+$reconciliationIndex = array_search('007_runtime_schema_reconciliation.sql', $files, true);
+$candidateIndex = array_search('008_startpartner_candidates.sql', $files, true);
+$assert(
+    $reconciliationIndex !== false && $candidateIndex === $reconciliationIndex + 1,
+    'Manifest muss Reconciliation unmittelbar vor Kandidatenschema ausführen.'
+);
 
 if ($failures !== []) {
     fwrite(STDERR, "=== Startpartner Side-Effect Contract: FAILED ===\n");

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/_schema.php';
 require_once __DIR__ . '/_domain.php';
+require_once dirname(__DIR__) . '/startpartner/_gate2_domain.php';
 
 be_require_review_access();
 
@@ -45,16 +46,53 @@ function be_cc_presented_cases(array $cases): array
     return $result;
 }
 
+function be_cc_enrich_startpartner_cases(PDO $pdo, array $cases): array
+{
+    foreach ($cases as &$case) {
+        if ((string)($case['source_system'] ?? $case['source']['system'] ?? '') !== 'startpartner_candidate') continue;
+        $candidateId = trim((string)($case['object']['id'] ?? $case['object_id'] ?? $case['source']['reference'] ?? $case['source_reference'] ?? ''));
+        if ($candidateId === '') continue;
+        try {
+            $candidate = be_startpartner_gate2_candidate_detail($pdo, $candidateId, true);
+            $case['startpartner_candidate'] = $candidate;
+            $case['decision_context'] = array_merge((array)($case['decision_context'] ?? []), [
+                'candidate_id' => $candidate['id'],
+                'candidate_status' => $candidate['status'],
+                'candidate_revision' => $candidate['revision'],
+                'readiness' => $candidate['readiness'],
+                'capacity' => $candidate['capacity'],
+                'assigned_to' => $candidate['assigned_to'],
+                'next_review_at' => $candidate['next_review_at'],
+            ]);
+        } catch (RuntimeException $error) {
+            $case['startpartner_error'] = $error->getMessage();
+        }
+    }
+    unset($case);
+    return $cases;
+}
+
+function be_cc_active_review_case(array $case): bool
+{
+    if (($case['case_kind'] ?? '') === 'startpartner_candidate') {
+        $status = (string)($case['startpartner_candidate']['status'] ?? $case['decision_context']['candidate_status'] ?? '');
+        return !in_array($status, ['routed_to_regular_product','rejected','withdrawn','expired'], true);
+    }
+    return !in_array((string)($case['state'] ?? ''), ['done','rejected','information','parked'], true);
+}
+
 try {
     be_cc_ensure_schema();
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
     if ($method === 'GET') {
-        $cases = be_cc_presented_cases(be_cc_list_cases([
+        $pdo = be_db();
+        $activeRequested = trim((string)($_GET['active'] ?? '')) !== '';
+        $cases = be_cc_enrich_startpartner_cases($pdo, be_cc_presented_cases(be_cc_list_cases([
             'type' => trim((string)($_GET['type'] ?? '')),
             'state' => trim((string)($_GET['state'] ?? '')),
-            'active' => trim((string)($_GET['active'] ?? '')),
-        ]));
+        ])));
+        if ($activeRequested) $cases = array_values(array_filter($cases, 'be_cc_active_review_case'));
 
         be_json_response(200, [
             'status' => 'ok',
@@ -73,6 +111,9 @@ try {
         $sourceSystem = trim((string)($input['source_system'] ?? 'manual')) ?: 'manual';
         $sourceReference = trim((string)($input['source_reference'] ?? '')) ?: 'manual:' . be_cc_uuid();
         if ($title === '') throw new InvalidArgumentException('Title is required.');
+        if ($sourceSystem === 'startpartner_candidate') {
+            throw new DomainException('Startpartner-Projektionen werden ausschließlich durch die Startpartner-Domäne angelegt.');
+        }
 
         $id = be_cc_uuid();
         $pdo = be_db();
