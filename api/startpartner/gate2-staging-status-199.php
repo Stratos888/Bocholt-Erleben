@@ -4,16 +4,9 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/_bootstrap.php';
 
 const BE_GATE2_STATUS_TOKEN_HASH = '921e687a88b06ddb2124766a0be0c43e5875309c393f3ed91219470100053243';
-const BE_GATE2_MIGRATION_LOCK = 'bocholt_erleben_gate2_migration_199';
 const BE_GATE2_MIGRATIONS = [
-    '009' => [
-        'key' => '009_control_center_runtime_schema',
-        'file' => '009_control_center_runtime_schema.sql',
-    ],
-    '010' => [
-        'key' => '010_startpartner_gate2_qualification_capacity',
-        'file' => '010_startpartner_gate2_qualification_capacity.sql',
-    ],
+    '009' => '009_control_center_runtime_schema',
+    '010' => '010_startpartner_gate2_qualification_capacity',
 ];
 
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -75,179 +68,7 @@ function be_gate2_status_migration_count(PDO $pdo, string $migrationKey): int
     );
 }
 
-function be_gate2_status_split_sql(string $sql): array
-{
-    $statements = [];
-    $buffer = '';
-    $quote = null;
-    $lineComment = false;
-    $blockComment = false;
-    $length = strlen($sql);
-
-    for ($index = 0; $index < $length; $index++) {
-        $char = $sql[$index];
-        $next = $index + 1 < $length ? $sql[$index + 1] : '';
-
-        if ($lineComment) {
-            if ($char === "\n") {
-                $lineComment = false;
-                $buffer .= "\n";
-            }
-            continue;
-        }
-        if ($blockComment) {
-            if ($char === '*' && $next === '/') {
-                $blockComment = false;
-                $index++;
-            }
-            continue;
-        }
-        if ($quote !== null) {
-            $buffer .= $char;
-            if ($char === '\\' && $next !== '') {
-                $buffer .= $next;
-                $index++;
-                continue;
-            }
-            if ($char === $quote) {
-                if ($next === $quote && $quote !== '`') {
-                    $buffer .= $next;
-                    $index++;
-                    continue;
-                }
-                $quote = null;
-            }
-            continue;
-        }
-
-        if ($char === '-' && $next === '-' && ($index + 2 >= $length || ctype_space($sql[$index + 2]))) {
-            $lineComment = true;
-            $index++;
-            continue;
-        }
-        if ($char === '#') {
-            $lineComment = true;
-            continue;
-        }
-        if ($char === '/' && $next === '*') {
-            $blockComment = true;
-            $index++;
-            continue;
-        }
-        if ($char === "'" || $char === '"' || $char === '`') {
-            $quote = $char;
-            $buffer .= $char;
-            continue;
-        }
-        if ($char === ';') {
-            $statement = trim($buffer);
-            if ($statement !== '') {
-                $statements[] = $statement;
-            }
-            $buffer = '';
-            continue;
-        }
-        $buffer .= $char;
-    }
-
-    $statement = trim($buffer);
-    if ($statement !== '') {
-        $statements[] = $statement;
-    }
-    return $statements;
-}
-
-function be_gate2_status_execute_statement(PDO $pdo, string $sql): void
-{
-    $statement = $pdo->prepare($sql);
-    try {
-        $statement->execute();
-        do {
-            if ($statement->columnCount() > 0) {
-                $statement->fetchAll(PDO::FETCH_NUM);
-            }
-        } while ($statement->nextRowset());
-    } finally {
-        $statement->closeCursor();
-    }
-}
-
-function be_gate2_status_apply_migration(PDO $pdo, string $filename): array
-{
-    $path = dirname(__DIR__) . '/sql/' . $filename;
-    $sql = file_get_contents($path);
-    if (!is_string($sql) || trim($sql) === '') {
-        throw new RuntimeException('Migration could not be read: ' . $filename);
-    }
-
-    $statements = be_gate2_status_split_sql($sql);
-    foreach ($statements as $statement) {
-        be_gate2_status_execute_statement($pdo, $statement);
-    }
-    return ['file' => $filename, 'statements' => count($statements)];
-}
-
-function be_gate2_status_release_lock(PDO $pdo): void
-{
-    $statement = $pdo->prepare('SELECT RELEASE_LOCK(:lock_name)');
-    $statement->execute(['lock_name' => BE_GATE2_MIGRATION_LOCK]);
-    be_gate2_status_scalar($statement);
-}
-
 $pdo = be_db();
-$migrationAction = $deployAuthorized ? 'already_applied' : 'read_only';
-$appliedMigrations = [];
-$lockAcquired = false;
-
-try {
-    if ($deployAuthorized) {
-        if (be_gate2_status_migration_count($pdo, '008_startpartner_candidates') !== 1) {
-            throw new RuntimeException('Required migration 008_startpartner_candidates is not registered.');
-        }
-
-        $lockStatement = $pdo->prepare('SELECT GET_LOCK(:lock_name, 0)');
-        $lockStatement->execute(['lock_name' => BE_GATE2_MIGRATION_LOCK]);
-        $lockAcquired = (int)be_gate2_status_scalar($lockStatement) === 1;
-        if (!$lockAcquired) {
-            throw new RuntimeException('Gate-2 migration lock is already held.');
-        }
-
-        foreach (BE_GATE2_MIGRATIONS as $migration) {
-            if (be_gate2_status_migration_count($pdo, $migration['key']) === 1) {
-                continue;
-            }
-            $appliedMigrations[] = be_gate2_status_apply_migration($pdo, $migration['file']);
-            if (be_gate2_status_migration_count($pdo, $migration['key']) !== 1) {
-                throw new RuntimeException('Migration was not registered after execution: ' . $migration['key']);
-            }
-        }
-        if ($appliedMigrations !== []) {
-            $migrationAction = 'applied';
-        }
-    }
-} catch (Throwable $error) {
-    if ($lockAcquired) {
-        try {
-            be_gate2_status_release_lock($pdo);
-        } catch (Throwable) {
-        }
-    }
-    be_json_response(500, [
-        'status' => 'ERROR',
-        'workpack_issue' => 199,
-        'environment' => be_app_env_value(),
-        'deployed_build' => $deployedBuild,
-        'migration_action' => $migrationAction,
-        'applied_migrations' => $appliedMigrations,
-        'error_message' => $error->getMessage(),
-        'checked_at' => gmdate(DateTimeInterface::ATOM),
-    ]);
-}
-
-if ($lockAcquired) {
-    be_gate2_status_release_lock($pdo);
-}
-
 $prefix = 'GATE2_SYNTHETIC_199_%';
 $operationPrefix = 'gate2:199:staging-%';
 $candidateSubquery = 'candidate_id IN (
@@ -255,8 +76,8 @@ $candidateSubquery = 'candidate_id IN (
 )';
 
 $migrations = [];
-foreach (BE_GATE2_MIGRATIONS as $number => $migration) {
-    $migrations[$number] = be_gate2_status_migration_count($pdo, $migration['key']);
+foreach (BE_GATE2_MIGRATIONS as $number => $migrationKey) {
+    $migrations[$number] = be_gate2_status_migration_count($pdo, $migrationKey);
 }
 
 $residue = [
@@ -298,8 +119,8 @@ be_json_response($status === 'PASS' ? 200 : 409, [
     'workpack_issue' => 199,
     'environment' => be_app_env_value(),
     'deployed_build' => $deployedBuild,
-    'migration_action' => $migrationAction,
-    'applied_migrations' => $appliedMigrations,
+    'migration_action' => 'read_only',
+    'applied_migrations' => [],
     'migrations' => $migrations,
     'residue' => $residue + ['total' => $totalResidue],
     'missing_tables' => $missingTables,
