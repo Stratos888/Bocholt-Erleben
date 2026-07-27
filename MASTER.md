@@ -1,6 +1,6 @@
 # MASTER – Produkt-Nordstern Bocholt erleben
 
-Stand: 2026-07-27  
+Stand: 2026-07-27
 Status: stabiler strategischer Produktvertrag, kein Projektstatus
 
 ## 1. Produktauftrag
