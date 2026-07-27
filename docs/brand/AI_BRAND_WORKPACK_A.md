@@ -1,7 +1,7 @@
 # AI-Markenentwicklung – Workpack A
 
-Stand: 2026-07-27  
-Status: Richtungs-Gate vorbereitet; zwei qualifizierte Richtungen, noch keine Auswahl  
+Stand: 2026-07-27
+Status: Richtungs-Gate vorbereitet; zwei qualifizierte Richtungen, noch keine Auswahl
 Issue: #225
 
 ## 1. Geschlossenes Strategie-Gate

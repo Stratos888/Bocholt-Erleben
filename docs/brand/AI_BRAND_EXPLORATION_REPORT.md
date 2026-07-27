@@ -1,7 +1,7 @@
 # AI-Markenexploration – Prüf- und Verwerfungsbericht
 
-Stand: 2026-07-27  
-Workpack: #225  
+Stand: 2026-07-27
+Workpack: #225
 Status: zwei Richtungen für das Richtungs-Gate qualifiziert
 
 ## 1. Untersuchte Architekturklassen
@@ -53,8 +53,8 @@ Untersucht wurden flache B-Formen, offene B-Konturen und eine radikale Reduktion
 - Accessibility / Robustheit: 4/5
 - Konstruktion / Provenienz: 4/5
 
-**Stärke:** sehr stabile Kleinform, direkte Namensbindung und ruhige digitale Wirkung.  
-**Risiko:** der B/e- und Einzelbuchstabenraum ist stark besetzt. Die konkrete Geometrie benötigt nach der Richtungswahl einen vertieften Bildähnlichkeitspreflight.  
+**Stärke:** sehr stabile Kleinform, direkte Namensbindung und ruhige digitale Wirkung.
+**Risiko:** der B/e- und Einzelbuchstabenraum ist stark besetzt. Die konkrete Geometrie benötigt nach der Richtungswahl einen vertieften Bildähnlichkeitspreflight.
 **Knock-out:** keiner im aktuellen Richtungsstand.
 
 ### B – Direktwort — 83/100
@@ -68,11 +68,11 @@ Untersucht wurden flache B-Formen, offene B-Konturen und eine radikale Reduktion
 - Accessibility / Robustheit: 5/5
 - Konstruktion / Provenienz: 5/5
 
-**Stärke:** kein erzwungenes Symbol; der vollständige Name trägt App-Icon, Header und Kommunikation konsistent.  
-**Risiko:** `Bocholt erleben` ist sprachlich beschreibend und wird im Umfeld auch als allgemeine Formulierung verwendet. Die individuelle typografische Ausarbeitung muss deshalb den Abstand tragen; die kleine `b`-Form ist bewusst nur ein technisches Derivat.  
+**Stärke:** kein erzwungenes Symbol; der vollständige Name trägt App-Icon, Header und Kommunikation konsistent.
+**Risiko:** `Bocholt erleben` ist sprachlich beschreibend und wird im Umfeld auch als allgemeine Formulierung verwendet. Die individuelle typografische Ausarbeitung muss deshalb den Abstand tragen; die kleine `b`-Form ist bewusst nur ein technisches Derivat.
 **Knock-out:** keiner im aktuellen Richtungsstand.
 
-## 4. Begrenzder Ähnlichkeits-Preflight
+## 4. Begrenzter Ähnlichkeits-Preflight
 
 - Der Markt enthält zahlreiche B-, BE- und B/e-Monogramme. Richtung A wird deshalb nicht als bereits einzigartig oder schutzfähig bezeichnet.
 - Stacked- und responsive Wortmarken sind ein verbreitetes Markensystem. Richtung B stützt ihre Erkennung auf den vollständigen Namen, die exakte Typografie, die Farbrollen und das konsequente Layout – nicht auf die Behauptung eines neuartigen Einzelzeichens.
