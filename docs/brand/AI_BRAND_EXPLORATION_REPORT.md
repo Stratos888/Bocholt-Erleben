@@ -1,7 +1,7 @@
 # AI-Markenexploration – interner Prüfbericht
 
-Stand: 2026-07-27  
-Workpack: #225  
+Stand: 2026-07-27
+Workpack: #225
 Status: Exploration eröffnet; noch keine Richtung freigegeben
 
 ## 1. Zweck
