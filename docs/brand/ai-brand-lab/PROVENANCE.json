@@ -1,0 +1,53 @@
+{
+  "workpack_issue": 224,
+  "design_owner": "ChatGPT",
+  "external_designer_used": false,
+  "stock_graphics_used": false,
+  "image_generation_used_for_final_assets": false,
+  "construction": "deterministic SVG geometry and outlined wordmarks",
+  "fonts_used_as_outline_sources": [
+    {
+      "name": "Inter Display",
+      "files_not_distributed": true
+    },
+    {
+      "name": "Lato",
+      "files_not_distributed": true
+    }
+  ],
+  "legal_status": "not cleared or approved for public use",
+  "assets": [
+    {
+      "path": "candidates/a/icon-mono.svg",
+      "sha256": "1778e8d0863271034d50d55db9aefcbc2008b7a4de2731564a1101bbd44fec2d"
+    },
+    {
+      "path": "candidates/a/icon.svg",
+      "sha256": "622da6e8b0aaee9365a44c55f6988f220fc6504d434ccf41429625ed75a7c2e4"
+    },
+    {
+      "path": "candidates/a/lockup-mono.svg",
+      "sha256": "1468e8c9eba94484f226ddba78c594b6ac63f328d4c3929951bfd129f19ba7c0"
+    },
+    {
+      "path": "candidates/a/lockup.svg",
+      "sha256": "52f3e0c93ec82885f6bf0f856b0e50080d92ccc2b3e7eb788d8910a65b386324"
+    },
+    {
+      "path": "candidates/b/icon-mono.svg",
+      "sha256": "e61d865069a0edfd59f55d2978f53a8835cfb6dfe855cca06b4575c188078c86"
+    },
+    {
+      "path": "candidates/b/icon.svg",
+      "sha256": "93b7527b44f63df8bd125851a8009213045101c90a0f4a7fc3f18e5dbc415e74"
+    },
+    {
+      "path": "candidates/b/lockup-mono.svg",
+      "sha256": "897ec924800543fa23d8ee5e8233e3d51e38fedc2fe4839a38ad015b61646f06"
+    },
+    {
+      "path": "candidates/b/lockup.svg",
+      "sha256": "97f754c5a034506db705c24c12591399c481b5fb89eab2afc39fbe7b7f70efc7"
+    }
+  ]
+}
