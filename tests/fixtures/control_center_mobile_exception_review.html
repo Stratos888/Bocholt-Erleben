@@ -39,10 +39,19 @@
     };
     const dimensions=['local_relevance','organization_contact','content_sources','editorial_fit','content_leverage','reach_leverage','user_need','maintenance_capability','cooperation_readiness','setup_effort','support_effort','regular_path','legal_technical','required_information'];
     const qualificationRows=(blocked=false)=>dimensions.map((dimension,index)=>({dimension,assessment:blocked&&index===0?'weak':(index<4||index>11?'adequate':'weak'),reason:`Begründung ${dimension}`,evidence_text:`Evidence ${dimension}`,operator_reference:'Fixture',evaluated_at:'2026-07-25 14:00:00',revision:1}));
+    const gate3State=(complete=false)=>complete?{
+      complete:true,blockers:[],
+      terms_acceptance:{id:301,terms_version:'pilot-terms-v1',terms_reference:'repo://pilot-terms-v1',terms_digest:'a'.repeat(64),accepting_person:'Erika Beispiel',accepting_organization:'GATE3_SYNTHETIC_Bocholt Kulturverein',accepted_at:'2026-07-27 20:00:00',confirmation_channel:'operator_recorded'},
+      organizer:{id:401,organization_name:'GATE3_SYNTHETIC_Bocholt Kulturverein',email:'erika@example.org'},
+      pilot:{id:'23100000-0000-4000-8000-000000000001',status:'onboarding',revision:1},
+      scopes:[{scope_key:'events',limit_value:8,is_unlimited:false,period_unit:'pilot_month'},{scope_key:'activities',limit_value:1,is_unlimited:false,period_unit:'concurrent'}],
+      entitlement:{id:'23100000-0000-4000-8000-000000000002',status:'pending_activation',starts_at:null,ends_at:null},
+      events:[{event_type:'gate3_pilot_created',actor_reference:'M. Muster',created_at:'2026-07-27 20:01:00'}],
+    }:{complete:false,terms_acceptance:null,organizer:null,pilot:null,scopes:[],entitlement:null,events:[],blockers:[{code:'terms_confirmation_required',message:'Pilotbedingungen müssen ausdrücklich bestätigt und einem Organizer zugeordnet werden.'}]};
     const startpartner=(status,options={})=>{
       const blocked=Boolean(options.blocked);const active=Number(options.active??2);const hard=Boolean(options.hard);const soft=Boolean(options.soft);
       return {
-        id:'19900000-0000-0000-0000-000000009999',organization_name:'GATE2_SYNTHETIC_199_Bocholt Kulturverein',source:'targeted_outreach',
+        id:'19900000-0000-0000-0000-000000009999',organization_name:options.gate3Complete?'GATE3_SYNTHETIC_Bocholt Kulturverein':'GATE2_SYNTHETIC_199_Bocholt Kulturverein',source:'targeted_outreach',
         desired_content_scope:'both',status,revision:Number(options.revision||4),assigned_to:'M. Muster',next_review_at:'2026-08-02 10:00:00',
         website_url:'https://example.org/startpartner',description_text:'Lokaler Kulturverein mit regelmäßigem Event- und Aktivitätsangebot.',
         contacts:[{contact_name:'Erika Beispiel',contact_role:'Vorstand',email:'erika@example.org',phone:'02871 12345',is_primary:true}],
@@ -53,13 +62,14 @@
         waitlist:options.waitlisted?{eligibility_reason:'Fachlich geeignet.',priority_reason:'Hoher lokaler Mehrwert.',next_review_at:'2026-08-15 10:00:00',contact_status:'paused',regular_alternative:'Reguläres Sichtbarkeitspaket'}:null,
         decision:options.reserved?{result:'accepted_pending_terms',reason:'Gute fachliche Passung.'}:options.waitlisted?{result:'waitlisted',reason:'Kapazität derzeit ausgeschöpft.',regular_alternative:'Reguläres Sichtbarkeitspaket'}:null,
         events:[{event_type:'candidate_created',actor_reference:'Fixture',created_at:'2026-07-25 12:00:00'},{event_type:'qualifications_updated',actor_reference:'M. Muster',created_at:'2026-07-25 14:00:00'}],
+        gate3:gate3State(Boolean(options.gate3Complete)),
       };
     };
     const startpartnerItem=(data,primary,secondary=[])=>({
       id:'fixture-startpartner',type:'intake',queue_group:'startpartner',case_kind:'startpartner_candidate',state:data.status==='waitlisted'?'parked':data.status==='decision_ready'?'decision_required':'in_progress',
-      title:`Startpartner prüfen: ${data.organization_name}`,display_status:data.status==='accepted_pending_terms'?'Platz reserviert · Bedingungen offen':data.status==='decision_ready'?'Entscheidungsreif':data.status==='waitlisted'?'Warteliste':data.status==='qualifying'?'Qualifizierung':'Neu',
+      title:`Startpartner prüfen: ${data.organization_name}`,display_status:data.gate3?.complete?'Pilot-Onboarding':data.status==='accepted_pending_terms'?'Platz reserviert · Bedingungen offen':data.status==='decision_ready'?'Entscheidungsreif':data.status==='waitlisted'?'Warteliste':data.status==='qualifying'?'Qualifizierung':'Neu',
       primary_action:primary,secondary_actions:[...secondary,{key:'details',label:'Audit und Rohdaten'}],startpartner_candidate:data,
-      decision_context:{candidate_id:data.id,candidate_status:data.status,candidate_revision:data.revision,readiness:data.readiness,capacity:data.capacity,assigned_to:data.assigned_to,next_review_at:data.next_review_at},
+      decision_context:{candidate_id:data.id,candidate_status:data.status,candidate_revision:data.revision,readiness:data.readiness,capacity:data.capacity,assigned_to:data.assigned_to,next_review_at:data.next_review_at,gate3:data.gate3},
       source:{system:'startpartner_candidate',reference:data.id},object:{id:data.id,title:data.organization_name,type:'startpartner_candidate'},
     });
 
@@ -70,7 +80,8 @@
       if(scenario==='startpartner-ready')item=startpartnerItem(startpartner('decision_ready',{active:4}),{key:'accept_pending_terms',label:'Platz reservieren'},[{key:'waitlist',label:'Auf Warteliste setzen'},{key:'route_regular',label:'Regulären Weg wählen'}]);
       if(scenario==='startpartner-soft')item=startpartnerItem(startpartner('decision_ready',{active:6,soft:true}),{key:'accept_pending_terms',label:'Platz reservieren'},[{key:'waitlist',label:'Auf Warteliste setzen'}]);
       if(scenario==='startpartner-hard')item=startpartnerItem(startpartner('decision_ready',{active:8,hard:true}),{key:'waitlist',label:'Auf Warteliste setzen'},[{key:'route_regular',label:'Regulären Weg wählen'}]);
-      if(scenario==='startpartner-reserved')item=startpartnerItem(startpartner('accepted_pending_terms',{active:5,reserved:true}),{key:'extend_reservation',label:'Reservierung prüfen'},[{key:'release_reservation',label:'Reservierung freigeben',destructive:true}]);
+      if(scenario==='startpartner-reserved')item=startpartnerItem(startpartner('accepted_pending_terms',{active:5,reserved:true}),{key:'confirm_pilot_terms',label:'Bedingungen bestätigen und Pilot anlegen'},[{key:'extend_reservation',label:'Reservierung verlängern'},{key:'release_reservation',label:'Reservierung freigeben',destructive:true}]);
+      if(scenario==='startpartner-gate3-complete')item=startpartnerItem(startpartner('accepted_pending_terms',{active:5,reserved:true,gate3Complete:true,revision:5}),{key:'details',label:'Pilotstatus prüfen'},[{key:'edit_profile',label:'Profil bearbeiten'}]);
       if(scenario==='startpartner-waitlisted')item=startpartnerItem(startpartner('waitlisted',{active:8,hard:true,waitlisted:true}),{key:'update_waitlist',label:'Warteliste aktualisieren'},[{key:'start_qualification',label:'Neu qualifizieren'}]);
       if(scenario==='startpartner-mutation')item=startpartnerItem(startpartner('new',{active:2,revision:1}),{key:'start_prequalification',label:'Vorqualifizierung starten'},[]);
     }else if (scenario === 'ready') {
