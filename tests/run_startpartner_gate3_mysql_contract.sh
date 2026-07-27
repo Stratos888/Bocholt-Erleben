@@ -62,12 +62,20 @@ run_engine() {
       "$image" >/dev/null
   fi
 
+  ready_check() {
+    docker exec "$container" "$client" --protocol=TCP -h127.0.0.1 \
+      -uroot -pcontract-root -Nse 'SELECT 1' be_contract >/dev/null 2>&1
+  }
+
   for attempt in {1..90}; do
-    if docker exec "$container" "$client" -uroot -pcontract-root -Nse 'SELECT 1' be_contract >/dev/null 2>&1; then
-      break
+    if ready_check; then
+      sleep 2
+      if ready_check; then
+        break
+      fi
     fi
     if [ "$attempt" -eq 90 ]; then
-      printf '%s\n' "${engine} contract container did not become ready." >&2
+      printf '%s\n' "${engine} contract container did not become stably ready." >&2
       docker logs "$container" >&2 || true
       return 1
     fi
@@ -77,7 +85,8 @@ run_engine() {
   apply_sql() {
     local file="$1"
     printf '[%s] Applying %s\n' "$engine" "$file"
-    docker exec -i "$container" "$client" -uroot -pcontract-root be_contract < "$file"
+    docker exec -i "$container" "$client" --protocol=TCP -h127.0.0.1 \
+      -uroot -pcontract-root be_contract < "$file"
   }
 
   for file in \
