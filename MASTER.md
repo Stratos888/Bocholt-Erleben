@@ -53,7 +53,7 @@ Das Produkt soll wirken:
 - `Produktvertrag.md` definiert bereits gültige Produktmechanik.
 - `COMMERCIAL_STRATEGY.md` begründet das kommerzielle Modell.
 - `ROADMAP.md` priorisiert die Produktentwicklung.
-- `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md` definiert Zielarchitektur, Beschaffung, Qualitätsgates, Rechte und Integrationsgrenze der zukünftigen Markenidentität; er beschreibt keine bereits umgesetzte öffentliche Marke.
+- `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md` definiert Zielarchitektur, Beschaffung, Qualitätsgates, Rechte und Integrationsgrenze der zukünftigen Markenidentität; er gibt keine bereits umgesetzte oder freigegebene öffentliche Markenänderung vor.
 - Fachliche Zielzustandsdateien beschreiben beschlossene, noch nicht zwingend umgesetzte Zukunft.
 - `CURRENT_WORKPACK.md` steuert ausschließlich die aktuelle Umsetzung.
 
