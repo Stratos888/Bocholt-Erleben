@@ -25,7 +25,7 @@ Das weitere Vorgehen wurde deshalb auf einen Champion-Challenger-Funnel korrigie
 2. Intern werden nur Zeichenarchitekturen gegeneinander geprüft.
 3. Ein Challenger wird nur präsentiert, wenn er den Champion in mindestens einer tragenden Dimension übertrifft und keinen neuen Knock-out einführt.
 4. Keine zweite Richtung wird zur bloßen Erzeugung einer Auswahl gezeigt.
-5. Der Product Owner erhält genau ein Freigabe-Gate: Champion weiterführen oder wegen eines konkreten Knock-outs zurückweisen.
+5. Der Product Owner erhält genau ein Freigabe-Gate: Champion weiterführen oder wegen eines konkret benannten Knock-outs zurückweisen.
 
 ## 3. Ergebnis des Funnels
 
