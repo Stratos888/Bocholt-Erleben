@@ -6,7 +6,7 @@ Dieses Verzeichnis besitzt den geschützten First-Party-Kandidatenprozess und di
 
 Alle Endpunkte sind review-geschützt und staging-/dev-orientiert. Sie senden keine Mail, erzeugen keine Magic-Link- oder Portal-Session, rufen Stripe nicht auf, erzeugen keine Submission und veröffentlichen keine Inhalte.
 
-Gate 3 darf einen Organizer deterministisch verknüpfen oder neu anlegen. Diese Organizer-Anlage bleibt Bestandteil derselben atomaren internen Transaktion und besitzt noch keine Portal- oder Kommunikationswirkung.
+Gate 3 darf einen Organizer deterministisch verknüpfen oder neu anlegen. Diese Organizer-Anlage bleibt Bestandteil derselben atomaren internen Transaktion und besitzt noch keine Portal- oder Kommunikationswirkung. Ausschließlich `_gate3_domain.php` besitzt diesen Organizer-Insert; der kanonische Startpartner-Side-Effect-Vertrag verbietet ihn weiterhin in allen anderen Runtime-Dateien und hält Mail-, Session-, Stripe-, Submission-, reguläre Entitlement- und Consumption-Writes gesperrt.
 
 ## Source of Truth
 
