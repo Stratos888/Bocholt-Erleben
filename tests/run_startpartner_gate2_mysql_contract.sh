@@ -52,10 +52,12 @@ python3 - <<'PY'
 import json
 from pathlib import Path
 manifest = json.loads(Path('api/sql/000_manifest.json').read_text(encoding='utf-8'))
-expected = [f'{number:03d}' for number in range(1, 11)]
+expected_prefix = [f'{number:03d}' for number in range(1, 11)]
 actual = [entry['key'][:3] for entry in manifest['migrations']]
-if actual != expected:
-    raise SystemExit(f'Unexpected migration order: {actual}')
+if actual[:len(expected_prefix)] != expected_prefix:
+    raise SystemExit(f'Unexpected Gate-2 migration prefix: {actual}')
+if len(actual) != len(set(actual)):
+    raise SystemExit(f'Duplicate migration numbers: {actual}')
 for entry in manifest['migrations']:
     path = Path('api/sql') / entry['file']
     if not path.is_file():
@@ -127,7 +129,7 @@ for file in \
   apply_sql "$file"
 done
 
-# The complete idempotent owner chain must be safely repeatable.
+# The complete Gate-2 idempotent owner chain must be safely repeatable.
 for file in \
   api/sql/007_runtime_schema_reconciliation.sql \
   api/sql/008_startpartner_candidates.sql \
