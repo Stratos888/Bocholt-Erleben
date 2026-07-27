@@ -1,25 +1,47 @@
-# Markenidentität – Zielvertrag und belastbarer Lieferweg
+# Markenidentität – AI-first Zielvertrag und Produktionsweg
 
 Stand: 2026-07-27
-Status: angenommener Zielzustand; noch nicht beauftragt oder umgesetzt
-Operativer Owner bei Umsetzung: jeweils genau ein aktives GitHub-Workpack
+Status: angenommener korrigierter Zielzustand; noch keine Markenrichtung ausgewählt oder umgesetzt
+Operativer Design- und Produktionsowner: ChatGPT
 
-## 1. Zweck und Geltungsgrenze
+## 1. Verbindliche Nutzeranforderung
 
-Dieses Dokument ist der kanonische Zielvertrag für die zukünftige Markenidentität von **Bocholt erleben**. Es legt fest:
+Für die zukünftige Markenidentität von **Bocholt erleben** wird kein externer Designer, kein Studio, keine Agentur, kein Marketplace-Anbieter und kein Logo-Wettbewerb beauftragt.
 
-- welche strategischen, rechtlichen und organisatorischen Fragen vor einem Designauftrag geschlossen werden;
-- welche Beschaffungs- und Produktionswege geeignet, bedingt geeignet oder ausgeschlossen sind;
-- wie Wortmarke, optionales Markenzeichen, App-Icon und visuelles System entwickelt und geprüft werden;
-- welche Entscheidungen beim Product Owner verbleiben und welche interne Facharbeit nicht als Nutzeriteration sichtbar wird;
-- welche Dateien, Nutzungsrechte, Lizenzen und technischen Nachweise vor einer Repository-Integration vorliegen müssen;
-- wie die spätere Implementierung vom externen Markendesign getrennt wird.
+ChatGPT übernimmt als fachlicher Lead:
 
-Dieses Dokument ist **keine fertige Markenidentität** und gibt keine öffentliche Änderung frei. Bis zum vollständigen Abschluss aller Gates bleiben aktuelles Logo, App-Icon, Wortlaut, PWA-Assets, Fonts, Farben und UI unverändert.
+- Markenstrategie und Positionierungsübersetzung;
+- breite visuelle Exploration;
+- Auswahl und Kritik der Entwurfsrichtungen;
+- Konstruktion von Wortmarke, Markenzeichen und App-Icon;
+- Aufbau des visuellen Systems;
+- technische Produktionsdateien und Derivate;
+- Qualitäts-, Größen-, Masken-, Kontrast- und Produktprüfung;
+- Vorbereitung der späteren Repository-Integration.
 
-## 2. Belegter Ausgangspunkt
+Der Product Owner liefert Produktwissen, entscheidet an klar begrenzten Gates und erteilt die finale Freigabe. Er übernimmt keine manuelle Zeichen-, Vektor- oder Layoutarbeit.
 
-### 2.1 Produktidentität
+Ein externer Kreativdienstleister ist auch dann kein Fallback, wenn frühe AI-Entwürfe unzureichend sind. In diesem Fall wird der AI-Prozess, die Aufgabenzerlegung oder die Suchrichtung korrigiert; ein schwaches Ergebnis wird weder veröffentlicht noch an einen Designer ausgelagert.
+
+## 2. Zweck und Geltungsgrenze
+
+Dieser Vertrag legt den belastbaren Weg fest, mit dem ChatGPT eine eigenständige, produktionsreife Markenidentität entwickelt.
+
+Er definiert:
+
+- die geeignete Kombination aus generativer Exploration und deterministischer Konstruktion;
+- die Trennung von Strategie, Entwurf, Kritik, Produktion und Integration;
+- die gleichwertig zu prüfenden Markenarchitekturen;
+- objektive Qualitäts- und Abbruchkriterien;
+- die wenigen notwendigen Nutzerentscheidungen;
+- die rechtlichen und technischen Prüfgrenzen;
+- die spätere kontrollierte Integration in das reale Produkt.
+
+Dieser Vertrag ist noch keine fertige Marke. Bis zur vollständigen Endabnahme bleiben öffentliches Logo, App-Icon, Wortlaut, Fonts, Farben, Manifest, PWA-Assets und UI unverändert.
+
+## 3. Belegter Ausgangspunkt
+
+### 3.1 Produktidentität
 
 Bocholt erleben ist eine mobile-first Plattform, die relevante Veranstaltungen, Aktivitäten und lokale Freizeitideen kuratiert, verständlich bündelt und schnell nutzbar macht.
 
@@ -42,495 +64,505 @@ Die Marke ist nicht:
 - Gaming-, Dating- oder laute Lifestyle-App;
 - Display-Werbeportal, Kleinanzeigenmarkt oder gekaufte Empfehlungsfläche.
 
-### 2.2 Bestehendes Produktsystem
+### 3.2 Bestehendes Produktsystem
 
-Der aktuelle öffentliche Header verwendet das bestehende App-Icon und die einfache Textzeile `Bocholt erleben`. Das Produkt besitzt bereits:
+Das Produkt besitzt bereits:
 
 - eine belastbare mobile-first Informationsarchitektur;
-- zentrale Farb- und Komponententokens;
-- ein einheitliches Lucide-Icon-System;
 - Today-, Event-, Activity-, Detail-, Anbieter- und Vertrauenskontexte;
-- bestehende Responsive-, Accessibility-, PWA-, Cache- und Browserverträge.
+- zentrale Farb- und Komponententokens;
+- ein einheitliches Lucide-Funktionsicon-System;
+- bestehende Responsive-, Accessibility-, PWA-, Cache- und Browserverträge;
+- einen Header mit kleinem App-Icon und der Textzeile `Bocholt erleben`.
 
-Die Markenentwicklung startet deshalb **nicht** mit einer allgemeinen Neugestaltung des Produkts. Sie entwickelt zuerst den Markenkern und integriert ihn danach kontrolliert in die vorhandenen Owner.
+Die Markenentwicklung ist deshalb kein allgemeiner UI-Neuentwurf. Sie entwickelt zuerst den Markenkern und wendet ihn anschließend auf die vorhandenen Komponenten an.
 
-### 2.3 Stadtmarke Bocholt
+### 3.3 Stadtmarke und Absender
 
-Die Stadt Bocholt besitzt seit 2024 eine eigene Stadtmarke als Place-Branding-Leitplanke. Deren belegte Stärken – unter anderem Gemeinschaft, Nähe zu den Niederlanden sowie Historie und Natur im Stadtbild – sind Kontextwissen, aber kein Baukasten für ein Produktlogo.
+Bocholt erleben bleibt ohne ausdrückliche Vereinbarung eine eigenständige Plattform. Gestaltung, Sprache und Absender dürfen keine amtliche Trägerschaft oder offizielle Kooperation suggerieren.
 
-Verbindliche Grenze:
+Wappen-, Siegel-, Rathaus-, Kirchturm-, Brücken-, Fahrrad-, Blatt- oder Landschaftsmontagen sind keine Abkürzung zu lokaler Eigenständigkeit. Lokale Relevanz soll aus Haltung, Sprache, Bildauswahl und Produktnutzen entstehen, nicht aus einer Ansammlung von Bocholt-Klischees.
 
-- Bocholt erleben bleibt ohne ausdrückliche Vereinbarung eine eigenständige Plattform;
-- Gestaltung, Sprache und Absender dürfen keine amtliche Trägerschaft oder offizielle Kooperation suggerieren;
-- Wappen-, Siegel-, Rathaus-, Kirchturm-, Brücken-, Fahrrad-, Blatt- oder Landschaftsmontagen sind keine Abkürzung zu lokaler Eigenständigkeit;
-- eine spätere formale Kooperation oder Co-Branding-Lösung benötigt einen separaten Produkt-, Rechts- und Markenvertrag.
+## 4. Korrektur der bisherigen Root Cause
 
-## 3. Root Cause der bisherigen Schleifen
+Die bisherigen Schleifen entstanden nicht, weil eine KI grundsätzlich keine Marke entwickeln kann. Der Prozess war ungeeignet:
 
-Die bisherigen Versuche haben drei Aufgaben zu früh miteinander vermischt:
+1. Ein einzelnes Bildmodell sollte gleichzeitig Strategie, Logo, Typografie, UI und Produktionsdatei lösen.
+2. Schwache Erstideen wurden zu früh als vollständige Brandboards ausgearbeitet.
+3. Rasterbilder wurden wie präzise Logos bewertet, obwohl Geometrie und Kleingrößen nicht belastbar waren.
+4. Textartefakte und dekorative Mock-ups verdeckten die tatsächliche Zeichenqualität.
+5. Entwurf und Kritik lagen in derselben unmittelbaren Generationsrunde.
+6. Ein B/e-Monogramm oder ein separates Symbol wurde zu früh als Pflicht angenommen.
+7. Reale App-Komponenten wurden durch erfundene Screens ersetzt.
 
-1. Markenstrategie und Positionierung;
-2. handwerkliche Entwicklung von Wortmarke, Zeichen und App-Icon;
-3. vollständige Produkt- und UI-Integration.
+Die Lösung ist daher nicht die Auslagerung an einen Designer, sondern eine andere AI-Architektur:
 
-Bildgenerierung und programmatisch konstruierte SVGs konnten Richtungen visualisieren, aber keine belastbare typografische und formale Markenqualität sichern. Schwache Zeichen wurden dadurch wiederholt in aufwendigen BrandLabs präsentiert und erst danach verworfen.
+```text
+Generative Breite
+-> unabhängige Kritik
+-> bewusste Auswahl
+-> deterministische Vektorkonstruktion
+-> reale Produktanwendung
+-> automatisierte und visuelle QA
+```
 
-Daraus folgt:
+## 5. Validierte AI-Produktionsarchitektur
 
-- keine weitere Logoerzeugung durch Chat, Bild-KI oder Code als Produktionsweg;
-- keine vollständige UI-Ausarbeitung, bevor ein handwerklich belastbarer Markenkern existiert;
-- viele notwendige Entwurfs- und Verwerfungsrunden finden intern beim beauftragten Designer statt;
-- der Product Owner sieht höchstens zwei fachlich kuratierte Konzepte und trifft keine Entscheidung zwischen unreifen Skizzen.
+### 5.1 Generative Modelle als Suchinstrument
 
-## 4. Zentrale Architekturentscheidung
+Bildgenerierung wird eingesetzt für:
 
-### 4.1 Wortmarke zuerst, Symbol nur bei Mehrwert
+- frühe visuelle Suchräume;
+- Form-, Rhythmus- und Typografieideen;
+- unerwartete Richtungen;
+- Bildsprache, Stimmung und Anwendungsideen;
+- schnelle Variation einer klar definierten Grundidee.
 
-Die Entwicklung ist **wordmark-first**, nicht symbol-first.
+Ein generiertes Rasterbild ist niemals automatisch der Finalmaster. Es ist Hypothese, Referenz oder Entwurfsrohstoff.
 
-Verpflichtend ist eine individuelle, hochwertige Wortmarke. Ein separates Markenzeichen ist optional und wird nur übernommen, wenn es:
+### 5.2 Deterministische Konstruktion als Produktionsstufe
 
-- die Wiedererkennbarkeit nachweislich stärkt;
-- eigenständig und nicht klischeehaft ist;
-- als App-Icon und in sehr kleinen Größen funktioniert;
-- mit der Wortmarke ein gemeinsames Formprinzip bildet;
-- keine falsche Produktkategorie oder amtliche Nähe vermittelt.
+Finale Markenelemente werden anschließend bewusst rekonstruiert:
 
-Eine reine Wortmarke ist ein vollwertiger Finalkandidat. Das App-Icon darf daraus als optisch eigenständiger typografischer Ausschnitt, Monogramm oder kompakte Systemform abgeleitet werden. Es muss nicht die gesamte Markenbotschaft erklären.
+- geometrische Zeichen als saubere SVG-Pfade oder Primitive;
+- Wortmarken als kontrollierte Typografie beziehungsweise eigens angepasste Vektorformen;
+- definierte Koordinaten, Radien, Strichstärken und optische Korrekturen;
+- reproduzierbare Rasterderivate aus einem kanonischen Master;
+- separate Kleinversionen, falls optische Größenkorrektur erforderlich ist.
 
-### 4.2 Marke ist ein System, nicht nur ein Logo
+Keine blinde Auto-Vektorisierung eines komplexen Rasterbildes wird als Finalproduktion akzeptiert.
 
-Der Zielzustand umfasst:
+### 5.3 Mehrere getrennte AI-Rollen
 
-- individuelle Wortmarke;
-- optionales Markenzeichen;
-- responsive Wort-Bild-Kombinationen;
-- App-Icon- und Kleingrößenprinzip;
-- typografische Hierarchie;
-- Farbrollen und Kontrastprinzip;
-- Bildsprache und Zuschnittlogik;
-- ein zurückhaltendes Bewegungsprinzip;
-- Tonalität und kurze Textbeispiele;
-- klare Anwendung im digitalen Produkt.
+ChatGPT arbeitet nicht in einer einzigen fortlaufenden Geschmacksrunde, sondern in klar getrennten Rollen:
 
-Die Marke darf Inhalte und Funktionen nicht verdrängen. Der Markenkern wird im Header, App-Icon, in Typografie, Farbe, Bildsprache und wenigen charakteristischen Details erkennbar – nicht durch wiederholtes Platzieren des Logos auf jeder Oberfläche.
+1. **Strategie-Owner** – definiert Produktkern, Ausschlüsse und Bewertungsmaßstab.
+2. **Divergenz-Owner** – erzeugt bewusst unterschiedliche Markenarchitekturen und viele Rohideen.
+3. **Kritik-Owner** – bewertet anonymisierte Kandidaten nur gegen den eingefrorenen Vertrag.
+4. **Reduktions-Owner** – entfernt Details, Klischees und unnötige Erklärlast.
+5. **Geometrie-Owner** – konstruiert die ausgewählten Kandidaten deterministisch neu.
+6. **Produkt-Owner** – setzt die Marke in reale App-Komponenten und echte Texte ein.
+7. **QA-Owner** – prüft Größen, Masken, Kontrast, Verwechslung, Robustheit und technische Assets.
 
-## 5. Strategische Vorentscheidung zum Namen
+Die Rollen dürfen Erkenntnisse austauschen, aber keine Bewertungskriterien nachträglich zugunsten eines Lieblingsentwurfs verändern.
 
-Vor einem kostenpflichtigen Identitätsauftrag wird die Namensfrage einmalig geschlossen. Der Name `Bocholt erleben` wird nicht beiläufig im Designprozess geändert.
+### 5.4 Externe Werkzeuge ohne externe Kreativbeauftragung
 
-### 5.1 Standardannahme
+Zulässig sind Werkzeuge, die ChatGPT im Prozess verwendet oder vorbereitet:
 
-Der bestehende Name bleibt erhalten, weil er:
+- ChatGPT Images für Generierung und gezielte Bildbearbeitung;
+- SVG-, HTML-, CSS- und Scriptkonstruktion;
+- Raster- und Maskenrendering;
+- Font- und Lizenzrecherche;
+- DPMA-, EUIPO- und WIPO-Recherche;
+- Browser- und Screenshottests;
+- Bildähnlichkeits- und Websuche;
+- Repository- und CI-Prüfungen.
 
-- die lokale Leistung unmittelbar erklärt;
-- bereits in Produkt, Domain, Suchsignalen und öffentlichen Inhalten verwendet wird;
-- keine zusätzliche Lernhürde erzeugt.
+Diese Werkzeuge übernehmen keine kreative Eigentümerschaft und ersetzen nicht die abschließende Nutzerfreigabe.
 
-### 5.2 Pflichtprüfung vor Beauftragung
+## 6. Gleichwertig zu prüfende Markenarchitekturen
 
-Zu prüfen sind:
+Vor der Exploration wird keine Formlösung als Sieger festgelegt. Mindestens diese vier Architekturen werden geprüft:
 
-- identische und ähnliche Wortmarken mit Schutzwirkung in Deutschland beziehungsweise der EU;
-- Unternehmens-, Domain-, App-, Social- und lokale Namensverwendung;
-- mögliche Verwechslung mit Stadt, Stadtmarketing, Tourismus oder anderen lokalen Absendern;
-- tatsächliche Schutz- und Durchsetzbarkeit der Wort-, Bild- oder kombinierten Marke;
-- Auswirkung einer möglichen späteren Expansion über Bocholt hinaus.
+### A. Individuelle Wortmarke ohne separates Zeichen
 
-Eine interne Registersuche ist nur ein Preflight. Die finale Beurteilung von Schutzfähigkeit und Verwechslungsgefahr erfolgt professionell.
+Stärken:
 
-### 5.3 Nur bei belegtem Blocker zu entscheidende Alternativen
+- direkte Lesbarkeit;
+- geringe Klischeegefahr;
+- gute Eignung für Header, SEO-nahe Kommunikation und Vertrauen;
+- Identität kann über Lettering, Rhythmus und Farbe entstehen.
 
-Falls die Vorprüfung einen erheblichen rechtlichen, strategischen oder skalierungsbezogenen Blocker ergibt, werden genau diese Optionen gegeneinander bewertet:
+Das App-Icon wird bei dieser Architektur als eigenständiger typografischer Ausschnitt oder kompaktes Monogramm abgeleitet.
 
-1. Name beibehalten und eine besonders eigenständige kombinierte Wort-/Bildmarke aufbauen;
-2. `Bocholt erleben` als beschreibenden Produktnamen unter einer schutzfähigeren Absendermarke führen;
-3. den Produktnamen bewusst ändern und Domain-, SEO-, Kommunikations- und Migrationsfolgen separat planen;
-4. bei realer institutioneller Kooperation eine vertraglich definierte Co-Branding-Architektur entwickeln.
+### B. Wortmarke mit typografischem Icon
 
-Ohne solchen Blocker bleibt der Name erhalten. Eine Umbenennung ist kein kreativer Selbstzweck.
+Mögliche Prinzipien:
 
-## 6. Vollständige Optionsbewertung
-
-| Option | Einordnung | Entscheidung |
-|---|---|---|
-| Aktuelle Identität unverändert lassen | minimales Risiko, aber bestehender Qualitätsabstand bleibt | verbindlicher Zwischenzustand bis zur vollständigen Abnahme |
-| Nur das aktuelle 3D-B modernisieren | geringe Umstellung, kann aber eine generische Altidee konservieren | als Designerexploration zulässig, nicht als Vorgabe |
-| Reine individuelle Wortmarke | hohe Lesbarkeit, geringer Klischeedruck, guter Header-Fit | verpflichtender Konzeptweg |
-| Wortmarke plus abgeleitetes kompaktes Zeichen | verbindet Markenstärke und App-Tauglichkeit | bevorzugte Zielarchitektur, sofern das Zeichen echten Mehrwert besitzt |
-| Symbol-first oder erzwungene B/e-Ligatur | führt leicht zu generischen, technischen oder dekorativen Zeichen | nicht vorgeben; nur bei außergewöhnlich guter Lösung zulässig |
-| Vollständige Umbenennung | höhere Schutz- oder Skalierungschance, aber hohe Migrations- und SEO-Kosten | nur bei belegtem Namensblocker |
-| Beschreibender Produktname plus proprietäre Absendermarke | kann Schutz und Expansion erleichtern, erhöht aber Komplexität | bedingte Alternative bei Namens- oder Skalierungsproblem |
-| Formales Co-Branding mit Stadt oder Stadtmarketing | kann Vertrauen und Reichweite stärken, erzeugt Abhängigkeit und Governancebedarf | nur nach ausdrücklicher institutioneller Vereinbarung |
-| Seniorer unabhängiger Identity-Designer | direkte Zusammenarbeit, gute Kosteneffizienz, ausreichend für klar begrenzten Scope | empfohlener Standardweg |
-| Kleines spezialisiertes Identity-Studio | breitere Qualitätssicherung und Vertretung, höherer Aufwand | bevorzugte Alternative bei ausreichendem Budget oder größerem Systemumfang |
-| Allgemeine Web-/Marketingagentur | kann Integration mitdenken, besitzt aber nicht automatisch Markendesign-Handwerk | nur bei belegtem Identity-, Typografie- und App-Icon-Portfolio |
-| Lokaler Designer allein wegen Ortsnähe | lokales Verständnis ist nützlich, ersetzt aber keine Fachqualität | Herkunft ist Zusatzkriterium, kein Auswahlgrund |
-| Marketplace-Freelancer | kann gute Einzelpersonen enthalten, Plattform garantiert aber keine Qualität | nur als Suchkanal mit vollständiger Scorecard |
-| Offener Logo-Wettbewerb oder Crowdsourcing | viele schnelle Vorschläge, aber flache Recherche, unklare Herkunft und Spec-Work-Risiko | ausgeschlossen |
-| Unbezahlter Pitch mehrerer Anbieter | verschiebt Risiko auf Designer und fördert oberflächliche Lösungen | ausgeschlossen |
-| Bezahlter Mini-Test mehrerer Anbieter | fairer, aber teuer und koordinationsintensiv | nur als begründete Ausnahme, nicht als Standard |
-| Designschule oder offene Community-Challenge | kann Perspektiven liefern, aber keine verlässliche Produktionsverantwortung | nur Forschung, nicht finaler Owner |
-| Stock-, Template- oder Logo-Generator-Lösung | schnell und günstig, aber austauschbar und schwer exklusiv zu sichern | ausgeschlossen |
-| AI-only-Produktion | gut für Exploration, nicht verlässlich für Originalität, Typografie, Geometrie und Rechtekette | als Finalproduktion ausgeschlossen |
-| AI-gestützte Arbeit eines verantwortlichen Designers | kann Recherche und Varianten beschleunigen, wenn Ursprung und Rechte transparent bleiben | zulässig mit Offenlegung und vollständig kontrolliertem Finalmaster |
-| Getrennte Spezialisten für Lettering und Produktdesign | potenziell höchste Fachqualität, aber mehr Koordination und Schnittstellenrisiko | Fallback, wenn ein Lead-Designer den Gesamtumfang nicht abdeckt |
-
-## 7. Verbindlicher Beschaffungsweg
-
-### 7.1 Standardroute
-
-Der Standardweg ist ein **erfahrener unabhängiger Identity-Designer** als eindeutiger fachlicher Lead. Ein kleines spezialisiertes Studio wird gewählt, wenn:
-
-- der gewünschte Umfang über eine kompakte digitale Identität hinausgeht;
-- parallele Qualitätssicherung oder Vertretung notwendig ist;
-- Naming, Strategie, Typedesign und umfangreiche Anwendungen aus einer Hand benötigt werden;
-- das freigegebene Budget den zusätzlichen Umfang rechtfertigt.
-
-### 7.2 Auswahl ohne Spec Work
-
-Ablauf:
-
-1. acht bis zwölf passende Portfolios recherchieren;
-2. drei bis fünf Anbieter anhand der Scorecard vorprüfen;
-3. mit höchstens drei Finalisten ein kurzes Gespräch zu Prozess, Scope, Rechten, Terminen und Zusammenarbeit führen;
-4. schriftliche Angebote auf dieselbe Leistungsbeschreibung beziehen;
-5. genau einen Anbieter beauftragen;
-6. nur bei verbleibender begründeter Unsicherheit einen bezahlten Diagnose- oder Discovery-Baustein mit dem bevorzugten Anbieter vorschalten.
-
-Es werden keine kostenlosen, eigens für Bocholt erleben angefertigten Entwürfe verlangt. Vorhandene Arbeiten, Prozessqualität, Referenzen und ein klares Angebot müssen für die Auswahl genügen.
-
-### 7.3 Anbieter-Scorecard
-
-| Kriterium | Gewicht |
-|---|---:|
-| nachweisbare Qualität eigenständiger Markenidentitäten | 25 |
-| digitale Produkt- und App-Icon-Erfahrung | 20 |
-| Typografie, Lettering und Wortmarkenhandwerk | 15 |
-| Fähigkeit, aus dem Markenkern ein konsistentes System zu entwickeln | 15 |
-| nachvollziehbarer Prozess mit interner Divergenz und klarer Kuration | 10 |
-| Rechte-, Lizenz-, Provenienz- und Source-File-Kompetenz | 10 |
-| verständliche Zusammenarbeit und lokaler Kontexttransfer | 5 |
-
-Mindestwert: 75 von 100 Punkten und kein Knock-out.
-
-Knock-out-Kriterien:
-
-- kein einschlägiges Portfolio;
-- nur dekorative Mock-ups ohne belastbare Logosysteme oder Kleingrößen;
-- kostenlose Entwürfe als Auswahlbedingung;
-- Stock-, Template- oder undeklarierte AI-Abhängigkeit;
-- unklare Urheber-, Nutzungs- oder Exklusivrechte;
-- keine editierbaren Source-Dateien;
-- kein Nachweis für responsive Marken, Wortmarken oder App-Icons;
-- keine Bereitschaft, reale Produktkontexte und technische Anforderungen zu prüfen;
-- pauschaler Vorschlag einer vollständigen Website-Neugestaltung ohne Markenkern und Owneranalyse.
-
-## 8. Verbindliches Designerbriefing
-
-Das Briefing enthält mindestens:
-
-- Produktauftrag, Nutzer- und Anbieterwert;
-- reale Zielgruppen und Nutzungssituationen;
-- bestehende Informationsarchitektur und aktuelle Screens;
-- verbindliche Markenpersönlichkeit und ausgeschlossene Kategorien;
-- klare Abgrenzung zur Stadt Bocholt und zum Stadtmarketing;
-- reale deutsche Inhalte und typische lange Textfälle;
-- aktuelle Farben und Komponenten als Ausgangs-DNA, nicht als unveränderliche Designvorgabe;
-- Pflichtkontexte für Header, App-Icon, Today, Events, Aktivitäten, Detail und Anbieter-/Vertrauensweg;
-- Accessibility-, PWA-, Kleingrößen-, Responsive- und Performanceanforderungen;
-- verbindliche Liefer-, Rechte- und Provenienzanforderungen;
-- genau einen Product Owner als konsolidierten Feedbackgeber.
-
-Nicht Teil des ersten Auftrags sind ohne gesonderte Freigabe:
-
-- komplette Neugestaltung aller Seiten;
-- neues Framework oder Designsystem-Rewrite;
-- Merchandising, Fahrzeugbeklebung oder umfangreiche Printkampagnen;
-- Social-Media-Templatepakete;
-- laufende Contentproduktion;
-- Naming, falls der Name-Gate keinen Blocker ergibt.
-
-## 9. Designprozess ohne Nutzer-Try-and-Error
-
-### Phase 0 – Freeze
-
-- Aktuelle öffentliche Identität bleibt unverändert.
-- Bisherige AI- und Codeentwürfe werden nicht als Designvorlage übergeben.
-- Verwertet werden nur strategische Erkenntnisse, Ausschlüsse und technische Anforderungen.
-
-### Phase 1 – Name, Absender und Schutz-Preflight
-
-- bestehende Namensnutzung und offizielle Stadtmarken-Abgrenzung prüfen;
-- relevante Markenregister und Waren-/Dienstleistungsbereiche vorprüfen;
-- Standardannahme `Name bleibt` bestätigen oder einen echten Blocker dokumentieren;
-- nur bei Blocker eine separate Namensentscheidung auslösen.
-
-### Phase 2 – Anbieter auswählen
-
-- Portfolios und Angebote nach einer Scorecard bewerten;
-- genau einen fachlichen Lead beauftragen;
-- Scope, Meilensteine, Feedbackweg, Abbruchregel, Rechte und Lieferformat vertraglich festhalten.
-
-### Phase 3 – Interne breite Entwicklung
-
-Der Designer recherchiert, skizziert, konstruiert und verwirft intern. Weder Product Owner noch Repository erhalten laufend Rohentwürfe.
-
-Verbindlich zu untersuchen sind mindestens:
-
-- reine individuelle Wortmarke;
-- Wortmarke mit abgeleitetem kompaktem Zeichen;
-- typografischer App-Icon-Ausschnitt oder Monogramm;
-- eine mögliche Weiterentwicklung der bestehenden B-Erkennung, ohne sie zu erzwingen;
-- unterschiedliche Grade von Wärme und Präzision;
-- monochrome und sehr kleine Fassungen von Beginn an.
-
-### Phase 4 – Genau zwei kuratierte Konzepte
-
-Der Product Owner erhält höchstens zwei Konzepte. Mindestens eines ist klar wortmarkengeführt. Jedes Konzept muss bereits zeigen:
-
-- Markenidee in einem klaren Satz;
-- Wortmarke und gegebenenfalls Zeichen;
-- horizontale und kompakte Kombination;
-- Schwarz-Weiß-Fassung;
-- reale Darstellung bei 16, 24, 32 und 48 Pixeln;
-- App-Icon in Kreis-, Squircle- und Maskable-Kontext;
-- echten mobilen Header;
-- eine Today-/Event-Anwendung mit realem Inhalt;
-- einen Anbieter- oder Vertrauenskontext;
-- begründete Abgrenzung zu Verwaltung, Tourismus, Karten-App und generischer Tech-Marke;
-- erste visuelle Ähnlichkeits- und Provenienzprüfung.
-
-Ein Konzept wird nicht präsentiert, wenn es ein Knock-out-Kriterium verletzt. Bestehen nicht zwei Konzepte die Qualitätsgrenze, arbeitet der Designer intern weiter oder der Auftrag wird nach vertraglicher Abbruchregel beendet. Es wird kein „bester schwacher Kandidat“ zur Auswahl gestellt.
-
-### Phase 5 – Eine Richtungsentscheidung
-
-Der Product Owner wählt genau eine Grundrichtung und nennt gebündelt höchstens die wesentlichen Störpunkte. Detailentscheidungen zu Kurven, Kerning, optischer Korrektur und Produktionsgeometrie verbleiben beim Designer.
-
-Keine neue Grundrichtung wird nach Auswahl eröffnet, außer ein rechtlicher oder nachweisbarer Verwechslungsblocker macht sie unbrauchbar.
-
-### Phase 6 – Gebündelte Verfeinerung
-
-Nur die gewählte Richtung wird finalisiert:
-
-- Wortmarkenzeichnung, Kerning und optische Größen;
-- Zeichen- und App-Icon-Geometrie;
+- charakteristisches `B`;
+- `B` und `e` als zurückhaltende, lesbare Verbindung;
+- Ausschnitt aus einer eigens angepassten Wortmarke;
+- kompakte Buchstabenform mit eigenständigem Negativraum.
+
+Eine B/e-Verbindung ist keine Pflicht und wird verworfen, wenn sie technisch, generisch oder unlesbar wirkt.
+
+### C. Wortmarke mit abstraktem Zeichen
+
+Das Zeichen darf Produktwerte wie Auswahl, Öffnung, Verbindung, Entdeckung oder lokale Nähe abstrakt übersetzen. Es darf keine Landschaftscollage, Kartenpin-, Fahrrad-, Blatt- oder Skyline-Illustration sein.
+
+### D. Behutsame Weiterentwicklung des aktuellen B
+
+Das bestehende B darf als Wiedererkennungsanker untersucht werden. Es wird nur weiterverfolgt, wenn daraus eine flache, eigenständige, skalierbare und systemfähige Form entsteht. Der bisherige 3D- beziehungsweise Glossy-Charakter ist nicht bindend.
+
+## 7. Verbindlicher Ausführungsprozess
+
+### Phase 0 – Freeze und Referenzbestand
+
+- aktuelle öffentliche Marke unverändert lassen;
+- reale App-Screens, Headergrößen, Inhalte und Tokens sichern;
+- bisherige Entwürfe nur als Negativwissen und Lernmaterial verwenden;
+- keine bisherige AI-Grafik als geometrische Vorlage privilegieren;
+- Bewertungsmaßstab vor neuen Entwürfen einfrieren.
+
+### Phase 1 – Name und Absender-Preflight
+
+Standardannahme: Der Name `Bocholt erleben` bleibt erhalten.
+
+ChatGPT prüft vor der Detailarbeit:
+
+- identische und ähnliche Namensverwendungen;
+- Domains, Apps, Social Media, lokale Unternehmen und Plattformen;
+- DPMA-, EUIPO- und WIPO-Treffer;
+- Verwechslungsnähe zu Stadt, Stadtmarketing und Tourismus;
+- Auswirkungen einer möglichen späteren geografischen Erweiterung.
+
+Eine einfache Registersuche ist ein Preflight und keine verbindliche Rechtsfreigabe. Nur ein belegter schwerer Blocker öffnet die Namensfrage erneut.
+
+### Phase 2 – Systematische Suchmatrix
+
+Die vier Markenarchitekturen werden mit mehreren formalen Dimensionen kombiniert:
+
+- warm versus präzise;
+- rund versus kantig;
+- ruhig-editorial versus klar-digital;
+- typografisch versus abstrakt;
+- kompakt versus offen;
+- bekannte Buchstabenform versus vollständig neue Form.
+
+ChatGPT erzeugt intern eine breite Kandidatenmenge. Zielgröße sind nicht möglichst viele präsentierte Bilder, sondern ausreichend viele interne Rohhypothesen, typischerweise 30 bis 60 Mikroideen über alle Architekturen.
+
+### Phase 3 – Frühe harte Filter
+
+Rohideen werden sofort verworfen bei:
+
+- offensichtlicher Ähnlichkeit zu bekannten Marken;
+- Tourismus-, Verwaltungs-, Karten-, Bank- oder SaaS-Fehlassoziation;
+- notwendiger Erklärung, um die Form überhaupt zu verstehen;
+- zu vielen Details;
+- Unlesbarkeit als Silhouette;
+- fehlender einfarbiger Fassung;
+- Abhängigkeit von Schatten, Glanz, Foto oder Farbverlauf;
+- schwachem Bezug zwischen Wortmarke und Icon;
+- bloßer Dekoration ohne Markenprinzip.
+
+Erst Kandidaten, die diesen Filter bestehen, werden weiter ausgearbeitet.
+
+### Phase 4 – Unabhängige Kritik und Shortlist
+
+Die verbleibenden Kandidaten werden ohne die ursprünglichen Generationsargumente neu bewertet. Bewertet wird das sichtbare Ergebnis, nicht die Absicht.
+
+Mindestens folgende Prüfungen erfolgen:
+
+- reine schwarze Silhouette;
+- 16-, 24-, 32- und 48-Pixel-Darstellung;
+- Kreis-, Squircle- und Maskable-Maske;
+- Spiegelung und Drehung zur Erkennung versteckter Formprobleme;
+- Vergleich ohne Farbe und ohne Wortmarke;
+- Vergleich der Wortmarke ohne Icon;
+- Kategorie- und Fehlassoziationsprüfung;
+- erste Bildähnlichkeitssuche.
+
+Maximal sechs Kandidaten gelangen in die Produktionskonstruktion.
+
+### Phase 5 – Deterministische Vektorkonstruktion
+
+Jeder Shortlist-Kandidat wird als echtes Vektorsystem neu gebaut:
+
+- saubere SVG-Struktur;
+- definierte ViewBox;
+- kontrollierte Pfade und Primitive;
+- keine unnötigen Masken oder Rasterbilder;
+- optischer statt nur mathematischer Ausgleich;
+- konsistente Radien und Strichlogik;
+- eigene kompakte beziehungsweise kleine Fassung, falls nötig;
+- einfarbig, invers und farbig;
+- reproduzierbare Exporte.
+
+Wortmarken verwenden entweder:
+
+- einen rechtssicher self-hostbaren Font mit gezielten individuellen Modifikationen;
+- oder vollständig in Vektoren konstruierte individuelle Buchstabenformen.
+
+Eine unveränderte Standardschrift mit lediglich angepasstem Abstand reicht nicht als individuelle Wortmarke.
+
+### Phase 6 – Reales Marken-Minisystem
+
+Die besten Kandidaten werden nicht in erfundenen Moodboards, sondern in einem identischen Prüfset gezeigt:
+
+1. mobiler Header `390x844`;
+2. Today-Startseite mit realen deutschen Inhalten;
+3. Eventübersicht Desktop `1440x900`;
+4. Aktivitäten mobil;
+5. Event- oder Activity-Detail mobil;
+6. Anbieter-/Vertrauensweg;
+7. App-Icon unter realen Android- und PWA-Masken;
+8. Favicon und 24-Pixel-Headerdarstellung;
+9. monochrome beziehungsweise thematisierte Iconfassung;
+10. einfache Social-/Avataranwendung.
+
+Alle Kandidaten erhalten dieselben Inhalte, Größen und Komponenten. Kein Kandidat darf durch bessere Fotos, andere Screens oder aufwendigere Präsentation bevorzugt werden.
+
+### Phase 7 – Höchstens drei qualifizierte Richtungen
+
+Der Product Owner erhält höchstens drei Richtungen. Eine Richtung wird nur gezeigt, wenn:
+
+- sie den Mindestscore erreicht;
+- kein Knock-out vorliegt;
+- Wortmarke und Icon produktionsfähig konstruiert sind;
+- reale Kleingrößen gezeigt werden;
+- die Produktanwendung aus echten Komponenten besteht;
+- Stärken, Schwächen und Risiken offen benannt sind.
+
+Bestehen weniger als zwei Richtungen die Qualitätsgrenze, arbeitet ChatGPT intern weiter. Es wird kein schwacher Kandidat zur künstlichen Auswahl ergänzt.
+
+### Phase 8 – Eine Richtungsentscheidung und gebündelte Finalisierung
+
+Der Product Owner wählt genau eine Grundrichtung und nennt gebündelt die wesentlichen Störpunkte.
+
+Anschließend finalisiert ChatGPT ausschließlich diese Richtung:
+
+- Wortmarkenzeichnung und Kerning;
+- Icon- und Negativraumgeometrie;
 - responsive Lockups;
-- monochrome, inverse und kleine Fassungen;
-- Farb- und Typografiesystem;
-- Bild- und Bewegungsprinzip;
+- Klein- und Monochromfassungen;
+- Farbrollen und Kontrast;
+- Typografiesystem und Fallbacks;
+- Bildsprache und Zuschnitt;
+- ein zurückhaltendes Bewegungsprinzip;
 - reale Produktanwendung;
-- technische und rechtliche Vorbereitung.
+- technische Master und Provenienzdokumentation.
 
-Der Product Owner erhält eine konsolidierte Korrekturrunde und anschließend den Finalstand. Interne handwerkliche Revisionen des Designers zählen nicht als Nutzeriteration.
+Eine neue Grundrichtung wird nur eröffnet, wenn ein belegter rechtlicher, technischer oder eindeutiger Fehlassoziationsblocker die gewählte Richtung unbrauchbar macht.
 
-### Phase 7 – Rechts- und Produktionsfreigabe
+### Phase 9 – Separate Repository-Integration
 
-Vor öffentlicher Nutzung:
+Erst nach vollständiger Markenfreigabe wird ein eigener Implementierungsworkpack aktiviert. Er integriert die Marke token-first in bestehende Owner und erzeugt die finalen Derivate deterministisch aus den freigegebenen Mastern.
 
-- professionelle Prüfung von Wort-, Bild- und kombinierter Marke;
-- bei Bildbestandteilen geeignete Bild- und Ähnlichkeitssuche;
-- relevante Waren-/Dienstleistungsklassen fachlich bestimmen;
-- finalen Rechte-, Font-, Asset- und AI-/Provenienznachweis prüfen;
-- erst danach finale Master abnehmen oder eine Anmeldung vorbereiten.
-
-### Phase 8 – Separater Repository-Workpack
-
-Erst nach vollständiger Asset- und Rechteabnahme wird ein Implementierungs-Workpack aktiviert. Dieser integriert die Marke token-first in bestehende Owner und verändert nicht automatisch Informationsarchitektur oder Produktlogik.
-
-## 10. Begrenzte Nutzerentscheidungen
+## 8. Begrenzte Nutzerentscheidungen
 
 Der Product Owner trifft höchstens drei Entscheidungen:
 
-1. **Route und Budget:** Solo-Spezialist oder kleines Spezialstudio; eine Namensentscheidung nur bei belegtem Blocker.
-2. **Markenrichtung:** eine Auswahl aus höchstens zwei qualifizierten Konzepten.
-3. **Staging-Endfreigabe:** finale Marke im echten Produkt auf Smartphone und Desktop.
+1. **Strategie-Gate:** Produktkern, Name-bleibt-Annahme und die vier zu prüfenden Architekturklassen bestätigen; nur bei belegtem Namensblocker zusätzliche Entscheidung.
+2. **Richtungs-Gate:** eine Auswahl aus höchstens drei vollständig qualifizierten Markenrichtungen.
+3. **End-Gate:** finale Marke im echten Staging-Produkt auf Smartphone und Desktop freigeben oder wegen eines konkreten Knock-outs zurückweisen.
 
-Keine öffentliche Abstimmung und kein Design-by-Committee. Eine kleine Nutzerprüfung darf objektive Fehlassoziationen erkennen, entscheidet aber nicht per Mehrheitsgeschmack über das Logo.
+Zwischen diesen Gates führt ChatGPT interne Entwurfs-, Kritik- und Korrekturschleifen selbstständig durch. Der Nutzer wird nicht mit Mikrovarianten, Kurvenentscheidungen, Kerningdetails oder unreifen Rohentwürfen belastet.
 
-## 11. Objektive Konzept-Scorecard
+## 9. Objektive Bewertung
+
+### 9.1 Konzept-Scorecard
 
 | Kriterium | Gewicht |
 |---|---:|
 | Produkt- und Markenpassung | 20 |
 | Eigenständigkeit und potenzielle Schutzfähigkeit | 20 |
-| Wortmarkenqualität, Lesbarkeit und typografisches Handwerk | 15 |
+| Wortmarkenqualität und Lesbarkeit | 15 |
 | App-Icon, Maskierung und Kleingrößenfestigkeit | 15 |
-| Erweiterbarkeit zu einem responsiven Markensystem | 15 |
-| Integration in reales digitales Produkt und Accessibility | 10 |
-| technische Produktions- und Rechtequalität | 5 |
+| Erweiterbarkeit zum konsistenten Markensystem | 10 |
+| Integration in das reale Produkt | 10 |
+| Accessibility und technische Robustheit | 5 |
+| nachvollziehbare Konstruktion und Provenienz | 5 |
 
-Mindestwert: 75 von 100 Punkten und kein Knock-out.
+Mindestwert: 78 von 100 Punkten und kein Knock-out.
 
-Konzept-Knock-outs:
+### 9.2 Knock-out-Kriterien
 
-- falsche Kategorieassoziation zu Verwaltung, Tourismusbroschüre, Karten-App oder generischer Tech-Marke;
-- unlesbare oder nicht unterscheidbare Form bei 24 Pixeln;
+- falsche Kategorieassoziation zu Verwaltung, Tourismusbroschüre, Karten-App, Bank oder generischer Tech-Marke;
+- unlesbare Wortmarke oder nicht unterscheidbare Iconform bei 24 Pixeln;
 - keine belastbare einfarbige Fassung;
-- entscheidende Details liegen außerhalb der PWA-Maskable-Safe-Zone;
-- Zeichen und Wortmarke besitzen kein gemeinsames System;
-- offenkundige visuelle Nähe zu vorhandenen Marken;
-- nicht belegbare Herkunft oder Rechte;
-- benötigte Fonts oder Assets sind nicht rechtssicher webfähig;
-- Marke funktioniert nur im präsentierten Hochglanz-Mock-up, nicht in realen Produktkontexten.
+- wichtige Inhalte außerhalb der Maskable-Safe-Zone;
+- Wirkung nur durch Schatten, Glanz, 3D oder Fotohintergrund;
+- Wortmarke und Icon folgen keinem gemeinsamen Formprinzip;
+- offenkundige visuelle Nähe zu einer vorhandenen Marke;
+- nicht nachvollziehbare Herkunft eines wesentlichen Bestandteils;
+- nicht webfähiger oder unklar lizenzierter Font;
+- Darstellung funktioniert nur im Hochglanz-Mock-up;
+- horizontale Überbreite oder Verschlechterung der mobilen Nutzbarkeit.
 
-## 12. Gezielte Validierung statt Geschmacksabstimmung
+## 10. Interne AI-Schleifen und Stop-Regeln
 
-Vor der Finalisierung werden folgende Fragen geprüft:
+Kreative Iteration bleibt notwendig, wird aber kontrolliert.
 
-- Wird die Plattform als eigenständig und nicht amtlich verstanden?
-- Werden Ruhe, lokale Relevanz, Vertrauen und moderne Nutzbarkeit wahrgenommen?
-- Entsteht eine falsche Tourismus-, Routen-, Bank-, SaaS- oder Lifestyle-Assoziation?
-- Ist die Wortmarke schnell lesbar?
-- Ist das App-Icon ohne App-Namen wiedererkennbar und unter unterschiedlichen Masken stabil?
-- bleibt die Marke in monochromer und thematisierter Darstellung erkennbar?
+### Interne Schleifen
 
-Eine kleine, gezielte Fehlassoziationsprüfung mit repräsentativen Nutzern ist zulässig. Sie ist kein Popularitätsvoting. Bei eindeutigen Fehlassoziationen wird intern korrigiert; bei bloßer Geschmacksverteilung bleibt die fachlich ausgewählte Richtung bestehen.
+- pro Architektur mehrere voneinander unabhängige Ideencluster;
+- pro Shortlist-Kandidat höchstens drei grundlegende Geometrieumbauten;
+- pro gewählter Richtung eine gebündelte Finalisierungsrunde mit beliebig vielen internen Detailkorrekturen;
+- jede neue Schleife muss einen benannten Fehler oder ein nicht erfülltes Kriterium adressieren.
 
-## 13. Pflichtliefergegenstände
+### Stop-Regeln
 
-### 13.1 Markenmaster
+- keine weitere Variante ohne klaren Erkenntnisgewinn;
+- keine Detailpolitur an einem Kandidaten mit Architektur-Knock-out;
+- kein Ausbau eines Zeichens, das nur groß funktioniert;
+- kein Festhalten an B/e, Symbol oder aktuellem B aus Gewohnheit;
+- keine parallelen Finalrichtungen nach dem Richtungs-Gate;
+- keine öffentliche Änderung vor vollständigem Master und Staging-Nachweis.
+
+## 11. Produktionsliefergegenstände
+
+### 11.1 Kanonische Master
 
 - individuelle Wortmarke;
-- optionales Markenzeichen, falls fachlich begründet;
-- horizontale, kompakte und gegebenenfalls gestapelte Lockups;
+- optionales Markenzeichen, sofern es echten Mehrwert besitzt;
+- horizontale und kompakte Lockups;
 - optisch korrigierte Kleinversion;
-- monochrome, inverse und Graustufenfassung;
-- App-Icon-Master und monochrome Kernform;
-- definierte Schutzräume, Mindestgrößen und Fehlanwendungen;
-- farbverbindliche Werte und zugängliche Anwendungsrollen;
-- Typografie- und Fallback-Empfehlung;
-- Bildsprache, Zuschnitt und ein zurückhaltendes Bewegungsprinzip;
+- App-Icon-Master;
+- monochrome Icon-Kernform;
+- farbige, einfarbige, inverse und Graustufenfassung;
+- Schutzraum, Mindestgröße und Fehlanwendungen;
+- Farb- und Typografierollen;
+- Bild- und Bewegungsprinzip;
 - kurze Tonalitäts- und Copy-Beispiele.
 
-### 13.2 Dateiformate
+### 11.2 Dateiformate
 
-- editierbare native Source-Dateien;
-- saubere SVG-Master ohne unnötige Rasterbestandteile;
+- saubere SVG-Master;
+- editierbare textbasierte Quellen im Repository oder eindeutig versionierte Vektorsourcen;
 - druckfähige PDF- beziehungsweise Vektorfassung;
-- PNG-Exporte für definierte Vorschauzwecke;
-- schwarz-weiße Artwork-Datei für Markenprüfung oder Anmeldung;
-- dokumentierte Farbprofile und Exportregeln.
+- deterministisch erzeugte PNG-Derivate;
+- Favicon-, Apple-Touch- und PWA-Größen;
+- Vordergrund-, Hintergrund- und Monochromebenen für adaptive Icons, soweit technisch relevant;
+- dokumentierte Exportparameter.
 
-Plattformspezifische Rasterderivate werden im Implementierungs-Workpack deterministisch aus den freigegebenen Mastern erzeugt, nicht manuell in vielen abweichenden Varianten gepflegt.
+### 11.3 Provenienz- und Lizenzprotokoll
 
-### 13.3 Rechte- und Lizenzpaket
+Dokumentiert werden:
 
-Schriftlich geklärt werden:
+- verwendete AI-Werkzeuge;
+- wesentliche Prompts beziehungsweise Entwurfsaufträge;
+- manuelle beziehungsweise codebasierte Konstruktionsschritte durch ChatGPT;
+- verwendete Fonts und deren Lizenzen;
+- verwendete Drittassets, sofern überhaupt vorhanden;
+- verworfene Ähnlichkeitstreffer und daraus folgende Änderungen;
+- finale Master-SHAs und Generatorskripte.
 
-- exklusive beziehungsweise ausreichend umfassende Nutzungsrechte am finalen Markensystem;
-- Bearbeitungs-, Vervielfältigungs-, Online-, App-, Social-, Print- und zukünftige Produktnutzung;
-- Übergabe der Source-Dateien;
-- Rechte an individuell gezeichneter Typografie;
-- vollständige Liste aller Fonts, Stock- oder Drittassets und ihrer Lizenzen;
-- Offenlegung verwendeter generativer Werkzeuge und Herkunft relevanter Bestandteile;
-- Zusicherung, dass keine Stock- oder Template-Marke als exklusiver Finalmaster ausgegeben wird;
-- Regelung zu unveröffentlichten und verworfenen Konzepten;
-- keine Wiederverwendung des finalen unverwechselbaren Markenmasters für andere Kunden.
+Das finale Logo soll grundsätzlich ohne Stockgrafik und ohne fremde Bildbestandteile auskommen.
 
-Die konkrete Vertragsformulierung wird bei Bedarf juristisch geprüft.
+## 12. Rechtliche und markenbezogene Grenze
 
-## 14. Technische Abnahmekriterien vor Integration
+OpenAI räumt dem Nutzer im Verhältnis zu OpenAI Rechte am Output ein. AI-Output kann jedoch ähnlich zu anderem Output oder vorhandenen Zeichen sein. Rechte am Output ersetzen daher keine Recherche nach älteren Marken und sonstigen Kennzeichen.
 
-### 14.1 Zeichen und App-Icon
+Vor finaler Freigabe führt ChatGPT mindestens durch:
+
+- Wortsuche in DPMAregister;
+- ergänzende Suche in EUIPO- und WIPO-Datenbanken;
+- Bildähnlichkeitssuche der finalen Iconkandidaten;
+- Suche nach ähnlichen Apps, Domains, Unternehmen und lokalen Angeboten;
+- Dokumentation relevanter Treffer und der begründeten Abgrenzung.
+
+Das DPMA prüft bei einer Anmeldung nicht, ob bereits identische oder ähnliche ältere Marken bestehen. Ein interner AI-Preflight kann das Risiko reduzieren, aber keine verbindliche juristische Freedom-to-use-Aussage liefern.
+
+Eine anwaltliche Markenprüfung ist keine Designbeauftragung und keine Voraussetzung für die kreative Arbeit. Sie bleibt eine separate bewusste Risikoentscheidung vor einer möglichen Markenanmeldung oder einem wirtschaftlich weitreichenden Rollout.
+
+## 13. Technische Abnahmekriterien
+
+### 13.1 Zeichen und App-Icon
 
 - klar bei 16, 24, 32 und 48 CSS-Pixeln;
-- stabil als Favicon, PWA-Icon, Apple-Touch-Icon und maskable Icon;
-- alle wesentlichen Inhalte innerhalb der W3C-Maskable-Safe-Zone;
+- stabil als Favicon, PWA-Icon und Apple-Touch-Icon;
+- wesentliche Form innerhalb der Maskable-Safe-Zone;
 - funktioniert unter Kreis-, Squircle- und abgerundeten Masken;
-- brauchbare monochrome beziehungsweise thematisierbare Kernform;
-- keine extrem dünnen Linien oder nur in Großansicht erkennbare Details;
-- keine vorgerenderten Masken in den Masterebenen.
+- nutzbare monochrome beziehungsweise thematisierbare Kernform;
+- klare Kanten ohne vorgerenderte Außenmaske oder Hintergrundschatten;
+- keine extrem dünnen Linien oder nur groß erkennbare Details.
 
-### 14.2 Wortmarke und Typografie
+### 13.2 Wortmarke und Typografie
 
-- lesbar im realen mobilen Header;
-- responsive kompakte Fassung ohne Verlust der Identität;
-- sauberes Kerning und optische Korrektur;
-- Webfont-Lizenz und Self-Hosting geklärt;
-- begrenzte notwendige Schnitte und vertretbares Ladebudget;
-- robuste Fallbacks ohne kritische Layoutverschiebung;
-- Textvergrößerung und deutsche Sonderzeichen funktionieren.
+- schnell lesbar im realen mobilen Header;
+- kompakte Fassung ohne Identitätsverlust;
+- sauberes Kerning und optischer Ausgleich;
+- deutsche Sonderzeichen in der Systemtypografie;
+- webfähige Lizenz und Self-Hosting;
+- begrenzte notwendige Schriftschnitte;
+- robuste Fallbacks ohne kritische Layoutverschiebung.
 
-### 14.3 Produktanwendung
+### 13.3 Produkt und Accessibility
 
-Prüfkontexte:
+- reale deutsche Inhalte und typische lange Textfälle;
+- keine Verschlechterung der mobilen Informationsdichte;
+- WCAG-konforme funktionale Kontraste;
+- sichtbare Fokuszustände;
+- `prefers-reduced-motion` berücksichtigt;
+- keine horizontale Überbreite;
+- Theme-Color, Manifest und Iconfamilie konsistent;
+- geordneter Service-Worker- und Cache-Cutover;
+- Lucide-Funktionsicons bleiben erhalten, sofern kein belegter Grund für eine Änderung besteht.
 
-- Today mobil `390x844`;
-- Events Desktop `1440x900`;
-- Aktivitäten mobil;
-- Detailansicht mobil;
-- Anbieter-/Vertrauensweg;
-- PWA-Installations- und Homescreen-Kontext;
-- Social-/Avatar-Kontext.
+## 14. Repository-Workpackfolge
 
-Die Anwendung muss reale Komponenten und reale deutsche Inhaltslängen verwenden. Keine Freigabe allein auf Basis dekorativer Mock-ups.
+### Workpack A – AI-Markenentwicklung und Richtungswahl
 
-### 14.4 Accessibility und Technik
+Ziel:
 
-- WCAG-konforme Kontraste für funktionale Farbrollen;
-- sichtbare Fokuszustände bleiben erhalten;
-- `prefers-reduced-motion` wird respektiert;
-- keine horizontale Überbreite oder relevante Layoutverschiebung;
-- Theme-Color, Manifest, Favicons, Apple-Touch- und PWA-Assets sind konsistent;
-- Service-Worker- und Cache-Cutover sind geordnet;
-- bestehende Lucide- und Interaktionskonventionen werden nicht ohne belegten Grund ersetzt.
+- Strategie-Gate schließen;
+- breite interne Exploration durchführen;
+- Kandidaten vektoriell konstruieren;
+- reale Prüfsets erstellen;
+- höchstens drei qualifizierte Richtungen vorlegen;
+- eine Richtung auswählen und finalisieren;
+- Markenmaster, Provenienz und technische Spezifikation abnehmen.
 
-## 15. Spätere Repository-Integration
+Grenze:
 
-Die Integration erhält einen eigenen Workpack mit eingefrorenem Scope. Voraussichtlich betroffen sind nur die tatsächlich owning Pfade für:
+- keine öffentliche Änderung;
+- keine dauerhaften parallelen Themes;
+- keine Staging- oder Live-Freigabe als neue Marke, bevor der Master final ist.
 
-- Markenmaster und deterministisch erzeugte Icon-Derivate;
-- Header- und Subpage-Lockups;
-- globale Brand-, Farb- und Typografietokens;
-- Font-Assets und Ladeverhalten;
-- Manifest, Theme-Color, Favicons und Apple-Touch-Icon;
-- optional ein einziges charakteristisches Bewegungsprinzip;
-- Browser-, Accessibility-, PWA-, Cache- und Screenshotverträge.
+### Workpack B – Markenintegration
 
-Nicht automatisch betroffen:
+Ziel:
+
+- finale Master und deterministische Derivate integrieren;
+- Header, Tokens, Fonts, Manifest, Icons und relevante Markendetails aktualisieren;
+- Browser-, Accessibility-, PWA-, Cache- und Screenshotverträge schließen;
+- finale Staging-Endabnahme;
+- kontrollierter Release nach `main`.
+
+Nicht automatisch Teil der Integration:
 
 - Produktlogik und Tarife;
-- Event-/Activity-Daten;
 - Informationsarchitektur;
-- Lucide-Funktionsicons;
-- Control Center, APIs, Datenbanken oder Workflows;
-- allgemeine CSS-/JS-Sanierung.
+- Event- oder Activity-Daten;
+- Control Center, APIs oder Datenbanken;
+- allgemeiner CSS-/JS-Rewrite;
+- vollständige Neugestaltung jeder Oberfläche.
 
-Der Preview- und Abnahmezustand verwendet die echten Komponenten und Inhalte. Ein separater Theme- oder Query-Preview darf genutzt werden, sofern er keine zweite dauerhafte UI-Logik erzeugt. Nach Auswahl bleiben keine parallelen Markenvarianten im Produktivcode.
+## 15. Fallback- und Abbruchregeln
 
-## 16. Abbruch-, Fallback- und Qualitätsregeln
+- Erreicht keine Richtung die Mindestscorecard, bleibt die aktuelle Identität bestehen und ChatGPT öffnet eine neue interne Suchmatrix.
+- Erzeugt Bildgenerierung keine belastbare Grundlage, wird stärker typografisch und geometrisch in SVG gearbeitet.
+- Erzeugt codebasierte Konstruktion sterile oder generische Formen, wird erneut mit visueller Divergenz gearbeitet.
+- Scheitert ein separates Symbol wiederholt, wird eine reine Wortmarkenarchitektur final geprüft.
+- Scheitert die B/e-Verbindung, wird sie vollständig verworfen.
+- Entsteht ein Namensblocker, stoppt die visuelle Finalisierung bis zur bewussten Namensentscheidung.
+- Eine verzögerte gute AI-Marke ist einem schnellen Zwischenlogo vorzuziehen.
+- Ein externer Designer ist kein Fallback.
 
-- Erreicht kein Anbieter die Mindestscorecard, wird nicht beauftragt.
-- Erreicht kein Konzept die Mindestqualität, wird keine Nutzerentscheidung erzwungen.
-- Verursacht die Namensprüfung einen harten Blocker, stoppt die visuelle Ausarbeitung bis zur Namensentscheidung.
-- Scheitert der beauftragte Anbieter fachlich oder prozessual, greift die vertragliche Meilenstein- und Abbruchregel; schwache Arbeit wird nicht durch weitere UI-Mock-ups kaschiert.
-- Solange kein vollständiger Finalmaster vorliegt, bleibt die aktuelle Identität aktiv.
-- Eine verzögerte gute Marke ist einem schnellen, erneuten Zwischenlogo vorzuziehen.
-- Nach finaler Auswahl werden keine alternativen Markensysteme dauerhaft im Repository gehalten.
-- Ein späterer Rebrand öffnet dieses Ziel nicht erneut, solange keine neue belegte strategische, rechtliche oder technische Ursache vorliegt.
-
-## 17. Ergebnis dieses Zielvertrags
-
-Der verbindliche Weg lautet:
+## 16. Verbindlicher Zielweg
 
 ```text
 aktuellen öffentlichen Stand einfrieren
--> Name, Absender, Schutz- und Stadtmarken-Abgrenzung einmalig prüfen
--> einen qualifizierten Identity-Spezialisten auswählen
--> breite interne Entwicklung ohne Nutzer-Rohschleifen
--> höchstens zwei belastbare Konzepte
+-> Produkt- und Bewertungsvertrag bestätigen
+-> Name und Absender AI-gestützt vorprüfen
+-> vier Markenarchitekturen systematisch explorieren
+-> breite interne AI-Divergenz
+-> harte anonyme Kritik und Kleingrößenfilter
+-> höchstens sechs Kandidaten deterministisch als SVG konstruieren
+-> identische reale Produktanwendung und Ähnlichkeitsprüfung
+-> höchstens drei qualifizierte Richtungen vorlegen
 -> genau eine Richtungsentscheidung
--> gebündelte Verfeinerung und professionelle Rechtsprüfung
--> vollständige Asset-, Rechte- und Lizenzabnahme
+-> AI-gestützte gebündelte Finalisierung
+-> Master-, Lizenz-, Provenienz- und Risikoabnahme
 -> separater Repository-Integrationsworkpack
 -> genau eine Staging-Endabnahme
 -> kontrollierter Release
 ```
 
-Damit werden notwendige kreative Iterationen nicht geleugnet, sondern fachlich dorthin verlagert, wo sie hingehören: intern zum verantwortlichen Designer. Der Product Owner entscheidet nur an klaren Gates über Route, Richtung und fertige Produktintegration.
+Damit bleibt das Ziel vollständig AI-first: ChatGPT übernimmt die kreative und technische Markenarbeit. Die Schwächen eines einzelnen generativen Bilddurchlaufs werden nicht durch einen externen Designer kompensiert, sondern durch Aufgabenzerlegung, unabhängige Kritik, deterministische Konstruktion und reale technische Tests.
 
-## 18. Referenzen
+## 17. Referenzen
 
 Interne Grundlagen:
 
@@ -539,17 +571,15 @@ Interne Grundlagen:
 - `ROADMAP.md`;
 - `ENGINEERING.md`;
 - `docs/architecture/SYSTEM_MAP.md`;
-- aktuelle öffentliche Today-, Event-, Activity-, Detail- und Anbieteroberflächen.
+- aktuelle Today-, Event-, Activity-, Detail- und Anbieteroberflächen.
 
-Externe Primär- und Fachreferenzen, abgerufen am 2026-07-27:
+Externe Primärquellen, abgerufen am 2026-07-27:
 
-- Stadt Bocholt, Stadtmarke: <https://www.bocholt.de/stadtmarke>
-- Design Council, Double Diamond: <https://www.designcouncil.org.uk/resources/the-double-diamond/>
-- Apple Human Interface Guidelines, Branding: <https://developer.apple.com/design/human-interface-guidelines/branding>
-- Apple Human Interface Guidelines, App icons: <https://developer.apple.com/design/human-interface-guidelines/app-icons/>
-- Android, Adaptive Icons: <https://developer.android.com/develop/ui/compose/system/icon_design_adaptive>
+- OpenAI, Nutzungsbedingungen für Europa: <https://openai.com/de-DE/policies/eu-terms-of-use/>
+- OpenAI, Images in ChatGPT: <https://help.openai.com/en/articles/11084440>
+- Android Developers, Adaptive Icons: <https://developer.android.com/develop/ui/compose/system/icon_design_adaptive>
 - W3C, Web Application Manifest – Icon masks and safe zone: <https://www.w3.org/TR/appmanifest/#icon-masks>
-- DPMA, Markenrecherche: <https://www.dpma.de/marken/markenrecherche/index.html>
-- EUIPO, Wiener Klassifikation für Bildmarken: <https://www.euipo.europa.eu/de/help-centre/searches/faq-vienna-classification>
-- WIPO, Nice Classification: <https://www.wipo.int/classifications/nice/>
-- AIGA, Auswahl ohne unbezahlte Entwürfe: <https://losangeles.aiga.org/call-for-designers-design-the-identity-for-the-2025-aiga-national-conference/>
+- DPMA, Markenrecherche: <https://www.dpma.de/marken/markenrecherche/>
+- DPMA, Fragen rund um die Marke: <https://www.dpma.de/marken/faq/>
+- EUIPO, eSearch plus und Bildsuche: <https://www.euipo.europa.eu/de/help-centre/searches/faq-esearch-plus>
+- WIPO, Global Brand Database: <https://www.wipo.int/en/web/global-brand-database>
