@@ -1,7 +1,7 @@
 # Markenidentität – Zielvertrag und belastbarer Lieferweg
 
-Stand: 2026-07-27  
-Status: angenommener Zielzustand; noch nicht beauftragt oder umgesetzt  
+Stand: 2026-07-27
+Status: angenommener Zielzustand; noch nicht beauftragt oder umgesetzt
 Operativer Owner bei Umsetzung: jeweils genau ein aktives GitHub-Workpack
 
 ## 1. Zweck und Geltungsgrenze
