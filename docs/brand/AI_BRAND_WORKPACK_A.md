@@ -1,8 +1,8 @@
 # AI-Markenentwicklung – Workpack A
 
-Stand: 2026-07-27  
-Status: aktiv; Strategie-Gate geschlossen, interne Exploration läuft  
-Issue: #225  
+Stand: 2026-07-27
+Status: aktiv; Strategie-Gate geschlossen, interne Exploration läuft
+Issue: #225
 Branch: `brand/ai-workpack-a-225`
 
 ## 1. Ziel
