@@ -2,7 +2,7 @@ import {
   state, els, reviewLabels, escapeHtml, clean, asArray, formatDate,
   reviewGroup, allReviewCases, reviewCases,
 } from './shared.js?v=2026-07-16-e2e-state-v5';
-import { renderStartpartnerReview } from './startpartner-review.js?v=2026-07-25-startpartner-gate2-v1';
+import { renderStartpartnerReview } from './startpartner-review.js?v=2026-07-27-startpartner-gate3-v1';
 
 let handleAction = async () => {};
 export function configureReviewRenderer(callbacks = {}) { if (callbacks.handleAction) handleAction = callbacks.handleAction; }
