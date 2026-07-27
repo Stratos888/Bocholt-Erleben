@@ -106,10 +106,15 @@ run_engine() {
 
   local port
   port="$(docker inspect -f '{{(index (index .NetworkSettings.Ports "3306/tcp") 0).HostPort}}' "$container")"
-  STARTPARTNER_TEST_DSN="mysql:host=127.0.0.1;port=${port};dbname=be_contract;charset=utf8mb4" \
-  STARTPARTNER_TEST_USER='root' \
-  STARTPARTNER_TEST_PASSWORD='contract-root' \
-    php tests/startpartner_gate3_schema_contract_test.php
+  for contract in \
+    tests/startpartner_gate3_schema_contract_test.php \
+    tests/startpartner_gate3_mysql_contract_test.php; do
+    printf '[%s] Running %s\n' "$engine" "$contract"
+    STARTPARTNER_TEST_DSN="mysql:host=127.0.0.1;port=${port};dbname=be_contract;charset=utf8mb4" \
+    STARTPARTNER_TEST_USER='root' \
+    STARTPARTNER_TEST_PASSWORD='contract-root' \
+      php "$contract"
+  done
 
   docker rm -f "$container" >/dev/null
 }
@@ -117,4 +122,4 @@ run_engine() {
 run_engine mysql8 mysql:8.0 mysql
 run_engine mariadb114 mariadb:11.4 mariadb
 
-printf '%s\n' '=== Startpartner Gate-3 MySQL 8 and MariaDB 11.4 Schema Contract: OK ==='
+printf '%s\n' '=== Startpartner Gate-3 MySQL 8 and MariaDB 11.4 Contracts: OK ==='
