@@ -32,16 +32,21 @@ for entry in manifest['migrations']:
         raise SystemExit(f'Manifest migration missing: {path}')
 PY
 
+CONTAINERS=()
+cleanup_all() {
+  local container
+  for container in "${CONTAINERS[@]:-}"; do
+    docker rm -f "$container" >/dev/null 2>&1 || true
+  done
+}
+trap cleanup_all EXIT
+
 run_engine() {
   local engine="$1"
   local image="$2"
   local client="$3"
   local container="be-startpartner-gate3-${engine}-$RANDOM-$RANDOM"
-
-  cleanup_engine() {
-    docker rm -f "$container" >/dev/null 2>&1 || true
-  }
-  trap cleanup_engine RETURN
+  CONTAINERS+=("$container")
 
   if [ "$engine" = "mysql8" ]; then
     docker run -d --name "$container" \
@@ -106,8 +111,7 @@ run_engine() {
   STARTPARTNER_TEST_PASSWORD='contract-root' \
     php tests/startpartner_gate3_schema_contract_test.php
 
-  cleanup_engine
-  trap - RETURN
+  docker rm -f "$container" >/dev/null
 }
 
 run_engine mysql8 mysql:8.0 mysql
