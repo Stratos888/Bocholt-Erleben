@@ -29,12 +29,20 @@ docker run -d --name "$CONTAINER" \
   -p 127.0.0.1::3306 \
   mariadb:11.4 >/dev/null
 
+ready_check() {
+  docker exec "$CONTAINER" mariadb --protocol=TCP -h127.0.0.1 \
+    -uroot -pcontract-root -Nse 'SELECT 1' be_contract >/dev/null 2>&1
+}
+
 for attempt in {1..60}; do
-  if docker exec "$CONTAINER" mariadb -uroot -pcontract-root -Nse 'SELECT 1' be_contract >/dev/null 2>&1; then
-    break
+  if ready_check; then
+    sleep 2
+    if ready_check; then
+      break
+    fi
   fi
   if [ "$attempt" -eq 60 ]; then
-    printf '%s\n' 'MariaDB contract container did not become ready with authenticated database access.' >&2
+    printf '%s\n' 'MariaDB contract container did not become stably ready with authenticated TCP access.' >&2
     docker logs "$CONTAINER" >&2 || true
     exit 1
   fi
@@ -44,7 +52,8 @@ done
 apply_sql() {
   local file="$1"
   printf 'Applying %s\n' "$file"
-  docker exec -i "$CONTAINER" mariadb -uroot -pcontract-root be_contract < "$file"
+  docker exec -i "$CONTAINER" mariadb --protocol=TCP -h127.0.0.1 \
+    -uroot -pcontract-root be_contract < "$file"
 }
 
 python3 -m json.tool api/sql/000_manifest.json >/dev/null
@@ -74,7 +83,8 @@ for file in \
   apply_sql "$file"
 done
 
-docker exec -i "$CONTAINER" mariadb -uroot -pcontract-root be_contract <<'SQL'
+docker exec -i "$CONTAINER" mariadb --protocol=TCP -h127.0.0.1 \
+  -uroot -pcontract-root be_contract <<'SQL'
 INSERT INTO organizers (
   id, organization_name, contact_name, email, email_normalized,
   stripe_customer_id, default_plan_key
