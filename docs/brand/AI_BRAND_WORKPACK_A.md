@@ -1,7 +1,7 @@
 # AI-Markenentwicklung – Workpack A
 
 Stand: 2026-07-27
-Status: Richtungs-Gate vorbereitet; zwei qualifizierte Richtungen, noch keine Auswahl
+Status: kalibriertes Richtungs-Gate vorbereitet; ein Champion, keine künstliche Auswahl
 Issue: #225
 
 ## 1. Geschlossenes Strategie-Gate
@@ -15,34 +15,48 @@ Verbindlich eingefroren:
 - kein erzwungenes B, keine erzwungene B/e-Ligatur und kein erzwungenes separates Symbol;
 - aktuelle öffentliche Identität bleibt unverändert.
 
-## 2. Getrennte AI-Rollen
+## 2. Validierte Prozesskorrektur
 
-1. Strategie hält Positionierung und Ausschlüsse stabil.
-2. Exploration untersucht voneinander unabhängige Formprinzipien.
-3. Kritik bewertet monochrom und ohne Präsentationsbonus.
-4. Reduktion verwirft Kategoriefehler und schwache Kleingrößen.
-5. Produktion konstruiert nur Shortlist-Ideen als deterministische SVGs.
-6. Produktprüfung nutzt identische Inhalte, Komponenten und Größen.
-7. Risiko-Preflight dokumentiert Ähnlichkeit und Provenienz ohne Rechtsfreigabe zu behaupten.
+Die im vorherigen Richtungs-Gate gezeigten Richtungen `Offener Takt` und `Direktwort` werden zurückgezogen. Sie bestanden den technischen Vertrag, erreichten in der nachgelagerten visuellen Kalibrierung aber nicht die notwendige Eigenständigkeit und Markenreife.
 
-## 3. Ergebnis des internen Funnels
+Das weitere Vorgehen wurde deshalb auf einen Champion-Challenger-Funnel korrigiert:
 
-Untersucht wurden alle vier Architekturklassen. Zwei bewusst unterschiedliche Richtungen überschreiten die Mindestgrenze von 78/100 ohne Knock-out:
+1. Palette, UI, Inhalte und Produktarchitektur bleiben konstant.
+2. Intern werden nur Zeichenarchitekturen gegeneinander geprüft.
+3. Ein Challenger wird nur präsentiert, wenn er den Champion in mindestens einer tragenden Dimension übertrifft und keinen neuen Knock-out einführt.
+4. Keine zweite Richtung wird zur bloßen Erzeugung einer Auswahl gezeigt.
+5. Der Product Owner erhält genau ein Freigabe-Gate: Champion weiterführen oder wegen eines konkreten Knock-outs zurückweisen.
 
-- **A – Offener Takt:** eine wortmarkengebundene typografische Kleinform; das `b` bleibt primär lesbar, die horizontale Öffnung trägt die sekundäre `e`-Lesart;
-- **B – Direktwort:** eine reine, responsive Wortmarkenarchitektur ohne behauptetes Bildzeichen; das vollständige Namensfeld ist das App-Icon, während nur für Favicons und sehr kleine Kontexte eine optische `b`-Kleinmarke verwendet wird.
+## 3. Ergebnis des Funnels
 
-Nicht qualifizierte Familien werden im Explorationsbericht dokumentiert und nicht im Brand Lab gezeigt.
+### Champion – B-Moment
+
+Der bekannte B-Anker wird vollständig von Glanz, 3D, Schatten und Badge-Optik befreit. Eine schmale Lichtöffnung führt zu einem limefarbenen Momentpunkt: In Bocholt passiert etwas, das entdeckt werden kann.
+
+Die Wortmarke ist kein separates Standard-Textfeld. Das Zeichen bildet direkt das initiale `B`; gemeinsam mit `ocholt` und `erleben.` entsteht ein integrierter, responsiver Absender.
+
+Interne Bewertung: **84/100**, kein aktueller Knock-out.
+
+Kein untersuchter Challenger übertraf den Champion gleichzeitig bei Kontinuität, App-Icon-Robustheit, direkter Namensbindung und ruhiger Produktintegration. Ein zweiter Kandidat wird daher nicht künstlich präsentiert.
 
 ## 4. Präsentationsvertrag
 
-Beide Richtungen besitzen:
+Der Champion besitzt:
 
-- repository-lokale SVG-Master;
-- monochrome Fassungen mit identischer Geometrie;
-- echte PNG-Raster bei 16, 24, 32 und 48 Pixeln;
+- repository-lokale, deterministische SVG-Master;
+- integrierte zweizeilige und horizontale Wortmarke;
+- farbige, inverse und echte einfarbige Fassung;
+- echte App-Icon-PNGs bei 16, 24, 32 und 48 Pixeln;
 - Kreis-, Squircle- und Rounded-Maskenprüfung;
-- identische Today-, Event-, Aktivitäten-, Detail- und Anbietertexte;
-- offene Stärken-, Risiken- und Scorecard.
+- unveränderte reale Produktinhalte in Today-, Event-, Aktivitäten-, Detail- und Anbieter-Kontexten;
+- offene Stärken-, Risiken- und Scorecard;
+- dokumentierte Provenienz ohne Bild-KI oder externen Designer.
 
-Das Richtungs-Gate verlangt genau eine Entscheidung: A, B oder Zurückweisung wegen eines konkreten Knock-outs.
+## 5. Nutzerentscheidung
+
+Das Richtungs-Gate verlangt genau eine Entscheidung:
+
+- **Champion zur Produktionsverfeinerung freigeben**, oder
+- **zurückweisen**, aber nur mit einem konkret benannten Knock-out.
+
+Die Freigabe autorisiert noch keinen öffentlichen Rollout. Danach folgen nur noch die gebündelte Produktionsverfeinerung, vertiefter Ähnlichkeits-/Rechte-Preflight und ein finales Staging-Gate.

@@ -1,83 +1,88 @@
-# AI-Markenexploration – Prüf- und Verwerfungsbericht
+# AI-Markenexploration – kalibrierter Prüf- und Verwerfungsbericht
 
 Stand: 2026-07-27
 Workpack: #225
-Status: zwei Richtungen für das Richtungs-Gate qualifiziert
+Status: ein Champion für das Richtungs-Gate qualifiziert
 
-## 1. Untersuchte Architekturklassen
+## 1. Warum das vorherige Gate zurückgezogen wurde
 
-### Wortmarke-only
+`Offener Takt` und `Direktwort` erfüllten die technischen Mindestanforderungen, waren aber als Markenrichtungen nicht eigenständig genug. Die damaligen Scores wurden durch technische Sauberkeit zu stark getragen. Dieser Befund wird nicht kaschiert: Beide Richtungen sind aus dem aktiven Gate entfernt.
 
-Untersucht wurden einzeilige und gestapelte Sans-Wortmarken, unterschiedliche Gewichte, Groß-/Kleinschreibung und responsive Namensfelder.
+## 2. Korrigierte Bewertungslogik
 
-**Weitergeführt:** Richtung B. Das vollständige Namensfeld bleibt der primäre Identitätsträger. Dadurch wird kein schwaches Symbol erzwungen. Für sehr kleine technische Kontexte existiert nur eine optisch abgeleitete Kleinmarke.
+Ein Kandidat wird nur noch weitergeführt, wenn er in diesen tragenden Dimensionen besteht:
 
-### Wortmarke plus typografisches Icon
+- sofortige Namens- oder Absenderbindung;
+- klare Einfarben- und 16-px-Funktion;
+- keine falsche Kategorieassoziation;
+- ruhige Integration in den bestehenden mobilen Header;
+- belastbares Verhältnis von Zeichen und Wortmarke;
+- erkennbare Kontinuität ohne kosmetische Modernisierung;
+- kein Mock-up-, Farb- oder Glanzeffekt als Qualitätsersatz.
 
-Untersucht wurden B/e-, B/o- und Einzelbuchstabenprinzipien, negative Räume, gemeinsame Stämme und Monoline-Konstruktionen.
+Ein Challenger wird nur gezeigt, wenn er den Champion in mindestens einer tragenden Dimension sichtbar übertrifft.
 
-**Weitergeführt:** Richtung A. Überlagerte Serif-, Negativraum- und Doppelbuchstabenmonogramme wurden wegen Detailverlust, dichter Ähnlichkeitslage sowie Kanzlei-, Kosmetik- oder SaaS-Assoziation verworfen.
+## 3. Erneut untersuchte Architekturen
 
-### Wortmarke plus abstraktes Zeichen
+### Reine Wortmarke
 
-Untersucht wurden Marker, Raster, Karten, Rahmen, Fokusformen, Öffnungen und doppelte Flächen.
+Weiter untersucht wurden einzeilige und gestapelte Wortmarken sowie Namensfelder als App-Icon.
 
-**Verworfen:** Die stärksten Varianten drifteten zu Sternchen, Fußnote, Buch, Tür, Wallet, Foto-, Fokus- oder generischem Softwarezeichen. Keine abstrakte Form übertraf die qualifizierten typografischen Architekturen.
+**Verworfen:** Im Header funktional, im App-Icon aber zu schwach oder zu klein. Eine technische Einzelbuchstaben-Ableitung hätte erneut ein zweites, nicht ausreichend verbundenes Zeichen erzeugt.
 
-### Behutsame Bestandsentwicklung
+### B/e- und BE-Monogramme
 
-Untersucht wurden flache B-Formen, offene B-Konturen und eine radikale Reduktion des vorhandenen Öffnungsmotivs.
+Weiter untersucht wurden negative Räume, Überlagerungen, gemeinsame Stämme und explizite `be`-Formen.
 
-**Verworfen:** Die B-Varianten konservierten einen dicht besetzten Initialraum; die Öffnungsvarianten blieben trotz technischer Robustheit als Tür, Buch oder Panel mehrdeutig. 3D, Glanz, Verläufe und Badge-Optik bleiben vollständig ausgeschlossen.
+**Verworfen:** zu dicht besetztes Monogrammfeld; mehrere Varianten drifteten in Kanzlei, Beauty, Software oder Finanzdienstleistung. Keine Variante schlug die B-Kontinuität.
 
-## 2. Verbindlich verworfene Abkürzungen
+### BO-Monogramm
 
-- Karten-Pin, Kompass, Route oder Standortnadel;
-- Rathaus-, Kirchturm-, Brücken-, Fahrrad-, Blatt- oder Skyline-Montage;
-- Wappen-, Siegel- oder amtliche Anmutung;
-- dekorative Handschrift;
-- 3D, Glanz, Schatten oder Verlauf als Identitätsträger;
-- automatisch vektorisierte Bild-KI-Ausgabe;
-- Mock-up-Bonus vor Schwarz-Weiß- und Kleingrößenprüfung.
+Untersucht wurde ein direkt aus `Bocholt` abgeleitetes BO-Zeichen.
 
-## 3. Qualifizierte Richtungen
+**Verworfen:** lokal nachvollziehbar, aber in der Form generisch und im kleinen App-Icon unruhiger. Das zusätzliche O schwächte die klare B-Silhouette.
 
-### A – Offener Takt — 81/100
+### Abstraktes Zeichen
 
-- Produkt- und Markenpassung: 18/20
-- Eigenständigkeit / Schutzpotenzial: 9/20
-- Wortmarkenqualität: 14/15
-- Kleinmarke / Maskierung: 14/15
-- Systemerweiterung: 9/10
-- Realproduktintegration: 9/10
-- Accessibility / Robustheit: 4/5
-- Konstruktion / Provenienz: 4/5
+Untersucht wurden Öffnung, Fokus, Moment, Rahmen, Orbit und modulare Flächen.
 
-**Stärke:** sehr stabile Kleinform, direkte Namensbindung und ruhige digitale Wirkung.
-**Risiko:** der B/e- und Einzelbuchstabenraum ist stark besetzt. Die konkrete Geometrie benötigt nach der Richtungswahl einen vertieften Bildähnlichkeitspreflight.
-**Knock-out:** keiner im aktuellen Richtungsstand.
+**Verworfen:** Tür-, Buch-, Scan-, Stern-, Smile-, Karten- oder generische Softwareassoziationen. Kein abstraktes Zeichen besaß eine stärkere direkte Bindung an `Bocholt erleben`.
 
-### B – Direktwort — 83/100
+### Flache Bestandsentwicklung
+
+Untersucht wurden mehrere radikal reduzierte B-Silhouetten mit Schlitz, Lichtkeil, Punkt, Basisflare und unterschiedlichen Akzentrollen.
+
+**Weitergeführt:** `B-Moment`. Nur diese Familie verband die bestehende Wiedererkennung mit einer tatsächlich neuen, flachen und kleingrößenfesten Konstruktion.
+
+## 4. Champion – B-Moment — 84/100
 
 - Produkt- und Markenpassung: 19/20
-- Eigenständigkeit / Schutzpotenzial: 10/20
-- Wortmarkenqualität: 15/15
-- Kleinmarke / Maskierung: 11/15
+- Eigenständigkeit / Schutzpotenzial: 12/20
+- Wortmarkenqualität: 14/15
+- Kleinmarke / Maskierung: 15/15
 - Systemerweiterung: 9/10
-- Realproduktintegration: 9/10
+- Realproduktintegration: 10/10
 - Accessibility / Robustheit: 5/5
 - Konstruktion / Provenienz: 5/5
 
-**Stärke:** kein erzwungenes Symbol; der vollständige Name trägt App-Icon, Header und Kommunikation konsistent.
-**Risiko:** `Bocholt erleben` ist sprachlich beschreibend und wird im Umfeld auch als allgemeine Formulierung verwendet. Die individuelle typografische Ausarbeitung muss deshalb den Abstand tragen; die kleine `b`-Form ist bewusst nur ein technisches Derivat.
+**Stärken:**
+
+- unmittelbare Absenderbindung durch das B;
+- glaubwürdige Kontinuität zum vorhandenen Markenanker ohne dessen 3D- und Glanzprobleme;
+- integrierte Wortmarke statt Zeichen plus wiederholtem Namen;
+- klare Silhouette und echte Rasterfunktion von 16 bis 48 Pixeln;
+- funktioniert auf hellen und dunklen Flächen sowie einfarbig;
+- verändert nicht die Informationsdichte oder Produktarchitektur.
+
+**Offene Risiken:**
+
+- B-Zeichen sind grundsätzlich dicht besetzt;
+- die Lichtöffnung und der Momentpunkt müssen im vertieften Ähnlichkeitspreflight auf konkrete Nähe geprüft werden;
+- die Cabin-basierte Wortform ist für dieses Richtungs-Gate vollständig als Pfad gebaut, benötigt vor Produktion aber eine endgültige Lizenz-/Rechteakte und optische Feinabstimmung;
+- noch keine markenrechtliche Schutz- oder Freedom-to-use-Aussage.
+
 **Knock-out:** keiner im aktuellen Richtungsstand.
-
-## 4. Begrenzter Ähnlichkeits-Preflight
-
-- Der Markt enthält zahlreiche B-, BE- und B/e-Monogramme. Richtung A wird deshalb nicht als bereits einzigartig oder schutzfähig bezeichnet.
-- Stacked- und responsive Wortmarken sind ein verbreitetes Markensystem. Richtung B stützt ihre Erkennung auf den vollständigen Namen, die exakte Typografie, die Farbrollen und das konsequente Layout – nicht auf die Behauptung eines neuartigen Einzelzeichens.
-- Die Stadt Bocholt und andere lokale Seiten verwenden die Wörter `Bocholt` und `erleben` auch beschreibend. Eine rechtliche oder markenrechtliche Freigabe ist nicht Bestandteil dieses Richtungs-Gates.
 
 ## 5. Präsentationsgrenze
 
-Das Brand Lab zeigt nur A und B. Alle Inhalte, Komponenten und Größen sind identisch. Die nächste Nutzerentscheidung ist ausschließlich die Wahl einer Grundrichtung oder die Zurückweisung wegen eines konkreten Knock-outs.
+Das Brand Lab zeigt genau den Champion und seine reale Anwendung. Es zeigt keine künstliche Alternative und keine neue UI-Welt. Die nächste Nutzerentscheidung lautet ausschließlich: Richtung freigeben oder mit einem konkreten Knock-out zurückweisen.
