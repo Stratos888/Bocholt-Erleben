@@ -12,7 +12,6 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
 $expectedStartpartnerFiles = [
     '_schema.php', '_contract.php', '_repository.php', '_domain.php',
     '_gate2_domain.php', '_gate3_domain.php', '_gate3_presentation.php',
-    '_gate3_staging_migration_231.php', '_gate3_staging_lifecycle_231.php',
     'intake.php', 'candidates.php', 'profile.php', 'qualification.php',
     'action.php', 'capacity.php', 'pilot.php',
 ];
@@ -23,7 +22,7 @@ $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
 $assert(
     $actualNames === $expectedNames,
-    'Startpartner muss während der kontrollierten Gate-3-E4-Evidence ausschließlich kanonische Owner plus temporären Migrations- und Lifecycle-Owner besitzen.'
+    'Startpartner muss nach Gate 3 ausschließlich die kanonischen Runtime-Owner besitzen.'
 );
 foreach ([
     'triage.php',
@@ -31,6 +30,8 @@ foreach ([
     'gate2-staging-smoke-auto-199.php',
     'gate2-staging-lifecycle-199.php',
     'gate2-staging-status-199.php',
+    '_gate3_staging_migration_231.php',
+    '_gate3_staging_lifecycle_231.php',
 ] as $removedFile) {
     $assert(!is_file($root . '/api/startpartner/' . $removedFile), "Temporäre Startpartner-Datei muss entfernt sein: {$removedFile}");
 }
@@ -74,8 +75,6 @@ $pilot = (string)file_get_contents($root . '/api/startpartner/pilot.php');
 $gate2Domain = (string)file_get_contents($root . '/api/startpartner/_gate2_domain.php');
 $gate3Domain = (string)file_get_contents($root . '/api/startpartner/_gate3_domain.php');
 $gate3Presentation = (string)file_get_contents($root . '/api/startpartner/_gate3_presentation.php');
-$gate3Migration = (string)file_get_contents($root . '/api/startpartner/_gate3_staging_migration_231.php');
-$gate3Lifecycle = (string)file_get_contents($root . '/api/startpartner/_gate3_staging_lifecycle_231.php');
 $contract = (string)file_get_contents($root . '/api/startpartner/_contract.php');
 $domain = (string)file_get_contents($root . '/api/startpartner/_domain.php');
 $repository = (string)file_get_contents($root . '/api/startpartner/_repository.php');
@@ -115,47 +114,24 @@ $assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
 
+$assert(str_contains($deploySmoke, 'check_removed_gate3_temporary_endpoints'), 'Erster Rückbau-Deploy muss die entfernten Gate-3-Evidence-URLs prüfen.');
 foreach ([
-    'be_startpartner_require_gate1_environment',
-    'be_require_review_access',
-    'BE_GATE3_MIGRATION_USER_AGENT',
-    'expected_build',
-    'GET_LOCK',
-    'BE_GATE3_MIGRATION_KEY',
-    'BE_GATE3_MIGRATION_FILE',
-    'be_gate3_migration_split_sql',
-    'be_gate3_migration_execute_statement',
-    'RELEASE_LOCK',
+    '/api/startpartner/_gate3_staging_migration_231.php',
+    '/api/startpartner/_gate3_staging_lifecycle_231.php',
+    'HTTP 404',
 ] as $marker) {
-    $assert(str_contains($gate3Migration, $marker), "Gate-3-Migrationsschutz fehlt: {$marker}");
+    $assert(str_contains($deploySmoke, $marker), "Gate-3-Rückbauvertrag fehlt: {$marker}");
 }
 foreach ([
-    '011_startpartner_gate3_terms_organizer_entitlement.sql',
-    '010_startpartner_gate2_qualification_capacity',
-    'be_startpartner_gate3_schema_gaps',
-    'locked_counts_before',
-    'locked_counts_after',
-] as $marker) {
-    $assert(str_contains($gate3Migration, $marker), "Gate-3-Migrationsvertrag fehlt: {$marker}");
+    'check_gate3_staging_migration',
+    'check_gate3_staging_lifecycle',
+    'load_deploy_review_password',
+    'write_gate3_diagnostic',
+    '231_gate3_staging_lifecycle_completed',
+    'deploy/api/_config.php',
+] as $removedEvidenceToken) {
+    $assert(!str_contains($deploySmoke, $removedEvidenceToken), "Generischer Deploy-Smoke enthält noch aktive Gate-3-Evidence: {$removedEvidenceToken}");
 }
-$assert(!str_contains($gate3Migration, '009_control_center_runtime_schema.sql'), 'Gate-3-Migrationswriter darf Migration 009 nicht ausführen.');
-$assert(!str_contains($gate3Migration, '010_startpartner_gate2_qualification_capacity.sql'), 'Gate-3-Migrationswriter darf Migration 010 nicht ausführen.');
-
-foreach (['be_startpartner_require_gate1_environment', 'be_require_review_access', 'BE_GATE3_E4_USER_AGENT', 'expected_build', 'GET_LOCK', 'BE_GATE3_E4_MARKER', 'be_gate3_e4_cleanup'] as $marker) {
-    $assert(str_contains($gate3Lifecycle, $marker), "Gate-3-E4-Lifecycle-Schutz fehlt: {$marker}");
-}
-foreach (['/api/startpartner/action.php', '/api/startpartner/pilot.php', 'pending_activation', 'idempotent_replay', 'RELEASE_LOCK'] as $marker) {
-    $assert(str_contains($gate3Lifecycle, $marker), "Gate-3-E4-Lifecycle-Vertrag fehlt: {$marker}");
-}
-$assert(str_contains($deploySmoke, 'check_gate3_staging_migration'), 'Deploy-Smoke muss Migration 011 kontrolliert anwenden.');
-$assert(str_contains($deploySmoke, 'check_gate3_staging_lifecycle'), 'Deploy-Smoke muss den einmaligen Gate-3-E4-Lifecycle ausführen.');
-$assert(str_contains($deploySmoke, 'deploy/api/_config.php'), 'Gate-3-Evidence muss das Review-Secret nur aus der privaten Deploy-Konfiguration lesen.');
-$migrationIndex = strpos($deploySmoke, 'lambda: check_gate3_staging_migration');
-$lifecycleIndex = strpos($deploySmoke, 'lambda: check_gate3_staging_lifecycle');
-$assert(
-    $migrationIndex !== false && $lifecycleIndex !== false && $migrationIndex < $lifecycleIndex,
-    'Deploy-Smoke muss Migration 011 vor dem Gate-3-Lifecycle ausführen.'
-);
 
 foreach ([
     'gate2-staging-status-199.php',
