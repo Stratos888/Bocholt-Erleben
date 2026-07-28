@@ -13,6 +13,7 @@ const statusLabels={
 const sourceLabels={self_service:'Selbstmeldung',targeted_outreach:'Interne Identifizierung'};
 const scopeLabels={events:'Events',activities:'Aktivitäten',both:'Events und Aktivitäten',unknown:'Noch offen'};
 const assessmentLabels={unknown:'Offen',weak:'Schwach',adequate:'Ausreichend',strong:'Stark'};
+const channelLabels={operator_recorded:'Intern protokolliert',signed_document:'Unterzeichnetes Dokument',email_reply:'E-Mail-Bestätigung',portal:'Portalbestätigung'};
 const dimensionLabels={
   local_relevance:'Lokaler Bezug',organization_contact:'Organisation und Kontakt',content_sources:'Inhalte und Quellen',
   editorial_fit:'Redaktionelle Passung',content_leverage:'Inhaltshebel',reach_leverage:'Reichweitenhebel',
@@ -37,7 +38,8 @@ function candidate(item){
     revision:Number(context.candidate_revision||0),assigned_to:context.assigned_to||'',
     next_review_at:context.next_review_at||'',desired_content_scope:context.desired_content_scope||'',
     source:context.candidate_source||'',readiness:context.readiness||{ready:false,blockers:[]},
-    capacity:context.capacity||{},qualifications:[],contacts:[],events:[],reservations:[],
+    capacity:context.capacity||{},gate3:context.gate3||{complete:false,blockers:[]},
+    qualifications:[],contacts:[],events:[],reservations:[],
   };
 }
 function dateInput(valueText){
@@ -45,9 +47,17 @@ function dateInput(valueText){
   const date=new Date(text.replace(' ','T'));if(Number.isNaN(date.getTime()))return '';
   const local=new Date(date.getTime()-date.getTimezoneOffset()*60000);return local.toISOString().slice(0,16);
 }
+function nowInput(){return dateInput(new Date().toISOString());}
 function futureDate(days){const date=new Date();date.setDate(date.getDate()+days);return date.toISOString().slice(0,10);}
 function metric(label,value,tone=''){return `<div class="cc-startpartner-metric ${tone?`cc-startpartner-metric--${tone}`:''}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value||'–')}</strong></div>`;}
 function blockerText(data){
+  const gate3=data?.gate3||{};
+  if(data?.status==='accepted_pending_terms'){
+    if(gate3.complete)return 'Bedingungen bestätigt; Pilot-Onboarding vorbereitet. Aktivierung und Laufzeit bleiben gesperrt.';
+    const blocker=asArray(gate3.blockers)[0];
+    if(blocker?.message)return blocker.message;
+    return 'Pilotbedingungen müssen ausdrücklich bestätigt und einem Organizer zugeordnet werden.';
+  }
   const blockers=asArray(data?.readiness?.blockers);
   if(data?.readiness?.ready)return 'Alle 14 Dimensionen sind bewusst bewertet; die Mindestanforderungen sind erfüllt.';
   if(!blockers.length)return 'Qualifizierung ist noch nicht vollständig belegt.';
@@ -73,7 +83,12 @@ function contacts(data){
 }
 function reservation(data){
   const active=data.active_reservation;
-  if(active)return `<section class="cc-startpartner-state-card"><span class="cc-kicker">Aktive Reservierung</span><strong>Bis ${escapeHtml(formatDate(active.ends_at))}</strong><p>Der Platz ist reserviert; Bedingungen und Pilotaktivierung sind ausdrücklich noch offen.</p></section>`;
+  if(active){
+    const message=data?.gate3?.complete
+      ? 'Die Reservierung bleibt während des Onboardings der einzige Kapazitätsowner; Aktivierung und Laufzeit sind weiterhin offen.'
+      : 'Der Platz ist reserviert; Bedingungen und Pilotaktivierung sind ausdrücklich noch offen.';
+    return `<section class="cc-startpartner-state-card"><span class="cc-kicker">Aktive Reservierung</span><strong>Bis ${escapeHtml(formatDate(active.ends_at))}</strong><p>${escapeHtml(message)}</p></section>`;
+  }
   if(data.waitlist)return `<section class="cc-startpartner-state-card"><span class="cc-kicker">Warteliste</span><strong>Neubewertung ${escapeHtml(formatDate(data.waitlist.next_review_at))}</strong><p>${escapeHtml(data.waitlist.priority_reason||data.waitlist.eligibility_reason||'Erneute Prüfung vorgesehen.')}</p><small>${escapeHtml(contactStatusLabels[data.waitlist.contact_status]||data.waitlist.contact_status||'')}</small></section>`;
   return '';
 }
@@ -81,19 +96,32 @@ function decision(data){
   const current=data.decision;if(!current)return '';
   return `<section class="cc-startpartner-state-card"><span class="cc-kicker">Aktuelle Entscheidung</span><strong>${escapeHtml(statusLabels[current.result]||current.result)}</strong><p>${escapeHtml(current.reason||'')}</p>${current.regular_alternative?`<small>Alternative: ${escapeHtml(current.regular_alternative)}</small>`:''}</section>`;
 }
+function gate3Summary(data){
+  if(data.status!=='accepted_pending_terms'&&!data?.gate3?.pilot)return '';
+  const gate3=data.gate3||{};
+  if(!gate3.complete){
+    const blocker=asArray(gate3.blockers)[0];
+    return `<section class="cc-startpartner-panel"><header><div><span class="cc-kicker">Pilotbedingungen und Organizer</span><h3>Gate 3 offen</h3></div><span class="cc-pill">Bedingungen offen</span></header><p>${escapeHtml(blocker?.message||'Ausdrückliche Bestätigung, Organizer-Verknüpfung und Pilotberechtigung fehlen.')}</p></section>`;
+  }
+  const terms=gate3.terms_acceptance||{},organizer=gate3.organizer||{},pilot=gate3.pilot||{},entitlement=gate3.entitlement||{};
+  const scopes=asArray(gate3.scopes).filter(scope=>['events','activities'].includes(scope.scope_key)).map(scope=>`${scope.scope_key==='events'?'Events':'Aktivitäten'}: ${scope.is_unlimited?'unbegrenzt':scope.limit_value||'–'}${scope.period_unit==='pilot_month'?' / Pilotmonat':scope.period_unit==='concurrent'?' gleichzeitig':''}`).join(' · ');
+  return `<section class="cc-startpartner-panel"><header><div><span class="cc-kicker">Pilotbedingungen und Organizer</span><h3>Pilot-Onboarding vorbereitet</h3></div><span class="cc-pill">Aktivierung ausstehend</span></header><dl class="cc-startpartner-facts"><div><dt>Bedingungen</dt><dd>${escapeHtml(terms.terms_version||'–')} · ${escapeHtml(formatDateTime(terms.accepted_at)||'–')}</dd></div><div><dt>Organizer</dt><dd>${escapeHtml(organizer.organization_name||'–')} · ${escapeHtml(organizer.email||'–')}</dd></div><div><dt>Pilot</dt><dd>${escapeHtml(pilot.status||'onboarding')} · Revision ${escapeHtml(pilot.revision||1)}</dd></div><div><dt>Pilotberechtigung</dt><dd>${escapeHtml(entitlement.status||'pending_activation')} · keine aktuelle Veröffentlichungswirkung</dd></div></dl>${scopes?`<p>${escapeHtml(scopes)}</p>`:''}</section>`;
+}
 function audit(data){
-  const events=asArray(data.events);if(!events.length)return '<p class="cc-muted">Noch kein Auditverlauf vorhanden.</p>';
+  const events=[...asArray(data.events),...asArray(data?.gate3?.events)];if(!events.length)return '<p class="cc-muted">Noch kein Auditverlauf vorhanden.</p>';
   return `<ol class="cc-startpartner-audit">${events.slice().reverse().map(event=>`<li><div><strong>${escapeHtml(event.event_type||'Änderung')}</strong><span>${escapeHtml(formatDateTime(event.created_at))}</span></div><small>${escapeHtml(event.actor_reference||event.actor_type||'System')}</small></li>`).join('')}</ol>`;
 }
 export function renderStartpartnerReview(item={}){
   const data=candidate(item);const readiness=data.readiness||{};const capacity=data.capacity||{};
   const primary=item.primary_action;
+  const displayStatus=data?.gate3?.complete?'Pilot-Onboarding':(statusLabels[data.status]||item.display_status||'Prüfung erforderlich');
   return `<section class="cc-startpartner-review" data-startpartner-status="${escapeHtml(data.status||'')}">
     <section class="cc-startpartner-priority" aria-label="Priorisierte Startpartner-Prüfung">
-      <div class="cc-startpartner-priority__status"><span class="cc-kicker">Aktueller Stand</span><strong>${escapeHtml(statusLabels[data.status]||item.display_status||'Prüfung erforderlich')}</strong><p>${escapeHtml(blockerText(data))}</p></div>
+      <div class="cc-startpartner-priority__status"><span class="cc-kicker">Aktueller Stand</span><strong>${escapeHtml(displayStatus)}</strong><p>${escapeHtml(blockerText(data))}</p></div>
       <div class="cc-startpartner-priority__facts">${metric('Fälligkeit',data.next_review_at?formatDate(data.next_review_at):'Nicht gesetzt',data.next_review_at?'':'attention')}${metric('Bearbeiter',data.assigned_to||'Nicht zugewiesen',data.assigned_to?'':'attention')}${metric('Kapazität',capacityText(capacity),capacity.hard_stop?'attention':capacity.soft_stop?'warning':'good')}</div>
       ${primary?`<button class="cc-button cc-button--primary cc-button--large cc-startpartner-primary" data-review-action="${escapeHtml(primary.key)}">${escapeHtml(primary.label)}</button>`:'<div class="cc-empty">Aktuell keine Fachaktion erforderlich.</div>'}
     </section>
+    ${gate3Summary(data)}
     <section class="cc-startpartner-panel"><header><div><span class="cc-kicker">Qualifizierung</span><h3>${readiness.ready?'Entscheidungsreif':'Blocker offen'}</h3></div><span class="cc-pill">${escapeHtml(`${Number(readiness.assessed_count||0)} / ${Number(readiness.total_count||14)} bewertet`)}</span></header>${qualificationSummary(data)}</section>
     <section class="cc-startpartner-grid"><section class="cc-startpartner-panel"><span class="cc-kicker">Organisation und Kontakt</span><h3>${escapeHtml(data.organization_name||item.title||'Startpartner')}</h3><dl class="cc-startpartner-facts"><div><dt>Herkunft</dt><dd>${escapeHtml(sourceLabels[data.source]||data.source||'–')}</dd></div><div><dt>Scope</dt><dd>${escapeHtml(scopeLabels[data.desired_content_scope]||data.desired_content_scope||'–')}</dd></div><div><dt>Website</dt><dd>${data.website_url?`<a href="${escapeHtml(data.website_url)}" target="_blank" rel="noopener">Website öffnen</a>`:'–'}</dd></div></dl>${contacts(data)}${data.description_text?`<p class="cc-startpartner-description">${escapeHtml(data.description_text)}</p>`:''}</section><section class="cc-startpartner-panel"><span class="cc-kicker">Kapazität und Weg</span><h3>${escapeHtml(capacityText(capacity))}</h3>${reservation(data)}${decision(data)}</section></section>
     <details class="cc-disclosure cc-startpartner-evidence"><summary>Evidence und Auditverlauf</summary><div>${audit(data)}</div></details>
@@ -101,11 +129,11 @@ export function renderStartpartnerReview(item={}){
 }
 
 async function latest(item){return api(`/api/control-center/case.php?id=${encodeURIComponent(item.id)}`,{timeoutMs:15000});}
-function gate2Id(){return `gate2:199:${operationId().replace(/^cc:/,'')}`;}
+function mutationId(prefix='gate2:199'){return `${prefix}:${operationId().replace(/^cc:/,'')}`;}
 function operator(data){return clean(data.assigned_to)||'Steuerzentrale';}
-async function mutate(path,data,payload,reload,success){
+async function mutate(path,data,payload,reload,success,prefix='gate2:199'){
   try{
-    const result=await api(path,{method:'POST',body:JSON.stringify({candidate_id:data.id,operation_id:gate2Id(),expected_revision:Number(data.revision),operator_name:operator(data),...payload}),timeoutMs:70000});
+    const result=await api(path,{method:'POST',body:JSON.stringify({candidate_id:data.id,operation_id:mutationId(prefix),expected_revision:Number(data.revision),operator_name:operator(data),...payload}),timeoutMs:70000});
     await reload({throwOnError:true});closeDialog();setStatus(success,'success');return result;
   }catch(error){
     if(error.status===409){await reload({throwOnError:true}).catch(()=>{});dialogMessage('Zwischenzeitlich geändert. Die Ansicht wurde neu geladen; bitte prüfe den aktuellen Stand.');return null;}
@@ -115,13 +143,39 @@ async function mutate(path,data,payload,reload,success){
 function confirmButton(label,tone='primary'){return `<button type="button" class="cc-button cc-button--${tone}" id="sp-confirm">${escapeHtml(label)}</button>`;}
 function scopeSelect(selected){return `<label class="cc-field"><span>Inhaltlicher Scope</span><select id="sp-scope">${Object.entries(scopeLabels).map(([key,label])=>`<option value="${key}" ${key===selected?'selected':''}>${escapeHtml(label)}</option>`).join('')}</select></label>`;}
 function assessmentSelect(id,selected){return `<select id="${id}">${Object.entries(assessmentLabels).map(([key,label])=>`<option value="${key}" ${key===selected?'selected':''}>${escapeHtml(label)}</option>`).join('')}</select>`;}
+function selectField(id,label,options,selected=''){return `<label class="cc-field"><span>${escapeHtml(label)}</span><select id="${id}">${Object.entries(options).map(([key,text])=>`<option value="${escapeHtml(key)}" ${key===selected?'selected':''}>${escapeHtml(text)}</option>`).join('')}</select></label>`;}
+
 async function profileDialog(item,reload){
   setStatus('Startpartner-Profil wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;const contactFields=asArray(data.contacts).map((contact,index)=>`<fieldset class="cc-startpartner-contact-editor"><legend>Kontakt ${index+1}${contact.is_primary?' · Hauptkontakt':''}</legend>${field(`sp-contact-name-${index}`,'Name',contact.contact_name||'')}${field(`sp-contact-role-${index}`,'Rolle',contact.contact_role||'')}${field(`sp-contact-email-${index}`,'E-Mail',contact.email||'','email','required')}${field(`sp-contact-phone-${index}`,'Telefon',contact.phone||'')}</fieldset>`).join('');openDialog(`<h2>Startpartner-Profil bearbeiten</h2><p class="cc-hint">Organisation, Zuständigkeit, Quellenprofil und bestehende Kontakte bleiben gemeinsam konsistent.</p><div id="cc-dialog-message"></div><div class="cc-stack">${field('sp-organization','Organisation',data.organization_name||'')}${field('sp-assigned','Bearbeiter',data.assigned_to||'')}${field('sp-review','Nächste Prüfung',dateInput(data.next_review_at),'datetime-local')}${field('sp-website','Website',data.website_url||'','url')}${scopeSelect(data.desired_content_scope)}${textarea('sp-description','Inhalts- und Organisationsprofil',data.description_text||'')}${contactFields}${confirmButton('Profil speichern')}</div>`,'cc-dialog--wide');setStatus('');document.querySelector('#sp-confirm')?.addEventListener('click',async event=>{event.currentTarget.disabled=true;const contacts=asArray(data.contacts).map((contact,index)=>({contact_name:value(`#sp-contact-name-${index}`),contact_role:value(`#sp-contact-role-${index}`),email:value(`#sp-contact-email-${index}`),phone:value(`#sp-contact-phone-${index}`),is_primary:Boolean(contact.is_primary)}));const result=await mutate('/api/startpartner/profile.php',data,{organization_name:value('#sp-organization'),assigned_to:value('#sp-assigned'),next_review_at:value('#sp-review'),website_url:value('#sp-website'),desired_content_scope:value('#sp-scope'),description_text:value('#sp-description'),...(contacts.length?{contacts}:{})},reload,'Profil gespeichert und vollständig neu geladen.');if(!result)event.currentTarget.disabled=false;});}catch(error){setStatus(error.message,'attention');}
 }
 async function qualificationDialog(item,reload){
   setStatus('Qualifizierung wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;const byDimension=Object.fromEntries(asArray(data.qualifications).map(row=>[row.dimension,row]));const sections=qualificationGroups.map(([label,dimensions])=>`<fieldset class="cc-startpartner-qualification-editor"><legend>${escapeHtml(label)}</legend>${dimensions.map(dimension=>{const row=byDimension[dimension]||{assessment:'unknown'};return `<section data-sp-dimension="${dimension}"><h3>${escapeHtml(dimensionLabels[dimension])}</h3><label class="cc-field"><span>Bewertung</span>${assessmentSelect(`sp-assessment-${dimension}`,row.assessment||'unknown')}</label>${textarea(`sp-reason-${dimension}`,'Begründung',row.reason||'')}${textarea(`sp-evidence-${dimension}`,'Evidence',row.evidence_text||'')}</section>`;}).join('')}</fieldset>`).join('');openDialog(`<h2>Qualifizierung bearbeiten</h2><p class="cc-hint">Alle 14 Dimensionen werden bewusst bewertet. Eine Bewertung außer „Offen“ benötigt Begründung und Evidence.</p><div id="cc-dialog-message"></div><div class="cc-stack">${sections}${confirmButton('Qualifizierung speichern')}</div>`,'cc-dialog--wide cc-dialog--qualification');setStatus('');document.querySelector('#sp-confirm')?.addEventListener('click',async event=>{event.currentTarget.disabled=true;const qualifications=Object.keys(dimensionLabels).map(dimension=>({dimension,assessment:value(`#sp-assessment-${dimension}`),reason:value(`#sp-reason-${dimension}`),evidence_text:value(`#sp-evidence-${dimension}`)}));const result=await mutate('/api/startpartner/qualification.php',data,{qualifications},reload,'Qualifizierung gespeichert und vollständig neu bewertet.');if(!result)event.currentTarget.disabled=false;});}catch(error){setStatus(error.message,'attention');}
 }
+function gate3DialogContent(data){
+  const primary=asArray(data.contacts).find(contact=>contact.is_primary)||asArray(data.contacts)[0]||{};
+  return `<div class="cc-notice cc-notice--info"><strong>Ausdrückliche Bestätigung</strong><span>Diese interne Erfassung sendet keine Nachricht, erzeugt keinen Portalzugang und aktiviert keine Veröffentlichung.</span></div>
+    ${field('sp-terms-version','Bedingungsversion','','text','required')}
+    ${field('sp-terms-reference','Unveränderliche Referenz','','text','required')}
+    ${field('sp-terms-digest','SHA-256 der bestätigten Fassung','','text','required')}
+    ${field('sp-accepting-person','Bestätigende Person',primary.contact_name||'','text','required')}
+    ${field('sp-accepting-organization','Bestätigende Organisation',data.organization_name||'','text','required')}
+    ${field('sp-accepted-at','Bestätigt am',nowInput(),'datetime-local','required')}
+    ${selectField('sp-confirmation-channel','Bestätigungskanal',channelLabels,'operator_recorded')}
+    ${field('sp-target-plans','Dokumentierter Zieltarifspiegel','','text','required')}
+    ${field('sp-cohort','Pilotkohorte','','text','required')}
+    ${data.desired_content_scope==='activities'?'':field('sp-event-limit','Events je Pilotmonat','8','number','required')}
+    ${data.desired_content_scope==='events'?'':field('sp-activity-limit','Gleichzeitige Aktivitäten','1','number','required')}
+    ${textarea('sp-source-care','Quellenpflege und Herkunft','','required')}
+    ${textarea('sp-maintenance','Pflege- und Serviceumfang','','required')}
+    ${textarea('sp-reach','Reichweitenbeitrag','','required')}
+    ${field('sp-privacy-version','Datenschutzhinweis-Version','','text')}
+    ${field('sp-communication-version','Kommunikationshinweis-Version','','text')}
+    ${field('sp-planned-start','Geplanter Aktivierungsstart','','date')}
+    ${field('sp-planned-end','Geplantes Aktivierungsende','','date')}
+    <label class="cc-field"><span><input id="sp-no-auto-renewal" type="checkbox" required> Keine automatische kostenpflichtige Verlängerung bestätigt</span></label>`;
+}
 function actionDialogContent(action,data){
+  if(action==='confirm_pilot_terms')return gate3DialogContent(data);
   if(action==='accept_pending_terms')return `${textarea('sp-reason','Entscheidungsbegründung','','required')}${field('sp-reservation-end','Reservierung bis',futureDate(20),'date')}${data.capacity?.soft_stop?textarea('sp-capacity-reason','Kapazitätsausnahme','','required'):''}`;
   if(action==='waitlist'||action==='update_waitlist'){const wait=data.waitlist||{};return `${textarea('sp-reason','Entscheidungsbegründung',action==='update_waitlist'?(data.status_reason||''):'','required')}${textarea('sp-eligibility','Eignungsgrund',wait.eligibility_reason||'','required')}${textarea('sp-priority','Prioritätsgrund',wait.priority_reason||'','required')}${field('sp-review-date','Neubewertung',wait.next_review_at?String(wait.next_review_at).slice(0,10):futureDate(14),'date')}<label class="cc-field"><span>Kontaktstatus</span><select id="sp-contact-status">${Object.entries(contactStatusLabels).map(([key,label])=>`<option value="${key}" ${key===(wait.contact_status||'not_contacted')?'selected':''}>${escapeHtml(label)}</option>`).join('')}</select></label>${field('sp-alternative','Reguläre Alternative',wait.regular_alternative||'')}`;}
   if(action==='extend_reservation')return `${textarea('sp-reason','Grund der Verlängerung','','required')}${field('sp-reservation-end','Neue Reservierung bis',futureDate(25),'date')}`;
@@ -132,6 +186,18 @@ function actionDialogContent(action,data){
 }
 function actionPayload(action){
   const payload={action};const reason=value('#sp-reason');if(reason)payload.reason=reason;
+  if(action==='confirm_pilot_terms'){
+    return {
+      action,terms_version:value('#sp-terms-version'),terms_reference:value('#sp-terms-reference'),terms_digest:value('#sp-terms-digest'),
+      accepting_person:value('#sp-accepting-person'),accepting_organization:value('#sp-accepting-organization'),accepted_at:value('#sp-accepted-at'),
+      confirmation_channel:value('#sp-confirmation-channel'),target_plan_keys:value('#sp-target-plans').split(',').map(item=>item.trim()).filter(Boolean),cohort_key:value('#sp-cohort'),
+      event_limit_per_pilot_month:value('#sp-event-limit'),activity_concurrent_limit:value('#sp-activity-limit'),is_event_unlimited:false,
+      source_care_text:value('#sp-source-care'),maintenance_scope_text:value('#sp-maintenance'),reach_contribution_text:value('#sp-reach'),
+      privacy_notice_version:value('#sp-privacy-version'),communication_notice_version:value('#sp-communication-version'),
+      planned_activation_start:value('#sp-planned-start'),planned_activation_end:value('#sp-planned-end'),
+      no_automatic_paid_renewal:Boolean(document.querySelector('#sp-no-auto-renewal')?.checked),
+    };
+  }
   if(action==='accept_pending_terms'){payload.reservation_ends_at=value('#sp-reservation-end');const capacity=value('#sp-capacity-reason');if(capacity)payload.capacity_exception_reason=capacity;}
   if(action==='waitlist'||action==='update_waitlist'){payload.eligibility_reason=value('#sp-eligibility');payload.priority_reason=value('#sp-priority');payload.next_review_at=value('#sp-review-date');payload.contact_status=value('#sp-contact-status');payload.regular_alternative=value('#sp-alternative');}
   if(action==='extend_reservation')payload.reservation_ends_at=value('#sp-reservation-end');
@@ -140,7 +206,7 @@ function actionPayload(action){
   return payload;
 }
 async function workflowDialog(item,action,reload){
-  setStatus('Aktueller Startpartner-Stand wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;const label=[item.primary_action,...asArray(item.secondary_actions)].find(entry=>entry?.key===action)?.label||'Aktion bestätigen';const destructive=['reject','withdraw','expire','release_reservation'].includes(action);openDialog(`<h2>${escapeHtml(label)}</h2><p>${escapeHtml(statusLabels[data.status]||data.status)} · Revision ${escapeHtml(data.revision)}</p><div id="cc-dialog-message"></div><div class="cc-stack">${actionDialogContent(action,data)}${confirmButton(label,destructive?'danger':'primary')}</div>`);setStatus('');document.querySelector('#sp-confirm')?.addEventListener('click',async event=>{event.currentTarget.disabled=true;const result=await mutate('/api/startpartner/action.php',data,actionPayload(action),reload,'Aktion gespeichert und vollständiger Serverzustand neu geladen.');if(!result)event.currentTarget.disabled=false;});}catch(error){setStatus(error.message,'attention');}
+  setStatus('Aktueller Startpartner-Stand wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;const label=[item.primary_action,...asArray(item.secondary_actions)].find(entry=>entry?.key===action)?.label||'Aktion bestätigen';const destructive=['reject','withdraw','expire','release_reservation'].includes(action);openDialog(`<h2>${escapeHtml(label)}</h2><p>${escapeHtml(data?.gate3?.complete?'Pilot-Onboarding':(statusLabels[data.status]||data.status))} · Revision ${escapeHtml(data.revision)}</p><div id="cc-dialog-message"></div><div class="cc-stack">${actionDialogContent(action,data)}${confirmButton(label,destructive?'danger':'primary')}</div>`,'cc-dialog--wide');setStatus('');document.querySelector('#sp-confirm')?.addEventListener('click',async event=>{event.currentTarget.disabled=true;const prefix=action==='confirm_pilot_terms'?'gate3:231':'gate2:199';const result=await mutate('/api/startpartner/action.php',data,actionPayload(action),reload,action==='confirm_pilot_terms'?'Bedingungen, Organizer und Pilot wurden gespeichert und vollständig neu geladen.':'Aktion gespeichert und vollständiger Serverzustand neu geladen.',prefix);if(!result)event.currentTarget.disabled=false;});}catch(error){setStatus(error.message,'attention');}
 }
 async function detailsDialog(item){setStatus('Audit wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;openDialog(`<h2>${escapeHtml(data.organization_name)}</h2>${renderStartpartnerReview({...item,startpartner_candidate:data,primary_action:null})}`,'cc-dialog--wide');setStatus('');}catch(error){setStatus(error.message,'attention');}}
 export async function handleStartpartnerAction(item,action,reload){

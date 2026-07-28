@@ -13,30 +13,28 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
 
 try {
     $pdo = be_db();
-    $candidateId = trim((string)($_GET['id'] ?? ''));
-    if ($candidateId !== '') {
-        $data = be_startpartner_gate3_candidate_detail($pdo, $candidateId);
-    } else {
-        $items = be_startpartner_gate2_list_candidates($pdo, [
-            'status' => trim((string)($_GET['status'] ?? '')),
-            'source' => trim((string)($_GET['source'] ?? '')),
-            'scope' => trim((string)($_GET['scope'] ?? '')),
-            'assigned_to' => trim((string)($_GET['assigned_to'] ?? '')),
-            'decision_ready' => trim((string)($_GET['decision_ready'] ?? '')),
-            'overdue' => !empty($_GET['overdue']),
-            'limit' => (int)($_GET['limit'] ?? 100),
-        ]);
-        foreach ($items as &$item) {
-            $item['gate3'] = be_startpartner_gate3_state($pdo, (string)$item['id'], false);
+    $candidateId = trim((string)($_GET['candidate_id'] ?? ''));
+    $pilotId = trim((string)($_GET['id'] ?? ''));
+
+    if ($candidateId === '' && $pilotId === '') {
+        throw new InvalidArgumentException('candidate_id or pilot id is required.');
+    }
+    if ($candidateId === '') {
+        $statement = $pdo->prepare(
+            'SELECT candidate_id FROM startpartner_pilots WHERE id = :id LIMIT 1'
+        );
+        $statement->execute(['id' => $pilotId]);
+        $resolved = $statement->fetchColumn();
+        if ($resolved === false) {
+            throw new RuntimeException('Startpartner pilot not found.');
         }
-        unset($item);
-        $data = [
-            'items' => $items,
-            'capacity' => be_startpartner_gate2_capacity($pdo),
-            'total' => count($items),
-        ];
+        $candidateId = (string)$resolved;
     }
 
+    $data = be_startpartner_gate3_state($pdo, $candidateId, true);
+    if ($data['pilot'] === null) {
+        throw new RuntimeException('Startpartner pilot not found.');
+    }
     be_json_response(200, ['status' => 'ok', 'data' => $data]);
 } catch (InvalidArgumentException|DomainException $error) {
     be_json_response(422, ['status' => 'error', 'message' => $error->getMessage()]);
@@ -52,7 +50,7 @@ try {
 } catch (Throwable $error) {
     be_json_response(500, [
         'status' => 'error',
-        'message' => 'Startpartner candidates could not be loaded.',
+        'message' => 'Startpartner pilot could not be loaded.',
         'error_message' => $error->getMessage(),
     ]);
 }

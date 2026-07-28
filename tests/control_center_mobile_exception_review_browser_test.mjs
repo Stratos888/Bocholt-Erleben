@@ -66,7 +66,7 @@ async function startpartnerState(browser,scenario,viewport,name,markers,primaryL
   }
   await context.close();results.push({name,status:'OK'});
 }
-function latestCandidate(){return {id:'19900000-0000-0000-0000-000000009999',organization_name:'GATE2_SYNTHETIC_199_Bocholt Kulturverein',source:'targeted_outreach',desired_content_scope:'both',status:'new',revision:1,assigned_to:'M. Muster',next_review_at:'2026-08-02 10:00:00',website_url:'https://example.org/startpartner',contacts:[],qualifications:[],readiness:{ready:false,assessed_count:0,total_count:14,blockers:[{dimension:'local_relevance',message:'Bewertung fehlt.'}]},capacity:{active_reservations:2,hard_stop_at:8,soft_stop:false,hard_stop:false},reservations:[],active_reservation:null,waitlist:null,decision:null,events:[]};}
+function latestCandidate(){return {id:'19900000-0000-0000-0000-000000009999',organization_name:'GATE2_SYNTHETIC_199_Bocholt Kulturverein',source:'targeted_outreach',desired_content_scope:'both',status:'new',revision:1,assigned_to:'M. Muster',next_review_at:'2026-08-02 10:00:00',website_url:'https://example.org/startpartner',contacts:[],qualifications:[],readiness:{ready:false,assessed_count:0,total_count:14,blockers:[{dimension:'local_relevance',message:'Bewertung fehlt.'}]},capacity:{active_reservations:2,hard_stop_at:8,soft_stop:false,hard_stop:false},reservations:[],active_reservation:null,waitlist:null,decision:null,gate3:{complete:false,blockers:[]},events:[]};}
 async function startpartnerMutation(browser,conflict){
   const name=conflict?'startpartner-stale-conflict':'startpartner-successful-readback';
   const {page,context}=await openScenario(browser,'startpartner-mutation',{width:390,height:844},name,async current=>{
@@ -84,6 +84,29 @@ async function startpartnerMutation(browser,conflict){
     assert((await page.locator('#cc-status').innerText()).includes('vollständiger Serverzustand neu geladen'),'successful readback: eindeutige Rückmeldung fehlt');
   }
   await context.close();results.push({name,status:'OK'});
+}
+async function gate3DialogContract(browser){
+  const reservedCandidate={
+    ...latestCandidate(),
+    status:'accepted_pending_terms',
+    revision:4,
+    contacts:[{contact_name:'Synthetischer Gate-3-Kontakt',email:'gate3@example.org',is_primary:true}],
+    readiness:{ready:true,assessed_count:14,total_count:14,blockers:[]},
+    capacity:{active_reservations:4,hard_stop_at:8,soft_stop:false,hard_stop:false},
+    active_reservation:{id:231,ends_at:'2026-08-20 12:00:00',status:'active'},
+    decision:{result:'accepted_pending_terms',reason:'Synthetisch reserviert.'},
+    gate3:{complete:false,blockers:[{message:'Pilotbedingungen müssen ausdrücklich bestätigt werden.'}]},
+  };
+  const {page,context}=await openScenario(browser,'startpartner-reserved',{width:390,height:844},'startpartner-gate3-dialog',async current=>{
+    await current.route('**/api/control-center/case.php*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'ok',data:{id:'fixture-startpartner',startpartner_candidate:reservedCandidate}})}));
+  });
+  await page.locator('.cc-startpartner-primary').click();
+  await page.waitForSelector('#cc-dialog[open] #sp-terms-version');
+  for(const marker of ['Bedingungsversion','Unveränderliche Referenz','SHA-256','Bestätigende Person','Bestätigungskanal','Pilotkohorte','Keine automatische kostenpflichtige Verlängerung']){
+    assert((await page.locator('#cc-dialog').innerText()).includes(marker),`gate3 dialog: Feld fehlt: ${marker}`);
+  }
+  assert(await page.locator('#sp-no-auto-renewal').isChecked()===false,'gate3 dialog: No-auto-renewal darf nicht vorselektiert sein');
+  await context.close();results.push({name:'startpartner-gate3-dialog',status:'OK'});
 }
 async function shellContracts(browser){
   const noJsContext=await browser.newContext({viewport:{width:360,height:780},javaScriptEnabled:false});
@@ -143,8 +166,10 @@ try{
   await startpartnerState(browser,'startpartner-ready',{width:390,height:844},'startpartner-mobile-390x844-ready',['Entscheidungsreif','Alle 14 Dimensionen','4 von 8 Plätzen reserviert'],'Platz reservieren');
   await startpartnerState(browser,'startpartner-soft',{width:768,height:1024},'startpartner-tablet-768x1024-soft-stop',['Entscheidungsreif','Ausnahmebegründung erforderlich','6 von 8 Plätzen reserviert'],'Platz reservieren');
   await startpartnerState(browser,'startpartner-hard',{width:360,height:780},'startpartner-mobile-360x780-hard-stop',['Entscheidungsreif','harte Grenze erreicht','8 von 8 Plätzen reserviert'],'Auf Warteliste setzen');
-  await startpartnerState(browser,'startpartner-reserved',{width:1440,height:900},'startpartner-desktop-1440x900-reserved',['Platz reserviert · Bedingungen offen','Aktive Reservierung','Bedingungen und Pilotaktivierung sind ausdrücklich noch offen.'],'Reservierung prüfen');
+  await startpartnerState(browser,'startpartner-reserved',{width:1440,height:900},'startpartner-desktop-1440x900-reserved',['Platz reserviert · Bedingungen offen','Aktive Reservierung','Pilotbedingungen müssen ausdrücklich bestätigt','Gate 3 offen'],'Bedingungen bestätigen und Pilot anlegen');
+  await startpartnerState(browser,'startpartner-gate3-complete',{width:390,height:844},'startpartner-mobile-390x844-gate3-complete',['Pilot-Onboarding','Aktivierung ausstehend','pending_activation','Aktive Reservierung','einzige Kapazitätsowner'],'Pilotstatus prüfen');
   await startpartnerState(browser,'startpartner-waitlisted',{width:390,height:844},'startpartner-mobile-390x844-waitlisted',['Warteliste','Neubewertung','Hoher lokaler Mehrwert.'],'Warteliste aktualisieren');
+  await gate3DialogContract(browser);
   await startpartnerMutation(browser,false);
   await startpartnerMutation(browser,true);
   await shellContracts(browser);

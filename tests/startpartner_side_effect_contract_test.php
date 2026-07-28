@@ -10,8 +10,10 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
 };
 
 $expectedStartpartnerFiles = [
-    '_schema.php', '_contract.php', '_repository.php', '_domain.php', '_gate2_domain.php',
-    'intake.php', 'candidates.php', 'profile.php', 'qualification.php', 'action.php', 'capacity.php',
+    '_schema.php', '_contract.php', '_repository.php', '_domain.php',
+    '_gate2_domain.php', '_gate3_domain.php', '_gate3_presentation.php',
+    'intake.php', 'candidates.php', 'profile.php', 'qualification.php',
+    'action.php', 'capacity.php', 'pilot.php',
 ];
 $startpartnerFiles = glob($root . '/api/startpartner/*.php') ?: [];
 $actualNames = array_map('basename', $startpartnerFiles);
@@ -20,7 +22,7 @@ $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
 $assert(
     $actualNames === $expectedNames,
-    'Startpartner muss nach Gate 2 ausschließlich die kanonischen Runtime-Owner besitzen.'
+    'Startpartner muss nach Gate 3 ausschließlich die kanonischen Runtime-Owner besitzen.'
 );
 foreach ([
     'triage.php',
@@ -37,16 +39,24 @@ foreach ($startpartnerFiles as $file) {
     $source = (string)file_get_contents($file);
     $combined .= "\n" . $source;
     $assert(!preg_match('/\b(CREATE|ALTER|DROP)\s+TABLE\b/i', $source), basename($file) . ' darf kein Runtime-DDL enthalten.');
+    if (basename($file) !== '_gate3_domain.php') {
+        $assert(
+            !str_contains($source, 'INSERT INTO organizers'),
+            basename($file) . ' darf keinen Organizer anlegen.'
+        );
+    }
 }
 
 foreach ([
     'be_send_mail',
     'stripe_checkout',
     'stripe_subscription',
-    'publication_entitlements',
-    'publication_consumptions',
-    'INSERT INTO organizers',
+    'INSERT INTO organizer_magic_links',
+    'INSERT INTO organizer_portal_sessions',
+    'INSERT INTO subscriptions',
     'INSERT INTO submissions',
+    'INSERT INTO publication_entitlements',
+    'INSERT INTO publication_consumptions',
     'curl_exec',
     'smtp_',
 ] as $forbiddenToken) {
@@ -59,7 +69,10 @@ $profile = (string)file_get_contents($root . '/api/startpartner/profile.php');
 $qualification = (string)file_get_contents($root . '/api/startpartner/qualification.php');
 $action = (string)file_get_contents($root . '/api/startpartner/action.php');
 $capacity = (string)file_get_contents($root . '/api/startpartner/capacity.php');
+$pilot = (string)file_get_contents($root . '/api/startpartner/pilot.php');
 $gate2Domain = (string)file_get_contents($root . '/api/startpartner/_gate2_domain.php');
+$gate3Domain = (string)file_get_contents($root . '/api/startpartner/_gate3_domain.php');
+$gate3Presentation = (string)file_get_contents($root . '/api/startpartner/_gate3_presentation.php');
 $contract = (string)file_get_contents($root . '/api/startpartner/_contract.php');
 $domain = (string)file_get_contents($root . '/api/startpartner/_domain.php');
 $repository = (string)file_get_contents($root . '/api/startpartner/_repository.php');
@@ -76,6 +89,7 @@ foreach ([
     'qualification.php' => $qualification,
     'action.php' => $action,
     'capacity.php' => $capacity,
+    'pilot.php' => $pilot,
 ] as $name => $source) {
     $assert(str_contains($source, 'be_require_review_access'), "{$name} muss geschützt sein.");
     $assert(str_contains($source, 'be_startpartner_require_gate1_environment'), "{$name} muss außerhalb Staging/Dev fail-closed sein.");
@@ -86,6 +100,14 @@ $assert(str_contains($action, 'BeStartpartnerConflictException'), 'Fachaktionen 
 $assert(str_contains($gate2Domain, 'expected_revision'), 'Jede Gate-2-Mutation benötigt eine erwartete Candidate-Revision.');
 $assert(str_contains($gate2Domain, 'payload_hash'), 'Gate-2-Operationen müssen payloadgebunden sein.');
 $assert(str_contains($gate2Domain, 'be_startpartner_gate2_project_control_case'), 'Control-Center-Projektion muss aus der Startpartner-Domäne erfolgen.');
+$assert(str_contains($gate3Domain, 'expected_revision'), 'Jede Gate-3-Mutation benötigt eine erwartete Candidate-Revision.');
+$assert(str_contains($gate3Domain, 'payload_hash'), 'Gate-3-Operationen müssen payloadgebunden sein.');
+$assert(str_contains($gate3Domain, 'be_startpartner_gate3_project_control_case'), 'Gate-3-Projektion muss aus der Startpartner-Domäne erfolgen.');
+$assert(str_contains($gate3Domain, "'pending_activation'"), 'Gate 3 muss die Pilotberechtigung fail-closed anlegen.');
+$assert(str_contains($gate3Domain, 'be_startpartner_gate3_guard_gate2_action'), 'Gate 3 muss spätere Reservierungsänderungen blockieren.');
+$assert(substr_count($gate3Domain, 'INSERT INTO organizers') === 1, 'Nur der atomare Gate-3-Owner darf genau einen Organizer-Insert besitzen.');
+$assert(str_contains($gate3Presentation, 'Bedingungen bestätigen und Pilot anlegen'), 'Gate-3-Hauptaktion fehlt.');
+$assert(str_contains($pilot, 'be_startpartner_gate3_state'), 'Pilot-Readback muss den Gate-3-Owner verwenden.');
 $assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate'"), 'Der generische Control-Center-Writer muss Startpartner-Fälle abweisen.');
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
@@ -112,7 +134,7 @@ $assert(str_contains($domain, 'be_startpartner_record_duplicate_after_race'), 'U
 
 $publicHtml = (string)file_get_contents($root . '/startpartner/index.html');
 $publicJs = (string)file_get_contents($root . '/js/startpartner-funnel.js');
-$assert(str_contains($publicHtml, 'https://formspree.io/f/mrerpwjy'), 'Öffentliche Route muss in Gate 2 bei Formspree bleiben.');
+$assert(str_contains($publicHtml, 'https://formspree.io/f/mrerpwjy'), 'Öffentliche Route muss in Gate 3 bei Formspree bleiben.');
 $assert(str_contains($publicHtml, 'startpartner_6_months_limited'), 'Öffentlicher Lead-Typ muss unverändert bleiben.');
 $assert(str_contains($publicJs, 'fetch('), 'Bestehender Formspree-Clientpfad muss unverändert vorhanden sein.');
 $assert(!str_contains($publicHtml, '/api/startpartner/intake.php'), 'Öffentliches Formular darf noch nicht auf First Party umgestellt werden.');
@@ -126,9 +148,15 @@ $manifest = json_decode(
 $files = array_column((array)($manifest['migrations'] ?? []), 'file');
 $reconciliationIndex = array_search('007_runtime_schema_reconciliation.sql', $files, true);
 $candidateIndex = array_search('008_startpartner_candidates.sql', $files, true);
+$gate2Index = array_search('010_startpartner_gate2_qualification_capacity.sql', $files, true);
+$gate3Index = array_search('011_startpartner_gate3_terms_organizer_entitlement.sql', $files, true);
 $assert(
     $reconciliationIndex !== false && $candidateIndex === $reconciliationIndex + 1,
     'Manifest muss Reconciliation unmittelbar vor Kandidatenschema ausführen.'
+);
+$assert(
+    $gate2Index !== false && $gate3Index === $gate2Index + 1,
+    'Manifest muss Gate 3 unmittelbar nach dem Gate-2-Schema ausführen.'
 );
 
 if ($failures !== []) {
