@@ -12,6 +12,7 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
 $expectedStartpartnerFiles = [
     '_schema.php', '_contract.php', '_repository.php', '_domain.php',
     '_gate2_domain.php', '_gate3_domain.php', '_gate3_presentation.php',
+    '_gate3_staging_lifecycle_231.php',
     'intake.php', 'candidates.php', 'profile.php', 'qualification.php',
     'action.php', 'capacity.php', 'pilot.php',
 ];
@@ -22,7 +23,7 @@ $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
 $assert(
     $actualNames === $expectedNames,
-    'Startpartner muss nach Gate 3 ausschließlich die kanonischen Runtime-Owner besitzen.'
+    'Startpartner muss während der kontrollierten Gate-3-E4-Evidence ausschließlich kanonische Owner plus den temporären Lifecycle-Owner besitzen.'
 );
 foreach ([
     'triage.php',
@@ -73,6 +74,7 @@ $pilot = (string)file_get_contents($root . '/api/startpartner/pilot.php');
 $gate2Domain = (string)file_get_contents($root . '/api/startpartner/_gate2_domain.php');
 $gate3Domain = (string)file_get_contents($root . '/api/startpartner/_gate3_domain.php');
 $gate3Presentation = (string)file_get_contents($root . '/api/startpartner/_gate3_presentation.php');
+$gate3Lifecycle = (string)file_get_contents($root . '/api/startpartner/_gate3_staging_lifecycle_231.php');
 $contract = (string)file_get_contents($root . '/api/startpartner/_contract.php');
 $domain = (string)file_get_contents($root . '/api/startpartner/_domain.php');
 $repository = (string)file_get_contents($root . '/api/startpartner/_repository.php');
@@ -111,6 +113,15 @@ $assert(str_contains($pilot, 'be_startpartner_gate3_state'), 'Pilot-Readback mus
 $assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate'"), 'Der generische Control-Center-Writer muss Startpartner-Fälle abweisen.');
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
+
+foreach (['be_startpartner_require_gate1_environment', 'be_require_review_access', 'BE_GATE3_E4_USER_AGENT', 'expected_build', 'GET_LOCK', 'BE_GATE3_E4_MARKER', 'be_gate3_e4_cleanup'] as $marker) {
+    $assert(str_contains($gate3Lifecycle, $marker), "Gate-3-E4-Lifecycle-Schutz fehlt: {$marker}");
+}
+foreach (['/api/startpartner/action.php', '/api/startpartner/pilot.php', 'pending_activation', 'idempotent_replay', 'RELEASE_LOCK'] as $marker) {
+    $assert(str_contains($gate3Lifecycle, $marker), "Gate-3-E4-Lifecycle-Vertrag fehlt: {$marker}");
+}
+$assert(str_contains($deploySmoke, 'check_gate3_staging_lifecycle'), 'Deploy-Smoke muss den einmaligen Gate-3-E4-Lifecycle ausführen.');
+$assert(str_contains($deploySmoke, 'deploy/api/_config.php'), 'Gate-3-Evidence muss das Review-Secret nur aus der privaten Deploy-Konfiguration lesen.');
 
 foreach ([
     'gate2-staging-status-199.php',
