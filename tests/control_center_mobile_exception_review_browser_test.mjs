@@ -101,6 +101,7 @@ async function gate3DialogContract(browser){
     await current.route('**/api/control-center/case.php*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'ok',data:{id:'fixture-startpartner',startpartner_candidate:reservedCandidate}})}));
   });
   await page.locator('.cc-startpartner-primary').click();
+  await page.waitForSelector('#cc-dialog[open] #sp-terms-version');
   for(const marker of ['Bedingungsversion','Unveränderliche Referenz','SHA-256','Bestätigende Person','Bestätigungskanal','Pilotkohorte','Keine automatische kostenpflichtige Verlängerung']){
     assert((await page.locator('#cc-dialog').innerText()).includes(marker),`gate3 dialog: Feld fehlt: ${marker}`);
   }
