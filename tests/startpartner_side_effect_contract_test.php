@@ -114,15 +114,10 @@ $assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
 
-$assert(str_contains($deploySmoke, 'check_removed_gate3_temporary_endpoints'), 'Erster Rückbau-Deploy muss die entfernten Gate-3-Evidence-URLs prüfen.');
 foreach ([
-    '/api/startpartner/_gate3_staging_migration_231.php',
-    '/api/startpartner/_gate3_staging_lifecycle_231.php',
-    'HTTP 404',
-] as $marker) {
-    $assert(str_contains($deploySmoke, $marker), "Gate-3-Rückbauvertrag fehlt: {$marker}");
-}
-foreach ([
+    '_gate3_staging_migration_231.php',
+    '_gate3_staging_lifecycle_231.php',
+    'check_removed_gate3_temporary_endpoints',
     'check_gate3_staging_migration',
     'check_gate3_staging_lifecycle',
     'load_deploy_review_password',
@@ -130,7 +125,7 @@ foreach ([
     '231_gate3_staging_lifecycle_completed',
     'deploy/api/_config.php',
 ] as $removedEvidenceToken) {
-    $assert(!str_contains($deploySmoke, $removedEvidenceToken), "Generischer Deploy-Smoke enthält noch aktive Gate-3-Evidence: {$removedEvidenceToken}");
+    $assert(!str_contains($deploySmoke, $removedEvidenceToken), "Generischer Deploy-Smoke enthält noch Gate-3-Evidence: {$removedEvidenceToken}");
 }
 
 foreach ([

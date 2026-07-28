@@ -1,6 +1,6 @@
 # Aktueller Proofindex – Bocholt erleben
 
-Stand: 2026-07-26
+Stand: 2026-07-28
 
 Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence-Grenzen. Operative Zwischenstände, vollständige Logs und laufende Run-IDs stehen im jeweiligen Workpack-Issue und in GitHub Actions.
 
@@ -41,7 +41,10 @@ Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence
 | Startpartner Gate-2-Schema | E2/E4 | versionierte Kette `008` bis `010`, reine Runtime-Schemaprüfung, frische MariaDB 11.4 und realer Staging-Preflight auf MySQL 8.0.36; sichere Wiederholung, Fremdschlüssel, Kaskaden, Candidate-Revision und unveränderte gesperrte Tabellen belegt |
 | Startpartner Gate-2-Domäne | E2/E4 | 14 Dimensionen, Readiness-Blocker, State Machine, stale-write `409`, payloadgebundener Replay, Profil-Deduplizierung, Entscheidungen, Warteliste, Reservierung, Verlängerung, Soft-Stop sechs, begründete siebte Reservierung, Hard-Stop acht, atomare Projektion und Cleanup real auf Staging belegt |
 | Startpartner interne Premium-UI | E2/E4 | eigener Review-Bereich ohne neue Hauptnavigation; Status, Blocker, Hauptaktion, Fälligkeit, Bearbeiter und Kapazität bei 360×780, 390×844, 768×1024 und 1440×900; Konflikt-, Readback-, No-JS-, Modul- und API-Fehlerzustände sowie aktuelle Control-Center-Revision belegt |
-| Startpartner Staging-Lifecycle | E4 | finaler Lifecycle-Versuch 2 über den normalen Staging-Deploy erfolgreich: Migrationen `009`/`010`, Profilrevision, Replay, Payload-Konflikt, stale `409`, 14 Dimensionen, Entscheidung, Reservierungshistorie, Warteliste, Soft-/Hard-Stop und Control-Center-Readback; gesperrte Tabellen unverändert, Kapazität wieder null und vollständiges Zero-Residue-Cleanup. Completion-Marker und sämtliche temporären Evidence-Endpunkte wurden anschließend entfernt; beide ehemaligen URLs lieferten HTTP 404. |
+| Startpartner Gate-2-Staging-Lifecycle | E4 | finaler Lifecycle-Versuch 2 über den normalen Staging-Deploy erfolgreich: Migrationen `009`/`010`, Profilrevision, Replay, Payload-Konflikt, stale `409`, 14 Dimensionen, Entscheidung, Reservierungshistorie, Warteliste, Soft-/Hard-Stop und Control-Center-Readback; gesperrte Tabellen unverändert, Kapazität wieder null und vollständiges Zero-Residue-Cleanup. Completion-Marker und sämtliche temporären Evidence-Endpunkte wurden anschließend entfernt; beide ehemaligen URLs lieferten HTTP 404. |
+| Startpartner Gate-3-Schema | E2/E4 | Migration `011` ist versioniert, auf frischem MySQL 8 und MariaDB 11.4 wiederholbar geprüft und real auf Staging von `0` auf `1` angewendet; sechs Statements, keine Schema-Gaps und unveränderte reguläre Subscription-, Portal-, Submission- und Publication-Owner |
+| Startpartner Gate-3-Domäne | E2/E4 | ausdrückliche versionierte Bedingungenbestätigung, deterministische Organizer-Auflösung, genau ein `onboarding`-Pilot, sieben normalisierte Scopes und ein fail-closed `pending_activation`-Pilotgrant; Replay, geänderter Payload, stale Revision, unveränderte aktive Reservierung als Kapazitätsowner und autoritativer Readback real auf Staging belegt |
+| Startpartner Gate-3-Staging-Lifecycle und Rückbau | E4 | einmaliger synthetischer Lifecycle in Deploy Run `30347617144` erfolgreich; `residue.total = 0`, Kapazität zurück auf null und gesperrte Counts unverändert. Marker danach kontrolliert `1 -> 0`; temporäre Migrations-/Lifecycle-Owner entfernt und beide ehemaligen URLs im Deploy Run `30392440244` mit HTTP 404 belegt. Der generische Deploy-Smoke enthält anschließend kein Gate-3-Evidence- oder Review-Secret-Wiring mehr. |
 | Event-Builder-Kompatibilität | E2 | vom Control-Center-Writer erzeugte Zeitformate werden vom normalen Event-Builder verarbeitet |
 | Externe Live-Writes | Grenze | keine Live-Testschreibaktion; echte Live-Admin-Mutation nur nach ausdrücklicher Freigabe und Write-Vertrag |
 
