@@ -266,9 +266,47 @@ try {
             ['marker_key' => BE_GATE3_E4_MARKER]
         ) === 1;
         if ($markerExists) {
+            $lockedBefore = be_gate3_e4_locked_counts($pdo);
+            $organizersBefore = be_gate3_e4_count($pdo, 'organizers');
+            $capacityBefore = be_startpartner_gate2_capacity($pdo);
+            $residue = be_gate3_e4_residue($pdo);
+            be_gate3_e4_assert((int)$residue['total'] === 0, 'Synthetic Gate-3 residue exists before marker cleanup.');
+            $pdo->prepare('DELETE FROM app_schema_migrations WHERE migration_key = :marker_key')->execute([
+                'marker_key' => BE_GATE3_E4_MARKER,
+            ]);
+            $markerAfter = be_gate3_e4_count(
+                $pdo,
+                'app_schema_migrations',
+                'migration_key = :marker_key',
+                ['marker_key' => BE_GATE3_E4_MARKER]
+            );
+            be_gate3_e4_assert($markerAfter === 0, 'Gate-3 completion marker was not removed.');
+            $lockedAfter = be_gate3_e4_locked_counts($pdo);
+            $organizersAfter = be_gate3_e4_count($pdo, 'organizers');
+            $capacityAfter = be_startpartner_gate2_capacity($pdo);
+            be_gate3_e4_assert($lockedAfter === $lockedBefore, 'Locked table counts changed during marker cleanup.');
+            be_gate3_e4_assert($organizersAfter === $organizersBefore, 'Organizer count changed during marker cleanup.');
+            be_gate3_e4_assert(
+                (int)$capacityAfter['active_reservations'] === (int)$capacityBefore['active_reservations'],
+                'Capacity changed during marker cleanup.'
+            );
             be_json_response(200, [
                 'status' => 'ok',
-                'data' => ['already_completed' => true, 'marker' => BE_GATE3_E4_MARKER, 'build' => $deployedBuild],
+                'data' => [
+                    'already_completed' => true,
+                    'marker' => BE_GATE3_E4_MARKER,
+                    'marker_removed' => true,
+                    'marker_count_before' => 1,
+                    'marker_count_after' => 0,
+                    'build' => $deployedBuild,
+                    'residue' => $residue,
+                    'locked_counts_before' => $lockedBefore,
+                    'locked_counts_after' => $lockedAfter,
+                    'organizers_before' => $organizersBefore,
+                    'organizers_after' => $organizersAfter,
+                    'capacity_before' => (int)$capacityBefore['active_reservations'],
+                    'capacity_after' => (int)$capacityAfter['active_reservations'],
+                ],
             ]);
         }
 
