@@ -312,6 +312,15 @@ def load_deploy_review_password() -> str:
     return password
 
 
+def write_gate3_diagnostic(name: str, payload: dict[str, Any]) -> None:
+    artifact_dir = Path("artifacts/browser-smoke")
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+    (artifact_dir / name).write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
 def check_gate3_staging_lifecycle(base_url: str, expected_build: str) -> None:
     if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
         return
@@ -328,12 +337,27 @@ def check_gate3_staging_lifecycle(base_url: str, expected_build: str) -> None:
     )
     require_status(unauthenticated, {401}, "Gate-3-Evidence Zugriffsschutz")
     password = load_deploy_review_password()
-    result = request_url(
-        build_url(base_url, path),
-        method="POST",
-        body=json.dumps({"expected_build": build}).encode("utf-8"),
-        headers={"Content-Type": "application/json", "X-BE-Review-Password": password},
-        timeout=180,
+    try:
+        result = request_url(
+            build_url(base_url, path),
+            method="POST",
+            body=json.dumps({"expected_build": build}).encode("utf-8"),
+            headers={"Content-Type": "application/json", "X-BE-Review-Password": password},
+            timeout=180,
+        )
+    except Exception as error:  # noqa: BLE001
+        write_gate3_diagnostic(
+            "gate3-e4-exception.json",
+            {"build": build, "error_type": type(error).__name__, "error": str(error)},
+        )
+        raise
+    try:
+        response_body: Any = json.loads(result.body)
+    except json.JSONDecodeError:
+        response_body = {"raw": result.body[:4000]}
+    write_gate3_diagnostic(
+        "gate3-e4-response.json",
+        {"build": build, "http_status": result.status, "body": response_body},
     )
     require_status(result, {200}, "Gate-3-E4-Staging-Lifecycle")
     payload = parse_json(result)
@@ -341,6 +365,7 @@ def check_gate3_staging_lifecycle(base_url: str, expected_build: str) -> None:
     if payload.get("status") != "ok" or not isinstance(data, dict):
         raise AssertionError(f"Gate-3-E4-Staging-Lifecycle: unerwartete Antwort: {payload}")
     if data.get("already_completed") is True:
+        write_gate3_diagnostic("gate3-e4-evidence.json", {"build": build, "data": data})
         print("✅ Gate-3-E4-Staging-Lifecycle: bereits genau einmal abgeschlossen; Marker bestätigt")
         return
     evidence = data.get("evidence")
@@ -360,6 +385,7 @@ def check_gate3_staging_lifecycle(base_url: str, expected_build: str) -> None:
     mismatches = {key: (evidence.get(key), value) for key, value in required.items() if evidence.get(key) != value}
     if mismatches:
         raise AssertionError(f"Gate-3-E4-Staging-Lifecycle: Evidence unvollständig: {mismatches}")
+    write_gate3_diagnostic("gate3-e4-evidence.json", {"build": build, "data": data})
     print(
         "✅ Gate-3-E4-Staging-Lifecycle: permanente API, Organizer, Onboarding-Pilot, "
         "pending_activation-Grant, Replay, Konflikte, Reservierung, Locked Counts und Zero Residue belegt"
