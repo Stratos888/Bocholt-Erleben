@@ -321,6 +321,57 @@ def write_gate3_diagnostic(name: str, payload: dict[str, Any]) -> None:
     )
 
 
+def check_gate3_staging_migration(base_url: str, expected_build: str) -> None:
+    if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
+        return
+    build = expected_build.strip()
+    if not re.fullmatch(r"[0-9a-f]{12}", build):
+        raise AssertionError("Gate-3-Migration benötigt den exakten zwölfstelligen Deploy-Build.")
+    path = "/api/startpartner/_gate3_staging_migration_231.php"
+    request_body = json.dumps({"expected_build": build}).encode("utf-8")
+    unauthenticated = request_url(
+        build_url(base_url, path),
+        method="POST",
+        body=request_body,
+        headers={"Content-Type": "application/json"},
+        timeout=30,
+    )
+    require_status(unauthenticated, {401}, "Gate-3-Migration Zugriffsschutz")
+    password = load_deploy_review_password()
+    try:
+        result = request_url(
+            build_url(base_url, path),
+            method="POST",
+            body=request_body,
+            headers={"Content-Type": "application/json", "X-BE-Review-Password": password},
+            timeout=180,
+        )
+    except Exception as error:  # noqa: BLE001
+        write_gate3_diagnostic(
+            "gate3-migration-exception.json",
+            {"build": build, "error_type": type(error).__name__, "error": str(error)},
+        )
+        raise
+    try:
+        response_body: Any = json.loads(result.body)
+    except json.JSONDecodeError:
+        response_body = {"raw": result.body[:4000]}
+    write_gate3_diagnostic(
+        "gate3-migration-response.json",
+        {"build": build, "http_status": result.status, "body": response_body},
+    )
+    require_status(result, {200}, "Gate-3-Staging-Migration-011")
+    payload = parse_json(result)
+    data = payload.get("data")
+    if payload.get("status") != "ok" or not isinstance(data, dict):
+        raise AssertionError(f"Gate-3-Staging-Migration-011: unerwartete Antwort: {payload}")
+    if data.get("migration_count_after") != 1 or data.get("schema_gaps") != []:
+        raise AssertionError(f"Gate-3-Staging-Migration-011: Schema nicht vollständig: {data}")
+    if data.get("locked_counts_before") != data.get("locked_counts_after"):
+        raise AssertionError("Gate-3-Staging-Migration-011: gesperrte Tabellen wurden verändert.")
+    print(f"✅ Gate-3-Staging-Migration-011: {data.get('action')} und vollständig zurückgelesen")
+
+
 def check_gate3_staging_lifecycle(base_url: str, expected_build: str) -> None:
     if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
         return
@@ -407,6 +458,7 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_checkout_validation(base_url),
         lambda: check_review_endpoint_protected(base_url),
         lambda: check_push_endpoints_protected(base_url),
+        lambda: check_gate3_staging_migration(base_url, args.expected_build),
         lambda: check_gate3_staging_lifecycle(base_url, args.expected_build),
     ]
     print(f"=== Deploy-Smoke-Check: {base_url} ===")
