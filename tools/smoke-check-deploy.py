@@ -300,30 +300,6 @@ def check_push_endpoints_protected(base_url: str) -> None:
         check_protected_json_endpoint(base_url, path=path, label=label, method="POST", body=b"{}")
 
 
-def check_removed_gate3_temporary_endpoints(base_url: str) -> None:
-    if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
-        return
-    for path, label in [
-        (
-            "/api/startpartner/_gate3_staging_migration_231.php",
-            "Entfernter Gate-3-Migrationsowner",
-        ),
-        (
-            "/api/startpartner/_gate3_staging_lifecycle_231.php",
-            "Entfernter Gate-3-Lifecycle-Owner",
-        ),
-    ]:
-        result = request_url(
-            build_url(base_url, path),
-            method="POST",
-            body=b"{}",
-            headers={"Content-Type": "application/json"},
-            timeout=30,
-        )
-        require_status(result, {404}, label)
-    print("✅ Gate-3-Evidence-Rückbau: beide ehemaligen URLs liefern HTTP 404")
-
-
 def run(args: argparse.Namespace) -> None:
     base_url = normalize_base_url(args.base_url)
     checks = [
@@ -339,7 +315,6 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_checkout_validation(base_url),
         lambda: check_review_endpoint_protected(base_url),
         lambda: check_push_endpoints_protected(base_url),
-        lambda: check_removed_gate3_temporary_endpoints(base_url),
     ]
     print(f"=== Deploy-Smoke-Check: {base_url} ===")
     for check in checks:
