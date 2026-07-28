@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import argparse
-import base64
 import json
 import re
 import sys
 import time
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin
@@ -166,6 +164,7 @@ def check_build_file(base_url: str, expected_build: str | None) -> None:
     if not expected:
         return
     label = "Build-Datei"
+
     def do_check() -> str:
         result = request_url(build_url(base_url, "/meta/build.txt"), timeout=20)
         require_status(result, {200}, label)
@@ -173,6 +172,7 @@ def check_build_file(base_url: str, expected_build: str | None) -> None:
         if deployed_build != expected:
             raise AssertionError(f"{label}: erwarteter Build {expected}, deployt ist {deployed_build!r}.")
         return deployed_build
+
     deployed_build = retry(label, do_check)
     print(f"✅ {label}: {deployed_build}")
 
@@ -294,153 +294,16 @@ def check_push_endpoints_protected(base_url: str) -> None:
         check_protected_json_endpoint(base_url, path=path, label=label, method="POST", body=b"{}")
 
 
-def load_deploy_review_password() -> str:
-    path = Path("deploy/api/_config.php")
-    if not path.is_file():
-        raise AssertionError("Private Deploy-Konfiguration für Gate-3-Evidence fehlt.")
-    source = path.read_text(encoding="utf-8")
-    match = re.search(r"base64_decode\('([^']+)'\)", source)
-    if match is None:
-        raise AssertionError("Private Deploy-Konfiguration ist nicht auslesbar.")
-    try:
-        config = json.loads(base64.b64decode(match.group(1)).decode("utf-8"))
-    except (ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
-        raise AssertionError("Private Deploy-Konfiguration ist ungültig.") from error
-    password = str((config.get("review") or {}).get("password") or "").strip()
-    if not password:
-        raise AssertionError("Staging-Review-Passwort fehlt in der privaten Deploy-Konfiguration.")
-    return password
-
-
-def write_gate3_diagnostic(name: str, payload: dict[str, Any]) -> None:
-    artifact_dir = Path("artifacts/browser-smoke")
-    artifact_dir.mkdir(parents=True, exist_ok=True)
-    (artifact_dir / name).write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-
-
-def check_gate3_staging_migration(base_url: str, expected_build: str) -> None:
+def check_removed_gate3_temporary_endpoints(base_url: str) -> None:
     if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
         return
-    build = expected_build.strip()
-    if not re.fullmatch(r"[0-9a-f]{12}", build):
-        raise AssertionError("Gate-3-Migration benötigt den exakten zwölfstelligen Deploy-Build.")
-    path = "/api/startpartner/_gate3_staging_migration_231.php"
-    request_body = json.dumps({"expected_build": build}).encode("utf-8")
-    unauthenticated = request_url(
-        build_url(base_url, path),
-        method="POST",
-        body=request_body,
-        headers={"Content-Type": "application/json"},
-        timeout=30,
-    )
-    require_status(unauthenticated, {401}, "Gate-3-Migration Zugriffsschutz")
-    password = load_deploy_review_password()
-    try:
-        result = request_url(
-            build_url(base_url, path),
-            method="POST",
-            body=request_body,
-            headers={"Content-Type": "application/json", "X-BE-Review-Password": password},
-            timeout=180,
-        )
-    except Exception as error:  # noqa: BLE001
-        write_gate3_diagnostic(
-            "gate3-migration-exception.json",
-            {"build": build, "error_type": type(error).__name__, "error": str(error)},
-        )
-        raise
-    try:
-        response_body: Any = json.loads(result.body)
-    except json.JSONDecodeError:
-        response_body = {"raw": result.body[:4000]}
-    write_gate3_diagnostic(
-        "gate3-migration-response.json",
-        {"build": build, "http_status": result.status, "body": response_body},
-    )
-    require_status(result, {200}, "Gate-3-Staging-Migration-011")
-    payload = parse_json(result)
-    data = payload.get("data")
-    if payload.get("status") != "ok" or not isinstance(data, dict):
-        raise AssertionError(f"Gate-3-Staging-Migration-011: unerwartete Antwort: {payload}")
-    if data.get("migration_count_after") != 1 or data.get("schema_gaps") != []:
-        raise AssertionError(f"Gate-3-Staging-Migration-011: Schema nicht vollständig: {data}")
-    if data.get("locked_counts_before") != data.get("locked_counts_after"):
-        raise AssertionError("Gate-3-Staging-Migration-011: gesperrte Tabellen wurden verändert.")
-    print(f"✅ Gate-3-Staging-Migration-011: {data.get('action')} und vollständig zurückgelesen")
-
-
-def check_gate3_staging_lifecycle(base_url: str, expected_build: str) -> None:
-    if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
-        return
-    build = expected_build.strip()
-    if not re.fullmatch(r"[0-9a-f]{12}", build):
-        raise AssertionError("Gate-3-Evidence benötigt den exakten zwölfstelligen Deploy-Build.")
-    path = "/api/startpartner/_gate3_staging_lifecycle_231.php"
-    unauthenticated = request_url(
-        build_url(base_url, path),
-        method="POST",
-        body=json.dumps({"expected_build": build}).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        timeout=30,
-    )
-    require_status(unauthenticated, {401}, "Gate-3-Evidence Zugriffsschutz")
-    password = load_deploy_review_password()
-    try:
-        result = request_url(
-            build_url(base_url, path),
-            method="POST",
-            body=json.dumps({"expected_build": build}).encode("utf-8"),
-            headers={"Content-Type": "application/json", "X-BE-Review-Password": password},
-            timeout=180,
-        )
-    except Exception as error:  # noqa: BLE001
-        write_gate3_diagnostic(
-            "gate3-e4-exception.json",
-            {"build": build, "error_type": type(error).__name__, "error": str(error)},
-        )
-        raise
-    try:
-        response_body: Any = json.loads(result.body)
-    except json.JSONDecodeError:
-        response_body = {"raw": result.body[:4000]}
-    write_gate3_diagnostic(
-        "gate3-e4-response.json",
-        {"build": build, "http_status": result.status, "body": response_body},
-    )
-    require_status(result, {200}, "Gate-3-E4-Staging-Lifecycle")
-    payload = parse_json(result)
-    data = payload.get("data")
-    if payload.get("status") != "ok" or not isinstance(data, dict):
-        raise AssertionError(f"Gate-3-E4-Staging-Lifecycle: unerwartete Antwort: {payload}")
-    if data.get("already_completed") is True:
-        write_gate3_diagnostic("gate3-e4-evidence.json", {"build": build, "data": data})
-        print("✅ Gate-3-E4-Staging-Lifecycle: bereits genau einmal abgeschlossen; Marker bestätigt")
-        return
-    evidence = data.get("evidence")
-    residue = data.get("residue")
-    if not isinstance(evidence, dict) or not isinstance(residue, dict):
-        raise AssertionError("Gate-3-E4-Staging-Lifecycle: Evidence oder Cleanup-Readback fehlt.")
-    if residue.get("total") != 0:
-        raise AssertionError(f"Gate-3-E4-Staging-Lifecycle: Cleanup nicht rückstandsfrei: {residue}")
-    required = {
-        "pilot_status": "onboarding",
-        "entitlement_status": "pending_activation",
-        "scope_count": 7,
-        "replay": True,
-        "payload_conflict": True,
-        "stale_conflict": True,
-    }
-    mismatches = {key: (evidence.get(key), value) for key, value in required.items() if evidence.get(key) != value}
-    if mismatches:
-        raise AssertionError(f"Gate-3-E4-Staging-Lifecycle: Evidence unvollständig: {mismatches}")
-    write_gate3_diagnostic("gate3-e4-evidence.json", {"build": build, "data": data})
-    print(
-        "✅ Gate-3-E4-Staging-Lifecycle: permanente API, Organizer, Onboarding-Pilot, "
-        "pending_activation-Grant, Replay, Konflikte, Reservierung, Locked Counts und Zero Residue belegt"
-    )
+    for path, label in [
+        ("/api/startpartner/_gate3_staging_migration_231.php", "Gate-3-Migrationsendpoint entfernt"),
+        ("/api/startpartner/_gate3_staging_lifecycle_231.php", "Gate-3-Lifecycleendpoint entfernt"),
+    ]:
+        result = request_url(build_url(base_url, path), timeout=30)
+        require_status(result, {404}, label)
+        print(f"✅ {label}: HTTP 404")
 
 
 def run(args: argparse.Namespace) -> None:
@@ -458,8 +321,7 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_checkout_validation(base_url),
         lambda: check_review_endpoint_protected(base_url),
         lambda: check_push_endpoints_protected(base_url),
-        lambda: check_gate3_staging_migration(base_url, args.expected_build),
-        lambda: check_gate3_staging_lifecycle(base_url, args.expected_build),
+        lambda: check_removed_gate3_temporary_endpoints(base_url),
     ]
     print(f"=== Deploy-Smoke-Check: {base_url} ===")
     for check in checks:
