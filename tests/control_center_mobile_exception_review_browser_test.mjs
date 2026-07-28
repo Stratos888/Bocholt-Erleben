@@ -86,7 +86,20 @@ async function startpartnerMutation(browser,conflict){
   await context.close();results.push({name,status:'OK'});
 }
 async function gate3DialogContract(browser){
-  const {page,context}=await openScenario(browser,'startpartner-reserved',{width:390,height:844},'startpartner-gate3-dialog');
+  const reservedCandidate={
+    ...latestCandidate(),
+    status:'accepted_pending_terms',
+    revision:4,
+    contacts:[{contact_name:'Synthetischer Gate-3-Kontakt',email:'gate3@example.org',is_primary:true}],
+    readiness:{ready:true,assessed_count:14,total_count:14,blockers:[]},
+    capacity:{active_reservations:4,hard_stop_at:8,soft_stop:false,hard_stop:false},
+    active_reservation:{id:231,ends_at:'2026-08-20 12:00:00',status:'active'},
+    decision:{result:'accepted_pending_terms',reason:'Synthetisch reserviert.'},
+    gate3:{complete:false,blockers:[{message:'Pilotbedingungen müssen ausdrücklich bestätigt werden.'}]},
+  };
+  const {page,context}=await openScenario(browser,'startpartner-reserved',{width:390,height:844},'startpartner-gate3-dialog',async current=>{
+    await current.route('**/api/control-center/case.php*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'ok',data:{id:'fixture-startpartner',startpartner_candidate:reservedCandidate}})}));
+  });
   await page.locator('.cc-startpartner-primary').click();
   for(const marker of ['Bedingungsversion','Unveränderliche Referenz','SHA-256','Bestätigende Person','Bestätigungskanal','Pilotkohorte','Keine automatische kostenpflichtige Verlängerung']){
     assert((await page.locator('#cc-dialog').innerText()).includes(marker),`gate3 dialog: Feld fehlt: ${marker}`);
