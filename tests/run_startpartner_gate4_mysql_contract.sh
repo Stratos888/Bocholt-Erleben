@@ -23,7 +23,11 @@ CONTAINERS=()
 cleanup(){ for c in "${CONTAINERS[@]:-}"; do docker rm -f "$c" >/dev/null 2>&1 || true; done; }
 trap cleanup EXIT
 run_engine(){
-  local engine="$1" image="$2" client="$3" container="be-startpartner-gate4-${engine}-$RANDOM-$RANDOM"; CONTAINERS+=("$container")
+  local engine="$1"
+  local image="$2"
+  local client="$3"
+  local container="be-startpartner-gate4-${engine}-$RANDOM-$RANDOM"
+  CONTAINERS+=("$container")
   if [ "$engine" = mysql8 ]; then docker run -d --name "$container" -e MYSQL_ROOT_PASSWORD=contract-root -e MYSQL_DATABASE=be_contract -p 127.0.0.1::3306 "$image" >/dev/null
   else docker run -d --name "$container" -e MARIADB_ROOT_PASSWORD=contract-root -e MARIADB_DATABASE=be_contract -p 127.0.0.1::3306 "$image" >/dev/null; fi
   for attempt in {1..90}; do if docker exec "$container" "$client" --protocol=TCP -h127.0.0.1 -uroot -pcontract-root -Nse 'SELECT 1' be_contract >/dev/null 2>&1; then sleep 2; break; fi; [ "$attempt" -lt 90 ] || { docker logs "$container" >&2 || true; return 1; }; sleep 1; done
