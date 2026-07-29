@@ -25,6 +25,7 @@ try {
         $candidate=be_startpartner_gate4_candidate_detail(be_db(),$candidateId,true);
         $item=be_startpartner_gate3_present_case($item,$candidate);
         $item['decision_context']['candidate_revision']=(int)$candidate['revision'];
+        $item['decision_context']['readiness']=$candidate['readiness'];
         $item['decision_context']['capacity']=$candidate['capacity'];
         $item['decision_context']['gate4']=$candidate['gate4'];
         $item['decision_ready']=(bool)($candidate['gate4']['activation_ready']??false);
