@@ -54,7 +54,7 @@ $deploySmoke = (string)file_get_contents($root . '/tools/smoke-check-deploy.py')
 
 $assert(str_contains($files['intake'], 'be_startpartner_require_gate1_environment'), 'Intake muss außerhalb Staging/Dev fail-closed sein.');
 $assert(str_contains($files['intake'], 'be_require_review_access'), 'Gate-1-Intake muss bis zum öffentlichen Cutover geschützt sein.');
-$assert(str_contains($files['intake'], "$actorType = $source === 'targeted_outreach' ? 'operator' : 'self_service'"), 'Beide Quellen müssen denselben Intake-Endpunkt verwenden.');
+$assert(str_contains($files['intake'], "\$actorType = \$source === 'targeted_outreach' ? 'operator' : 'self_service'"), 'Beide Quellen müssen denselben Intake-Endpunkt verwenden.');
 foreach ($files as $name => $source) {
     $assert(str_contains($source, 'be_require_review_access'), "{$name}.php muss geschützt sein.");
     $assert(str_contains($source, 'be_startpartner_require_gate1_environment'), "{$name}.php muss außerhalb Staging/Dev fail-closed sein.");
@@ -86,7 +86,7 @@ $assert(str_contains($gate4Domain, 'Europe/Berlin'), 'Gate 4 muss die lokale Akt
 $assert(str_contains($gate4Domain, 'startpartner_pilot_usages'), 'Pilotverbräuche benötigen einen eigenen Owner.');
 $assert(!str_contains($gate4Domain, 'publication_consumptions'), 'Pilotverbräuche dürfen reguläre Publication-Consumptions nicht verwenden.');
 
-$assert(str_contains($controlAction, "$sourceSystem === 'startpartner_candidate'"), 'Der generische Control-Center-Writer muss Startpartner-Fälle abweisen.');
+$assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate'"), 'Der generische Control-Center-Writer muss Startpartner-Fälle abweisen.');
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
 
