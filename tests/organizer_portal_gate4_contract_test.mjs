@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+const html=fs.readFileSync(new URL('../fuer-veranstalter/dashboard/index.html',import.meta.url),'utf8');
+const js=fs.readFileSync(new URL('../js/organizer-pilot.js',import.meta.url),'utf8');
+const failures=[];const assert=(ok,message)=>{if(!ok)failures.push(message);};
+assert(html.includes('organizer-dashboard-pilot-card'),'Dashboard needs a dedicated pilot card inside the existing portal.');
+assert(html.includes('/js/organizer-pilot.js'),'Dashboard needs the Gate-4 portal enhancement.');
+assert(js.includes('/api/organizer-portal/pilot.php'),'Portal must read the canonical pilot state.');
+assert(js.includes('/api/startpartner/content.php'),'Portal must prepare content through the Gate-4 submission integration.');
+assert(js.includes('keine automatische kostenpflichtige Verlängerung'),'Pilot UI must state the no-auto-renewal boundary.');
+assert(!js.includes('create-billing-portal-session'),'Pilot UI must not expose Stripe billing as the pilot contract.');
+if(failures.length){console.error('=== Organizer Portal Gate-4 Contract: FAILED ===');failures.forEach(f=>console.error(`- ${f}`));process.exit(1);}console.log('=== Organizer Portal Gate-4 Contract: OK ===');
