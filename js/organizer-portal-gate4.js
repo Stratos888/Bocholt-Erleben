@@ -4,6 +4,14 @@
   const root = document.querySelector('[data-organizer-page="dashboard"]');
   if (!root) return;
 
+  if (!document.querySelector('link[data-organizer-gate4-style]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/css/organizer-gate4.css?v=2026-07-29-startpartner-gate4-v1';
+    link.dataset.organizerGate4Style = 'true';
+    document.head.appendChild(link);
+  }
+
   const card = document.getElementById('organizer-dashboard-startpartner-card');
   const body = document.getElementById('organizer-dashboard-startpartner-body');
   if (!card || !body) return;
