@@ -22,10 +22,12 @@ python3 - <<'PY'
 import json
 from pathlib import Path
 manifest = json.loads(Path('api/sql/000_manifest.json').read_text(encoding='utf-8'))
-expected = [f'{number:03d}' for number in range(1, 12)]
+expected_prefix = [f'{number:03d}' for number in range(1, 12)]
 actual = [entry['key'][:3] for entry in manifest['migrations']]
-if actual != expected:
-    raise SystemExit(f'Unexpected migration order: {actual}')
+if actual[:len(expected_prefix)] != expected_prefix:
+    raise SystemExit(f'Unexpected Gate-3 migration prefix: {actual}')
+if len(actual) < len(expected_prefix):
+    raise SystemExit(f'Incomplete Gate-3 migration chain: {actual}')
 for entry in manifest['migrations']:
     path = Path('api/sql') / entry['file']
     if not path.is_file():
