@@ -16,5 +16,5 @@ $hashA=be_startpartner_gate4_payload_hash(['b'=>2,'a'=>1]);
 $hashB=be_startpartner_gate4_payload_hash(['a'=>1,'b'=>2]);
 $assert(hash_equals($hashA,$hashB),'Payload hash must be key-order independent.');
 
-if($failures!==[]){fwrite(STDERR,implode("\n",$failures)."\n");exit(1);} 
+if($failures!==[]){fwrite(STDERR,implode("\n",$failures)."\n");exit(1);}
 printf("=== Startpartner Gate-4 Domain Contract: OK ===\n");
