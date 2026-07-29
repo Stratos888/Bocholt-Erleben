@@ -1,8 +1,12 @@
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const dashboard = fs.readFileSync(new URL('../fuer-veranstalter/dashboard/index.html', import.meta.url), 'utf8');
-const script = fs.readFileSync(new URL('../js/organizer-portal-gate4.js', import.meta.url), 'utf8');
-const endpoint = fs.readFileSync(new URL('../api/organizer-portal/pilot.php', import.meta.url), 'utf8');
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const read = (relative) => fs.readFileSync(path.join(root, relative), 'utf8');
+const dashboard = read('fuer-veranstalter/dashboard/index.html');
+const script = read('js/organizer-portal-gate4.js');
+const endpoint = read('api/organizer-portal/pilot.php');
 
 const required = [
   [dashboard, 'organizer-dashboard-startpartner-card'],
