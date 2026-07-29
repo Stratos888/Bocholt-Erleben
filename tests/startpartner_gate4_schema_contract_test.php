@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $dsn=getenv('STARTPARTNER_TEST_DSN')?:'';$user=getenv('STARTPARTNER_TEST_USER')?:'';$password=getenv('STARTPARTNER_TEST_PASSWORD')?:'';
-if($dsn===''){fwrite(STDERR,"STARTPARTNER_TEST_DSN is required.\n");exit(2);} 
+if($dsn===''){fwrite(STDERR,"STARTPARTNER_TEST_DSN is required.\n");exit(2);}
 $pdo=new PDO($dsn,$user,$password,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
 $required=[
  'startpartner_pilot_onboarding_items'=>['pilot_id','item_key','status','evidence_json','blocker_reason','completed_at'],
@@ -21,5 +21,5 @@ foreach($required as $table=>$columns){if(!isset($present[$table])){$failures[]=
 $count=(int)$pdo->query("SELECT COUNT(*) FROM app_schema_migrations WHERE migration_key='012_startpartner_gate4_onboarding_content_activation'")->fetchColumn();
 if($count!==1)$failures[]='Migration 012 must be recorded exactly once.';
 foreach(['subscriptions','publication_entitlements','publication_consumptions','organizer_magic_links','organizer_portal_sessions'] as $table){$count=(int)$pdo->query("SELECT COUNT(*) FROM {$table}")->fetchColumn();if($count!==0)$failures[]="Locked table {$table} must remain empty in schema contract.";}
-if($failures!==[]){fwrite(STDERR,implode("\n",$failures)."\n");exit(1);} 
+if($failures!==[]){fwrite(STDERR,implode("\n",$failures)."\n");exit(1);}
 printf("=== Startpartner Gate-4 Schema Contract: OK ===\n");
