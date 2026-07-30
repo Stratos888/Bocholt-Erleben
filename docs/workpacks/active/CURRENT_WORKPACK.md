@@ -1,36 +1,21 @@
 # Current Workpack Router
 
-Diese Datei enthält keinen operativen Status. GitHub ist der einzige Workpack-Owner.
+Ein aktives Workpack ist optional.
 
-## Auswahl
+## Normaler Fall
 
-Suche offene Issues mit:
+Kleine und mittlere Änderungen benötigen kein Workpack-Issue. Bestehende Branches und Pull Requests zur Aufgabe werden geprüft und passende Arbeit wird fortgesetzt.
 
-```text
-[ACTIVE WORKPACK]
-```
+## Workpack-Fall
 
-- genau ein Treffer: Issue und Vertrag vollständig lesen;
-- kein Treffer: Repository-Writes stoppen;
-- mehrere Treffer: Konflikt bereinigen, keine Writes.
+Ein Issue mit `[ACTIVE WORKPACK]` wird nur verwendet, wenn die Aufgabe mehrere Chats, Systeme oder Owner umfasst oder Schema-, Berechtigungs-, Zahlungs-, externe Write-, Deployment- oder Governancegrenzen berührt.
 
-## Serialisierung
-
-Der aktive Vertrag nennt genau einen `branch`.
-
-Vor jeder schreibenden Arbeit:
-
-1. offene PRs nach `staging` lesen;
-2. existiert ein PR dieses Branches, genau dort fortsetzen;
-3. existiert ein anderer Feature-PR nach `staging`, fail-closed stoppen;
-4. existiert noch kein PR, darf nur der deklarierte Branch verwendet werden.
-
-Der PR enthält genau eine Referenz:
+Jedes Workpack nennt genau einen `branch`. Der zugehörige PR enthält:
 
 ```text
 Workpack: #123
 ```
 
-Keine Vertragsrevision, kein Hash, kein Rollback und kein Evidence-Block werden in den PR kopiert. Der Required Check liest den Vertrag direkt aus dem aktiven Issue.
+Mehrere voneinander unabhängige aktive Workpacks dürfen existieren. Für dasselbe Workpack ist nur ein offener PR zulässig.
 
-Beim Abschluss wird der Active-Marker im finalen Issue-Update entfernt. Pausierte, vorbereitete und abgeschlossene Issues tragen ihn nicht.
+Operativer Status gehört ausschließlich in das jeweilige Issue. Beim Abschluss wird der Active-Marker entfernt.
