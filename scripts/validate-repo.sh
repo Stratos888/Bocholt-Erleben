@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# Draft PRs use `quick`; review-ready PRs use the complete default section.
 section="${1:-all}"
 PREFLIGHT_TEST="tests/control_center_runtime_preflight_contract_test.php"
 
