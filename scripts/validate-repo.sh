@@ -30,6 +30,29 @@ validate_php_syntax() {
   done
 }
 
+validate_frontend_syntax() {
+  node --check js/control-center-environment.js
+  node --check js/control-center.js
+  node --check js/control-center-seo-embed.js
+  node --check js/neutral-selection.js
+  node --check js/seo-schema.js
+  node --check js/organizer-pilot.js
+  node --input-type=module --check < js/control-center/startpartner-gate4.js
+  node --check scripts/render-static-content.mjs
+  for file in js/control-center/*.js; do
+    node --input-type=module --check < "$file"
+  done
+}
+
+validate_quick() {
+  echo "== Quick draft validation =="
+  validate_routing
+  validate_php_syntax
+  validate_frontend_syntax
+  python3 -m compileall -q scripts tools
+  python3 tests/test_pr_contract.py
+}
+
 validate_preflight() {
   php "$PREFLIGHT_TEST"
 }
@@ -70,17 +93,7 @@ validate_backend() {
 
 validate_frontend() {
   echo "== Frontend contracts =="
-  node --check js/control-center-environment.js
-  node --check js/control-center.js
-  node --check js/control-center-seo-embed.js
-  node --check js/neutral-selection.js
-  node --check js/seo-schema.js
-  node --check js/organizer-pilot.js
-  node --input-type=module --check < js/control-center/startpartner-gate4.js
-  node --check scripts/render-static-content.mjs
-  for file in js/control-center/*.js; do
-    node --input-type=module --check < "$file"
-  done
+  validate_frontend_syntax
   node tests/organizer_portal_gate4_contract_test.mjs
   node tests/control_center_frontend_contract_test.mjs
   node tests/control_center_browser_secret_contract_test.mjs
@@ -109,6 +122,7 @@ validate_repository() {
 }
 
 case "$section" in
+  quick) validate_quick ;;
   backend) validate_backend ;;
   routing) validate_routing ;;
   php-syntax) validate_php_syntax ;;
