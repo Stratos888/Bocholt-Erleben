@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/_gate3_domain.php';
+require_once dirname(__DIR__) . '/submissions/_approval_domain.php';
 
 const BE_STARTPARTNER_GATE4_REQUIRED_SCHEMA = [
     'startpartner_pilot_onboarding_items' => ['id','pilot_id','item_key','item_type','status','is_required','is_hard_blocker','evidence_json','blocker_reason','operator_name','completed_at'],
@@ -204,11 +205,8 @@ function be_startpartner_gate4_activate(PDO $pdo, array $input): array
         if (!$readiness['ready']) throw new DomainException('pilot is not activation ready: '.implode(', ',$readiness['blockers']));
         $content=$readiness['content'];
         $submissionId=(int)$content['submission_id'];
-        $submission=$pdo->prepare('SELECT * FROM submissions WHERE id=:id LIMIT 1 FOR UPDATE');
-        $submission->execute(['id'=>$submissionId]);
-        $submissionRow=$submission->fetch(PDO::FETCH_ASSOC);
-        if (!is_array($submissionRow) || (int)$submissionRow['organizer_id']!==(int)$pilot['organizer_id']) throw new DomainException('linked submission does not match pilot organizer.');
-        if (!in_array((string)$submissionRow['status'],['paid','in_review'],true)) throw new DomainException('linked submission is not editorially approvable.');
+        $submissionRow=be_submission_approval_fetch_for_update($pdo,$submissionId);
+        be_submission_approval_assert_pilot_path($submissionRow,$content,$pilot);
 
         $reservation=$pdo->prepare("SELECT * FROM startpartner_candidate_reservations WHERE id=:id AND candidate_id=:candidate_id AND status='active' LIMIT 1 FOR UPDATE");
         $reservation->execute(['id'=>(int)$pilot['reservation_id'],'candidate_id'=>(string)$pilot['candidate_id']]);
@@ -221,7 +219,7 @@ function be_startpartner_gate4_activate(PDO $pdo, array $input): array
         $endDate=be_startpartner_gate4_planned_end_date($activationDate);
         $endUtc=(new DateTimeImmutable($endDate.' 00:00:00',new DateTimeZone('Europe/Berlin')))->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
 
-        $pdo->prepare("UPDATE submissions SET status='approved',review_started_at=COALESCE(review_started_at,UTC_TIMESTAMP()),approved_at=COALESCE(approved_at,UTC_TIMESTAMP()),updated_at=UTC_TIMESTAMP() WHERE id=:id")->execute(['id'=>$submissionId]);
+        be_submission_approval_mark_pilot_approved($pdo,$submissionId);
         $pdo->prepare("UPDATE startpartner_pilot_content_links SET publication_status='approved',approved_at=COALESCE(approved_at,UTC_TIMESTAMP()) WHERE id=:id")->execute(['id'=>(int)$content['id']]);
         $pdo->prepare("UPDATE startpartner_pilot_scopes SET status='active' WHERE pilot_id=:pilot_id AND status='planned'")->execute(['pilot_id'=>$pilotId]);
         $pdo->prepare("UPDATE startpartner_pilot_entitlements SET status='active',starts_at=:starts_at,ends_at=:ends_at,revision=revision+1,audit_json=JSON_SET(audit_json,'$.activated_by',:actor,'$.activation_operation_id',:operation_id) WHERE id=:id AND status='pending_activation'")->execute(['starts_at'=>$activatedAt,'ends_at'=>$endUtc,'actor'=>$actor,'operation_id'=>$operationId,'id'=>(string)$entitlement['id']]);
