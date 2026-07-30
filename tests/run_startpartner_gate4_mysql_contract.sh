@@ -23,7 +23,10 @@ CONTAINERS=()
 cleanup(){ for c in "${CONTAINERS[@]:-}"; do docker rm -f "$c" >/dev/null 2>&1 || true; done; }
 trap cleanup EXIT
 run_engine(){
-  local engine="$1" image="$2" client="$3" container="be-startpartner-gate4-${engine}-$RANDOM-$RANDOM"
+  local engine="$1"
+  local image="$2"
+  local client="$3"
+  local container="be-startpartner-gate4-${engine}-$RANDOM-$RANDOM"
   CONTAINERS+=("$container")
   if [ "$engine" = mysql8 ]; then
     docker run -d --name "$container" -e MYSQL_ROOT_PASSWORD=contract-root -e MYSQL_DATABASE=be_contract -p 127.0.0.1::3306 "$image" >/dev/null
