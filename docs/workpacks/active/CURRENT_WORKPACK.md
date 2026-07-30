@@ -1,23 +1,36 @@
 # Current Workpack Router
 
-Diese Datei ist kein Statusjournal und enthält bewusst keine wechselnde Issue-Nummer.
+Diese Datei enthält keinen operativen Status. GitHub ist der einzige Workpack-Owner.
 
-## Verbindliche Auswahlregel
+## Auswahl
 
-Das aktive Workpack ist genau das eine **offene GitHub-Issue**, dessen Titel den Marker
+Suche offene Issues mit:
 
 ```text
 [ACTIVE WORKPACK]
 ```
 
-enthält.
+- genau ein Treffer: Issue und Vertrag vollständig lesen;
+- kein Treffer: Repository-Writes stoppen;
+- mehrere Treffer: Konflikt bereinigen, keine Writes.
 
-- **Genau ein Treffer:** Dieses Issue vollständig lesen. Es ist der einzige Scope-, Status- und Evidence-Owner.
-- **Kein Treffer:** Es gibt kein aktives Workpack. Schreibende Repository-Arbeit stoppen, bis Chat einen Workpack aktiviert und Gate A schließt.
-- **Mehr als ein Treffer:** Fail-closed stoppen und den Konflikt im GitHub-Issue-Bestand bereinigen.
+## Serialisierung
 
-Beim Abschluss wird der Marker im selben finalen Issue-Update entfernt. Queue-, vorbereitete und abgeschlossene Issues tragen den Marker nicht.
+Der aktive Vertrag nennt genau einen `branch`.
 
-## Arbeitsgrenze
+Vor jeder schreibenden Arbeit:
 
-Repository-Dateien enthalten nur dauerhafte Regeln und Architektur. Operativer Fortschritt, Entscheidungen, Evidence und der nächste Schritt stehen ausschließlich im aktiven Issue.
+1. offene PRs nach `staging` lesen;
+2. existiert ein PR dieses Branches, genau dort fortsetzen;
+3. existiert ein anderer Feature-PR nach `staging`, fail-closed stoppen;
+4. existiert noch kein PR, darf nur der deklarierte Branch verwendet werden.
+
+Der PR enthält genau eine Referenz:
+
+```text
+Workpack: #123
+```
+
+Keine Vertragsrevision, kein Hash, kein Rollback und kein Evidence-Block werden in den PR kopiert. Der Required Check liest den Vertrag direkt aus dem aktiven Issue.
+
+Beim Abschluss wird der Active-Marker im finalen Issue-Update entfernt. Pausierte, vorbereitete und abgeschlossene Issues tragen ihn nicht.
