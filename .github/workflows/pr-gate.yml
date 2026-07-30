@@ -3,7 +3,7 @@ name: PR Gate
 on:
   pull_request:
     branches: ["staging", "main"]
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, edited]
 
 concurrency:
   group: pr-gate-${{ github.event.pull_request.number }}
@@ -25,7 +25,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Enforce serial workpack and branch
+      - name: Validate PR and select test plan
+        id: contract
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -45,8 +46,35 @@ jobs:
           set -o pipefail
           bash scripts/validate-repo.sh quick 2>&1 | tee "${RUNNER_TEMP}/validation.log"
 
+      - name: Documentation validation
+        if: github.event.pull_request.draft == false && steps.contract.outputs.plan == 'docs'
+        shell: bash
+        run: |
+          echo "Documentation-only validation: OK" | tee "${RUNNER_TEMP}/validation.log"
+
+      - name: Quick review validation
+        if: github.event.pull_request.draft == false && steps.contract.outputs.plan == 'quick'
+        shell: bash
+        run: |
+          set -o pipefail
+          bash scripts/validate-repo.sh quick 2>&1 | tee "${RUNNER_TEMP}/validation.log"
+
+      - name: Backend review validation
+        if: github.event.pull_request.draft == false && steps.contract.outputs.plan == 'backend'
+        shell: bash
+        run: |
+          set -o pipefail
+          bash scripts/validate-repo.sh backend 2>&1 | tee "${RUNNER_TEMP}/validation.log"
+
+      - name: Frontend review validation
+        if: github.event.pull_request.draft == false && steps.contract.outputs.plan == 'frontend'
+        shell: bash
+        run: |
+          set -o pipefail
+          bash scripts/validate-repo.sh frontend 2>&1 | tee "${RUNNER_TEMP}/validation.log"
+
       - name: Full review validation
-        if: github.event.pull_request.draft == false
+        if: github.event.pull_request.draft == false && steps.contract.outputs.plan == 'full'
         shell: bash
         run: |
           set -o pipefail
@@ -60,35 +88,35 @@ jobs:
           path: ${{ runner.temp }}/validation.log
           if-no-files-found: warn
 
-      - name: Setup Node for review browser contracts
-        if: github.event.pull_request.draft == false
+      - name: Setup Node for browser contracts
+        if: github.event.pull_request.draft == false && steps.contract.outputs.browser == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install review browser runtime
-        if: github.event.pull_request.draft == false
+      - name: Install browser runtime
+        if: github.event.pull_request.draft == false && steps.contract.outputs.browser == 'true'
         shell: bash
         run: |
           npm install --no-save --no-package-lock playwright@1.54.1
           npx playwright install --with-deps chromium
 
       - name: Run bounded synthetic event-navigation contract
-        if: github.event.pull_request.draft == false
+        if: github.event.pull_request.draft == false && steps.contract.outputs.browser == 'true'
         shell: bash
         env:
           SMOKE_OUT_DIR: ${{ runner.temp }}/browser-smoke-synthetic
         run: bash scripts/run-event-navigation-fixture-smoke.sh
 
       - name: Run bounded mobile exception-review contract
-        if: github.event.pull_request.draft == false
+        if: github.event.pull_request.draft == false && steps.contract.outputs.browser == 'true'
         shell: bash
         env:
           SMOKE_OUT_DIR: ${{ runner.temp }}/browser-smoke-control-center-mobile
         run: bash scripts/run-control-center-mobile-exception-review-smoke.sh
 
       - name: Upload bounded synthetic browser evidence
-        if: always() && github.event.pull_request.draft == false
+        if: always() && github.event.pull_request.draft == false && steps.contract.outputs.browser == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: synthetic-event-navigation-${{ github.event.pull_request.number }}
@@ -96,7 +124,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload mobile exception-review evidence
-        if: always() && github.event.pull_request.draft == false
+        if: always() && github.event.pull_request.draft == false && steps.contract.outputs.browser == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: control-center-mobile-exception-review-${{ github.event.pull_request.number }}
