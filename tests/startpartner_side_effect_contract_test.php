@@ -12,8 +12,10 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
 $expectedStartpartnerFiles = [
     '_schema.php', '_contract.php', '_repository.php', '_domain.php',
     '_gate2_domain.php', '_gate3_domain.php', '_gate3_presentation.php',
+    '_gate4_domain.php', '_gate4_resources.php',
     'intake.php', 'candidates.php', 'profile.php', 'qualification.php',
     'action.php', 'capacity.php', 'pilot.php',
+    'onboarding.php', 'content.php', 'activation.php',
 ];
 $startpartnerFiles = glob($root . '/api/startpartner/*.php') ?: [];
 $actualNames = array_map('basename', $startpartnerFiles);
@@ -22,7 +24,7 @@ $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
 $assert(
     $actualNames === $expectedNames,
-    'Startpartner muss nach Gate 3 ausschließlich die kanonischen Runtime-Owner besitzen.'
+    'Startpartner muss nach Gate 4 ausschließlich die kanonischen Runtime-Owner besitzen.'
 );
 foreach ([
     'triage.php',
@@ -84,7 +86,7 @@ $deploySmoke = (string)file_get_contents($root . '/tools/smoke-check-deploy.py')
 
 $assert(str_contains($intake, 'be_startpartner_require_gate1_environment'), 'Intake muss außerhalb Staging/Dev fail-closed sein.');
 $assert(str_contains($intake, 'be_require_review_access'), 'Gate-1-Intake muss bis zum öffentlichen Cutover vollständig geschützt sein.');
-$assert(str_contains($intake, "\$actorType = \$source === 'targeted_outreach' ? 'operator' : 'self_service'"), 'Beide Quellen müssen denselben Intake-Endpunkt mit korrektem Actor-Typ verwenden.');
+$assert(str_contains($intake, "$actorType = $source === 'targeted_outreach' ? 'operator' : 'self_service'"), 'Beide Quellen müssen denselben Intake-Endpunkt mit korrektem Actor-Typ verwenden.');
 foreach ([
     'candidates.php' => $candidates,
     'profile.php' => $profile,
@@ -110,7 +112,7 @@ $assert(str_contains($gate3Domain, 'be_startpartner_gate3_guard_gate2_action'), 
 $assert(substr_count($gate3Domain, 'INSERT INTO organizers') === 1, 'Nur der atomare Gate-3-Owner darf genau einen Organizer-Insert besitzen.');
 $assert(str_contains($gate3Presentation, 'Bedingungen bestätigen und Pilot anlegen'), 'Gate-3-Hauptaktion fehlt.');
 $assert(str_contains($pilot, 'be_startpartner_gate3_state'), 'Pilot-Readback muss den Gate-3-Owner verwenden.');
-$assert(str_contains($controlAction, "\$sourceSystem === 'startpartner_candidate'"), 'Der generische Control-Center-Writer muss Startpartner-Fälle abweisen.');
+$assert(str_contains($controlAction, "$sourceSystem === 'startpartner_candidate'"), 'Der generische Control-Center-Writer muss Startpartner-Fälle abweisen.');
 $assert(str_contains($repository, "source_system' => 'startpartner_candidate'"), 'Control-Center-Projektion benötigt einen stabilen Source-System-Key.');
 $assert(str_contains($schema, 'INFORMATION_SCHEMA.COLUMNS'), 'Runtime muss das versionierte Schema nur prüfen.');
 
