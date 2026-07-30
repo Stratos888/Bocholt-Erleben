@@ -51,70 +51,32 @@ def issue_body(values: dict) -> str:
     )
 
 
-def v2_contract() -> dict:
+def workpack_contract() -> dict:
     return {
         "schema_version": 2,
-        "workpack_issue": 245,
-        "branch": "agent/ai-workflow-simplification-245",
-        "objective": "Simplify and serialize the AI workflow.",
+        "workpack_issue": 300,
+        "branch": "agent/adaptive-workflow-300",
+        "objective": "Change a high-risk workflow through one bounded workpack.",
         "allowed_paths": [
+            ".github/workflows/pr-gate.yml",
+            "AI_ENTRYPOINT.md",
+            "AGENTS.md",
+            "ENGINEERING.md",
+            "docs/workpacks/active/CURRENT_WORKPACK.md",
             "scripts/validate_pr_contract.py",
             "tests/test_pr_contract.py",
-            ".github/workflows/pr-gate.yml",
         ],
         "locked_paths": ["api/**", "main-only.txt"],
         "external_access": "none",
         "required_tests": ["python3 tests/test_pr_contract.py"],
-        "done": [
-            "Exactly one feature PR targets staging.",
-            "The PR head equals the declared branch.",
-        ],
+        "done": ["Normal and workpack PR paths are both validated."],
         "forbidden_effects": ["No runtime or data write."],
         "staging_smoke": "No runtime smoke required.",
     }
 
 
-def v1_contract() -> dict:
-    values = {
-        "schema_version": 1,
-        "workpack_issue": 245,
-        "contract_revision": 1,
-        "work_branch": "agent/ai-workflow-simplification-245",
-        "objective": "Migrate governance.",
-        "scope_classes": ["governance", "ci"],
-        "allowed_paths": ["scripts/validate_pr_contract.py", "tests/test_pr_contract.py"],
-        "locked_paths": ["api/**"],
-        "implementation_external_access": "none",
-        "required_tests": ["python3 tests/test_pr_contract.py"],
-        "staging_smoke": "No runtime smoke required.",
-        "evidence_scope": ["Validator behavior"],
-        "not_proven": ["No runtime change."],
-        "rollback": "Revert migration PR.",
-    }
-    values["contract_hash"] = contract.canonical_contract_hash(values)
-    return values
-
-
-def legacy_pr_body(values: dict | None = None) -> str:
-    issue = values or v1_contract()
-    evidence = {
-        "schema_version": 1,
-        "workpack_issue": issue["workpack_issue"],
-        "contract_revision": issue["contract_revision"],
-        "contract_hash": issue["contract_hash"],
-        "tests": list(issue["required_tests"]),
-        "evidence_scope": ["Validator behavior"],
-        "not_proven": list(issue["not_proven"]),
-        "rollback": issue["rollback"],
-    }
-    return (
-        "Workpack: #245\n\n"
-        f"{contract.PR_START}\n```toml\n{toml_block(evidence)}\n```\n{contract.PR_END}"
-    )
-
-
 def issue_object(values: dict | None = None, *, title: str = "[ACTIVE WORKPACK] Test", state: str = "open") -> dict:
-    values = values or v2_contract()
+    values = values or workpack_contract()
     return {
         "number": values["workpack_issue"],
         "title": title,
@@ -128,18 +90,18 @@ class PullRequestContractTests(unittest.TestCase):
         self,
         *,
         issue: dict | None = None,
-        pr_body: str = "Workpack: #245",
-        pr_number: int = 246,
+        pr_body: str = "",
+        pr_number: int = 301,
         base_ref: str = "staging",
-        head_ref: str = "agent/ai-workflow-simplification-245",
+        head_ref: str = "agent/small-change",
         changed: list[str] | None = None,
-        active: list[dict] | None = None,
         open_prs: list[dict] | None = None,
     ):
         issue = issue or issue_object()
-        changed = changed or ["scripts/validate_pr_contract.py"]
-        active = active if active is not None else [{"number": 245, "title": "[ACTIVE WORKPACK] Test"}]
-        open_prs = open_prs if open_prs is not None else [{"number": pr_number}]
+        changed = changed or ["docs/note.md"]
+        open_prs = open_prs if open_prs is not None else [
+            {"number": pr_number, "body": pr_body, "changed_paths": changed}
+        ]
         return contract.validate_pull_request(
             pr_number=pr_number,
             pr_body=pr_body,
@@ -148,7 +110,6 @@ class PullRequestContractTests(unittest.TestCase):
             head_ref=head_ref,
             changed_paths=changed,
             issue_loader=lambda _: issue,
-            active_issue_loader=lambda: active,
             open_feature_pr_loader=lambda: open_prs,
         )
 
@@ -156,76 +117,121 @@ class PullRequestContractTests(unittest.TestCase):
         with self.assertRaisesRegex(contract.ContractError, message):
             self.validate(**kwargs)
 
-    def test_valid_v2_contract_passes(self):
-        parsed, paths, mode = self.validate()
-        self.assertEqual(parsed["workpack_issue"], 245)
-        self.assertEqual(paths, ["scripts/validate_pr_contract.py"])
-        self.assertEqual(mode, "feature")
+    def test_normal_pr_without_workpack_passes(self):
+        parsed, paths, mode, plan = self.validate()
+        self.assertIsNone(parsed)
+        self.assertEqual(paths, ["docs/note.md"])
+        self.assertEqual(mode, "normal")
+        self.assertEqual(plan, "docs")
 
-    def test_second_open_feature_pr_is_rejected(self):
+    def test_workpack_pr_passes_and_forces_full_plan(self):
+        parsed, paths, mode, plan = self.validate(
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md", "scripts/validate_pr_contract.py"],
+        )
+        self.assertEqual(parsed["workpack_issue"], 300)
+        self.assertEqual(paths, ["AI_ENTRYPOINT.md", "scripts/validate_pr_contract.py"])
+        self.assertEqual(mode, "workpack")
+        self.assertEqual(plan, "full")
+
+    def test_high_risk_path_requires_workpack(self):
         self.assert_rejected(
-            "exactly one open feature PR",
-            open_prs=[{"number": 246}, {"number": 247}],
+            "workpack is required",
+            changed=[".github/workflows/pr-gate.yml"],
         )
 
-    def test_no_open_feature_pr_is_rejected(self):
-        self.assert_rejected("exactly one open feature PR", open_prs=[])
-
-    def test_branch_mismatch_is_rejected(self):
-        self.assert_rejected("head branch", head_ref="agent/other-245")
-
-    def test_missing_workpack_line_is_rejected(self):
-        self.assert_rejected("exactly one line", pr_body="No reference")
-
-    def test_duplicate_workpack_line_is_rejected(self):
+    def test_workpack_branch_mismatch_is_rejected(self):
         self.assert_rejected(
-            "exactly one line",
-            pr_body="Workpack: #245\nWorkpack: #245",
+            "head branch",
+            pr_body="Workpack: #300",
+            changed=["AI_ENTRYPOINT.md"],
         )
 
-    def test_wrong_workpack_issue_is_rejected(self):
-        self.assert_rejected("different issue", pr_body="Workpack: #246")
-
-    def test_zero_or_multiple_active_issues_are_rejected(self):
-        self.assert_rejected("exactly one", active=[])
+    def test_closed_or_unmarked_workpack_is_rejected(self):
         self.assert_rejected(
-            "exactly one",
-            active=[{"number": 245}, {"number": 246}],
+            "must be open",
+            issue=issue_object(state="closed"),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
         )
-
-    def test_closed_or_unmarked_issue_is_rejected(self):
-        self.assert_rejected("must be open", issue=issue_object(state="closed"))
         self.assert_rejected(
             "active-workpack marker",
             issue=issue_object(title="Prepared"),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
         )
 
-    def test_outside_and_locked_paths_are_rejected(self):
+    def test_duplicate_workpack_line_is_rejected(self):
+        self.assert_rejected(
+            "at most one line",
+            pr_body="Workpack: #300\nWorkpack: #300",
+        )
+
+    def test_duplicate_pr_for_same_workpack_is_rejected(self):
+        self.assert_rejected(
+            "already has open PR",
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
+            open_prs=[
+                {"number": 301, "body": "Workpack: #300", "changed_paths": ["AI_ENTRYPOINT.md"]},
+                {"number": 302, "body": "Workpack: #300", "changed_paths": ["other.md"]},
+            ],
+        )
+
+    def test_exact_file_overlap_is_rejected(self):
+        self.assert_rejected(
+            "overlap open PR #302",
+            changed=["js/example.js"],
+            open_prs=[
+                {"number": 301, "body": "", "changed_paths": ["js/example.js"]},
+                {"number": 302, "body": "", "changed_paths": ["js/example.js", "css/other.css"]},
+            ],
+        )
+
+    def test_independent_parallel_pr_is_allowed(self):
+        parsed, paths, mode, plan = self.validate(
+            changed=["js/example.js"],
+            open_prs=[
+                {"number": 301, "body": "", "changed_paths": ["js/example.js"]},
+                {"number": 302, "body": "", "changed_paths": ["api/other.php"]},
+            ],
+        )
+        self.assertIsNone(parsed)
+        self.assertEqual(paths, ["js/example.js"])
+        self.assertEqual(mode, "normal")
+        self.assertEqual(plan, "frontend")
+
+    def test_workpack_scope_and_locked_paths_are_enforced(self):
         self.assert_rejected(
             "outside allowed scope",
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
             changed=["README.md"],
         )
+        values = workpack_contract()
+        values["allowed_paths"].append("api/status.php")
         self.assert_rejected(
             "changed path is locked",
+            issue=issue_object(values),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
             changed=["api/status.php"],
         )
 
-    def test_rename_checks_old_and_new_path(self):
-        paths = contract.parse_name_status_z(
-            b"R100\0scripts/validate_pr_contract.py\0README.md\0"
-        )
-        self.assertEqual(paths, ["scripts/validate_pr_contract.py", "README.md"])
-        self.assert_rejected("outside allowed scope", changed=paths)
-
-    def test_unbounded_root_wildcard_is_rejected(self):
-        values = v2_contract()
-        values["allowed_paths"] = ["**/*"]
-        self.assert_rejected("unbounded root wildcard", issue=issue_object(values))
-
     def test_controlled_write_requires_compact_write_contract(self):
-        values = v2_contract()
+        values = workpack_contract()
         values["external_access"] = "controlled-staging-write"
-        self.assert_rejected("external_write", issue=issue_object(values))
+        self.assert_rejected(
+            "external_write",
+            issue=issue_object(values),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
+        )
         values["external_write"] = {
             "resource": "Staging DB",
             "identity": "Synthetic UUID",
@@ -234,71 +240,78 @@ class PullRequestContractTests(unittest.TestCase):
             "readback": "Exact row",
             "cleanup": "Delete row and prove zero residue",
         }
-        self.validate(issue=issue_object(values))
+        self.validate(
+            issue=issue_object(values),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
+        )
 
     def test_release_path_accepts_only_staging_to_main(self):
-        parsed, paths, mode = self.validate(
+        parsed, paths, mode, plan = self.validate(
             base_ref="main",
             head_ref="staging",
-            pr_body="",
-            active=[],
+            changed=["docs/note.md"],
             open_prs=[],
         )
-        self.assertEqual(parsed["schema_version"], 0)
+        self.assertIsNone(parsed)
+        self.assertEqual(paths, ["docs/note.md"])
         self.assertEqual(mode, "release")
-        self.assertEqual(paths, ["scripts/validate_pr_contract.py"])
+        self.assertEqual(plan, "full")
         self.assert_rejected(
             "release PR",
             base_ref="main",
             head_ref="agent/release",
-            active=[],
+            changed=["docs/note.md"],
             open_prs=[],
         )
 
-    def test_legacy_migration_issue_245_passes(self):
-        values = v1_contract()
-        parsed, _, mode = self.validate(
-            issue=issue_object(values),
-            pr_body=legacy_pr_body(values),
+    def test_rename_checks_old_and_new_path(self):
+        paths = contract.parse_name_status_z(
+            b"R100\0docs/old.md\0docs/new.md\0"
         )
-        self.assertEqual(parsed["schema_version"], 1)
-        self.assertEqual(mode, "feature")
+        self.assertEqual(paths, ["docs/old.md", "docs/new.md"])
 
-    def test_legacy_schema_is_rejected_for_other_issue(self):
-        values = v1_contract()
-        values["workpack_issue"] = 244
-        values["contract_hash"] = contract.canonical_contract_hash(values)
-        with self.assertRaisesRegex(contract.ContractError, "only allowed"):
-            contract.validate_issue_contract(
-                values,
-                issue_number=244,
-                issue_state="open",
-                issue_title="[ACTIVE WORKPACK] Legacy",
-            )
-
-    def test_legacy_hash_mismatch_is_rejected(self):
-        values = v1_contract()
-        values["contract_hash"] = "0" * 64
+    def test_unbounded_root_wildcard_is_rejected(self):
+        values = workpack_contract()
+        values["allowed_paths"] = ["**/*"]
         self.assert_rejected(
-            "contract_hash",
+            "unbounded root wildcard",
             issue=issue_object(values),
-            pr_body=legacy_pr_body(v1_contract()),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
         )
+
+    def test_plan_classification(self):
+        cases = [
+            (["README.md", "docs/note.md"], False, "docs"),
+            (["js/example.js", "tests/example.mjs"], False, "frontend"),
+            (["api/example.php", "tests/example.php"], False, "backend"),
+            (["scripts/example.py", "tests/example.py"], False, "quick"),
+            (["api/example.php", "js/example.js"], False, "full"),
+            (["api/sql/013.sql"], True, "full"),
+        ]
+        for paths, is_workpack, expected in cases:
+            with self.subTest(paths=paths):
+                self.assertEqual(
+                    contract.classify_changed_paths(paths, workpack=is_workpack),
+                    expected,
+                )
 
     def test_api_failure_fails_closed(self):
         with self.assertRaisesRegex(contract.ContractError, "simulated API failure"):
             contract.validate_pull_request(
-                pr_number=246,
-                pr_body="Workpack: #245",
+                pr_number=301,
+                pr_body="Workpack: #300",
                 repository="Stratos888/Bocholt-Erleben",
                 base_ref="staging",
-                head_ref="agent/ai-workflow-simplification-245",
-                changed_paths=["scripts/validate_pr_contract.py"],
+                head_ref="agent/adaptive-workflow-300",
+                changed_paths=["AI_ENTRYPOINT.md"],
                 issue_loader=lambda _: (_ for _ in ()).throw(
                     contract.ContractError("simulated API failure")
                 ),
-                active_issue_loader=lambda: [{"number": 245}],
-                open_feature_pr_loader=lambda: [{"number": 246}],
+                open_feature_pr_loader=lambda: [],
             )
 
 

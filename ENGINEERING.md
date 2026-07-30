@@ -1,14 +1,14 @@
 # ENGINEERING – Bocholt erleben
 
-Diese Datei enthält dauerhafte technische Regeln. Der Arbeitsablauf steht in `AI_ENTRYPOINT.md`; operativer Status ausschließlich im aktiven GitHub-Issue.
+Diese Datei enthält dauerhafte technische Regeln. Der Arbeitsablauf steht in `AI_ENTRYPOINT.md`.
 
 ## 1. Quellen der Wahrheit
 
 - `staging` ist Entwicklungsbaseline.
 - `main` ist Live-Releasebranch.
 - Kein Patch ohne aktuellen Inhalt der owning Datei.
-- Genau ein aktives Issue ist der operative Scope- und Evidence-Owner.
 - Generierte Eventdateien sind Buildartefakte, keine manuell gepflegten Quellen.
+- Ein Workpack-Issue ist nur für große oder riskante Vorhaben erforderlich.
 
 ## 2. Owner und Schreiber
 
@@ -19,13 +19,13 @@ Diese Datei enthält dauerhafte technische Regeln. Der Arbeitsablauf steht in `A
 
 Nicht zulässig:
 
-- mehrere Writer für denselben Workpack;
-- zweiter Feature-Branch oder zweiter PR für dieselbe Ursache;
+- zweiter Branch oder Pull Request für dieselbe Ursache;
+- mehrere Schreiber an derselben Datei;
 - Wrapper auf Wrapper;
 - parallele Statusführung;
 - große Multi-Datei-Änderungen über die Contents API ohne Checkout und lokale Tests.
 
-Zentrale Owner, Schema, Deploy und globale Entrypoints werden seriell geändert.
+Unabhängige Owner dürfen parallel bearbeitet werden. Zentrale Schema-, Authentifizierungs-, Zahlungs-, Deployment- und Governanceowner werden seriell geändert.
 
 ## 3. Git-Topologie
 
@@ -33,41 +33,56 @@ Zentrale Owner, Schema, Deploy und globale Entrypoints werden seriell geändert.
 Feature-Branch -> staging -> main
 ```
 
-- Pro aktivem Workpack genau ein im Issue deklarierter Feature-Branch.
-- Repositoryweit höchstens ein offener Feature-PR nach `staging`.
-- Korrekturen bleiben im selben Branch und PR.
+- Normale Änderungen benötigen einen Branch und einen PR, aber kein Issue.
+- Workpacks besitzen genau einen deklarierten Branch und einen PR.
+- Mehrere unabhängige Feature-PRs nach `staging` sind erlaubt.
+- Exakte Dateiüberschneidungen zwischen offenen PRs werden blockiert.
+- Korrekturen bleiben im bestehenden Branch und PR.
 - Kein direkter Commit nach `staging` oder `main`.
-- Kein Force-Push, Force-Reset oder Feature-Branch-Deploy.
+- Kein Force-Push oder Force-Reset.
 - Merge nur bei grünem Check auf exakt aktuellem Head-SHA.
 
 ## 4. Entwicklungsumgebung
 
-Größere Codearbeit benötigt einen vollständigen Checkout mit lokaler Suche, Patchbearbeitung und Tests. Der GitHub-Connector dient für Repositorylesen, Issues, PRs, Checks, Logs und Merge.
+Größere Codearbeit benötigt einen vollständigen Checkout mit lokaler Suche, Patchbearbeitung und Tests.
 
-Ohne Checkout sind nur kleine, vollständig gelesene und deterministische Text- oder Konfigurationsänderungen zulässig. Ein fehlendes Werkzeug wird nicht durch Dutzende einzelne Remote-Datei-Commits kompensiert.
+Der GitHub-Connector dient primär für Lesen, Issues, PRs, Checks, Logs und Merge. Ohne Checkout sind nur kleine, vollständig gelesene und deterministische Änderungen zulässig.
 
 ## 5. Tests und CI
 
-Der PR besitzt genau einen Required Check `PR Gate`.
+Der Required Check `PR Gate` validiert zunächst Branch, optionales Workpack und Konflikte.
 
 ### Draft
 
-`bash scripts/validate-repo.sh quick`
-
-Enthält nur schnelle, containerfreie Prüfungen: Routing, Syntax, Whitespace, Validator-Tests und Compile-Checks.
+```bash
+bash scripts/validate-repo.sh quick
+```
 
 ### Reviewbereit
 
-`bash scripts/validate-repo.sh`
+Der Diff bestimmt den kleinsten zuverlässigen Plan:
 
-Enthält vollständige Backend-, Datenbank-, Frontend- und Repositoryverträge. Browser-Fixtures laufen zusätzlich im PR Gate.
+- `docs`: Contract-, Diff- und Formatprüfung;
+- `quick`: schnelle Repository-, Syntax- und Validatorprüfungen;
+- `backend`: Backend-, PHP-, Daten- und zugehörige Datenbankverträge;
+- `frontend`: Frontendverträge und Browser-Fixtures;
+- `full`: vollständige Repository-, Datenbank-, Frontend- und Browserprüfung.
 
-- PR-Textänderungen lösen keinen Lauf aus.
-- Nach Reviewbereitschaft löst jede Codeänderung erneut den vollständigen Lauf aus.
-- Ein roter Test wird vor dem Merge im selben PR behoben.
-- Tests beweisen Verhalten, nicht Dateinamen oder Kommentare.
+PR-Textänderungen lösen einen neuen Check aus. Nach Codeänderungen muss der aktuelle Head-SHA erneut grün sein.
 
-## 6. Environment und externe Writes
+## 6. Workpacks und Risikogrenzen
+
+Ein Workpack ist verpflichtend für:
+
+- `.github/workflows/**` und zentrale KI-/Governancedateien;
+- Datenbankschema;
+- Stripe, Webhooks und Zahlungen;
+- Magic-Link-, Billing- und vergleichbare Berechtigungsgrenzen;
+- kontrollierte externe Writes.
+
+Der Workpack-Vertrag nennt erlaubte und gesperrte Pfade, Tests, Done-Kriterien und verbotene Wirkungen. Der PR referenziert nur `Workpack: #<Issue>`.
+
+## 7. Environment und externe Writes
 
 ```text
 staging: Staging-Quellen und Staging-Ziele
@@ -78,42 +93,33 @@ Externe Writes benötigen stabile Identität, Vorherzustand, begrenzte Mutation,
 
 Live-Schreibtests bleiben ausgeschlossen. Secrets gehören weder in Repository noch Chat.
 
-## 7. Evidence
+## 8. Evidence, Deploy und Release
 
 Normalfall:
 
-- bestehender permanenter Owner;
 - automatisierter Contracttest;
 - normaler Staging-Deploy;
 - vorhandener Deploy-Smoke.
 
-Synthetische Mutation, Readback und Cleanup erfolgen in einem Lauf. Temporäre Runtime-Endpunkte, Marker- und mehrstufige Cleanup-PR-Ketten sind kein Standardweg.
+Synthetische Mutation, Readback und Cleanup erfolgen in einem Lauf. Temporäre Runtime-Endpunkte und mehrstufige Cleanup-PR-Ketten sind kein Standardweg.
 
-Actions-Artefakte bleiben interne Evidence. Nutzerseitig werden Ergebnisse und Grenzen berichtet, nicht automatisch ZIP-Dateien.
-
-## 8. Deploy und Release
-
-- Nur `staging` und `main` deployen.
-- Ein Implementierungs-PR erzeugt einen normalen Staging-Deploy.
-- Der enthaltene Build-/HTTP-/Browser-Smoke genügt, sofern kein konkret unbelegtes Risiko besteht.
-- Zusätzliche Deploys benötigen ein benanntes offenes Risiko.
-- Release ausschließlich per `staging -> main`, anschließend normaler Live-Smoke.
+Release ausschließlich per `staging -> main`, anschließend normaler Live-Smoke.
 
 ## 9. UI und Inhalte
 
 - Komponenten stylen sich selbst; Layoutdateien platzieren sie.
 - Token-first, keine Override-Ketten.
 - Daten- und Bildprobleme upstream lösen.
-- Sichtbare Änderungen benötigen vorher festgelegte Viewports und Browser- oder Screenshotnachweis.
+- Sichtbare Änderungen benötigen relevante Viewports und Browser- oder Screenshotnachweis.
 - Progressive Enhancement bei relevantem Scope mit und ohne JavaScript prüfen.
 
 ## 10. Dokumentation
 
 - `AI_ENTRYPOINT.md`: Arbeitsmodell;
-- `AGENTS.md`: Codex-Kurzrouter;
-- aktives Issue: operativer Status;
+- `AGENTS.md`: Kurzrouter;
+- optionales aktives Issue: operativer Workpack-Status;
 - `SYSTEM_MAP.md`: Owner und Datenflüsse;
 - `TEST_STATUS.md`: dauerhafte Evidence-Grenzen;
 - Roadmap und Produktverträge: nur echte Zieländerungen.
 
-Repository-Dokumentation wird am Workpack-Ende genau einmal und nur bei dauerhaftem Wissensdelta aktualisiert.
+Dauerhafte Dokumentation wird genau einmal und nur bei echtem Wissensdelta aktualisiert.
