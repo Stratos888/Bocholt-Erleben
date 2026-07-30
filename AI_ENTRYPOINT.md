@@ -1,282 +1,220 @@
-# Bocholt erleben – KI-Einstieg
+# Bocholt erleben – KI-Arbeitsmodell
 
-Arbeitsbranch: `staging`
+Arbeitsbaseline ist `staging`. Ziel ist eine schnelle, fail-closed Arbeitsweise mit möglichst wenig Übergaben, Branches, PRs und Deploys.
 
-Diese Datei ist der verbindliche Arbeitsrouter. Ziel ist die schnellste zuverlässige Arbeitsweise mit möglichst wenigen Übergaben, Pull Requests, Deploys und Nutzeraktionen.
-
-## 1. Start jeder Repo-Aufgabe
-
-1. aktuellen `staging`-SHA, `main`-SHA und offene Pull Requests prüfen;
-2. `docs/workpacks/active/CURRENT_WORKPACK.md` lesen;
-3. das genau eine offene Issue mit `[ACTIVE WORKPACK]` vollständig lesen, falls vorhanden;
-4. `docs/architecture/SYSTEM_MAP.md` und nur die betroffenen Owner-Dateien lesen;
-5. `ENGINEERING.md` lesen, wenn technische Regeln, Workflows oder Runtime betroffen sind;
-6. bei externen Daten zusätzlich `docs/external-resource-matrix.md` lesen;
-7. erst danach analysieren oder schreiben.
-
-Aktueller Ref, owning Dateien, aktives Workpack-Issue und dessen eingefrorener Vertrag sind die Source of Truth. Alte Chats, Memory, ZIPs und historische Dokumente sind nur Kontext.
-
-## 2. Verbindlicher Standardprozess
+## 1. Unverrückbarer Normalfall
 
 ```text
-Chat führt und entscheidet
--> genau ein Repository-Schreiber
--> Work nur bei echten Mehrstrang- oder Mehrsystem-Workpacks
--> ein GitHub-Issue führt operativen Status und Evidence
--> Feature-Branch -> staging -> main
+ein aktives Workpack
+-> ein Repository-Schreiber
+-> ein deklarierter Feature-Branch
+-> ein offener PR nach staging
+-> ein vollständiger Review-Check
+-> ein Staging-Deploy
 ```
 
-- Chat bleibt die führende Steuerungs-, Prüf- und Abnahmeebene.
-- Genau ein schreibender Agent oder Werkzeugpfad ist der Normalfall.
-- Der Nutzer muss weder Werkzeug noch technischen Ablauf auswählen.
-- Repository-Writes beginnen erst nach geschlossenem Gate A.
+`main` bleibt der Live-Releasebranch. Ein Release-PR ist ausschließlich `staging -> main`.
+
+## 2. Start jeder Repository-Aufgabe
+
+1. aktuellen `staging`- und `main`-SHA lesen;
+2. offene PRs lesen;
+3. genau ein offenes Issue mit `[ACTIVE WORKPACK]` lesen;
+4. den im Vertrag deklarierten `branch` lesen;
+5. einen vorhandenen PR dieses Branches fortsetzen;
+6. `SYSTEM_MAP.md`, betroffene Owner und bei Technik `ENGINEERING.md` lesen.
+
+Fail-closed stoppen, wenn:
+
+- kein oder mehr als ein aktiver Workpack existiert;
+- mehr als ein Feature-PR nach `staging` offen ist;
+- der offene PR nicht vom deklarierten Branch stammt;
+- ein anderer Schreiber denselben Workpack bearbeitet.
+
+Ein neuer Chat eröffnet niemals vorsorglich einen neuen Branch oder PR. Er setzt den kanonischen Stand fort.
 
 ## 3. Werkzeugwahl
 
-### Chat – Standard-Orchestrator
+### Chat
 
-Chat übernimmt:
+Chat steuert Ziel, Scope, GitHub, Checks, Merge, Deployprüfung und Abschluss. Kleine vollständig gelesene Text- oder Konfigurationsänderungen darf Chat selbst schreiben.
 
-- Zielklärung und Priorisierung;
-- belegten Ausgangszustand;
-- kleinsten vollständigen Scope;
-- Workpack-Vertrag und Abnahmevertrag;
-- Entscheidung, ob überhaupt ein Patch nötig ist;
-- unabhängige proportionale Prüfung;
-- GitHub-, PR-, Actions-, Branch-, Deploy- und Live-Prüfungen;
-- Merge- und Releaseentscheidung;
-- Dokumentations-Reconciliation und genau den nächsten Schritt.
+### Checkout-fähiger Code-Agent
 
-Chat darf kleine deterministische Text- oder Konfigurationsänderungen selbst als Repository-Schreiber ausführen, wenn alle Bedingungen erfüllt sind:
+Größere Code-, Test-, Build- und UI-Arbeit benötigt:
 
-- der vollständige betroffene Textscope wurde gelesen;
-- die Änderung ist ohne große partielle Dateioperation oder komplexe Codebearbeitung kontrollierbar;
-- Branch, Write, Read-back, PR und Required Check sind über die vorhandene GitHub-Verbindung sicher möglich;
-- genau ein Branch und ein PR genügen;
-- kein anderer Schreiber arbeitet am selben Owner.
+- vollständigen Repository-Checkout;
+- Suche und patchfähige Bearbeitung;
+- lokale Syntax- und Contracttests;
+- Build- oder Browsernachweis;
+- gebündelte Commits auf dem deklarierten Branch.
 
-### Codex – bevorzugter technischer Repository-Schreiber
+### GitHub-Connector
 
-Codex übernimmt insbesondere:
+Der Connector ist primär für Lesen, Issues, PRs, Checks, Logs und Merge. Er ist keine Ersatz-IDE für große Multi-Datei-Implementierungen. Fehlt eine Checkout- und Testumgebung, wird kein großer Patch Datei für Datei begonnen.
 
-- Code-, Test-, Build- und Generatoränderungen;
-- größere oder patchintensive Diffs;
-- Änderungen an langen bestehenden Workflows oder zentralen technischen Ownern;
-- lokale Befehle, Builds, Renderer- und Browsernachweise;
-- genau einen Feature-Branch und einen reviewfähigen PR nach `staging`.
+## 4. Kompakter Workpack-Vertrag
 
-Codex erweitert Produktziel oder Workpack-Scope nicht selbstständig. Innerhalb eines Codex-Auftrags ist Codex der einzige Repository-Schreiber.
+Neue Workpacks verwenden genau einen TOML-Block im aktiven Issue:
 
-### Work – nur begründete Ausnahme
-
-Work wird nur aktiviert, wenn vor der Umsetzung mindestens eines davon belegt ist:
-
-- mindestens zwei unabhängige Lieferstränge mit getrennten Ownern;
-- mehrere nacheinander zu steuernde Codex-Aufträge;
-- mehrere externe Systeme mit echten fachlichen Gates;
-- umfangreiche externe Recherche, die nicht sinnvoll im führenden Chat gehalten werden kann.
-
-Ein großer einzelner Patch reicht nicht aus. Ist die Notwendigkeit nicht eindeutig, bleibt Chat der Orchestrator.
-
-## 4. Ein operativer Status-Owner
-
-Für jeden aktiven größeren Workpack gibt es genau ein offenes GitHub-Issue mit `[ACTIVE WORKPACK]`.
-
-Das Issue enthält:
-
-- Status;
-- eingefrorenen Workpack- und Abnahmevertrag;
-- Entscheidungen;
-- Evidence und Links auf PRs und Actions;
-- Risiken und Grenzen;
-- genau den nächsten Schritt.
-
-Repository-Dateien enthalten nur dauerhafte Regeln, Architektur, Datenverträge, Produktentscheidungen und Prooffähigkeiten. Operativer Fortschritt wird nicht parallel in Router, Roadmap, Queue, Proofindex oder Abschlussdateien fortgeschrieben.
-
-`CURRENT_WORKPACK.md` bleibt ein statusfreier Router zum aktiven Issue.
-
-## 5. Verbindlicher Vertrag vor jedem Write
-
-Vor einem Repository- oder externen Write müssen feststehen:
-
-1. fachliches Ziel;
-2. Nicht-Ziele und gesperrter Scope;
-3. erlaubte sichtbare Änderungen;
-4. unveränderte Bereiche;
-5. betroffene Owner;
-6. erforderliche Tests;
-7. konkrete Evidence aus dem tatsächlichen Zielpfad;
-8. Definition of Done;
-9. Rollback;
-10. erforderliche dauerhafte Dokumentations-Owner.
-
-Der maschinenlesbare Issue-Vertrag friert erlaubte und gesperrte Pfade, Tests, Evidence-Grenzen und Rollback ein. Ist der Vertrag nicht geschlossen, bleibt die Arbeit read-only.
-
-### Zusätzlich bei UI, Rendering oder Progressive Enhancement
-
-- Referenzzustand;
-- relevante Viewports;
-- Above-the-fold-Grenze;
-- ausdrückliche Aussage zu neuen sichtbaren Elementen;
-- Zustand mit und ohne JavaScript;
-- echter Build-/Renderer-Output;
-- Browser- oder Screenshotnachweis vor dem Staging-Merge.
-
-## 6. Keine Doppelarbeit
-
-- Chat klärt Ziel und Scope; der Schreiber wiederholt keine vollständige Produktanalyse.
-- Work wiederholt weder Chat- noch Schreiberanalyse.
-- Chat prüft das Ergebnis proportional und führt keine zweite Vollanalyse durch.
-- Korrekturen vor dem Staging-Merge bleiben im selben Task, Branch und PR.
-- Dieselbe Ursache erhält keinen zweiten parallelen Schreiber.
-
-## 7. PR-Liefervertrag
-
-Normalfall:
-
-```text
-ein Workpack
--> ein Repository-Schreiber
--> ein Feature-Branch
--> ein vollständiger PR nach staging
+```toml
+schema_version = 2
+workpack_issue = 123
+branch = "agent/workpack-123"
+objective = "Kleinster vollständiger Zielzustand."
+allowed_paths = ["api/bereich/**", "tests/bereich_*"]
+locked_paths = ["api/stripe/**", ".github/workflows/**"]
+external_access = "none"
+required_tests = ["bash scripts/validate-repo.sh"]
+done = ["Zielwirkung ist belegt."]
+forbidden_effects = ["Keine Mail, kein Stripe, kein Live-Write."]
+staging_smoke = "Normaler Deploy-Smoke genügt."
 ```
 
-Vor dem PR müssen vorliegen:
+Bei einem kontrollierten externen Write kommt nur dies hinzu:
 
-- relevanter Diff vollständig;
-- Syntax-, Unit- und Contracttests grün;
-- `bash scripts/validate-repo.sh` grün;
-- tatsächlicher Build-/Renderer-Output geprüft, falls betroffen;
-- UI-/Browsernachweis geprüft, falls betroffen;
-- keine bekannte Grundsatzfrage offen.
-
-## 8. Prüfung vor dem Staging-Merge
-
-Chat prüft:
-
-- entspricht der Diff dem eingefrorenen Vertrag;
-- wurden ausschließlich zuständige Owner geändert;
-- beweisen Tests und Evidence den tatsächlichen Zielpfad;
-- bleiben gesperrte Bereiche unverändert;
-- ist die sichtbare Wirkung vorab belegt, falls betroffen;
-- ist die Dokumentations-Reconciliation für dauerhafte Änderungen vorbereitet.
-
-Erst danach wird nach `staging` gemergt.
-
-## 9. PR- und Deploybudget
-
-Normaler Runtime-Workpack:
-
-```text
-1 Implementierungs-PR nach staging
-1 normaler Staging-Deploy
-1 gezielter Staging-Smoke
-1 Release-PR staging -> main
-1 normaler Main-Deploy
-1 gezielter Live-Smoke
+```toml
+[external_write]
+resource = "Staging-Ressource"
+identity = "stabile synthetische ID"
+before = "belegter Vorherzustand"
+mutation = "eine begrenzte Mutation"
+readback = "exakter Readback"
+cleanup = "Cleanup und Zero Residue"
 ```
 
-- Keine Feature-Branch-Deploys.
-- Keine synthetischen Folge-Deploys ohne konkret unbelegtes Risiko.
-- Reine Vor-Merge-Korrekturen bleiben im bestehenden PR.
-- Nach dem Staging-Merge ist höchstens eine begründete Korrektur zulässig.
-- Erfordert der Zustand danach eine weitere Suchschleife, werden Ziel oder Architektur neu entschieden.
-
-Dokumentations-only-Workpacks benötigen keinen fachlichen Runtime-Smoke. Der normale Branch- und PR-Pfad bleibt verbindlich.
-
-## 10. Fehlerbudget
+Der PR enthält nur:
 
 ```text
-unerwartetes Verhalten
--> stoppen
--> Zustand sichern
--> Ursache bestimmen
--> Vertrag korrigieren
--> höchstens eine begründete reale Korrektur
+Workpack: #123
 ```
 
-Keine Merge-/Deploy-Schleifen zur Designsuche und keine manuelle Datenkorrektur zum künstlichen Grünmachen.
+Revision, Hash, Tests, Rollback und Evidence werden nicht mehr manuell in den PR kopiert. Das Issue ist alleiniger operativer Vertrag.
 
-## 11. Nutzerbeteiligung
+## 5. Serialisierung
 
-Chat erledigt selbst:
+Der Required Check erzwingt:
 
-- GitHub- und PR-Prüfungen;
-- Action-Status und Merges;
-- Branchvergleiche;
-- technische Live-HTML-, Robots-, Sitemap-, Schema- und Releaseprüfungen;
-- automatische Ermittlung von Deploy-Runs über Commitstatus;
-- technische Releaseentscheidungen innerhalb des erteilten Mandats.
+- genau ein aktives Workpack;
+- genau einen offenen Feature-PR nach `staging`;
+- PR-Head entspricht exakt dem im Issue deklarierten Branch;
+- vollständiger Diff liegt innerhalb `allowed_paths`;
+- `locked_paths` bleiben unverändert;
+- Release nur `staging -> main`.
 
-Der Nutzer wird nur benötigt für:
+Ein zweiter Chat liest dadurch den bestehenden Branch und PR und setzt dort fort. Er kann keinen konkurrierenden PR grün bekommen.
 
-- subjektive visuelle Bewertung;
-- private externe Oberflächen wie Search Console;
-- echte fachliche Entscheidungen ohne eindeutige Ableitung;
-- irreversible, kostenpflichtige oder extern schreibende Aktionen.
+## 6. Zwei CI-Stufen
 
-## 12. Artefaktregel
+### Draft
 
-Actions-Artefakte, Screenshots und Browserreports sind maschinelle Evidence, keine automatische Nutzerlieferung.
+Bei jedem Draft-Push laufen nur:
 
-- Chat oder Codex prüft bevorzugt Jobsummary, Logs und strukturierte Reports.
-- Ein Actions-Artefakt wird nur intern gelesen, wenn die Evidence sonst nicht ausreicht.
-- Keine ZIP-Datei, kein Downloadlink und keine Artefaktübergabe an den Nutzer, sofern dieser sie nicht ausdrücklich verlangt.
-- Keine Screenshots auf Vorrat; nur bei sichtbarer Abnahme oder zur belegten Fehlerdiagnose.
-- Im Chat wird das Ergebnis kompakt berichtet: Testumfang, Ergebnis, Fehler und relevante Evidence-Grenze.
+- Workpack-, Branch- und PR-Serialisierung;
+- `git diff --check`;
+- Syntax und Routing;
+- PR-Validator-Tests;
+- weitere schnelle, containerfreie Checks.
 
-## 13. Dokumentations-Owner und Reconciliation
+Befehl:
 
-| Dauerhafte Änderung | Kanonischer Owner |
-|---|---|
-| Arbeitsmodell, Werkzeugwahl, Nutzerartefakte | `AI_ENTRYPOINT.md` |
-| Codex-spezifischer Einstieg | `AGENTS.md` |
-| technische Regeln und Workflowrollen | `ENGINEERING.md` |
-| Systeme, Datenflüsse und technische Owner | `docs/architecture/SYSTEM_MAP.md` |
-| externe Ressourcen und Writes | `docs/external-resource-matrix.md` |
-| Produktziel | `MASTER.md`, `Produktvertrag.md`, `COMMERCIAL_STRATEGY.md` |
-| Produktpriorität und Kandidaten | `ROADMAP.md` |
-| dauerhafte Testabdeckung und Evidence-Grenzen | `TEST_STATUS.md` |
-| operativer Status und Lauf-Evidence | aktives GitHub-Issue |
+```bash
+bash scripts/validate-repo.sh quick
+```
 
-Vor dem Schließen jedes Workpacks prüft Chat diese Matrix:
+### Reviewbereit
 
-1. Welche dauerhafte Realität hat sich geändert?
-2. Welcher Owner ist dafür zuständig?
-3. Muss dieser Owner aktualisiert werden oder lautet das Ergebnis ausdrücklich `kein dauerhaftes Wissensdelta`?
-4. Wurden veraltete aktuelle Aussagen ersetzt statt ergänzt?
-5. Bleiben operative SHAs, Run-IDs und Zwischenstände im Issue, sofern sie keine dauerhafte Proofgrenze darstellen?
+Erst beim Wechsel auf reviewbereit und nach späteren Codeänderungen laufen:
 
-Repository-Dokumentation wird genau einmal und nur bei dauerhaftem Wissensdelta geändert. Roadmap, Proofindex und technische Architektur werden nicht als allgemeines Abschlussjournal benutzt.
+- vollständige Repositoryvalidierung;
+- erforderliche MySQL-/MariaDB-Verträge;
+- vollständige Frontendverträge;
+- Browser-Fixtures und vereinbarte Viewports.
 
-## 14. Arbeitsmandat
+Befehl:
 
-Eine eindeutige Anweisung wie `mach das`, `umsetzen`, `patchen`, `dokumentieren` oder `zum Abschluss prüfen` erlaubt innerhalb des geschlossenen Scopes:
+```bash
+bash scripts/validate-repo.sh
+```
 
-- Analyse und Zieldefinition;
-- Aktivierung eines Workpack-Issues;
-- Branch, Commits und PR;
-- automatisierte Tests;
-- Merge nach `staging`, wenn der PR Gate grün ist;
-- Staging-Prüfung;
-- Release-PR und Merge nach `main`, wenn die Abnahme grün ist;
-- einmalige dauerhafte Dokumentations-Reconciliation;
-- Abschluss des Workpack-Issues.
+Ein bloßes Editieren des PR-Texts startet keinen neuen Lauf. Der grüne Required Check muss zum aktuellen Head-SHA gehören.
 
-Eine neue Freigabe ist nur bei Scope-Erweiterung, Live-Schreibaktion, irreversibler Aktion, Zahlung, Nachricht, Veröffentlichung außerhalb des vereinbarten Releasepfads oder Berechtigungsänderung erforderlich.
+## 7. Evidence und Staging
 
-## 15. Definition of Done
+Der Normalfall ist:
 
-Ein Workpack ist abgeschlossen, wenn:
+```text
+ein Implementierungs-PR
+-> ein normaler Staging-Deploy
+-> der vorhandene Deploy-Smoke
+-> höchstens ein gezielter zusätzlicher Smoke bei konkret unbelegtem Risiko
+```
 
-- der eingefrorene Vertrag erfüllt ist;
-- der kleinste vollständige Patch integriert ist oder ein Patch nachvollziehbar nicht nötig war;
-- `PR Gate` grün war, sofern ein Patch existiert;
-- erforderliche Staging- und Live-Evidence grün ist;
-- die konkrete Zielwirkung geprüft wurde;
-- das GitHub-Issue finalen Status, Evidence und Grenzen enthält;
-- die Dokumentations-Reconciliation durchgeführt wurde;
-- keine veraltete Queue-, Roadmap- oder Proofaussage zurückbleibt;
-- keine unnötige Nutzeraktion oder Nutzerartefaktdatei erzeugt wurde;
-- `[ACTIVE WORKPACK]` aus dem abgeschlossenen Issue entfernt wurde;
-- kein unnötiger Folge-Workpack erzeugt wurde.
+Nicht mehr zulässig als Standard:
+
+- temporäre Runtime-Endpunkte;
+- Completion-Marker;
+- Diagnose-PRs;
+- Marker-Cleanup-PRs;
+- Endpunktentfernungs-PRs;
+- separate 404-Finalisierungs-PRs.
+
+Synthetische Staging-Evidence nutzt permanente geschützte APIs oder einen wiederverwendbaren Test-Runner. Mutation, Readback und Cleanup geschehen im selben Lauf. Bei unerwartetem Verhalten wird gestoppt, nicht erneut geschrieben.
+
+## 8. Merge und Release
+
+Vor dem Merge nach `staging`:
+
+- PR vollständig;
+- aktueller Head-SHA grün;
+- relevante Evidence vorhanden;
+- keine offenen Reviewthreads;
+- Merge mit exakter Head-SHA-Bindung.
+
+Nach dem Staging-Deploy genügt der enthaltene Smoke, solange kein konkretes Risiko offen bleibt.
+
+Release nach Live:
+
+```text
+staging -> main
+-> normaler Main-Deploy
+-> gezielter Live-Smoke
+```
+
+Live-Schreibtests bleiben ausgeschlossen.
+
+## 9. Dokumentation
+
+- aktives Issue: operativer Status, Entscheidungen, Evidence, nächster Schritt;
+- `SYSTEM_MAP.md`: dauerhafte Owner und Datenflüsse;
+- `ENGINEERING.md`: dauerhafte technische Regeln;
+- `TEST_STATUS.md`: dauerhafte Prooffähigkeiten;
+- Roadmap und Produktvertrag nur bei echter Zieländerung.
+
+Keine parallelen Statusjournale. Dauerhafte Dokumentation wird einmal am Workpack-Ende reconciliiert.
+
+## 10. Arbeitsmandat
+
+Eine klare Anweisung wie `mach das`, `umsetzen` oder `zum Abschluss bringen` erlaubt innerhalb des geschlossenen Vertrags:
+
+- Arbeit auf dem deklarierten Branch;
+- Aktualisierung desselben PRs;
+- Tests;
+- Merge nach `staging` bei grünem Required Check;
+- vereinbarte Staging-Evidence;
+- Release nach `main`, sofern im Mandat enthalten und ohne neue externe Freigabegrenze;
+- Abschlussdokumentation und Issue-Abschluss.
+
+Neue Zustimmung ist nur bei Scope-Erweiterung, Zahlung, Nachricht, Berechtigungsänderung, irreversiblem externen Write oder einer ausdrücklich gesperrten Live-Aktion erforderlich.
+
+## 11. Definition of Done
+
+Ein Workpack ist fertig, wenn:
+
+- der Issue-Vertrag erfüllt ist;
+- genau der deklarierte Branch und PR integriert wurden;
+- der aktuelle Required Check grün ist;
+- erforderliche Staging-/Live-Evidence grün ist;
+- synthetische Daten vollständig bereinigt sind;
+- dauerhaftes Wissensdelta einmal dokumentiert ist;
+- das Issue den finalen Stand und genau den nächsten Schritt enthält.
