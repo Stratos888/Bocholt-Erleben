@@ -22,7 +22,7 @@ python3 - <<'PY'
 import json
 from pathlib import Path
 manifest = json.loads(Path('api/sql/000_manifest.json').read_text(encoding='utf-8'))
-expected = [f'{number:03d}' for number in range(1, 12)]
+expected = [f'{number:03d}' for number in range(1, 13)]
 actual = [entry['key'][:3] for entry in manifest['migrations']]
 if actual != expected:
     raise SystemExit(f'Unexpected migration order: {actual}')
