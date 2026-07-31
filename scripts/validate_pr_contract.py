@@ -262,6 +262,41 @@ def classify_changed_paths(paths: Iterable[str], *, workpack: bool) -> str:
     return "full"
 
 
+def select_test_targets(paths: Iterable[str], *, plan: str) -> tuple[str, bool, bool]:
+    values = list(paths)
+    if plan == "full":
+        return "all", True, True
+
+    backend_components: set[str] = set()
+    for path in values:
+        if path_matches(path, ("api/startpartner/**", "api/organizer-portal/**", "tests/startpartner_*", "tests/run_startpartner_*")):
+            backend_components.add("startpartner")
+        elif path_matches(path, ("api/control-center/**", "tests/control_center*", "js/control-center/**", "steuerzentrale/**")):
+            backend_components.add("control-center")
+        elif path_matches(path, ("api/submissions/**", "tests/submission_*", "events-veroeffentlichen/**", "js/publish-funnel.js")):
+            backend_components.add("submissions")
+        elif path_matches(path, BACKEND_PATTERNS):
+            backend_components.add("all")
+
+    if "all" in backend_components or not backend_components:
+        backend = "all"
+    else:
+        backend = ",".join(sorted(backend_components))
+
+    event_browser = plan == "frontend" and any(
+        path_matches(path, ("index.html", "events/**", "heute/**", "aktivitaeten/**", "js/app.js", "js/events*.js", "css/style.css"))
+        for path in values
+    )
+    control_browser = plan == "frontend" and any(
+        path_matches(path, ("steuerzentrale/**", "js/control-center.js", "js/control-center/**", "css/style.css"))
+        for path in values
+    )
+    if plan == "frontend" and not event_browser and not control_browser:
+        event_browser = True
+        control_browser = True
+    return backend, event_browser, control_browser
+
+
 def validate_parallel_prs(
     *,
     pr_number: int,
@@ -437,13 +472,19 @@ def load_event(path: str) -> dict[str, Any]:
     return value
 
 
-def write_github_output(path: str, *, mode: str, plan: str, workpack: int | None) -> None:
+def write_github_output(
+    path: str, *, mode: str, plan: str, workpack: int | None, changed_paths: Iterable[str]
+) -> None:
     if not path:
         return
+    backend, event_browser, control_browser = select_test_targets(changed_paths, plan=plan)
     with open(path, "a", encoding="utf-8") as handle:
         handle.write(f"mode={mode}\n")
         handle.write(f"plan={plan}\n")
-        handle.write(f"browser={'true' if plan in {'frontend', 'full'} else 'false'}\n")
+        handle.write(f"backend_components={backend}\n")
+        handle.write(f"browser_event={'true' if event_browser else 'false'}\n")
+        handle.write(f"browser_control={'true' if control_browser else 'false'}\n")
+        handle.write(f"browser={'true' if event_browser or control_browser else 'false'}\n")
         handle.write(f"workpack={workpack or ''}\n")
 
 
@@ -488,7 +529,13 @@ def main() -> int:
         return 1
 
     workpack_issue = int(contract["workpack_issue"]) if contract is not None else None
-    write_github_output(args.github_output, mode=mode, plan=plan, workpack=workpack_issue)
+    write_github_output(
+        args.github_output,
+        mode=mode,
+        plan=plan,
+        workpack=workpack_issue,
+        changed_paths=paths,
+    )
     print(
         f"PR contract: OK ({mode}, plan {plan}, {len(paths)} changed paths"
         + (f", workpack #{workpack_issue}" if workpack_issue else "")
