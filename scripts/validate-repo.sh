@@ -89,7 +89,9 @@ validate_php_tests() {
   fi
   if component_enabled submissions; then
     for file in tests/submission_*.php; do
-      [ -e "$file" ] && php "$file"
+      if [ -e "$file" ]; then
+        php "$file"
+      fi
     done
   fi
 }
