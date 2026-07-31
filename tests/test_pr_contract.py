@@ -299,6 +299,20 @@ class PullRequestContractTests(unittest.TestCase):
                     expected,
                 )
 
+    def test_component_and_browser_target_selection(self):
+        cases = [
+            (["api/startpartner/action.php"], "backend", ("startpartner", False, False)),
+            (["api/control-center/action.php"], "backend", ("control-center", False, False)),
+            (["api/example.php"], "backend", ("all", False, False)),
+            (["events/index.html"], "frontend", ("all", True, False)),
+            (["steuerzentrale/index.html"], "frontend", ("all", False, True)),
+            (["css/component.css"], "frontend", ("all", True, True)),
+            (["api/startpartner/action.php", "js/control-center/startpartner.js"], "full", ("all", True, True)),
+        ]
+        for paths, plan, expected in cases:
+            with self.subTest(paths=paths, plan=plan):
+                self.assertEqual(contract.select_test_targets(paths, plan=plan), expected)
+
     def test_api_failure_fails_closed(self):
         with self.assertRaisesRegex(contract.ContractError, "simulated API failure"):
             contract.validate_pull_request(
