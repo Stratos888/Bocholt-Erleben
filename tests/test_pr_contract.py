@@ -305,7 +305,7 @@ class PullRequestContractTests(unittest.TestCase):
             (["api/control-center/action.php"], "backend", ("control-center", False, False)),
             (["api/example.php"], "backend", ("all", False, False)),
             (["events/index.html"], "frontend", ("all", True, False)),
-            (["steuerzentrale/index.html"], "frontend", ("all", False, True)),
+            (["steuerzentrale/index.html"], "frontend", ("control-center", False, True)),
             (["css/component.css"], "frontend", ("all", True, True)),
             (["api/startpartner/action.php", "js/control-center/startpartner.js"], "full", ("all", True, True)),
         ]
