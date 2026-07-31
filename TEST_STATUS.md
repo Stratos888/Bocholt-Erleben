@@ -1,6 +1,6 @@
 # Aktueller Proofindex – Bocholt erleben
 
-Stand: 2026-07-28
+Stand: 2026-07-31
 
 Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence-Grenzen. Operative Zwischenstände, vollständige Logs und laufende Run-IDs stehen im jeweiligen Workpack-Issue und in GitHub Actions.
 
@@ -20,9 +20,10 @@ Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence
 | Bereich | Evidence | Dauerhaft belegter Stand |
 |---|---:|---|
 | Branch- und Deployrouting | E2 | nur `staging` und `main` dürfen deployen; Releasepfad `Feature-Branch -> staging -> main` |
-| Aktiver Workpack | E2 | genau ein offenes Issue mit `[ACTIVE WORKPACK]`; kein oder mehrere Treffer stoppen Repository-Writes fail-closed |
-| PR-Scope-Vertrag | E2 | PR referenziert Revision und Hash des aktiven Issue-Vertrags; vollständiger Diff einschließlich Löschungen wird gegen `allowed_paths` und `locked_paths` geprüft |
-| PR-Integration | E2 | ein Required Check `PR Gate` führt Contract-, Diff-, Repository- und synthetische Browserprüfung aus |
+| Adaptiver Arbeitsweg | E2 | normale Änderungen benötigen kein Workpack; unabhängige PRs dürfen parallel laufen, während Dateiüberschneidungen und doppelte PRs desselben Workpacks fail-closed blockiert werden |
+| Optionaler Workpack | E2 | große, riskante, mehrchatfähige oder zentrale Governance-/Deploymentänderungen nutzen genau ein offenes `[ACTIVE WORKPACK]`-Issue, einen deklarierten Branch und einen PR |
+| PR-Scope-Vertrag | E2 | Workpack-PRs referenzieren nur ihr Issue; der aktuelle Live-Vertrag wird bei jedem PR-Gate-Lauf neu geladen und der vollständige Diff einschließlich Löschungen gegen `allowed_paths` und `locked_paths` geprüft; Hashkopien entfallen |
+| Adaptive PR-Integration | E2 | der Required Check `PR Gate` wählt `docs`, `quick`, `backend`, `frontend` oder `full`; kleine Backend- und Browserläufe werden auf betroffene Komponenten begrenzt, unklare oder große Änderungen fallen konservativ auf `full` zurück |
 | Checkout-neutrale Browser-Evidence | E2 | synthetische Event-Navigation läuft in temporärem Verzeichnis und verändert den Repository-Checkout nicht |
 | Mobile Ausnahmeprüfung | E2 | begrenzte Playwright-Fixture prüft 360×780 und 390×844 auf priorisierten Treffervergleich, genau eine unmittelbare Entscheidungsebene, eingeklappte Evidence, Überlauf und Navigationsüberdeckung sowie 1440×900 auf unveränderte Desktopstruktur |
 | Deploy-Run-Locator | E2/E6 | `Publish Deploy Run Status` schreibt branch- und eventbezogen `pending`, `success`, `failure` oder `error` mit exaktem Actions-Link auf den Commit |
@@ -50,12 +51,12 @@ Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence
 
 ## Prozessnachweis
 
-Die Einführung des issue-verankerten PR-Vertrags stoppte zwei reale Fehler vor dem Merge:
+Der issue-verankerte Workpack-Vertrag stoppte zwei reale Fehler vor dem Merge:
 
 1. einen unvollständigen PR-Evidence-Block;
 2. einen neuen, noch nicht im fail-closed Workflow-Inventar registrierten Workflow.
 
-Erst nach expliziter Vertragsrevision und vollständigem Neu-Lauf wurde freigegeben. Damit ist belegt, dass der Prozess echten Scope und Verhalten prüft statt nur Dokumentationsmarker.
+Erst nach expliziter Vertragsrevision und vollständigem Neu-Lauf wurde freigegeben. Heute gilt derselbe Schutz nur für Workpacks. Normale Änderungen bleiben issuefrei; vor jedem Workpack-Merge wird über das PR-Ereignis `final-validation` ein letzter Lauf auf dem exakten Head ausgelöst, der den aktuellen Live-Issue-Vertrag erneut lädt.
 
 ## Artifact-Grenze
 
