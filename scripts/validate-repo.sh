@@ -51,29 +51,57 @@ validate_quick() {
   python3 tests/test_pr_contract.py
 }
 
+validate_docs() {
+  echo "== Documentation contracts =="
+  if git grep -nE '^(<<<<<<<|=======|>>>>>>>)' -- '*.md' '*.txt'; then
+    echo "Documentation contains unresolved conflict markers." >&2
+    return 1
+  fi
+  python3 tests/test_pr_contract.py
+}
+
+component_enabled() {
+  local wanted="$1"
+  local configured="${VALIDATION_COMPONENTS:-all}"
+  [ "$configured" = "all" ] || [[ ",$configured," == *",$wanted,"* ]]
+}
+
 validate_preflight() {
   php "$PREFLIGHT_TEST"
 }
 
 validate_php_tests() {
-  for file in tests/control_center*.php; do
-    if [ "$file" = "$PREFLIGHT_TEST" ]; then
-      continue
-    fi
-    php "$file"
-  done
-  php tests/startpartner_domain_contract_test.php
-  php tests/startpartner_side_effect_contract_test.php
-  php tests/startpartner_gate2_domain_contract_test.php
-  php tests/startpartner_gate2_side_effect_contract_test.php
-  php tests/startpartner_gate3_domain_contract_test.php
-  php tests/startpartner_gate3_side_effect_contract_test.php
+  if component_enabled control-center; then
+    for file in tests/control_center*.php; do
+      if [ "$file" = "$PREFLIGHT_TEST" ]; then
+        continue
+      fi
+      php "$file"
+    done
+  fi
+  if component_enabled startpartner; then
+    php tests/startpartner_domain_contract_test.php
+    php tests/startpartner_side_effect_contract_test.php
+    php tests/startpartner_gate2_domain_contract_test.php
+    php tests/startpartner_gate2_side_effect_contract_test.php
+    php tests/startpartner_gate3_domain_contract_test.php
+    php tests/startpartner_gate3_side_effect_contract_test.php
+  fi
+  if component_enabled submissions; then
+    for file in tests/submission_*.php; do
+      if [ -e "$file" ]; then
+        php "$file"
+      fi
+    done
+  fi
 }
 
 validate_startpartner_mysql() {
-  bash tests/run_startpartner_mysql_contract.sh
-  bash tests/run_startpartner_gate2_mysql_contract.sh
-  bash tests/run_startpartner_gate3_mysql_contract.sh
+  if component_enabled startpartner; then
+    bash tests/run_startpartner_mysql_contract.sh
+    bash tests/run_startpartner_gate2_mysql_contract.sh
+    bash tests/run_startpartner_gate3_mysql_contract.sh
+  fi
 }
 
 validate_backend() {
@@ -115,6 +143,7 @@ validate_repository() {
 }
 
 case "$section" in
+  docs) validate_docs ;;
   quick) validate_quick ;;
   backend) validate_backend ;;
   routing) validate_routing ;;

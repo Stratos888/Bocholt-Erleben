@@ -97,7 +97,7 @@ Der PR-Gate-Validator plant automatisch:
 
 Draft-Pushes erhalten nur den schnellen Check. Reviewbereite Pull Requests erhalten den zum Diff passenden Abschlusscheck.
 
-Vor dem Merge werden aktueller Head-SHA, aktueller Diff, offene Konflikte und aktuelle Checks erneut geprüft.
+Vor dem Merge werden aktueller Head-SHA, aktueller Diff, offene Konflikte und aktuelle Checks erneut geprüft. Bei Workpacks wird unmittelbar vor dem Merge einmal das PR-Label `final-validation` gesetzt. Dieses Ereignis startet den Required Check neu; er lädt den aktuellen Issue-Vertrag live und bindet das Ergebnis an den exakten PR-Head.
 
 ## 7. Staging und Live
 
