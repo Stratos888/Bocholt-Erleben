@@ -68,7 +68,7 @@ Der Diff bestimmt den kleinsten zuverlässigen Plan:
 - `frontend`: Frontendverträge und Browser-Fixtures;
 - `full`: vollständige Repository-, Datenbank-, Frontend- und Browserprüfung.
 
-PR-Textänderungen lösen einen neuen Check aus. Nach Codeänderungen muss der aktuelle Head-SHA erneut grün sein.
+PR-Textänderungen lösen einen neuen Check aus. Nach Codeänderungen muss der aktuelle Head-SHA erneut grün sein. Bei Workpacks wird unmittelbar vor dem Merge das PR-Label `final-validation` gesetzt; der dadurch gestartete Lauf lädt den aktuellen Issue-Vertrag erneut. Nach einer späteren Vertrags- oder Codeänderung wird das Label entfernt und erst für den neuen finalen Lauf wieder gesetzt.
 
 ## 6. Workpacks und Risikogrenzen
 
