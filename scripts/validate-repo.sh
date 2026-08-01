@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# Draft PRs use `quick`; review-ready PRs use the complete default section.
 section="${1:-all}"
 PREFLIGHT_TEST="tests/control_center_runtime_preflight_contract_test.php"
 
@@ -36,6 +37,8 @@ validate_frontend_syntax() {
   node --check js/control-center-seo-embed.js
   node --check js/neutral-selection.js
   node --check js/seo-schema.js
+  node --check js/organizer-pilot.js
+  node --input-type=module --check < js/control-center/startpartner-gate4.js
   node --check scripts/render-static-content.mjs
   for file in js/control-center/*.js; do
     node --input-type=module --check < "$file"
@@ -86,6 +89,9 @@ validate_php_tests() {
     php tests/startpartner_gate2_side_effect_contract_test.php
     php tests/startpartner_gate3_domain_contract_test.php
     php tests/startpartner_gate3_side_effect_contract_test.php
+    php tests/startpartner_gate4_domain_contract_test.php
+    php tests/startpartner_gate4_submission_contract_test.php
+    php tests/startpartner_gate4_side_effect_contract_test.php
   fi
   if component_enabled submissions; then
     for file in tests/submission_*.php; do
@@ -101,6 +107,7 @@ validate_startpartner_mysql() {
     bash tests/run_startpartner_mysql_contract.sh
     bash tests/run_startpartner_gate2_mysql_contract.sh
     bash tests/run_startpartner_gate3_mysql_contract.sh
+    bash tests/run_startpartner_gate4_mysql_contract.sh
   fi
 }
 
@@ -116,6 +123,7 @@ validate_backend() {
 validate_frontend() {
   echo "== Frontend contracts =="
   validate_frontend_syntax
+  node tests/organizer_portal_gate4_contract_test.mjs
   node tests/control_center_frontend_contract_test.mjs
   node tests/control_center_browser_secret_contract_test.mjs
   python3 tests/test_responsive_grid_cache_contract.py
