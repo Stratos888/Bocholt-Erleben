@@ -8,7 +8,7 @@ const seo=read('js/control-center-seo-embed.js'),style=read('css/style.css'),css
 const presentation=read('api/control-center/_presentation.php'),caseApi=read('api/control-center/case.php'),casesApi=read('api/control-center/cases.php'),actionApi=read('api/control-center/action.php');
 const startpartnerDomain=read('api/startpartner/_gate2_domain.php'),gate3Domain=read('api/startpartner/_gate3_domain.php'),gate3Presentation=read('api/startpartner/_gate3_presentation.php');
 const startpartnerAction=read('api/startpartner/action.php'),startpartnerProfile=read('api/startpartner/profile.php'),startpartnerQualification=read('api/startpartner/qualification.php'),startpartnerPilot=read('api/startpartner/pilot.php');
-const gate4Operation=read('api/startpartner/_gate4_operation.php'),gate4State=read('api/startpartner/_gate4_state.php'),gate4Preflight=read('api/startpartner/_gate4_preflight.php');
+const gate4Operation=read('api/startpartner/_gate4_operation.php'),gate4State=read('api/startpartner/_gate4_state.php'),gate4Readiness=read('api/startpartner/_gate4_readiness_actions.php');
 const taskContract=read('api/control-center/_event_review_tasks.php'),taskWriteback=read('api/control-center/_event_review_writeback.php');
 const directInboxWriteback=read('api/control-center/_inbox_decision_writeback.php'),verifiedSourceWriteback=read('api/control-center/_verified_source_writeback.php'),sourceReconciliation=read('api/control-center/_source_reconciliation.php');
 const sheetInboxSource=read('api/control-center/_sheet_inbox_source.php'),submissionSource=read('api/control-center/_submission_source.php'),sources=read('api/control-center/_sources.php');
@@ -71,7 +71,7 @@ if(!reviewRender.includes('renderGate4Panel(data)'))errors.push('Gate-4 panel mu
 if(!review.includes('handleGate4Action(item, action, reload)'))errors.push('Gate-4 actions must use the existing review router and reload lifecycle.');
 for(const forbidden of ['new MutationObserver(','window.prompt(','window.alert(','document.createElement(\'style\')','startGate4ReviewEnhancement'])if(gate4.includes(forbidden)||loader.includes(forbidden))errors.push(`Gate-4 must not use parallel or browser-native UI mechanisms: ${forbidden}`);
 for(const marker of ['BE_STARTPARTNER_GATE4_MANUAL_ONBOARDING_ITEMS','be_startpartner_gate4_manual_onboarding_key'])if(!gate4Operation.includes(marker)&&!read('api/startpartner/_gate4_contract.php').includes(marker))errors.push(`Gate-4 manual/derived boundary missing: ${marker}`);
-for(const marker of ['technical_readback','value_metric_daily','query_status','reporting_target_id'])if(!gate4Preflight.includes(marker)&&!read('api/startpartner/_gate4_measurement_actions.php').includes(marker))errors.push(`Gate-4 measurement preflight missing: ${marker}`);
+for(const marker of ['technical_readback','value_metric_daily','query_status','reporting_target_id'])if(!gate4Readiness.includes(marker))errors.push(`Gate-4 measurement preflight missing: ${marker}`);
 for(const marker of ['ready_measurement','ready_distribution','is_manual','completed_count'])if(!gate4State.includes(marker))errors.push(`Gate-4 state projection missing: ${marker}`);
 
 if(modules.includes('new MutationObserver('))errors.push('core modules must not patch their own UI through MutationObserver');
