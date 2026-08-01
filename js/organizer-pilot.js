@@ -34,23 +34,23 @@
   function phaseLabel(phase) {
     return ({
       onboarding: 'Einrichtung läuft',
-      activation_ready: 'Bereit für die Aktivierung',
+      activation_ready: 'Bereit zum Start',
       active: 'Pilotphase läuft',
     })[phase] || 'Einrichtung läuft';
   }
 
   function phaseBadge(phase) {
     return ({
-      onboarding: 'In Einrichtung',
-      activation_ready: 'Bereit',
+      onboarding: 'Einrichtung',
+      activation_ready: 'Startbereit',
       active: 'Aktiv',
-    })[phase] || 'In Einrichtung';
+    })[phase] || 'Einrichtung';
   }
 
   function contentStatus(status) {
     return ({
-      draft: 'Eingereicht',
-      editorial_ready: 'Redaktionell vorbereitet',
+      draft: 'Zur Prüfung eingereicht',
+      editorial_ready: 'Für den Start vorbereitet',
       approved: 'Veröffentlicht',
       rejected: 'Nicht veröffentlicht',
       withdrawn: 'Zurückgezogen',
@@ -71,7 +71,7 @@
         const label = row.scope_key === 'events' ? 'Veranstaltungen' : 'Aktivitäten';
         const amount = row.is_unlimited ? 'vereinbarter Rahmen' : row.limit_value || '–';
         const period = row.period_unit === 'pilot_month'
-          ? ' je Pilotmonat'
+          ? ' pro Monat'
           : row.period_unit === 'concurrent'
             ? ' gleichzeitig'
             : '';
@@ -82,7 +82,7 @@
 
   function contentList(rows = []) {
     if (!rows.length) {
-      return '<p class="content-note">Noch kein Pilotinhalt eingereicht.</p>';
+      return '<p class="content-note">Noch kein Inhalt für den Pilot eingereicht.</p>';
     }
     return `<div class="content-links">${rows.slice().reverse().map(row => `
       <div class="content-link">
@@ -98,7 +98,7 @@
     const eventScope = (gate4.scopes || []).some(row => row.scope_key === 'events');
     const activityScope = (gate4.scopes || []).some(row => row.scope_key === 'activities');
     if (!eventScope && !activityScope) {
-      return '<p class="content-note">Für diesen Pilot ist noch kein Inhaltsscope freigegeben.</p>';
+      return '<p class="content-note">Für diesen Pilot ist noch kein Inhaltsumfang vereinbart.</p>';
     }
     return `
       <form class="content-form organizer-pilot-content-form" id="organizer-pilot-content-form">
@@ -153,7 +153,7 @@
           <button class="content-cta content-cta--primary" type="submit">Kostenlos zur Prüfung einreichen</button>
         </div>
         <p class="content-note" data-pilot-submit-status aria-live="polite">
-          Keine Zahlung, kein Stripe-Checkout und keine automatische Veröffentlichung.
+          Die Einreichung ist kostenlos. Wir prüfen den Inhalt redaktionell, bevor er veröffentlicht wird.
         </p>
       </form>
     `;
@@ -175,21 +175,21 @@
       </div>
       <p>${escape(active
         ? 'Die sechsmonatige Pilotphase läuft. Es gibt keine automatische kostenpflichtige Verlängerung.'
-        : 'Die Einrichtung läuft. Die sechs Monate beginnen erst nach vollständiger Aktivierung und der Freigabe des ersten Inhalts.')}</p>
+        : 'Die Einrichtung läuft. Die sechs Monate beginnen erst nach dem vollständigen Start und der Freigabe des ersten Inhalts.')}</p>
       ${successMessage ? `<div class="content-note" role="status">${escape(successMessage)}</div>` : ''}
       <dl class="organizer-tariff-table">
         <div><dt>Vereinbarter Umfang</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
-        <div><dt>Onboarding</dt><dd>${escape(`${Number(gate4.onboarding?.complete_count || 0)} von ${Number(gate4.onboarding?.total_count || 14)} Punkten belegt`)}</dd></div>
-        <div><dt>Aktivierung</dt><dd>${escape(formatDate(pilot.activation_date_local))}</dd></div>
+        <div><dt>Einrichtung</dt><dd>${escape(`${Number(gate4.onboarding?.complete_count || 0)} von ${Number(gate4.onboarding?.total_count || 14)} Schritten erledigt`)}</dd></div>
+        <div><dt>Pilotstart</dt><dd>${escape(formatDate(pilot.activation_date_local))}</dd></div>
         <div><dt>Geplantes Ende</dt><dd>${escape(formatDate(pilot.planned_end_date))}</dd></div>
-        <div><dt>Veröffentlichte Pilotinhalte</dt><dd>${escape(String((gate4.content_links || []).filter(row => row.status === 'approved').length))}</dd></div>
+        <div><dt>Veröffentlichte Inhalte</dt><dd>${escape(String((gate4.content_links || []).filter(row => row.status === 'approved').length))}</dd></div>
       </dl>
       <details class="content-disclosure">
-        <summary>Pilotinhalte anzeigen</summary>
+        <summary>Inhalte im Pilot anzeigen</summary>
         ${contentList(gate4.content_links)}
       </details>
       <details class="content-disclosure">
-        <summary>Neuen Pilotinhalt einreichen</summary>
+        <summary>Neuen Inhalt einreichen</summary>
         ${contentForm(gate4)}
       </details>
     `;
@@ -255,7 +255,7 @@
         const id = result.submission_id || result.content_link?.submission_id || '';
         form.reset();
         sync();
-        await load(`Einreichung ${id} wurde ohne Zahlung zur redaktionellen Prüfung gespeichert.`);
+        await load(`Einreichung ${id} wurde gespeichert und wird redaktionell geprüft.`);
       } catch (error) {
         status.textContent = friendlyError(error);
       } finally {
