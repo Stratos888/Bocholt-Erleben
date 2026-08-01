@@ -1,7 +1,7 @@
 # Brand Lab v2
 
-Stand: 2026-08-01  
-Workpack: #225  
+Stand: 2026-08-01
+Workpack: #225
 Status: Qualifizierungsrahmen aktiv; präsentationsfähige Kandidaten: `0`
 
 Dieses Verzeichnis bleibt bis zur abgeschlossenen internen Schwarz-Weiß-Exploration bewusst ohne Kandidatenpräsentation.
