@@ -1,32 +1,27 @@
 {
-  "candidate_id": "open-impulse",
-  "candidate_name": "Offener Impuls",
-  "workpack_issue": 225,
+  "archive_status": "rejected",
+  "former_candidate_id": "open-impulse",
+  "former_candidate_name": "Offener Impuls",
+  "former_score_claim": 91,
+  "score_claim_valid": false,
+  "premium_gate_passed": false,
+  "microdrawing_authorized": false,
+  "public_cutover_authorized": false,
+  "further_development_authorized": false,
+  "reason": [
+    "generic typography after ablation",
+    "artifact-like diagonal interruption and accent",
+    "weak real-size identity",
+    "generic small mark",
+    "insufficient Bocholt erleben specificity"
+  ],
   "source_basis": {
     "typeface": "Inter Display SemiBold",
     "license": "SIL Open Font License 1.1",
-    "use": "outline construction basis; no font file shipped",
-    "customization": "path-outlined lowercase wordmark; bespoke diagonal openings and floating impulses on the initial letters of both words; responsive stacked construction; exact small-mark derivation; optical accent enlargement only in committed 16 and 24 px rasters"
+    "use": "historical outline construction basis; no font file shipped"
   },
   "external_designer_used": false,
   "image_generation_used_for_final_assets": false,
   "automatic_tracing_used": false,
-  "assets_are_path_based": true,
-  "legal_clearance_claimed": false,
-  "score": 91,
-  "scorecard": {
-    "product_brand_fit": 19,
-    "distinctiveness": 17,
-    "primary_wordmark_quality": 14,
-    "small_context_continuity": 14,
-    "system_extensibility": 9,
-    "real_product_integration": 9,
-    "robustness_accessibility": 4,
-    "construction_provenance": 5
-  },
-  "open_risks": [
-    "The diagonal opening and floating impulse require a professional similarity and trademark review before registration.",
-    "The 16 px raster is functional but intentionally simplified by antialiasing and remains the lower practical limit.",
-    "Final production still requires Product Owner direction approval and optical micro-adjustment, not a public cutover."
-  ]
+  "legal_clearance_claimed": false
 }

@@ -1,0 +1,15 @@
+{
+  "template": true,
+  "candidate_id": "candidate-000",
+  "role": "consolidator",
+  "evaluator_id": "consolidator-placeholder",
+  "created_at": null,
+  "source_reviews_locked": false,
+  "evaluator_ids_distinct": null,
+  "hard_knockout": null,
+  "design_score": null,
+  "minimums_met": null,
+  "technical_pass_fail_complete": null,
+  "ci_certifies_aesthetic_quality": false,
+  "status": "not_evaluated"
+}
