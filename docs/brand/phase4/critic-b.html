@@ -1,0 +1,34 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Blindkritik B – Produkt und Kategorie</title><style>
+*{box-sizing:border-box}body{margin:0;background:#eef1ed;color:#18211d;font:15px/1.45 Arial,sans-serif}
+header{position:sticky;top:0;z-index:5;padding:18px 22px;background:#fffffff2;border-bottom:1px solid #cfd6d0}
+header h1{margin:0 0 6px;font-size:24px}header p{margin:0;color:#5d6962}
+main{max-width:1180px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px}
+.card{background:#fff;border:1px solid #d2d9d3;border-radius:18px;padding:16px;overflow:hidden}
+.id{font:700 12px/1 Arial;letter-spacing:.12em;color:#66716b;margin-bottom:14px}
+.identity{width:100%;height:84px;display:block;border:1px solid #e1e5e2;border-radius:12px;padding:8px;background:#fafbfa}
+.sizes{display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin-top:14px}
+.size{display:grid;gap:5px;justify-items:center;font-size:10px;color:#657069}.size svg{display:block}
+.phone{margin-top:14px;border:5px solid #17201c;border-radius:24px;overflow:hidden;background:#fafbf8}
+.phone-head{height:62px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid #d8ded9;background:#fff}.phone-head svg{width:150px;height:42px}
+.phone-body{padding:16px}.phone-body h3{font-size:28px;line-height:1;margin:5px 0}.muted{color:#68736d}
+.home{display:flex;gap:14px;align-items:center;margin-top:14px}.icon{width:64px;height:64px;border-radius:17px;background:#153d2e;display:grid;place-items:center;padding:9px}.icon svg{width:100%;height:100%;filter:invert(1)}
+.favicon{width:24px;height:24px;border:1px solid #cdd4ce;border-radius:5px;padding:3px}.partner{margin-top:14px;padding:13px;border-radius:12px;background:#173c2e;color:#fff;display:flex;align-items:center;gap:12px}.partner svg{width:40px;height:40px;filter:invert(1)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}.compare section{border:1px solid #dce1dd;border-radius:12px;padding:10px}.compare svg{width:100%;height:90px}
+.questions{margin-top:12px;padding:10px;background:#f5f7f4;border-radius:10px;font-size:13px}
+@media(max-width:560px){header{position:static;padding:14px}main{padding:10px}.grid{grid-template-columns:1fr}.card{padding:12px}}
+</style></head>
+<body><header><h1>Blindkritik B – Produkt und Kategorie</h1><p>Nur anonyme IDs in identischen Produktkontexten. Keine Konzepttitel, keine Produzentennotizen.</p></header><main><div id="grid" class="grid"></div></main>
+<script>
+const mode="b";
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function sized(svg,n,id){return `<span class="size"><span style="width:${n}px;height:${n}px;display:block">${svg}</span><b>${n}</b></span>`}
+fetch('blind-systems.json').then(r=>r.json()).then(data=>{
+ document.getElementById('grid').innerHTML=data.systems.map(s=>{
+  if(mode==='a') return `<article class="card"><div class="id">${esc(s.candidate_id)}</div><div class="identity">${s.identity_svg}</div><div class="sizes">${[64,48,32,24,16].map(n=>sized(s.mark_svg,n,s.candidate_id)).join('')}</div></article>`;
+  if(mode==='b') return `<article class="card"><div class="id">${esc(s.candidate_id)}</div><div class="phone"><div class="phone-head">${s.identity_svg}</div><div class="phone-body"><small>DEIN SCHNELLER BLICK</small><h3>Heute rund um Bocholt</h3><p class="muted">Events und Aktivitäten, die heute relevant sind.</p></div></div><div class="home"><div class="icon">${s.mark_svg}</div><div class="favicon">${s.mark_svg}</div><span class="muted">Homescreen · Browser-Tab</span></div><div class="partner">${s.mark_svg}<div><b>Für Veranstalter</b><br><small>Professionell sichtbar werden</small></div></div></article>`;
+  if(mode==='r') return `<article class="card"><div class="id">${esc(s.candidate_id)}</div><div class="compare"><section><small>ORIGINAL</small>${s.identity_svg}</section><section><small>ABLATION</small>${s.ablation_svg}</section></div><div class="questions">Prüfe Genericity, Austauschbarkeit, Artefaktlesart, Kategoriefehler, Erklärungspflicht, Silhouette und Kleingrößenkollaps.</div></article>`;
+  return '';
+ }).join('');
+});
+</script></body></html>
