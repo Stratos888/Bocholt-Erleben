@@ -2,7 +2,7 @@
 
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **AKTIV – Creative Direction geschlossen, Wortmarkenstudien freigegeben**
+Status: **AKTIV – interne Wortmarkenstudien und Qualitätsfilter**
 
 ## Zweck
 
@@ -58,17 +58,21 @@ Ein separates abstraktes Zeichen ist keine Pflicht. Es wird nicht als Ausgangspu
 - Nutzerinteraktion auf qualifizierte Richtungen begrenzt;
 - Bilder, Berichtsgrafiken und Rohentwürfe für den Nutzer gesperrt.
 
-## Freigegebene interne Studien
+## Interne Studien
 
-Die interne Suche ist auf höchstens sieben vollständige Wortmarkenstudien begrenzt:
+Die interne Suche ist auf höchstens sieben vollständige Wortmarkenstudien begrenzt. Die Zahl ist eine Obergrenze, kein Lieferziel. Schwache Studien werden ohne Ersatz beendet.
 
-- Territorium A `Klar ausgewählt`: höchstens drei Studien;
-- Territorium B `Nah am echten Leben`: höchstens zwei Studien;
-- Territorium C `Raus ins Leben`: höchstens zwei Studien.
+Aktueller Befund:
 
-Die Zahl ist eine Obergrenze, kein Lieferziel. Eine schwache Studie wird beendet und nicht automatisch ersetzt.
+- intern geprüfte Studien: `17`;
+- verworfen: `16`;
+- als Kandidat qualifiziert: `0`;
+- vorläufig weitergeführt: `1`;
+- Nutzerpräsentationen: `0`.
 
-Keine Studie erhält ein App-Icon, bevor sie das Creative-Director-Gate als vollständige Primäridentität besteht.
+Die vorläufige Studie aus Territorium A hat den ersten Creative-Director-Filter und die reale Produktkontextprüfung bestanden. Kategorieabgrenzung, optische Korrektur, Ähnlichkeits- und Herkunftsprüfung sind offen. Sie ist ausdrücklich keine qualifizierte Richtung.
+
+Keine Studie erhält ein App-Icon, bevor sie das Creative-Director-Gate als vollständige Primäridentität vollständig besteht.
 
 ## Qualitätsbarriere vor der formalen Bewertung
 
@@ -86,13 +90,7 @@ Formale Prüfungen und Punktwerte dürfen keine mittelmäßige Gestaltung adeln.
 
 ## Methodische Ehrlichkeit
 
-Wenn Produktion, Kritik und Konsolidierung durch denselben ChatGPT-Orchestrator ausgeführt werden, wird dies nicht als echte unabhängige Blindprüfung bezeichnet. Stattdessen werden:
-
-- Produktionsnotizen vor der Bewertung gesperrt;
-- Kandidaten anonymisiert;
-- getrennte evidenzbasierte Bewertungspässe ausgeführt;
-- Widersprüche und methodische Grenzen dokumentiert;
-- die finale visuelle Entscheidung beim Product Owner belassen.
+Wenn Produktion, Kritik und Konsolidierung durch denselben ChatGPT-Orchestrator ausgeführt werden, wird dies nicht als echte unabhängige Blindprüfung bezeichnet. Stattdessen werden Produktionsnotizen vor der Bewertung gesperrt, Kandidaten anonymisiert, getrennte evidenzbasierte Bewertungspässe ausgeführt und methodische Grenzen dokumentiert.
 
 ## Nutzerinteraktion
 
@@ -103,13 +101,11 @@ Der Nutzer erhält:
 - keine generierten Berichtsgrafiken;
 - keine Aufforderung, Chats oder Prüfergebnisse zu verwalten.
 
-Interne visuelle Arbeit muss trotzdem real erfolgen: als private, repository-lokale SVG-, Typografie- und Originalgrößenstudien. Rein verbale oder nur gedachte Logos sind nicht bewertbar. Sichtbar präsentiert wird erst, wenn mindestens eine Richtung die Qualitätsbarriere nachvollziehbar überschritten hat.
+Interne visuelle Arbeit erfolgt real als private, repository-lokale SVG-, Typografie- und Originalgrößenstudien. Sichtbar präsentiert wird erst, wenn mindestens eine Richtung die Qualitätsbarriere nachvollziehbar überschritten hat.
 
 ## Aktueller Stand
 
 - qualifizierte Richtungen: `0`
 - neue Phase-5-Richtungen: `0`
 - öffentliche Änderungen: `0`
-- Premium-Benchmark: abgeschlossen
-- kreative Territorien: abgeschlossen
-- nächster Schritt: interne vollständige Wortmarkenstudien; noch keine Nutzerpräsentation
+- nächster Schritt: optische Korrektur und Kategorie-/Ähnlichkeitsprüfung der vorläufigen Studie; parallel höchstens eine Studie aus Territorium B
