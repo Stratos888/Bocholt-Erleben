@@ -2,13 +2,13 @@
 
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **AKTIV – integrierte Identitätsarchitektur nach belegtem W0-Abbruch**
+Status: **AKTIV – aktueller Studienzyklus beendet; neuer generativer Suchraum vorbereitet**
 
 ## Zweck
 
-Phase 5 setzt die Markenentwicklung nach `0 qualifizierte Richtungen` aus Phase 4 neu auf.
+Phase 5 entwickelt eine Premium-Markenidentität für `Bocholt erleben`, ohne schwache Rohideen, generische Icons oder formale Prüfergebnisse als Qualitätsersatz an den Product Owner weiterzugeben.
 
-Sie ist keine Reparaturrunde für einen bestehenden Kandidaten. Alle Phase-4-Systeme bleiben beendet. Die öffentliche Marke und das Produkt bleiben unverändert.
+Die öffentliche Marke und das Produkt bleiben unverändert.
 
 ## Verbindliche Eingänge
 
@@ -17,111 +17,86 @@ Sie ist keine Reparaturrunde für einen bestehenden Kandidaten. Alle Phase-4-Sys
 3. `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`
 4. `docs/brand/phase5/PREMIUM_BENCHMARK.md`
 5. `docs/brand/phase5/CREATIVE_TERRITORIES.md`
-6. `docs/brand/phase5/TYPE_MATERIAL_SHORTLIST.md`
-7. `docs/brand/phase5/PRODUCT_FORM_PRINCIPLE.md`
-8. `docs/brand/phase5/INTEGRATED_IDENTITY_BRIEF.md`
-9. `docs/brand/phase5/PHASE4_CONCLUSION.md`
-10. `docs/brand/phase5/SEARCH_BRIEF.md`
-11. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
+6. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
+7. `docs/brand/phase5/GENERATIVE_SEARCH_BRIEF.md`
+8. `docs/brand/phase5/PHASE4_CONCLUSION.md`
+9. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
 
-Die Governance-Datei definiert die Dokumenthierarchie. Verbindlich bleiben mindestens `90/100`, alle Dimensionsmindestwerte, kein architekturabhängig belegter Knock-out, zwei getrennte positive Bewertungspässe und höchstens zwei Richtungen im Product-Owner-Gate.
+Verbindlich bleiben:
 
-## Prozessbefund
+- mindestens `90/100`;
+- alle Dimensionsmindestwerte;
+- kein architekturabhängig belegter Knock-out;
+- zwei getrennte positive Bewertungspässe;
+- kein ungelöster Red-Team-Befund;
+- höchstens zwei Richtungen im Product-Owner-Gate;
+- keine Nutzerpräsentation unreifer Studien.
 
-Phase 4 scheiterte bereits bei der kreativen Erzeugung:
+## Geschlossener Phase-5-Studienzyklus
 
-- generische geometrische Symbolfamilien;
-- primitive Zeichen mit Standardtypografie;
-- zu frühe App-Icon-Ableitung;
-- Quantität und Prüfbarkeit statt gestalterischer Qualität.
-
-Phase 5 korrigierte zunächst die architekturblinde Bewertung und prüfte reine Wortmarken systematisch in Gate W0.
-
-## Ergebnis der Wortmarkenphase
-
-Geprüft wurden:
+Geprüft wurden unter anderem:
 
 - standardschriftbasierte systemische Eingriffe;
-- vollständig eigene Monoline-, Grotesk- und Humanist-Systeme;
+- eigene Monoline-, Grotesk- und Humanist-Systeme;
 - typografische Dualität;
-- Materialstudien mit neutralen Lizenz- und Qualitätskontrollen;
-- das produktspezifische Prinzip `Geführte Öffnung` gegen eine Ablationsfassung.
+- Type-Material-Studien;
+- das produktspezifische Prinzip `Geführte Öffnung`;
+- integrierte Buchstaben- und Negativraummodule;
+- eine flache Weiterentwicklung der tatsächlichen öffentlichen Öffnungs-/Vorhangmarke.
 
 Aktueller Befund:
 
-- intern geprüfte Studien und Gegenproben: `28`;
-- verworfen: `28`;
+- intern geprüfte Studien und Gegenproben: `32`;
+- verworfen: `32`;
 - Kandidaten: `0`;
-- vorläufig weitergeführt: `0`;
+- qualifizierte Richtungen: `0`;
 - Nutzerpräsentationen: `0`;
 - öffentliche Änderungen: `0`.
 
-Die reinen Wortmarkenpfade scheiterten nicht mehr an primitiven Symbolen, sondern an fehlender Premium-Eigenhöhe:
+## Wichtigste Erkenntnisse
 
-1. bekannte Stilformeln;
-2. generische eigene Sans-Systeme;
-3. produktspezifische Öffnung entweder zu subtil oder technisch überzeichnet.
+- Die reine Wortmarkensuche erzeugte keine ausreichende Premium-Eigenhöhe.
+- Integrierte Negativraummodule kippten in Pfeil-, Status- und UI-Lesarten.
+- Die tatsächliche öffentliche Marke ist kein `B`, sondern ein räumliches grünes Öffnungs-/Vorhangmotiv; ältere Ausgangsbeschreibungen waren überholt.
+- Eine flache Reduktion dieses Bestandsmotivs kollabierte zu Vorhang, Pausezeichen, App-Kachel oder gewöhnlichem Schlitz.
+- Keine schwache Richtung wurde künstlich zum Kandidaten erklärt.
 
-Eine weitere allgemeine Wortmarkenvariation ist deshalb gesperrt.
+Der vollständige Befund liegt in:
 
-## Architekturwechsel
+- `docs/brand/phase5/internal/STUDY_LOG.md`
 
-Geöffnet wird Architekturklasse `I` – integrierte Identität:
+## Nächster zulässiger Suchraum
 
-- Wortmarke und kleines Identitätsmodul werden gemeinsam entwickelt;
-- kein isoliertes Icon vor der Primäridentität;
-- kein B-/BE-/be-Monogramm;
-- kein Pin, Ticket, Kalender, Liste, Karte, Filter, Scanner oder UI-Zeichen;
-- Modul und Buchstaben teilen Kurven-, Endungs- und Negativraumprinzipien;
-- nur eine integrierte Studie darf Gate I0 erreichen;
-- Kleinmarke und App-Icon erst nach bestandenem I0 und I1.
+Eine weitere kleine Vektorvariation ist gesperrt.
+
+Der nächste Zyklus ist ein neuer generativer Formraum mit späterer deterministischer Rekonstruktion:
+
+- keine Festlegung auf Sans-Wortmarke, Monogramm oder Bestandsmotiv;
+- höchstens vier klar begrenzte Suchfelder;
+- keine Mindestmenge an Varianten;
+- erste Sichtung monochrom und in mobiler Originalgröße;
+- frühe Kategorie-, Genericity- und Ähnlichkeitsfilter;
+- nur sichtbar starke Rohhypothesen werden als SVG oder Lettering neu konstruiert;
+- generierte Rasterbilder sind Suchmaterial, niemals Finalmaster.
 
 Verbindlicher Auftrag:
 
-- `docs/brand/phase5/INTEGRATED_IDENTITY_BRIEF.md`
-
-## Nächster interner Ablauf
-
-1. Hypothesen I-A, I-B und I-C nur als monochrome Struktur vorfiltern.
-2. UI-, Artefakt-, Monogramm- und falsche Kategorien sofort beenden.
-3. Höchstens eine Hypothese vollständig als Primäridentität konstruieren.
-4. Gegen Ablationskontrolle und im realen mobilen Header prüfen.
-5. Nur bei bestandenem I0 ein neutrales Marken-Minisystem öffnen.
-6. Erst danach responsive beziehungsweise isolierte Fassung prüfen.
-7. Formale Bewertung erst nach bestandenen Architektur-Gates.
-
-## Qualitätsbarriere
-
-Eine Richtung gelangt nur in Bewertungspässe und Scorecard, wenn sie:
-
-- sichtbar über Standardschrift, Stocklogo und generischem App-Icon liegt;
-- die aktuelle Identität deutlich übertrifft;
-- als vollständige Primäridentität professionell und eigenständig erscheint;
-- ohne Konzepttext eine passende, nicht-technische Haltung trägt;
-- im realen mobilen Header funktioniert;
-- keine dominante falsche Kategorie besitzt;
-- ein erweiterbares typografisches, farbliches, bildliches und verhaltensbezogenes System tragen kann.
-
-Formale Prüfungen und Punktwerte dürfen keine mittelmäßige Gestaltung adeln.
-
-## Methodische Ehrlichkeit
-
-Wenn Produktion, Kritik und Konsolidierung durch denselben ChatGPT-Orchestrator ausgeführt werden, wird dies nicht als externe unabhängige Blindprüfung bezeichnet. Produktionsnotizen werden gesperrt, Kandidaten anonymisiert, getrennte evidenzbasierte Bewertungspässe ausgeführt und methodische Grenzen dokumentiert.
+- `docs/brand/phase5/GENERATIVE_SEARCH_BRIEF.md`
 
 ## Nutzerinteraktion
 
-Der Nutzer erhält:
+Der Product Owner erhält:
 
 - keine Rohideen;
 - keine Mikrovarianten;
-- keine generierten Berichtsgrafiken;
-- keine Aufforderung, Chats oder Prüfergebnisse zu verwalten.
+- keine generierten Suchtafeln oder Berichtsgrafiken;
+- keine Aufforderung zur Vorauswahl oder Chatverwaltung.
 
-Interne visuelle Arbeit erfolgt real als private, repository-lokale Schwarz-Weiß-, SVG- und Originalgrößenstudien. Sichtbar präsentiert wird erst, wenn mindestens eine Richtung die vollständige Qualitätsbarriere überschritten hat.
+Sichtbar präsentiert wird erst, wenn mindestens eine rekonstruierte Richtung die vollständige Premiumqualifikation besteht.
 
 ## Aktueller Stand
 
 - qualifizierte Richtungen: `0`
 - Phase-5-Kandidaten: `0`
 - öffentliche Änderungen: `0`
-- nächster Schritt: Vorfilter der drei integrierten Architekturhypothesen; noch keine Nutzerpräsentation
+- nächster Schritt: nicht öffentlicher generativer Suchzyklus gemäß `GENERATIVE_SEARCH_BRIEF.md`
