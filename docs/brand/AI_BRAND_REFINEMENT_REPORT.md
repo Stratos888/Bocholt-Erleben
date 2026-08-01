@@ -1,8 +1,8 @@
 # AI-Markenentwicklung – Refinement- und Qualifizierungsbericht
 
-Stand: 2026-08-01  
-Workpack: #225  
-Branch: `brand/ai-workpack-b-225`  
+Stand: 2026-08-01
+Workpack: #225
+Branch: `brand/ai-workpack-b-225`
 Status: Bewertungsmodell eingefroren; keine Richtung qualifiziert
 
 ## 1. Kalibrierter Ausgangsbefund
