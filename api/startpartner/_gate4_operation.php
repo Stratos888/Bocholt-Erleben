@@ -123,12 +123,15 @@ function be_startpartner_gate4_update_onboarding(PDO $pdo, string $candidateId, 
         'gate4.onboarding.item',
         $input,
         static function(PDO $pdo, array $candidate, array $pilot, string $operator, string $operationId, array $input): array {
-            $itemKey = be_startpartner_gate4_onboarding_key($input['item_key'] ?? null);
+            $itemKey = be_startpartner_gate4_manual_onboarding_key($input['item_key'] ?? null);
             $status = be_startpartner_gate4_item_status($input['status'] ?? null);
+            if (!in_array($status, ['pending', 'complete', 'blocked'], true)) {
+                throw new InvalidArgumentException('Manual onboarding status must be pending, complete or blocked.');
+            }
             $evidenceText = be_startpartner_gate4_optional_text($input['evidence_text'] ?? null, 5000, 'evidence_text');
             $evidenceReference = be_startpartner_gate4_optional_text($input['evidence_reference'] ?? null, 2048, 'evidence_reference');
-            if ($status === 'complete' && $evidenceText === null && $evidenceReference === null) {
-                throw new InvalidArgumentException('Completed onboarding items require evidence.');
+            if (in_array($status, ['complete', 'blocked'], true) && $evidenceText === null && $evidenceReference === null) {
+                throw new InvalidArgumentException('Completed or blocked onboarding items require evidence.');
             }
             $statement = $pdo->prepare(
                 "UPDATE startpartner_pilot_onboarding_items
@@ -165,7 +168,10 @@ function be_startpartner_gate4_update_onboarding(PDO $pdo, string $candidateId, 
                     'status' => $status,
                 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
             ]);
-            return ['status_reason' => 'Gate-4-Onboardingpunkt aktualisiert.', 'item_key' => $itemKey];
+            return [
+                'status_reason' => 'Manueller Gate-4-Onboardingpunkt aktualisiert.',
+                'item_key' => $itemKey,
+            ];
         }
     );
 }
