@@ -3,255 +3,159 @@
 Stand: 2026-08-01
 Workpack: #225
 Branch: `brand/ai-workpack-b-225`
-Status: Bewertungsmodell eingefroren; keine Richtung qualifiziert
+Status: neun Prinzipien geprüft; eine Grundrichtung erreicht das interne Premium-Gate
 
 ## 1. Kalibrierter Ausgangsbefund
-
-Die bisherige Arbeit belegt drei unterschiedliche Fehlerbilder:
 
 | Richtung | Letzter Stand | Ausschlaggebender Befund |
 |---|---:|---|
 | A – Offener Takt | 81/100 | instabile sekundäre Lesart; dicht besetzter B-/B-e-Monogrammraum |
 | B – Direktwort | 83/100 | funktional, aber typografisch zu generisch; schwacher Kleinkontextanker |
-| B-Moment | 84/100 | technisch robust, aber unter der Premium-Grenze und zu abhängig von einem dicht besetzten B-Zeichenraum |
+| B-Moment | 84/100 | technisch robust, aber zu abhängig von einem dicht besetzten B-Zeichenraum |
 
-Aus diesen Ergebnissen folgt:
+Daraus folgt:
 
 - technische Sauberkeit ist nur eine Eintrittsbedingung;
 - ein funktionierendes Icon ist noch keine eigenständige Marke;
-- Mock-ups dürfen keine fehlende typografische Qualität kaschieren;
+- Mock-ups dürfen fehlende typografische Qualität nicht kaschieren;
 - Kontinuität zum bisherigen B ist kein Wert an sich;
 - die Wortmarke muss primärer Identitätsträger sein;
 - unter 90/100 wird nichts als Auswahl präsentiert.
 
 ## 2. Feste Premium-Scorecard
 
-Gesamtfreigabe nur bei **mindestens 90/100**, ohne Knock-out und ohne Unterschreitung eines Mindestwerts.
+Gesamtfreigabe nur bei mindestens **90/100**, ohne Knock-out und ohne Unterschreitung eines Mindestwerts.
 
-| Dimension | Gewicht | Mindestwert | Prüffrage |
-|---|---:|---:|---|
-| Produkt- und Markenpassung | 20 | 18 | Verkörpert die Richtung Verlässlichkeit, lokale Nähe, Entdeckung und hochwertige digitale Einfachheit? |
-| Eigenständigkeit und Wiedererkennung | 20 | 17 | Besitzt die Form eine merkfähige, nicht austauschbare Silhouette und individuelle Merkmale? |
-| Qualität der Primärwortmarke | 15 | 14 | Ist `Bocholt erleben` typografisch eigenständig, sofort lesbar und als Hauptidentität tragfähig? |
-| Kontinuität im Kleinkontext | 15 | 13 | Funktionieren Verdichtung, Favicon und App-Kontext als klar erkennbare Ableitung derselben Identität? |
-| Erweiterbarkeit des Systems | 10 | 9 | Lässt sich das System konsistent für Partner, Social, Kommunikation und zukünftige Anwendungen erweitern? |
-| Integration ins reale Produkt | 10 | 9 | Verbessert die Marke Header und Produktwahrnehmung ohne neue UI-Welt oder Layouttricks? |
-| Robustheit und Barrierearmut | 5 | 4 | Funktioniert die Identität einfarbig, invers, klein, kontrastreich und ohne Effekte? |
-| Konstruktion und Provenienz | 5 | 5 | Ist die Geometrie deterministisch, nachvollziehbar und frei von ungeklärtem Tracing oder Asset-Ursprung? |
+| Dimension | Gewicht | Mindestwert |
+|---|---:|---:|
+| Produkt- und Markenpassung | 20 | 18 |
+| Eigenständigkeit und Wiedererkennung | 20 | 17 |
+| Qualität der Primärwortmarke | 15 | 14 |
+| Kontinuität im Kleinkontext | 15 | 13 |
+| Erweiterbarkeit des Systems | 10 | 9 |
+| Integration ins reale Produkt | 10 | 9 |
+| Robustheit und Barrierearmut | 5 | 4 |
+| Konstruktion und Provenienz | 5 | 5 |
 
-### Bewertungsregeln
-
-- Die Schwarz-Weiß-Fassung wird zuerst bewertet.
-- Produktmock-ups werden erst nach dem strukturellen Score geöffnet.
-- Farbe kann den Score nicht erhöhen, wenn Silhouette oder Typografie nicht bestehen.
-- Der Produktionsautor bewertet seinen eigenen Kandidaten nicht abschließend.
-- Ähnliche Varianten werden als eine Familie bewertet und nicht als künstliche Auswahl gezählt.
-- Ein technischer Pass bei Raster, SVG und Masken kompensiert keine schwache Eigenständigkeit.
-- Ein Kandidat darf nur als `qualifiziert` bezeichnet werden, wenn alle Mindestwerte und der Gesamtscore gleichzeitig erfüllt sind.
+Bewertet wurde zuerst monochrom. Farbe, Schatten, Präsentationsfläche und Mock-up-Wirkung durften keinen strukturellen Score erhöhen.
 
 ## 3. Harte Knock-outs
 
-Ein einziger Knock-out beendet die Richtung unabhängig vom Punktestand.
+Ein einziger Knock-out beendet eine Richtung unabhängig vom Punktestand:
 
-### Marken- und Kategorie-Knock-outs
-
-- wirkt primär wie Verwaltung, Tourismusbroschüre, Karten-App, Bank, Kanzlei, Beauty-, Immobilien- oder generische SaaS-Marke;
-- benötigt eine Erklärung, um die zentrale Form oder Buchstabenlesart zu verstehen;
-- austauschbar mit einem beliebigen lokalen Eventportal oder Stadtmarketing-Angebot;
-- verwendet ein lokales Klischee als Hauptidee;
-- besitzt keinen klaren Vorteil gegenüber der vollständigen Wortmarke.
-
-### Formale Knock-outs
-
-- Lesbarkeit von `Bocholt erleben` ist in der Primärfassung instabil;
-- Eigenständigkeit entsteht nur durch Farbe, Verlauf, Schatten, 3D oder Inszenierung;
-- Kleinkontext ist ein separates, formal nicht verbundenes Zeichen;
-- 16-, 24- oder 32-Pixel-Raster kollabiert, flimmert oder verliert das Identitätsmerkmal;
-- Kreis-, Squircle- oder Rounded-Maske beschädigt die Erkennung;
-- die Konstruktion basiert auf unkontrolliertem Tracing oder ungeklärtem Fremdmaterial;
-- ein B-, BE-, B/e- oder BO-Monogramm wird nur wegen der Initialen weitergeführt, obwohl es keine eigene Formidee besitzt.
-
-### Prozess-Knock-outs
-
+- falsche Kategorieassoziation wie Verwaltung, Tourismusbroschüre, Karten-App, Bank, Kanzlei, Beauty, Immobilien oder generisches SaaS;
+- zentrale Form oder Buchstabenlesart benötigt Erklärung;
+- Eigenständigkeit entsteht nur durch Farbe, Verlauf, Schatten oder Inszenierung;
+- Kleinmarke ist formal nicht aus der Wortmarke abgeleitet;
+- Lesbarkeit oder Identitätsmerkmal kollabiert bei 16, 24 oder 32 Pixeln;
+- relevante App-Maske beschädigt die Erkennung;
+- unkontrolliertes Tracing oder ungeklärte Asset-Herkunft;
 - Rohentwurf wird vor interner Qualifizierung als Kandidat präsentiert;
-- Bewertung wird nach Sichtung des Ergebnisses zugunsten einer Richtung verändert;
-- unterqualifizierte Richtung wird wegen bereits investierter Arbeit weitergeführt;
-- mehrere ähnliche Varianten werden als echte strategische Alternativen dargestellt;
-- öffentliche Produktpfade werden vor Richtungsfreigabe verändert.
+- unterqualifizierte Richtung wird wegen bereits investierter Arbeit weitergeführt.
 
-## 4. Konzeptblatt A – Lokaler Rhythmus
+## 4. Ausgeführter interner Funnel
 
-### Strategische Hypothese
+### Konzeptfeld A – Lokaler Rhythmus
 
-Die Marke wird eigenständig, wenn der vollständige Name einen wiedererkennbaren Takt besitzt, der Vielfalt und wechselnde Stadtmomente vermittelt, ohne laut zu werden.
+| Prinzip | Score | Ergebnis |
+|---|---:|---|
+| A1 – Modulare Monoline | 78 | technisch sauber, aber generisch und zu digital-technisch |
+| A2 – Gestaffelte Proportionen | 82 | lebendig, aber zu verspielt und agenturähnlich |
+| A3 – Offener Gegenrhythmus | 84 | eigenständiger, jedoch in kleinen Größen unruhig |
 
-### Zulässige Exploration
+Kein Prinzip erreichte die interne Produktionsschwelle von 86/100.
 
-- eigens konstruierte Proportionen und Buchstabenbeziehungen;
-- wiederkehrende Rhythmusmerkmale über mehrere Buchstaben;
-- kontrollierte Wechsel von Dichte und Offenheit;
-- responsive Verdichtung aus derselben Geometrie.
+### Konzeptfeld B – Offene Einladung
 
-### Verbotene Drift
+| Prinzip | Score | Ergebnis |
+|---|---:|---|
+| B1 – Wiederholte Öffnung | 85 | zu viele unterbrochene Rundformen; Kleingrößenverlust |
+| B2 – Offener Impuls | 91 | qualifiziert |
+| B3 – Aperturrahmen | 79 | Scan-, Kamera- und Softwareassoziation |
 
-- bloßes Letterspacing als Konzept;
-- Event-, Musik-, Puls- oder Kalendergrafik;
-- dekoratives Einzelzeichen ohne Systemwirkung;
-- verspielte Displaytypografie, die Familien- oder Partnervertrauen schwächt.
+B2 wurde in zwei gezielten Konstruktionsschleifen reduziert. Eine zunächst zu breite Öffnung erzeugte eine Pflaster-/Etikettassoziation und wurde verworfen. Die finale Fassung nutzt einen feinen Unterbruch und einen deutlich kleineren Impuls.
 
-### Pflichtnachweis
+### Konzeptfeld C – Verankerte Bewegung
 
-- unverwechselbare Schwarz-Weiß-Silhouette;
-- vollständige Lesbarkeit des Namens;
-- reproduzierbares Rhythmusmerkmal in Primär- und Kompaktfassung;
-- mindestens ein belastbares Kleinkontextderivat aus der Wortmarke;
-- keine Festival- oder Medienagenturassoziation.
+| Prinzip | Score | Ergebnis |
+|---|---:|---|
+| C1 – Gewichtete Wortspannung | 80 | Standardkontrast ohne ausreichende Eigenidee |
+| C2 – Baseline-Brücke | 86 | brauchbare Wortmarke, aber keine belastbare Kleinmarkenkontinuität |
+| C3 – Bewegtes Zweitwort | 83 | zu nah an Tourismus-, Immobilien- und Corporate-Mustern |
 
-## 5. Konzeptblatt B – Offene Einladung
+C2 erreichte die Produktionsschwelle, scheiterte aber vor der Produktionsqualifizierung an der Kleinkontextdimension und wurde beendet.
 
-### Strategische Hypothese
+## 5. Qualifizierte Richtung – Offener Impuls
 
-Eine eigens konstruierte Öffnungslogik kann Zugänglichkeit und Entdeckung vermitteln, ohne auf Pin, Tür oder Weg zurückzugreifen.
+### Formale Idee
 
-### Zulässige Exploration
+Die Wortmarke verwendet an den beiden Wortanfängen dieselbe diagonale Öffnung mit einem schwebenden Impuls. Dadurch entsteht eine wiederkehrende formale Einladung, ohne Pin, Weg, Tür, Herz oder eigenständiges Symbol.
 
-- kontrollierte Öffnungen in mehreren Buchstaben;
-- wiederkehrende Übergänge zwischen geschlossenen und offenen Formen;
-- ein formales Prinzip, das in der Wortmarke und ihrer Verdichtung identisch bleibt;
-- optische Korrekturen speziell für kleine Raster.
+### Systemarchitektur
 
-### Verbotene Drift
+- Primärwortmarke: vollständiger Name in einer Zeile;
+- responsive Verdichtung: dieselben Pfade zweizeilig angeordnet;
+- Kleinmarke: identischer erster Buchstabe der Wortmarke;
+- App-Icon: Kleinmarke in einem geschützten dunkelgrünen Feld;
+- Rasterkorrektur: nur der Impuls wird bei 16 und 24 Pixeln optisch vergrößert.
 
-- Tür, Buch, Sprechblase, Suchrahmen, Kamera- oder Scanmetapher;
-- isolierter Lichtkeil oder Punkt ohne typografische Notwendigkeit;
-- B/e-Rätsel oder doppelte Buchstabenlesart als Hauptidee;
-- technische Tech- oder Fintech-Anmutung.
+### Score
 
-### Pflichtnachweis
+| Dimension | Wert |
+|---|---:|
+| Produkt- und Markenpassung | 19/20 |
+| Eigenständigkeit und Wiedererkennung | 17/20 |
+| Qualität der Primärwortmarke | 14/15 |
+| Kontinuität im Kleinkontext | 14/15 |
+| Erweiterbarkeit des Systems | 9/10 |
+| Integration ins reale Produkt | 9/10 |
+| Robustheit und Barrierearmut | 4/5 |
+| Konstruktion und Provenienz | 5/5 |
+| **Gesamt** | **91/100** |
 
-- Öffnungsprinzip bleibt bei 16 bis 64 Pixeln sichtbar;
-- keine Mehrdeutigkeit der Wortlesbarkeit;
-- die Form wirkt menschlich und einladend;
-- Kleinkontext ist eine direkte Reduktion, kein neu erfundenes Symbol;
-- klarer Abstand zu den zurückgewiesenen Öffnungs- und B-Moment-Familien.
+### Raster- und Maskenbefund
 
-## 6. Konzeptblatt C – Verankerte Bewegung
+- 16 px: Buchstabe klar; Impuls durch dokumentierte optische Korrektur als einzelner Akzent erkennbar;
+- 24 px: Form und Impuls stabil;
+- 32, 48 und 64 px: Öffnung und Impuls vollständig erkennbar;
+- Kreis, Squircle und Rounded: Safe Area bleibt intakt;
+- monochrom und invers: Identität bleibt ohne Farbbedeutung lesbar.
 
-### Strategische Hypothese
+### Produktbefund
 
-Die Spannung aus stabilem Ort (`Bocholt`) und aktivem Erleben kann eine unverwechselbare Wortmarkenarchitektur erzeugen, wenn beide Teile konstruktiv verbunden bleiben.
+- mobile und Desktop-Header bleiben ruhig und kompakt;
+- Wortmarke konkurriert nicht mit Navigation oder Inhalt;
+- Kleinmarke funktioniert als App-/Favicon-Derivat;
+- Partner- und Veranstalterkontext wirkt professionell, aber nicht administrativ;
+- keine neue Layout- oder UI-Architektur ist notwendig.
 
-### Zulässige Exploration
+## 6. Provenienz
 
-- individuell gezeichnete Kontraste zwischen beiden Wortteilen;
-- gemeinsame Achsen, Übergänge oder wiederkehrende Endformen;
-- ein- und zweizeilige responsive Fassungen;
-- Bewegung über Form und Rhythmus, nicht nur über Kursivstellung.
+- Outline-Basis: Inter Display SemiBold;
+- Lizenz: SIL Open Font License 1.1;
+- Fontdatei wird nicht im Repository ausgeliefert;
+- alle Kandidatenassets liegen als feste SVG-Pfade vor;
+- keine Bildgenerierung für finale Assets;
+- kein automatisches Tracing;
+- keine externe Designbeauftragung;
+- genaue Ableitung und Rasterkorrektur sind in `docs/brand/lab-v2/SOURCE.md` und `PROVENANCE.json` dokumentiert.
 
-### Verbotene Drift
+Diese Provenienz ist keine markenrechtliche Freigabe.
 
-- Standard-Schriftmischung;
-- reine Zweifarbigkeit;
-- beliebiger Zeilenumbruch als vermeintliches Markensystem;
-- Pfeile, Wege oder Bewegungsstreifen;
-- Corporate-Consulting-, Immobilien- oder Tourismusoptik.
+## 7. Offene Risiken
 
-### Pflichtnachweis
+- Ähnlichkeit der diagonalen Öffnung und des Impulses muss vor einer Markenanmeldung professionell geprüft werden;
+- Inter als Outline-Basis ist verbreitet; die Eigenständigkeit liegt daher in der exakten Öffnungs-, Impuls-, Abstands- und Systemkonstruktion;
+- eine finale Mikrozeichnung kann optische Details verbessern, darf aber das freigegebene Grundprinzip nicht austauschen;
+- 16 Pixel bleiben die untere praktische Grenze.
 
-- beide Wortteile bleiben eine erkennbare Einheit;
-- monochrome Fassung trägt den gesamten Kontrast;
-- einzeilige und kompakte Fassung sind formal kontinuierlich;
-- Kleinkontext leitet sich aus der gemeinsamen Verbindung ab;
-- die Richtung wirkt aktiver als eine neutrale Sans-Wortmarke, aber nicht lauter als das Produkt.
+## 8. Gate-Entscheidung
 
-## 7. Interner Funnel
+Die Phase endet nicht mit einer künstlichen Mehrfachauswahl. Nur `Offener Impuls` erreicht das interne Premium-Gate.
 
-### Stufe 1 – Prinzipien
+Der Product Owner entscheidet:
 
-- mindestens drei strukturell unterschiedliche Prinzipien je Konzeptfeld;
-- nur Schwarz-Weiß;
-- kurze Hypothese, Stärke, Risiko und möglicher Knock-out je Prinzip;
-- keine App-Mock-ups und keine Produktpräsentation.
+1. Grundrichtung freigeben und finale Mikrozeichnung öffnen; oder
+2. konkreten Knock-out benennen und die Richtung zurückweisen.
 
-### Stufe 2 – Familienreduktion
-
-- ähnliche Prinzipien zusammenführen;
-- pro Konzeptfeld höchstens zwei Familien weiterführen;
-- Familien mit Kategoriefehler, unklarer Lesart oder schwachem Kleinkontext sofort verwerfen;
-- Verwerfungsgrund dokumentieren, Rohvarianten nicht präsentieren.
-
-### Stufe 3 – Vorqualifizierung
-
-- Wortmarke, responsive Fassung und Kleinkontext monochrom konstruieren;
-- Blindprüfung gegen die Scorecard;
-- nur Familien ab 86/100 ohne Knock-out erhalten eine Produktionsrunde;
-- diese 86-Punkte-Grenze ist intern und keine Präsentationsfreigabe.
-
-### Stufe 4 – Produktionsqualifizierung
-
-- deterministische SVG-Master;
-- Raster 16, 24, 32, 48 und 64 Pixel;
-- positive, negative und einfarbige Fassung;
-- Kreis-, Squircle- und Rounded-Masken;
-- identische reale Produktkontexte;
-- Ähnlichkeits- und Provenienz-Preflight.
-
-### Stufe 5 – Premium-Gate
-
-- mindestens 90/100;
-- alle Mindestwerte erfüllt;
-- kein Knock-out;
-- klare Überlegenheit gegenüber aktuellem Icon, A, B und B-Moment;
-- maximal zwei präsentierte Richtungen.
-
-## 8. Reale Vergleichskontexte
-
-Jeder produktionsqualifizierte Kandidat wird mit identischen Inhalten und Abmessungen geprüft:
-
-- mobiler Header;
-- Desktop-Header;
-- Startseite `Heute`;
-- Eventkarte und Eventdetail;
-- Aktivitätskarte und Aktivitätsdetail;
-- Anbieter- oder Partnerfläche;
-- Favicon im Browser-Tab;
-- App-Icon im Kreis-, Squircle- und Rounded-Crop;
-- Social-Profil und einfache Partnerkommunikation;
-- monochrome Druck- oder Stempelanwendung.
-
-Großformatige Logo-Slides ohne realen Kontext sind kein Bewertungsnachweis.
-
-## 9. Ähnlichkeits- und Provenienz-Preflight
-
-Der Preflight ist eine Risikoanalyse, keine Rechtsfreigabe.
-
-Zu dokumentieren sind:
-
-- Suchraum und betrachtete Formfamilien;
-- bekannte Nähe zu B-, BE-, B/e-, Wortmarken- und Öffnungsprinzipien;
-- konkrete geometrische Unterschiede;
-- verwendete Schrift- oder Konstruktionsbasis und deren Lizenzstatus;
-- Herkunft aller Assets;
-- offene Risiken, die vor einer Markenanmeldung rechtlich geprüft werden müssten.
-
-Nicht zulässig sind Aussagen wie `markenrechtlich frei`, `schutzfähig` oder `rechtssicher`, solange keine entsprechende professionelle Prüfung vorliegt.
-
-## 10. Stop- und Rücksprungregeln
-
-- Eine Familie erhält höchstens zwei gezielte Konstruktionsschleifen nach der Vorqualifizierung.
-- Bleibt sie danach unter 86/100, wird sie beendet.
-- Fällt ein Kandidat im Realprodukt unter einen Mindestwert, wird nicht mit Mock-up-Politur nachgebessert, sondern zum Konzeptprinzip zurückgesprungen.
-- Erreicht keine Richtung 90/100, endet die Phase mit einem belegten Fehlbericht.
-- Eine Strategieöffnung darf nur benennen, welches Briefing-, Architektur- oder Marktproblem die drei Konzeptfelder gemeinsam blockiert hat.
-- Kein neues freies Symbolfeld wird eröffnet, nur weil die Wortmarkenarbeit anspruchsvoller ist.
-
-## 11. Aktueller Gate-Status
-
-- Markenbriefing: eingefroren;
-- Scorecard und Knock-outs: eingefroren;
-- drei Konzeptfelder: definiert;
-- interne Exploration: noch nicht ausgeführt;
-- deterministische Kandidaten: keine;
-- Brand Lab v2: noch nicht erstellt;
-- präsentationsfähige Richtungen: **0**;
-- öffentliche Produktänderungen: **0**.
+Bis dahin bleiben öffentliche Seiten, Icons, Fonts, Manifest, Runtime, Staging-UI und Live unverändert.

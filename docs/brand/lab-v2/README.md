@@ -2,18 +2,24 @@
 
 Stand: 2026-08-01
 Workpack: #225
-Status: Qualifizierungsrahmen aktiv; präsentationsfähige Kandidaten: `0`
+Status: ein intern qualifizierter Richtungs-Kandidat; keine öffentliche Änderung
 
-Dieses Verzeichnis bleibt bis zur abgeschlossenen internen Schwarz-Weiß-Exploration bewusst ohne Kandidatenpräsentation.
+Das isolierte Brand Lab v2 zeigt ausschließlich **Offener Impuls**. Die Richtung erreicht intern 91/100, unterschreitet keinen Mindestwert und besitzt im aktuellen Stand keinen Knock-out.
 
-Ein Kandidat darf hier erst ergänzt werden, wenn er:
+Nicht gezeigt werden acht verworfene Prinzipien aus den drei Konzeptfeldern. Ihre Fehlerbilder sind im Refinement- und Qualifizierungsbericht dokumentiert; Rohvarianten werden nicht als künstliche Auswahl präsentiert.
 
-- nach der festen Scorecard intern mindestens 86/100 ohne Knock-out erreicht;
-- als deterministischer SVG-Master konstruiert wurde;
-- eine formal kontinuierliche Primärwortmarke, responsive Fassung und Kleinkontextableitung besitzt;
-- in Schwarz-Weiß, positiv, negativ sowie bei 16, 24, 32, 48 und 64 Pixeln besteht;
-- in Kreis-, Squircle- und Rounded-Masken sowie in identischen realen Produktkontexten geprüft wird.
+## Enthaltene Prüfungen
 
-Für eine Präsentation an den Product Owner gelten zusätzlich mindestens 90/100, alle Dimensionsmindestwerte, kein Knock-out und ein dokumentierter Ähnlichkeits- und Provenienz-Preflight.
+- Primärwortmarke, responsive Verdichtung und direkt abgeleitete Kleinmarke;
+- Farb-, Monochrom- und Inversfassung;
+- echte Raster bei 16, 24, 32, 48 und 64 Pixeln;
+- Kreis-, Squircle- und Rounded-Masken;
+- identische mobile und Desktop-Produktkontexte;
+- feste Scorecard, Stärken, Risiken und Product-Owner-Gate;
+- dokumentierte Provenienz ohne Rechtsfreigabe zu behaupten.
 
-Großformatige Logo-Slides, Rohentwürfe, automatisch vektorisierte Bild-KI-Ausgaben und unterqualifizierte Varianten gehören nicht in dieses Brand Lab.
+## Grenzen
+
+- Die 16- und 24-Pixel-Raster besitzen eine dokumentierte optische Akzentvergrößerung, bleiben aber geometrisch und semantisch dieselbe Kleinmarke.
+- Keine Markenrechts-, Schutzfähigkeits- oder Freedom-to-use-Freigabe.
+- Keine finale Mikrozeichnung, kein Asset-Cutover und keine Änderung an öffentlichem Staging oder Live.
