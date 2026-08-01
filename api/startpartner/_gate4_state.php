@@ -53,9 +53,10 @@ function be_startpartner_gate4_automatic_onboarding_items(array $gate3, string $
         $scopes,
         static fn(array $scope): bool => in_array((string)($scope['scope_key'] ?? ''), ['events', 'activities'], true)
     ));
-    $serviceScopeReady = $contentScopes !== []
-        && is_array($pilot)
-        && trim((string)($pilot['target_plan_keys_json'] ?? '')) !== '';
+    $targetPlanKeys = is_array($pilot) && is_array($pilot['target_plan_keys'] ?? null)
+        ? array_values(array_filter($pilot['target_plan_keys'], static fn(mixed $key): bool => trim((string)$key) !== ''))
+        : [];
+    $serviceScopeReady = $contentScopes !== [] && $targetPlanKeys !== [];
     $sourceScope = be_startpartner_gate4_scope_row($scopes, 'automatic-source');
     $maintenanceScope = be_startpartner_gate4_scope_row($scopes, 'maintenance-service');
 
