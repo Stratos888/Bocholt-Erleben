@@ -17,9 +17,10 @@ Dieser Log dokumentiert Entscheidungen und Fehlerklassen. Verworfene visuelle Ro
 | 6 | Type-Material Study 01, zwei Konstruktionspässe | 2 | vollständig verworfen |
 | 7 | Guided Opening Study 01, Primär- und Ablationspfad | 2 | vollständig verworfen |
 | 8 | Integrated Study 01, Primär- und Ablationspfad | 2 | an I0 beendet |
+| 9 | Heritage Opening Study 01, freie und gefasste Fassung | 2 | an I0 beendet |
 
-- intern geprüfte Studien und Gegenproben: `30`;
-- verworfen: `30`;
+- intern geprüfte Studien und Gegenproben: `32`;
+- verworfen: `32`;
 - Kandidaten: `0`;
 - vorläufig weitergeführt: `0`;
 - Nutzerpräsentationen: `0`;
@@ -107,7 +108,7 @@ Dokumentation:
 
 ## Runde 8 – Integrated Study 01
 
-Geprüft wurde eine integrierte Buchstabenfamilie mit asymmetrischem Negativraummodul über `b`, `o`, `c`, `e`, `h` und `n` sowie verwandten Endungen in `l`, `t` und `r`.
+Geprüft wurde eine integrierte Buchstabenfamilie mit asymmetrischem Negativraummodul über mehrere Glyphen.
 
 Primärfassung:
 
@@ -122,16 +123,46 @@ Ablationsfassung:
 - ruhiger und besser lesbar;
 - dafür generische geometrische Sans ohne ausreichende Eigenständigkeit.
 
-Unlösbarer Zielkonflikt:
-
-- Modul sichtbar: falsche Kategorie und Artefakt;
-- Modul neutralisiert: generisch und austauschbar.
-
 I0-Ergebnis: **HARD KNOCK-OUT – Artefakt-/UI-Lesart.**
 
 Dokumentation:
 
 - `internal/studies/integrated-study-01-i0.md`
+
+## Korrektur des öffentlichen Ausgangszustands
+
+Die tatsächlich öffentliche Marke verwendet kein `B`, sondern ein grünes räumliches Öffnungs-/Vorhangmotiv mit hellem Zentrum. Ältere Dokumentpassagen zum aktuellen `B` waren damit sachlich überholt.
+
+Dokumentation:
+
+- `CURRENT_IDENTITY_BASELINE.md`
+
+Der vorhandene Anker besitzt Wiedererkennung, ist aber stark von 3D, Licht, Schatten und Vorhangillustration abhängig.
+
+## Runde 9 – Heritage Opening Study 01
+
+Geprüft wurde eine flache Weiterentwicklung der vorhandenen Öffnungs-/Eintrittsidee.
+
+### Pass 1 – freie flache Öffnungsform
+
+- Öffnung grundsätzlich erkennbar;
+- zugleich Vorhang-, Theater-, Hosen-, Pause- oder Flächenpaar-Lesart;
+- schwache kompakte Silhouette;
+- Kleingrößenkollaps zum gewöhnlichen Schlitz.
+
+### Pass 2 – gefasste Öffnungsform
+
+- stabilere App-Silhouette;
+- zugleich Pause-, Steuerungs-, Kachel- und Standard-App-Lesart;
+- Grundfläche trägt mehr Wiedererkennung als das Öffnungsprinzip;
+- ohne Grün und warmes Zentrum kaum Bezug zum Bestand;
+- keine belastbare gemeinsame Formlogik mit der Wortmarke.
+
+I0-Ergebnis: **nicht bestanden**.
+
+Dokumentation:
+
+- `internal/studies/heritage-opening-study-01-i0.md`
 
 ## Aktueller Befund
 
@@ -145,13 +176,22 @@ Keine schwache Richtung wird künstlich weitergeführt.
 
 ## Nächste Prozessentscheidung
 
-Eine weitere Variation aus Sans, Apertur, Negativraum oder Modul wäre Wiederholung ohne Erkenntnisgewinn.
+Ausgeschöpft beziehungsweise gesperrt sind nun:
 
-Vor einem nächsten visuellen Zyklus muss deshalb auf Strategieebene entschieden werden, welcher Suchraum geöffnet wird:
+- generische geometrische Zeichen;
+- Standardschrift plus Detail;
+- allgemeine Sans-, Humanist- und Monoline-Eigenkonstruktionen;
+- Schriftpaarung und Kursivkontrast als Markenidee;
+- Apertur-, Negativraum- und Modulverdichtung;
+- flache Vorhang-, Sichel-, Schlitz- oder Portalreduktionen des Bestands.
 
-1. eigenständige, nicht Sans-dominierte Letteringarchitektur;
-2. bewusste Weiterentwicklung des aktuellen B mit vollständiger Systemprüfung;
-3. Prüfung, ob der stark beschreibende Name zusätzliche visuelle Eigenständigkeit strukturell begrenzt;
-4. neuer generativer Suchraum mit späterer deterministischer Rekonstruktion, ohne Rohbilder für den Nutzer.
+Der nächste zulässige Zyklus darf deshalb nicht als weitere kleine Vektorvariation beginnen. Er muss einen neuen generativen Formraum eröffnen und starke visuelle Rohhypothesen erst danach deterministisch rekonstruieren.
 
-Bis diese Entscheidung dokumentiert ist, bleibt die öffentliche Marke unverändert.
+Verbindliche Bedingungen:
+
+1. keine Rohbilder oder Mikrovarianten für den Nutzer;
+2. keine direkte Übernahme generierter Rasterbilder als Master;
+3. frühe Kategorie-, Genericity- und Ähnlichkeitsfilter;
+4. nur sichtbar starke Rohhypothesen werden als SVG neu konstruiert;
+5. keine öffentliche Änderung vor vollständiger Qualifikation;
+6. bleibt der Suchraum erneut unter Premiumhöhe, endet er mit `0 qualifizierte Richtungen` statt einer künstlichen Auswahl.
