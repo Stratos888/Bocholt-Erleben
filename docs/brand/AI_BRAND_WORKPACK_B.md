@@ -1,8 +1,8 @@
 # AI-Markenentwicklung – Workpack B
 
-Stand: 2026-08-01  
-Workpack: #225  
-Branch: `brand/ai-workpack-b-225`  
+Stand: 2026-08-01
+Workpack: #225
+Branch: `brand/ai-workpack-b-225`
 Status: Phase-2-Briefing und Konzeptarchitektur eingefroren; kein Kandidat freigegeben
 
 ## 1. Ausgangslage
