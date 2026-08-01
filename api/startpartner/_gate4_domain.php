@@ -14,14 +14,18 @@ require_once __DIR__ . '/_gate4_portal_domain.php';
 // Temporäre, staginggebundene Evidence-Verkettung für Workpack #241:
 // Vor dem einmaligen Gate-4-Lifecycle wird ausschließlich Migration 012 über
 // ihren separat geschützten Writer verifiziert beziehungsweise angewendet.
+// Ohne Review-Zugang bleibt der normale Endpoint-Schutz zuständig und liefert 401.
 $gate4EvidenceScript = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? ''));
-if (str_ends_with($gate4EvidenceScript, '/evidence/gate4_staging_lifecycle_241.php')) {
+$gate4EvidenceReviewPassword = trim((string)($_SERVER['HTTP_X_BE_REVIEW_PASSWORD'] ?? ''));
+if (
+    str_ends_with($gate4EvidenceScript, '/evidence/gate4_staging_lifecycle_241.php')
+    && $gate4EvidenceReviewPassword !== ''
+) {
     $gate4EvidenceOrigin = 'https://staging.bocholt-erleben.de';
     $gate4EvidenceMigrationPath = '/api/startpartner/evidence/gate4_staging_migration_241.php';
-    $gate4EvidenceReviewPassword = trim((string)($_SERVER['HTTP_X_BE_REVIEW_PASSWORD'] ?? ''));
     $gate4EvidenceUserAgent = (string)($_SERVER['HTTP_USER_AGENT'] ?? '');
     $gate4EvidenceRequestBody = (string)file_get_contents('php://input');
-    if ($gate4EvidenceReviewPassword === '' || $gate4EvidenceUserAgent !== 'Bocholt-Erleben-Deploy-Smoke/1.0') {
+    if ($gate4EvidenceUserAgent !== 'Bocholt-Erleben-Deploy-Smoke/1.0') {
         throw new RuntimeException('Gate-4 evidence migration preflight is not authorized.');
     }
     $gate4EvidenceContext = stream_context_create([
