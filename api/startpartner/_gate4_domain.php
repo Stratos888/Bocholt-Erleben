@@ -71,4 +71,10 @@ if (
             . ($gate4EvidenceMessage !== '' ? ': ' . $gate4EvidenceMessage : '')
         );
     }
+
+    // Nur dieser synthetische Lifecycle-Request benötigt Kompatibilität mit
+    // den Test-Fixture-Statements, die benannte PDO-Parameter wiederverwenden.
+    // Permanente APIs laufen in separaten Requests weiterhin mit nativen Prepares.
+    $gate4EvidencePdo = be_db();
+    $gate4EvidencePdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 }
