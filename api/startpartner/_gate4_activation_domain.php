@@ -14,6 +14,12 @@ function be_startpartner_gate4_activate(PDO $pdo, string $candidateId, array $in
                 throw new DomainException('Pilot is not activation ready.');
             }
             $window = be_startpartner_gate4_activation_window((string)($input['activation_date_local'] ?? ''));
+            $timezone = new DateTimeZone('Europe/Berlin');
+            $activationLocal = new DateTimeImmutable($window['activation_date_local'] . ' 00:00:00', $timezone);
+            $todayLocal = new DateTimeImmutable('today', $timezone);
+            if ($activationLocal > $todayLocal) {
+                throw new DomainException('Das Aktivierungsdatum darf bei einer sofort ausgeführten Aktivierung nicht in der Zukunft liegen.');
+            }
             $content = $state['first_content'];
             $measurement = $state['ready_measurement'];
             $distribution = $state['ready_distribution'];
