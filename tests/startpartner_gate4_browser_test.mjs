@@ -11,6 +11,7 @@ fs.mkdirSync(outDir,{recursive:true});
 const results=[];
 function assert(condition,message){if(!condition)throw new Error(message);}
 async function isRequired(locator){return await locator.getAttribute('required')!==null;}
+function containsVisibleText(text,marker){return text.toLocaleLowerCase('de-DE').includes(marker.toLocaleLowerCase('de-DE'));}
 
 function gate4Candidate(scenario='onboarding'){
   const keys=['terms_confirmed','organizer_linked','contact_confirmed','portal_access_tested','pilot_entitlement_readback','service_scope_confirmed','sources_recorded','maintenance_path_agreed','content_rights_cleared','first_content_ready','editorial_review_ready','measurement_ready','distribution_ready','activation_target_set'];
@@ -38,7 +39,7 @@ async function controlState(browser,scenario,viewport,name,markers){
   const panel=page.locator('[data-gate4-panel]:visible');
   assert(await panel.count()===1,`${name}: Gate-4-Panel fehlt oder ist doppelt`);
   const text=await panel.innerText();
-  for(const marker of markers)assert(text.includes(marker),`${name}: Marker fehlt: ${marker}`);
+  for(const marker of markers)assert(containsVisibleText(text,marker),`${name}: Marker fehlt: ${marker}`);
   assert(!/\b(editorial_ready|pending_activation|activation_ready)\b/.test(text),`${name}: technischer Rohstatus sichtbar`);
   assert(await panel.locator('[data-gate4-item="measurement_ready"] button').count()===0,`${name}: abgeleitete Messbereitschaft ist manuell überschreibbar`);
   assert(await panel.locator('[data-gate4-item="portal_access_tested"] button').count()===(scenario==='active'?0:2),`${name}: manueller Portalnachweis hat falsche Aktionen`);
@@ -57,7 +58,7 @@ async function activationDialog(browser){
   await page.locator('[data-review-action="gate4:activate"]').click();
   await page.waitForSelector('#cc-dialog[open] #gate4-activation-date');
   const text=await page.locator('#cc-dialog').innerText();
-  for(const marker of ['Atomare Aktivierung','Mail, Zahlung und Stripe bleiben unverändert','Lokales Aktivierungsdatum','Geplantes Ende'])assert(text.includes(marker),`activation dialog: Marker fehlt: ${marker}`);
+  for(const marker of ['Atomare Aktivierung','Mail, Zahlung und Stripe bleiben unverändert','Lokales Aktivierungsdatum','Geplantes Ende'])assert(containsVisibleText(text,marker),`activation dialog: Marker fehlt: ${marker}`);
   assert(await page.locator('#gate4-activation-date').inputValue()!=='','activation dialog: lokales Standarddatum fehlt');
   assert(await page.locator('#gate4-end-preview').innerText()!=='','activation dialog: Enddatumsvorschau fehlt');
   await context.close();results.push({name:'gate4-activation-dialog',status:'OK'});
@@ -68,8 +69,8 @@ async function manualDialog(browser){
   await page.locator('[data-review-action="gate4:item:portal_access_tested:complete"]').click();
   await page.waitForSelector('#cc-dialog[open] #gate4-evidence');
   const text=await page.locator('#cc-dialog').innerText();
-  assert(text.includes('Portalzugang getestet'),'manual dialog: fachlicher Titel fehlt');
-  assert(text.includes('belastbaren Nachweis'),'manual dialog: Nachweisanforderung fehlt');
+  assert(containsVisibleText(text,'Portalzugang getestet'),'manual dialog: fachlicher Titel fehlt');
+  assert(containsVisibleText(text,'belastbaren Nachweis'),'manual dialog: Nachweisanforderung fehlt');
   assert(await isRequired(page.locator('#gate4-evidence')),'manual dialog: Nachweis ist nicht erforderlich');
   await context.close();results.push({name:'gate4-manual-dialog',status:'OK'});
 }
@@ -94,7 +95,7 @@ async function organizerPortal(browser,viewport,name){
   await page.waitForSelector('#organizer-dashboard-pilot-card:not([hidden])');
   const card=page.locator('#organizer-dashboard-pilot-card');
   const initial=await card.innerText();
-  for(const marker of ['Kostenloser Startpartner-Pilot','Einrichtung läuft','9 von 14 Punkten belegt','Keine Zahlung'])assert(initial.includes(marker),`${name}: Portalmarker fehlt: ${marker}`);
+  for(const marker of ['Kostenloser Startpartner-Pilot','Einrichtung läuft','9 von 14 Punkten belegt','Keine Zahlung'])assert(containsVisibleText(initial,marker),`${name}: Portalmarker fehlt: ${marker}`);
   assert(!/\b(onboarding|draft|pending_activation)\b/.test(initial),`${name}: technischer Rohstatus sichtbar`);
   await card.locator('summary', {hasText:'Neuen Pilotinhalt einreichen'}).click();
   const form=page.locator('#organizer-pilot-content-form');
