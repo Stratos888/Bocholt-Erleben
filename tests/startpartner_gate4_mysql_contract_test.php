@@ -16,6 +16,11 @@ $pilot='24100000-0000-4000-8000-000000000002';
 $entitlement='24100000-0000-4000-8000-000000000003';
 $email='gate4-241@example.invalid';
 $token=str_repeat('a',64);
+$timezone=new DateTimeZone('Europe/Berlin');
+$activationDate=(new DateTimeImmutable('today',$timezone))->format('Y-m-d');
+$futureActivationDate=(new DateTimeImmutable('tomorrow',$timezone))->format('Y-m-d');
+$distributionDate=(new DateTimeImmutable('+7 days',$timezone))->format('Y-m-d');
+$pastDistributionDate=(new DateTimeImmutable('yesterday',$timezone))->format('Y-m-d');
 try{
   $pdo->exec(<<<'SQL'
 CREATE TABLE IF NOT EXISTS value_metric_daily (
@@ -78,31 +83,35 @@ SQL);
   $assert(is_array($technical)&&($technical['query_status']??'')==='ok','Measurement readiness must contain a real read-only owner readback.');
   $assert(($technical['reporting_target_id']??'')===be_startpartner_gate4_reporting_target_id($organizer),'Measurement readback must use the deterministic organizer target.');
 
-  $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4','planned_at'=>'2026-08-31','status'=>'ready','evidence_text'=>'Synthetic distribution commitment.']);
+  $expectDomain(static function()use($pdo,$candidate,&$cr,&$pr,$pastDistributionDate):void{be_startpartner_gate4_set_distribution($pdo,$candidate,['operation_id'=>'gate4:241:past-distribution','operator_name'=>'Contract','expected_revision'=>$cr,'expected_pilot_revision'=>$pr,'channel'=>'newsletter','target_reference'=>'https://example.invalid/past','planned_at'=>$pastDistributionDate,'status'=>'ready','evidence_text'=>'Must fail.']);},'Ready distribution in the past must fail closed.');
+
+  $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4','planned_at'=>$distributionDate,'status'=>'ready','evidence_text'=>'Synthetic distribution commitment.']);
   $ready=be_startpartner_gate4_candidate_detail($pdo,$candidate);$assert($ready['gate4']['activation_ready']===true,'Pilot must become activation ready.');
 
-  $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4','planned_at'=>'2026-08-31','status'=>'blocked','evidence_text'=>'Distribution owner has not approved the launch.']);
+  $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4','planned_at'=>$distributionDate,'status'=>'blocked','evidence_text'=>'Distribution owner has not approved the launch.']);
   $blocked=be_startpartner_gate4_candidate_detail($pdo,$candidate);
   $assert($blocked['gate4']['activation_ready']===false,'A newer blocked distribution must withdraw activation readiness.');
   $cancelled=(int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_distribution_commitments WHERE status='cancelled'")->fetchColumn();
   $assert($cancelled>=1,'Older ready distribution must be superseded instead of remaining authoritative.');
 
-  $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4-final','planned_at'=>'2026-08-31','status'=>'ready','evidence_text'=>'Distribution owner approved the final launch.']);
+  $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4-final','planned_at'=>$distributionDate,'status'=>'ready','evidence_text'=>'Distribution owner approved the final launch.']);
   $readyAgain=be_startpartner_gate4_candidate_detail($pdo,$candidate);$assert($readyAgain['gate4']['activation_ready']===true,'A new current ready distribution must restore activation readiness.');
 
   $portalProjection=be_startpartner_gate4_portal_projection($readyAgain);
   $assert(!array_key_exists('capacity',$portalProjection),'Portal projection must not expose internal capacity.');
   $assert(!array_key_exists('measurement_preflights',$portalProjection),'Portal projection must not expose internal measurement evidence.');
 
+  $expectDomain(static function()use($pdo,$candidate,&$cr,&$pr,$futureActivationDate):void{be_startpartner_gate4_activate($pdo,$candidate,['operation_id'=>'gate4:241:future-activation','operator_name'=>'Contract','expected_revision'=>$cr,'expected_pilot_revision'=>$pr,'activation_date_local'=>$futureActivationDate]);},'Immediate activation must reject a future local start date.');
+
   $before=[(int)$pdo->query('SELECT COUNT(*) FROM subscriptions')->fetchColumn(),(int)$pdo->query('SELECT COUNT(*) FROM publication_entitlements')->fetchColumn(),(int)$pdo->query('SELECT COUNT(*) FROM publication_consumptions')->fetchColumn()];
-  $activated=$mutate('be_startpartner_gate4_activate',['activation_date_local'=>'2026-08-31']);$state=$activated['candidate']['gate4'];
+  $activated=$mutate('be_startpartner_gate4_activate',['activation_date_local'=>$activationDate]);$state=$activated['candidate']['gate4'];
   $assert($state['active']===true,'Pilot must be active.');
-  $assert((string)$state['pilot']['planned_end_date']==='2027-02-28','Month-end must clamp.');
+  $assert((string)$state['pilot']['planned_end_date']===be_startpartner_gate4_add_calendar_months($activationDate,6),'Planned end date must use the explicit six-calendar-month rule.');
   $assert((string)$state['first_content']['status']==='approved','First content must be approved atomically.');
   $assert((int)$state['capacity']['occupied_slots']===1,'Occupied capacity must remain one.');
   $after=[(int)$pdo->query('SELECT COUNT(*) FROM subscriptions')->fetchColumn(),(int)$pdo->query('SELECT COUNT(*) FROM publication_entitlements')->fetchColumn(),(int)$pdo->query('SELECT COUNT(*) FROM publication_consumptions')->fetchColumn()];
   $assert($before===$after,'Locked subscription and regular entitlement owners must remain unchanged.');
-  $replay=be_startpartner_gate4_activate($pdo,$candidate,['activation_date_local'=>'2026-08-31','operation_id'=>$activated['operation_id'],'operator_name'=>'Contract','expected_revision'=>$cr-1,'expected_pilot_revision'=>$pr-1]);
+  $replay=be_startpartner_gate4_activate($pdo,$candidate,['activation_date_local'=>$activationDate,'operation_id'=>$activated['operation_id'],'operator_name'=>'Contract','expected_revision'=>$cr-1,'expected_pilot_revision'=>$pr-1]);
   $assert($replay['idempotent_replay']===true,'Activation retry must replay.');
 }catch(Throwable $error){$failures[]=$error::class.': '.$error->getMessage();}
 $pdo->exec('SET FOREIGN_KEY_CHECKS=0');
