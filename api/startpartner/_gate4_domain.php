@@ -11,3 +11,4 @@ require_once __DIR__ . '/_gate4_preflight.php';
 require_once __DIR__ . '/_gate4_readiness_actions.php';
 require_once __DIR__ . '/_gate4_activation_domain.php';
 require_once __DIR__ . '/_gate4_portal_domain.php';
+require_once __DIR__ . '/_gate4_portal_projection.php';
