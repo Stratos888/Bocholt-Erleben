@@ -34,7 +34,7 @@
       is_required:1,
       is_hard_blocker:1,
       is_manual:manual.has(key)?1:0,
-      evidence_text:completeKeys.has(key)?`Belastbarer synthetischer Nachweis: ${key}`:null,
+      evidence_text:completeKeys.has(key)?`Synthetischer Nachweis: ${key}`:null,
       revision:completeKeys.has(key)?2:0,
     }));
     const contentStatus = scenario === 'onboarding' ? 'draft' : scenario === 'active' ? 'approved' : 'editorial_ready';
@@ -55,7 +55,7 @@
         completed_count:items.filter(row=>row.status==='complete').length,
         total_count:14,
         items,
-        blockers:items.filter(row=>row.status!=='complete').map(row=>({item_key:row.item_key,message:'Verbindlicher Onboardingpunkt ist noch offen.'})),
+        blockers:items.filter(row=>row.status!=='complete').map(row=>({item_key:row.item_key,message:'Ein erforderlicher Schritt der Piloteinrichtung ist noch offen.'})),
       },
       content_links:[{
         id:'24100000-0000-4000-8000-000000000010',
@@ -75,7 +75,7 @@
       },
       ready_measurement:scenario === 'onboarding'?null:{id:'24100000-0000-4000-8000-000000000020',metrics_owner:'value_metric_daily',checked_at:'2026-08-01 10:00:00'},
       ready_distribution:scenario === 'onboarding'?null:{id:'24100000-0000-4000-8000-000000000030',channel:'Newsletter',planned_at:'2026-08-08 22:00:00'},
-      blockers:scenario === 'onboarding'?[{code:'required_item_open',item_key:'portal_access_tested',message:'Portalzugang ist noch nicht getestet.'}]:[],
+      blockers:scenario === 'onboarding'?[{code:'required_item_open',item_key:'portal_access_tested',message:'Der Veranstalterzugang ist noch nicht getestet.'}]:[],
       capacity:{occupied_slots:1,active_pilots:scenario==='active'?1:0,active_reservations:scenario==='active'?0:1,hard_stop_at:8,soft_stop_at:6},
     };
     const candidate = {
@@ -101,7 +101,7 @@
     };
     const item = {
       id:'fixture-gate4',type:'intake',queue_group:'startpartner',case_kind:'startpartner_candidate',state:'in_progress',
-      title:`Startpartner prüfen: ${candidate.organization_name}`,display_status:'Pilot-Onboarding',
+      title:`Startpartner prüfen: ${candidate.organization_name}`,display_status:'Piloteinrichtung',
       primary_action:{key:'details',label:'Pilotstatus prüfen'},secondary_actions:[],startpartner_candidate:candidate,
       decision_context:{candidate_id:candidate.id,candidate_status:candidate.status,candidate_revision:candidate.revision,readiness:candidate.readiness,capacity:candidate.capacity,assigned_to:candidate.assigned_to,next_review_at:candidate.next_review_at,gate3:candidate.gate3,gate4:candidate.gate4},
       source:{system:'startpartner_candidate',reference:candidate.id},object:{id:candidate.id,title:candidate.organization_name,type:'startpartner_candidate'},
