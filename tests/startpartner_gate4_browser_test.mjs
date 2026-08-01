@@ -66,6 +66,7 @@ async function activationDialog(browser){
 
 async function manualDialog(browser){
   const {page,context}=await openControl(browser,'onboarding',{width:390,height:844},'gate4-mobile-manual-dialog');
+  await page.locator('[data-gate4-panel] summary', {hasText:'Onboarding-Checkliste'}).click();
   await page.locator('[data-review-action="gate4:item:portal_access_tested:complete"]').click();
   await page.waitForSelector('#cc-dialog[open] #gate4-evidence');
   const text=await page.locator('#cc-dialog').innerText();
