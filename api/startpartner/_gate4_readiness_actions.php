@@ -8,7 +8,7 @@ function be_startpartner_gate4_measurement_readback(PDO $pdo, array $content): a
     $targetId = trim((string)($content['reporting_target_id'] ?? ''));
     $expectedTargetId = be_startpartner_gate4_reporting_target_id($organizerId);
     if ($targetType !== 'organizer' || !hash_equals($expectedTargetId, $targetId)) {
-        throw new DomainException('Die Messzuordnung stimmt nicht mit dem kanonischen Organizer-Ziel überein.');
+        throw new DomainException('Die Erfolgsmessung ist nicht dem richtigen Veranstalter zugeordnet.');
     }
 
     $requiredColumns = ['metric_date', 'reporting_target_type', 'reporting_target_id', 'count_value', 'updated_at'];
@@ -22,7 +22,7 @@ function be_startpartner_gate4_measurement_readback(PDO $pdo, array $content): a
     );
     $columns->execute($requiredColumns);
     if ((int)$columns->fetchColumn() !== count($requiredColumns)) {
-        throw new DomainException('Der kanonische Messdaten-Owner ist nicht vollständig initialisiert.');
+        throw new DomainException('Die Erfolgsmessung ist technisch noch nicht vollständig eingerichtet.');
     }
 
     $readback = $pdo->prepare(
@@ -36,7 +36,7 @@ function be_startpartner_gate4_measurement_readback(PDO $pdo, array $content): a
     $readback->execute(['target_type' => $targetType, 'target_id' => $targetId]);
     $row = $readback->fetch(PDO::FETCH_ASSOC);
     if (!is_array($row)) {
-        throw new DomainException('Der Messdaten-Owner konnte nicht read-only zurückgelesen werden.');
+        throw new DomainException('Die Erfolgsmessung konnte nicht geprüft werden.');
     }
 
     return [
@@ -58,13 +58,13 @@ function be_startpartner_gate4_distribution_input(array $input): array
     $plannedLocalDate = be_startpartner_gate4_validate_local_date($input['planned_at'] ?? null);
     $status = strtolower(be_startpartner_gate4_required_text($input['status'] ?? null, 16, 'status'));
     if (!in_array($status, ['ready', 'blocked'], true)) {
-        throw new InvalidArgumentException('distribution status must be ready or blocked.');
+        throw new InvalidArgumentException('Der Reichweitenbeitrag muss als vorbereitet oder als klärungsbedürftig gespeichert werden.');
     }
     $timezone = new DateTimeZone('Europe/Berlin');
     $plannedLocal = new DateTimeImmutable($plannedLocalDate . ' 00:00:00', $timezone);
     $todayLocal = new DateTimeImmutable('today', $timezone);
     if ($status === 'ready' && $plannedLocal < $todayLocal) {
-        throw new DomainException('Eine als bereit markierte Distribution darf nicht in der Vergangenheit liegen.');
+        throw new DomainException('Der geplante Termin für den Reichweitenbeitrag darf nicht in der Vergangenheit liegen.');
     }
     return [
         'channel' => $channel,
@@ -117,7 +117,7 @@ function be_startpartner_gate4_mark_content_ready(PDO $pdo, string $candidateId,
                 );
                 $check->execute(['id' => $contentLinkId, 'pilot_id' => (string)$pilot['id']]);
                 if ((string)$check->fetchColumn() !== 'editorial_ready') {
-                    throw new DomainException('Pilot content cannot be marked editorially ready.');
+                    throw new DomainException('Der Inhalt konnte nicht für den Pilotstart vorbereitet werden.');
                 }
             }
             foreach (['first_content_ready', 'editorial_review_ready'] as $itemKey) {
@@ -129,7 +129,7 @@ function be_startpartner_gate4_mark_content_ready(PDO $pdo, string $candidateId,
                      WHERE pilot_id = :pilot_id AND item_key = :item_key"
                 );
                 $item->execute([
-                    'evidence_text' => 'Linked submission passed editorial readiness review.',
+                    'evidence_text' => 'Der verknüpfte Inhalt ist für die redaktionelle Prüfung vorbereitet.',
                     'evidence_reference' => $contentLinkId,
                     'operator' => $operator,
                     'pilot_id' => (string)$pilot['id'],
@@ -137,7 +137,7 @@ function be_startpartner_gate4_mark_content_ready(PDO $pdo, string $candidateId,
                 ]);
             }
             return [
-                'status_reason' => 'Erster Pilotinhalt ist redaktionell bereit.',
+                'status_reason' => 'Der erste Inhalt ist für den Pilotstart vorbereitet.',
                 'content_link_id' => $contentLinkId,
             ];
         }
@@ -155,7 +155,7 @@ function be_startpartner_gate4_set_measurement(PDO $pdo, string $candidateId, ar
             $contentLinkId = be_startpartner_gate4_required_text($input['content_link_id'] ?? null, 36, 'content_link_id');
             $status = strtolower(be_startpartner_gate4_required_text($input['status'] ?? null, 16, 'status'));
             if (!in_array($status, ['ready', 'blocked'], true)) {
-                throw new InvalidArgumentException('measurement status must be ready or blocked.');
+                throw new InvalidArgumentException('Die Erfolgsmessung muss als eingerichtet oder als klärungsbedürftig gespeichert werden.');
             }
             $link = $pdo->prepare(
                 'SELECT * FROM startpartner_pilot_content_links
@@ -164,10 +164,10 @@ function be_startpartner_gate4_set_measurement(PDO $pdo, string $candidateId, ar
             $link->execute(['id' => $contentLinkId, 'pilot_id' => (string)$pilot['id']]);
             $content = $link->fetch(PDO::FETCH_ASSOC);
             if (!is_array($content)) {
-                throw new DomainException('Pilot content link not found.');
+                throw new DomainException('Der ausgewählte Pilotinhalt wurde nicht gefunden.');
             }
             if (!in_array((string)$content['status'], ['editorial_ready', 'approved'], true)) {
-                throw new DomainException('Der Messpreflight benötigt einen redaktionell bereiten Pilotinhalt.');
+                throw new DomainException('Für die Erfolgsmessung muss zuerst ein Inhalt für den Pilotstart vorbereitet sein.');
             }
             $evidenceText = be_startpartner_gate4_required_text($input['evidence_text'] ?? null, 5000, 'evidence_text');
             $technicalReadback = $status === 'ready'
@@ -224,8 +224,8 @@ function be_startpartner_gate4_set_measurement(PDO $pdo, string $candidateId, ar
             ]);
             return [
                 'status_reason' => $status === 'ready'
-                    ? 'Messpreflight technisch zurückgelesen und als bereit gespeichert.'
-                    : 'Messpreflight mit Begründung blockiert.',
+                    ? 'Die Erfolgsmessung wurde geprüft und als eingerichtet gespeichert.'
+                    : 'Für die Erfolgsmessung wurde ein offener Punkt gespeichert.',
                 'content_link_id' => $contentLinkId,
                 'technical_readback' => $technicalReadback,
             ];
@@ -282,8 +282,8 @@ function be_startpartner_gate4_set_distribution(PDO $pdo, string $candidateId, a
             ]);
             return [
                 'status_reason' => $distribution['status'] === 'ready'
-                    ? 'Aktueller Partner-Reichweitenstart als bereit gespeichert.'
-                    : 'Partner-Reichweitenstart mit Begründung blockiert.',
+                    ? 'Der Reichweitenbeitrag wurde mit Kanal und Termin gespeichert.'
+                    : 'Für den Reichweitenbeitrag wurde ein offener Punkt gespeichert.',
                 'distribution_id' => $id,
                 'planned_date_local' => $distribution['planned_date_local'],
             ];
