@@ -2,7 +2,7 @@
 
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **AKTIV – aktueller Studienzyklus beendet; neuer generativer Suchraum vorbereitet**
+Status: **INTERNER SUCHRAUM AUSGESCHÖPFT – EXTERNE ORIGINÄRE GESTALTUNG VORBEREITET**
 
 ## Zweck
 
@@ -19,8 +19,10 @@ Die öffentliche Marke und das Produkt bleiben unverändert.
 5. `docs/brand/phase5/CREATIVE_TERRITORIES.md`
 6. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
 7. `docs/brand/phase5/GENERATIVE_SEARCH_BRIEF.md`
-8. `docs/brand/phase5/PHASE4_CONCLUSION.md`
-9. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
+8. `docs/brand/phase5/GENERATIVE_SEARCH_CYCLE_01_RESULT.md`
+9. `docs/brand/phase5/EXTERNAL_CREATIVE_EXECUTION_BRIEF.md`
+10. `docs/brand/phase5/PHASE4_CONCLUSION.md`
+11. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
 
 Verbindlich bleiben:
 
@@ -32,71 +34,109 @@ Verbindlich bleiben:
 - höchstens zwei Richtungen im Product-Owner-Gate;
 - keine Nutzerpräsentation unreifer Studien.
 
-## Geschlossener Phase-5-Studienzyklus
+## Gesamtbefund
 
-Geprüft wurden unter anderem:
+### Phase 4
+
+- qualifizierte Richtungen: `0`;
+- generische geometrische und UI-nahe Richtungen vollständig beendet.
+
+### Phase 5 – erster kontrollierter Studienzyklus
+
+Geprüft und beendet wurden unter anderem:
 
 - standardschriftbasierte systemische Eingriffe;
-- eigene Monoline-, Grotesk- und Humanist-Systeme;
+- eigene Monoline-, Grotesk-, Humanist- und Semi-Serif-Systeme;
 - typografische Dualität;
 - Type-Material-Studien;
-- das produktspezifische Prinzip `Geführte Öffnung`;
+- produktspezifische `Geführte Öffnung`;
 - integrierte Buchstaben- und Negativraummodule;
-- eine flache Weiterentwicklung der tatsächlichen öffentlichen Öffnungs-/Vorhangmarke.
+- flache Weiterentwicklung der tatsächlichen öffentlichen Öffnungs-/Vorhangmarke.
 
-Aktueller Befund:
+Ergebnis:
 
 - intern geprüfte Studien und Gegenproben: `32`;
-- verworfen: `32`;
 - Kandidaten: `0`;
-- qualifizierte Richtungen: `0`;
-- Nutzerpräsentationen: `0`;
-- öffentliche Änderungen: `0`.
+- qualifizierte Richtungen: `0`.
 
-## Wichtigste Erkenntnisse
+### Phase 5 – generativer Suchzyklus 01
 
-- Die reine Wortmarkensuche erzeugte keine ausreichende Premium-Eigenhöhe.
-- Integrierte Negativraummodule kippten in Pfeil-, Status- und UI-Lesarten.
-- Die tatsächliche öffentliche Marke ist kein `B`, sondern ein räumliches grünes Öffnungs-/Vorhangmotiv; ältere Ausgangsbeschreibungen waren überholt.
-- Eine flache Reduktion dieses Bestandsmotivs kollabierte zu Vorhang, Pausezeichen, App-Kachel oder gewöhnlichem Schlitz.
-- Keine schwache Richtung wurde künstlich zum Kandidaten erklärt.
+Gemäß `GENERATIVE_SEARCH_BRIEF.md` wurden zwölf ernsthafte Rohhypothesen über vier Suchfelder geprüft:
+
+- nicht Sans-dominierte Letteringarchitektur;
+- abstrakte Primäridentität ohne Standardicon;
+- lokales Strukturprinzip ohne Bocholt-Klischee;
+- radikal reduzierte responsive Identität.
+
+Ergebnis:
+
+- ernsthafte Rohhypothesen: `12`;
+- zur deterministischen Rekonstruktion zugelassen: `0`;
+- Kandidaten: `0`;
+- Nutzerpräsentationen: `0`.
 
 Der vollständige Befund liegt in:
 
-- `docs/brand/phase5/internal/STUDY_LOG.md`
+- `docs/brand/phase5/GENERATIVE_SEARCH_CYCLE_01_RESULT.md`
 
-## Nächster zulässiger Suchraum
+## Warum keine weitere automatische Variantenrunde folgt
 
-Eine weitere kleine Vektorvariation ist gesperrt.
+Die verfügbaren internen prozeduralen Formräume wurden systematisch kontrolliert:
 
-Der nächste Zyklus ist ein neuer generativer Formraum mit späterer deterministischer Rekonstruktion:
+- Schriftbasis plus Modifikation;
+- eigene Schriftkonstruktionen;
+- typografische Paarungen;
+- Initial- und Monogrammableitungen;
+- Schleifen-, Band-, Gewebe-, Rosetten- und Rhythmuszeichen;
+- Bestandsöffnung und Negativraummodule;
+- responsive Voll- und Kleinformen.
 
-- keine Festlegung auf Sans-Wortmarke, Monogramm oder Bestandsmotiv;
-- höchstens vier klar begrenzte Suchfelder;
-- keine Mindestmenge an Varianten;
-- erste Sichtung monochrom und in mobiler Originalgröße;
-- frühe Kategorie-, Genericity- und Ähnlichkeitsfilter;
-- nur sichtbar starke Rohhypothesen werden als SVG oder Lettering neu konstruiert;
-- generierte Rasterbilder sind Suchmaterial, niemals Finalmaster.
+Die wiederkehrenden Fehler sind stabil:
 
-Verbindlicher Auftrag:
+- hochwertige, aber bekannte Stilformel;
+- eigene, aber generische digitale Schriftstruktur;
+- lokale Herleitung nur im Konzepttext;
+- Symbol kippt in UI, Mode, Handwerk, Publishing oder andere falsche Kategorien;
+- mobile Reduktion verliert das besondere Merkmal;
+- Kleinform bleibt ein austauschbares Initialmonogramm.
 
-- `docs/brand/phase5/GENERATIVE_SEARCH_BRIEF.md`
+Eine weitere kleine automatische Variation wäre kein belastbarer Erkenntnisgewinn.
+
+## Nächster belastbarer Weg
+
+Der originäre Premiumentwurf muss durch eine externe Creative-Director-/Lettering-Leistung entstehen. Der Arbeitsauftrag ist vollständig vorbereitet in:
+
+- `docs/brand/phase5/EXTERNAL_CREATIVE_EXECUTION_BRIEF.md`
+
+ChatGPT übernimmt danach weiterhin vollständig:
+
+- Eingangskontrolle;
+- Provenienz- und Lizenzprüfung;
+- Anonymisierung;
+- Originalgrößen- und Kategorieprüfung;
+- getrennte Bewertungspässe;
+- Red Team;
+- Scorecard und Konsolidierung;
+- technische Vektorrekonstruktion und Härtung;
+- Product-Owner-Präsentation;
+- spätere Repository-Integration.
 
 ## Nutzerinteraktion
 
-Der Product Owner erhält:
+Der Product Owner erhält weiterhin:
 
 - keine Rohideen;
 - keine Mikrovarianten;
 - keine generierten Suchtafeln oder Berichtsgrafiken;
-- keine Aufforderung zur Vorauswahl oder Chatverwaltung.
+- keine künstliche Entscheidung zwischen mittelmäßigen Optionen.
 
-Sichtbar präsentiert wird erst, wenn mindestens eine rekonstruierte Richtung die vollständige Premiumqualifikation besteht.
+Sichtbar präsentiert wird erst, wenn mindestens eine originär gestaltete und technisch rekonstruierte Richtung die vollständige Premiumqualifikation besteht.
 
 ## Aktueller Stand
 
-- qualifizierte Richtungen: `0`
-- Phase-5-Kandidaten: `0`
-- öffentliche Änderungen: `0`
-- nächster Schritt: nicht öffentlicher generativer Suchzyklus gemäß `GENERATIVE_SEARCH_BRIEF.md`
+- qualifizierte Richtungen: `0`;
+- Phase-5-Kandidaten: `0`;
+- Nutzerpräsentationen: `0`;
+- öffentliche Änderungen: `0`;
+- automatische interne Suche: abgeschlossen;
+- externer Creative-Execution-Brief: ausführungsbereit.
