@@ -59,16 +59,30 @@ Der Prozess darf künftig nur von getrennten Bewertungspässen sprechen, nicht v
 
 Der Product Owner sollte keine Rohideen, Mikrovarianten oder internen Berichtsgrafiken erhalten. Die Ausgabe einer unbestellten Prüfberichtgrafik verletzte diese Regel und hatte keinen gestalterischen Nutzen.
 
+### 1.7 Das Gegenframework übersteuerte bei Wortmarken
+
+Die frühe Prozessreparatur behandelte Genericity, Austauschbarkeit, Silhouette, Produktspezifität und App-Icon architekturunabhängig.
+
+Das war für generische Symbole und einzelne Schriftgimmicks sinnvoll, erzeugte bei einer Wortmarkenarchitektur aber neue Fehlanreize:
+
+- hochwertige Wortmarken wurden wegen fehlender wörtlicher Produktsymbolik benachteiligt;
+- ein freistehendes Zeichen und App-Icon wurden zu früh erzwungen;
+- systemische Typografie wurde wie Standardschrift plus Detail behandelt;
+- harte Austauschbarkeitsregeln förderten überzeichnete Buchstabenmetaphern statt souveräner Markenführung.
+
+Die Korrektur steht in `ARCHITECTURE_AWARE_EVALUATION.md` und senkt den Premiumanspruch ausdrücklich nicht.
+
 ## 2. Verbindliche Dokumenthierarchie
 
 Für Workpack #259 gilt folgende Reihenfolge:
 
 1. `docs/brand/phase5/PROCESS_ROOT_CAUSE_AND_GOVERNANCE.md`
-2. `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`
-3. `docs/brand/phase5/README.md`
-4. `docs/brand/phase5/SEARCH_BRIEF.md`
-5. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
-6. Phase-4-Dokumente ausschließlich als Negativwissen
+2. `docs/brand/phase5/ARCHITECTURE_AWARE_EVALUATION.md`
+3. `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`
+4. `docs/brand/phase5/README.md`
+5. `docs/brand/phase5/SEARCH_BRIEF.md`
+6. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
+7. Phase-4-Dokumente ausschließlich als Negativwissen
 
 Bei Konflikten gilt die höher stehende Datei.
 
@@ -76,10 +90,11 @@ Damit sind verbindlich:
 
 - Freigabeschwelle: mindestens `90/100`;
 - alle Dimensionsmindestwerte müssen erreicht sein;
-- kein Knock-out;
+- kein architekturabhängig belegter Knock-out;
 - zwei getrennte positive Bewertungspässe;
 - kein ungelöster Red-Team-Befund;
-- höchstens zwei Richtungen im Product-Owner-Gate.
+- höchstens zwei Richtungen im Product-Owner-Gate;
+- App-Icon und Kleinmarke erst nach bestandener vollständiger Wortmarke.
 
 Die ältere 78-Punkte-Schwelle und die Grenze von drei Richtungen sind für Phase 5 außer Kraft.
 
@@ -95,6 +110,8 @@ Vor weiterer visueller Gestaltung gelten folgende Sperren:
 6. Keine Behauptung unabhängiger Prüfer, wenn dieselbe Orchestrierung alle Rollen ausführt.
 7. Keine Nutzerpräsentation von Rohideen, Prüfboards oder internen Berichtsgrafiken.
 8. Keine öffentliche oder produktive Markenänderung vor vollständiger Qualifikation und separatem Integrationsworkpack.
+9. Keine architekturblinde Anwendung von Knock-outs: Wortmarken werden nach Klasse `W` des Phase-5-Overrides geprüft.
+10. Keine erzwungene wörtliche Produktmetapher im monochromen Zeichen.
 
 ## 4. Korrigierter Qualitätsweg
 
@@ -102,11 +119,12 @@ Vor weiterer visueller Gestaltung gelten folgende Sperren:
 2. Aktuelle Premium- und Kategoriebenchmarks analysieren, ohne Formen zu kopieren.
 3. Höchstens drei kreative Territorien mit klarer strategischer und sichtbarer Differenz entwickeln.
 4. Pro Territorium wenige ernsthafte Studien der vollständigen Wortmarke erstellen.
-5. Creative-Director-Gate gegen aktuelle Marke, Kategorieklischees und Premiumniveau.
-6. Erst aus bestandenen Primäridentitäten kompakte Fassung und App-Zeichen ableiten.
-7. Maximal drei ausgereifte Kandidaten in realen Produktkontexten prüfen.
-8. Zwei getrennte Bewertungspässe, Red-Team-Pass, Scorecard und technische Eintrittsprüfung durchführen.
-9. Dem Product Owner nur eine oder höchstens zwei vollständig qualifizierte Richtungen präsentieren.
+5. Wortmarken-Gate W0 gegen aktuelle Marke, Kategorieklischees und Premiumniveau.
+6. Nur bestandene Wortmarken als neutrales Marken-Minisystem prüfen.
+7. Erst danach kompakte Fassung und App-Marke ableiten.
+8. Maximal drei ausgereifte Kandidaten in realen Produktkontexten prüfen.
+9. Zwei getrennte Bewertungspässe, Red-Team-Pass, Scorecard und technische Eintrittsprüfung durchführen.
+10. Dem Product Owner nur eine oder höchstens zwei vollständig qualifizierte Richtungen präsentieren.
 
 ## 5. Definition von Fortschritt
 
@@ -116,13 +134,15 @@ Fortschritt ist nicht:
 - Anzahl SVG-Dateien;
 - grüne CI;
 - formal vollständige Prüftabellen;
-- ein Kandidat ohne harten Knock-out.
+- ein Kandidat ohne harten Knock-out;
+- ein wörtlich erklärbares App-Symbol.
 
 Fortschritt ist erst belegt, wenn eine vollständige Primäridentität:
 
 - sichtbar eigenständig ist;
-- klar zum Produkt passt;
+- klar zum Produkt und zur gewünschten Haltung passt;
 - ohne Erklärung hochwertig wirkt;
 - die aktuelle Identität deutlich übertrifft;
 - als Wortmarke und im realen mobilen Header überzeugt;
+- ein kohärentes Typografie-, Farb-, Bild- und Bewegungsverhalten tragen kann;
 - anschließend eine verwandte belastbare Kleinform ermöglicht.
