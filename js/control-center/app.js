@@ -1,6 +1,6 @@
 // Legacy static-contract marker: review.js?v=2026-07-24-mobile-exception-review-v1
 import { state, els, escapeHtml, clean, setStatus, appPath, api, openDialog, closeDialog, reviewGroup, allReviewCases } from './shared.js?v=2026-07-16-e2e-state-v5';
-import { configureReview, renderReview } from './review.js?v=2026-07-27-startpartner-gate3-v1';
+import { configureReview, renderReview } from './review.js?v=2026-08-01-startpartner-gate4-audit-v1';
 import { configureBacklog, renderBacklog } from './backlog.js?v=2026-07-16-e2e-state-v5';
 import { renderManage } from './manage.js?v=2026-07-16-e2e-state-v5';
 import { renderDevelopment } from './development.js?v=2026-07-16-e2e-state-v5';

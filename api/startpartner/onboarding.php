@@ -8,14 +8,14 @@ be_require_review_access();
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     header('Allow: POST');
-    be_json_response(405, ['status' => 'error', 'message' => 'Method not allowed.']);
+    be_json_response(405, ['status' => 'error', 'message' => 'Diese Anfrageart wird nicht unterstützt.']);
 }
 
 try {
     $input = json_decode((string)file_get_contents('php://input'), true, 512, JSON_THROW_ON_ERROR);
-    if (!is_array($input)) throw new InvalidArgumentException('Invalid JSON body.');
+    if (!is_array($input)) throw new InvalidArgumentException('Die übermittelten Angaben konnten nicht gelesen werden.');
     $candidateId = trim((string)($input['candidate_id'] ?? ''));
-    if ($candidateId === '') throw new InvalidArgumentException('candidate_id is required.');
+    if ($candidateId === '') throw new InvalidArgumentException('Der Startpartner-Fall fehlt.');
     $action = trim((string)($input['action'] ?? 'update_item'));
     $pdo = be_db();
     $result = match ($action) {
@@ -23,7 +23,7 @@ try {
         'mark_content_ready' => be_startpartner_gate4_mark_content_ready($pdo, $candidateId, $input),
         'set_measurement' => be_startpartner_gate4_set_measurement($pdo, $candidateId, $input),
         'set_distribution' => be_startpartner_gate4_set_distribution($pdo, $candidateId, $input),
-        default => throw new InvalidArgumentException('Unsupported Gate-4 onboarding action.'),
+        default => throw new InvalidArgumentException('Diese Aktion gehört nicht zur Piloteinrichtung.'),
     };
     be_json_response(200, ['status' => 'ok', 'data' => $result]);
 } catch (BeStartpartnerConflictException $error) {
@@ -32,7 +32,7 @@ try {
     be_json_response(422, ['status'=>'error','message'=>$error->getMessage()]);
 } catch (RuntimeException $error) {
     $missing = str_starts_with($error->getMessage(), 'STARTPARTNER_');
-    be_json_response($missing ? 503 : 404, ['status'=>'error','message'=>$missing?'Startpartner schema is not ready.':$error->getMessage(),'error_message'=>$error->getMessage()]);
+    be_json_response($missing ? 503 : 404, ['status'=>'error','message'=>$missing?'Die Piloteinrichtung ist technisch noch nicht verfügbar.':$error->getMessage(),'error_message'=>$error->getMessage()]);
 } catch (Throwable $error) {
-    be_json_response(500, ['status'=>'error','message'=>'Gate-4 onboarding action failed.','error_message'=>$error->getMessage()]);
+    be_json_response(500, ['status'=>'error','message'=>'Die Änderung an der Piloteinrichtung konnte gerade nicht gespeichert werden.','error_message'=>$error->getMessage()]);
 }

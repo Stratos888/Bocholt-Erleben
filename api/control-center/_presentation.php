@@ -56,7 +56,7 @@ function be_cc_startpartner_actions(string $status, array $readiness, array $cap
         'awaiting_response' => be_cc_action('start_qualification', 'Qualifizierung fortsetzen'),
         'qualifying' => $ready
             ? be_cc_action('mark_decision_ready', 'Entscheidungsreife bestätigen')
-            : be_cc_action('edit_qualification', 'Höchsten Blocker bearbeiten', true),
+            : be_cc_action('edit_qualification', 'Wichtigsten offenen Punkt bearbeiten', true),
         'needs_information' => be_cc_action('edit_qualification', 'Fehlende Angaben klären', true),
         'decision_ready' => $hardStop
             ? be_cc_action('waitlist', 'Auf Warteliste setzen', true)
@@ -94,7 +94,7 @@ function be_cc_startpartner_actions(string $status, array $readiness, array $cap
         $secondary[] = be_cc_action('withdraw', 'Rückzug dokumentieren', true, true);
         $secondary[] = be_cc_action('expire', 'Als abgelaufen markieren', true, true);
     }
-    $secondary[] = be_cc_action('details', 'Audit und Rohdaten');
+    $secondary[] = be_cc_action('details', 'Nachweise und Verlauf');
 
     return ['primary' => $primary, 'secondary' => $secondary];
 }

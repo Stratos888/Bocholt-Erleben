@@ -16,10 +16,21 @@ with socket.socket() as sock:
 PY
 )"
 python3 -m http.server "$port" --bind 127.0.0.1 --directory "$ROOT" >"$TMP/http-server.log" 2>&1 & echo "$!" > "$TMP/server.pid"
-for _ in {1..30}; do curl --fail --silent "http://127.0.0.1:$port/tests/fixtures/control_center_mobile_exception_review.html" >/dev/null && break; sleep 1; done
-curl --fail --silent "http://127.0.0.1:$port/tests/fixtures/control_center_mobile_exception_review.html" >/dev/null || { cat "$TMP/http-server.log" >&2; exit 1; }
+fixtures=(
+  control_center_mobile_exception_review.html
+  control_center_gate4_review.html
+  organizer_gate4_portal.html
+)
+for _ in {1..30}; do
+  curl --fail --silent "http://127.0.0.1:$port/tests/fixtures/${fixtures[0]}" >/dev/null && break
+  sleep 1
+done
+for fixture in "${fixtures[@]}"; do
+  curl --fail --silent "http://127.0.0.1:$port/tests/fixtures/$fixture" >/dev/null || { cat "$TMP/http-server.log" >&2; exit 1; }
+done
 rm -rf "$SMOKE_OUT_DIR"; mkdir -p "$SMOKE_OUT_DIR"
 node "$ROOT/tests/control_center_mobile_exception_review_browser_test.mjs" --base-url "http://127.0.0.1:$port" --out-dir "$SMOKE_OUT_DIR" 2>&1 | tee "$SMOKE_OUT_DIR/browser-test.log"
+node "$ROOT/tests/startpartner_gate4_browser_test.mjs" --base-url "http://127.0.0.1:$port" --out-dir "$SMOKE_OUT_DIR" 2>&1 | tee "$SMOKE_OUT_DIR/gate4-browser-test.log"
 cleanup; trap - EXIT
 after_snapshot="$(snapshot_checkout)"
 if [ "$before_snapshot" != "$after_snapshot" ]; then echo "CONTROL_CENTER_MOBILE_EXCEPTION_REVIEW: checkout changed during smoke" >&2; exit 1; fi

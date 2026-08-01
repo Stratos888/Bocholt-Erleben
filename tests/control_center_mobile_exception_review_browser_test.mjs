@@ -30,7 +30,7 @@ async function mobileDuplicate(browser,viewport,name){
   assert(await decision.count()===1,`${name}: eine unmittelbare Entscheidungsebene erwartet`);
   const decisionBox=await decision.boundingBox(); const navBox=await page.locator('.cc-nav').boundingBox();
   assert(decisionBox&&navBox&&decisionBox.y+decisionBox.height<=navBox.y,`${name}: Entscheidung wird von unterer Navigation verdeckt oder liegt außerhalb des ersten Viewports`);
-  assert(await page.locator('.cc-review-task-evidence--mobile[open]').count()===0,`${name}: Evidence muss initial eingeklappt sein`);
+  assert(await page.locator('.cc-review-task-evidence--mobile[open]').count()===0,`${name}: Nachweis muss initial eingeklappt sein`);
   assert(await page.locator('.cc-reviewed-summary--mobile[open]').count()===0,`${name}: Gesamtfassung muss mobil initial eingeklappt sein`);
   assert(await page.locator('.cc-mobile-case-options[open]').count()===0,`${name}: Nebenaktionen müssen initial eingeklappt sein`);
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth);
@@ -52,15 +52,16 @@ async function startpartnerState(browser,scenario,viewport,name,markers,primaryL
   const text=await page.locator('.cc-startpartner-review').innerText();
   const normalizedText=text.toLocaleLowerCase('de-DE');
   for(const marker of markers)assert(normalizedText.includes(marker.toLocaleLowerCase('de-DE')),`${name}: Marker fehlt: ${marker}`);
+  for(const forbidden of ['pilot-onboarding','pending_activation','organizer'])assert(!normalizedText.includes(forbidden),`${name}: technischer oder veralteter Begriff sichtbar: ${forbidden}`);
   assert(!normalizedText.includes('pilot aktiv')&&!normalizedText.includes('aufgenommen'),`${name}: UI behauptet unzulässige Aktivierung`);
   assert((await priority.locator('.cc-startpartner-primary').innerText())===primaryLabel,`${name}: falsche Hauptaktion`);
-  assert(await page.locator('.cc-startpartner-evidence[open]').count()===0,`${name}: Evidence muss initial eingeklappt sein`);
+  assert(await page.locator('.cc-startpartner-evidence[open]').count()===0,`${name}: Nachweise müssen initial eingeklappt sein`);
   assert(await page.locator('.cc-mobile-case-options[open]').count()===0,`${name}: Nebenoptionen müssen initial eingeklappt sein`);
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth);
   assert(!overflow,`${name}: horizontaler Überlauf`);
   if(viewport.width<760){
     const priorityBox=await priority.boundingBox();const navBox=await page.locator('.cc-nav').boundingBox();
-    assert(priorityBox&&navBox&&priorityBox.y+priorityBox.height<=navBox.y,`${name}: Status, Blocker, Hauptaktion, Fälligkeit oder Kapazität werden von der Navigation verdeckt`);
+    assert(priorityBox&&navBox&&priorityBox.y+priorityBox.height<=navBox.y,`${name}: Status, offener Punkt, Hauptaktion, Fälligkeit oder Kapazität werden von der Navigation verdeckt`);
     const priorityText=(await priority.innerText()).toLocaleLowerCase('de-DE');
     for(const label of ['Fälligkeit','Bearbeiter','Kapazität'])assert(priorityText.includes(label.toLocaleLowerCase('de-DE')),`${name}: mobile Priorität fehlt: ${label}`);
   }
@@ -81,7 +82,7 @@ async function startpartnerMutation(browser,conflict){
     assert(await page.locator('#cc-dialog[open]').count()===1,'stale conflict: Dialog muss zur erneuten Prüfung offen bleiben');
   }else{
     assert(await page.locator('#cc-dialog[open]').count()===0,'successful readback: Dialog wurde nach vollständigem Reload nicht geschlossen');
-    assert((await page.locator('#cc-status').innerText()).includes('vollständiger Serverzustand neu geladen'),'successful readback: eindeutige Rückmeldung fehlt');
+    assert((await page.locator('#cc-status').innerText()).includes('aktueller Stand neu geladen'),'successful readback: eindeutige Rückmeldung fehlt');
   }
   await context.close();results.push({name,status:'OK'});
 }
@@ -102,10 +103,10 @@ async function gate3DialogContract(browser){
   });
   await page.locator('.cc-startpartner-primary').click();
   await page.waitForSelector('#cc-dialog[open] #sp-terms-version');
-  for(const marker of ['Bedingungsversion','Unveränderliche Referenz','SHA-256','Bestätigende Person','Bestätigungskanal','Pilotkohorte','Keine automatische kostenpflichtige Verlängerung']){
+  for(const marker of ['Version der Pilotbedingungen','Referenz der bestätigten Fassung','SHA-256','Bestätigende Person','Bestätigungskanal','Pilotgruppe','Keine automatische kostenpflichtige Verlängerung']){
     assert((await page.locator('#cc-dialog').innerText()).includes(marker),`gate3 dialog: Feld fehlt: ${marker}`);
   }
-  assert(await page.locator('#sp-no-auto-renewal').isChecked()===false,'gate3 dialog: No-auto-renewal darf nicht vorselektiert sein');
+  assert(await page.locator('#sp-no-auto-renewal').isChecked()===false,'gate3 dialog: automatische Verlängerung darf nicht vorselektiert sein');
   await context.close();results.push({name:'startpartner-gate3-dialog',status:'OK'});
 }
 async function shellContracts(browser){
@@ -162,12 +163,12 @@ try{
   assert(await desktopRun.page.locator('.cc-actions--secondary-desktop:visible').count()===1,'desktop: bestehende Nebenaktionen fehlen');
   await desktopRun.context.close(); results.push({name:'desktop-contract',status:'OK'});
 
-  await startpartnerState(browser,'startpartner-blocked',{width:360,height:780},'startpartner-mobile-360x780-blocked',['Qualifizierung','Lokaler Bezug','Mindestanforderung nicht erfüllt.','Fälligkeit','Kapazität'],'Höchsten Blocker bearbeiten');
-  await startpartnerState(browser,'startpartner-ready',{width:390,height:844},'startpartner-mobile-390x844-ready',['Entscheidungsreif','Alle 14 Dimensionen','4 von 8 Plätzen reserviert'],'Platz reservieren');
-  await startpartnerState(browser,'startpartner-soft',{width:768,height:1024},'startpartner-tablet-768x1024-soft-stop',['Entscheidungsreif','Ausnahmebegründung erforderlich','6 von 8 Plätzen reserviert'],'Platz reservieren');
-  await startpartnerState(browser,'startpartner-hard',{width:360,height:780},'startpartner-mobile-360x780-hard-stop',['Entscheidungsreif','harte Grenze erreicht','8 von 8 Plätzen reserviert'],'Auf Warteliste setzen');
-  await startpartnerState(browser,'startpartner-reserved',{width:1440,height:900},'startpartner-desktop-1440x900-reserved',['Platz reserviert · Bedingungen offen','Aktive Reservierung','Pilotbedingungen müssen ausdrücklich bestätigt','Gate 3 offen'],'Bedingungen bestätigen und Pilot anlegen');
-  await startpartnerState(browser,'startpartner-gate3-complete',{width:390,height:844},'startpartner-mobile-390x844-gate3-complete',['Pilot-Onboarding','Aktivierung ausstehend','pending_activation','Aktive Reservierung','einzige Kapazitätsowner'],'Pilotstatus prüfen');
+  await startpartnerState(browser,'startpartner-blocked',{width:360,height:780},'startpartner-mobile-360x780-blocked',['Qualifizierung','Lokaler Bezug','Mindestanforderung nicht erfüllt.','Fälligkeit','Kapazität'],'Wichtigsten offenen Punkt bearbeiten');
+  await startpartnerState(browser,'startpartner-ready',{width:390,height:844},'startpartner-mobile-390x844-ready',['Entscheidungsreif','Alle 14 Prüfpunkte','4 von 8 Plätzen reserviert'],'Platz reservieren');
+  await startpartnerState(browser,'startpartner-soft',{width:768,height:1024},'startpartner-tablet-768x1024-soft-stop',['Entscheidungsreif','Begründung für eine Ausnahme erforderlich','6 von 8 Plätzen reserviert'],'Platz reservieren');
+  await startpartnerState(browser,'startpartner-hard',{width:360,height:780},'startpartner-mobile-360x780-hard-stop',['Entscheidungsreif','Grenze erreicht','8 von 8 Plätzen reserviert'],'Auf Warteliste setzen');
+  await startpartnerState(browser,'startpartner-reserved',{width:1440,height:900},'startpartner-desktop-1440x900-reserved',['Platz reserviert · Bedingungen offen','Aktive Reservierung','Pilotbedingungen müssen ausdrücklich bestätigt','Vorbereitung noch offen'],'Bedingungen bestätigen und Pilot anlegen');
+  await startpartnerState(browser,'startpartner-gate3-complete',{width:390,height:844},'startpartner-mobile-390x844-gate3-complete',['Piloteinrichtung','Pilotstart ausstehend','Noch nicht aktiv','Aktive Reservierung','Pilotphase beginnt erst nach der vollständigen Einrichtung'],'Pilotstatus prüfen');
   await startpartnerState(browser,'startpartner-waitlisted',{width:390,height:844},'startpartner-mobile-390x844-waitlisted',['Warteliste','Neubewertung','Hoher lokaler Mehrwert.'],'Warteliste aktualisieren');
   await gate3DialogContract(browser);
   await startpartnerMutation(browser,false);
