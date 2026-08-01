@@ -302,8 +302,8 @@ def check_push_endpoints_protected(base_url: str) -> None:
         check_protected_json_endpoint(base_url, path=path, label=label, method="POST", body=b"{}")
 
 
-def load_deploy_review_password() -> str:
-    path = Path("deploy/api/_config.php")
+def load_gate4_review_password() -> str:
+    path = Path("deploy") / "api" / "_config.php"
     if not path.is_file():
         raise AssertionError("Private Deploy-Konfiguration für Gate-4-Evidence fehlt.")
     source = path.read_text(encoding="utf-8")
@@ -336,7 +336,7 @@ def check_gate4_staging_lifecycle(base_url: str, expected_build: str) -> None:
         timeout=30,
     )
     require_status(unauthenticated, {401}, "Gate-4-Evidence Zugriffsschutz")
-    password = load_deploy_review_password()
+    password = load_gate4_review_password()
     result = request_url(
         build_url(base_url, path),
         method="POST",
