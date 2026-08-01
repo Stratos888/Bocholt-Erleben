@@ -1,0 +1,21 @@
+{
+  "template": true,
+  "candidate_id": "candidate-000",
+  "role": "red_team",
+  "evaluator_id": "red-team-placeholder",
+  "created_at": null,
+  "review_locked": false,
+  "mission": "seek_rejection",
+  "tests": {
+    "genericity_ablation": null,
+    "explanation_dependency": null,
+    "substitutability": null,
+    "artifact_reading": null,
+    "real_size_failure": null,
+    "category_error": null,
+    "silhouette_failure": null,
+    "provenance_gap": null
+  },
+  "hard_knockout_found": null,
+  "verdict": null
+}
