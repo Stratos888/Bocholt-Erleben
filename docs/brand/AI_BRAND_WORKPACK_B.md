@@ -1,136 +1,74 @@
-# AI-Markenentwicklung – Workpack B
+# AI-Markenentwicklung – Phase 2 Abschluss und Phase 3 Übergang
 
 Stand: 2026-08-01
 Workpack: #225
-Branch: `brand/ai-workpack-b-225`
-Status: interne Phase-2-Exploration und Produktionsqualifizierung abgeschlossen; eine Grundrichtung qualifiziert
+Status: Phase 2 gescheitert; `Offener Impuls` zurückgewiesen; Prozessreparatur aktiv
 
-## 1. Ausgangslage
+## 1. Formale Korrektur
 
-Die Phase-1-Richtungen `Offener Takt` und `Direktwort` wurden trotz technischer Funktionsfähigkeit wegen fehlender Eigenständigkeit und unzureichender Markenqualität zurückgewiesen. Der spätere Kandidat `B-Moment` erreichte nur 84/100; PR #233 wurde ohne Merge geschlossen.
+Die bisherige Aussage, `Offener Impuls` habe mit 91/100 das interne Premium-Gate erreicht, ist ungültig.
 
-Workpack B begann deshalb nicht mit einer weiteren freien Symbol- oder Präsentationsrunde. Markenkern, Bewertungslogik und drei getrennte wortmarkengeführte Suchfelder wurden vor der Gestaltung eingefroren.
+Kanonischer Status:
 
-## 2. Markenauftrag
+- Kandidat: zurückgewiesen;
+- Premium-Gate: nicht bestanden;
+- Mikrozeichnung: nicht freigegeben;
+- öffentliche Umsetzung: nicht freigegeben;
+- bisheriger Score: nicht belastbar und nicht weiterzuverwenden;
+- neue Gestaltung: bis zum Abschluss der Phase-3-Prozessreparatur gesperrt.
 
-### 2.1 Produktversprechen
+Eine nachträgliche diagnostische Einordnung um 57/100 dient nur der Fehleranalyse. Sie ist kein neuer zertifizierter Score.
 
-`Bocholt erleben` ist die persönliche und verlässliche Abkürzung zu den Möglichkeiten der Stadt, die gerade wirklich relevant sind.
+## 2. Belegte Knock-outs
 
-Die Marke soll vermitteln:
+- Ohne den dekorativen Eingriff bleibt eine weitgehend generische Sans-Serif-Wortmarke.
+- Einschnitt und Impuls werden plausibel als Beschädigung, Pflaster, Etikett oder Pixelartefakt gelesen.
+- Das Identitätsmerkmal verliert in realen Header- und Kleingrößenkontexten seine Wirkung.
+- Die Kleinmarke bleibt ein generisches `b` mit aufgesetztem Detail.
+- Die Gestaltung ist nicht spezifisch genug für `Bocholt erleben`.
+- Die responsive Verdichtung wirkt wie Layoutanpassung statt eigenständigem Markensystem.
 
-- Hier finde ich schnell etwas Passendes.
-- Die Auswahl wirkt lokal, menschlich und kuratiert statt beliebig.
-- Das Produkt ist modern und hochwertig, aber nicht exklusiv oder distanziert.
-- Veranstalter und Partner erscheinen in einem glaubwürdigen, professionellen Umfeld.
+## 3. Warum Phase 2 trotz verschärfter Regeln scheiterte
 
-### 2.2 Markenkern
+Die Qualitätsgrenze von 90/100 war nicht das Hauptproblem. Das Verfahren konnte sich selbst bewerten und anschließend die eigene Behauptung technisch bestätigen.
 
-> **Bocholt neu und unkompliziert erleben.**
+Fehler:
 
-Die visuelle Identität verbindet:
+1. Produktion, Herleitung und Endbewertung waren nicht belastbar getrennt.
+2. Der Validator prüfte Kandidatenname, Scoremarker und Rechensumme statt gestalterischer Qualität.
+3. Technische Sauberkeit, Raster und Provenienz erhöhten den Gesamtscore.
+4. Die Wortmarken-Vorfestlegung verengte den Suchraum.
+5. Die neun behaupteten Prinzipien waren visuell nicht vollständig auditierbar.
+6. Reale Originalgrößen wurden erst nach der konzeptionellen Aufladung beurteilt.
+7. Ein bereits erkanntes Artefaktproblem wurde verkleinert statt als Grundidee verworfen.
 
-1. Vertrautheit und Entdeckung;
-2. Ruhe und Aktivierung;
-3. Nähe und Professionalität.
+## 4. Verbindlicher Übergang zu Phase 3
 
-### 2.3 Verbindliche Wirkung
+Vor jeder neuen Gestaltung werden umgesetzt:
 
-- lokal, ohne Folklore;
-- lebendig, ohne Lautstärke;
-- modern, ohne Tech-SaaS-Kälte;
-- persönlich, ohne Verspieltheit;
-- hochwertig, ohne Luxusinszenierung;
-- eigenständig, ohne erklärungsbedürftiges Symbolrätsel;
-- mobil effizient und in kleinen Größen robust.
+- offene Markenarchitektur;
+- anonymes Originalgrößen-Preflight;
+- harte Knock-outs vor Punkten;
+- getrennte Blindkritik A und B;
+- explizites Red Team;
+- gestalterische Scorecard ohne technische Bonuspunkte;
+- feste Bewertungsanker;
+- nicht kompensierbare Mindestwerte;
+- Evidenzvertrag und neutrale Rollenvorlagen;
+- CI ausschließlich für Vollständigkeit, Reihenfolge und Rechenregeln.
 
-### 2.4 Ausgeschlossene Kategorien
+Die verbindlichen Regeln stehen in:
 
-Die Identität darf nicht wirken wie:
+- `docs/brand/AI_BRAND_PROCESS_FAILURE_REPORT.md`;
+- `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`;
+- `docs/brand/evaluation/EVIDENCE_CONTRACT.json`;
+- `docs/brand/evaluation/README.md`.
 
-- Stadtverwaltung, Behörde oder amtliches Portal;
-- klassische Tourismusbroschüre oder Stadtmarketing-Kampagne;
-- Karten-, Routen-, Navigations- oder Ticket-App;
-- Bank, Versicherung, Kanzlei, Kosmetik-, Hochzeits- oder Immobilienmarke;
-- generisches SaaS-Produkt;
-- laute Festival-, Sport- oder Lifestyle-Marke.
+## 5. Aktueller Gate-Status
 
-Verboten bleiben insbesondere Karten-Pin, Kompass, Weg, Herz, Sonne, Skyline, Rathaus, Kirchturm, Fahrrad, Blatt, Wappen, dekorative Initialmonogramme sowie 3D, Glanz, Schatten, Verlauf oder Mock-up-Effekt als Identitätsträger.
+- qualifizierte Richtungen: **0**;
+- freigegebene Grundrichtungen: **0**;
+- neue Entwürfe in Phase 3: **0**;
+- öffentliche Produktänderungen: **0**.
 
-## 3. Verbindliche Markenarchitektur
-
-1. Primärsystem ist eine individuelle Wortmarke `Bocholt erleben`.
-2. Die responsive Fassung verwendet dieselben formalen Merkmale.
-3. Favicon oder App-Kleinmarke ist nur als direkte Ableitung aus der Wortmarke zulässig.
-4. Ein separates Bildzeichen ist kein Ziel an sich.
-5. Schwarz-Weiß wird vor Farbe und Produktinszenierung bewertet.
-6. Primärwortmarke, Verdichtung und Kleinmarke müssen als dasselbe System erkennbar sein.
-
-## 4. Ausgeführte Konzeptfelder
-
-### A – Lokaler Rhythmus
-
-Drei strukturell verschiedene Prinzipien wurden geprüft. Die stärkste Familie blieb als modulare Monoline-Wortmarke technisch sauber, wirkte aber zu generisch, digital-technisch und nicht ausreichend premium. Kein Prinzip erreichte die Produktionsschwelle von 86/100.
-
-### B – Offene Einladung
-
-Drei Öffnungsprinzipien wurden geprüft. Wiederholte Öffnungen in mehreren Rundbuchstaben wurden wegen Unruhe und Kleingrößenverlust verworfen. Ein Rahmen-/Aperturprinzip driftete in Scan- und Softwareassoziationen.
-
-Die Familie `Offener Impuls` bestand die Vorqualifizierung und wurde deterministisch produziert. Sie verwendet eine präzise diagonale Öffnung und einen schwebenden Impuls ausschließlich an den beiden Wortanfängen. Die Kleinmarke ist der identische erste Buchstabe der Primärwortmarke.
-
-### C – Verankerte Bewegung
-
-Drei Verbindungs- und Bewegungsprinzipien wurden geprüft. Gewichtskontrast, schräge Zweitwortarchitektur und Baseline-Verbindung blieben entweder generisch, tourismusnah oder erzeugten kein belastbares Kleinkontextderivat. Kein Prinzip erreichte das Premium-Gate.
-
-## 5. Qualifizierte Grundrichtung
-
-### Offener Impuls — 91/100
-
-- Produkt- und Markenpassung: 19/20
-- Eigenständigkeit und Wiedererkennung: 17/20
-- Qualität der Primärwortmarke: 14/15
-- Kontinuität im Kleinkontext: 14/15
-- Erweiterbarkeit des Systems: 9/10
-- Integration ins reale Produkt: 9/10
-- Robustheit und Barrierearmut: 4/5
-- Konstruktion und Provenienz: 5/5
-
-Kein definierter Knock-out wurde ausgelöst. Alle Dimensionsmindestwerte werden erreicht.
-
-### Belegte Stärken
-
-- vollständiger Name bleibt der primäre Absender;
-- individuelles Merkmal erscheint semantisch an beiden Wortanfängen;
-- Kleinmarke ist keine separate Erfindung;
-- Farb-, Monochrom-, Invers-, Raster- und Maskenfassungen sind vorhanden;
-- ruhige Integration in bestehende mobile und Desktop-Kontexte;
-- keine neue UI-Welt und keine öffentliche Produktänderung.
-
-### Offene Risiken
-
-- professioneller Ähnlichkeits- und Markenrechtscheck bleibt vor Anmeldung erforderlich;
-- 16 Pixel sind die untere praktische Grenze;
-- 16- und 24-Pixel-Raster nutzen eine dokumentierte optische Akzentvergrößerung;
-- finale Mikrozeichnung erfolgt erst nach Richtungsfreigabe;
-- keine Schutzfähigkeits-, Freedom-to-use- oder Rechtsfreigabe wird behauptet.
-
-## 6. Produktionsnachweise
-
-Das isolierte Brand Lab v2 enthält:
-
-- Primärwortmarke, responsive Verdichtung und abgeleitete Kleinmarke;
-- Farb-, Monochrom- und Inversfassungen;
-- echte PNG-Raster bei 16, 24, 32, 48 und 64 Pixeln;
-- Kreis-, Squircle- und Rounded-Masken;
-- identische mobile und Desktop-Produktkontexte;
-- Scorecard, Stärken, Risiken und Product-Owner-Gate;
-- Provenienz- und Konstruktionsdokumentation.
-
-## 7. Entscheidungspunkt
-
-Es wird bewusst keine künstliche zweite Richtung präsentiert. Der nächste Product-Owner-Entscheid lautet ausschließlich:
-
-- `Offener Impuls` als Grundrichtung zur finalen Mikrozeichnung freigeben; oder
-- einen konkreten Marken-, Form- oder Kategorie-Knock-out benennen.
-
-Eine Freigabe ist noch kein öffentlicher Cutover. Öffentliche Icons, Header, Manifest, Runtime, Staging-UI und Live bleiben bis zu einem separaten Umsetzungsgate unverändert.
+Erst ein späteres, ausdrücklich eröffnetes Gestaltungs-Gate darf neue Konzepte erzeugen.
