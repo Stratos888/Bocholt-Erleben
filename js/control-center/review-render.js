@@ -2,7 +2,7 @@ import {
   state, els, reviewLabels, escapeHtml, clean, asArray, formatDate,
   reviewGroup, allReviewCases, reviewCases,
 } from './shared.js?v=2026-07-16-e2e-state-v5';
-import { renderStartpartnerReview } from './startpartner-review.js?v=2026-07-27-startpartner-gate3-v1';
+import { renderStartpartnerReview } from './startpartner-review.js?v=2026-08-01-startpartner-wording-v1';
 import { renderGate4Panel, gate4PhaseLabel } from './startpartner-gate4.js?v=2026-08-01-startpartner-gate4-audit-v1';
 
 let handleAction = async () => {};
@@ -77,7 +77,7 @@ function verifiedFactsContent(review) {
   const visualKey=visual.key_label||visual.key;
   const visualMotif=visual.motif_label||visual.motif;
   const visualAsset=visual.asset_label||(asset?'Freigegebenes Eventbild':'');
-  return `<dl class="cc-fact-grid">${verifiedFact('Termin',date,evidence.date)}${verifiedFact('Uhrzeit',time,evidence.time_details||evidence.time||evidence.time_status)}${verifiedFact('Ort',[facts.location,facts.city].filter(Boolean).join(' · '),evidence.location)}${verifiedFact('Adresse',facts.address,evidence.address)}${verifiedFact('Kategorie',classification.category,evidence.category)}${verifiedFact('Prüfquelle',source.name||source.url,evidence.source_url,source.url)}${verifiedFact('Eventseite',source.event_url,evidence.event_url,source.event_url)}${verifiedFact('Ticket / Anmeldung',source.ticket_url,evidence.ticket_url,source.ticket_url)}${verifiedFact('Bildbereich',visualKey,evidence.visual_key)}${verifiedFact('Motiv',visualMotif,evidence.visual_motif)}${verifiedFact('Gebundenes Bild',visualAsset,evidence.visual_asset_id)}</dl>
+  return `<dl class="cc-fact-grid">${verifiedFact('Termin',date,evidence.date)}${verifiedFact('Uhrzeit',time,evidence.time_details||evidence.time||evidence.time_status)}${verifiedFact('Ort',[facts.location,facts.city].filter(Boolean).join(' · '),evidence.location)}${verifiedFact('Adresse',facts.address,evidence.address)}${verifiedFact('Kategorie',classification.category,evidence.category)}${verifiedFact('Prüfquelle',source.name||source.url,evidence.source_url,source.url)}${verifiedFact('Eventseite',source.event_url,evidence.event_url,source.event_url)}${verifiedFact('Ticket / Anmeldung',source.ticket_url,evidence.ticket_url,source.event_url)}${verifiedFact('Bildbereich',visualKey,evidence.visual_key)}${verifiedFact('Motiv',visualMotif,evidence.visual_motif)}${verifiedFact('Gebundenes Bild',visualAsset,evidence.visual_asset_id)}</dl>
     ${assetPreview(asset)}
     <section class="cc-detail-section"><h3>Finale Beschreibung</h3><p class="cc-description-copy">${escapeHtml(review.description?.final||'Keine Beschreibung vorhanden.')}</p></section>`;
 }
