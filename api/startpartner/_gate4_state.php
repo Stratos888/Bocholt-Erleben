@@ -64,49 +64,49 @@ function be_startpartner_gate4_automatic_onboarding_items(array $gate3, string $
         'terms_confirmed' => be_startpartner_gate4_item_row(
             'terms_confirmed',
             $termsReady,
-            'Bestätigte Pilotbedingungen einschließlich Ausschluss einer automatischen kostenpflichtigen Verlängerung wurden zurückgelesen.',
+            'Die bestätigten Pilotbedingungen sind hinterlegt. Eine automatische kostenpflichtige Verlängerung ist ausgeschlossen.',
             $termsReady ? (string)$terms['id'] : null,
             $operator
         ),
         'organizer_linked' => be_startpartner_gate4_item_row(
             'organizer_linked',
             $organizerReady,
-            'Der Pilot ist einem eindeutigen Organizer zugeordnet.',
+            'Der Pilot ist einem eindeutigen Veranstalterzugang zugeordnet.',
             $organizerReady ? (string)$organizer['id'] : null,
             $operator
         ),
         'contact_confirmed' => be_startpartner_gate4_item_row(
             'contact_confirmed',
             $contactReference !== '',
-            'Der bestätigte Ansprechpartner ist im Pilot-Snapshot hinterlegt.',
+            'Die bestätigte Ansprechperson ist für den Pilot hinterlegt.',
             $contactReference !== '' ? $contactReference : null,
             $operator
         ),
         'pilot_entitlement_readback' => be_startpartner_gate4_item_row(
             'pilot_entitlement_readback',
             $entitlementReady,
-            'Die dedizierte Pilotberechtigung wurde mit zulässigem Status zurückgelesen.',
+            'Die Pilotfreigabe ist angelegt und hat einen zulässigen Stand.',
             $entitlementReady ? (string)$entitlement['id'] : null,
             $operator
         ),
         'service_scope_confirmed' => be_startpartner_gate4_item_row(
             'service_scope_confirmed',
             $serviceScopeReady,
-            'Zieltarife und mindestens ein fachlicher Inhaltsscope sind eindeutig hinterlegt.',
+            'Der vereinbarte Inhaltsumfang und die möglichen Tarife nach dem Pilot sind hinterlegt.',
             $serviceScopeReady ? 'gate3-scopes' : null,
             $operator
         ),
         'sources_recorded' => be_startpartner_gate4_item_row(
             'sources_recorded',
             is_array($sourceScope),
-            'Der vereinbarte Quellenumfang ist als Pilot-Scope gespeichert.',
+            'Die vereinbarten Inhaltsquellen sind hinterlegt.',
             is_array($sourceScope) ? 'automatic-source' : null,
             $operator
         ),
         'maintenance_path_agreed' => be_startpartner_gate4_item_row(
             'maintenance_path_agreed',
             is_array($maintenanceScope),
-            'Der Pflege- und Änderungsweg ist als Pilot-Scope gespeichert.',
+            'Die laufende Pflege und der Änderungsweg sind vereinbart.',
             is_array($maintenanceScope) ? 'maintenance-service' : null,
             $operator
         ),
@@ -230,20 +230,20 @@ function be_startpartner_gate4_current_onboarding_items(
         $automatic[$key] = be_startpartner_gate4_item_row(
             $key,
             $contentReady,
-            'Der erste zugeordnete Pilotinhalt ist redaktionell prüfbar.',
+            'Der erste Inhalt kann redaktionell geprüft werden.',
             $contentReady ? (string)$firstContent['id'] : null
         );
     }
     $automatic['measurement_ready'] = be_startpartner_gate4_item_row(
         'measurement_ready',
         is_array($readyMeasurement),
-        'Der kanonische Messdaten-Owner und die Organizer-/Inhaltszuordnung wurden read-only geprüft.',
+        'Die Erfolgsmessung ist dem Veranstalter und dem ersten Inhalt richtig zugeordnet.',
         is_array($readyMeasurement) ? (string)$readyMeasurement['id'] : null
     );
     $automatic['distribution_ready'] = be_startpartner_gate4_item_row(
         'distribution_ready',
         is_array($readyDistribution),
-        'Ein aktueller und belegter Partner-Reichweitenstart ist vorbereitet.',
+        'Der Reichweitenbeitrag ist mit Kanal und Termin vorbereitet.',
         is_array($readyDistribution) ? (string)$readyDistribution['id'] : null
     );
 
@@ -276,7 +276,7 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
             'active' => false,
             'blockers' => [[
                 'code' => 'gate3_pilot_required',
-                'message' => 'Gate 3 muss vor dem Onboarding abgeschlossen sein.',
+                'message' => 'Pilotbedingungen und Veranstalterzugang müssen vor der Piloteinrichtung vollständig vorbereitet sein.',
             ]],
         ];
     }
@@ -328,26 +328,26 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
     if ($first === null) {
         $blockers[] = [
             'code' => 'first_content_not_ready',
-            'message' => 'Der erste Inhalt ist noch nicht redaktionell bereit.',
+            'message' => 'Der erste Inhalt ist noch nicht für den Pilotstart vorbereitet.',
         ];
     }
     if ($measurement === null) {
         $blockers[] = [
             'code' => 'measurement_not_ready',
-            'message' => 'Die Pilot-, Organizer- und Inhaltsmessung ist noch nicht technisch belegt.',
+            'message' => 'Die Erfolgsmessung ist noch nicht vollständig eingerichtet.',
         ];
     }
     if ($reach === null) {
         $blockers[] = [
             'code' => 'distribution_not_ready',
-            'message' => 'Der Partner-Reichweitenstart ist noch nicht konkret vorbereitet.',
+            'message' => 'Der Reichweitenbeitrag ist noch nicht mit Kanal und Termin vorbereitet.',
         ];
     }
     $entitlement = $gate3['entitlement'] ?? null;
     if (!is_array($entitlement)) {
         $blockers[] = [
             'code' => 'pilot_entitlement_missing',
-            'message' => 'Pilotberechtigung fehlt.',
+            'message' => 'Die Pilotfreigabe fehlt.',
         ];
     }
 
