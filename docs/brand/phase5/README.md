@@ -2,7 +2,7 @@
 
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **AKTIV – interne Wortmarkenstudien und Qualitätsfilter**
+Status: **AKTIV – architekturabhängiges Wortmarken-Gate und Material-Preflight**
 
 ## Zweck
 
@@ -13,41 +13,42 @@ Sie ist keine Reparaturrunde für einen bestehenden Kandidaten. Alle Phase-4-Sys
 ## Verbindliche Eingänge
 
 1. `docs/brand/phase5/PROCESS_ROOT_CAUSE_AND_GOVERNANCE.md`
-2. `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`
-3. `docs/brand/phase5/PREMIUM_BENCHMARK.md`
-4. `docs/brand/phase5/CREATIVE_TERRITORIES.md`
-5. `docs/brand/phase5/PHASE4_CONCLUSION.md`
-6. `docs/brand/phase5/SEARCH_BRIEF.md`
-7. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
+2. `docs/brand/phase5/ARCHITECTURE_AWARE_EVALUATION.md`
+3. `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`
+4. `docs/brand/phase5/PREMIUM_BENCHMARK.md`
+5. `docs/brand/phase5/CREATIVE_TERRITORIES.md`
+6. `docs/brand/phase5/TYPE_MATERIAL_SHORTLIST.md`
+7. `docs/brand/phase5/PHASE4_CONCLUSION.md`
+8. `docs/brand/phase5/SEARCH_BRIEF.md`
+9. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
 
-Die Governance-Datei definiert die Dokumenthierarchie. Die strengere Freigabeschwelle beträgt mindestens `90/100`, alle Dimensionsmindestwerte, kein Knock-out, zwei getrennte positive Bewertungspässe und höchstens zwei Richtungen im Product-Owner-Gate.
+Die Governance-Datei definiert die Dokumenthierarchie. Verbindlich bleiben mindestens `90/100`, alle Dimensionsmindestwerte, kein architekturabhängig belegter Knock-out, zwei getrennte positive Bewertungspässe und höchstens zwei Richtungen im Product-Owner-Gate.
 
-## Prozessbefund vom 2026-08-01
+## Prozessbefund
 
-Phase 4 scheiterte nicht hauptsächlich an zu schwacher Prüfung. Sie scheiterte bereits bei der kreativen Erzeugung:
+Phase 4 scheiterte bereits bei der kreativen Erzeugung:
 
 - generische geometrische Symbolfamilien statt eigenständiger Markenideen;
 - primitive Zeichen mit Standardtypografie statt echter Wortmarkenarbeit;
 - zu frühe Ableitung von App-Icons;
-- Quantität und Prüfbarkeit wurden mit gestalterischer Qualität verwechselt;
-- die späteren Knock-out-Prüfungen konnten schwache Ausgangsarbeit nur ablehnen, aber nicht in Premiumqualität verwandeln.
+- Quantität und Prüfbarkeit wurden mit gestalterischer Qualität verwechselt.
 
-Der erste Phase-5-Entwurf wiederholte dieses Risiko durch die Vorgabe vieler Mikroideen und Rohkandidaten. Dieser Ansatz ist aufgehoben.
+Die ersten Phase-5-Studien zeigten zusätzlich, dass das allgemeine Evaluationsframework Wortmarken architekturblind prüfte. Es setzte dadurch falsche Anreize für künstliche Schnitte, Ligaturen, wörtliche Symbolik und zu frühe App-Zeichen.
+
+Dieser Fehler ist mit `ARCHITECTURE_AWARE_EVALUATION.md` korrigiert. Der Qualitätsanspruch wurde nicht gesenkt.
 
 ## Korrigierte Leitentscheidung
 
-Die nächste Runde ist **creative-direction- und lettering-first**:
+Phase 5 arbeitet zunächst ausschließlich in Architekturklasse `W`:
 
-1. Produktkern und emotionale Markenspannung präzisieren;
-2. aktuelle Premium-Benchmarks und Kategorieklischees neutral vergleichen;
-3. höchstens drei klar verschiedene kreative Territorien definieren;
-4. pro Territorium wenige ernsthafte Wortmarken- und Typografiestudien erstellen;
-5. nur sichtbar starke Identitäten in reale mobile Produktgrößen übertragen;
-6. erst danach eine responsive Kleinform oder ein App-Zeichen ableiten;
-7. maximal drei ausgereifte Kandidaten prüfen;
-8. dem Product Owner nur eine oder höchstens zwei tatsächlich qualifizierte Richtungen zeigen.
+1. vollständige Wortmarke;
+2. Gate W0 für Qualität, Eigenständigkeit, Lesbarkeit und Kategorieabgrenzung;
+3. nur bei bestandenem W0 ein neutrales Marken-Minisystem;
+4. erst danach responsive Kleinform und App-Marke;
+5. formale Bewertung erst nach bestandenen Gates W0 bis W2;
+6. dem Product Owner nur eine oder höchstens zwei vollständig qualifizierte Richtungen zeigen.
 
-Ein separates abstraktes Zeichen ist keine Pflicht. Es wird nicht als Ausgangspunkt verwendet, solange die Wortmarke und das übergreifende Formprinzip nicht überzeugen.
+Ein separates abstraktes Zeichen ist keine Pflicht und kein Ausgangspunkt.
 
 ## Geschlossene Vorstufen
 
@@ -55,42 +56,55 @@ Ein separates abstraktes Zeichen ist keine Pflicht. Es wird nicht als Ausgangspu
 - verbindliche Dokumenthierarchie definiert;
 - Premium-Benchmark dokumentiert;
 - drei kreative Territorien definiert;
+- architekturabhängige Evaluation eingeführt;
+- typografischer Material-Preflight dokumentiert;
 - Nutzerinteraktion auf qualifizierte Richtungen begrenzt;
 - Bilder, Berichtsgrafiken und Rohentwürfe für den Nutzer gesperrt.
 
 ## Interne Studien
 
-Die interne Suche ist auf höchstens sieben vollständige Wortmarkenstudien begrenzt. Die Zahl ist eine Obergrenze, kein Lieferziel. Schwache Studien werden ohne Ersatz beendet.
-
 Aktueller Befund:
 
-- intern geprüfte Studien: `17`;
-- verworfen: `16`;
+- intern geprüfte Studien und begrenzte Gegenproben: `24`;
+- verworfen: `24`;
 - als Kandidat qualifiziert: `0`;
-- vorläufig weitergeführt: `1`;
+- vorläufig weitergeführt: `0`;
 - Nutzerpräsentationen: `0`.
 
-Die vorläufige Studie aus Territorium A hat den ersten Creative-Director-Filter und die reale Produktkontextprüfung bestanden. Kategorieabgrenzung, optische Korrektur, Ähnlichkeits- und Herkunftsprüfung sind offen. Sie ist ausdrücklich keine qualifizierte Richtung.
+`territory-a-study-01` bestand Lesbarkeit und Produktkontext, scheiterte aber am Gate W0:
 
-Keine Studie erhält ein App-Icon, bevor sie das Creative-Director-Gate als vollständige Primäridentität vollständig besteht.
+- redaktionell-kulturelle beziehungsweise gastronomische Nähe in der Serifenkursiv-Fassung;
+- Sport-/Active-/Template-Nähe in der Sanskursiv-Korrektur;
+- zu verbreitetes Grundrezept aus stabilem fettem Wortteil und lebendig kursivem Wortteil;
+- keine ausreichend eigenständige gemeinsame Gesamtzeichnung.
 
-## Qualitätsbarriere vor der formalen Bewertung
+Die Studie ist beendet. Es wurde kein App-Icon entwickelt.
 
-Eine Richtung gelangt nur in Bewertungspässe und Scorecard, wenn sie zuvor:
+## Nächste interne Studie
 
-- sichtbar über dem Niveau einer Standardschrift oder eines generischen App-Icons liegt;
-- im direkten Vergleich klar besser als die aktuelle Identität wirkt;
+Die nächste Runde arbeitet `type-material-first`, aber nicht fontbasiert im Sinne einer unveränderten Setzung.
+
+Bricolage Grotesque, Onest und Figtree dienen ausschließlich als lizenzierte Referenz- und Kontrollmaterialien für Proportion, Rhythmus, Offenheit und mobile Lesbarkeit. Die eigentliche Studie konstruiert ein eigenes zusammenhängendes Buchstabensystem für `Bocholt erleben`.
+
+Es wird genau eine neue Studie bis Gate W0 entwickelt. Scheitert sie, wird sie beendet, ohne künstliche Ersatzvariante oder Nutzerpräsentation.
+
+## Qualitätsbarriere
+
+Eine Richtung gelangt nur in Bewertungspässe und Scorecard, wenn sie:
+
+- sichtbar über Standardschrift und generischem App-Icon liegt;
+- die aktuelle Identität deutlich übertrifft;
 - als vollständige Primäridentität professionell und eigenständig erscheint;
-- ohne Konzepttext eine plausible, nicht-technische Markenwirkung besitzt;
-- in realem mobilem Header funktioniert;
-- keine der bekannten Phase-4-Formfamilien wiederholt;
-- ein erweiterbares typografisches und verhaltensbezogenes System trägt.
+- ohne Konzepttext eine passende, nicht-technische Haltung trägt;
+- im realen mobilen Header funktioniert;
+- keine dominante falsche Kategorie besitzt;
+- ein erweiterbares typografisches, farbliches, bildliches und verhaltensbezogenes System tragen kann.
 
 Formale Prüfungen und Punktwerte dürfen keine mittelmäßige Gestaltung adeln.
 
 ## Methodische Ehrlichkeit
 
-Wenn Produktion, Kritik und Konsolidierung durch denselben ChatGPT-Orchestrator ausgeführt werden, wird dies nicht als echte unabhängige Blindprüfung bezeichnet. Stattdessen werden Produktionsnotizen vor der Bewertung gesperrt, Kandidaten anonymisiert, getrennte evidenzbasierte Bewertungspässe ausgeführt und methodische Grenzen dokumentiert.
+Wenn Produktion, Kritik und Konsolidierung durch denselben ChatGPT-Orchestrator ausgeführt werden, wird dies nicht als externe unabhängige Blindprüfung bezeichnet. Produktionsnotizen werden gesperrt, Kandidaten anonymisiert, getrennte evidenzbasierte Bewertungspässe ausgeführt und methodische Grenzen dokumentiert.
 
 ## Nutzerinteraktion
 
@@ -106,6 +120,6 @@ Interne visuelle Arbeit erfolgt real als private, repository-lokale SVG-, Typogr
 ## Aktueller Stand
 
 - qualifizierte Richtungen: `0`
-- neue Phase-5-Richtungen: `0`
+- neue Phase-5-Kandidaten: `0`
 - öffentliche Änderungen: `0`
-- nächster Schritt: optische Korrektur und Kategorie-/Ähnlichkeitsprüfung der vorläufigen Studie; parallel höchstens eine Studie aus Territorium B
+- nächster Schritt: genau eine kohärente eigene Wortmarkenstudie aus dem abgeschlossenen Material-Preflight; noch keine Nutzerpräsentation
