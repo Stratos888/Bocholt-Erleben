@@ -16,11 +16,10 @@ Dieser Log dokumentiert Entscheidungen und Fehlerklassen. Verworfene visuelle Ro
 | 5 | korrigierende Einzelprototypen | 7 | vollständig verworfen |
 | 6 | Type-Material Study 01, zwei Konstruktionspässe | 2 | vollständig verworfen |
 | 7 | Guided Opening Study 01, Primär- und Ablationspfad | 2 | vollständig verworfen |
+| 8 | Integrated Study 01, Primär- und Ablationspfad | 2 | an I0 beendet |
 
-Hinweis: Die Runden enthalten teils Studien und teils eng begrenzte Gegenproben. Entscheidend ist nicht die Anzahl, sondern dass keine verworfene Form als Kandidat weitergeführt wurde.
-
-- intern geprüfte Studien und Gegenproben: `28`;
-- verworfen: `28`;
+- intern geprüfte Studien und Gegenproben: `30`;
+- verworfen: `30`;
 - Kandidaten: `0`;
 - vorläufig weitergeführt: `0`;
 - Nutzerpräsentationen: `0`;
@@ -28,38 +27,17 @@ Hinweis: Die Runden enthalten teils Studien und teils eng begrenzte Gegenproben.
 
 ## Runde 1 – standardschriftbasierte Eingriffe
 
-Geprüft wurden Apertur-, Terminal-, Gewichts-, Breiten- und Laufweitenprinzipien auf neutralen Sans-Grundformen.
-
-Verworfen, weil:
-
-- Eingriffe wie beschädigte oder angeschnittene Glyphen wirkten;
-- die Grundidentität Standardschrift blieb;
-- Eigenständigkeit an einem einzelnen Effekt hing;
-- keine belastbare Premiumwirkung entstand.
+Verworfen, weil Eingriffe wie beschädigte Glyphen wirkten, die Grundidentität Standardschrift blieb und die Eigenständigkeit an einzelnen Effekten hing.
 
 ## Runde 2 – eigene Monoline-/Grotesk-Systeme
 
-Geprüft wurden vollständig gezeichnete gerundete Alphabete in präziser, warmer und bewegter Ausprägung.
-
-Verworfen, weil:
-
-- zu kindlich, freundlich oder spielzeughaft;
-- Nähe zu Familienzentrum, Lernangebot oder generischer Digitalmarke;
-- unzureichender typografischer Kontrast;
-- Dynamik erzeugte keinen eigenständigen Markenwert.
+Verworfen wegen kindlicher, lernangebotsnaher oder generisch-digitaler Wirkung und fehlender typografischer Premiumspannung.
 
 ## Runde 3 und 4 – typografische Dualität
 
-Sans-/Serif- und Sans-/Italic-Paarungen wurden wegen Magazin-, Buchhandel-, Gastronomie- oder Kulturinstitutionsnähe verworfen.
+Sans-/Serif- und Sans-/Italic-Paarungen wurden wegen Magazin-, Buchhandel-, Gastronomie-, Kulturinstitutions-, Sport- oder Template-Nähe verworfen.
 
-`territory-a-study-01` wurde als einzige stärkere Hybridstudie real im mobilen Header sowie in Today-, Detail- und Veranstalterkontexten geprüft.
-
-W0-Ergebnis: **nicht bestanden**.
-
-- Serifenkursive: zu redaktionell-kulturell und gastronomisch;
-- Sanskursive Korrektur: zu Sport, Active, Apparel und Template;
-- das Grundrezept `stabiler fetter Wortteil + lebendig kursiver Wortteil` blieb zu verbreitet;
-- keine ausreichend eigene gemeinsame Zeichnung.
+`territory-a-study-01` bestand Lesbarkeit und reale Produktkontexte, scheiterte aber an fehlender gemeinsamer Eigenzeichnung und falschen Nachbarkategorien.
 
 Dokumentation:
 
@@ -67,29 +45,22 @@ Dokumentation:
 
 ## Runde 5 – korrigierende Einzelprototypen
 
-Geprüft wurden Schnitte, Aperturen, Quer- und Endstrichverbindungen, humanistische Rundformen, dynamische Monoline, typografische Brücken und aktive Rhythmen.
+Schnitte, Aperturen, Quer- und Endstrichverbindungen, humanistische Rundformen, dynamische Monoline und typografische Brücken wurden verworfen.
 
-Verworfen, weil:
+Fehlerklassen:
 
-- Schnittvarianten Standardschrift plus Artefakt blieben;
-- Brücken wie Ligaturgimmicks oder fehlerhafte Verbindungen wirkten;
-- Rundformen in UI-, Euro-, Finanz- oder generische Digitalassoziationen kippten;
-- monolineare Systeme familien- oder lernangebotsnah wirkten;
-- aktivierende Fassungen Ruhe und Vertrauen verloren.
+- Artefakt oder Ligaturgimmick;
+- UI-, Euro-, Finanz- oder generische Digitalassoziation;
+- familien- oder lernangebotsnahe Wirkung;
+- Dynamik nur durch Schräglage oder Rhythmustrick.
 
 ## Prozesskorrektur – architekturabhängige Bewertung
 
-Das allgemeine Phase-3-Framework war für Wortmarken teilweise architekturblind. Es förderte überzeichnete Eingriffe, wörtliche Metaphern und zu frühe App-Zeichen.
+Das allgemeine Phase-3-Framework war für Wortmarken teilweise architekturblind. Es förderte überzeichnete Eingriffe und zu frühe App-Zeichen.
 
 Verbindliche Korrektur:
 
 - `docs/brand/phase5/ARCHITECTURE_AWARE_EVALUATION.md`
-
-Architekturklasse `W` wurde in drei Gates getrennt:
-
-1. W0 – vollständige Wortmarke;
-2. W1 – neutrales Marken-Minisystem;
-3. W2 – erst danach responsive Kleinform und App-Marke.
 
 Die Premiumgrenze blieb mindestens `90/100` mit allen Mindestwerten.
 
@@ -97,20 +68,11 @@ Die Premiumgrenze blieb mindestens `90/100` mit allen Mindestwerten.
 
 ### Pass 1 – eigenes kontrastiertes Buchstabensystem
 
-Verworfen, weil:
-
-- zu geometrisch und generisch-digital;
-- Nähe zu Product-Sans, Lernangebot oder freundlicher Plattformmarke;
-- keine souveräne Premiumspannung;
-- Rundformen und Öffnungen zu vorhersehbar.
+Verworfen wegen geometrischer Product-Sans-Nähe, fehlender Premiumspannung und vorhersehbarer Rundformen.
 
 ### Pass 2 – humanistische Gegenfassung
 
-Verworfen, weil:
-
-- lesbar und erwachsener, aber zu nah an Humanist-Sans- und Gill-artigen Formeln;
-- keine vollständig eigene Gesamtzeichnung;
-- kein ausreichender Abstand zu einer sorgfältig gesetzten hochwertigen Schriftbasis.
+Verworfen wegen zu großer Nähe zu Humanist-Sans- und Gill-artigen Formeln und fehlendem Abstand zu einer sorgfältig gesetzten hochwertigen Schriftbasis.
 
 Dokumentation:
 
@@ -118,56 +80,78 @@ Dokumentation:
 
 ## Runde 7 – Guided Opening Study 01
 
-Das produktspezifische Prinzip `Geführte Öffnung` wurde gegen eine neutrale Ablationsfassung geprüft.
+Das produktspezifische Prinzip `Geführte Öffnung` wurde gegen eine Ablationsfassung geprüft.
 
-### Pass 1 – humanistische Skelettfassung
-
-Verworfen, weil:
-
-- Primär- und Ablationsfassung praktisch gleich stark waren;
-- die Öffnung zu subtil blieb;
-- der Markenwert weiter hauptsächlich aus einer bekannten Humanist-Sans-Formel stammte.
-
-### Pass 2 – vollständig eigene parametrisierte Fassung
-
-Verworfen, weil:
-
-- stärkere Sichtbarkeit nur durch schwere, geometrische und technische Formen entstand;
-- `c` und `e` sich Interface-, Euro- oder Tech-Zeichen näherten;
-- die Wortmarke ihre ruhige Premiumhaltung verlor.
+- subtil umgesetzt: Primär- und Ablationsfassung praktisch gleich stark;
+- sichtbar umgesetzt: schwere, geometrische, technische und artefaktanfällige Buchstaben.
 
 Dokumentation:
 
 - `PRODUCT_FORM_PRINCIPLE.md`
 - `internal/studies/guided-opening-study-01-w0.md`
 
-## Architekturentscheidung
+## Architekturwechsel zur integrierten Identität
 
-Drei belastbare W0-Pfade scheiterten am gleichen Kernproblem:
+Nach drei gescheiterten W0-Pfaden wurde Architekturklasse `I` geöffnet.
 
-1. professionelle, aber bekannte Stilformel;
-2. ordentliches, aber generisches eigenes Sans-System;
-3. produktspezifisches Prinzip entweder unsichtbar oder typografisch überzeichnet.
+Vorfilter:
 
-Eine weitere reine Wortmarkenvariation wäre kein Erkenntnisgewinn.
+- I-A gemeinsamer Negativraum nicht eigenständig weitergeführt;
+- I-B kuratierter Rhythmuskern wegen Trennzeichen-, Cursor- und Ligaturgimmick-Risiko beendet;
+- I-C responsive Buchstabenfamilie bedingt zur vollständigen Studie zugelassen.
 
-Deshalb wird Architekturklasse `I` geöffnet:
+Dokumentation:
 
-- Wortmarke und Identitätsmodul werden gemeinsam entwickelt;
-- kein isoliertes Icon vor der Primäridentität;
-- kein Monogramm oder Branchenpiktogramm;
-- Modul und Wortmarke müssen dieselben Kurven-, Endungs- und Negativraumprinzipien teilen;
-- nur eine integrierte Studie darf I0 erreichen.
+- `INTEGRATED_IDENTITY_BRIEF.md`
+- `INTEGRATED_HYPOTHESIS_PREFILTER.md`
 
-Verbindlicher Brief:
+## Runde 8 – Integrated Study 01
 
-- `docs/brand/phase5/INTEGRATED_IDENTITY_BRIEF.md`
+Geprüft wurde eine integrierte Buchstabenfamilie mit asymmetrischem Negativraummodul über `b`, `o`, `c`, `e`, `h` und `n` sowie verwandten Endungen in `l`, `t` und `r`.
 
-## Nächster zulässiger Schritt
+Primärfassung:
 
-1. Die drei integrierten Architekturhypothesen I-A, I-B und I-C nur als Schwarz-Weiß-Struktur vorfiltern.
-2. Hypothesen mit UI-, Artefakt-, Monogramm- oder falscher Kategorie sofort beenden.
-3. Höchstens eine Hypothese vollständig als Primäridentität konstruieren.
-4. Gegen eine neutrale Ablationskontrolle und im mobilen Header prüfen.
-5. Scheitert I0, entsteht weder Kleinmarke noch App-Icon noch Nutzerpräsentation.
-6. Nur bei bestandenem I0 wird ein Marken-Minisystem geöffnet.
+- Modul über mehrere Buchstaben sichtbar;
+- formale Systemkohärenz vorhanden;
+- jedoch Pfeil-, Status-, Interface- und technische Überlagerungslesart;
+- mobile Verdichtung und visuelle Unruhe;
+- modulare Digitalwirkung statt ruhiger Premiumhaltung.
+
+Ablationsfassung:
+
+- ruhiger und besser lesbar;
+- dafür generische geometrische Sans ohne ausreichende Eigenständigkeit.
+
+Unlösbarer Zielkonflikt:
+
+- Modul sichtbar: falsche Kategorie und Artefakt;
+- Modul neutralisiert: generisch und austauschbar.
+
+I0-Ergebnis: **HARD KNOCK-OUT – Artefakt-/UI-Lesart.**
+
+Dokumentation:
+
+- `internal/studies/integrated-study-01-i0.md`
+
+## Aktueller Befund
+
+Der Phase-5-Zyklus besitzt weiterhin:
+
+- qualifizierte Richtungen: `0`;
+- Kandidaten: `0`;
+- Nutzerpräsentationen: `0`.
+
+Keine schwache Richtung wird künstlich weitergeführt.
+
+## Nächste Prozessentscheidung
+
+Eine weitere Variation aus Sans, Apertur, Negativraum oder Modul wäre Wiederholung ohne Erkenntnisgewinn.
+
+Vor einem nächsten visuellen Zyklus muss deshalb auf Strategieebene entschieden werden, welcher Suchraum geöffnet wird:
+
+1. eigenständige, nicht Sans-dominierte Letteringarchitektur;
+2. bewusste Weiterentwicklung des aktuellen B mit vollständiger Systemprüfung;
+3. Prüfung, ob der stark beschreibende Name zusätzliche visuelle Eigenständigkeit strukturell begrenzt;
+4. neuer generativer Suchraum mit späterer deterministischer Rekonstruktion, ohne Rohbilder für den Nutzer.
+
+Bis diese Entscheidung dokumentiert ist, bleibt die öffentliche Marke unverändert.
