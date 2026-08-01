@@ -39,7 +39,7 @@ function be_startpartner_gate3_present_case(array $item, array $candidate): arra
     }
 
     if (!empty($gate3['complete'])) {
-        $item['display_status'] = 'Pilot-Onboarding';
+        $item['display_status'] = 'Piloteinrichtung';
         $item['primary_action'] = be_startpartner_gate3_case_action(
             'details',
             'Pilotstatus prüfen'
@@ -47,7 +47,7 @@ function be_startpartner_gate3_present_case(array $item, array $candidate): arra
         $item['secondary_actions'] = [
             be_startpartner_gate3_case_action('edit_profile', 'Profil bearbeiten', true),
         ];
-        $item['next_action'] = 'Pilot-Onboarding vorbereiten; Aktivierung bleibt gesperrt.';
+        $item['next_action'] = 'Piloteinrichtung abschließen; der Pilotstart bleibt bis dahin gesperrt.';
         return $item;
     }
 
@@ -66,8 +66,8 @@ function be_startpartner_gate3_present_case(array $item, array $candidate): arra
             true,
             true
         ),
-        be_startpartner_gate3_case_action('details', 'Audit und Rohdaten'),
+        be_startpartner_gate3_case_action('details', 'Nachweise und Verlauf'),
     ];
-    $item['next_action'] = 'Pilotbedingungen bestätigen und Organizer verknüpfen.';
+    $item['next_action'] = 'Pilotbedingungen bestätigen und Veranstalterzugang zuordnen.';
     return $item;
 }
