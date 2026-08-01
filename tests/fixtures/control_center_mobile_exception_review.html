@@ -76,7 +76,7 @@
     let review = structuredClone(baseReview);
     let item = { id:'fixture-event', type:'intake', queue_group:'new_content', case_kind:'event_candidate', state:'decision_required', title:review.facts.title, display_status:'Entscheidung erforderlich', review_contract:review, source_links:[{label:'Prüfquelle',url:'https://example.org/source'}] };
     if(scenario.startsWith('startpartner-')){
-      if(scenario==='startpartner-blocked')item=startpartnerItem(startpartner('qualifying',{blocked:true}),{key:'edit_qualification',label:'Höchsten Blocker bearbeiten'},[{key:'edit_profile',label:'Profil bearbeiten'}]);
+      if(scenario==='startpartner-blocked')item=startpartnerItem(startpartner('qualifying',{blocked:true}),{key:'edit_qualification',label:'Wichtigsten offenen Punkt bearbeiten'},[{key:'edit_profile',label:'Profil bearbeiten'}]);
       if(scenario==='startpartner-ready')item=startpartnerItem(startpartner('decision_ready',{active:4}),{key:'accept_pending_terms',label:'Platz reservieren'},[{key:'waitlist',label:'Auf Warteliste setzen'},{key:'route_regular',label:'Regulären Weg wählen'}]);
       if(scenario==='startpartner-soft')item=startpartnerItem(startpartner('decision_ready',{active:6,soft:true}),{key:'accept_pending_terms',label:'Platz reservieren'},[{key:'waitlist',label:'Auf Warteliste setzen'}]);
       if(scenario==='startpartner-hard')item=startpartnerItem(startpartner('decision_ready',{active:8,hard:true}),{key:'waitlist',label:'Auf Warteliste setzen'},[{key:'route_regular',label:'Regulären Weg wählen'}]);
