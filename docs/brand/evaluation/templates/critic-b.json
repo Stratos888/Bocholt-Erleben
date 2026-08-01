@@ -1,0 +1,20 @@
+{
+  "template": true,
+  "candidate_id": "candidate-000",
+  "role": "critic_b",
+  "evaluator_id": "critic-b-placeholder",
+  "created_at": null,
+  "review_locked": false,
+  "concept_title_seen": false,
+  "rationale_seen": false,
+  "prior_scores_seen": false,
+  "evidence_seen": [
+    "anonymized_product_contexts",
+    "homescreen",
+    "favicon",
+    "comparison_controls"
+  ],
+  "knockout_findings": {},
+  "dimension_scores": {},
+  "verdict": null
+}
