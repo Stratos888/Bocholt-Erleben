@@ -56,19 +56,21 @@ function be_startpartner_gate4_distribution_input(array $input): array
     $channel = be_startpartner_gate4_required_text($input['channel'] ?? null, 64, 'channel');
     $targetReference = be_startpartner_gate4_required_text($input['target_reference'] ?? null, 2048, 'target_reference');
     $plannedLocalDate = be_startpartner_gate4_validate_local_date($input['planned_at'] ?? null);
-    $plannedAt = (new DateTimeImmutable(
-        $plannedLocalDate . ' 00:00:00',
-        new DateTimeZone('Europe/Berlin')
-    ))->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
     $status = strtolower(be_startpartner_gate4_required_text($input['status'] ?? null, 16, 'status'));
     if (!in_array($status, ['ready', 'blocked'], true)) {
         throw new InvalidArgumentException('distribution status must be ready or blocked.');
+    }
+    $timezone = new DateTimeZone('Europe/Berlin');
+    $plannedLocal = new DateTimeImmutable($plannedLocalDate . ' 00:00:00', $timezone);
+    $todayLocal = new DateTimeImmutable('today', $timezone);
+    if ($status === 'ready' && $plannedLocal < $todayLocal) {
+        throw new DomainException('Eine als bereit markierte Distribution darf nicht in der Vergangenheit liegen.');
     }
     return [
         'channel' => $channel,
         'target_reference' => $targetReference,
         'planned_date_local' => $plannedLocalDate,
-        'planned_at_utc' => $plannedAt,
+        'planned_at_utc' => $plannedLocal->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s'),
         'status' => $status,
         'evidence_text' => be_startpartner_gate4_required_text($input['evidence_text'] ?? null, 5000, 'evidence_text'),
     ];
