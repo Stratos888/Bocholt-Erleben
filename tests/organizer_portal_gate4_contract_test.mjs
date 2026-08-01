@@ -4,7 +4,7 @@ const read = path => fs.readFileSync(new URL(`../${path}`, import.meta.url), 'ut
 const html = read('fuer-veranstalter/dashboard/index.html');
 const js = read('js/organizer-pilot.js');
 const pilotApi = read('api/organizer-portal/pilot.php');
-const projection = read('api/startpartner/_gate4_portal_projection.php');
+const projection = read('api/startpartner/_gate4_projection.php');
 const contentApi = read('api/startpartner/content.php');
 const failures = [];
 const assert = (ok, message) => { if (!ok) failures.push(message); };
@@ -23,9 +23,11 @@ assert(pilotApi.includes('be_startpartner_gate4_portal_projection'), 'Portal API
 assert(!pilotApi.includes("'candidate'=>$candidate") && !pilotApi.includes("'candidate' => $candidate"), 'Portal API must not expose the internal candidate object.');
 assert(!pilotApi.includes('portal_session_id'), 'Portal API must not expose the internal session identifier.');
 assert(!pilotApi.includes('error_message'), 'Portal API must not leak internal exception messages.');
+assert(projection.includes('function be_startpartner_gate4_portal_projection'), 'Canonical projection owner must contain the portal projection.');
 assert(projection.includes("'scopes' => $scopes") && projection.includes("'content_links' => $contentLinks"), 'Portal projection must expose only the required pilot UX data.');
+const portalProjection = projection.slice(projection.indexOf('function be_startpartner_gate4_portal_projection'));
 for (const forbidden of ['capacity', 'measurement_preflights', 'distribution_commitments', 'events', 'audit_json', 'evidence_json']) {
-  assert(!projection.includes(`'${forbidden}' =>`), `Portal projection must not expose internal ${forbidden}.`);
+  assert(!portalProjection.includes(`'${forbidden}' =>`), `Portal projection must not expose internal ${forbidden}.`);
 }
 assert(contentApi.includes('be_startpartner_gate4_portal_session'), 'Content endpoint must authenticate before processing the submission.');
 assert(contentApi.includes('Dein Veranstalterzugang ist nicht mehr gültig'), 'Expired sessions need a clear portal-facing 401 message.');
