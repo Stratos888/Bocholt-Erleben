@@ -7,191 +7,126 @@ Dieser Log dokumentiert Entscheidungen und Fehlerklassen. Verworfene visuelle Ro
 
 ## Gesamtstand
 
-| Runde | Gegenstand | Umfang | Ergebnis |
+| Zyklus | Gegenstand | ernsthafte Studien/Rohhypothesen | Ergebnis |
 |---|---|---:|---|
-| 1 | standardschriftbasierte systemische Eingriffe | 5 | vollständig verworfen |
-| 2 | eigene Monoline-/Grotesk-Systeme | 5 | vollständig verworfen |
-| 3 | typografische Dualität und Paarungen | 7 | 6 verworfen, 1 vorläufig weitergeführt |
-| 4 | W0-Prüfung `territory-a-study-01` | 1 | beendet |
-| 5 | korrigierende Einzelprototypen | 7 | vollständig verworfen |
-| 6 | Type-Material Study 01, zwei Konstruktionspässe | 2 | vollständig verworfen |
-| 7 | Guided Opening Study 01, Primär- und Ablationspfad | 2 | vollständig verworfen |
-| 8 | Integrated Study 01, Primär- und Ablationspfad | 2 | an I0 beendet |
-| 9 | Heritage Opening Study 01, freie und gefasste Fassung | 2 | an I0 beendet |
+| Phase 5A | kontrollierte Wortmarken-, integrierte und Bestandsstudien | 32 | vollständig verworfen |
+| Phase 5B | generativer Suchzyklus über G-A bis G-D | 12 | keine Rekonstruktion zugelassen |
+| **Gesamt** |  | **44** | **0 Kandidaten** |
 
-- intern geprüfte Studien und Gegenproben: `32`;
-- verworfen: `32`;
-- Kandidaten: `0`;
-- vorläufig weitergeführt: `0`;
+- qualifizierte Richtungen: `0`;
 - Nutzerpräsentationen: `0`;
 - öffentliche Produktänderungen: `0`.
 
-## Runde 1 – standardschriftbasierte Eingriffe
+## Phase 5A – geschlossene Studienpfade
 
-Verworfen, weil Eingriffe wie beschädigte Glyphen wirkten, die Grundidentität Standardschrift blieb und die Eigenständigkeit an einzelnen Effekten hing.
+Systematisch geprüft und beendet wurden:
 
-## Runde 2 – eigene Monoline-/Grotesk-Systeme
+- standardschriftbasierte systemische Eingriffe;
+- eigene Monoline-, Grotesk-, Humanist- und Semi-Serif-Systeme;
+- typografische Dualität und Paarungen;
+- Type-Material-Studien;
+- produktspezifische `Geführte Öffnung`;
+- integrierte Buchstaben- und Negativraummodule;
+- flache Weiterentwicklung der tatsächlichen öffentlichen Öffnungs-/Vorhangmarke.
 
-Verworfen wegen kindlicher, lernangebotsnaher oder generisch-digitaler Wirkung und fehlender typografischer Premiumspannung.
+Wiederkehrende Fehler:
 
-## Runde 3 und 4 – typografische Dualität
+- beschädigte oder dekorativ manipulierte Glyphen;
+- bekannte Stilformel statt originärer Zeichnung;
+- generische digitale Schriftstruktur;
+- Magazin-, Kultur-, Gastronomie-, Sport-, SaaS-, UI- oder Handwerksnähe;
+- besondere Form verschwindet in kleinen Größen;
+- Ablationsfassung nahezu gleich stark;
+- keine glaubwürdige Verbindung von Primäridentität und Kleinform.
 
-Sans-/Serif- und Sans-/Italic-Paarungen wurden wegen Magazin-, Buchhandel-, Gastronomie-, Kulturinstitutions-, Sport- oder Template-Nähe verworfen.
+Detailbefunde liegen in den Dateien unter:
 
-`territory-a-study-01` bestand Lesbarkeit und reale Produktkontexte, scheiterte aber an fehlender gemeinsamer Eigenzeichnung und falschen Nachbarkategorien.
+- `docs/brand/phase5/internal/studies/`
 
-Dokumentation:
+## Phase 5B – generativer Suchzyklus 01
 
-- `internal/studies/territory-a-study-01-w0.md`
+Geprüft wurden zwölf ernsthafte Rohhypothesen gemäß `GENERATIVE_SEARCH_BRIEF.md`.
 
-## Runde 5 – korrigierende Einzelprototypen
+### G-A – nicht Sans-dominierte Letteringarchitektur
 
-Schnitte, Aperturen, Quer- und Endstrichverbindungen, humanistische Rundformen, dynamische Monoline und typografische Brücken wurden verworfen.
+- flared-humanistische Wortform;
+- warme Slab-/Soft-Serif-Wortform;
+- kalligrafisch beziehungsweise kontrastiert geprägte Serif-Wortform.
 
-Fehlerklassen:
+Ergebnis: **0 weitergeführt**.
 
-- Artefakt oder Ligaturgimmick;
-- UI-, Euro-, Finanz- oder generische Digitalassoziation;
-- familien- oder lernangebotsnahe Wirkung;
-- Dynamik nur durch Schräglage oder Rhythmustrick.
+Fehler:
 
-## Prozesskorrektur – architekturabhängige Bewertung
+- bekannte Schriftformel;
+- Publishing-, Bildung-, Café-, Kultur- oder Gastronomienähe;
+- Flares und Keile als dekorative Aufsätze;
+- Reverse-Contrast-Varianten nicht ruhig und mobil belastbar.
 
-Das allgemeine Phase-3-Framework war für Wortmarken teilweise architekturblind. Es förderte überzeichnete Eingriffe und zu frühe App-Zeichen.
+### G-B – abstrakte Primäridentität
 
-Verbindliche Korrektur:
+- asymmetrisch gewebter Diamant;
+- gefalteter nicht radialer Funken;
+- offene Bandverflechtung.
 
-- `docs/brand/phase5/ARCHITECTURE_AWARE_EVALUATION.md`
+Ergebnis: **0 weitergeführt**.
 
-Die Premiumgrenze blieb mindestens `90/100` mit allen Mindestwerten.
+Fehler:
 
-## Runde 6 – Type-Material Study 01
+- Krypto-, App-, Schmuck-, Blüten-, Asterisk-, Knoten- oder Fashionlesart;
+- Über-/Unterführung kollabiert klein;
+- keine überzeugende gemeinsame Identität mit der Wortmarke.
 
-### Pass 1 – eigenes kontrastiertes Buchstabensystem
+### G-C – lokales Strukturprinzip
 
-Verworfen wegen geometrischer Product-Sans-Nähe, fehlender Premiumspannung und vorhersehbarer Rundformen.
+- textile Rosette;
+- verbundene lokale Rhythmusstruktur;
+- mehrbahnige Interleave-Struktur.
 
-### Pass 2 – humanistische Gegenfassung
+Ergebnis: **0 weitergeführt**.
 
-Verworfen wegen zu großer Nähe zu Humanist-Sans- und Gill-artigen Formeln und fehlendem Abstand zu einer sorgfältig gesetzten hochwertigen Schriftbasis.
+Fehler:
 
-Dokumentation:
+- Handwerk, Mode, Stofflabel, Industrie, Gebäude oder Datenvisualisierung;
+- lokale Bedeutung nur nach Erklärung;
+- kleine Fassung als undefiniertes Geflecht.
 
-- `internal/studies/type-material-study-01-w0.md`
+Zusätzliche gewebte `B`-Kontrollen wurden als `B`, `8`, Bank-/Bitcoin- oder technisches Monogramm gelesen.
 
-## Runde 7 – Guided Opening Study 01
+### G-D – responsive Identität
 
-Das produktspezifische Prinzip `Geführte Öffnung` wurde gegen eine Ablationsfassung geprüft.
+- warmes Soft-Serif-System mit `be`-Ableitung;
+- humanistisches System mit `be`-Ableitung;
+- typografische Flare-Systeme.
 
-- subtil umgesetzt: Primär- und Ablationsfassung praktisch gleich stark;
-- sichtbar umgesetzt: schwere, geometrische, technische und artefaktanfällige Buchstaben.
+Ergebnis: **0 weitergeführt**.
 
-Dokumentation:
+Fehler:
 
-- `PRODUCT_FORM_PRINCIPLE.md`
-- `internal/studies/guided-opening-study-01-w0.md`
+- technisch stabile, aber austauschbare Initialmonogramme;
+- Publishing-/Bildungs- beziehungsweise Kultur-/Product-Font-Nähe;
+- Wortmarke nicht deutlich genug über einer hochwertigen Fontsetzung;
+- Systemkohärenz löst fehlende Eigenhöhe nicht.
 
-## Architekturwechsel zur integrierten Identität
+Der vollständige Zyklusbefund steht in:
 
-Nach drei gescheiterten W0-Pfaden wurde Architekturklasse `I` geöffnet.
+- `docs/brand/phase5/GENERATIVE_SEARCH_CYCLE_01_RESULT.md`
 
-Vorfilter:
+## Prozessentscheidung
 
-- I-A gemeinsamer Negativraum nicht eigenständig weitergeführt;
-- I-B kuratierter Rhythmuskern wegen Trennzeichen-, Cursor- und Ligaturgimmick-Risiko beendet;
-- I-C responsive Buchstabenfamilie bedingt zur vollständigen Studie zugelassen.
+Die verfügbaren internen prozeduralen Formräume sind ausreichend ausgeschöpft. Eine weitere automatische Kleinvariation ist gesperrt.
 
-Dokumentation:
+Der nächste belastbare Weg ist eine originäre externe Creative-Director-/Lettering-Leistung gemäß:
 
-- `INTEGRATED_IDENTITY_BRIEF.md`
-- `INTEGRATED_HYPOTHESIS_PREFILTER.md`
-
-## Runde 8 – Integrated Study 01
-
-Geprüft wurde eine integrierte Buchstabenfamilie mit asymmetrischem Negativraummodul über mehrere Glyphen.
-
-Primärfassung:
-
-- Modul über mehrere Buchstaben sichtbar;
-- formale Systemkohärenz vorhanden;
-- jedoch Pfeil-, Status-, Interface- und technische Überlagerungslesart;
-- mobile Verdichtung und visuelle Unruhe;
-- modulare Digitalwirkung statt ruhiger Premiumhaltung.
-
-Ablationsfassung:
-
-- ruhiger und besser lesbar;
-- dafür generische geometrische Sans ohne ausreichende Eigenständigkeit.
-
-I0-Ergebnis: **HARD KNOCK-OUT – Artefakt-/UI-Lesart.**
-
-Dokumentation:
-
-- `internal/studies/integrated-study-01-i0.md`
-
-## Korrektur des öffentlichen Ausgangszustands
-
-Die tatsächlich öffentliche Marke verwendet kein `B`, sondern ein grünes räumliches Öffnungs-/Vorhangmotiv mit hellem Zentrum. Ältere Dokumentpassagen zum aktuellen `B` waren damit sachlich überholt.
-
-Dokumentation:
-
-- `CURRENT_IDENTITY_BASELINE.md`
-
-Der vorhandene Anker besitzt Wiedererkennung, ist aber stark von 3D, Licht, Schatten und Vorhangillustration abhängig.
-
-## Runde 9 – Heritage Opening Study 01
-
-Geprüft wurde eine flache Weiterentwicklung der vorhandenen Öffnungs-/Eintrittsidee.
-
-### Pass 1 – freie flache Öffnungsform
-
-- Öffnung grundsätzlich erkennbar;
-- zugleich Vorhang-, Theater-, Hosen-, Pause- oder Flächenpaar-Lesart;
-- schwache kompakte Silhouette;
-- Kleingrößenkollaps zum gewöhnlichen Schlitz.
-
-### Pass 2 – gefasste Öffnungsform
-
-- stabilere App-Silhouette;
-- zugleich Pause-, Steuerungs-, Kachel- und Standard-App-Lesart;
-- Grundfläche trägt mehr Wiedererkennung als das Öffnungsprinzip;
-- ohne Grün und warmes Zentrum kaum Bezug zum Bestand;
-- keine belastbare gemeinsame Formlogik mit der Wortmarke.
-
-I0-Ergebnis: **nicht bestanden**.
-
-Dokumentation:
-
-- `internal/studies/heritage-opening-study-01-i0.md`
-
-## Aktueller Befund
-
-Der Phase-5-Zyklus besitzt weiterhin:
-
-- qualifizierte Richtungen: `0`;
-- Kandidaten: `0`;
-- Nutzerpräsentationen: `0`.
-
-Keine schwache Richtung wird künstlich weitergeführt.
-
-## Nächste Prozessentscheidung
-
-Ausgeschöpft beziehungsweise gesperrt sind nun:
-
-- generische geometrische Zeichen;
-- Standardschrift plus Detail;
-- allgemeine Sans-, Humanist- und Monoline-Eigenkonstruktionen;
-- Schriftpaarung und Kursivkontrast als Markenidee;
-- Apertur-, Negativraum- und Modulverdichtung;
-- flache Vorhang-, Sichel-, Schlitz- oder Portalreduktionen des Bestands.
-
-Der nächste zulässige Zyklus darf deshalb nicht als weitere kleine Vektorvariation beginnen. Er muss einen neuen generativen Formraum eröffnen und starke visuelle Rohhypothesen erst danach deterministisch rekonstruieren.
-
-Verbindliche Bedingungen:
-
-1. keine Rohbilder oder Mikrovarianten für den Nutzer;
-2. keine direkte Übernahme generierter Rasterbilder als Master;
-3. frühe Kategorie-, Genericity- und Ähnlichkeitsfilter;
-4. nur sichtbar starke Rohhypothesen werden als SVG neu konstruiert;
-5. keine öffentliche Änderung vor vollständiger Qualifikation;
-6. bleibt der Suchraum erneut unter Premiumhöhe, endet er mit `0 qualifizierte Richtungen` statt einer künstlichen Auswahl.
+- `docs/brand/phase5/EXTERNAL_CREATIVE_EXECUTION_BRIEF.md`
+
+Nach Eingang übernimmt ChatGPT wieder vollständig:
+
+- Provenienz- und Lizenzkontrolle;
+- Anonymisierung;
+- Originalgrößen- und Kategorieprüfung;
+- getrennte Bewertungspässe;
+- Red Team;
+- Scorecard und Konsolidierung;
+- technische Vektorhärtung;
+- Vorbereitung des Product-Owner-Gates;
+- spätere Integration.
