@@ -96,10 +96,11 @@ async function organizerPortal(browser,viewport,name){
   await page.waitForSelector('#organizer-dashboard-pilot-card:not([hidden])');
   const card=page.locator('#organizer-dashboard-pilot-card');
   const initial=await card.innerText();
-  for(const marker of ['Kostenloser Startpartner-Pilot','Einrichtung läuft','9 von 14 Punkten belegt','Keine Zahlung'])assert(containsVisibleText(initial,marker),`${name}: Portalmarker fehlt: ${marker}`);
+  for(const marker of ['Kostenloser Startpartner-Pilot','Einrichtung läuft','9 von 14 Punkten belegt'])assert(containsVisibleText(initial,marker),`${name}: Portalmarker fehlt: ${marker}`);
   assert(!/\b(onboarding|draft|pending_activation)\b/.test(initial),`${name}: technischer Rohstatus sichtbar`);
   await card.locator('summary', {hasText:'Neuen Pilotinhalt einreichen'}).click();
   const form=page.locator('#organizer-pilot-content-form');
+  assert(containsVisibleText(await form.innerText(),'Keine Zahlung'),`${name}: Zahlungsgrenze fehlt im sichtbaren Einreichungsformular`);
   await form.locator('[name="content_type"]').selectOption('activity');
   assert(!(await isRequired(form.locator('[name="start_date"]'))),`${name}: Aktivität verlangt ein Veranstaltungsdatum`);
   assert(await form.locator('[data-pilot-event-date]').isHidden(),`${name}: Datumsfeld für Aktivität sichtbar`);
