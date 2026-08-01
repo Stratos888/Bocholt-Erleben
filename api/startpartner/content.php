@@ -12,8 +12,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
 
 try {
     $pdo = be_db();
+} catch (Throwable $error) {
+    be_json_response(503, [
+        'status' => 'error',
+        'message' => 'Der Startpartner-Bereich ist technisch gerade nicht erreichbar.',
+    ]);
+}
+
+try {
     $session = be_startpartner_gate4_portal_session($pdo);
-} catch (InvalidArgumentException|RuntimeException $error) {
+} catch (InvalidArgumentException $error) {
     be_json_response(401, [
         'status' => 'error',
         'message' => 'Dein Veranstalterzugang ist nicht mehr gültig. Bitte fordere einen neuen Zugangslink an.',
