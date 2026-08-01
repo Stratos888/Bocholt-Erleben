@@ -118,10 +118,55 @@ Phase 5 arbeitet zunächst ausschließlich in Architekturklasse `W`:
 
 Die Qualitätsgrenze bleibt mindestens `90/100` mit allen Mindestwerten.
 
+## Runde 6 – Type-Material Study 01
+
+Nach dem Material-Preflight wurde genau eine neue Studie in zwei Konstruktionspässen geprüft.
+
+### Pass 1 – eigenes kontrastiertes Buchstabensystem
+
+- eigenständig gezeichnete Rund- und Stammformen;
+- unterschiedliche Stamm- und Kurvenstärken;
+- einheitliches System über beide Wörter;
+- keine Schriftpaarung und kein Symbol.
+
+Ergebnis: **verworfen**.
+
+Gründe:
+
+- zu geometrisch und generisch-digital;
+- Nähe zu Product-Sans, Lernangebot oder freundlicher Plattformmarke;
+- trotz Eigenkonstruktion keine souveräne Premiumspannung;
+- Rundformen und offene Buchstaben blieben zu vorhersehbar.
+
+### Pass 2 – humanistische Gegenfassung
+
+- offenere, humanistischere `c`, `e` und `r`;
+- kompaktere Gesamtwortform;
+- optisch korrigierte Breiten und Abstände;
+- gleiche Formlogik über beide Wörter.
+
+Ergebnis: **verworfen**.
+
+Gründe:
+
+- gute Lesbarkeit und erwachsenere Wirkung;
+- jedoch zu nah an etablierten Humanist-Sans- und Gill-artigen Formeln;
+- Mischung aus neutralen Stämmen und charaktervolleren Rundbuchstaben nicht als vollständig eigene Zeichnung glaubwürdig;
+- gegenüber einer sorgfältig gesetzten hochwertigen Schriftbasis kein ausreichender qualitativer Abstand.
+
+Konsequenz:
+
+- Gate W0 nicht bestanden;
+- kein Gate W1;
+- keine Kleinmarke;
+- kein App-Icon;
+- kein Kandidatenstatus;
+- keine Nutzerpräsentation.
+
 ## Aktueller Stand
 
-- intern geprüfte Studien und eng begrenzte Gegenproben: `24`;
-- verworfen: `24`;
+- intern geprüfte Studien und eng begrenzte Gegenproben: `26`;
+- verworfen: `26`;
 - als Kandidaten qualifiziert: `0`;
 - vorläufig weitergeführt: `0`;
 - Nutzerpräsentationen: `0`;
@@ -129,13 +174,17 @@ Die Qualitätsgrenze bleibt mindestens `90/100` mit allen Mindestwerten.
 
 ## Nächster zulässiger Schritt
 
-Die nächste Runde beginnt nicht mit Symbol, Kursivkontrast, Schnitt oder Ligaturidee.
+Die bisherige Suche scheitert nun nicht mehr an primitiven Symbolen, sondern an fehlender typografischer Eigenhöhe.
 
-Sie arbeitet `type-material-first`:
+Eine weitere allgemeine Sans-Konstruktion ist deshalb gesperrt. Vor einer neuen Zeichnung muss ein engeres, sichtbares und markenspezifisches Formprinzip aus dem Produkt abgeleitet werden, das über `warm`, `humanistisch`, `offen`, `editorial` oder `dynamisch` hinausgeht.
 
-1. wenige hochwertige, rechtssicher self-hostbare Schriftmaterialien als neutrale Ausgangskontrollen prüfen;
-2. daraus keine unveränderte Font-Wortmarke übernehmen;
-3. ein zusammenhängendes eigenes Buchstabensystem für die vollständige Wortmarke entwickeln;
-4. Eigenständigkeit über Rhythmus, Proportion, Punzen, Endungen und Wortverhältnis erzeugen;
-5. genau eine neue Studie durch Gate W0 führen;
-6. bei Scheitern beenden, ohne künstliche Ersatzvariante oder Nutzerpräsentation.
+Das Prinzip muss:
+
+1. in der vollständigen Wortmarke sichtbar sein;
+2. über mehrere Buchstaben hinweg wirken;
+3. ohne Schnitt-, Ligatur-, Kursiv- oder Farbgimmick funktionieren;
+4. die Spannung aus verlässlicher Auswahl und realem Erlebnis tragen;
+5. weder UI-, Karten-, Eventticket-, Tourismus- noch Magazinmetapher sein;
+6. vor jeder weiteren visuellen Studie schriftlich gegen Genericity und falsche Kategorien geprüft werden.
+
+Erst danach ist genau eine weitere Wortmarkenstudie zulässig.
