@@ -18,6 +18,12 @@ const BE_STARTPARTNER_GATE4_ONBOARDING_ITEMS = [
     'activation_target_set',
 ];
 
+const BE_STARTPARTNER_GATE4_MANUAL_ONBOARDING_ITEMS = [
+    'portal_access_tested',
+    'content_rights_cleared',
+    'activation_target_set',
+];
+
 const BE_STARTPARTNER_GATE4_CONTENT_TYPES = ['event', 'activity'];
 const BE_STARTPARTNER_GATE4_ITEM_STATUSES = ['pending', 'complete', 'blocked', 'not_applicable'];
 const BE_STARTPARTNER_GATE4_DISTRIBUTION_STATUSES = ['planned', 'ready', 'completed', 'blocked', 'cancelled'];
@@ -79,6 +85,20 @@ function be_startpartner_gate4_onboarding_key(mixed $value): string
     $key = strtolower(trim((string)$value));
     if (!in_array($key, BE_STARTPARTNER_GATE4_ONBOARDING_ITEMS, true)) {
         throw new InvalidArgumentException('onboarding item_key is invalid.');
+    }
+    return $key;
+}
+
+function be_startpartner_gate4_onboarding_item_is_manual(string $key): bool
+{
+    return in_array($key, BE_STARTPARTNER_GATE4_MANUAL_ONBOARDING_ITEMS, true);
+}
+
+function be_startpartner_gate4_manual_onboarding_key(mixed $value): string
+{
+    $key = be_startpartner_gate4_onboarding_key($value);
+    if (!be_startpartner_gate4_onboarding_item_is_manual($key)) {
+        throw new DomainException('Dieser Onboardingpunkt wird aus dem fachlichen Quellsystem abgeleitet und kann nicht manuell überschrieben werden.');
     }
     return $key;
 }

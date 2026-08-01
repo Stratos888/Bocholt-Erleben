@@ -11,5 +11,5 @@ $assert(str_contains($content,'be_startpartner_gate4_portal_session'),'Pilot con
 $assert(!str_contains($content,'be_send_mail')&&!str_contains($content,'stripe'),'Pilot content endpoint must not send mail or invoke Stripe.');
 $assert(str_contains($portal,'be_startpartner_gate4_portal_candidate'),'Portal status must read the canonical pilot owner.');
 $assert(str_contains($dashboard,'/api/startpartner/content.php'),'Organizer dashboard must use the permanent pilot submission endpoint.');
-$assert(str_contains($dashboard,'Keine Zahlung, kein Stripe-Checkout'),'Organizer UI must state the fail-closed payment boundary.');
+$assert(str_contains($dashboard,'Die Einreichung ist kostenlos und löst keine Zahlung aus.'),'Organizer UI must state the fail-closed payment boundary in plain language.');
 if($failures){fwrite(STDERR,"=== Startpartner Gate-4 Submission Contract: FAILED ===\n".implode("\n",array_map(static fn($v)=>'- '.$v,$failures))."\n");exit(1);}echo "=== Startpartner Gate-4 Submission Contract: OK ===\n";

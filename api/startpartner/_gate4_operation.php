@@ -30,10 +30,10 @@ function be_startpartner_gate4_run_operation(
                 || (string)$existingOperation['action'] !== $action
                 || !hash_equals((string)$existingOperation['payload_hash'], $payloadHash)
             ) {
-                throw new BeStartpartnerConflictException('operation_id was already used with a different payload.');
+                throw new BeStartpartnerConflictException('Diese Änderung wurde bereits mit anderen Angaben verwendet.');
             }
             if ((string)$existingOperation['status'] !== 'completed' || $existingOperation['result_json'] === null) {
-                throw new BeStartpartnerConflictException('operation_id is not replayable.');
+                throw new BeStartpartnerConflictException('Diese Änderung kann nicht erneut ausgeführt werden.');
             }
             $result = json_decode((string)$existingOperation['result_json'], true, 512, JSON_THROW_ON_ERROR);
             $result['idempotent_replay'] = true;
@@ -46,7 +46,7 @@ function be_startpartner_gate4_run_operation(
         if ((int)$candidate['revision'] !== $expectedCandidateRevision || (int)$pilot['revision'] !== $expectedPilotRevision) {
             $pdo->rollBack();
             throw new BeStartpartnerConflictException(
-                'Candidate or pilot was changed in the meantime.',
+                'Der Startpartner-Fall wurde zwischenzeitlich geändert.',
                 be_startpartner_gate4_candidate_detail($pdo, $candidateId)
             );
         }
@@ -77,7 +77,7 @@ function be_startpartner_gate4_run_operation(
         $newPilotRevision = $expectedPilotRevision + 1;
         be_startpartner_gate2_update_candidate($pdo, $candidateId, [
             'revision' => $newCandidateRevision,
-            'status_reason' => (string)($meta['status_reason'] ?? 'Startpartner-Onboarding aktualisiert.'),
+            'status_reason' => (string)($meta['status_reason'] ?? 'Piloteinrichtung aktualisiert.'),
         ]);
         $pilotRevision = $pdo->prepare(
             'UPDATE startpartner_pilots SET revision = :revision WHERE id = :id'
@@ -123,12 +123,15 @@ function be_startpartner_gate4_update_onboarding(PDO $pdo, string $candidateId, 
         'gate4.onboarding.item',
         $input,
         static function(PDO $pdo, array $candidate, array $pilot, string $operator, string $operationId, array $input): array {
-            $itemKey = be_startpartner_gate4_onboarding_key($input['item_key'] ?? null);
+            $itemKey = be_startpartner_gate4_manual_onboarding_key($input['item_key'] ?? null);
             $status = be_startpartner_gate4_item_status($input['status'] ?? null);
+            if (!in_array($status, ['pending', 'complete', 'blocked'], true)) {
+                throw new InvalidArgumentException('Für einen manuellen Schritt sind nur offen, erledigt oder Klärung nötig zulässig.');
+            }
             $evidenceText = be_startpartner_gate4_optional_text($input['evidence_text'] ?? null, 5000, 'evidence_text');
             $evidenceReference = be_startpartner_gate4_optional_text($input['evidence_reference'] ?? null, 2048, 'evidence_reference');
-            if ($status === 'complete' && $evidenceText === null && $evidenceReference === null) {
-                throw new InvalidArgumentException('Completed onboarding items require evidence.');
+            if (in_array($status, ['complete', 'blocked'], true) && $evidenceText === null && $evidenceReference === null) {
+                throw new InvalidArgumentException('Für einen erledigten oder offenen Schritt ist ein Nachweis beziehungsweise eine Begründung erforderlich.');
             }
             $statement = $pdo->prepare(
                 "UPDATE startpartner_pilot_onboarding_items
@@ -149,7 +152,7 @@ function be_startpartner_gate4_update_onboarding(PDO $pdo, string $candidateId, 
                 'item_key' => $itemKey,
             ]);
             if ($statement->rowCount() !== 1) {
-                throw new RuntimeException('Onboarding item could not be updated.');
+                throw new RuntimeException('Der Schritt der Piloteinrichtung konnte nicht gespeichert werden.');
             }
             $event = $pdo->prepare(
                 'INSERT INTO startpartner_pilot_events (pilot_id, event_type, actor_reference, payload_json)
@@ -165,7 +168,10 @@ function be_startpartner_gate4_update_onboarding(PDO $pdo, string $candidateId, 
                     'status' => $status,
                 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
             ]);
-            return ['status_reason' => 'Gate-4-Onboardingpunkt aktualisiert.', 'item_key' => $itemKey];
+            return [
+                'status_reason' => 'Schritt der Piloteinrichtung aktualisiert.',
+                'item_key' => $itemKey,
+            ];
         }
     );
 }
