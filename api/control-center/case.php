@@ -3,7 +3,7 @@ declare(strict_types=1);
 require __DIR__ . '/_domain.php';
 require_once __DIR__ . '/_content_source.php';
 require_once __DIR__ . '/_editorial_contracts.php';
-require_once dirname(__DIR__) . '/startpartner/_gate3_domain.php';
+require_once dirname(__DIR__) . '/startpartner/_gate4_domain.php';
 require_once dirname(__DIR__) . '/startpartner/_gate3_presentation.php';
 be_require_review_access();
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') { header('Allow: GET'); be_json_response(405, ['status'=>'error','message'=>'Method not allowed.']); }
@@ -22,11 +22,13 @@ try {
     if((string)($row['source_system']??'')==='startpartner_candidate'){
         $candidateId=trim((string)($row['object_id']??$payload['candidate_id']??$row['source_reference']??''));
         if($candidateId==='')throw new RuntimeException('Startpartner candidate reference is missing.');
-        $candidate=be_startpartner_gate3_candidate_detail(be_db(),$candidateId,true);
+        $candidate=be_startpartner_gate4_candidate_detail(be_db(),$candidateId,true);
         $item=be_startpartner_gate3_present_case($item,$candidate);
         $item['decision_context']['candidate_revision']=(int)$candidate['revision'];
+        $item['decision_context']['readiness']=$candidate['readiness'];
         $item['decision_context']['capacity']=$candidate['capacity'];
-        $item['decision_ready']=(bool)($candidate['readiness']['ready']??false);
+        $item['decision_context']['gate4']=$candidate['gate4'];
+        $item['decision_ready']=(bool)($candidate['gate4']['activation_ready']??false);
     }
     if((string)($row['source_system']??'')==='inbox_feed'){
         $review=be_cc_event_candidate_review_contract($payload); $item['review_contract']=$review; $item['decision_context']['review_contract']=$review; $item['decision_ready']=(bool)($review['decision_gate']['ready']??false);
@@ -45,7 +47,7 @@ try {
     $item['source_payload']=$payload; be_json_response(200,['status'=>'ok','data'=>$item]);
 } catch(InvalidArgumentException $error){be_json_response(422,['status'=>'error','message'=>$error->getMessage()]);}
 catch(RuntimeException $error){
-    $schemaMissing=str_starts_with($error->getMessage(),'STARTPARTNER_SCHEMA_MISSING:')||str_starts_with($error->getMessage(),'STARTPARTNER_GATE3_SCHEMA_MISSING:');
+    $schemaMissing=str_starts_with($error->getMessage(),'STARTPARTNER_SCHEMA_MISSING:')||str_starts_with($error->getMessage(),'STARTPARTNER_GATE3_SCHEMA_MISSING:')||str_starts_with($error->getMessage(),'STARTPARTNER_GATE4_SCHEMA_MISSING:');
     be_json_response($schemaMissing?503:404,['status'=>'error','message'=>$schemaMissing?'Startpartner schema is not ready.':$error->getMessage(),'error_message'=>$error->getMessage()]);
 }
 catch(Throwable $error){be_json_response(500,['status'=>'error','message'=>'Vorgang konnte nicht geladen werden.','error_message'=>$error->getMessage()]);}
