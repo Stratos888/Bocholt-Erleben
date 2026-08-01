@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Begriffswechsel: Der frühere sichtbare Status „Pilot-Onboarding“ heißt jetzt „Piloteinrichtung“.
+
 function be_startpartner_gate3_case_action(
     string $key,
     string $label,
