@@ -2,7 +2,7 @@
 
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **AKTIV – architekturabhängiges Wortmarken-Gate und Material-Preflight**
+Status: **AKTIV – integrierte Identitätsarchitektur nach belegtem W0-Abbruch**
 
 ## Zweck
 
@@ -18,9 +18,11 @@ Sie ist keine Reparaturrunde für einen bestehenden Kandidaten. Alle Phase-4-Sys
 4. `docs/brand/phase5/PREMIUM_BENCHMARK.md`
 5. `docs/brand/phase5/CREATIVE_TERRITORIES.md`
 6. `docs/brand/phase5/TYPE_MATERIAL_SHORTLIST.md`
-7. `docs/brand/phase5/PHASE4_CONCLUSION.md`
-8. `docs/brand/phase5/SEARCH_BRIEF.md`
-9. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
+7. `docs/brand/phase5/PRODUCT_FORM_PRINCIPLE.md`
+8. `docs/brand/phase5/INTEGRATED_IDENTITY_BRIEF.md`
+9. `docs/brand/phase5/PHASE4_CONCLUSION.md`
+10. `docs/brand/phase5/SEARCH_BRIEF.md`
+11. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
 
 Die Governance-Datei definiert die Dokumenthierarchie. Verbindlich bleiben mindestens `90/100`, alle Dimensionsmindestwerte, kein architekturabhängig belegter Knock-out, zwei getrennte positive Bewertungspässe und höchstens zwei Richtungen im Product-Owner-Gate.
 
@@ -28,71 +30,71 @@ Die Governance-Datei definiert die Dokumenthierarchie. Verbindlich bleiben minde
 
 Phase 4 scheiterte bereits bei der kreativen Erzeugung:
 
-- generische geometrische Symbolfamilien statt eigenständiger Markenideen;
-- primitive Zeichen mit Standardtypografie statt echter Wortmarkenarbeit;
-- zu frühe Ableitung von App-Icons;
-- Quantität und Prüfbarkeit wurden mit gestalterischer Qualität verwechselt.
+- generische geometrische Symbolfamilien;
+- primitive Zeichen mit Standardtypografie;
+- zu frühe App-Icon-Ableitung;
+- Quantität und Prüfbarkeit statt gestalterischer Qualität.
 
-Die ersten Phase-5-Studien zeigten zusätzlich, dass das allgemeine Evaluationsframework Wortmarken architekturblind prüfte. Es setzte dadurch falsche Anreize für künstliche Schnitte, Ligaturen, wörtliche Symbolik und zu frühe App-Zeichen.
+Phase 5 korrigierte zunächst die architekturblinde Bewertung und prüfte reine Wortmarken systematisch in Gate W0.
 
-Dieser Fehler ist mit `ARCHITECTURE_AWARE_EVALUATION.md` korrigiert. Der Qualitätsanspruch wurde nicht gesenkt.
+## Ergebnis der Wortmarkenphase
 
-## Korrigierte Leitentscheidung
+Geprüft wurden:
 
-Phase 5 arbeitet zunächst ausschließlich in Architekturklasse `W`:
-
-1. vollständige Wortmarke;
-2. Gate W0 für Qualität, Eigenständigkeit, Lesbarkeit und Kategorieabgrenzung;
-3. nur bei bestandenem W0 ein neutrales Marken-Minisystem;
-4. erst danach responsive Kleinform und App-Marke;
-5. formale Bewertung erst nach bestandenen Gates W0 bis W2;
-6. dem Product Owner nur eine oder höchstens zwei vollständig qualifizierte Richtungen zeigen.
-
-Ein separates abstraktes Zeichen ist keine Pflicht und kein Ausgangspunkt.
-
-## Geschlossene Vorstufen
-
-- Prozessursache und Dokumentwidersprüche geklärt;
-- verbindliche Dokumenthierarchie definiert;
-- Premium-Benchmark dokumentiert;
-- drei kreative Territorien definiert;
-- architekturabhängige Evaluation eingeführt;
-- typografischer Material-Preflight dokumentiert;
-- Nutzerinteraktion auf qualifizierte Richtungen begrenzt;
-- Bilder, Berichtsgrafiken und Rohentwürfe für den Nutzer gesperrt.
-
-## Interne Studien
+- standardschriftbasierte systemische Eingriffe;
+- vollständig eigene Monoline-, Grotesk- und Humanist-Systeme;
+- typografische Dualität;
+- Materialstudien mit neutralen Lizenz- und Qualitätskontrollen;
+- das produktspezifische Prinzip `Geführte Öffnung` gegen eine Ablationsfassung.
 
 Aktueller Befund:
 
-- intern geprüfte Studien und begrenzte Gegenproben: `24`;
-- verworfen: `24`;
-- als Kandidat qualifiziert: `0`;
+- intern geprüfte Studien und Gegenproben: `28`;
+- verworfen: `28`;
+- Kandidaten: `0`;
 - vorläufig weitergeführt: `0`;
-- Nutzerpräsentationen: `0`.
+- Nutzerpräsentationen: `0`;
+- öffentliche Änderungen: `0`.
 
-`territory-a-study-01` bestand Lesbarkeit und Produktkontext, scheiterte aber am Gate W0:
+Die reinen Wortmarkenpfade scheiterten nicht mehr an primitiven Symbolen, sondern an fehlender Premium-Eigenhöhe:
 
-- redaktionell-kulturelle beziehungsweise gastronomische Nähe in der Serifenkursiv-Fassung;
-- Sport-/Active-/Template-Nähe in der Sanskursiv-Korrektur;
-- zu verbreitetes Grundrezept aus stabilem fettem Wortteil und lebendig kursivem Wortteil;
-- keine ausreichend eigenständige gemeinsame Gesamtzeichnung.
+1. bekannte Stilformeln;
+2. generische eigene Sans-Systeme;
+3. produktspezifische Öffnung entweder zu subtil oder technisch überzeichnet.
 
-Die Studie ist beendet. Es wurde kein App-Icon entwickelt.
+Eine weitere allgemeine Wortmarkenvariation ist deshalb gesperrt.
 
-## Nächste interne Studie
+## Architekturwechsel
 
-Die nächste Runde arbeitet `type-material-first`, aber nicht fontbasiert im Sinne einer unveränderten Setzung.
+Geöffnet wird Architekturklasse `I` – integrierte Identität:
 
-Bricolage Grotesque, Onest und Figtree dienen ausschließlich als lizenzierte Referenz- und Kontrollmaterialien für Proportion, Rhythmus, Offenheit und mobile Lesbarkeit. Die eigentliche Studie konstruiert ein eigenes zusammenhängendes Buchstabensystem für `Bocholt erleben`.
+- Wortmarke und kleines Identitätsmodul werden gemeinsam entwickelt;
+- kein isoliertes Icon vor der Primäridentität;
+- kein B-/BE-/be-Monogramm;
+- kein Pin, Ticket, Kalender, Liste, Karte, Filter, Scanner oder UI-Zeichen;
+- Modul und Buchstaben teilen Kurven-, Endungs- und Negativraumprinzipien;
+- nur eine integrierte Studie darf Gate I0 erreichen;
+- Kleinmarke und App-Icon erst nach bestandenem I0 und I1.
 
-Es wird genau eine neue Studie bis Gate W0 entwickelt. Scheitert sie, wird sie beendet, ohne künstliche Ersatzvariante oder Nutzerpräsentation.
+Verbindlicher Auftrag:
+
+- `docs/brand/phase5/INTEGRATED_IDENTITY_BRIEF.md`
+
+## Nächster interner Ablauf
+
+1. Hypothesen I-A, I-B und I-C nur als monochrome Struktur vorfiltern.
+2. UI-, Artefakt-, Monogramm- und falsche Kategorien sofort beenden.
+3. Höchstens eine Hypothese vollständig als Primäridentität konstruieren.
+4. Gegen Ablationskontrolle und im realen mobilen Header prüfen.
+5. Nur bei bestandenem I0 ein neutrales Marken-Minisystem öffnen.
+6. Erst danach responsive beziehungsweise isolierte Fassung prüfen.
+7. Formale Bewertung erst nach bestandenen Architektur-Gates.
 
 ## Qualitätsbarriere
 
 Eine Richtung gelangt nur in Bewertungspässe und Scorecard, wenn sie:
 
-- sichtbar über Standardschrift und generischem App-Icon liegt;
+- sichtbar über Standardschrift, Stocklogo und generischem App-Icon liegt;
 - die aktuelle Identität deutlich übertrifft;
 - als vollständige Primäridentität professionell und eigenständig erscheint;
 - ohne Konzepttext eine passende, nicht-technische Haltung trägt;
@@ -115,11 +117,11 @@ Der Nutzer erhält:
 - keine generierten Berichtsgrafiken;
 - keine Aufforderung, Chats oder Prüfergebnisse zu verwalten.
 
-Interne visuelle Arbeit erfolgt real als private, repository-lokale SVG-, Typografie- und Originalgrößenstudien. Sichtbar präsentiert wird erst, wenn mindestens eine Richtung die Qualitätsbarriere nachvollziehbar überschritten hat.
+Interne visuelle Arbeit erfolgt real als private, repository-lokale Schwarz-Weiß-, SVG- und Originalgrößenstudien. Sichtbar präsentiert wird erst, wenn mindestens eine Richtung die vollständige Qualitätsbarriere überschritten hat.
 
 ## Aktueller Stand
 
 - qualifizierte Richtungen: `0`
-- neue Phase-5-Kandidaten: `0`
+- Phase-5-Kandidaten: `0`
 - öffentliche Änderungen: `0`
-- nächster Schritt: genau eine kohärente eigene Wortmarkenstudie aus dem abgeschlossenen Material-Preflight; noch keine Nutzerpräsentation
+- nächster Schritt: Vorfilter der drei integrierten Architekturhypothesen; noch keine Nutzerpräsentation
