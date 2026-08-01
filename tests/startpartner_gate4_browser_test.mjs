@@ -10,6 +10,7 @@ if(!baseUrl||!outDir){console.error('Usage: node tests/startpartner_gate4_browse
 fs.mkdirSync(outDir,{recursive:true});
 const results=[];
 function assert(condition,message){if(!condition)throw new Error(message);}
+async function isRequired(locator){return await locator.getAttribute('required')!==null;}
 
 function gate4Candidate(scenario='onboarding'){
   const keys=['terms_confirmed','organizer_linked','contact_confirmed','portal_access_tested','pilot_entitlement_readback','service_scope_confirmed','sources_recorded','maintenance_path_agreed','content_rights_cleared','first_content_ready','editorial_review_ready','measurement_ready','distribution_ready','activation_target_set'];
@@ -69,7 +70,7 @@ async function manualDialog(browser){
   const text=await page.locator('#cc-dialog').innerText();
   assert(text.includes('Portalzugang getestet'),'manual dialog: fachlicher Titel fehlt');
   assert(text.includes('belastbaren Nachweis'),'manual dialog: Nachweisanforderung fehlt');
-  assert(await page.locator('#gate4-evidence').getAttribute('required')!==null,'manual dialog: Nachweis ist nicht erforderlich');
+  assert(await isRequired(page.locator('#gate4-evidence')),'manual dialog: Nachweis ist nicht erforderlich');
   await context.close();results.push({name:'gate4-manual-dialog',status:'OK'});
 }
 
@@ -98,7 +99,7 @@ async function organizerPortal(browser,viewport,name){
   await card.locator('summary', {hasText:'Neuen Pilotinhalt einreichen'}).click();
   const form=page.locator('#organizer-pilot-content-form');
   await form.locator('[name="content_type"]').selectOption('activity');
-  assert(await form.locator('[name="start_date"]').isRequired()===false,`${name}: Aktivität verlangt ein Veranstaltungsdatum`);
+  assert(!(await isRequired(form.locator('[name="start_date"]'))),`${name}: Aktivität verlangt ein Veranstaltungsdatum`);
   assert(await form.locator('[data-pilot-event-date]').isHidden(),`${name}: Datumsfeld für Aktivität sichtbar`);
   await form.locator('[name="title"]').fill('Synthetische Familienaktivität');
   await form.locator('[name="location_name"]').fill('Bocholt');
@@ -109,7 +110,7 @@ async function organizerPortal(browser,viewport,name){
   await card.locator('summary', {hasText:'Neuen Pilotinhalt einreichen'}).click();
   const refreshed=page.locator('#organizer-pilot-content-form');
   assert(await refreshed.locator('[name="content_type"]').inputValue()==='event',`${name}: Formularreset stellt den Standardtyp nicht wieder her`);
-  assert(await refreshed.locator('[name="start_date"]').isRequired(),`${name}: Datum ist nach Reset für Veranstaltung nicht erforderlich`);
+  assert(await isRequired(refreshed.locator('[name="start_date"]')),`${name}: Datum ist nach Reset für Veranstaltung nicht erforderlich`);
   assert(await refreshed.locator('[data-pilot-event-date]').isVisible(),`${name}: Datum bleibt nach Reset verborgen`);
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth);
   assert(!overflow,`${name}: horizontaler Überlauf`);
