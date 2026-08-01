@@ -1,165 +1,144 @@
-# Phase 5 – Suchbrief für die qualifizierte Neusuche
+# Phase 5 – Korrigierter Suchbrief für eine Premium-Marke
 
 Stand: 2026-08-01
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
+Status: verbindlich vor jeder neuen Gestaltung
 
 ## 1. Auftrag
 
-Entwickle eine neue Markenrunde für **Bocholt erleben**, ohne einen Phase-4-Kandidaten fortzuzeichnen oder unter neuem Namen wieder einzuführen.
+Entwickle für **Bocholt erleben** eine eigenständige, hochwertige mobile Marke für kuratierte Veranstaltungen, Aktivitäten und lokale Freizeitideen.
 
-Das Ergebnis muss als eigenständige digitale Marke funktionieren für:
+Die Marke soll ruhig, modern, persönlich, lebendig und vertrauenswürdig wirken. Sie darf weder amtlich, touristisch-klischeehaft, technisch-generisch noch beliebig lifestylehaft erscheinen.
 
-- kuratierte Veranstaltungen;
-- lokale Aktivitäten und Freizeitideen;
-- schnelle mobile Orientierung;
-- vertrauenswürdige Auswahl statt ungefiltertem Verzeichnis;
-- Nutzer, Veranstalter und lokale Anbieter.
+Phase-4-Kandidaten werden nicht fortgeführt oder unter neuem Namen wiederholt.
 
-Die Marke soll ruhig, modern, persönlich, hochwertig und direkt wirken. Sie darf weder amtlich noch touristisch-klischeehaft, technisch-generisch oder beliebig lifestylehaft erscheinen.
+## 2. Root Cause der bisherigen Qualität
 
-## 2. Strategische Korrektur
+Die bisherigen Ergebnisse waren keine knapp gescheiterten Premium-Marken. Sie waren überwiegend einfache Symbolhypothesen:
 
-Phase 4 zeigte, dass formal einfache abstrakte Zeichen zwar kleinformatig funktionieren können, aber sehr schnell in bekannte UI-, Software- oder Branchenlesarten kippen.
+- generische geometrische Grundformen;
+- Standardtypografie;
+- zu frühe Iconfixierung;
+- schwache Verbindung zwischen Zeichen, Name und Produkt;
+- formale Testbarkeit ohne ausreichende kreative Substanz.
 
-Phase 5 priorisiert deshalb Identität in dieser Reihenfolge:
+Mehr Varianten und strengere Scores lösen dieses Problem nicht. Die Qualität muss bereits vor der Prüfung sichtbar höher sein.
 
-1. individuelle Wortmarke als primärer Markenwert;
-2. responsives typografisches System mit klar verwandter Kleinform;
-3. aus der Wortmarke abgeleitetes App-Zeichen;
-4. separates abstraktes Zeichen nur bei früh belegter Eigenständigkeit und Produktspezifität.
+## 3. Stufe A – Markenfundament und Premium-Benchmark
 
-Ein separates Zeichen ist kein Pflichtbestandteil.
+Vor jeder Logozeichnung werden dokumentiert:
 
-## 3. Neue Suchmatrix
+1. der konkrete Produktkern: **kuratierte relevante Möglichkeiten in der Nähe schnell entdeckbar machen**;
+2. die emotionale Wirkung: **Vorfreude, Offenheit, Vertrauen, Nähe und leichte Aktivierung**;
+3. die Abgrenzung: keine Verwaltung, keine Tourismuswerbung, keine Karten-App, kein Veranstaltungsverzeichnis, kein generisches SaaS;
+4. ein neutraler Vergleich mit aktuellen hochwertigen digitalen Marken und typischen lokalen Eventportalen;
+5. die sichtbaren Qualitätsmerkmale, die eine neue Richtung klar besser als die aktuelle Marke machen müssen.
 
-### Track A – Individuelle Wortmarke
+Der Benchmark dient nicht zum Kopieren. Er definiert das erwartete Niveau bei Typografie, Proportion, Eigenständigkeit, Ruhe und Systemfähigkeit.
 
-Mindestens zwölf Mikroideen.
+## 4. Stufe B – Höchstens drei kreative Territorien
 
-Untersuche:
+Es werden zunächst keine Logos, Icons oder 48 Mikrovarianten erzeugt. Zuerst entstehen höchstens drei deutlich verschiedene kreative Territorien.
 
-- eigenständigen Rhythmus zwischen `Bocholt` und `erleben`;
-- kontrollierte Kontraste aus ruhig/präzise und offen/kompakt;
-- charakteristische Buchstabenproportionen statt dekorativer Einzelgeste;
-- mögliche zweizeilige und einzeilige Fassungen;
-- offene Punzen und robuste Kleinlesbarkeit;
-- Wiedererkennbarkeit auch in rein schwarzer Darstellung.
+Jedes Territorium muss beantworten:
 
-Verboten:
+- Welche sichtbare Markenspannung trägt die Identität?
+- Warum passt sie konkret zu Bocholt erleben?
+- Wodurch unterscheidet sie sich spontan von Verwaltung, Tourismus und Tech?
+- Welche typografischen Prinzipien können eine vollständige Wortmarke prägen?
+- Wie kann daraus später ein responsives System entstehen, ohne ein beliebiges Icon anzukleben?
+
+Zulässige Ausgangsrichtungen sind beispielsweise:
+
+- **kuratierte Offenheit** – einladend, selektiv, nicht laut;
+- **lokaler Impuls** – unmittelbare Lust, etwas zu erleben, ohne Event- oder Navigationspiktogramm;
+- **redaktionelle Nähe** – glaubwürdige Auswahl, Persönlichkeit und Orientierung durch Typografie und Rhythmus.
+
+Diese Bezeichnungen sind Arbeitsfelder, keine vorentschiedenen Formlösungen.
+
+## 5. Stufe C – Ernsthafte Wortmarkenarbeit
+
+Pro tragfähigem Territorium werden wenige, aber substanziell unterschiedliche Wortmarkenstudien erstellt.
+
+Pflicht:
+
+- der vollständige Name `Bocholt erleben` steht zuerst im Zentrum;
+- individuelle Proportionen, Rhythmus, Buchstabenbeziehungen und Endungen;
+- sichtbare Eigenständigkeit über mehrere Buchstaben hinweg;
+- ein- und zweizeilige reale Headerfassungen;
+- monochrome Wirkung;
+- professionelle Lesbarkeit ohne dekorative Erklärung.
+
+Nicht zulässig:
 
 - unveränderte Standardschrift;
-- bloßes Tracking oder Gewichtwechsel als behauptete Markenidee;
-- einzelner Punkt, Schnitt, Strich oder Farbakzent als einziges Identitätsmerkmal.
+- Standardschrift plus Punkt, Schnitt, Linie, Farbe oder Tracking;
+- beliebige B-, BE- oder be-Monogramme;
+- Symbol plus austauschbare Wortmarke;
+- ein einzelnes Sonderdetail als gesamte Markenidee.
 
-### Track B – Responsive typografische Identität
+Die Studien werden als echte Vektor- oder Typografieartefakte gebaut und intern visuell geprüft. Rein verbale Beschreibungen gelten nicht als Entwurf.
 
-Mindestens zehn Mikroideen.
+## 6. Stufe D – Creative-Director-Gate
 
-Untersuche:
+Bevor eine Kleinform oder ein App-Icon entsteht, muss die Primäridentität bestehen:
 
-- kompakte Ausschnitte aus einer wirklich individuellen Wortmarke;
-- ein eigenständiges Buchstabenmodul, das sichtbar aus mehreren Zeichenprinzipien der Wortmarke entsteht;
-- responsive Wechsel zwischen voller Wortmarke, kompakter Fassung und App-Zeichen;
-- gleiche Kurven-, Endungs-, Winkel- und Negativraumlogik über alle Fassungen.
+- Sie wirkt klar professioneller und eigenständiger als die aktuelle Identität.
+- Sie besitzt auch ohne Herleitung eine plausible hochwertige Markenwirkung.
+- Sie lässt sich nicht nahezu unverändert auf ein beliebiges Portal übertragen.
+- Sie ist weder UI-Symbol noch Branchenklischee.
+- Sie funktioniert im realen mobilen Header.
+- Mindestens zwei sichtbare Formprinzipien verbinden die gesamte Wortmarke; keine Einzelgeste trägt alles.
 
-Verboten:
+Besteht keine Studie dieses Gate, wird das kreative Territorium beendet oder grundlegend neu geöffnet. Es wird kein schwacher Kandidat zur Prüfung weitergereicht.
 
-- beliebiges `B`, `be`, `BE` oder Initialmonogramm;
-- Icon und Wortmarke mit getrennten Formsprachen;
-- erzwungene B/e-Ligatur ohne spontane Lesbarkeit.
+## 7. Stufe E – Responsives Markensystem
 
-### Track C – Redaktionelle Auswahl und Öffnung
+Erst nach bestandenem Wortmarken-Gate werden entwickelt:
 
-Mindestens acht Mikroideen.
+- kompakte Lockup-Fassung;
+- kleine Headerfassung;
+- Favicon beziehungsweise App-Zeichen;
+- monochrome und inverse Kernform.
 
-Übersetze nicht einzelne Gegenstände, sondern den Produktnutzen:
+Die Kleinform muss sichtbar aus dem Formprinzip der Primäridentität entstehen. Ein separates abstraktes Zeichen wird nur akzeptiert, wenn es einen belegbaren Mehrwert besitzt und keine generische technische Lesart erzeugt.
 
-- Relevantes sichtbar machen;
-- Auswahl öffnen;
-- mehrere Möglichkeiten zu einem verständlichen Einstieg bündeln;
-- lokale Vielfalt ruhig strukturieren;
-- vom Überblick in ein konkretes Erlebnis führen.
+## 8. Stufe F – Reale Produktprüfung
 
-Mögliche Ausdrucksmittel:
+Maximal drei ausgereifte Kandidaten werden in identischen realen Anwendungen geprüft:
 
-- typografischer Rhythmus;
-- kontrollierter Positiv-/Negativraum;
-- Öffnung und Staffelung innerhalb einer zusammenhängenden Silhouette;
-- ein wiederkehrendes Layout- oder Bewegungsprinzip.
+1. mobiler Header in tatsächlicher Größe;
+2. Homescreen-App-Icon;
+3. 16-, 24-, 32- und 48-Pixel-Darstellung;
+4. Favicon;
+5. Today-, Event- und Activity-Kontext mit echten Inhalten;
+6. monochrome Primäridentität;
+7. Vergleich mit aktueller Marke und neutralem Premium-Benchmark.
 
-Verboten:
+Keine Hochglanz-Mock-ups, erfundenen Screens oder dekorativen Berichtsgrafiken.
 
-- Listen-, Filter-, Menü-, Kartenstapel- oder Dashboardicons;
-- Pins, Karten, Kompasse, Scanner, Sucher oder Lupen;
-- abstrakte Formen, deren Bedeutung nur durch einen Konzepttext entsteht.
+## 9. Stufe G – Bewertung
 
-### Track D – Behutsame Wiedererkennbarkeit ohne Altlast
+Nur Kandidaten, die das Creative-Director-Gate bereits bestanden haben, erhalten:
 
-Mindestens sechs Mikroideen.
+- getrennte anonymisierte Bewertungspässe für Form und Produkt;
+- Red-Team-Ablehnungssuche;
+- Phase-3-Scorecard;
+- technische Pass/Fail-Prüfung.
 
-Untersuche, ob aus der bestehenden öffentlichen B-Wiedererkennbarkeit ein flaches, ruhiges und eigenständiges System entstehen kann.
+Wenn derselbe ChatGPT-Orchestrator alle Pässe ausführt, wird dies als methodisch getrennte interne Prüfung dokumentiert, nicht als vollständig unabhängige Blindkritik.
 
-Bedingungen:
+Eine Richtung wird nur präsentiert bei:
 
-- keine 3D-, Glossy- oder Schattenwirkung;
-- kein gewöhnliches B in einem Kreis oder Quadrat;
-- kein Monogramm ohne eigenständige Negativraumidee;
-- sofortiger Abbruch bei generischer App- oder Firmenmarkenlesart.
+- mindestens 90/100 und allen Dimensionsmindestwerten;
+- keinem Knock-out;
+- klarer Überlegenheit gegenüber der aktuellen Marke;
+- stabiler realer Produktanwendung;
+- nachvollziehbarer Konstruktion und Herkunft.
 
-## 4. Frühe Ausschlussmatrix
+## 10. Nutzerentlastung
 
-Jede Mikroidee wird vor weiterer Ausarbeitung einzeln geprüft:
+Der Product Owner sieht keine Rohideen und keine internen Prüftafeln. Er muss keine Chats suchen oder Daten übertragen.
 
-1. **Standardschema:** Bleibt nach Entfernung eines Details ein bekanntes Basissymbol oder eine Standardschrift?
-2. **Erklärung:** Ist die sichtbare Hauptwirkung ohne Titel und Herleitung erfassbar?
-3. **Austauschbarkeit:** Könnte die Form nahezu unverändert für ein beliebiges Portal, SaaS-Produkt oder eine andere Branche stehen?
-4. **Artefakt:** Wird sie als UI-Funktion, Fehler, Cursor, Scanrahmen, Menü, Liste, Dashboard oder Navigation gelesen?
-5. **Kategorie:** Wirkt sie wie Verwaltung, Tourismus, Karten-App, Bank, Immobilien, Beauty, Audio, Analytics oder generische Technologie?
-6. **Silhouette:** Ist die einfarbige Hauptform kompakt und merkfähig?
-7. **Kleinformat:** Bleibt das zentrale Prinzip bei 24 und 16 Pixeln sichtbar?
-8. **Systembezug:** Folgen Wortmarke, Kleinform und App-Icon demselben Formprinzip?
-
-Ein belegtes Scheitern beendet die Mikroidee vor jeder weiteren Politur.
-
-## 5. Interne Produktionsfolge
-
-1. 36 bis 48 Mikroideen über alle vier Tracks;
-2. reine Schwarz-Weiß-Sichtung ohne Namen und Herleitung;
-3. frühe Genericity-, Kategorie- und Artefaktprüfung;
-4. Reduktion auf höchstens acht Rohkandidaten;
-5. deterministische Vektorkonstruktion mit echter Wortmarkenarbeit;
-6. Originalgrößenprüfung in mobilem Header, App-Icon, 24 und 16 Pixeln;
-7. anonyme Kritik A, Kritik B und Red Team mit vollständig festgeschriebenen Einzelwerten;
-8. Konsolidierung ausschließlich für Kandidaten ohne Knock-out;
-9. technische Pass/Fail-Prüfung;
-10. Product-Owner-Präsentation erst bei höchstens zwei vollständig qualifizierten Richtungen.
-
-## 6. Bewertungsanforderung
-
-Eine Richtung wird nur weitergegeben bei:
-
-- mindestens 90/100 nach der verbindlichen Phase-3-Scorecard;
-- Erreichen jedes Dimensionsmindestwerts;
-- keinem harten Knock-out;
-- übereinstimmender Freigabe beider Blindkritiker;
-- keinem ungelösten Red-Team-Befund;
-- nachvollziehbarer Konstruktion und Herkunft;
-- stabiler realer Produktanwendung.
-
-Technische Sauberkeit, Skalierbarkeit und CI-Erfolg sind Eintrittsbedingungen und erhöhen den gestalterischen Score nicht.
-
-## 7. Nutzerentlastung
-
-Der Product Owner erhält keine Rohideen, keine Mikrovarianten und keine Aufforderung, Prüfergebnisse zwischen Chats zu übertragen.
-
-ChatGPT übernimmt:
-
-- Exploration;
-- getrennte Prüfpakete;
-- Festschreibung der Bewertungsartefakte;
-- Konsolidierung;
-- Dokumentation;
-- Vorbereitung des späteren Richtungs-Gates.
-
-Der nächste Nutzereingriff erfolgt erst, wenn höchstens zwei Richtungen alle Anforderungen erfüllen oder wenn ein echter Strategieblocker belegt ist.
+Der nächste visuelle Nutzereingriff erfolgt nur, wenn eine oder höchstens zwei Richtungen die gesamte Qualitätsbarriere bestanden haben. Gibt es keine, lautet das Ergebnis weiterhin `0 qualifizierte Richtungen`, und die interne Suche wird nicht als Fortschritt verkauft.
