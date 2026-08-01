@@ -70,7 +70,7 @@ for(const marker of ['renderGate4Panel','gate4PhaseLabel','handleGate4Action','g
 if(!reviewRender.includes('renderGate4Panel(data)'))errors.push('Gate-4 panel must render directly from the existing review projection.');
 if(!review.includes('handleGate4Action(item, action, reload)'))errors.push('Gate-4 actions must use the existing review router and reload lifecycle.');
 for(const forbidden of ['new MutationObserver(','window.prompt(','window.alert(','document.createElement(\'style\')','startGate4ReviewEnhancement'])if(gate4.includes(forbidden)||loader.includes(forbidden))errors.push(`Gate-4 must not use parallel or browser-native UI mechanisms: ${forbidden}`);
-for(const marker of ['BE_STARTPART_GATE4_MANUAL_ONBOARDING_ITEMS','be_startpartner_gate4_manual_onboarding_key'])if(!gate4Operation.includes(marker)&&!gate4Contract.includes(marker))errors.push(`Gate-4 manual/derived boundary missing: ${marker}`);
+for(const marker of ['BE_STARTPARTNER_GATE4_MANUAL_ONBOARDING_ITEMS','be_startpartner_gate4_manual_onboarding_key'])if(!gate4Operation.includes(marker)&&!gate4Contract.includes(marker))errors.push(`Gate-4 manual/derived boundary missing: ${marker}`);
 for(const marker of ['technical_readback','value_metric_daily','query_status','reporting_target_id'])if(!gate4Readiness.includes(marker))errors.push(`Gate-4 measurement preflight missing: ${marker}`);
 for(const marker of ['ready_measurement','ready_distribution','is_manual'])if(!gate4State.includes(marker))errors.push(`Gate-4 state projection missing: ${marker}`);
 if(!gate4Contract.includes('completed_count'))errors.push('Gate-4 readiness contract missing: completed_count');
