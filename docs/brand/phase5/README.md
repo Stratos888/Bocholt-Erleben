@@ -2,48 +2,78 @@
 
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: aktiv
+Status: **PAUSIERT – Prozesskorrektur vor weiterer Gestaltung**
 
 ## Zweck
 
 Phase 5 setzt die Markenentwicklung nach `0 qualifizierte Richtungen` aus Phase 4 neu auf.
 
-Sie ist keine Reparaturrunde für einen bestehenden Kandidaten. Alle Phase-4-Systeme bleiben beendet. Die neue Runde verwendet ausschließlich das belegte Negativwissen und die allgemeinen Qualitätsanforderungen.
+Sie ist keine Reparaturrunde für einen bestehenden Kandidaten. Alle Phase-4-Systeme bleiben beendet. Die öffentliche Marke und das Produkt bleiben unverändert.
 
-## Kanonische Eingänge
+## Prozessbefund vom 2026-08-01
 
-- `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
-- `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`
-- `docs/brand/AI_BRAND_PROCESS_FAILURE_REPORT.md`
-- `docs/brand/phase5/PHASE4_CONCLUSION.md`
-- `docs/brand/phase5/SEARCH_BRIEF.md`
+Phase 4 scheiterte nicht hauptsächlich an zu schwacher Prüfung. Sie scheiterte bereits bei der kreativen Erzeugung:
 
-## Leitentscheidung
+- generische geometrische Symbolfamilien statt eigenständiger Markenideen;
+- primitive Zeichen mit Standardtypografie statt echter Wortmarkenarbeit;
+- zu frühe Ableitung von App-Icons;
+- Quantität und Prüfbarkeit wurden mit gestalterischer Qualität verwechselt;
+- die späteren Knock-out-Prüfungen konnten schwache Ausgangsarbeit nur ablehnen, aber nicht in Premiumqualität verwandeln.
 
-Die neue Suche priorisiert individuelle Wortmarken und responsive typografische Identität. Ein separates Zeichen ist optional und muss strengere frühe Produkt-, Kategorie- und Austauschbarkeitstests bestehen.
+Der erste Phase-5-Entwurf wiederholte dieses Risiko durch die Vorgabe vieler Mikroideen und Rohkandidaten. Deshalb beginnt keine weitere Gestaltung, bevor der Suchprozess korrigiert ist.
 
-`candidate-011` wird nicht fortgeführt. Die einzige übertragene Erkenntnis ist, dass kompakte Bewegung, klare Silhouette und Reduktion technisch tragfähig sein können. Spiral-, Wirbel-, Augen- und Ladeindikatorformen selbst sind kein Ausgangsentwurf.
+## Korrigierte Leitentscheidung
 
-## Operativer Ablauf
+Die nächste Runde ist **creative-direction- und lettering-first**:
 
-1. breite interne Mikroideen;
-2. frühe harte Filter;
-3. höchstens acht anonyme Rohkandidaten;
-4. deterministische Wortmarken- und SVG-Konstruktion;
-5. reale Originalgrößen-Prüfsets;
-6. getrennte festgeschriebene Kritik A, Kritik B und Red Team;
-7. vollständige Phase-3-Scores bereits in den Blindurteilen;
-8. Konsolidierung und technische Eintrittsprüfung;
-9. höchstens zwei qualifizierte Richtungen für das Product-Owner-Gate.
+1. Produktkern und emotionale Markenspannung präzisieren;
+2. aktuelle Premium-Benchmarks und Kategorieklischees neutral vergleichen;
+3. höchstens drei klar verschiedene kreative Territorien definieren;
+4. pro Territorium ernsthafte Wortmarken- und Typografiestudien erstellen;
+5. nur sichtbar starke Identitäten in reale mobile Produktgrößen übertragen;
+6. erst danach eine responsive Kleinform oder ein App-Zeichen ableiten;
+7. maximal drei ausgereifte Kandidaten prüfen;
+8. dem Product Owner nur eine oder höchstens zwei tatsächlich qualifizierte Richtungen zeigen.
+
+Ein separates abstraktes Zeichen ist keine Pflicht. Es wird nicht als Ausgangspunkt verwendet, solange die Wortmarke und das übergreifende Formprinzip nicht überzeugen.
+
+## Qualitätsbarriere vor der formalen Bewertung
+
+Eine Richtung gelangt nur in Blindkritik und Scorecard, wenn sie zuvor:
+
+- sichtbar über dem Niveau einer Standardschrift oder eines generischen App-Icons liegt;
+- im direkten Vergleich klar besser als die aktuelle Identität wirkt;
+- als vollständige Primäridentität professionell und eigenständig erscheint;
+- ohne Konzepttext eine plausible, nicht-technische Markenwirkung besitzt;
+- in realem mobilem Header und als kleine responsive Fassung funktioniert;
+- keine der bekannten Phase-4-Formfamilien wiederholt.
+
+Formale Prüfungen und Punktwerte dürfen keine mittelmäßige Gestaltung adeln.
+
+## Methodische Ehrlichkeit
+
+Wenn Produktion, Kritik und Konsolidierung durch denselben ChatGPT-Orchestrator ausgeführt werden, wird dies nicht als echte unabhängige Blindprüfung bezeichnet. Stattdessen werden:
+
+- Produktionsnotizen vor der Bewertung gesperrt;
+- Kandidaten anonymisiert;
+- getrennte evidenzbasierte Bewertungspässe ausgeführt;
+- Widersprüche und methodische Grenzen dokumentiert;
+- die finale visuelle Entscheidung beim Product Owner belassen.
 
 ## Nutzerinteraktion
 
-Der Nutzer muss keine Archivchats suchen, keine neuen Prüferchats anlegen und keine Ergebnisse übertragen. Unreife Entwürfe werden nicht präsentiert.
+Der Nutzer erhält:
 
-Bis zum Richtungs-Gate erfolgen keine öffentliche Produktänderung und keine Integration in Header, Manifest, Fonts, Tokens oder App-Icons.
+- keine Rohideen;
+- keine Mikrovarianten;
+- keine generierten Berichtsgrafiken;
+- keine Aufforderung, Chats oder Prüfergebnisse zu verwalten.
+
+Interne visuelle Arbeit muss trotzdem real erfolgen: als private, repository-lokale SVG-, Typografie- und Originalgrößenstudien. Rein verbale oder nur „gedachte“ Logos sind nicht bewertbar. Sichtbar präsentiert wird erst, wenn mindestens eine Richtung die Qualitätsbarriere nachvollziehbar überschritten hat.
 
 ## Aktuelles Ergebnis
 
 - qualifizierte Richtungen: `0`
-- Phase-5-Richtungen erzeugt: `0`
+- neue Phase-5-Richtungen: `0`
 - öffentliche Änderungen: `0`
+- nächster zulässiger Schritt: Premium-Benchmark und kreative Territorien, noch keine Logoerzeugung
