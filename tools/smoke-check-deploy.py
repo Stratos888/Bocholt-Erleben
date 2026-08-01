@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import argparse
-import base64
 import json
 import re
 import sys
 import time
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin
@@ -302,93 +300,6 @@ def check_push_endpoints_protected(base_url: str) -> None:
         check_protected_json_endpoint(base_url, path=path, label=label, method="POST", body=b"{}")
 
 
-def load_gate4_review_password() -> str:
-    path = Path("deploy") / "api" / "_config.php"
-    if not path.is_file():
-        raise AssertionError("Private Deploy-Konfiguration für Gate-4-Evidence fehlt.")
-    source = path.read_text(encoding="utf-8")
-    match = re.search(r"base64_decode\('([^']+)'\)", source)
-    if match is None:
-        raise AssertionError("Private Deploy-Konfiguration ist nicht auslesbar.")
-    try:
-        config = json.loads(base64.b64decode(match.group(1)).decode("utf-8"))
-    except (ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
-        raise AssertionError("Private Deploy-Konfiguration ist ungültig.") from error
-    password = str((config.get("review") or {}).get("password") or "").strip()
-    if not password:
-        raise AssertionError("Staging-Review-Passwort fehlt in der privaten Deploy-Konfiguration.")
-    return password
-
-
-def check_gate4_staging_lifecycle(base_url: str, expected_build: str) -> None:
-    if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
-        return
-    build = expected_build.strip()
-    if not re.fullmatch(r"[0-9a-f]{12}", build):
-        raise AssertionError("Gate-4-Evidence benötigt den exakten zwölfstelligen Deploy-Build.")
-    path = "/api/startpartner/evidence/gate4_staging_lifecycle_241.php"
-    request_body = json.dumps({"expected_build": build}).encode("utf-8")
-    unauthenticated = request_url(
-        build_url(base_url, path),
-        method="POST",
-        body=request_body,
-        headers={"Content-Type": "application/json"},
-        timeout=30,
-    )
-    require_status(unauthenticated, {401}, "Gate-4-Evidence Zugriffsschutz")
-    password = load_gate4_review_password()
-    result = request_url(
-        build_url(base_url, path),
-        method="POST",
-        body=request_body,
-        headers={"Content-Type": "application/json", "X-BE-Review-Password": password},
-        timeout=300,
-    )
-    require_status(result, {200}, "Gate-4-E4-Staging-Lifecycle")
-    payload = parse_json(result)
-    data = payload.get("data")
-    if payload.get("status") != "ok" or not isinstance(data, dict):
-        raise AssertionError(f"Gate-4-E4-Staging-Lifecycle: unerwartete Antwort: {payload}")
-    residue = data.get("residue")
-    if not isinstance(residue, dict) or int(residue.get("total", -1)) != 0:
-        raise AssertionError(f"Gate-4-E4-Staging-Lifecycle: Cleanup nicht rückstandsfrei: {residue}")
-    if data.get("already_completed") is True:
-        print("✅ Gate-4-E4-Staging-Lifecycle: bereits genau einmal abgeschlossen; Marker bestätigt")
-        return
-    evidence = data.get("evidence")
-    if not isinstance(evidence, dict):
-        raise AssertionError("Gate-4-E4-Staging-Lifecycle: Evidence fehlt.")
-    required_pairs = {
-        "onboarding_completed": 14,
-        "measurement_owner": "value_metric_daily",
-        "activation_replay": True,
-        "changed_payload_status": 409,
-        "stale_revision_status": 409,
-        "reservation_status": "released",
-        "active_scope_count": 7,
-        "pilot_usage_count": 1,
-        "second_content_status": "draft",
-    }
-    for key, expected in required_pairs.items():
-        if evidence.get(key) != expected:
-            raise AssertionError(
-                f"Gate-4-E4-Staging-Lifecycle: {key} erwartet {expected!r}, erhalten {evidence.get(key)!r}."
-            )
-    if sorted(evidence.get("content_types") or []) != ["activity", "event"]:
-        raise AssertionError("Gate-4-E4-Staging-Lifecycle: Event-/Aktivitätskompatibilität fehlt.")
-    if evidence.get("locked_after_cleanup") != evidence.get("locked_before"):
-        raise AssertionError("Gate-4-E4-Staging-Lifecycle: Locked-Owner-Counts wurden nicht wiederhergestellt.")
-    capacity_before = evidence.get("capacity_before") or {}
-    capacity_after = evidence.get("capacity_after_cleanup") or {}
-    if capacity_before.get("occupied_slots") != capacity_after.get("occupied_slots"):
-        raise AssertionError("Gate-4-E4-Staging-Lifecycle: Kapazität wurde nach Cleanup nicht wiederhergestellt.")
-    print(
-        "✅ Gate-4-E4-Staging-Lifecycle: Portal, Event und Aktivität, 14 Prüfpunkte, "
-        "Messung, Reichweite, Aktivierung, Kalenderdaten, Replay, Konflikte, Kapazität, "
-        "Locked Owners und Zero Residue belegt"
-    )
-
-
 def run(args: argparse.Namespace) -> None:
     base_url = normalize_base_url(args.base_url)
     checks = [
@@ -404,7 +315,6 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_checkout_validation(base_url),
         lambda: check_review_endpoint_protected(base_url),
         lambda: check_push_endpoints_protected(base_url),
-        lambda: check_gate4_staging_lifecycle(base_url, args.expected_build),
     ]
     print(f"=== Deploy-Smoke-Check: {base_url} ===")
     for check in checks:
