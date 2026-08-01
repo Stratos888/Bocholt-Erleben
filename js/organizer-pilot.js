@@ -153,7 +153,7 @@
           <button class="content-cta content-cta--primary" type="submit">Kostenlos zur Prüfung einreichen</button>
         </div>
         <p class="content-note" data-pilot-submit-status aria-live="polite">
-          Die Einreichung ist kostenlos. Wir prüfen den Inhalt redaktionell, bevor er veröffentlicht wird.
+          Die Einreichung ist kostenlos und löst keine Zahlung aus. Wir prüfen den Inhalt redaktionell, bevor er veröffentlicht wird.
         </p>
       </form>
     `;
