@@ -163,7 +163,7 @@ try{
   assert(await desktopRun.page.locator('.cc-actions--secondary-desktop:visible').count()===1,'desktop: bestehende Nebenaktionen fehlen');
   await desktopRun.context.close(); results.push({name:'desktop-contract',status:'OK'});
 
-  await startpartnerState(browser,'startpartner-blocked',{width:360,height:780},'startpartner-mobile-360x780-blocked',['Qualifizierung','Lokaler Bezug','Mindestanforderung nicht erfüllt.','Fälligkeit','Kapazität'],'Höchsten Blocker bearbeiten');
+  await startpartnerState(browser,'startpartner-blocked',{width:360,height:780},'startpartner-mobile-360x780-blocked',['Qualifizierung','Lokaler Bezug','Mindestanforderung nicht erfüllt.','Fälligkeit','Kapazität'],'Wichtigsten offenen Punkt bearbeiten');
   await startpartnerState(browser,'startpartner-ready',{width:390,height:844},'startpartner-mobile-390x844-ready',['Entscheidungsreif','Alle 14 Prüfpunkte','4 von 8 Plätzen reserviert'],'Platz reservieren');
   await startpartnerState(browser,'startpartner-soft',{width:768,height:1024},'startpartner-tablet-768x1024-soft-stop',['Entscheidungsreif','Begründung für eine Ausnahme erforderlich','6 von 8 Plätzen reserviert'],'Platz reservieren');
   await startpartnerState(browser,'startpartner-hard',{width:360,height:780},'startpartner-mobile-360x780-hard-stop',['Entscheidungsreif','Grenze erreicht','8 von 8 Plätzen reserviert'],'Auf Warteliste setzen');
