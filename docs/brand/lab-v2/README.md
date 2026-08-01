@@ -1,25 +1,23 @@
-# Brand Lab v2
+# Brand Lab v2 – archivierter Fehlversuch
 
 Stand: 2026-08-01
 Workpack: #225
-Status: ein intern qualifizierter Richtungs-Kandidat; keine öffentliche Änderung
+Status: **ZURÜCKGEWIESEN**
 
-Das isolierte Brand Lab v2 zeigt ausschließlich **Offener Impuls**. Die Richtung erreicht intern 91/100, unterschreitet keinen Mindestwert und besitzt im aktuellen Stand keinen Knock-out.
+Die frühere Darstellung von `Offener Impuls` als intern qualifizierte Richtung ist ungültig.
 
-Nicht gezeigt werden acht verworfene Prinzipien aus den drei Konzeptfeldern. Ihre Fehlerbilder sind im Refinement- und Qualifizierungsbericht dokumentiert; Rohvarianten werden nicht als künstliche Auswahl präsentiert.
+- frühere Behauptung: 91/100;
+- kanonischer Status: zurückgewiesen;
+- Premium-Gate: nicht bestanden;
+- Mikrozeichnung: nicht freigegeben;
+- öffentliche Umsetzung: nicht freigegeben;
+- Weiterentwicklung dieser Familie: beendet.
 
-## Enthaltene Prüfungen
+Die Assets bleiben ausschließlich als nachvollziehbare Fehler- und Prozesshistorie erhalten.
 
-- Primärwortmarke, responsive Verdichtung und direkt abgeleitete Kleinmarke;
-- Farb-, Monochrom- und Inversfassung;
-- echte Raster bei 16, 24, 32, 48 und 64 Pixeln;
-- Kreis-, Squircle- und Rounded-Masken;
-- identische mobile und Desktop-Produktkontexte;
-- feste Scorecard, Stärken, Risiken und Product-Owner-Gate;
-- dokumentierte Provenienz ohne Rechtsfreigabe zu behaupten.
+Sie dürfen nicht als freigegebene, qualifizierte oder empfohlene Markenrichtung verwendet werden.
 
-## Grenzen
+Der vollständige Befund steht in:
 
-- Die 16- und 24-Pixel-Raster besitzen eine dokumentierte optische Akzentvergrößerung, bleiben aber geometrisch und semantisch dieselbe Kleinmarke.
-- Keine Markenrechts-, Schutzfähigkeits- oder Freedom-to-use-Freigabe.
-- Keine finale Mikrozeichnung, kein Asset-Cutover und keine Änderung an öffentlichem Staging oder Live.
+- `docs/brand/AI_BRAND_PROCESS_FAILURE_REPORT.md`;
+- `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`.
