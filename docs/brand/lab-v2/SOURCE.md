@@ -1,22 +1,24 @@
-# Offener Impuls – Konstruktionsquelle
+# Archivierte Konstruktionsquelle – zurückgewiesene Richtung
 
-Die finalen Richtungsassets sind vollständig pfadbasiert und enthalten keine Textobjekte, externen Ressourcen oder automatisch vektorisierten Bildausgaben.
+Die hier dokumentierten Assets gehören zu einem formal zurückgewiesenen Phase-2-Fehlversuch.
 
-## Basis
+## Historische Basis
 
 - Outline-Basis: `Inter Display SemiBold`;
 - Lizenz: SIL Open Font License 1.1;
-- die Fontdatei wird nicht im Repository dupliziert oder ausgeliefert;
-- alle ausgelieferten Wortmarken liegen als feste SVG-Pfade vor.
+- pfadbasierte SVG-Ausgabe;
+- diagonaler Eingriff und grüner Impuls an den Wortanfängen.
 
-## Individuelle Konstruktion
+## Korrigierter Status
 
-- die beiden Wortanfänge erhalten dieselbe diagonale Öffnungsgeometrie;
-- ein schwebender, kleiner Impuls liegt innerhalb dieser Öffnung;
-- die responsive Fassung verwendet exakt dieselben Buchstabenpfade und dieselbe Öffnungslogik;
-- die Kleinmarke ist der identische erste Buchstabe der Primärwortmarke;
-- nur die 16- und 24-Pixel-Raster vergrößern den Impuls optisch, damit das Merkmal im Pixelraster nicht verschwindet.
+Die dokumentierte technische Herkunft belegt nur Reproduzierbarkeit.
 
-## Nicht behauptet
+Sie belegt nicht:
 
-Die dokumentierte Herkunft beweist Reproduzierbarkeit, nicht markenrechtliche Schutzfähigkeit oder Freedom-to-use. Ein professioneller Ähnlichkeits- und Rechtscheck bleibt vor einer Anmeldung erforderlich.
+- Eigenständigkeit;
+- Premiumqualität;
+- Markenpassung;
+- Schutzfähigkeit;
+- Freedom-to-use.
+
+Der Kandidat ist zurückgewiesen und wird nicht weiterentwickelt.
