@@ -1,0 +1,13 @@
+{
+  "template": true,
+  "candidate_id": "candidate-000",
+  "role": "producer",
+  "evaluator_id": "producer-placeholder",
+  "created_at": null,
+  "concept_title_disclosed": false,
+  "other_reviews_seen": false,
+  "final_design_score": null,
+  "construction_evidence": [],
+  "provenance_evidence": [],
+  "declared_risks": []
+}
