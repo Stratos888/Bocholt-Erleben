@@ -20,7 +20,7 @@ function gate4Candidate(scenario='onboarding'){
   const items=keys.map(key=>({item_key:key,status:complete.has(key)?'complete':'pending',is_required:1,is_hard_blocker:1,is_manual:manual.has(key)?1:0,evidence_text:complete.has(key)?`Nachweis ${key}`:null,revision:1}));
   const contentStatus=scenario==='onboarding'?'draft':scenario==='active'?'approved':'editorial_ready';
   const pilot={id:'24100000-0000-4000-8000-000000000002',status:scenario==='active'?'active':scenario==='ready'?'activation_ready':'onboarding',revision:7,activation_date_local:scenario==='active'?'2026-08-01':null,planned_end_date:scenario==='active'?'2027-02-01':null};
-  const gate4={phase:scenario==='active'?'active':scenario==='ready'?'activation_ready':'onboarding',complete:scenario==='active',active:scenario==='active',activation_ready:scenario==='ready',pilot,onboarding:{ready:scenario!=='onboarding',completed_count:items.filter(row=>row.status==='complete').length,total_count:14,items,blockers:[]},content_links:[{id:'24100000-0000-4000-8000-000000000010',submission_id:4241,content_type:'event',status:contentStatus,title:'Synthetischer Startpartner-Kulturtag',start_date:'2026-09-12'}],first_content:{id:'24100000-0000-4000-8000-000000000010',submission_id:4241,content_type:'event',status:contentStatus,title:'Synthetischer Startpartner-Kulturtag',start_date:'2026-09-12'},ready_measurement:scenario==='onboarding'?null:{id:'24100000-0000-4000-8000-000000000020',metrics_owner:'value_metric_daily',checked_at:'2026-08-01 10:00:00'},ready_distribution:scenario==='onboarding'?null:{id:'24100000-0000-4000-8000-000000000030',channel:'Newsletter',planned_at:'2026-08-08 22:00:00'},blockers:scenario==='onboarding'?[{message:'Portalzugang ist noch nicht getestet.'}]:[],capacity:{occupied_slots:1,active_pilots:scenario==='active'?1:0,active_reservations:scenario==='active'?0:1,hard_stop_at:8,soft_stop_at:6}};
+  const gate4={phase:scenario==='active'?'active':scenario==='ready'?'activation_ready':'onboarding',complete:scenario==='active',active:scenario==='active',activation_ready:scenario==='ready',pilot,onboarding:{ready:scenario!=='onboarding',completed_count:items.filter(row=>row.status==='complete').length,total_count:14,items,blockers:[]},content_links:[{id:'24100000-0000-4000-8000-000000000010',submission_id:4241,content_type:'event',status:contentStatus,title:'Synthetischer Startpartner-Kulturtag',start_date:'2026-09-12'}],first_content:{id:'24100000-0000-4000-8000-000000000010',submission_id:4241,content_type:'event',status:contentStatus,title:'Synthetischer Startpartner-Kulturtag',start_date:'2026-09-12'},ready_measurement:scenario==='onboarding'?null:{id:'24100000-0000-4000-8000-000000000020',metrics_owner:'value_metric_daily',checked_at:'2026-08-01 10:00:00'},ready_distribution:scenario==='onboarding'?null:{id:'24100000-0000-4000-8000-000000000030',channel:'Newsletter',planned_at:'2026-08-08 22:00:00'},blockers:scenario==='onboarding'?[{message:'Der Veranstalterzugang ist noch nicht getestet.'}]:[],capacity:{occupied_slots:1,active_pilots:scenario==='active'?1:0,active_reservations:scenario==='active'?0:1,hard_stop_at:8,soft_stop_at:6}};
   return {id:'19900000-0000-0000-0000-000000009999',organization_name:'Gate-4-Kulturverein Bocholt',source:'targeted_outreach',desired_content_scope:'both',status:'accepted_pending_terms',revision:12,assigned_to:'M. Muster',next_review_at:'2026-08-04 10:00:00',website_url:'https://example.org/startpartner',description_text:'Lokaler Kulturverein mit Veranstaltungen und Aktivitäten.',contacts:[{contact_name:'Erika Beispiel',email:'erika@example.org',is_primary:true}],qualifications:[],readiness:{ready:true,assessed_count:14,total_count:14,blockers:[]},capacity:gate4.capacity,reservations:[],active_reservation:scenario==='active'?null:{id:77,status:'active',ends_at:'2026-08-20 10:00:00'},waitlist:null,decision:{result:'accepted_pending_terms',reason:'Fachlich geeignet.'},events:[],gate3:{complete:true,blockers:[],terms_acceptance:{id:301,terms_version:'pilot-terms-v1',accepted_at:'2026-07-27 20:00:00'},organizer:{id:401,organization_name:'Gate-4-Kulturverein Bocholt',email:'erika@example.org'},pilot,scopes:[{scope_key:'events',limit_value:8,is_unlimited:false,period_unit:'pilot_month'},{scope_key:'activities',limit_value:1,is_unlimited:false,period_unit:'concurrent'}],entitlement:{id:'23100000-0000-4000-8000-000000000002',status:scenario==='active'?'active':'pending_activation'},events:[]},gate4};
 }
 
@@ -40,7 +40,7 @@ async function controlState(browser,scenario,viewport,name,markers){
   assert(await panel.count()===1,`${name}: Gate-4-Panel fehlt oder ist doppelt`);
   const text=await panel.innerText();
   for(const marker of markers)assert(containsVisibleText(text,marker),`${name}: Marker fehlt: ${marker}`);
-  assert(!/\b(editorial_ready|pending_activation|activation_ready)\b/.test(text),`${name}: technischer Rohstatus sichtbar`);
+  assert(!/\b(editorial_ready|pending_activation|activation_ready|onboarding)\b/.test(text),`${name}: technischer Rohstatus sichtbar`);
   assert(await panel.locator('[data-gate4-item="measurement_ready"] button').count()===0,`${name}: abgeleitete Messbereitschaft ist manuell überschreibbar`);
   assert(await panel.locator('[data-gate4-item="portal_access_tested"] button').count()===(scenario==='active'?0:2),`${name}: manueller Portalnachweis hat falsche Aktionen`);
   assert(await panel.locator('details[open]').count()===0,`${name}: Detailbereiche müssen initial eingeklappt sein`);
@@ -58,7 +58,7 @@ async function activationDialog(browser){
   await page.locator('[data-review-action="gate4:activate"]').click();
   await page.waitForSelector('#cc-dialog[open] #gate4-activation-date');
   const text=await page.locator('#cc-dialog').innerText();
-  for(const marker of ['Atomare Aktivierung','Mail, Zahlung und Stripe bleiben unverändert','Lokales Aktivierungsdatum','Geplantes Ende'])assert(containsVisibleText(text,marker),`activation dialog: Marker fehlt: ${marker}`);
+  for(const marker of ['Was beim Start passiert','keine Zahlung ausgelöst','Startdatum','Geplantes Ende'])assert(containsVisibleText(text,marker),`activation dialog: Marker fehlt: ${marker}`);
   assert(await page.locator('#gate4-activation-date').inputValue()!=='','activation dialog: lokales Standarddatum fehlt');
   assert(await page.locator('#gate4-end-preview').innerText()!=='','activation dialog: Enddatumsvorschau fehlt');
   await context.close();results.push({name:'gate4-activation-dialog',status:'OK'});
@@ -66,12 +66,12 @@ async function activationDialog(browser){
 
 async function manualDialog(browser){
   const {page,context}=await openControl(browser,'onboarding',{width:390,height:844},'gate4-mobile-manual-dialog');
-  await page.locator('[data-gate4-panel] summary', {hasText:'Onboarding-Checkliste'}).click();
+  await page.locator('[data-gate4-panel] summary', {hasText:'Schritte der Piloteinrichtung'}).click();
   await page.locator('[data-review-action="gate4:item:portal_access_tested:complete"]').click();
   await page.waitForSelector('#cc-dialog[open] #gate4-evidence');
   const text=await page.locator('#cc-dialog').innerText();
-  assert(containsVisibleText(text,'Portalzugang getestet'),'manual dialog: fachlicher Titel fehlt');
-  assert(containsVisibleText(text,'belastbaren Nachweis'),'manual dialog: Nachweisanforderung fehlt');
+  assert(containsVisibleText(text,'Veranstalterzugang getestet'),'manual dialog: fachlicher Titel fehlt');
+  assert(containsVisibleText(text,'Hinterlege den Nachweis'),'manual dialog: Nachweisanforderung fehlt');
   assert(await isRequired(page.locator('#gate4-evidence')),'manual dialog: Nachweis ist nicht erforderlich');
   await context.close();results.push({name:'gate4-manual-dialog',status:'OK'});
 }
@@ -96,11 +96,11 @@ async function organizerPortal(browser,viewport,name){
   await page.waitForSelector('#organizer-dashboard-pilot-card:not([hidden])');
   const card=page.locator('#organizer-dashboard-pilot-card');
   const initial=await card.innerText();
-  for(const marker of ['Kostenloser Startpartner-Pilot','Einrichtung läuft','9 von 14 Punkten belegt'])assert(containsVisibleText(initial,marker),`${name}: Portalmarker fehlt: ${marker}`);
+  for(const marker of ['Kostenloser Startpartner-Pilot','Einrichtung läuft','9 von 14 Schritten erledigt'])assert(containsVisibleText(initial,marker),`${name}: Portalmarker fehlt: ${marker}`);
   assert(!/\b(onboarding|draft|pending_activation)\b/.test(initial),`${name}: technischer Rohstatus sichtbar`);
-  await card.locator('summary', {hasText:'Neuen Pilotinhalt einreichen'}).click();
+  await card.locator('summary', {hasText:'Neuen Inhalt einreichen'}).click();
   const form=page.locator('#organizer-pilot-content-form');
-  assert(containsVisibleText(await form.innerText(),'Keine Zahlung'),`${name}: Zahlungsgrenze fehlt im sichtbaren Einreichungsformular`);
+  assert(containsVisibleText(await form.innerText(),'Einreichung ist kostenlos'),`${name}: Kostenhinweis fehlt im sichtbaren Einreichungsformular`);
   await form.locator('[name="content_type"]').selectOption('activity');
   assert(!(await isRequired(form.locator('[name="start_date"]'))),`${name}: Aktivität verlangt ein Veranstaltungsdatum`);
   assert(await form.locator('[data-pilot-event-date]').isHidden(),`${name}: Datumsfeld für Aktivität sichtbar`);
@@ -110,7 +110,7 @@ async function organizerPortal(browser,viewport,name){
   await form.locator('[name="location_public_confirmed"]').check();
   await form.locator('button[type="submit"]').click();
   await page.waitForFunction(()=>document.querySelector('#organizer-dashboard-pilot-card')?.textContent.includes('Einreichung 909'));
-  await card.locator('summary', {hasText:'Neuen Pilotinhalt einreichen'}).click();
+  await card.locator('summary', {hasText:'Neuen Inhalt einreichen'}).click();
   const refreshed=page.locator('#organizer-pilot-content-form');
   assert(await refreshed.locator('[name="content_type"]').inputValue()==='event',`${name}: Formularreset stellt den Standardtyp nicht wieder her`);
   assert(await isRequired(refreshed.locator('[name="start_date"]')),`${name}: Datum ist nach Reset für Veranstaltung nicht erforderlich`);
@@ -123,9 +123,9 @@ async function organizerPortal(browser,viewport,name){
 
 const browser=await chromium.launch({headless:true});
 try{
-  await controlState(browser,'onboarding',{width:360,height:780},'gate4-mobile-360x780-onboarding',['Pilot-Onboarding','9 / 14 belegt','Nächster Blocker','Portalzugang ist noch nicht getestet.','Onboarding-Checkliste','Pilotinhalte','Messpreflight','Partnerdistribution']);
-  await controlState(browser,'ready',{width:390,height:844},'gate4-mobile-390x844-ready',['Aktivierungsbereit','14 / 14 belegt','Pilot verbindlich aktivieren','Technisch belegt','Konkret vorbereitet']);
-  await controlState(browser,'active',{width:1440,height:900},'gate4-desktop-1440x900-active',['Pilot aktiv','Sechsmonatige Pilotphase läuft','01.08.2026','01.02.2027','Veröffentlicht']);
+  await controlState(browser,'onboarding',{width:360,height:780},'gate4-mobile-360x780-onboarding',['Piloteinrichtung','9 von 14 erledigt','Nächster offener Punkt','Der Veranstalterzugang ist noch nicht getestet.','Schritte der Piloteinrichtung','Inhalte im Pilot','Erfolgsmessung','Reichweitenbeitrag']);
+  await controlState(browser,'ready',{width:390,height:844},'gate4-mobile-390x844-ready',['Bereit zum Start','14 von 14 erledigt','Pilot jetzt starten','Eingerichtet','Vorbereitet']);
+  await controlState(browser,'active',{width:1440,height:900},'gate4-desktop-1440x900-active',['Pilotphase läuft','Sechsmonatige Pilotphase läuft','01.08.2026','01.02.2027','Veröffentlicht']);
   await activationDialog(browser);
   await manualDialog(browser);
   await organizerPortal(browser,{width:390,height:844},'gate4-organizer-mobile-390x844');
