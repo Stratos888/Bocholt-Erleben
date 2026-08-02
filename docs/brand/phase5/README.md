@@ -2,7 +2,7 @@
 
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **INTERNER SUCHRAUM AUSGESCHÖPFT – EXTERNE ORIGINÄRE GESTALTUNG VORBEREITET**
+Status: **INTERNE SUCH- UND KONSTRUKTIONSWEGE AUSGESCHÖPFT – EXTERNE ORIGINÄRE GESTALTUNG VORBEREITET**
 
 ## Zweck
 
@@ -20,9 +20,10 @@ Die öffentliche Marke und das Produkt bleiben unverändert.
 6. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
 7. `docs/brand/phase5/GENERATIVE_SEARCH_BRIEF.md`
 8. `docs/brand/phase5/GENERATIVE_SEARCH_CYCLE_01_RESULT.md`
-9. `docs/brand/phase5/EXTERNAL_CREATIVE_EXECUTION_BRIEF.md`
-10. `docs/brand/phase5/PHASE4_CONCLUSION.md`
-11. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
+9. `docs/brand/phase5/FINAL_CONTROLLED_CONSTRUCTION_RESULT.md`
+10. `docs/brand/phase5/EXTERNAL_CREATIVE_EXECUTION_BRIEF.md`
+11. `docs/brand/phase5/PHASE4_CONCLUSION.md`
+12. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
 
 Verbindlich bleiben:
 
@@ -41,7 +42,7 @@ Verbindlich bleiben:
 - qualifizierte Richtungen: `0`;
 - generische geometrische und UI-nahe Richtungen vollständig beendet.
 
-### Phase 5 – erster kontrollierter Studienzyklus
+### Phase 5A – kontrollierte Studien
 
 Geprüft und beendet wurden unter anderem:
 
@@ -59,7 +60,7 @@ Ergebnis:
 - Kandidaten: `0`;
 - qualifizierte Richtungen: `0`.
 
-### Phase 5 – generativer Suchzyklus 01
+### Phase 5B – generativer Suchzyklus 01
 
 Gemäß `GENERATIVE_SEARCH_BRIEF.md` wurden zwölf ernsthafte Rohhypothesen über vier Suchfelder geprüft:
 
@@ -79,17 +80,31 @@ Der vollständige Befund liegt in:
 
 - `docs/brand/phase5/GENERATIVE_SEARCH_CYCLE_01_RESULT.md`
 
-## Warum keine weitere automatische Variantenrunde folgt
+### Phase 5C – letzter kontrollierter Konstruktionslauf
 
-Die verfügbaren internen prozeduralen Formräume wurden systematisch kontrolliert:
+Nach der offenen Suche wurde genau eine falsifizierbare Wortmarkenhypothese gezielt konstruiert:
 
-- Schriftbasis plus Modifikation;
-- eigene Schriftkonstruktionen;
-- typografische Paarungen;
-- Initial- und Monogrammableitungen;
-- Schleifen-, Band-, Gewebe-, Rosetten- und Rhythmuszeichen;
-- Bestandsöffnung und Negativraummodule;
-- responsive Voll- und Kleinformen.
+- ein gemeinsames Buchstabensystem;
+- `Bocholt` stabil;
+- `erleben` schrittweise geöffnet;
+- keine Kursivpaarung, kein Symbol, Monogramm, Farbakzent oder App-Icon;
+- ausschließlich geringe, ausgewogene und deutliche Stärke desselben Parameters.
+
+Ergebnis:
+
+- geringe Öffnung: keine ausreichende Differenzierung zur neutralen Kontrolle;
+- ausgewogene Öffnung: Einschnitt-, Punkt-, Fehler- und beschädigte-Glyphe-Lesart;
+- deutliche Öffnung: überzeichnetes Gimmick und schlechtere mobile Lesbarkeit;
+- bestandene Fassungen: `0`;
+- Kandidaten: `0`.
+
+Der vollständige Befund liegt in:
+
+- `docs/brand/phase5/FINAL_CONTROLLED_CONSTRUCTION_RESULT.md`
+
+## Warum keine weitere interne Variantenrunde folgt
+
+Die verfügbaren internen explorativen, generativen und gezielt konstruktiven Formräume wurden systematisch kontrolliert.
 
 Die wiederkehrenden Fehler sind stabil:
 
@@ -98,7 +113,9 @@ Die wiederkehrenden Fehler sind stabil:
 - lokale Herleitung nur im Konzepttext;
 - Symbol kippt in UI, Mode, Handwerk, Publishing oder andere falsche Kategorien;
 - mobile Reduktion verliert das besondere Merkmal;
-- Kleinform bleibt ein austauschbares Initialmonogramm.
+- Kleinform bleibt ein austauschbares Initialmonogramm;
+- subtile Modifikation differenziert nicht;
+- sichtbare Modifikation wird zum Artefakt oder typografischen Defekt.
 
 Eine weitere kleine automatische Variation wäre kein belastbarer Erkenntnisgewinn.
 
@@ -134,9 +151,10 @@ Sichtbar präsentiert wird erst, wenn mindestens eine originär gestaltete und t
 
 ## Aktueller Stand
 
+- ernsthafte interne Hypothesen: `45`;
 - qualifizierte Richtungen: `0`;
 - Phase-5-Kandidaten: `0`;
 - Nutzerpräsentationen: `0`;
 - öffentliche Änderungen: `0`;
-- automatische interne Suche: abgeschlossen;
+- interne Suche und Konstruktion: abgeschlossen;
 - externer Creative-Execution-Brief: ausführungsbereit.
