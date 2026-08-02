@@ -2,159 +2,78 @@
 
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **INTERNE SUCH- UND KONSTRUKTIONSWEGE AUSGESCHÖPFT – EXTERNE ORIGINÄRE GESTALTUNG VORBEREITET**
+Status: **PRODUCT-OWNER-GATE – CANDIDATE 201 INTERN DESIGNQUALIFIZIERT**
 
 ## Zweck
 
-Phase 5 entwickelt eine Premium-Markenidentität für `Bocholt erleben`, ohne schwache Rohideen, generische Icons oder formale Prüfergebnisse als Qualitätsersatz an den Product Owner weiterzugeben.
+Phase 5 entwickelt eine Premium-Markenidentität für `Bocholt erleben`, ohne schwache Rohideen, generische Icons oder formale Prüfergebnisse als Qualitätsersatz weiterzugeben.
 
 Die öffentliche Marke und das Produkt bleiben unverändert.
 
-## Verbindliche Eingänge
-
-1. `docs/brand/phase5/PROCESS_ROOT_CAUSE_AND_GOVERNANCE.md`
-2. `docs/brand/phase5/ARCHITECTURE_AWARE_EVALUATION.md`
-3. `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`
-4. `docs/brand/phase5/PREMIUM_BENCHMARK.md`
-5. `docs/brand/phase5/CREATIVE_TERRITORIES.md`
-6. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
-7. `docs/brand/phase5/GENERATIVE_SEARCH_BRIEF.md`
-8. `docs/brand/phase5/GENERATIVE_SEARCH_CYCLE_01_RESULT.md`
-9. `docs/brand/phase5/FINAL_CONTROLLED_CONSTRUCTION_RESULT.md`
-10. `docs/brand/phase5/EXTERNAL_CREATIVE_EXECUTION_BRIEF.md`
-11. `docs/brand/phase5/PHASE4_CONCLUSION.md`
-12. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
-
-Verbindlich bleiben:
+## Verbindliche Qualitätsgrenze
 
 - mindestens `90/100`;
 - alle Dimensionsmindestwerte;
 - kein architekturabhängig belegter Knock-out;
 - zwei getrennte positive Bewertungspässe;
 - kein ungelöster Red-Team-Befund;
-- höchstens zwei Richtungen im Product-Owner-Gate;
-- keine Nutzerpräsentation unreifer Studien.
+- keine Integration ohne Product-Owner-Entscheidung und separates Workpack.
 
-## Gesamtbefund
+## Vorherige Zyklen
 
-### Phase 4
+Die früheren Such- und Konstruktionspfade bleiben beendet. Sie lieferten insgesamt `45` ernsthafte interne Hypothesen ohne Kandidaten. Ihre Fehlerklassen bleiben als Sperren erhalten.
 
-- qualifizierte Richtungen: `0`;
-- generische geometrische und UI-nahe Richtungen vollständig beendet.
+## Konstruktiver Reset
 
-### Phase 5A – kontrollierte Studien
+Statt einer weiteren offenen Variantensuche wurden genau zwei vollständige Architekturansätze konstruiert:
 
-Geprüft und beendet wurden unter anderem:
+1. neutraler zweizeiliger `7/7`-Wortblock;
+2. humanistischer responsiver `7/7`-Wortblock.
 
-- standardschriftbasierte systemische Eingriffe;
-- eigene Monoline-, Grotesk-, Humanist- und Semi-Serif-Systeme;
-- typografische Dualität;
-- Type-Material-Studien;
-- produktspezifische `Geführte Öffnung`;
-- integrierte Buchstaben- und Negativraummodule;
-- flache Weiterentwicklung der tatsächlichen öffentlichen Öffnungs-/Vorhangmarke.
+Die Namensbestandteile `bocholt` und `erleben` besitzen jeweils sieben Buchstaben. Daraus entsteht eine kompakte zweizeilige Primäridentität mit gleicher optischer Zeilenbreite.
 
-Ergebnis:
+### Richtung A
 
-- intern geprüfte Studien und Gegenproben: `32`;
-- Kandidaten: `0`;
-- qualifizierte Richtungen: `0`.
+Der neutrale `7/7`-Block wurde wegen zu geringer Eigenhöhe gegenüber einer hochwertigen Standardschrift beendet.
 
-### Phase 5B – generativer Suchzyklus 01
+### Candidate 201
 
-Gemäß `GENERATIVE_SEARCH_BRIEF.md` wurden zwölf ernsthafte Rohhypothesen über vier Suchfelder geprüft:
+Der humanistische responsive `7/7`-Block wurde weitergeführt:
 
-- nicht Sans-dominierte Letteringarchitektur;
-- abstrakte Primäridentität ohne Standardicon;
-- lokales Strukturprinzip ohne Bocholt-Klischee;
-- radikal reduzierte responsive Identität.
+- gemeinsames Buchstabensystem;
+- optisch korrigierte Oberlängen, Rundungen, Breiten und Laufweiten;
+- dunkles `bocholt` und dunkles Markengrün für `erleben`;
+- responsive Kleinform als erste Spalte `b/e` desselben Systems;
+- Pfadmaster ohne externe Laufzeitabhängigkeit.
 
-Ergebnis:
+Dokumentation und Assets:
 
-- ernsthafte Rohhypothesen: `12`;
-- zur deterministischen Rekonstruktion zugelassen: `0`;
-- Kandidaten: `0`;
-- Nutzerpräsentationen: `0`.
+- `docs/brand/phase5/candidate-201/README.md`
+- `docs/brand/phase5/candidate-201/primary-color.svg`
+- `docs/brand/phase5/candidate-201/app-icon.svg`
+- `docs/brand/phase5/candidate-201/compact-mono.svg`
 
-Der vollständige Befund liegt in:
+## Prüfstatus Candidate 201
 
-- `docs/brand/phase5/GENERATIVE_SEARCH_CYCLE_01_RESULT.md`
+- Gate W0 vollständige Wortmarke: bestanden;
+- Gate W1 Marken-Minisystem: bestanden;
+- Gate W2 responsive Kleinform: bestanden;
+- interner Pass A: `90/100`;
+- interner Pass B: `90/100`;
+- harter Red-Team-Knock-out: keiner.
 
-### Phase 5C – letzter kontrollierter Konstruktionslauf
+Die getrennten Pässe sind methodisch diszipliniert, aber keine externe unabhängige Begutachtung.
 
-Nach der offenen Suche wurde genau eine falsifizierbare Wortmarkenhypothese gezielt konstruiert:
+## Restliche Sperren vor Integration
 
-- ein gemeinsames Buchstabensystem;
-- `Bocholt` stabil;
-- `erleben` schrittweise geöffnet;
-- keine Kursivpaarung, kein Symbol, Monogramm, Farbakzent oder App-Icon;
-- ausschließlich geringe, ausgewogene und deutliche Stärke desselben Parameters.
-
-Ergebnis:
-
-- geringe Öffnung: keine ausreichende Differenzierung zur neutralen Kontrolle;
-- ausgewogene Öffnung: Einschnitt-, Punkt-, Fehler- und beschädigte-Glyphe-Lesart;
-- deutliche Öffnung: überzeichnetes Gimmick und schlechtere mobile Lesbarkeit;
-- bestandene Fassungen: `0`;
-- Kandidaten: `0`.
-
-Der vollständige Befund liegt in:
-
-- `docs/brand/phase5/FINAL_CONTROLLED_CONSTRUCTION_RESULT.md`
-
-## Warum keine weitere interne Variantenrunde folgt
-
-Die verfügbaren internen explorativen, generativen und gezielt konstruktiven Formräume wurden systematisch kontrolliert.
-
-Die wiederkehrenden Fehler sind stabil:
-
-- hochwertige, aber bekannte Stilformel;
-- eigene, aber generische digitale Schriftstruktur;
-- lokale Herleitung nur im Konzepttext;
-- Symbol kippt in UI, Mode, Handwerk, Publishing oder andere falsche Kategorien;
-- mobile Reduktion verliert das besondere Merkmal;
-- Kleinform bleibt ein austauschbares Initialmonogramm;
-- subtile Modifikation differenziert nicht;
-- sichtbare Modifikation wird zum Artefakt oder typografischen Defekt.
-
-Eine weitere kleine automatische Variation wäre kein belastbarer Erkenntnisgewinn.
-
-## Nächster belastbarer Weg
-
-Der originäre Premiumentwurf muss durch eine externe Creative-Director-/Lettering-Leistung entstehen. Der Arbeitsauftrag ist vollständig vorbereitet in:
-
-- `docs/brand/phase5/EXTERNAL_CREATIVE_EXECUTION_BRIEF.md`
-
-ChatGPT übernimmt danach weiterhin vollständig:
-
-- Eingangskontrolle;
-- Provenienz- und Lizenzprüfung;
-- Anonymisierung;
-- Originalgrößen- und Kategorieprüfung;
-- getrennte Bewertungspässe;
-- Red Team;
-- Scorecard und Konsolidierung;
-- technische Vektorrekonstruktion und Härtung;
-- Product-Owner-Präsentation;
-- spätere Repository-Integration.
-
-## Nutzerinteraktion
-
-Der Product Owner erhält weiterhin:
-
-- keine Rohideen;
-- keine Mikrovarianten;
-- keine generierten Suchtafeln oder Berichtsgrafiken;
-- keine künstliche Entscheidung zwischen mittelmäßigen Optionen.
-
-Sichtbar präsentiert wird erst, wenn mindestens eine originär gestaltete und technisch rekonstruierte Richtung die vollständige Premiumqualifikation besteht.
+1. Product-Owner-Entscheidung;
+2. formale Marken- und Ähnlichkeitsrecherche;
+3. finale optische Pfadbereinigung und Größenexporte;
+4. separates Integrationsworkpack.
 
 ## Aktueller Stand
 
-- ernsthafte interne Hypothesen: `45`;
-- qualifizierte Richtungen: `0`;
-- Phase-5-Kandidaten: `0`;
-- Nutzerpräsentationen: `0`;
+- intern designqualifizierte Richtungen: `1`;
+- Product-Owner-Präsentationen: `1` zulässig;
 - öffentliche Änderungen: `0`;
-- interne Suche und Konstruktion: abgeschlossen;
-- externer Creative-Execution-Brief: ausführungsbereit.
+- Änderungen an `staging`, `main` oder Live: `0`.
