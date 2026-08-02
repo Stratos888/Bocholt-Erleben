@@ -338,3 +338,60 @@ Für Startpartner wird kein neuer dauerhafter GitHub-Workflow angelegt, solange 
 12. Sind Kandidat, Pilot, Organizer, Inhalt und Messung über stabile IDs verbunden?
 
 Ist eine Antwort nicht belegbar, folgt read-only Analyse statt Mutation.
+
+## 14. Startpartner Gate 4 – aktueller kanonischer Staging-Zustand
+
+Dieser Abschnitt ist für den aktuellen Staging-Stand maßgeblich und ersetzt dort die historischen Gate-2-/Zielzustandsaussagen der Abschnitte 2, 3 und 6 bis 9. Der öffentliche Startpartner-Anfragepfad und Live bleiben weiterhin unverändert.
+
+### Dauerhafte Runtime-Owner
+
+| Verantwortung | Kanonischer Owner |
+|---|---|
+| Kandidat, Qualifikation, Entscheidung, Reservierung, Warteliste und Operations | `api/startpartner/**` sowie Migrationen `008` bis `010`; `control_cases` bleibt nur operative Projektion |
+| ausdrückliche Pilotbedingungen, Pilot, Scopes und kostenlose Pilotberechtigung | Gate-3-Owner in `api/startpartner/**` und Migration `011` |
+| Onboarding | `startpartner_pilot_onboarding_items` |
+| Pilotinhalt und Attribution | `startpartner_pilot_content_links` mit bestehenden `organizers`- und `submissions`-Ownern |
+| Messpreflight | `startpartner_pilot_measurement_preflights`; Metrikowner bleibt `value_metric_daily` |
+| Distributionsbereitschaft | `startpartner_pilot_distribution_commitments` |
+| Pilotnutzung | `startpartner_pilot_usages` |
+| lokales Aktivierungs- und Enddatum | `startpartner_pilots.activation_date_local` und `startpartner_pilots.planned_end_date` |
+| Organizer-Portal-Readback | `api/organizer-portal/pilot.php` und additive Gate-4-Dashboarddarstellung |
+| reguläre Zahlung, Abos und Veröffentlichungsberechtigungen | unverändert die bestehenden Stripe-, Subscription- und Publication-Owner; Gate 4 schreibt dort nicht regulär |
+
+Migration `012_startpartner_gate4_onboarding_content_activation` ergänzt diese Owner idempotent und wurde auf Staging erfolgreich angewendet.
+
+### Gate-4-Datenfluss
+
+```text
+qualifizierter, angenommener und bestätigter Kandidat
+-> bestehender Organizer und Gate-3-Pilot
+-> sieben Pilot-Scopes und fail-closed Pilotberechtigung
+-> 14 Onboardingpunkte
+-> bestehende Submission als Event oder Aktivität verknüpfen
+-> redaktionellen Status zurücklesen
+-> Messpreflight auf value_metric_daily vorbereiten
+-> Distribution verbindlich vorbereiten
+-> Pilotnutzung dem Inhalt zuordnen
+-> Aktivierungsdatum und sechsmonatiges Enddatum atomar festlegen
+-> geschützter Readback in Steuerzentrale und Organizer-Portal
+```
+
+Die Aktivierung ist operations-idempotent: ein identischer Replay liefert das gespeicherte Ergebnis; geänderter Payload oder stale Revision endet kontrolliert mit HTTP `409`. Eine Aktivierung erzeugt keine reguläre Subscription, keinen Stripe-Checkout und keine automatische Veröffentlichung.
+
+### Belegter Staging-Lifecycle und Rückbau
+
+- Deploy Run `30714196723`: kontrollierter authentifizierter No-Send-Lifecycle auf Build `9549ad072da0` erfolgreich;
+- Migration `012` angewendet;
+- vollständiger Gate-4-Datenfluss einschließlich Event- und Activity-Kompatibilität, 14 Onboardingpunkten, Messowner, Distribution, Pilotnutzung, Kalenderdaten sowie Replay-/Konfliktgrenzen belegt;
+- Cleanup vollständig: `residue.total = 0`;
+- gesperrte Runtime-Owner vor und nach dem Lauf unverändert;
+- Startpartner-Kapazität vor und nach dem Lauf unverändert;
+- keine Mail- oder Magic-Link-Zustellung, keine Partnerkommunikation, keine Stripe-, Zahlungs-, Abo-, reguläre Entitlement- oder automatische Veröffentlichungswirkung;
+- Deploy Run `30714760725`: einmaliger Lifecycle-Marker kontrolliert `1 -> 0` entfernt, ohne den Lifecycle erneut auszuführen;
+- PR `#265`, Merge-SHA `37c31add98f015f86086a7e0d541434f1bd1ca46`: vollständiger Rückbau aller temporären Gate-4-Evidence-Komponenten;
+- Removal-Deploy `30715216900`, Build `37c31add98f0`: exakt drei temporäre Evidence-Dateien gelöscht, HTTP-Smoke erfolgreich, Browser-Smoke 26/26 OK, 0 Fehler, 0 Warnungen;
+- dauerhafte Negativgrenze verbietet die drei ehemaligen Evidence-Dateien sowie Marker- und Lock-Tokens.
+
+Die drei ehemaligen Evidence-URLs müssen vor Workpack-Schließung zusätzlich durch einen tatsächlichen read-only HTTP-Abruf jeweils mit Status `404` bestätigt werden. Der erfolgreiche SFTP-Löschplan und die Dateiabwesenheit allein werden nicht als HTTP-Status ausgegeben oder umgedeutet.
+
+`main` und Live wurden durch Lifecycle, Marker-Cleanup und Evidence-Rückbau nicht verändert. Der dokumentierte Gate-4-Runtime-Endstand auf Staging ist Merge-SHA `37c31add98f015f86086a7e0d541434f1bd1ca46` mit Removal-Deploy `30715216900`; ein späterer reiner Dokumentationsdeploy ändert diese fachliche Runtime-Evidence nicht.
