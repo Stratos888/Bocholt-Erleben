@@ -1,6 +1,6 @@
 # Phase 5 – Interner Studienlog
 
-Stand: 2026-08-01
+Stand: 2026-08-02
 Workpack: #259
 
 Dieser Log dokumentiert Entscheidungen und Fehlerklassen. Verworfene visuelle Rohstudien werden nicht als Kandidatenpaket oder Nutzerpräsentation gespeichert.
@@ -11,7 +11,8 @@ Dieser Log dokumentiert Entscheidungen und Fehlerklassen. Verworfene visuelle Ro
 |---|---|---:|---|
 | Phase 5A | kontrollierte Wortmarken-, integrierte und Bestandsstudien | 32 | vollständig verworfen |
 | Phase 5B | generativer Suchzyklus über G-A bis G-D | 12 | keine Rekonstruktion zugelassen |
-| **Gesamt** |  | **44** | **0 Kandidaten** |
+| Phase 5C | letzter kontrollierter Konstruktionslauf | 1 Hypothese / 3 Parameterfassungen | vollständig verworfen |
+| **Gesamt** |  | **45 Hypothesen** | **0 Kandidaten** |
 
 - qualifizierte Richtungen: `0`;
 - Nutzerpräsentationen: `0`;
@@ -111,9 +112,37 @@ Der vollständige Zyklusbefund steht in:
 
 - `docs/brand/phase5/GENERATIVE_SEARCH_CYCLE_01_RESULT.md`
 
+## Phase 5C – letzter kontrollierter Konstruktionslauf
+
+Nach dem generativen Zyklus wurde genau eine falsifizierbare Hypothese zugelassen:
+
+- ein gemeinsames Buchstabensystem für `Bocholt erleben`;
+- `Bocholt` stabil;
+- `erleben` über wiederkehrende Buchstabenparameter schrittweise geöffnet;
+- kein Symbol, Monogramm, Kursivkontrast, Farbakzent oder separates App-Icon;
+- ausschließlich drei Stärken desselben Öffnungsparameters.
+
+Geprüft wurden eine neutrale Kontrolle sowie geringe, ausgewogene und deutliche Öffnung in monochromer Vollansicht und realer mobiler Headerbreite.
+
+Ergebnis: **vollständig verworfen**.
+
+- geringe Öffnung: praktisch keine sichtbare Eigenhöhe gegenüber der Kontrolle;
+- ausgewogene Öffnung: Einschnitt-, Punkt-, Fehler- und beschädigte-Glyphe-Lesart;
+- deutliche Öffnung: konstruiertes Gimmick, schlechtere Lesbarkeit und schwächere mobile Wirkung;
+- keine Fassung übertraf die neutrale Kontrolle gleichzeitig in Eigenständigkeit, Qualität und Lesbarkeit.
+
+Der Zielkonflikt war eindeutig:
+
+- subtil genug für Ruhe: nicht differenzierend;
+- sichtbar genug für Differenzierung: Artefakt beziehungsweise typografischer Defekt.
+
+Dokumentation:
+
+- `docs/brand/phase5/FINAL_CONTROLLED_CONSTRUCTION_RESULT.md`
+
 ## Prozessentscheidung
 
-Die verfügbaren internen prozeduralen Formräume sind ausreichend ausgeschöpft. Eine weitere automatische Kleinvariation ist gesperrt.
+Die verfügbaren internen explorativen, generativen und gezielt konstruktiven Formräume sind ausreichend ausgeschöpft. Eine weitere automatische Kleinvariation ist gesperrt.
 
 Der nächste belastbare Weg ist eine originäre externe Creative-Director-/Lettering-Leistung gemäß:
 
