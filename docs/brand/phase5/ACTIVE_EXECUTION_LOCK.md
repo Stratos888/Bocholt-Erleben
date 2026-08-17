@@ -11,128 +11,134 @@ Eine eigenständige Premium-Markenidentität für `Bocholt erleben` entwickeln, 
 
 Öffentliche Marke, `staging`, `main` und Live bleiben bis zu einer späteren vollständigen Markenfreigabe unverändert.
 
-## 2. Abgeschlossener Schritt
+## 2. Abgeschlossene Schritte
 
-**SCHRITT 2 VON 9 – VISUELLE PREMIUM-REFERENZANALYSE: ABGESCHLOSSEN**
+### Schritt 2 von 9 – visuelle Premium-Referenzanalyse
+
+Status: **abgeschlossen**
 
 Nachweis:
 
 - `docs/brand/phase5/VISUAL_PREMIUM_REFERENCE_ANALYSIS.md`
 
-Erfüllt:
+### Schritt 3 von 9 – zwei visuelle Markenrichtungen
 
-- sieben relevante Referenzsysteme;
-- vier Anti-Referenzmuster;
-- Visual-DNA-Matrix;
-- genau zwei Creative-Direction-Hypothesen;
-- gemeinsames Produktversprechen;
-- visuelle Abbruchkriterien je Richtung.
+Status: **abgeschlossen**
+
+Geprüft:
+
+- A – `Klar ausgewählt`;
+- B – `Nah am echten Leben`.
+
+Der Product Owner hat die fachliche Designentscheidung ausdrücklich an ChatGPT als Design- und Prozessowner delegiert.
+
+Fachliche Auswahl:
+
+- **A – `Klar ausgewählt`: FREIGEGEBEN**;
+- B – `Nah am echten Leben`: als führende Markenrichtung beendet.
+
+Nachweis:
+
+- `docs/brand/phase5/STEP3_DIRECTION_DECISION.md`
+
+Die Auswahl ist keine Mischrichtung. Menschlichkeit und Wärme bleiben allgemeine Produktanforderungen, dürfen A aber nicht in Richtung B, Tourismus, Lifestyle oder Community-Marketing umformen.
 
 ## 3. Aktueller Schritt
 
-**SCHRITT 3 VON 9 – ZWEI VISUELLE MARKENRICHTUNGEN**
+**SCHRITT 4 VON 9 – FORMSPRACHENERKUNDUNG INNERHALB VON `KLAR AUSGEWÄHLT`**
 
 Zweck:
 
-Die beiden in Schritt 2 definierten Richtungen werden sichtbar und verständlich operationalisiert, damit der Product Owner früh die Creative Direction wählen kann, bevor Logo- oder Wortmarkenkonstruktion beginnt.
+Eine eigenständige formale Sprache für die spätere Primäridentität finden, bevor vollständige Logo- oder Wortmarkenkandidaten konstruiert werden.
 
-Verbindliche Richtungen:
+Untersucht werden systemische Formprinzipien, nicht fertige Marken.
 
-### A – Klar ausgewählt
+## 4. Erlaubte Aktionen in Schritt 4
 
-Führende Idee: Vertrauen durch gute Auswahl.
+- Analyse und Erprobung von Buchstabenproportionen;
+- x-Höhe, Breite, Rundungsgrad, Offenheit und Strichcharakter;
+- Terminal-, Schulter-, Bogen- und Gegenformprinzipien;
+- Rhythmus, Dichte, Laufweite und Verhältnis `Bocholt` / `erleben`;
+- Einzeilen-, Zweizeilen- oder andere Primärarchitektur nur als neutrale Formstudie;
+- Nutzung lizenzierten Fontmaterials ausschließlich als Skelett/Referenz, nicht als fertige Marke;
+- isolierte generative Formstudien als Suchmaterial, sofern sie keine fertigen Logos oder Markenboards darstellen;
+- deterministische Geometrie- und Typografieproben;
+- interne Gegenproben gegen generische Standardschrift, Candidate 201 und bekannte Fehlfamilien;
+- maximal drei kohärente Formsprachensysteme gleichzeitig im internen Vergleich.
 
-Visueller Schwerpunkt:
+## 5. Verbotene Aktionen in Schritt 4
 
-- ruhig;
-- souverän;
-- kuratiert;
-- hochwertige Consumer-Marke;
-- klar und digital, aber nicht SaaS oder Verwaltung.
-
-### B – Nah am echten Leben
-
-Führende Idee: Lust auf das, was direkt um mich herum passiert.
-
-Visueller Schwerpunkt:
-
-- menschlich;
-- warm;
-- unmittelbar;
-- lokal ohne Tourismusklischee;
-- digital präzise, aber sichtbar nahbar.
-
-## 4. Erlaubte Aktionen in Schritt 3
-
-- genau zwei Richtungsdarstellungen A und B;
-- visuelle Beispiele für Typografiecharakter, Dichte, Weißraum, Farbtemperatur, Bildsprache und Produktnähe;
-- reale oder realitätsnahe Produktausschnitte nur zur Demonstration der Grundwirkung;
-- klare Beschriftung ausschließlich als `A – Klar ausgewählt` und `B – Nah am echten Leben`;
-- kurze Erklärung dessen, was der Product Owner beurteilen soll;
-- Product-Owner-Gate mit genau `A`, `B` oder `keine`.
-
-## 5. Verbotene Aktionen in Schritt 3
-
-Bis zum Product-Owner-Gate:
+Bis zum Abschluss von Schritt 4:
 
 - keine finale Wortmarke;
-- keine Logo-Kandidaten;
-- keine App-Icons;
-- keine Candidate-Nummern;
-- keine SVG-Master;
+- keine Logo-Kandidaten oder Candidate-Nummern;
+- kein App-Icon;
+- kein vollständiges Markenboard;
+- keine Claims;
 - keine Design-Scores;
 - kein Red Team;
-- keine Ähnlichkeitsprüfung;
-- keine erfundenen Claims oder neuen Markennamen;
-- keine dritte Markenrichtung;
-- keine Vermischung von A und B zu einer automatischen Kompromissrichtung;
-- kein Beginn von Schritt 4 ohne explizite Product-Owner-Entscheidung `A` oder `B`.
+- keine Markenrechts- oder Ähnlichkeitsfreigabe;
+- keine produktive UI-Integration;
+- keine Rückkehr zu B oder automatische Mischrichtung;
+- kein Einzelgimmick als behauptete Identität;
+- keine Auswahl allein wegen Präsentationsqualität;
+- keine Product-Owner-Auswahl zwischen Rohstudien.
 
-## 6. Abschlusskriterium Schritt 3
+## 6. Qualitätsregeln für Formsprachensysteme
 
-Schritt 3 ist erst abgeschlossen, wenn:
+Ein Formsprachensystem darf nur weiterleben, wenn:
 
-1. A und B eindeutig und ohne falsche Bezeichnungen visualisiert wurden;
-2. beide dasselbe Produktversprechen sichtbar unterschiedlich übersetzen;
-3. keine Logoentscheidung in die Richtungsdarstellung eingeschmuggelt wurde;
-4. der Product Owner verstanden hat, was bewertet wird;
-5. der Product Owner ausdrücklich `A`, `B` oder `keine` gewählt hat.
+1. mindestens drei miteinander verbundene formale Regeln über mehrere Buchstaben wirken;
+2. die Eigenwirkung nicht an einem Schnitt, Punkt, Defekt, Farbakzent oder einer Ligatur hängt;
+3. Lesbarkeit und ruhige Premiumwirkung erhalten bleiben;
+4. die Richtung sichtbar zu `Klar ausgewählt` passt;
+5. sie nicht primär wie SaaS, Verwaltung, Kulturinstitution, Tourismus, Gastronomie, Mode oder generisches Startup wirkt;
+6. sie gegenüber einer hochwertigen neutralen Schriftsetzung einen plausiblen Eigenwert besitzt;
+7. die Regeln bewusst erklärbar und später reproduzierbar sind.
 
-Bei `keine` wird Schritt 3 neu formuliert; es wird nicht automatisch zu Schritt 4 gewechselt.
+## 7. Abschlusskriterium Schritt 4
 
-## 7. Nächster zulässiger Übergang
+Schritt 4 ist erst abgeschlossen, wenn:
 
-Nur nach Product-Owner-Auswahl `A` oder `B`:
+- höchstens drei kohärente Formsprachensysteme intern untersucht wurden;
+- jedes System gegen neutrale Standardschrift, Candidate 201 und bekannte Fehlfamilien geprüft wurde;
+- ungeeignete Systeme mit sichtbarer Begründung beendet wurden;
+- ein oder höchstens zwei Formsprachensysteme nachweislich genügend Eigenhöhe für die nächste Konstruktion besitzen;
+- die weitergeführten Systeme als Regeln dokumentiert sind, noch nicht als freigegebene Logos.
 
-**SCHRITT 4 VON 9 – FORMSPRACHENERKUNDUNG INNERHALB DER GEWÄHLTEN WELT**
+Wenn kein System genügt, bleibt Schritt 4 aktiv und wird methodisch korrigiert; es wird nicht künstlich ein Gewinner bestimmt.
 
-Dort dürfen erstmals formale Bausteine der Primäridentität untersucht werden. Auch dort entsteht noch nicht automatisch ein freigegebenes Logo.
+## 8. Nächster zulässiger Übergang
 
-## 8. Anti-Drift-Regeln
+Nur nach erfülltem Abschlusskriterium:
+
+**SCHRITT 5 VON 9 – KONSTRUKTION VON HÖCHSTENS ZWEI VOLLSTÄNDIGEN PRIMÄRIDENTITÄTEN**
+
+Erst dort dürfen aus den bestandenen Formsprachensystemen vollständige Wortmarken-/Primäridentitäten entstehen.
+
+## 9. Anti-Drift-Regeln
 
 Vor jeder kreativen oder schreibenden Aktion muss intern geprüft werden:
 
-1. **CURRENT STEP:** Ist die Aktion Teil von Schritt 3?
+1. **CURRENT STEP:** Ist die Aktion Teil von Schritt 4?
 2. **ALLOWED:** Ist sie in Abschnitt 4 ausdrücklich erlaubt?
 3. **FORBIDDEN:** Verletzt sie Abschnitt 5?
-4. **DONE:** Ist das Abschlusskriterium bereits erfüllt?
-5. **TRANSITION:** Ohne explizite Gate-Entscheidung kein nächster Schritt.
+4. **QUALITY:** Erfüllt die Studie Abschnitt 6 oder ist sie sofort zu beenden?
+5. **DONE:** Ist Abschnitt 7 vollständig erfüllt?
+6. **TRANSITION:** Ohne Abschlussnachweis kein Schritt 5.
 
 Ein neues Tool, ein interessantes Bild, eine spontane Logoidee oder ein generiertes Zwischenergebnis ändert den aktiven Schritt nicht.
 
-## 9. Warum dieser Lock notwendig ist
+## 10. Design- und Product-Owner-Rollen
 
-Die bisherigen Abweichungen entstanden wiederholt durch:
+Für fachliche Designentscheidungen innerhalb der Markenentwicklung gilt ab der ausdrücklichen Delegation:
 
-- mehrere Prozessdokumente ohne einzelnen Ausführungszeiger;
-- Vermischung von Forschung, Exploration, Konstruktion und Bewertung;
-- Tool-Salienz: verfügbare Bild-/Logo-Tools verleiteten zu vorgezogener Generierung;
-- lokale Optimierung eines Zwischenresultats statt Prüfung des Gesamtprozesses;
-- Selbstbewertung durch denselben AI-Orchestrator;
-- Präsentationsqualität als Verstärker schwacher Grundideen;
-- Interpretation eines allgemeinen `mach weiter` als Erlaubnis zum Überspringen von Gates.
+- ChatGPT: Design- und Prozessowner, Auswahl und Verwerfung visueller Richtungen und Formsysteme;
+- Product Owner: Produktziele, fachliche Grenzen, reale Produktwirkung und spätere finale Einführungsentscheidung.
 
-## 10. Änderungskontrolle
+Der Product Owner wird nicht als Ersatz-Designer für Rohstudien oder ästhetische Vorauswahlen eingesetzt.
+
+## 11. Änderungskontrolle
 
 Dieser Lock darf nur geändert werden, wenn:
 
