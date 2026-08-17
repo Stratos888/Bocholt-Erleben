@@ -3,7 +3,7 @@
 Stand: 2026-08-17
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **R1 BESTANDEN – R2 DISTINCTIVE-ASSET-MARKENSYSTEME AKTIV**
+Status: **R2 BESTANDEN – R3 BLINDTEST / MENSCHLICHES WAHRNEHMUNGSSIGNAL AKTIV**
 
 ## 1. Unveränderliches Ziel
 
@@ -17,110 +17,98 @@ Verbindlich:
 
 - `docs/brand/phase5/PROCESS_REVALIDATION_AND_RESTART.md`
 - `docs/brand/phase5/R1_VISUAL_CALIBRATION.md`
+- `docs/brand/phase5/R2_SYSTEM_EXPLORATION.md`
+- `docs/brand/phase5/R3_BLIND_TEST_PROTOCOL.md`
 
-R1 ist abgeschlossen. Qualitätsanker und Anti-Referenzen sind operationalisiert. Es gibt weiterhin **keinen Premiumkandidaten**.
+Es gibt weiterhin **keinen Premiumkandidaten**. R2 hat lediglich drei Markensysteme qualifiziert, die jetzt ein unabhängiges menschliches Wahrnehmungssignal erhalten müssen.
 
-## 3. Erhalten
+## 3. R2-Ergebnis
 
-- Name `Bocholt erleben`;
-- Produktkern `relevante Auswahl statt Masse`;
-- mobile-first;
-- bestehendes Produkt unverändert;
-- reale Produktgrößen vor Hochglanzdarstellung;
-- Generatoroutput nur als Suchmaterial;
-- technische Produktionsassets später deterministisch;
-- keine Pflicht zu Monogramm, Einzelbuchstabenicon oder separatem Symbol.
+Verworfen:
 
-## 4. Verworfen als Premiumkandidaten
+- `Fundstücke` – zu nah an Pinterest-/Editorial-/UI-Stacking.
 
-- Candidate 201;
-- frühere `Präzise Humanität`-Wortmarke;
-- frühere `e`-Kleinmarke;
-- alle ästhetischen 90/91-Scores;
-- Status `Marken-Endkandidat`.
+Für R3 anonymisiert weitergeführt:
 
-## 5. Aktueller Schritt
+- `Momentstreifen`;
+- neutrale Kontrollvariante;
+- `Von hier ins echte Leben` / Foto-Breakout;
+- `Auswahlfenster`.
 
-**R2 – HÖCHSTENS DREI DISTINCTIVE-ASSET-MARKENSYSTEME MIT IDENTISCHER NEUTRALER WORTMARKE**
+Teilnehmer-facing Mapping ist ausschließlich `A/B/C/D`; interne Konzeptnamen dürfen Testpersonen nicht genannt werden.
+
+## 4. Aktueller Schritt
+
+**R3 – ANONYMISIERTER BLINDVERGLEICH + UNABHÄNGIGES MENSCHLICHES WAHRNEHMUNGSSIGNAL**
 
 Zweck:
 
-Beweisen, dass ein eigenständiger visueller Markenmechanismus **vor** individuellem Logo/Lettering existiert und im realen Produkt wiederholbar funktioniert.
+Erstmals prüfen, ob ein visuelles System außerhalb der AI-Selbstbewertung tatsächlich als hochwertiger, passender und erinnerbarer wahrgenommen wird als die neutrale Kontrolle.
 
-Zulässige Suchräume aus R1:
+## 5. Testmaterial
 
-1. `Auswahlfenster`;
-2. `Fundstücke`;
-3. `Von hier ins echte Leben`.
+Participant-facing Vergleich:
 
-Diese Bezeichnungen sind interne Suchraumtitel, keine Claims oder Kandidatennamen.
+- `/mnt/data/bocholt_erleben_R3_blind_test.png` aus dem ausführenden Arbeitslauf.
 
-## 6. Verbindliche R2-Regeln
+Protokoll:
 
-Alle Systeme verwenden:
+- `docs/brand/phase5/R3_BLIND_TEST_PROTOCOL.md`
 
-- exakt dieselbe neutrale Wortsetzung `Bocholt erleben`;
-- dieselben realen Inhalte;
-- dieselben mobilen/desktop Größen;
-- zunächst reduzierte Zwei-Farben-Fassung plus echte Fotografie;
-- keine individuelle Wortmarke;
-- kein App-Icon.
+Interner Mapping-Key:
 
-Jedes System muss einen primären wiederkehrenden visuellen Mechanismus besitzen, der in mindestens folgenden Kontexten funktioniert:
+- A = `Momentstreifen`;
+- B = neutrale Kontrolle;
+- C = `Von hier ins echte Leben`;
+- D = `Auswahlfenster`.
 
-- mobiler Header beziehungsweise Startbereich;
-- Today-/Auswahlkarten;
-- Detailseite;
-- Fotobehandlung/Zuschnitt;
-- einfache Social-/Avatarfläche;
-- ein Motion-/Übergangsprinzip.
+## 6. Durchführung
 
-## 7. Harte R2-Abbruchkriterien
+Ziel:
 
-Ein System wird sofort beendet, wenn:
+- 8–12 normale potenzielle Nutzer;
+- keine Designkenntnisse erforderlich;
+- keine Erklärung der Varianten;
+- 20–30 Sekunden sichtbarer Vergleich;
+- drei geschlossene Fragen zu Qualität/Vertrauen, Produktpassung und Wiedererkennbarkeit;
+- eine spontane Assoziationsfrage;
+- nach 3–5 Minuten eine Erinnerung ohne Bild.
 
-- der Mechanismus nur als Logo funktioniert;
-- er Kamera-, Scan-, Karten-, Navigation-, Ticket-, Festival-, SaaS-, Stadtmarketing- oder Tourismuswirkung dominiert;
-- er permanente Dekoration benötigt;
-- er bei 390px Produktbreite nicht klar funktioniert;
-- die Eigenheit nur über Farbe entsteht;
-- der Mechanismus die eigentlichen Inhalte überlagert;
-- er eine bekannte Referenz sichtbar nachahmt;
-- eine Erklärung nötig ist, um die Form überhaupt sinnvoll zu lesen.
+Antwortformat und genaue Fragen stehen im R3-Protokoll.
 
-## 8. R2-Ausgabe
+## 7. In R3 verboten
 
-R2 liefert höchstens drei anonymisierbare Systemboards beziehungsweise identische Produktkontexte.
+- keine Wortmarkenarbeit;
+- kein individuelles Logo;
+- kein App-Icon;
+- kein ästhetischer AI-Score;
+- keine Erklärung oder Verteidigung einer Variante gegenüber Testpersonen;
+- keine Produktintegration;
+- kein Merge oder Deploy;
+- keine Bezeichnung `premium-validiert`, bevor das unabhängige Signal ausgewertet ist.
 
-Noch **keine Premiumfreigabe**.
+## 8. R3-Abschlusskriterium
 
-R2 endet ausschließlich mit:
+Weiter zu R4 nur, wenn ein System:
 
-- `R3 freigeben`, wenn mindestens zwei Systeme sichtbar genügend Eigenhöhe und Produktpassung besitzen;
-- oder `R2 neu öffnen`, wenn weniger als zwei Systeme tragen.
+- die neutrale Kontrolle in der Wahrnehmung sichtbar übertrifft;
+- von mehreren Personen ohne Hilfe als konkreter visueller Mechanismus erinnert wird;
+- keinen dominanten Kategorie-Knock-out erzeugt.
 
-Keine 0–100-Designscores.
+Wenn zwei Systeme eng liegen, folgt ein kleiner Tie-Break-Blindtest nur dieser beiden.
 
-## 9. In R2 verboten
+Wenn die neutrale Kontrolle gleichauf oder besser ist, zurück zu R2.
 
-- individuelles Logo/Lettering;
-- App-Icon;
-- Candidate-Nummern als Qualitätsargument;
-- ästhetische Scores;
-- Product-Owner-Auswahl als Ersatz für fachliche Vorfilterung;
-- Produktintegration;
-- Merge oder Deploy.
+## 9. Nächster zulässiger Übergang
 
-## 10. Nächster zulässiger Übergang
+Nur nach R3-PASS:
 
-Nur bei mindestens zwei tragenden Systemen:
+**R4 – WORTMARKE INNERHALB DES BEWIESENEN MARKENSYSTEMS.**
 
-**R3 – ANONYMISIERTER BLINDVERGLEICH + UNABHÄNGIGES MENSCHLICHES WAHRNEHMUNGSSIGNAL.**
+## 10. Rollen
 
-## 11. Rollen
-
-- ChatGPT: entwickelt und filtert R2; darf die Systeme nicht als `premium-validiert` freigeben.
-- Product Owner: keine Designarbeit in R2.
-- Zielgruppenfeedback: erst R3.
+- ChatGPT: erstellt Test, wertet Ergebnisse aus und führt nur bei belastbarem Signal weiter.
+- Product Owner: organisiert ausschließlich die Weitergabe des fertigen Blindtests und liefert anonymisierte Antworten zurück; keine Designentscheidung.
+- Testpersonen: unabhängiges Wahrnehmungssignal, keine Kreativbeauftragung.
 
 Kein stiller Prozesswechsel.
