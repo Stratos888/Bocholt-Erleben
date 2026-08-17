@@ -11,77 +11,81 @@ Eine eigenständige Premium-Markenidentität für `Bocholt erleben` entwickeln, 
 
 Öffentliche Marke, `staging`, `main` und Live bleiben bis zu einer späteren vollständigen Markenfreigabe unverändert.
 
-## 2. Abgeschlossene Schritte
+## 2. Abgeschlossene Schritte und Schleife
 
-- Schritt 2: visuelle Premium-Referenzanalyse – abgeschlossen.
+- Schritt 2: Premium-Referenzanalyse – abgeschlossen.
 - Schritt 3: Creative Direction – `Klar ausgewählt` freigegeben.
-- Schritt 4: Formsprachenerkundung – `Präzise Humanität` weitergeführt.
-- Schritt 5, Lauf 1: Konstruktion A erstellt.
-- Schritt 6, Lauf 1: **nicht bestanden**.
+- Schritt 4: Formsprachenerkundung – `Präzise Humanität` freigegeben.
+- Schritt 5 Lauf 1: Primäridentität konstruiert.
+- Schritt 6 Lauf 1: nicht bestanden; Abstand zur neutralen Sans in mobiler Größe zu gering.
+- Schritt 5 Korrekturrunde 2: exakt eine begrenzte Revision abgeschlossen.
 
-Nachweis für den Fail:
+Die Revision hat ausschließlich die im Fail freigegebenen Bereiche verändert:
 
-- `docs/brand/phase5/STEP6_NEUTRAL_COMPARISON_RESULT.md`
+1. deutlichere Soft-Square-Rundfamilie über `o` und `b`;
+2. wiederkehrende offene `c/e/t`-Logik mit leicht ansteigendem, weich gezeichnetem `e`-Querstrich;
+3. klarerer Breitenrhythmus: Rundformen etwas weiter, Stamm-/Schulterbuchstaben etwas schmaler;
+4. daraus folgende optische Abstände.
 
-Grund: Die erste Konstruktion war bei realer mobiler Größe noch zu nah an einer hochwertigen neutralen Sans. Candidate 201 und der öffentliche Ausgangszustand wurden zwar übertroffen, der Abstand zur neutralen Kontrolle war jedoch nicht groß genug.
+Keine Architektur, Farbe, Symbolik oder Markenrichtung wurde geändert.
+
+Aktueller Master:
+
+- `docs/brand/phase5/step5/construction-a-mono.svg`
 
 ## 3. Aktueller Schritt
 
-**SCHRITT 5 VON 9 – BEGRENZTE KORREKTURRUNDE 2**
-
-Es handelt sich nicht um eine neue Markenrichtung. `Klar ausgewählt` und `Präzise Humanität` bleiben unverändert verbindlich.
+**SCHRITT 6 VON 9 – NEUTRALER VERGLEICH, LAUF 2**
 
 Zweck:
 
-Die bereits konstruierte einzeilige kleingeschriebene Primäridentität so systemisch nachschärfen, dass ihre Eigenzeichnung auch bei ungefähr 180 Pixel Gesamtbreite wahrnehmbar bleibt.
+Die korrigierte Primäridentität erneut bei realer Wahrnehmungsgröße prüfen. Dieser zweite Lauf entscheidet, ob der reine Sans-Wortmarkenpfad genügend Eigenhöhe erreicht hat oder methodisch beendet werden muss.
 
-## 4. Ausschließlich erlaubte Änderungen
+## 4. Erlaubte Prüfungen
 
-1. stärkere, aber ruhige Differenzierung der wiederkehrenden Rundformen `o` und `b`;
-2. klarere gemeinsame Apertur-/Querstrichfamilie über `c`, `e` und `t`;
-3. stärkerer Rhythmuskontrast zwischen breiteren Rundbuchstaben und schmaleren Stamm-/Schulterbuchstaben;
-4. optische Kerningkorrekturen, die direkt aus diesen Änderungen folgen;
-5. Aktualisierung des bestehenden monochromen Pfadmasters.
+- monochromer Vergleich mit hochwertiger neutraler Sans;
+- Vergleich mit Candidate 201;
+- Vergleich mit aktuellem öffentlichen Markenstand;
+- 180, 150 und 120 Pixel Gesamtbreite;
+- Gesamtwortform, Lesbarkeit, Wiedererkennbarkeit, Ruhe, Consumer-Wirkung und Fehlkategorien;
+- fachliches PASS/FAIL durch ChatGPT als delegierter Design-Owner.
 
-## 5. Weiterhin verboten
+## 5. Verboten
 
-- neue Creative Direction;
-- dritte Architektur;
-- zweizeiliger 7/7-Block;
-- Symbol oder App-Icon;
-- Farbe als Differenzierung;
-- Claim;
-- Markenboard;
-- Designscore;
-- Red Team;
-- Markenrechtsfreigabe;
-- produktive Integration;
-- einzelner Schnitt, Punkt, Pfeil, Ligaturtrick oder sonstiges Gimmick;
-- Product-Owner-Auswahl zwischen Rohvarianten.
+- weitere Buchstabenänderung während dieses Laufs;
+- dritte Korrekturrunde innerhalb desselben Sans-Wortmarkenpfads;
+- App-Icon, Symbol, Farbe oder Claim;
+- Markenboard oder Hochglanzinszenierung;
+- Scores oder Red Team;
+- Product-Owner-Auswahl zwischen Rohvarianten;
+- produktive Integration.
 
-## 6. Qualitätsziel dieser Korrektur
+## 6. Bestehensregel
 
-Die Revision darf nur weitergeführt werden, wenn:
+PASS nur, wenn die korrigierte Form bei ungefähr 180 Pixel Gesamtbreite als zusammenhängend eigengezeichnete Wortmarke wahrnehmbar bleibt und nicht bloß wie eine andere gute Sans.
 
-- `bocholt erleben` sofort lesbar bleibt;
-- die wiederkehrenden Formen als zusammenhängende Familie erkennbar sind;
-- die Identität bei 180 Pixel Gesamtbreite nicht mehr nur wie eine andere gute Sans wirkt;
-- keine Tech-, SaaS-, Verwaltungs-, Tourismus-, Kultur-, Gastro- oder Mode-Lesart entsteht;
-- die Veränderung aus dem ganzen Buchstabensystem stammt und nicht aus einem einzelnen Effekt.
+Zusätzlich müssen erfüllt sein:
 
-## 7. Abschluss
+- schnelle Lesbarkeit;
+- klarer Abstand zu Candidate 201;
+- plausibel hochwertigere Primäridentität als aktueller öffentlicher Stand;
+- keine dominante falsche Kategorie;
+- Eigenwirkung ohne Farbe, Icon und Erklärung.
 
-Nach genau einer kontrollierten Revision wird ohne weitere Zwischenvariation wieder auf
+Wenn der Abstand zur neutralen Kontrolle erneut nicht reicht, wird dieser reine Sans-Wortmarkenpfad beendet. Es gibt keine dritte Mikro-Optimierungsschleife.
 
-**SCHRITT 6 VON 9 – NEUTRALER VERGLEICH**
+## 7. Nächster Übergang
 
-geschaltet.
+Bei PASS:
 
-Wenn auch diese Revision gegen die neutrale Kontrolle scheitert, wird nicht weiter am selben Sans-Wortmarkenpfad poliert; dann muss der Prozess methodisch zurück auf die Architekturfrage geführt werden.
+**SCHRITT 7 VON 9 – MARKEN-MINISYSTEM UND REALE PRODUKTWIRKUNG**
+
+Bei FAIL:
+
+methodische Rückkehr auf die Architekturfrage innerhalb der bereits freigegebenen Creative Direction `Klar ausgewählt`; keine weitere Politur derselben Wortmarkenform.
 
 ## 8. Rollen
 
-- ChatGPT: Design- und Prozessowner;
-- Product Owner: Produktziele, Grenzen und spätere reale Einführungsentscheidung.
+ChatGPT trifft das fachliche Designurteil. Der Product Owner wird nicht als Ersatz-Designer eingesetzt.
 
 Kein stiller Prozesswechsel.
