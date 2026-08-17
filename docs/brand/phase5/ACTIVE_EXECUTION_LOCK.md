@@ -14,128 +14,136 @@ Eine eigenständige Premium-Markenidentität für `Bocholt erleben` entwickeln, 
 ## 2. Abgeschlossene Schritte
 
 - Schritt 2: Premium-Referenzanalyse – abgeschlossen.
-- Schritt 3: Creative Direction – `Klar ausgewählt` freigegeben.
-- Schritt 4: Formsprachenerkundung – `Präzise Humanität` freigegeben.
-- Schritt 5: Primäridentität konstruiert; nach dem ersten Step-6-Fail exakt einmal systemisch nachgeschärft.
-- Schritt 6: neutraler Vergleich – **in Lauf 2 bestanden**.
+- Schritt 3: Creative Direction – `Klar ausgewählt`.
+- Schritt 4: Formlogik – `Präzise Humanität`.
+- Schritt 5: Primäridentität konstruiert und einmal gezielt korrigiert.
+- Schritt 6: neutraler Vergleich – bestanden in Lauf 2.
+- Schritt 7: Marken-Minisystem und reale Produktwirkung – bestanden.
 
-Nachweis:
+Nachweis Schritt 7:
 
-- `docs/brand/phase5/STEP6_NEUTRAL_COMPARISON_RESULT.md`
+- `docs/brand/phase5/STEP7_BRAND_MINISYSTEM_RESULT.md`
 
-Weitergeführte Primäridentität:
+Primäridentität:
 
 - `docs/brand/phase5/step5/construction-a-mono.svg`
 
-Die Freigabe aus Schritt 6 bedeutet nur, dass die monochrome Primäridentität genügend Eigenhöhe für einen realen Systemtest besitzt. Sie ist noch keine finale Markenfreigabe.
+Verbindliche Farbrollen:
+
+- Wortmarke auf hell: `#0D3014` (`--brand-green-900`);
+- inverse Wortmarke: Weiß auf ausreichend dunkler Brand-Green-Fläche;
+- `#8FCB3B` bleibt Interaktionsfarbe;
+- kein Farbsplit in der Wortmarke.
 
 ## 3. Aktueller Schritt
 
-**SCHRITT 7 VON 9 – MARKEN-MINISYSTEM UND REALE PRODUKTWIRKUNG**
+**SCHRITT 8 VON 9 – RESPONSIVE KLEINFORM / APP-MARKE UND FORMALE QUALITÄTSPRÜFUNG**
 
 Zweck:
 
-Prüfen, ob die bereits bestandene Primäridentität das vorhandene Produkt als kohärente hochwertige Consumer-Marke tragen kann, ohne durch eine komplette UI-Neugestaltung, laute Farbe oder Mock-up-Inszenierung künstlich gerettet zu werden.
+Eine zur bestandenen Primäridentität gehörende Kleinform für App-, Favicon- und Kleinstanwendungen bestimmen und anschließend das gesamte Markensystem formal und kritisch prüfen.
 
-## 4. Verbindlicher Ausgangspunkt des realen Produkts
+Die Kleinform darf die Primäridentität nicht neu definieren und keine frühere generische `b/e`-Monogrammlogik wiederholen.
 
-Das bestehende Produktsystem bleibt die Basis:
+## 4. Erlaubte Kleinform-Architekturen
 
-- Headerhöhe: `48px`;
-- UI-Typografie: `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-- Brand-Green-Tokens von `#07240F` bis `#3F852C`;
-- Interaktionsgrün `#8FCB3B`;
-- Goldakzent `#D8B234`;
-- Background `#EEF1E3`;
-- Surface `#FFFFFF`;
-- Text Primary `#18281E`;
-- zentrale Lucide-Funktionsicons und vorhandene Komponenten-/Accessibility-Verträge.
+Intern dürfen höchstens drei Ansätze geprüft werden:
 
-Die Markenentwicklung darf dieses Produktsystem für den Test gezielt ergänzen, aber nicht verdecken oder unnötig neu erfinden.
+1. einzelner charakteristischer Buchstabenausschnitt aus der Wortmarke;
+2. sehr kompakter horizontaler typografischer Ausschnitt, nur wenn er bei 16–64px stabil bleibt;
+3. eigenständige abstrakte Kleinform, ausschließlich wenn sie direkt aus der bestehenden Rund-/Apertur-/Terminalformlogik ableitbar ist und nicht wie ein UI-Icon wirkt.
 
-## 5. Erlaubte Aktionen in Schritt 7
+Jeder Ansatz wird sofort beendet bei:
 
-- Farbrolle der Primäridentität innerhalb der vorhandenen Palette festlegen;
-- inverse Wortmarkenfassung für dunkle Flächen prüfen;
-- bestehende UI-Typografie bewusst als Produktrolle von der individuellen Wortmarke trennen;
-- Bildsprache für echte lokale Inhalte definieren;
-- zurückhaltendes Motion-/Übergangsprinzip definieren;
-- reale mobile Headerprobe bei `390x844` mit `48px` Headerhöhe;
-- reale Desktopprobe bei `1440x900`;
-- Today-, Event-/Activity- und Partnerkontexte mit realen deutschen Inhalten als Test verwenden;
-- bestehende Produktfarben und Oberflächen beibehalten, sofern sie die neue Primäridentität tragen;
-- fachliche Pass/Fail-Entscheidung durch ChatGPT als delegierter Design-Owner.
+- generischem Initial-/Monogrammcharakter;
+- Scanner-, Karten-, Dashboard-, Ticket-, Pin-, Kalender- oder UI-Lesart;
+- notwendiger Erklärung;
+- Verlust der Verwandtschaft zur Wortmarke;
+- Kollaps bei 16/24/32px.
 
-## 6. Verboten in Schritt 7
+## 5. Größen- und Maskenpflicht
 
-- kein App-Icon oder Monogramm;
-- kein neues freistehendes Symbol;
-- kein Produktiv-Patch an `staging`, `main` oder Live;
-- keine großflächige UI-Neugestaltung;
-- keine neue Palette nur zur Rettung der Wortmarke;
-- kein Claim als notwendiger Markenbestandteil;
-- keine Logoanimation als Rettungsmechanismus;
-- keine Design-Scores;
-- kein Red Team oder Markenrechts-Freigabe;
-- keine Product-Owner-Auswahl zwischen Rohvarianten;
-- keine Hochglanz-Mock-ups mit erfundenem Produkt.
+Weitergeführte Kleinformen müssen geprüft werden bei:
 
-## 7. Zu prüfendes Minisystem
+- 16px;
+- 24px;
+- 32px;
+- 48px;
+- 64px;
+- Kreis;
+- Squircle;
+- Maskable-Safe-Area.
 
-### Primäridentität
+Pflichtfassungen:
 
-- vollständige Wortmarke `bocholt erleben`;
-- Standard auf hellen Flächen: tiefes vorhandenes Brand-Grün, vorzugsweise `--brand-green-900` (`#0D3014`) oder Text Primary, sofern der reale Kontrastvergleich das bestätigt;
-- inverse Fassung: Weiß auf ausreichend dunkler vorhandener Brand-Fläche.
+- monochrom;
+- inverse;
+- App-Tile innerhalb der bestehenden Brand-Green-Familie.
 
-### Produkt-Typografie
+## 6. Formale Qualitätsprüfung
 
-- UI-Typografie bleibt funktional und unverändert;
-- die individuelle Markenzeichnung wird nicht zum UI-Font hochskaliert;
-- Markencharakter und Bedienbarkeit bleiben getrennte Rollen.
+Erst nach Auswahl einer belastbaren Kleinform werden Primäridentität und Minisystem als Ganzes geprüft.
 
-### Farbe
+Pflicht:
 
-- dunkles Grün trägt Vertrauen und die Marke;
-- Lime bleibt Interaktions-/Aktivierungsfarbe;
-- Gold bleibt seltener Sekundärakzent;
-- keine zweifarbige Wortmarke als Identitätskrücke.
+- zwei getrennte interne Bewertungspässe mit dokumentierter Bewertungsgrundlage;
+- Red-Team-Pass mit aktivem Ablehnungsauftrag;
+- Architektur- und Genericity-Prüfung;
+- reale mobile und Desktopwirkung;
+- technische SVG-/Rasterrobustheit;
+- Provenienz- und Lizenzstatus;
+- keine Behauptung externer unabhängiger Gutachter.
 
-### Bildsprache
+Scorecard erst jetzt zulässig:
 
-- echte Situationen, Orte und Menschen;
-- natürliche Perspektive und Licht;
-- kuratierter einzelner Fokus statt visueller Masse;
-- keine Postkarten-, Tourismus-, Festival-, Stock- oder Stadtmarketing-Inszenierung.
+| Dimension | Gewicht | Mindestwert |
+|---|---:|---:|
+| Qualität und Eigenständigkeit der Wortmarke | 25 | 22 |
+| Kohärenz und Wiedererkennung des Markensystems | 20 | 17 |
+| Passung zu Produkt, Haltung und Zielgruppen | 20 | 17 |
+| Wirkung ohne Herleitung und Kategorieabgrenzung | 15 | 13 |
+| Mobile und responsive Markenfunktion | 10 | 8 |
+| Konstruktion, Provenienz und technische Robustheit | 10 | 8 |
 
-### Bewegung
+Freigabe nur bei mindestens `90/100`, jedem Mindestwert, keinem harten Knock-out und keinem ungelösten Red-Team-Befund.
 
-- Bewegung unterstützt Auswahl und Orientierung;
-- kurze, ruhige Fokus-/Reveal-Übergänge;
-- keine springende, pulsierende oder logo-zentrierte Animation.
+Die Scorecard dokumentiert das Urteil; sie darf sichtbare Schwäche nicht überstimmen.
 
-## 8. Bestehensregeln
+## 7. Verboten
 
-Schritt 7 besteht nur, wenn:
+- keine Änderung der Primäridentität, außer ein harter Step-8-Befund zwingt methodisch zurück;
+- kein neues Creative Territory;
+- kein zweites Logo-System;
+- keine generische `b/e`-Stapelmarke;
+- kein Pin, Ticket, Kalender, Kompass, Fahrrad, Skyline oder lokales Klischee;
+- keine Produktiv-Integration;
+- keine neue Palette;
+- kein Claim als Qualitätsverstärker;
+- keine Präsentationsboards vor Abschluss der Bewertung.
 
-1. die Wortmarke in der realen `48px`-Headergeometrie klar und hochwertig wirkt;
-2. das vorhandene Farb- und Oberflächensystem sie trägt, ohne neue Rettungsfarben zu benötigen;
-3. die Marke auf Mobile und Desktop als Consumer-Produkt und nicht als Behörde, Tourismusportal oder SaaS wirkt;
-4. Wortmarke, UI-Typografie, Bildsprache und Farbrollen dieselbe Haltung `Klar ausgewählt` tragen;
-5. die Primäridentität nicht im Hero überinszeniert werden muss;
-6. die Produkterfahrung auch ohne App-Icon bereits kohärenter wirkt als der aktuelle öffentliche Markenstand;
-7. keine bestehende Accessibility-, Responsive- oder Komponentenlogik für die Marke geopfert werden muss.
+## 8. Abschlusskriterium
 
-## 9. Abschluss und nächster Übergang
+Schritt 8 ist nur bestanden, wenn:
 
-Bei PASS wird Schritt 7 dokumentiert und ausschließlich dann auf Schritt 8 gewechselt.
+1. genau eine belastbare responsive Kleinform/App-Marke vorliegt;
+2. alle Größen-/Maskentests bestanden sind;
+3. beide getrennten Bewertungspässe positiv sind;
+4. Red Team keinen ungelösten harten Befund hat;
+5. Score >= 90/100 und alle Dimensionsminima erreicht sind;
+6. Provenienz und technische Robustheit nachvollziehbar sind.
 
-Schritt 8 darf erstmals die **responsive Kleinform/App-Marke plus formale Qualitätsprüfung** öffnen.
+Bei Nichtbestehen wird nicht künstlich zu Schritt 9 gewechselt.
 
-Bei FAIL wird die Primäridentität nicht durch App-Icon, Farbe oder UI-Redesign gerettet; der Prozess geht gezielt zur letzten belegten Ursache zurück.
+## 9. Nächster zulässiger Übergang
+
+Bei PASS:
+
+**SCHRITT 9 VON 9 – FINALE MARKEN-/ÄHNLICHKEITSRECHERCHE, PRODUCT-OWNER-ENDGATE UND INTEGRATIONSVORBEREITUNG**
+
+Schritt 9 ist noch keine automatische Integration. `staging`, `main` und Live bleiben bis zur separaten ausdrücklichen Integrationsfreigabe unverändert.
 
 ## 10. Rollen
 
-ChatGPT trifft die fachliche Designentscheidung. Der Product Owner bleibt verantwortlich für Produktziele, Grenzen und die spätere reale Einführungsentscheidung.
+ChatGPT trifft die fachlichen Design- und Qualifikationsentscheidungen. Der Product Owner wird erst für das reale Endgate und die spätere Einführung benötigt.
 
 Kein stiller Prozesswechsel.
