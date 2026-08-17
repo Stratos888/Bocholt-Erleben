@@ -55,7 +55,13 @@ async function pageSignature(page) {
       'paddingLeft',
       'paddingRight',
     ]),
-    formControl: await styleSignature(page, '.content-field__control', [
+    inputControl: await styleSignature(page, 'input.content-field__control', [
+      'borderRadius',
+      'backgroundColor',
+      'borderTopColor',
+      'fontSize',
+    ]),
+    selectControl: await styleSignature(page, 'select.content-field__control', [
       'borderRadius',
       'backgroundColor',
       'borderTopColor',
@@ -158,7 +164,7 @@ async function runProfile(browser, profileName, viewport) {
   await open(page, '/startpartner/?scope=activities');
   assert(await page.locator('#startpartner-scope').inputValue() === 'activities', `${profileName}: Activity-Scope wurde nicht vorausgewählt`);
 
-  // Membership-Route liefert die unveränderten Shared-Primitives und bestehende Formmechanik.
+  // Membership-Route liefert dieselben Shared-Primitives. Input und Select werden jeweils nur mit demselben Control-Typ verglichen.
   await open(page, '/events-veroeffentlichen/mitgliedschaft/');
   await page.locator('#organizer-membership-form').waitFor({ state: 'visible' });
   const membershipStyles = await pageSignature(page);
@@ -180,7 +186,7 @@ async function runProfile(browser, profileName, viewport) {
       '/startpartner/?scope=activities',
       '/events-veroeffentlichen/mitgliedschaft/',
     ],
-    compared: ['hero', 'primaryCard', 'primaryCta', 'formControl'],
+    compared: ['hero', 'primaryCard', 'primaryCta', 'inputControl', 'selectControl'],
   };
 }
 
