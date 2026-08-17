@@ -1,165 +1,104 @@
 # Phase 5 – Prozessursache und Governance-Auflösung
 
-Stand: 2026-08-01
+Stand: 2026-08-17
 Workpack: #259
 Status: verbindlich
 
-## 1. Warum Phase 4 trotz vorhandener Dokumentation scheiterte
+## 1. Warum die bisherigen Schleifen trotz vorhandener Dokumentation scheiterten
 
-Die Repository-Dokumentation enthielt bereits viele richtige Qualitätsprinzipien. Das Scheitern entstand aus einer Kombination aus Dokumentwidersprüchen, unvollständiger Operationalisierung und Ausführungsfehlern.
+Die Repository-Dokumentation enthielt viele richtige Qualitätsprinzipien. Das Scheitern entstand aus Dokumentwidersprüchen, unvollständiger Operationalisierung, zu schwacher kreativer Erzeugung und einem zu spät eingebundenen realen visuellen Product-Owner-Gate.
 
 ### 1.1 Widersprüchliche Freigaberegeln
 
-Der ältere `BRAND_IDENTITY_TARGET_CONTRACT.md` nennt:
-
-- Mindestwert `78/100`;
-- höchstens drei Richtungen für das Product-Owner-Gate.
-
-Das spätere `AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md` nennt:
-
-- Mindestwert `90/100`;
-- verpflichtende Dimensionsmindestwerte;
-- übereinstimmende Freigabe beider Blindkritiker;
-- keinen ungelösten Red-Team-Befund;
-- höchstens zwei Richtungen.
-
-Diese Regeln waren nicht ausdrücklich hierarchisiert. Dadurch bestand Interpretationsspielraum, obwohl der spätere Rahmen erkennbar die strengere Prozessreparatur darstellt.
+Der ältere `BRAND_IDENTITY_TARGET_CONTRACT.md` nannte niedrigere Schwellen als das spätere `AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`. Für Phase 5 bleibt die strengere spätere Governance maßgeblich.
 
 ### 1.2 Phase 4 war nur strukturelle Exploration
 
-`docs/brand/phase4/README.md` begrenzt Phase 4 ausdrücklich auf:
-
-- keine Scores;
-- keine Rangfolge;
-- keine Finalisten;
-- keine Freigabe;
-- strukturelle SVG-Exploration statt Produktionsmaster.
-
-Die erzeugten Systeme waren daher Prüfrohstoff, keine Premiumkandidaten. Sie wurden im weiteren Ablauf dennoch wie eine nahezu vollständige Markenrunde behandelt.
+Phase 4 erzeugte Prüfrohstoff und keine Premiumkandidaten. Spätere Prozesse behandelten diese Studien teilweise zu nah an einer vollständigen Markenrunde.
 
 ### 1.3 Die kreative Erzeugung war zu schwach
 
-Die Phase-4-Systeme bestanden überwiegend aus einfachen geometrischen Primitiven, bekannten Symbolschemata und Standardtypografie. Der Prüfprozess erkannte viele dieser Schwächen korrekt, setzte aber erst ein, nachdem bereits zu viel Aufwand in schwache Grundideen geflossen war.
+Viele frühe Systeme bestanden aus einfachen geometrischen Primitiven, bekannten Symbolschemata, Standardtypografie oder `Font + Gimmick`. Strenge Bewertung kann solche Gestaltung beenden, aber nicht nachträglich in Premiumgestaltung verwandeln.
 
-Eine strengere Bewertung kann schlechte Gestaltung beenden, aber nicht nachträglich in Premiumgestaltung verwandeln.
+### 1.4 Rollenunabhängigkeit wurde überschätzt
 
-### 1.4 Die Scorecard war nicht Teil der Blindaufträge
+Getrennte Prompts und Sichtflächen verbessern Disziplin, erzeugen aber keine wirklich unabhängigen Gutachter, wenn derselbe AI-Orchestrator Produktion, Kritik und Konsolidierung kennt.
 
-Der Konsolidierungsauftrag verlangte eine Phase-3-Scorecard. Die tatsächlichen Kritikaufträge lieferten jedoch qualitative Knock-out-Urteile ohne vollständige Dimensionswerte.
+### 1.5 Der Product Owner wurde visuell zu spät eingebunden
 
-Später rekonstruierte Punktwerte waren keine unabhängige Blind-Evidenz und dürfen nicht als solche gespeichert oder zur formalen Freigabe verwendet werden.
+Die frühere Governance wollte den Product Owner vor Rohideen schützen. Das war richtig, wurde aber überzogen: Eine tatsächliche visuelle Richtungsentscheidung erfolgte erst, nachdem einzelne Identitäten bereits weit ausgearbeitet und intern bewertet waren.
 
-### 1.5 Rollenunabhängigkeit wurde überschätzt
+Candidate 201 belegt das Problem konkret:
 
-Getrennte Prompts und getrennte Sichtflächen verbessern die Disziplin. Sie erzeugen aber keine vollständig unabhängigen menschlichen Gutachter, wenn derselbe ChatGPT-Orchestrator Produktion, Kritik und Konsolidierung ausführt oder bereits alle Ergebnisse kennt.
+- intern zweimal `90/100`;
+- intern als designqualifiziert geführt;
+- später in tatsächlicher Product-Owner-Sichtung und erneuter visueller Bewertung klar nicht als Premium-Marke bestätigt.
 
-Der Prozess darf künftig nur von getrennten Bewertungspässen sprechen, nicht von unabhängiger externer Begutachtung.
+Damit ist belegt, dass interne Scorecards keinen menschlichen visuellen Richtungsentscheid ersetzen dürfen.
 
-### 1.6 Nutzerinteraktion wurde verletzt
+### 1.6 Generatoren wurden mit der falschen Aufgabe betraut
 
-Der Product Owner sollte keine Rohideen, Mikrovarianten oder internen Berichtsgrafiken erhalten. Die Ausgabe einer unbestellten Prüfberichtgrafik verletzte diese Regel und hatte keinen gestalterischen Nutzen.
+Zusätzliche Tests mit Recraft und Ideogram bestätigten typische Fehlmuster:
 
-### 1.7 Das Gegenframework übersteuerte bei Wortmarken
+- Recraft: `Font + Gimmick`, insbesondere Schnitte und dekorative Eingriffe;
+- Ideogram: saubere, aber generische Fontsetzungen ohne ausreichende Identität.
 
-Die frühe Prozessreparatur behandelte Genericity, Austauschbarkeit, Silhouette, Produktspezifität und App-Icon architekturunabhängig.
+Logo-Generatoren werden deshalb nicht weiter als Primärerzeuger eingesetzt.
 
-Das war für generische Symbole und einzelne Schriftgimmicks sinnvoll, erzeugte bei einer Wortmarkenarchitektur aber neue Fehlanreize:
+### 1.7 Textliche Benchmarks waren zu wenig visuell operationalisiert
 
-- hochwertige Wortmarken wurden wegen fehlender wörtlicher Produktsymbolik benachteiligt;
-- ein freistehendes Zeichen und App-Icon wurden zu früh erzwungen;
-- systemische Typografie wurde wie Standardschrift plus Detail behandelt;
-- harte Austauschbarkeitsregeln förderten überzeichnete Buchstabenmetaphern statt souveräner Markenführung.
-
-Die Korrektur steht in `ARCHITECTURE_AWARE_EVALUATION.md` und senkt den Premiumanspruch ausdrücklich nicht.
-
-### 1.8 Interne Erzeugungsgrenze
-
-Phase 5 hat mehrere Architekturklassen real konstruiert und anschließend einen begrenzten generativen Suchzyklus über vier offene Formfelder durchgeführt.
-
-Der wiederholte Befund ist stabil:
-
-- prozedural erzeugte Letteringvarianten bleiben bekannte Stilformeln oder wirken dekorativ verändert;
-- abstrakte Formen kippen in UI, Mode, Handwerk, Publishing oder andere falsche Kategorien;
-- lokale Strukturideen benötigen zu viel Erklärung;
-- technisch saubere Initialableitungen bleiben austauschbar;
-- keine der zwölf ernsthaften Rohhypothesen aus dem generativen Zyklus rechtfertigte eine deterministische Rekonstruktion.
-
-Die Grenze ist nicht fehlende Prüftiefe, sondern fehlende originäre Creative-Director-/Lettering-Qualität mit den aktuell verfügbaren internen Erzeugungswegen.
+Premiumreferenzen wurden inhaltlich korrekt analysiert, aber ihre sichtbare Grammatik – Dichte, x-Höhenwirkung, Proportion, Terminalcharakter, Weißraum, Bildnähe und Consumer-Markenwirkung – wurde nicht früh genug als visuelle Richtungsentscheidung übersetzt.
 
 ## 2. Verbindliche Dokumenthierarchie
 
-Für Workpack #259 gilt folgende Reihenfolge:
+Für Workpack #259 gilt ab 2026-08-17:
 
-1. `docs/brand/phase5/PROCESS_ROOT_CAUSE_AND_GOVERNANCE.md`
-2. `docs/brand/phase5/ARCHITECTURE_AWARE_EVALUATION.md`
-3. `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`
-4. `docs/brand/phase5/README.md`
-5. `docs/brand/phase5/GENERATIVE_SEARCH_CYCLE_01_RESULT.md`
-6. `docs/brand/phase5/EXTERNAL_CREATIVE_EXECUTION_BRIEF.md`
-7. weitere Phase-5-Such- und Benchmarkdateien
-8. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
-9. Phase-4-Dokumente ausschließlich als Negativwissen
+1. `docs/brand/phase5/VISUAL_DIRECTION_GATE.md`
+2. `docs/brand/phase5/PROCESS_ROOT_CAUSE_AND_GOVERNANCE.md`
+3. `docs/brand/phase5/ARCHITECTURE_AWARE_EVALUATION.md`, soweit nicht durch Gate 1/2 übersteuert
+4. `docs/brand/AI_BRAND_PHASE3_EVALUATION_FRAMEWORK.md`, nur für spätere formale Qualifikation
+5. `docs/brand/phase5/README.md`
+6. weitere Phase-5-Such- und Benchmarkdateien
+7. `docs/brand/BRAND_IDENTITY_TARGET_CONTRACT.md`
+8. ältere Studien ausschließlich als Negativwissen
 
 Bei Konflikten gilt die höher stehende Datei.
-
-Damit sind verbindlich:
-
-- Freigabeschwelle: mindestens `90/100`;
-- alle Dimensionsmindestwerte müssen erreicht sein;
-- kein architekturabhängig belegter Knock-out;
-- zwei getrennte positive Bewertungspässe;
-- kein ungelöster Red-Team-Befund;
-- höchstens zwei Richtungen im Product-Owner-Gate;
-- App-Icon und Kleinmarke erst nach bestandener vollständiger Primäridentität.
-
-Die ältere 78-Punkte-Schwelle und die Grenze von drei Richtungen sind für Phase 5 außer Kraft.
 
 ## 3. Verbindliche Prozesssperren
 
 1. Keine Quantitätsziele als Qualitätsersatz.
 2. Keine Standardschrift plus dekoratives Einzelmerkmal.
 3. Kein App-Icon vor überzeugender vollständiger Primäridentität.
-4. Keine Speicherung rekonstruierter Scores als formale Blind-Evidenz.
+4. Keine rekonstruierte oder selbstvergebene Scorecard als Ersatz für visuelle Freigabe.
 5. Keine Behauptung unabhängiger Prüfer bei identischer Orchestrierung.
-6. Keine Nutzerpräsentation von Rohideen, Prüfboards oder internen Berichtsgrafiken.
-7. Keine öffentliche oder produktive Markenänderung vor vollständiger Qualifikation und separatem Integrationsworkpack.
-8. Keine architekturblinde Anwendung von Knock-outs.
-9. Keine Wiederholung der im Studienlog geschlossenen Formfamilien.
-10. Keine weitere rein prozedurale automatische Variantenrunde nach dem abgeschlossenen generativen Suchzyklus 01.
-11. Kein externer Entwurf wird wegen Präsentationsqualität bevorzugt; bewertet wird das sichtbare Markensystem in identischen realen Anwendungen.
+6. Keine öffentliche oder produktive Markenänderung vor vollständiger Qualifikation und separatem Integrationsworkpack.
+7. Keine Wiederholung geschlossener Formfamilien ohne neue visuelle Richtungsgrundlage.
+8. Keine weiteren Recraft-/Ideogram-Logo-Generator-Runden derselben Art.
+9. Candidate 201 bleibt verworfen und besitzt keinen bevorzugten Status.
+10. Keine Architektur wird vor Gate 1 als Sieger festgelegt.
+11. Keine Scorecard vor bestandenem visuellen Product-Owner-Gate 2.
 
 ## 4. Korrigierter Qualitätsweg
 
-### Geschlossene interne Strecke
+### Gate 1 – Visual Direction
 
-1. Produktkern und emotionale Markenspannung präzisieren.
-2. Premium- und Kategoriebenchmarks dokumentieren.
-3. mehrere Architekturklassen untersuchen.
-4. Wortmarken-, integrierte und responsive Studien real konstruieren.
-5. Ablations-, Originalgrößen- und Kategorieprüfungen durchführen.
-6. generativen Suchraum über vier begrenzte Felder prüfen.
-7. alle nicht tragfähigen Richtungen ohne Nutzerpräsentation beenden.
+- zwei klar getrennte Markenwelten statt Logos;
+- `Klar ausgewählt` und `Nah am echten Leben`;
+- sichtbare Typografie-, Dichte-, Bild-, Farbtemperatur- und Consumer-Markenmechanik;
+- keine Finalwortmarke, kein App-Icon, kein Claim;
+- Product Owner entscheidet `A`, `B` oder `keine`.
 
-Diese Strecke ist abgeschlossen mit:
+### Formsprachenerkundung
 
-- `44` ernsthaften internen Studien beziehungsweise Rohhypothesen über beide Phase-5-Zyklen;
-- `0` Kandidaten;
-- `0` qualifizierten Richtungen;
-- `0` öffentlichen Änderungen.
+Nur die gewählte Welt wird in formale Bausteine übersetzt. AI dient als Such- und Sparringsinstrument; die endgültige Primäridentität wird bewusst und reproduzierbar konstruiert.
 
-### Nächste Strecke
+### Gate 2 – Primäridentität
 
-1. originäre externe Creative-Director-/Lettering-Leistung gemäß `EXTERNAL_CREATIVE_EXECUTION_BRIEF.md`;
-2. Eingangskontrolle und Provenienzprüfung;
-3. Anonymisierung und identische Originalgrößen-Prüfsets;
-4. architekturabhängige Knock-outs;
-5. neutrales Marken-Minisystem;
-6. responsive Kleinform und App-Marke;
-7. zwei getrennte Bewertungspässe;
-8. Red-Team-Pass;
-9. Scorecard und technische Prüfung;
-10. höchstens zwei vollständig qualifizierte Richtungen für den Product Owner;
-11. separate Finalisierung und Repository-Integration.
+Höchstens zwei ernsthafte Identitäten werden ohne Konzepttitel und Scores gegen aktuellen Stand und neutrale Kontrollsetzung verglichen. Product Owner entscheidet `weiter` oder `keine`.
+
+### Formale Qualifikation erst danach
+
+Erst eine sichtbar bestätigte Primäridentität erhält Mini-System, App-Marke, getrennte Bewertungspässe, Red Team, Ähnlichkeits- und Lizenzprüfung, technische Härtung und Scorecard.
 
 ## 5. Definition von Fortschritt
 
@@ -169,18 +108,20 @@ Fortschritt ist nicht:
 - Anzahl SVG-Dateien;
 - grüne CI;
 - formal vollständige Prüftabellen;
-- ein Kandidat ohne harten Knock-out;
-- ein wörtlich erklärbares App-Symbol;
-- eine professionelle, aber austauschbare Fontsetzung;
-- ein technisch stabiles Initialmonogramm.
+- selbstvergebene 90 Punkte;
+- ein technisch stabiles Initialmonogramm;
+- eine professionelle, aber austauschbare Fontsetzung.
 
-Fortschritt ist erst belegt, wenn eine vollständige Primäridentität:
+Fortschritt ist:
 
-- sichtbar eigenständig ist;
-- klar zum Produkt und zur gewünschten Haltung passt;
-- ohne Erklärung hochwertig wirkt;
-- die aktuelle Identität deutlich übertrifft;
-- als Wortmarke und im realen mobilen Header überzeugt;
-- ein kohärentes Typografie-, Farb-, Bild- und Bewegungsverhalten tragen kann;
-- anschließend eine verwandte belastbare Kleinform ermöglicht;
-- vollständig nachvollziehbar konstruiert und lizenziert ist.
+- eine vom Product Owner sichtbar bestätigte Markenwelt;
+- daraus eine bewusst konstruierte Primäridentität, die in realer mobiler Größe klar über aktuellem Stand und neutraler Kontrollsetzung liegt;
+- erst anschließend ein konsistentes Marken- und Produktsystem.
+
+## 6. Aktueller Status
+
+- qualifizierte Richtungen: `0`;
+- Candidate 201: `verworfen / Negativwissen`;
+- externe Kreativbeauftragung: weiterhin ausgeschlossen;
+- öffentliche Änderungen: `0`;
+- Gate 1: aktiv.
