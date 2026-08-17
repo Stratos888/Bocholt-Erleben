@@ -2,7 +2,7 @@
 
 Stand: 2026-08-17
 Workpack: #259
-Status: **ZWISCHENBEFUND – KEIN EINGETRAGENER KONFLIKT BELEGT; ÄLTERE STADTMARKETING-NUTZUNG BELEGT; AMTLICHE EXAKTSUCHE NOCH ZU VERIFIZIEREN**
+Status: **ZWISCHENBEFUND – DPMAREGISTER BASISSUCHE 0 TREFFER; ÄLTERE STADTMARKETING-NUTZUNG BELEGT; EUIPO/WIPO-GEGENKONTROLLE NOCH OFFEN**
 
 ## 1. Zweck
 
@@ -97,46 +97,61 @@ Ein 2018 veröffentlichter städtischer Pressedienst-Beitrag verweist ebenfalls 
 
 Die ältere Nutzung ist relevant für eine mögliche Prioritätsprüfung. Sie beweist aber noch nicht, dass `Bocholt erleben` in jedem dieser Kontexte als selbstständiges geschäftliches Kennzeichen und nicht nur als beschreibende Rubrik, Seitentaxonomie oder Social-Kanalbezeichnung benutzt wurde.
 
-## 5. Eingetragene Marken – aktueller Recherchebefund
+## 5. Eingetragene Marken – amtlicher DPMAregister-Lauf 2026-08-17
 
-Durchgeführt wurden aktuelle Suchmaschinen-/Indexabfragen unter anderem für:
+Der Product Owner hat die DPMAregister-Basisrecherche manuell mit folgenden Einstellungen ausgeführt:
+
+- Datenbestand `nationale Marken`: aktiviert;
+- Datenbestand `Unionsmarken`: aktiviert;
+- Datenbestand `internationale Marken`: aktiviert;
+- Feld `Marke`: `Bocholt erleben`;
+- sonstige Suchfelder leer.
+
+DPMAregister hat die Suchanfrage intern als
+
+`(marke="Bocholt" and marke="erleben")`
+
+formuliert und gemeldet:
+
+**`Die Datenbankabfrage lieferte keine Treffer.`**
+
+Dieser Lauf ist sogar breiter als eine reine Phrasensuche, weil beide Worte im Markenfeld vorhanden sein müssten, nicht zwingend direkt nebeneinander. Eine exakte Phrase `Bocholt erleben` ist damit in diesem Suchbestand ebenfalls nicht enthalten.
+
+Amtlicher Hintergrund:
+
+- die Basisrecherche verknüpft mehrere Suchbegriffe automatisch mit `UND`;
+- DPMAregister enthält nationale deutsche Marken und als zusätzliche Datenbestände Unions- und internationale Marken;
+- die Registerdaten werden täglich aktualisiert;
+- das DPMA empfiehlt für eine vollständige Recherche trotzdem die Gegenkontrolle in den aktuellen EUIPO- und WIPO-Datenbanken.
+
+Amtliche Grundlagen:
+
+- https://register.dpma.de/register/htdocs/test/de/hilfe/recherchemodi/basisrecherche/index.html
+- https://www.dpma.de/recherche/dpmaregister/
+
+### Ergebnis dieses Schritts
+
+**Kein Markenregistertreffer mit gleichzeitig `Bocholt` und `erleben` im Markenfeld wurde in den ausgewählten DPMAregister-Datenbeständen gefunden.**
+
+Damit gibt es aktuell **keinen belegten eingetragenen identischen Konflikt** in diesem amtlichen Suchlauf.
+
+Das ersetzt noch nicht:
+
+- Ähnlichkeitsrecherche;
+- EUIPO/TMview-Gegenkontrolle;
+- WIPO-Gegenkontrolle;
+- Prüfung nicht eingetragener Kennzeichenrechte.
+
+## 6. Web-/Indexrecherche ergänzend
+
+Zusätzlich wurden aktuelle Suchmaschinen-/Indexabfragen durchgeführt, unter anderem für:
 
 - `site:register.dpma.de "Bocholt erleben"`;
 - `site:euipo.europa.eu "Bocholt erleben"`;
 - `site:branddb.wipo.int "Bocholt erleben"`;
 - exakte Kombinationen aus `Bocholt erleben`, Marke, Trademark und Stadtmarketing.
 
-Befund:
-
-**Kein konkreter amtlicher Registerdatensatz für eine exakte Marke `Bocholt erleben` wurde in den indexierten Webtreffern gefunden.**
-
-Das ist keine vollständige Negativauskunft.
-
-Das DPMA weist selbst darauf hin:
-
-- DPMAregister enthält nationale deutsche Marken sowie auch Daten zu Unions- und IR-Marken;
-- für vollständige Recherche mit Wirkung in Deutschland sollen zusätzlich die aktuellen EUIPO- und WIPO-Datenbanken verwendet werden;
-- eine bloße identische Suche ersetzt keine Ähnlichkeitsrecherche;
-- auch ältere Benutzungsmarken, geschäftliche Bezeichnungen und sonstige Rechte können entgegenstehen und müssen außerhalb des Markenregisters recherchiert werden.
-
-Amtliche Grundlage:
-
-- https://www.dpma.de/marken/markenrecherche/
-- https://www.dpma.de/recherche/dpmaregister/
-
-## 6. Technische Grenze des aktuellen Assistant-Zugriffs
-
-Die live erreichbare DPMAregister-Basisrecherche wurde geöffnet und ist aktuell verfügbar:
-
-- https://register.dpma.de/DPMAregister/marke/basis
-
-Sie besitzt ein Eingabefeld `Marke` und Datenbestandsauswahl für nationale, Unions- und internationale Marken.
-
-Der verfügbare Webzugriff kann Webseiten lesen und Links öffnen, aber **keine Texte in gewöhnliche Webformulare eingeben und absenden**. Es ist außerdem kein verbundener Browser-Automationsdienst verfügbar.
-
-Deshalb konnte der exakte amtliche Formularlauf `Bocholt erleben` nicht selbst als reproduzierbarer Negativbefund abgeschlossen werden.
-
-Dieser einzelne technische Restpunkt darf weder als Treffer noch als Freigabe interpretiert werden.
+Auch dabei wurde kein konkreter amtlicher Registerdatensatz für eine exakte Marke `Bocholt erleben` gefunden.
 
 ## 7. Rechtliche Einordnung – keine Rechtsfreigabe
 
@@ -150,7 +165,7 @@ Dieser einzelne technische Restpunkt darf weder als Treffer noch als Freigabe in
 
 Folge:
 
-Die seit mindestens 2017 belegte Stadtmarketing-Nutzung darf nicht ignoriert werden, selbst wenn keine Registermarke gefunden würde.
+Die seit mindestens 2017 belegte Stadtmarketing-Nutzung darf nicht ignoriert werden, selbst wenn keine Registermarke gefunden wird.
 
 ### Kennzeichnungskraft der Wortfolge
 
@@ -197,7 +212,7 @@ Gleichzeitig unterscheiden sich Absender und Produktform:
 
 ### Nicht belegt
 
-- keine belegte eingetragene Marke `Bocholt erleben`;
+- kein DPMAregister-Treffer mit `Bocholt` UND `erleben` im Markenfeld in nationalen, Unions- und internationalen Datenbeständen;
 - kein belegtes Stadtmarketing-Logo `Bocholt erleben` aus der Playfountain-Stelle;
 - kein belegtes pauschales Verbotsrecht gegen die private Plattform.
 
@@ -215,12 +230,12 @@ Der richtige Prozess ist deshalb:
 
 - Name **nicht ändern**;
 - Name **noch nicht als rechtlich abschließend freigegeben bezeichnen**;
-- die exakte amtliche Registersuche schließen;
+- EUIPO/TMview und WIPO exakt gegenprüfen;
 - anschließend bewerten, ob wegen der historischen nicht eingetragenen Nutzung eine gezielte rechtliche Prioritäts-/Verwechslungsprüfung vor einer größeren Markeninvestition sinnvoll oder erforderlich ist.
 
 ## 10. Frühere Repository-Prüfung
 
-Die durchsuchbaren aktuellen Repository-Dateien, Issues, PRs und Committexte enthalten keinen wiederauffindbaren konkreten DPMA-/EUIPO-/WIPO-Trefferauszug für `Bocholt erleben`.
+Die durchsuchbaren aktuellen Repository-Dateien, Issues, PRs und Committexte enthalten keinen wiederauffindbaren konkreten früheren DPMA-/EUIPO-/WIPO-Trefferauszug für `Bocholt erleben`.
 
 Issue #218 dokumentiert jedoch ausdrücklich, dass Repo-, Marken-, Stadtmarken- und Rechtsgrenzen read-only betrachtet wurden und dass vor einer späteren Markenfinalisierung Name, Schutzfähigkeit und Verwechslungsrisiko zu prüfen sind. Derselbe Workpack grenzt ausdrücklich ab, dass `Bocholt erleben` noch nicht professionell hinsichtlich Registrierbarkeit, Ähnlichkeit, Verwechslungsrisiko oder Anmeldung freigegeben war.
 
@@ -230,15 +245,14 @@ Das widerspricht nicht der Möglichkeit, dass vor der ursprünglichen Projektein
 
 ## 11. Noch fehlender Minimalnachweis
 
-Für den Registerteil fehlt nur noch ein reproduzierbarer exakter amtlicher Suchlauf.
+Der deutsche/DPMAregister-Basissuchlauf ist jetzt dokumentiert.
 
-Mindestens zu sichern:
+Noch zu sichern:
 
-1. DPMAregister Basis/Experte mit `Bocholt erleben`, Datenbestände national + Union + international;
-2. idealerweise zusätzlich TMview/EUIPO exakt;
-3. WIPO Global Brand Database exakt.
+1. EUIPO/TMview exakt `Bocholt erleben`;
+2. WIPO Global Brand Database exakt `Bocholt erleben`.
 
-Wenn diese Suchen keinen relevanten Treffer ergeben, bleibt als Hauptrestfrage **nicht die Registermarke**, sondern die mögliche Reichweite der älteren Stadtmarketing-Nutzung als geschäftliche Bezeichnung beziehungsweise sonstiges Kennzeichen.
+Wenn auch diese Suchen keinen relevanten Treffer ergeben, bleibt als Hauptrestfrage **nicht die Registermarke**, sondern die mögliche Reichweite der älteren Stadtmarketing-Nutzung als geschäftliche Bezeichnung beziehungsweise sonstiges Kennzeichen.
 
 ## 12. Prozessentscheidung
 
