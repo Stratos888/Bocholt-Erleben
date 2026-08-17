@@ -3,137 +3,120 @@
 Stand: 2026-08-17
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **KANONISCHER AUSFÜHRUNGSLOCK**
+Status: **KANONISCHER AUSFÜHRUNGSLOCK – NAME RESET**
 
 ## 1. Unveränderliches Ziel
 
-Eine eigenständige Premium-Markenidentität für `Bocholt erleben` entwickeln, ohne externe Kreativbeauftragung und ohne schwache AI-Ergebnisse durch Prozess, Präsentation oder Scores künstlich aufzuwerten.
+Eine eigenständige Premium-Markenidentität für die private kuratierte Discovery-/Freizeitplattform in Bocholt entwickeln, ohne externe Kreativbeauftragung und ohne schwache AI-Ergebnisse durch Prozess, Präsentation oder Scores künstlich aufzuwerten.
 
 Öffentliche Marke, `staging`, `main` und Live bleiben bis zu einer späteren vollständigen Markenfreigabe unverändert.
 
-## 2. Abgeschlossene Schritte
+## 2. Belegter Step-9-Blocker des bisherigen Namens
 
-- Schritt 2: Premium-Referenzanalyse – abgeschlossen.
-- Schritt 3: Creative Direction – `Klar ausgewählt`.
-- Schritt 4: Formlogik – `Präzise Humanität`.
-- Schritt 5: Primäridentität konstruiert und einmal gezielt korrigiert.
-- Schritt 6: neutraler Vergleich – bestanden in Lauf 2.
-- Schritt 7: Marken-Minisystem und reale Produktwirkung – bestanden.
-- Schritt 8: responsive Kleinform und formale Design-/Technikprüfung – bestanden.
+Der Endgate-Preflight hat einen harten Absender-/Namenskonflikt für `Bocholt erleben` ergeben.
 
-Nachweis Schritt 8:
+Offizielle Stadt-/Stadtmarketing-Quellen belegen aktuell:
 
-- `docs/brand/phase5/STEP8_QUALITY_RESULT.md`
+- Social-Absender `bocholterleben` wird durch die Wirtschaftsförderungs- und Stadtmarketing Gesellschaft Bocholt betrieben;
+- derselbe Absender wird im lokalen Veranstaltungs-/Freizeitkontext aktiv genutzt;
+- auf einer offiziellen Stadtseite wird ein `Logo für Bocholt erleben` mit `© Stadtmarketing` geführt.
 
-Weitergeführte Assets:
+Nachweis:
 
-- Primäridentität: `docs/brand/phase5/step5/construction-a-mono.svg`
-- Kleinform: `docs/brand/phase5/step8/app-mark-mono.svg`
-- App-Source: `docs/brand/phase5/step8/app-icon-source.svg`
+- `docs/brand/phase5/STEP9_ENDGATE_BLOCKER.md`
 
-Step-8-Ergebnis:
+Damit scheitert der alte Name an der eigenen verbindlichen Anforderung, keine amtliche Trägerschaft oder Kooperation zu suggerieren.
 
-- charakteristisches `e` als einzige responsive Kleinform weitergeführt;
-- 16–64px bestanden;
-- Kreis, Squircle und Maskable-Safe-Area bestanden;
-- zwei getrennte interne Bewertungspässe positiv (`91/100`, `90/100`);
-- kein harter Red-Team-Knock-out;
-- offenes mittleres Ähnlichkeitsrisiko der einzelnen `e`-Glyphe ausdrücklich in Schritt 9 zu prüfen.
+Nicht als reale Marke weiterzuführen:
 
-Diese Qualifikation ist keine markenrechtliche oder produktive Freigabe.
+- Wortmarke `bocholt erleben`;
+- daraus abgeleitete `e`-Kleinmarke;
+- bisherige App-Source.
 
-## 3. Aktueller Schritt
+Die Assets bleiben nur historisches Konstruktions-/Negativwissen.
 
-**SCHRITT 9 VON 9 – FINALE MARKEN-/ÄHNLICHKEITSRECHERCHE, PRODUCT-OWNER-ENDGATE UND INTEGRATIONSVORBEREITUNG**
+## 3. Weiterhin gültiges Designwissen
+
+Der Blocker setzt die Markenstrategie nicht auf null zurück. Verbindlich erhalten bleiben:
+
+- Produktvorteil: `gute relevante Auswahl statt Masse`;
+- Creative Direction: `Klar ausgewählt`;
+- Zielwirkung: ruhig, souverän, menschlich, hochwertig, zugänglich, mobile-first;
+- Formprinzip: `Präzise Humanität` als bevorzugter Ausgangspunkt, aber erst nach bestandenem Namen erneut auf dessen konkreten Buchstabenbestand anzuwenden;
+- dunkles vorhandenes Brand-Grün als Vertrauensrolle, Lime als Interaktionsrolle;
+- Bildsprache: echte lokale Situationen, natürlicher Fokus, keine Tourismus-/Festival-/Stock-Inszenierung;
+- Motion: ruhige Fokus-/Reveal-Bewegung;
+- Anti-Gimmick-, Anti-Score- und Anti-Drift-Governance.
+
+## 4. Aktueller Schritt
+
+**NAME RESET – SCHRITT N1: DISTINCTIVE NAME SEARCH & PREFLIGHT**
 
 Zweck:
 
-Vor jeder realen Einführung prüfen, ob Name, Primäridentität und insbesondere die einzelne `e`-Kleinform erkennbare rechtliche, marktseitige oder visuelle Kollisionsrisiken aufweisen. Anschließend wird dem Product Owner genau ein Endgate mit belastbarem Befund vorgelegt.
+Einen eigenständigen, merkfähigen und premiumfähigen Hauptnamen finden, der die Plattform klar vom offiziellen Stadtmarketing-Absender trennt und bereits **vor** jeder neuen Wortmarkenkonstruktion gegen reale Nutzung und verfügbare Registerinformationen vorgeprüft wird.
 
-Schritt 9 ist ausdrücklich ein Recherche- und Freigabe-Preflight, keine Rechtsberatung und keine automatische Integration.
+## 5. Namensanforderungen
 
-## 4. Pflichtrecherche
+Ein Name darf nur weiterleben, wenn er:
 
-### Name / Absender
+1. klar eigenständiger ist als die beschreibende geografische Wortfolge `Bocholt erleben`;
+2. keine amtliche, kommunale oder Tourismus-Absenderschaft suggeriert;
+3. zur kuratierten Entdeckung von Events, Aktivitäten und Orten passt, ohne auf eine einzelne Kategorie beschränkt zu sein;
+4. im Deutschen gut aussprechbar, merkbar und mobil kompakt ist;
+5. eine hochwertige digitale Consumer-Marke tragen kann;
+6. keinen bekannten dominanten Branchen-/Markenkonflikt im ersten Web-Preflight aufweist;
+7. als Primärname auch mit einem rein beschreibenden Zusatz wie `für Bocholt & Umgebung` funktionieren könnte, ohne von diesem Zusatz abhängig zu sein;
+8. eine bessere Differenzierungs- und potenzielle Schutzbasis als rein beschreibende Kombinationen aus `Bocholt`, `Stadt`, `Events`, `Erleben`, `Entdecken` oder `Freizeit` besitzt.
 
-Aktuell prüfen:
+## 6. Erlaubte Aktionen in N1
 
-- identische und nahe Verwendungen von `Bocholt erleben`;
-- relevante lokale Stadt-, Tourismus-, Stadtmarketing- und Veranstaltungsangebote;
-- Markenregister-Preflight über offizielle beziehungsweise belastbare Quellen für Deutschland, EU und international, soweit öffentlich abfragbar;
-- Apps, Domains und digitale Angebote mit möglicher Verwechslungsnähe.
+- breite interne Namensdivergenz;
+- Wortfelder, Neologismen und semantische Kombinationen;
+- sprachliche/phonologische Prüfung;
+- harte interne Filterung ohne Nutzer-Rohbrainstorming;
+- Websuche nach exakten und ähnlichen Verwendungen;
+- lokale/regional relevante Unternehmens-, App-, Social- und Domain-Nutzung prüfen;
+- offizielle Markenregister beziehungsweise belastbare Suchwerkzeuge soweit technisch zugänglich vorprüfen;
+- höchstens zwei fachlich qualifizierte Namen für ein späteres Product-Owner-Namensgate vorbereiten.
 
-### Visuelle Ähnlichkeit
+## 7. Verboten in N1
 
-Aktuell prüfen:
+- kein neues Logo;
+- keine neue Wortmarke;
+- kein App-Icon;
+- keine Farb-/Mock-up-Inszenierung eines Namens;
+- kein Recraft/Ideogram/Image-Generator für Namenswahl;
+- keine Product-Owner-Auswahl aus langen Listen;
+- keine Behauptung markenrechtlicher Freigabe aus bloßem fehlendem Webtreffer;
+- keine Rückkehr zu `Bocholt erleben` ohne neue belastbare Klärung des Absenderkonflikts;
+- keine Produktivänderung, kein Merge, kein Deploy.
 
-- vollständige Wortmarke als System;
-- einzelne charakteristische `e`-Kleinform;
-- grüne App-Tile mit weißem `e`;
-- besonders ähnliche Marken/Apps in Event, Discovery, Local, Ticketing, Travel, Media und digitalen Consumer-Diensten.
+## 8. N1-Abschlusskriterium
 
-Ein häufig vorkommender Einzelbuchstabe ist nicht automatisch ein Blocker. Entscheidend ist die Kombination aus konkreter Zeichnung, Farbe, Anwendung, Waren-/Dienstleistungsnähe und Verwechslungswirkung.
+N1 ist erst abgeschlossen, wenn:
 
-## 5. Provenienz-/Lizenzabschluss
+- intern ein ausreichend breiter Namensraum untersucht wurde;
+- ungeeignete generische und kollidierende Namen ausgeschieden sind;
+- höchstens zwei Namen die strategischen, sprachlichen und marktseitigen Preflight-Kriterien bestehen;
+- für jeden Finalisten konkrete Fundstellen, Risiken und Aussagegrenzen dokumentiert sind;
+- eine klare fachliche Rangfolge vorliegt.
 
-Zu dokumentieren:
+Wenn kein Name genügt, bleibt N1 aktiv. Es wird kein mittelmäßiger Name aus Prozessgründen weitergereicht.
 
-- Ausgangsgeometrie Inter Display Medium / The Inter Project Authors;
-- Lizenzstatus der verwendeten Fontbasis;
-- Pfad-only-Master ohne Runtime-Fontabhängigkeit;
-- nachvollziehbare eigene systemische Modifikationen;
-- Aussagegrenze: technische Provenienz ist keine Schutzrechts- oder Freedom-to-use-Garantie.
+## 9. Nächster zulässiger Übergang
 
-## 6. Integrationsvorbereitung
+Nur nach bestandenem N1:
 
-Nur vorbereiten, nicht ausführen:
+**NAME RESET – SCHRITT N2: PRODUCT-OWNER-NAMENSGATE**
 
-- kanonische finalisierbare Assetliste;
-- erforderliche Rasterexporte und PWA-Größen;
-- betroffene Header-/Manifest-/Icon-Dateien;
-- Kontrast-, Safe-Area-, Cache- und Accessibility-Prüfplan;
-- separater späterer Integrationsweg auf Basis von `staging`.
+Der Product Owner erhält höchstens zwei qualifizierte Namen mit meiner fachlichen Empfehlung. Dies ist eine Produkt-/Absenderentscheidung, keine Aufforderung an den Product Owner, Designarbeit zu leisten.
 
-Bis zum Product-Owner-Endgate unverändert:
+Erst nach festgelegtem Namen darf die konkrete Wortmarkenkonstruktion neu beginnen.
 
-- `staging`;
-- `main`;
-- Live;
-- öffentliche Marke.
+## 10. Rollen
 
-## 7. Endgate-Regeln
+- ChatGPT: Naming-, Design- und Prozessowner; Recherche, Filterung und fachliche Empfehlung.
+- Product Owner: Produktziele, Namens-Endentscheidung, reale Einführung.
 
-Das Markensystem darf dem Product Owner nur als realer Einführungsfinalist vorgelegt werden, wenn:
-
-1. kein belegter harter Namens-/Absenderkonflikt gefunden wird;
-2. keine visuelle Kollision gefunden wird, die eine relevante Verwechslungsgefahr plausibel macht;
-3. verbleibende Unsicherheiten transparent als Risiko statt als Freigabe dargestellt werden;
-4. Provenienz und technische Integrationsvorbereitung vollständig dokumentiert sind;
-5. der bisherige Designbefund nicht nachträglich durch Rechercheergebnisse widerlegt wird.
-
-Wenn ein relevanter Blocker entsteht, wird nicht integriert und gezielt zur betroffenen Markenkomponente zurückgekehrt.
-
-## 8. Product-Owner-Endgate
-
-Der Product Owner erhält am Ende genau:
-
-- die finale Primäridentität und Kleinform in realer Anwendung;
-- den aktuellen Recherchebefund;
-- klar getrennte Restunsicherheiten;
-- meine fachliche Empfehlung `einführen` oder `nicht einführen`;
-- den konkreten separaten Integrationsplan.
-
-Keine Rohvarianten und keine künstliche Auswahl zwischen mittelmäßigen Alternativen.
-
-## 9. Verboten
-
-- keine automatische Änderung an `staging`, `main` oder Live;
-- kein Merge;
-- keine Behauptung einer anwaltlichen Rechtsfreigabe;
-- keine Verharmlosung nicht vollständig prüfbarer Register-/Ähnlichkeitsrisiken;
-- keine neue kreative Richtung ohne belegten Blocker;
-- kein stiller Prozesswechsel.
-
-## 10. Abschluss
-
-Schritt 9 endet mit einem dokumentierten Endgate-Befund. Eine tatsächliche Repository-/Produktintegration benötigt danach eine separate ausdrückliche Product-Owner-Freigabe und ein eigenes Integrationsworkpack.
+Kein stiller Prozesswechsel.
