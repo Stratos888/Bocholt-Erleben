@@ -2,7 +2,7 @@
 
 Stand: 2026-08-17
 Workpack: #259
-Status: **KANONISCHE PROZESSKORREKTUR – KEIN AKTUELLER PREMIUM-KANDIDAT**
+Status: **KANONISCHE PROZESSKORREKTUR – R3 BLINDTEST AKTIV – KEIN PREMIUMKANDIDAT**
 
 ## 1. Anlass
 
@@ -16,13 +16,13 @@ wurde nach tatsächlicher Product-Owner-Sichtung als visuell nicht premiumfähig
 
 Befund:
 
-- Wortmarke wirkt in realer Headergröße weitgehend wie eine normale Sans-Serif-Setzung;
-- die behaupteten Eigenmerkmale sind klein kaum identitätsstiftend;
-- das einzelne `e` wirkt groß wie ein `C` mit hineingelegtem Balken und nicht wie ein selbstverständlich gewachsenes Markenprinzip;
-- Produkt- und Präsentationsqualität haben die schwache Eigenhöhe der Identität überdeckt;
-- die internen Scores `91/100` und `90/100` waren erneut kein belastbarer Premiumnachweis.
+- Wortmarke wirkte in realer Headergröße weitgehend wie eine normale Sans-Serif-Setzung;
+- behauptete Eigenmerkmale waren klein kaum identitätsstiftend;
+- das einzelne `e` wirkte groß wie ein `C` mit hineingelegtem Balken;
+- Produkt- und Präsentationsqualität überdeckten die geringe Eigenhöhe;
+- die internen Scores `91/100` und `90/100` waren kein belastbarer Premiumnachweis.
 
-Damit ist die Step-8-/Step-9-Freigabe als Premiumbeweis ungültig.
+Damit ist die frühere Step-8-/Step-9-Freigabe als Premiumbeweis ungültig.
 
 ## 2. Wiederholter Root Cause
 
@@ -33,18 +33,13 @@ Der gleiche Grundfehler war bereits im Phase-2-Postmortem dokumentiert:
 - bewertete;
 - und qualifizierte denselben Kandidaten.
 
-Phase 3 versuchte dies mit getrennten Rollen und Blindkritik zu reparieren. Das verbesserte Disziplin, erzeugte aber keine echte unabhängige ästhetische Instanz, wenn Produktion, Kritik, Konsolidierung und Endentscheidung weiterhin durch denselben AI-Orchestrator beziehungsweise dasselbe Modell erfolgen.
+Getrennte AI-Rollen verbessern Disziplin, erzeugen aber keine unabhängige ästhetische Instanz, wenn Produktion, Kritik, Konsolidierung und Endentscheidung weiterhin durch denselben AI-Orchestrator beziehungsweise dasselbe Modell erfolgen.
 
-Der Fehler wurde in Phase 5 erneut sichtbar.
-
-## 3. Was am bisherigen Zielvertrag richtig bleibt
-
-Weiterhin gültig:
+## 3. Was gültig bleibt
 
 - keine öffentliche Änderung vor echter Freigabe;
 - Name `Bocholt erleben` bleibt Standardannahme;
 - Produktkern `relevante Auswahl statt Masse`;
-- Creative Direction `Klar ausgewählt` als strategische Hypothese;
 - reale Produktgrößen sind wichtiger als Hochglanzboards;
 - Generatoroutput ist Suchmaterial, kein Finalmaster;
 - finale Produktionsassets müssen reproduzierbar und technisch sauber sein;
@@ -52,104 +47,40 @@ Weiterhin gültig:
 - App-Icon erst nach belastbarem Primärsystem;
 - kein schwacher Kandidat wird aus Prozessgründen weitergereicht.
 
-## 4. Was am bisherigen Prozess verworfen wird
+## 4. Was verworfen wird
 
-### 4.1 Absolute ästhetische AI-Scores
+### Absolute ästhetische AI-Scores
 
-Aesthetic Scores wie `90/100` oder `91/100` werden als Freigabemechanismus abgeschafft.
+Aesthetic Scores wie `90/100` oder `91/100` sind kein Freigabemechanismus mehr.
 
-Zulässig bleiben numerische Messungen nur für objektive Eigenschaften, zum Beispiel:
+Numerische Messungen bleiben nur für objektive Eigenschaften zulässig, etwa Kontrast, Pixelgrößen, Safe Area, technische SVG-Gültigkeit, Maskierung und Dateigröße.
 
-- Kontrast;
-- Pixelgrößen;
-- Safe Area;
-- technische SVG-Gültigkeit;
-- Maskierung;
-- Dateigrößen.
+### AI-Rollen als angebliche Unabhängigkeit
 
-Premiumwirkung wird nicht mehr durch selbstvergebene Punktzahlen behauptet.
+Getrennte AI-Rollen dürfen Ideenfindung und Gegenargumente unterstützen, gelten aber nicht als unabhängige Premiumgutachter.
 
-### 4.2 AI-Rollen als angebliche Unabhängigkeit
+### Logo-first
 
-Getrennte AI-Rollen dürfen weiterhin für Ideenfindung und Gegenargumente genutzt werden, gelten aber nicht als unabhängige Premium-Gutachter.
+Der Prozess beginnt nicht mehr mit Wortmarke oder App-Icon als Hauptträger der Eigenständigkeit.
 
-### 4.3 Logo-first
+### Mikro-Modifikation neutraler Fonts als Hauptidee
 
-Der Prozess beginnt nicht mehr mit einer Wortmarke oder einem App-Icon als Hauptträger der Eigenständigkeit.
+`Standardschrift + kleine e/c/t-Modifikation` darf später funktional entstehen, aber nicht als Ersatz für ein tragendes Markensystem.
 
-Eine Marke ist ein System aus wiederkehrenden visuellen Codes. Die Wortmarke darf zurückhaltend sein, wenn das Gesamtsystem unverwechselbar ist.
+### Product Owner als Ersatz-Designer
 
-### 4.4 Mikro-Modifikation einer neutralen Fontbasis als Hauptidee
+Der Product Owner verantwortet Produktwahrheit, Grenzen und reale Einführung, aber keine typografischen Mikroentscheidungen.
 
-`Standardschrift + kleine e/c/t-Modifikation` wird nicht weiter als primäre Suchmethode verwendet. Eine solche Lösung darf später als funktionale Wortmarke entstehen, aber nicht als Ersatz für ein tragendes Markenprinzip.
+## 5. Externe Prozessvalidierung
 
-### 4.5 Product Owner als Ersatz-Designer
+Aktuelle beziehungsweise belastbare Erkenntnisse stützen den Neustart:
 
-Der Product Owner soll keine typografischen oder formalen Richtungen fachlich auswählen müssen.
-
-Seine Rolle bleibt:
-
-- Produktwahrheit;
-- Grenzen;
-- reale Einführung;
-- Rückweisung eines Ergebnisses, das sichtbar nicht überzeugt.
-
-## 5. Externe Validierung der Prozesskorrektur
-
-Die Prozesskorrektur stützt sich auf folgende aktuelle beziehungsweise belastbare Erkenntnisse:
-
-### OpenAI – Bilditeration
-
-OpenAI empfiehlt bei Bildgenerierung klare kurze Prompts, zuerst die Kernidee zu stabilisieren und anschließend jeweils nur kleine gezielte Änderungen vorzunehmen. Ein kleiner Referenzsatz ist leichter zu kontrollieren als eine große, ungerichtete Menge.
-
-Quelle:
-
-- https://openai.com/academy/image-generation/
-
-### AI-Logos versus Expertendesign
-
-Eine Reihe experimenteller Studien fand, dass Logos professioneller menschlicher Designer im Mittel besser beurteilt wurden als AI-Logo-Maker-Ergebnisse, insbesondere bei Ästhetik, Einzigartigkeit und Branchenwirkung. AI kann bei bereits klarer Designvision nützlich sein, ersetzt aber nicht automatisch kreative Differenzierung.
-
-Quelle:
-
-- https://doi.org/10.1016/j.sheji.2020.07.004
-
-### VLM-Bewertung bei ähnlichen Varianten
-
-Aktuelle Forschung zeigt, dass Vision-Language-Modelle bei nah beieinanderliegenden Designvarianten konsistente Beschreibungen erzeugen können, aber nicht zuverlässig zu einer stabilen, richtungsentscheidenden Präferenz konvergieren, während professionelle Designer dies deutlich besser leisten.
-
-Quelle:
-
-- https://doi.org/10.1016/j.daai.2026.100082
-
-### Graphic-Design-Aesthetics-Benchmark
-
-Aktuelle Benchmarks zeigen weiterhin klare Lücken zwischen VLMs und den nuancierten Anforderungen menschlicher grafischer Ästhetikbewertung.
-
-Quelle:
-
-- https://arxiv.org/abs/2603.01083
-
-### Human-AI-Logo-Workflow
-
-OpenAI-Community-Fallbeispiele behandeln generierte Logos sinnvoll als Konzeptmaterial und bauen Schrift/Geometrie anschließend reproduzierbar neu; der Prozess wird ausdrücklich nicht als vollständig automatisiert beschrieben.
-
-Quelle:
-
-- https://community.openai.com/t/the-dndgpt-case-study-for-you-and-me/745668/3
-
-### Brand ist mehr als Logo
-
-Empirische Forschung zu visueller Markensprache zeigt, dass Wiedererkennung aus einem Bündel visueller Codes entsteht und nicht zwingend aus einem dominanten Logo allein.
-
-Quellen:
-
-- https://arxiv.org/abs/1810.09941
-- https://link.springer.com/article/10.3758/s13428-024-02525-x
+- OpenAI: klare kurze Prompts, Kernidee zuerst stabilisieren, anschließend kleine gezielte Änderungen;
+- AI-Logo-Forschung: professionelle menschliche Logos schneiden im Mittel besser bei Ästhetik, Einzigartigkeit und Branchenwirkung ab;
+- aktuelle VLM-Forschung: bei nahen Designvarianten sind Modelle als erklärende Kritiker brauchbar, aber nicht als verlässlich richtungsentscheidende Präferenzinstanz;
+- Brand-Forschung: Wiedererkennung entsteht aus einem Bündel visueller Codes, nicht zwingend aus einem dominanten Logo allein.
 
 ## 6. Neuer verbindlicher Beweisweg
-
-Der Prozess wird von `Logo erzeugen -> AI bewerten` auf `Markensystem beweisen -> Wortmarke ableiten` umgestellt.
 
 ### R0 – Freeze
 
@@ -158,7 +89,6 @@ Erhalten:
 - Name `Bocholt erleben`;
 - Produktkern;
 - bestehendes Produktsystem;
-- Farbwelt als Ausgangsmaterial, nicht als Zwang;
 - bisherige Fehlversuche als Negativwissen.
 
 Verworfen als Kandidaten:
@@ -168,135 +98,109 @@ Verworfen als Kandidaten:
 - `e`-Kleinmarke;
 - alle bisherigen Premiumscores.
 
-Keine neue Gestaltung, bevor R1 definiert ist.
-
 ### R1 – visuelle Kalibrierungsleiter
 
-Statt allgemeiner Moodboards entsteht ein kleiner, expliziter Referenzsatz:
+Status: **BESTANDEN**.
 
-- 6–8 hochwertige reale Consumer-Marken beziehungsweise Identitätssysteme;
-- 4–6 Anti-Referenzen für SaaS, Stadtmarketing, Tourismus, generische Local-/Event-Portale;
-- für jede Referenz werden konkrete sichtbare Mechanismen benannt: Typografiedichte, Bildlogik, Farbverhalten, Layoutcode, Bewegungsprinzip, Wiedererkennungsasset.
+Kanonisch:
 
-Die Referenzen sind **Qualitätsanker**, keine Kopiervorlagen.
+- `docs/brand/phase5/R1_VISUAL_CALIBRATION.md`
+
+Qualitätsanker:
+
+- Headout;
+- Wise;
+- Monzo;
+- Spotify;
+- Eventbrite;
+- Duolingo.
+
+Anti-Referenzen:
+
+- Standardschrift + Einzelgimmick;
+- generisches Stadt-/Tourismusportal;
+- generische SaaS-/Startup-Identität;
+- Event-/Festival-Klischee;
+- Lifestyle-/Wellness-Mood ohne System.
 
 ### R2 – drei Distinctive-Asset-Systeme, noch ohne individuelles Logo
 
-Es werden höchstens drei Markenprinzipien entwickelt, jeweils aus einer Produktwahrheit abgeleitet.
+Status: **ABGESCHLOSSEN**.
 
-Jedes Prinzip muss als vollständiger visueller Code funktionieren über:
+Kanonisch:
 
-- realen mobilen Header;
-- Today-Karten;
-- Detailseite;
-- Fotobehandlung/Zuschnitt;
-- typografische Hierarchie;
-- einfache Social-/Avatarfläche;
-- ein Bewegungs- oder Übergangsprinzip.
+- `docs/brand/phase5/R2_SYSTEM_EXPLORATION.md`
 
-Wichtig:
+Verworfen:
 
-- alle drei Systeme verwenden zunächst **dieselbe neutrale Kontrollwortmarke** `Bocholt erleben`;
-- kein individuelles App-Icon;
-- kein Lettering-Gimmick;
-- dadurch wird geprüft, ob das System selbst eine echte Markenidee besitzt.
+- `Fundstücke`.
 
-Ein System ohne erkennbare Eigenhöhe wird beendet, bevor Wortmarkenarbeit beginnt.
+Für R3 weitergeführt:
+
+- `Momentstreifen`;
+- `Von hier ins echte Leben` / Foto-Breakout;
+- `Auswahlfenster`;
+- neutrale Kontrollvariante.
+
+Alle Systeme nutzen dieselbe neutrale Wortsetzung, Farben, Inhalte und Fotobasis. Kein individuelles Logo und kein App-Icon.
 
 ### R3 – Blindvergleich und unabhängiges Wahrnehmungssignal
 
-AI darf weiterhin harte Fehlassoziationen und technische Probleme suchen, darf aber keine Premiumfreigabe erteilen.
+Status: **AKTIV – TESTPAKET BEREIT**.
 
-Für die verbliebenen Systeme wird ein einfacher Blindtest mit Menschen aus der Zielgruppe durchgeführt. Dafür ist keine Designqualifikation nötig.
+Kanonisch:
 
-Testprinzip:
+- `docs/brand/phase5/R3_BLIND_TEST_PROTOCOL.md`
 
-- anonymisierte, identisch präsentierte Varianten;
-- keine Konzeptnamen oder Erklärtexte vor der Entscheidung;
-- Vergleich mit dem aktuellen öffentlichen System und einer neutralen hochwertigen Kontrolle;
-- Fragen in Alltagssprache, zum Beispiel:
-  - `Welches wirkt wie das hochwertigste und vertrauenswürdigste lokale Freizeitprodukt?`
-  - `Welches würdest du am ehesten wiedererkennen?`
-  - `Woran erinnert dich die Gestaltung spontan?`
-- kurze Wiedererkennungs-/Erinnerungsfrage nach Abstand zum ersten Eindruck.
+Teilnehmer sehen ausschließlich anonymisierte Varianten `A/B/C/D` ohne Konzeptnamen, Herleitungen oder AI-Einschätzungen.
 
-Ziel ist kein wissenschaftlicher Markttest, sondern ein **unabhängiges Wahrnehmungssignal**, das die bisherige AI-Selbstbestätigung ersetzt.
+Ziel:
 
-Wenn kein System klar trägt, zurück zu R2. Kein Logo wird gebaut.
+- 8–12 normale potenzielle Nutzer;
+- Fragen zu Qualität/Vertrauen, Produktpassung und Wiedererkennbarkeit;
+- spontane Assoziation;
+- Erinnerung ohne Bild nach 3–5 Minuten.
+
+AI darf harte Fehlassoziationen analysieren, aber keine Premiumfreigabe allein erteilen.
+
+Wenn kein System die neutrale Kontrolle sichtbar übertrifft, zurück zu R2.
 
 ### R4 – Wortmarke erst innerhalb des bewiesenen Systems
 
-Erst das stärkste System erhält Wortmarkenarbeit.
+Erst nach R3-PASS.
 
 Regeln:
 
-- reale Headergröße ist die primäre Arbeitsansicht, nicht die Großansicht;
-- zunächst mehrere hochwertige typografische Materialien beziehungsweise Letteringprinzipien testen;
-- eine kommerzielle oder Open-Source-Schriftbasis ist zulässig, wenn sie funktional und lizenzierbar ist;
+- reale Headergröße ist primäre Arbeitsansicht;
+- höchstens zwei ernsthafte Fassungen;
 - individuelle Modifikation nur, wenn sie sichtbar systemisch und nicht dekorativ ist;
-- höchstens zwei ernsthafte Wortmarkenfassungen.
-
-Die Wortmarke muss nicht allein die gesamte Differenzierung tragen.
+- die Wortmarke muss nicht allein die gesamte Differenzierung tragen.
 
 ### R5 – Blindvergleich Wortmarke gegen Kontrolle
 
-Die zwei Wortmarkenfassungen werden ohne Erklärung verglichen mit:
-
-- aktueller öffentlicher Wortsetzung;
-- hochwertiger neutraler Kontrollsetzung.
-
-Eine Fassung wird nur weitergeführt, wenn sie in realer Größe sichtbar mindestens gleichwertig funktioniert und das gewählte Markensystem stärkt.
+Vergleich ohne Erklärung mit aktueller öffentlicher Wortsetzung und hochwertiger neutraler Kontrollsetzung.
 
 Kein absoluter AI-Score.
 
 ### R6 – App-Icon zuletzt
 
-Erst jetzt wird geprüft, welche responsive Kleinform aus dem **gesamten Markensystem** logisch entsteht.
-
-Zulässig:
-
-- Systemasset;
-- typografischer Ausschnitt;
-- abstrakte Markenform;
-- notfalls bewusst sehr einfache Kleinform.
-
-Nicht erzwungen:
-
-- einzelnes `e`;
-- `b/e`;
-- Initialmonogramm.
-
-Das App-Icon wird gegen reale Store-/Launcher-Nachbarschaft und Bildähnlichkeit geprüft.
+Erst aus dem bereits bewiesenen Markensystem ableiten; kein erzwungenes `e`, `b/e` oder Initialmonogramm.
 
 ### R7 – technische Härtung
 
-Erst nach bestandenem Wahrnehmungsgate:
-
-- SVG-/Rastermaster;
-- Größen und Masken;
-- Kontrast;
-- Provenienz/Lizenz;
-- reale Produktanwendung;
-- PWA-/Favicon-/Social-Derivate.
+SVG-/Rastermaster, Größen, Masken, Kontrast, Provenienz/Lizenz, reale Produktanwendung.
 
 Technik kann nur `PASS/FAIL`, niemals Premiumqualität aufwerten.
 
 ### R8 – Endgate
 
-Der Product Owner erhält **eine** fachlich weitergeführte Identität im echten Produkt.
-
-Er entscheidet nur:
-
-- reale Einführung freigeben;
-- oder wegen eines klar benennbaren Produkt-/Markenproblems zurückweisen.
-
-Er wird nicht als Designer eingesetzt.
+Der Product Owner erhält eine fachlich weitergeführte Identität im echten Produkt und entscheidet nur über reale Einführung oder einen klaren Produkt-/Marken-Knock-out.
 
 ### R9 – separate Integration
 
 Erst danach eigener Integrationsworkpack auf aktueller `staging`-Basis.
 
-## 7. Neue harte Regeln gegen Drift
+## 7. Harte Regeln gegen Drift
 
 1. Vor jeder Aktion muss der `ACTIVE_EXECUTION_LOCK` gelesen werden.
 2. Nur Aktionen des aktuell genannten Schritts sind zulässig.
@@ -307,14 +211,14 @@ Erst danach eigener Integrationsworkpack auf aktueller `staging`-Basis.
 7. Keine AI-Selbstbewertung als unabhängige Freigabe.
 8. Kein Product Owner als Ersatz für Designexpertise.
 9. Kein Kandidat erhält den Status `Premium`, bevor ein unabhängiges menschliches Wahrnehmungssignal vorliegt.
-10. Wenn der erforderliche unabhängige menschliche Test nicht durchgeführt wird, darf das Ergebnis nur `AI-intern qualifiziert`, nicht `premium-validiert` heißen.
+10. Wenn der menschliche Test nicht erfolgt, darf das Ergebnis höchstens `AI-intern qualifiziert` heißen.
 
 ## 8. Aktueller Status
 
 - Name: `Bocholt erleben`;
 - öffentliche Marke: unverändert;
-- qualifizierte Premiumkandidaten: `0`;
-- bisherige Step-5-/Step-8-Identität: `verworfen als Premiumkandidat / Negativwissen`;
-- Strategie: erhalten;
-- aktueller nächster Schritt: **R1 – visuelle Kalibrierungsleiter erstellen**;
+- Premiumkandidaten: `0`;
+- R1: bestanden;
+- R2: abgeschlossen;
+- R3: aktiv, Testpaket bereit;
 - keine Produktintegration freigegeben.
