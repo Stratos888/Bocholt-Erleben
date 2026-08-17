@@ -38,6 +38,7 @@ validate_frontend_syntax() {
   node --check js/neutral-selection.js
   node --check js/seo-schema.js
   node --check js/organizer-pilot.js
+  node --check js/startpartner-funnel.js
   node --input-type=module --check < js/control-center/startpartner-gate4.js
   node --check scripts/render-static-content.mjs
   for file in js/control-center/*.js; do
@@ -123,6 +124,7 @@ validate_backend() {
 validate_frontend() {
   echo "== Frontend contracts =="
   validate_frontend_syntax
+  node tests/startpartner_public_funnel_contract_test.mjs
   node tests/organizer_portal_gate4_contract_test.mjs
   node tests/control_center_frontend_contract_test.mjs
   node tests/control_center_browser_secret_contract_test.mjs
