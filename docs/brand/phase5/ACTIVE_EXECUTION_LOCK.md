@@ -19,131 +19,121 @@ Eine eigenständige Premium-Markenidentität für `Bocholt erleben` entwickeln, 
 - Schritt 5: Primäridentität konstruiert und einmal gezielt korrigiert.
 - Schritt 6: neutraler Vergleich – bestanden in Lauf 2.
 - Schritt 7: Marken-Minisystem und reale Produktwirkung – bestanden.
+- Schritt 8: responsive Kleinform und formale Design-/Technikprüfung – bestanden.
 
-Nachweis Schritt 7:
+Nachweis Schritt 8:
 
-- `docs/brand/phase5/STEP7_BRAND_MINISYSTEM_RESULT.md`
+- `docs/brand/phase5/STEP8_QUALITY_RESULT.md`
 
-Primäridentität:
+Weitergeführte Assets:
 
-- `docs/brand/phase5/step5/construction-a-mono.svg`
+- Primäridentität: `docs/brand/phase5/step5/construction-a-mono.svg`
+- Kleinform: `docs/brand/phase5/step8/app-mark-mono.svg`
+- App-Source: `docs/brand/phase5/step8/app-icon-source.svg`
 
-Verbindliche Farbrollen:
+Step-8-Ergebnis:
 
-- Wortmarke auf hell: `#0D3014` (`--brand-green-900`);
-- inverse Wortmarke: Weiß auf ausreichend dunkler Brand-Green-Fläche;
-- `#8FCB3B` bleibt Interaktionsfarbe;
-- kein Farbsplit in der Wortmarke.
+- charakteristisches `e` als einzige responsive Kleinform weitergeführt;
+- 16–64px bestanden;
+- Kreis, Squircle und Maskable-Safe-Area bestanden;
+- zwei getrennte interne Bewertungspässe positiv (`91/100`, `90/100`);
+- kein harter Red-Team-Knock-out;
+- offenes mittleres Ähnlichkeitsrisiko der einzelnen `e`-Glyphe ausdrücklich in Schritt 9 zu prüfen.
+
+Diese Qualifikation ist keine markenrechtliche oder produktive Freigabe.
 
 ## 3. Aktueller Schritt
 
-**SCHRITT 8 VON 9 – RESPONSIVE KLEINFORM / APP-MARKE UND FORMALE QUALITÄTSPRÜFUNG**
+**SCHRITT 9 VON 9 – FINALE MARKEN-/ÄHNLICHKEITSRECHERCHE, PRODUCT-OWNER-ENDGATE UND INTEGRATIONSVORBEREITUNG**
 
 Zweck:
 
-Eine zur bestandenen Primäridentität gehörende Kleinform für App-, Favicon- und Kleinstanwendungen bestimmen und anschließend das gesamte Markensystem formal und kritisch prüfen.
+Vor jeder realen Einführung prüfen, ob Name, Primäridentität und insbesondere die einzelne `e`-Kleinform erkennbare rechtliche, marktseitige oder visuelle Kollisionsrisiken aufweisen. Anschließend wird dem Product Owner genau ein Endgate mit belastbarem Befund vorgelegt.
 
-Die Kleinform darf die Primäridentität nicht neu definieren und keine frühere generische `b/e`-Monogrammlogik wiederholen.
+Schritt 9 ist ausdrücklich ein Recherche- und Freigabe-Preflight, keine Rechtsberatung und keine automatische Integration.
 
-## 4. Erlaubte Kleinform-Architekturen
+## 4. Pflichtrecherche
 
-Intern dürfen höchstens drei Ansätze geprüft werden:
+### Name / Absender
 
-1. einzelner charakteristischer Buchstabenausschnitt aus der Wortmarke;
-2. sehr kompakter horizontaler typografischer Ausschnitt, nur wenn er bei 16–64px stabil bleibt;
-3. eigenständige abstrakte Kleinform, ausschließlich wenn sie direkt aus der bestehenden Rund-/Apertur-/Terminalformlogik ableitbar ist und nicht wie ein UI-Icon wirkt.
+Aktuell prüfen:
 
-Jeder Ansatz wird sofort beendet bei:
+- identische und nahe Verwendungen von `Bocholt erleben`;
+- relevante lokale Stadt-, Tourismus-, Stadtmarketing- und Veranstaltungsangebote;
+- Markenregister-Preflight über offizielle beziehungsweise belastbare Quellen für Deutschland, EU und international, soweit öffentlich abfragbar;
+- Apps, Domains und digitale Angebote mit möglicher Verwechslungsnähe.
 
-- generischem Initial-/Monogrammcharakter;
-- Scanner-, Karten-, Dashboard-, Ticket-, Pin-, Kalender- oder UI-Lesart;
-- notwendiger Erklärung;
-- Verlust der Verwandtschaft zur Wortmarke;
-- Kollaps bei 16/24/32px.
+### Visuelle Ähnlichkeit
 
-## 5. Größen- und Maskenpflicht
+Aktuell prüfen:
 
-Weitergeführte Kleinformen müssen geprüft werden bei:
+- vollständige Wortmarke als System;
+- einzelne charakteristische `e`-Kleinform;
+- grüne App-Tile mit weißem `e`;
+- besonders ähnliche Marken/Apps in Event, Discovery, Local, Ticketing, Travel, Media und digitalen Consumer-Diensten.
 
-- 16px;
-- 24px;
-- 32px;
-- 48px;
-- 64px;
-- Kreis;
-- Squircle;
-- Maskable-Safe-Area.
+Ein häufig vorkommender Einzelbuchstabe ist nicht automatisch ein Blocker. Entscheidend ist die Kombination aus konkreter Zeichnung, Farbe, Anwendung, Waren-/Dienstleistungsnähe und Verwechslungswirkung.
 
-Pflichtfassungen:
+## 5. Provenienz-/Lizenzabschluss
 
-- monochrom;
-- inverse;
-- App-Tile innerhalb der bestehenden Brand-Green-Familie.
+Zu dokumentieren:
 
-## 6. Formale Qualitätsprüfung
+- Ausgangsgeometrie Inter Display Medium / The Inter Project Authors;
+- Lizenzstatus der verwendeten Fontbasis;
+- Pfad-only-Master ohne Runtime-Fontabhängigkeit;
+- nachvollziehbare eigene systemische Modifikationen;
+- Aussagegrenze: technische Provenienz ist keine Schutzrechts- oder Freedom-to-use-Garantie.
 
-Erst nach Auswahl einer belastbaren Kleinform werden Primäridentität und Minisystem als Ganzes geprüft.
+## 6. Integrationsvorbereitung
 
-Pflicht:
+Nur vorbereiten, nicht ausführen:
 
-- zwei getrennte interne Bewertungspässe mit dokumentierter Bewertungsgrundlage;
-- Red-Team-Pass mit aktivem Ablehnungsauftrag;
-- Architektur- und Genericity-Prüfung;
-- reale mobile und Desktopwirkung;
-- technische SVG-/Rasterrobustheit;
-- Provenienz- und Lizenzstatus;
-- keine Behauptung externer unabhängiger Gutachter.
+- kanonische finalisierbare Assetliste;
+- erforderliche Rasterexporte und PWA-Größen;
+- betroffene Header-/Manifest-/Icon-Dateien;
+- Kontrast-, Safe-Area-, Cache- und Accessibility-Prüfplan;
+- separater späterer Integrationsweg auf Basis von `staging`.
 
-Scorecard erst jetzt zulässig:
+Bis zum Product-Owner-Endgate unverändert:
 
-| Dimension | Gewicht | Mindestwert |
-|---|---:|---:|
-| Qualität und Eigenständigkeit der Wortmarke | 25 | 22 |
-| Kohärenz und Wiedererkennung des Markensystems | 20 | 17 |
-| Passung zu Produkt, Haltung und Zielgruppen | 20 | 17 |
-| Wirkung ohne Herleitung und Kategorieabgrenzung | 15 | 13 |
-| Mobile und responsive Markenfunktion | 10 | 8 |
-| Konstruktion, Provenienz und technische Robustheit | 10 | 8 |
+- `staging`;
+- `main`;
+- Live;
+- öffentliche Marke.
 
-Freigabe nur bei mindestens `90/100`, jedem Mindestwert, keinem harten Knock-out und keinem ungelösten Red-Team-Befund.
+## 7. Endgate-Regeln
 
-Die Scorecard dokumentiert das Urteil; sie darf sichtbare Schwäche nicht überstimmen.
+Das Markensystem darf dem Product Owner nur als realer Einführungsfinalist vorgelegt werden, wenn:
 
-## 7. Verboten
+1. kein belegter harter Namens-/Absenderkonflikt gefunden wird;
+2. keine visuelle Kollision gefunden wird, die eine relevante Verwechslungsgefahr plausibel macht;
+3. verbleibende Unsicherheiten transparent als Risiko statt als Freigabe dargestellt werden;
+4. Provenienz und technische Integrationsvorbereitung vollständig dokumentiert sind;
+5. der bisherige Designbefund nicht nachträglich durch Rechercheergebnisse widerlegt wird.
 
-- keine Änderung der Primäridentität, außer ein harter Step-8-Befund zwingt methodisch zurück;
-- kein neues Creative Territory;
-- kein zweites Logo-System;
-- keine generische `b/e`-Stapelmarke;
-- kein Pin, Ticket, Kalender, Kompass, Fahrrad, Skyline oder lokales Klischee;
-- keine Produktiv-Integration;
-- keine neue Palette;
-- kein Claim als Qualitätsverstärker;
-- keine Präsentationsboards vor Abschluss der Bewertung.
+Wenn ein relevanter Blocker entsteht, wird nicht integriert und gezielt zur betroffenen Markenkomponente zurückgekehrt.
 
-## 8. Abschlusskriterium
+## 8. Product-Owner-Endgate
 
-Schritt 8 ist nur bestanden, wenn:
+Der Product Owner erhält am Ende genau:
 
-1. genau eine belastbare responsive Kleinform/App-Marke vorliegt;
-2. alle Größen-/Maskentests bestanden sind;
-3. beide getrennten Bewertungspässe positiv sind;
-4. Red Team keinen ungelösten harten Befund hat;
-5. Score >= 90/100 und alle Dimensionsminima erreicht sind;
-6. Provenienz und technische Robustheit nachvollziehbar sind.
+- die finale Primäridentität und Kleinform in realer Anwendung;
+- den aktuellen Recherchebefund;
+- klar getrennte Restunsicherheiten;
+- meine fachliche Empfehlung `einführen` oder `nicht einführen`;
+- den konkreten separaten Integrationsplan.
 
-Bei Nichtbestehen wird nicht künstlich zu Schritt 9 gewechselt.
+Keine Rohvarianten und keine künstliche Auswahl zwischen mittelmäßigen Alternativen.
 
-## 9. Nächster zulässiger Übergang
+## 9. Verboten
 
-Bei PASS:
+- keine automatische Änderung an `staging`, `main` oder Live;
+- kein Merge;
+- keine Behauptung einer anwaltlichen Rechtsfreigabe;
+- keine Verharmlosung nicht vollständig prüfbarer Register-/Ähnlichkeitsrisiken;
+- keine neue kreative Richtung ohne belegten Blocker;
+- kein stiller Prozesswechsel.
 
-**SCHRITT 9 VON 9 – FINALE MARKEN-/ÄHNLICHKEITSRECHERCHE, PRODUCT-OWNER-ENDGATE UND INTEGRATIONSVORBEREITUNG**
+## 10. Abschluss
 
-Schritt 9 ist noch keine automatische Integration. `staging`, `main` und Live bleiben bis zur separaten ausdrücklichen Integrationsfreigabe unverändert.
-
-## 10. Rollen
-
-ChatGPT trifft die fachlichen Design- und Qualifikationsentscheidungen. Der Product Owner wird erst für das reale Endgate und die spätere Einführung benötigt.
-
-Kein stiller Prozesswechsel.
+Schritt 9 endet mit einem dokumentierten Endgate-Befund. Eine tatsächliche Repository-/Produktintegration benötigt danach eine separate ausdrückliche Product-Owner-Freigabe und ein eigenes Integrationsworkpack.
