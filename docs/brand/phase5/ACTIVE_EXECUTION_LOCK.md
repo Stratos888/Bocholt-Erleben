@@ -13,158 +13,113 @@ Eine eigenständige Premium-Markenidentität für `Bocholt erleben` entwickeln, 
 
 ## 2. Abgeschlossene Schritte
 
-### Schritt 2 von 9 – visuelle Premium-Referenzanalyse
+### Schritt 2 – visuelle Premium-Referenzanalyse
+Abgeschlossen. Nachweis: `VISUAL_PREMIUM_REFERENCE_ANALYSIS.md`.
 
-Status: **abgeschlossen**
+### Schritt 3 – Creative Direction
+Abgeschlossen. Freigegeben: **`Klar ausgewählt`**. Nachweis: `STEP3_DIRECTION_DECISION.md`.
 
-Nachweis:
+### Schritt 4 – Formsprachenerkundung
+Abgeschlossen. Weitergeführt: **`Präzise Humanität`**. Nachweis: `STEP4_FORM_LANGUAGE_RESULT.md`.
 
-- `docs/brand/phase5/VISUAL_PREMIUM_REFERENCE_ANALYSIS.md`
+### Schritt 5 – Konstruktion der Primäridentität
+Abgeschlossen.
 
-### Schritt 3 von 9 – zwei visuelle Markenrichtungen
+- Konstruktion A: einzeilig, vollständig kleingeschrieben, weitergeführt;
+- Konstruktion B: initialer Großbuchstabe, intern beendet, weil die neutrale Kapitalform die Gesamtwirkung wieder zu stark in Richtung konventionelle Portal-/Unternehmenssetzung zog.
 
-Status: **abgeschlossen**
+Kanonischer Master:
 
-Fachliche Auswahl:
-
-- **A – `Klar ausgewählt`: FREIGEGEBEN**;
-- B – `Nah am echten Leben`: als führende Markenrichtung beendet.
-
-Nachweis:
-
-- `docs/brand/phase5/STEP3_DIRECTION_DECISION.md`
-
-### Schritt 4 von 9 – Formsprachenerkundung
-
-Status: **abgeschlossen**
-
-Geprüft wurden genau drei Formsprachensysteme:
-
-1. `Präzise Humanität` – weitergeführt;
-2. `Leise Flare` – beendet wegen Editorial-/Kulturinstitutionsrisiko;
-3. `Sanfte Geometrie` – beendet wegen zu geringer Eigenhöhe und Tech-/Startup-Austauschbarkeit.
+- `docs/brand/phase5/step5/construction-a-mono.svg`
 
 Nachweis:
 
-- `docs/brand/phase5/STEP4_FORM_LANGUAGE_RESULT.md`
-
-Weitergeführt wird ausschließlich:
-
-**`Präzise Humanität`**
-
-Die Formlogik kombiniert:
-
-- präzisen Stammrhythmus;
-- humanistische Rund- und Aperturformen;
-- gemeinsame Terminal-/Schulterlogik über mehrere Buchstaben;
-- natürlichen Wortrhythmus ohne 7/7-Zwang, Farbsplit oder vorgezogenes Monogramm.
+- `docs/brand/phase5/STEP5_CONSTRUCTION_RESULT.md`
 
 ## 3. Aktueller Schritt
 
-**SCHRITT 5 VON 9 – KONSTRUKTION VON HÖCHSTENS ZWEI VOLLSTÄNDIGEN PRIMÄRIDENTITÄTEN**
+**SCHRITT 6 VON 9 – NEUTRALER VERGLEICH DER PRIMÄRIDENTITÄT**
 
 Zweck:
 
-Aus dem bestandenen Formsprachensystem `Präzise Humanität` werden höchstens zwei vollständige, monochrome Primäridentitäten für `Bocholt erleben` bewusst und reproduzierbar konstruiert.
+Prüfen, ob Konstruktion A in tatsächlicher Wahrnehmung sichtbar stärker ist als:
 
-Die Primäridentität ist zuerst die vollständige Markenform. App-Icon, Kleinmarke, Farbe und Marken-Minisystem bleiben gesperrt.
+1. eine hochwertige neutrale Sans-Kontrollsetzung;
+2. Candidate 201 als dokumentierte Lernbarriere;
+3. der aktuelle öffentliche Markenstand.
 
-## 4. Erlaubte Aktionen in Schritt 5
+Dieser Schritt ist eine Wahrnehmungsprüfung, keine Scorecard.
 
-- vollständige Wortmarken-/Primäridentitätskonstruktion ausschließlich aus `Präzise Humanität`;
-- höchstens zwei unterschiedliche Primärarchitekturen;
-- einzeilige oder mehrzeilige Anordnung, sofern sie nicht die verworfene 7/7-Logik wiederholt;
-- kontrollierte Neuzeichnung von Buchstabenformen als SVG-Pfade;
-- optisches Kerning, Laufweite und Verhältnis `Bocholt` / `erleben`;
-- Groß-/Kleinschreibung als konstruktive Variable;
-- monochrome Darstellung;
-- Größenproben für reale mobile Headerbreite und kleine lesbare Wortmarkengrößen;
-- technische Provenienz- und Reproduzierbarkeitsdokumentation;
-- interne Eliminierung einer Konstruktion, wenn sie sichtbar hinter neutraler Kontrolle oder Candidate-201-Lernbarriere zurückbleibt.
+## 4. Erlaubte Aktionen in Schritt 6
 
-## 5. Verbotene Aktionen in Schritt 5
+- identische monochrome Größenvergleiche;
+- reale mobile Headergröße und kleinere lesbare Wortmarkengrößen;
+- Vergleich von Gesamtwortform, Rhythmus, Eigenständigkeit, Ruhe, Consumer-Wirkung und Fehlkategorien;
+- aktuelle öffentliche Identität als externe Kontrollreferenz;
+- fachliche Designentscheidung durch ChatGPT gemäß delegierter Design-Owner-Rolle;
+- eindeutiges `bestehen` oder `nicht bestehen` für die Primäridentität.
 
-Bis zum Abschluss von Schritt 5:
+## 5. Verbotene Aktionen in Schritt 6
 
-- kein App-Icon oder Monogramm;
-- kein Farbsplit als Identitätsprinzip;
+- kein App-Icon;
+- keine Farbe als Rettungsmechanismus;
 - kein Claim;
-- kein vollständiges Markenboard;
-- keine Product-UI-Integration außerhalb neutraler Größen-/Headerproben;
+- kein Markenboard;
+- keine neue dritte Konstruktion;
 - keine Design-Scores;
 - kein Red Team;
-- keine Markenrechts-/Ähnlichkeitsfreigabe;
-- keine dritte Primäridentität;
-- keine Rückkehr zu `Leise Flare`, `Sanfte Geometrie`, Candidate 201 oder 7/7;
-- keine sichtbare Mischung mehrerer Fonts als fertige Marke;
-- kein Einzelgimmick;
-- keine Product-Owner-Auswahl zwischen unfertigen Konstruktionen.
+- keine Markenrechtsfreigabe;
+- keine produktive Integration;
+- keine Product-Owner-Auswahl zwischen Rohvarianten;
+- keine Hochglanzinszenierung, die einen schwachen Unterschied verstärkt.
 
-## 6. Qualitätsregeln für die Konstruktionen
+## 6. Bestehensregeln
 
-Eine Primäridentität darf Schritt 5 nur bestehen, wenn:
+Konstruktion A besteht Schritt 6 nur, wenn sie:
 
-1. sie als vollständiges `Bocholt erleben` sofort lesbar bleibt;
-2. die Regeln von `Präzise Humanität` sichtbar über mehrere Buchstaben hinweg kohärent umgesetzt sind;
-3. sie gegenüber einer hochwertigen neutralen Sans einen erkennbaren Eigenwert besitzt;
-4. sie Candidate 201 sichtbar übertrifft und dessen 7/7-/Farbsplit-/b-e-Logik nicht wiederholt;
-5. sie ruhig, souverän, kuratiert und consumer-orientiert wirkt;
-6. keine dominante SaaS-, Verwaltungs-, Tourismus-, Kultur-, Gastro-, Mode- oder Startup-Lesart entsteht;
-7. sie monochrom und in realer mobiler Größe funktioniert;
-8. ihre Geometrie bewusst erklärbar und reproduzierbar ist.
+1. in identischer mobiler Größe sofort lesbar ist;
+2. auch ohne Konzepttext sichtbar eine eigene Wortform besitzt;
+3. die neutrale Kontrollsetzung nicht nur durch minimale Mikrodetails, sondern durch ein zusammenhängendes Formsystem übertrifft;
+4. Candidate 201 sichtbar übertrifft;
+5. gegenüber dem aktuellen öffentlichen Markenstand eine plausibel modernere, ruhigere und hochwertigere Primäridentität bildet;
+6. nicht in SaaS, Verwaltung, Tourismus, Kultur, Gastro, Mode oder Startup kippt;
+7. ohne Farbe und App-Icon genügend Eigenhöhe besitzt, um ein späteres Markensystem zu rechtfertigen.
 
-## 7. Abschlusskriterium Schritt 5
+Wenn der Unterschied zur neutralen Kontrolle nur bei starker Vergrößerung oder nach Erklärung erkennbar ist, lautet das Ergebnis **nicht bestanden** und Schritt 5 wird gezielt korrigiert. Kein Fortschritt um des Fortschritts willen.
 
-Schritt 5 ist erst abgeschlossen, wenn:
+## 7. Abschlusskriterium Schritt 6
 
-- höchstens zwei vollständige Primäridentitäten konstruiert wurden;
-- jede intern gegen neutrale Kontrolle und Candidate 201 geprüft wurde;
-- schwache Konstruktionen beendet wurden;
-- ein oder höchstens zwei vollständige Primäridentitäten genügend sichtbare Qualität für den neutralen Vergleich in Schritt 6 besitzen;
-- für jede weitergeführte Identität ein deterministischer monochromer Master beziehungsweise reproduzierbare Konstruktionsquelle vorliegt;
-- noch kein App-Icon, Score oder Marken-Minisystem erzeugt wurde.
+Schritt 6 ist abgeschlossen, wenn:
 
-Wenn keine Konstruktion genügt, bleibt Schritt 5 aktiv und die Konstruktion wird innerhalb von `Präzise Humanität` methodisch korrigiert. Es wird kein Kandidat künstlich weitergereicht.
+- die drei Kontrollen tatsächlich geprüft wurden;
+- mobile Originalgröße und kleinere Wortmarkengröße berücksichtigt wurden;
+- ein dokumentiertes fachliches Urteil `bestanden` oder `nicht bestanden` vorliegt;
+- bei `nicht bestanden` der Execution Lock zurück auf eine klar begrenzte Step-5-Korrektur gesetzt wird;
+- bei `bestanden` exakt eine Primäridentität für Schritt 7 weitergeführt wird.
 
 ## 8. Nächster zulässiger Übergang
 
-Nur nach erfülltem Abschlusskriterium:
+Bei `bestanden`:
 
-**SCHRITT 6 VON 9 – NEUTRALER VERGLEICH DER PRIMÄRIDENTITÄTEN**
+**SCHRITT 7 VON 9 – MARKEN-MINISYSTEM UND REALE PRODUKTWIRKUNG**
 
-Dort werden die bestandenen Konstruktionen in identischen Größen gegen aktuellen öffentlichen Stand und hochwertige neutrale Kontrollsetzung verglichen. Erst dieser Vergleich entscheidet, ob eine Primäridentität tatsächlich sichtbar weiterkommt.
+Dort dürfen erstmals Farbe, Typografierollen, Bildsprache und reale Produktkontexte gemeinsam mit der bereits bestandenen Primäridentität geprüft werden. Eine App-Kleinmarke bleibt bis zum dafür vorgesehenen späteren Schritt gesperrt.
 
 ## 9. Anti-Drift-Regeln
 
-Vor jeder kreativen oder schreibenden Aktion muss intern geprüft werden:
+Vor jeder Aktion:
 
-1. **CURRENT STEP:** Ist die Aktion Teil von Schritt 5?
-2. **ALLOWED:** Ist sie in Abschnitt 4 ausdrücklich erlaubt?
-3. **FORBIDDEN:** Verletzt sie Abschnitt 5?
-4. **QUALITY:** Erfüllt die Konstruktion Abschnitt 6 oder ist sie zu beenden?
-5. **DONE:** Ist Abschnitt 7 vollständig erfüllt?
-6. **TRANSITION:** Ohne Abschlussnachweis kein Schritt 6.
-
-Ein neues Tool, ein interessantes Bild, eine spontane App-Icon-Idee oder ein generiertes Zwischenergebnis ändert den aktiven Schritt nicht.
-
-## 10. Design- und Product-Owner-Rollen
-
-- ChatGPT: Design- und Prozessowner, Konstruktion, Auswahl und Verwerfung visueller Richtungen und Primäridentitäten;
-- Product Owner: Produktziele, fachliche Grenzen, reale Produktwirkung und spätere finale Einführungsentscheidung.
-
-Der Product Owner wird nicht als Ersatz-Designer für Rohstudien oder ästhetische Vorauswahlen eingesetzt.
-
-## 11. Änderungskontrolle
-
-Dieser Lock darf nur geändert werden, wenn:
-
-- das aktuelle Abschlusskriterium nachweislich erfüllt wurde; oder
-- ein belegter Prozessfehler den Schritt selbst ungültig macht.
-
-Jede Änderung muss erklären:
-
-- warum der alte Schritt beendet oder korrigiert wurde;
-- welcher neue Schritt aktiv ist;
-- was dort erlaubt und verboten ist.
+1. CURRENT STEP;
+2. ALLOWED;
+3. FORBIDDEN;
+4. PASS/FAIL gegen Abschnitt 6;
+5. kein Übergang ohne dokumentierten Abschluss.
 
 Kein stiller Prozesswechsel.
+
+## 10. Rollen
+
+- ChatGPT: Design- und Prozessowner, fachliches visuelles Urteil;
+- Product Owner: Produktziele, Grenzen und spätere reale Einführungsentscheidung.
+
+Der Product Owner wird nicht als Ersatz-Designer eingesetzt.
