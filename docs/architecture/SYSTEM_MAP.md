@@ -392,6 +392,6 @@ Die Aktivierung ist operations-idempotent: ein identischer Replay liefert das ge
 - Removal-Deploy `30715216900`, Build `37c31add98f0`: exakt drei temporäre Evidence-Dateien gelöscht, HTTP-Smoke erfolgreich, Browser-Smoke 26/26 OK, 0 Fehler, 0 Warnungen;
 - dauerhafte Negativgrenze verbietet die drei ehemaligen Evidence-Dateien sowie Marker- und Lock-Tokens.
 
-Die drei ehemaligen Evidence-URLs müssen vor Workpack-Schließung zusätzlich durch einen tatsächlichen read-only HTTP-Abruf jeweils mit Status `404` bestätigt werden. Der erfolgreiche SFTP-Löschplan und die Dateiabwesenheit allein werden nicht als HTTP-Status ausgegeben oder umgedeutet.
+Am 2026-08-17 wurden alle drei ehemaligen Evidence-URLs durch einen separaten read-only HTTP-Statuscheck direkt geprüft. `gate4_staging_lifecycle_241.php`, `gate4_staging_migration_241.php` und `gate4_staging_marker_cleanup_241.php` lieferten jeweils HTTP `404` bei `0` Redirects. Damit ist der vollständige Evidence-Rückbau auch auf HTTP-Ebene belegt und das letzte Gate-4-Abschlusskriterium erfüllt.
 
-`main` und Live wurden durch Lifecycle, Marker-Cleanup und Evidence-Rückbau nicht verändert. Der dokumentierte Gate-4-Runtime-Endstand auf Staging ist Merge-SHA `37c31add98f015f86086a7e0d541434f1bd1ca46` mit Removal-Deploy `30715216900`; ein späterer reiner Dokumentationsdeploy ändert diese fachliche Runtime-Evidence nicht.
+`main` und Live wurden durch Lifecycle, Marker-Cleanup, Evidence-Rückbau und den Dokumentationsabgleich nicht verändert. Der fachliche Gate-4-Runtime-Endstand auf Staging bleibt Merge-SHA `37c31add98f015f86086a7e0d541434f1bd1ca46` mit Removal-Deploy `30715216900`; spätere reine Dokumentationscommits ändern diese fachliche Runtime-Evidence nicht.
