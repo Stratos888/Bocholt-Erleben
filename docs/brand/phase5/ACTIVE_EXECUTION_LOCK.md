@@ -3,107 +3,131 @@
 Stand: 2026-08-17
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **PRODUCT-OWNER-ENDGATE – VISUELLE IDENTITÄT EINFÜHRUNGSFÄHIG**
+Status: **PROZESS NEU VALIDiert – R1 VISUELLE KALIBRIERUNGSLEITER AKTIV**
 
 ## 1. Unveränderliches Ziel
 
 Eine eigenständige Premium-Markenidentität für die private kuratierte Discovery-/Freizeitplattform **Bocholt erleben** entwickeln, ohne externe Kreativbeauftragung und ohne schwache AI-Ergebnisse durch Prozess, Präsentation oder Scores künstlich aufzuwerten.
 
-Öffentliche Marke, `staging`, `main` und Live bleiben bis zur ausdrücklichen Integrationsfreigabe unverändert.
+Öffentliche Marke, `staging`, `main` und Live bleiben bis zur späteren ausdrücklichen Integrationsfreigabe unverändert.
 
-## 2. Abgeschlossene Schritte
+## 2. Kanonische Prozesskorrektur
 
-- Schritt 2: Premium-Referenzanalyse – abgeschlossen.
-- Schritt 3: Creative Direction – `Klar ausgewählt`.
-- Schritt 4: Formlogik – `Präzise Humanität`.
-- Schritt 5: Primäridentität konstruiert und einmal gezielt korrigiert.
-- Schritt 6: neutraler Vergleich – bestanden in Lauf 2.
-- Schritt 7: Marken-Minisystem und reale Produktwirkung – bestanden.
-- Schritt 8: responsive Kleinform und formale Design-/Technikprüfung – bestanden.
-- Schritt 9: Namens-/Rechtepreflight, visuelle Ähnlichkeitsprüfung und Endgate – abgeschlossen mit dokumentierten Restunsicherheiten.
+Verbindlich:
 
-## 3. Kanonische Identität
+- `docs/brand/phase5/PROCESS_REVALIDATION_AND_RESTART.md`
 
-### Primärwortmarke
+Der frühere Ablauf hat trotz bereits dokumentiertem Phase-2-Postmortem erneut eine visuell mittelmäßige Wortmarke durch AI-Selbstbewertung, technische Sauberkeit und Präsentationsqualität bis zum Status `Endkandidat` hochqualifiziert.
 
-- `docs/brand/phase5/step5/construction-a-mono.svg`
-- Farbe auf hell: `#0D3014`
-- inverse Fassung: Weiß auf ausreichend dunkler Markenfläche
+Deshalb sind ab jetzt abgeschafft:
 
-### Responsive Kleinform
+- absolute ästhetische AI-Scores als Freigabegate;
+- AI-Rollen als behauptete unabhängige Premiumgutachter;
+- Logo-first als primärer Differenzierungsweg;
+- Mikro-Modifikation einer neutralen Fontbasis als Ersatz für ein tragendes Markenprinzip;
+- Product Owner als Ersatz-Designer.
 
-- `docs/brand/phase5/step8/app-mark-mono.svg`
-- charakteristisches `e` direkt aus derselben Wortmarkengeometrie
+## 3. Erhalten
 
-### App-/Maskable-Source
+Weiterhin gültig:
 
-- `docs/brand/phase5/step8/app-icon-source.svg`
-- Hintergrund `#F3F2E6`
-- Glyph `#0D3014`
+- Name `Bocholt erleben`;
+- Produktkern `relevante Auswahl statt Masse`;
+- eigenständiger privater Absender;
+- mobile-first;
+- reale Produktgrößen vor Hochglanzdarstellung;
+- generatorische Bilder nur als Suchmaterial;
+- technische Produktionsassets später deterministisch;
+- keine Pflicht zu Monogramm, Einzelbuchstabenicon oder separatem Symbol;
+- keine öffentliche Änderung vor echter Freigabe.
 
-Die App-Kachel wurde nach externer Step-9-Ähnlichkeitssuche von der dicht belegten Architektur `weißes e auf grün` weggeführt, ohne die kanonische `e`-Geometrie oder die bestehende Markenpalette neu zu erfinden.
+Creative Direction `Klar ausgewählt` bleibt strategisches Lernmaterial, aber keine automatisch freigegebene visuelle Lösung.
 
-## 4. Namens-/Rechtestand
+## 4. Verworfen als Premiumkandidaten
 
-Der Name bleibt **`Bocholt erleben`**.
+- Candidate 201;
+- `docs/brand/phase5/step5/construction-a-mono.svg`;
+- `docs/brand/phase5/step8/app-mark-mono.svg`;
+- `docs/brand/phase5/step8/app-icon-source.svg`;
+- Step-8-Scores `91/100` und `90/100` als ästhetischer Beweis;
+- der Status `Marken-Endkandidat`.
 
-Belegt:
+Die Dateien bleiben ausschließlich als historische Studien-/Negativartefakte erhalten.
 
-- der frühere behauptete harte Stadtmarketing-Logo-Blocker war falsch und wurde zurückgezogen;
-- Stadtmarketing nutzt `bocholterleben` historisch und aktuell als Social-/Kommunikationsbezeichnung;
-- der Product Owner führte am 2026-08-17 eine DPMAregister-Basisrecherche mit nationalen, Unions- und internationalen Markenbeständen und dem Suchbegriff `Bocholt erleben` durch;
-- Ergebnis laut Screenshot: `Die Datenbankabfrage lieferte keine Treffer.`
+## 5. Aktueller Schritt
 
-Nicht behauptet:
+**R1 – VISUELLE KALIBRIERUNGSLEITER**
 
-- anwaltliche Freedom-to-use-Freigabe;
-- vollständiger Ausschluss nicht eingetragener älterer Kennzeichenrechte;
-- abschließende rechtliche Verwechslungsbewertung.
+Zweck:
 
-Diese Restunsicherheit betrifft den bereits bestehenden Namen und wird nicht fälschlich als neuer Effekt des visuellen Rebrands behandelt.
+Vor jeder neuen Gestaltung einen kleinen, konkreten visuellen Qualitätsmaßstab aufbauen, gegen den spätere Systeme vergleichend geprüft werden können.
 
-Nachweise:
+Zu erstellen:
 
-- `docs/brand/phase5/STEP9_NAME_RIGHTS_VERIFICATION.md`
-- `docs/brand/phase5/STEP9_FINAL_ENDGATE.md`
+- 6–8 hochwertige reale Consumer-Marken-/Identitätssysteme als Qualitätsanker;
+- 4–6 Anti-Referenzen für generische SaaS-, Stadtmarketing-, Tourismus-, Eventportal- oder Local-App-Wirkung;
+- pro Referenz konkrete sichtbare Mechanismen statt allgemeiner Adjektive:
+  - Typografiedichte;
+  - Bildlogik;
+  - Farbverhalten;
+  - Layoutcode;
+  - Bewegungsprinzip;
+  - Wiedererkennungsasset;
+  - Verhältnis Logo zu Gesamtsystem.
 
-## 5. Fachliches Urteil
+Die Referenzen sind keine Kopiervorlagen.
 
-**Die neue visuelle Identität ist zur kontrollierten Integration auf `staging` freigabefähig.**
+## 6. In R1 erlaubt
 
-Es besteht kein offener harter Design- oder Technik-Knock-out.
+- aktuelle Referenzrecherche;
+- Analyse realer Markenassets und Brand-Systeme;
+- visuelle Kalibrierungsmatrix;
+- Identifikation der Merkmale, die zu `Bocholt erleben` passen oder bewusst nicht passen;
+- dokumentierter Qualitätskorridor für R2.
 
-## 6. Aktueller Gate
+## 7. In R1 verboten
 
-**PRODUCT-OWNER-INTEGRATIONSFREIGABE**
+- kein neues Logo;
+- keine neue Wortmarke;
+- kein App-Icon;
+- keine SVG-Konstruktion;
+- keine neuen ästhetischen Scores;
+- keine Candidate-Nummern;
+- kein Übergang zu einer einzelnen Formidee;
+- keine Product-Owner-Auswahl aus Designrichtungen;
+- keine Produktintegration;
+- kein Merge oder Deploy.
 
-Erforderliche Entscheidung:
+## 8. R1-Abschlusskriterium
 
-- `freigeben` → separates Integrationsworkpack auf aktueller `staging`-Basis;
-- `nicht freigeben` → keine Produktänderung, Designbranch bleibt dokumentierter Endstand.
+R1 ist nur abgeschlossen, wenn:
 
-## 7. Bei Freigabe zulässiger nächster Schritt
+1. der Referenzsatz klein und klar genug ist, um tatsächlich als Vergleichsanker zu dienen;
+2. sichtbare Mechanismen statt nur Markennamen/Adjektive dokumentiert sind;
+3. mindestens vier typische Fehlrichtungen als Anti-Referenzen operationalisiert sind;
+4. daraus klare Anforderungen für drei Distinctive-Asset-Systeme in R2 folgen;
+5. noch keine neue Logo-/Wortmarkenlösung privilegiert wurde.
 
-Nicht in diesem Workpack direkt integrieren.
+## 9. Nächster zulässiger Übergang
 
-Stattdessen:
+Nur nach R1-PASS:
 
-1. neues Integrationsworkpack von aktuellem `staging`;
-2. finale SVG-/Rasterassets erzeugen;
-3. Header-Wortmarke ersetzen;
-4. PWA/Favicon/Apple-Touch/Maskable-Assets ersetzen;
-5. Manifest- und Cacheversionen kontrolliert aktualisieren;
-6. mobile und Desktop-Staging-Screenshots prüfen;
-7. Safe Area, Kontrast, Accessibility und Installation prüfen;
-8. erst nach Staging-Sichtprüfung separater Main-/Live-Entscheid.
+**R2 – HÖCHSTENS DREI DISTINCTIVE-ASSET-MARKENSYSTEME MIT IDENTISCHER NEUTRALER WORTMARKE.**
 
-## 8. Verboten bis zur Product-Owner-Freigabe
+Dort wird erstmals wieder gestaltet – als System, nicht als Logo.
 
-- kein Merge nach `staging` als Markenintegration;
-- keine Änderung an `main` oder Live;
-- kein Deploy;
-- kein weiterer Namenswechsel;
-- keine neue Logoexploration;
-- keine Behauptung rechtlicher Vollfreigabe.
+## 10. Spätere Premiumvalidierung
+
+AI darf technische und harte Fehlassoziationsprüfungen durchführen, aber die Premiumfreigabe nicht mehr allein erteilen.
+
+Vor der Bezeichnung `premium-validiert` ist ein anonymisiertes unabhängiges menschliches Wahrnehmungssignal aus der Zielgruppe erforderlich. Keine Designausbildung notwendig; geprüft werden Wirkung, Vertrauen, Differenzierung und Erinnerung in Alltagssprache.
+
+Wenn dieser Test nicht erfolgt, darf ein späteres Ergebnis höchstens `AI-intern qualifiziert` heißen.
+
+## 11. Rollen
+
+- ChatGPT: Strategie-, Recherche-, Design-, Produktions- und Prozessowner; darf keinen eigenen Entwurf durch Selbstscore freigeben.
+- Product Owner: Produktziele, Grenzen und reale Einführungsentscheidung; keine Ersatz-Designerrolle.
+- unabhängiges Zielgruppenfeedback: späteres Wahrnehmungssignal, keine Kreativbeauftragung.
 
 Kein stiller Prozesswechsel.
