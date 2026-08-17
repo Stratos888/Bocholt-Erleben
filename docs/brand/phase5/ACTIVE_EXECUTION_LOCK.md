@@ -3,7 +3,7 @@
 Stand: 2026-08-17
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **PROZESS NEU VALIDiert – R1 VISUELLE KALIBRIERUNGSLEITER AKTIV**
+Status: **R1 BESTANDEN – R2 DISTINCTIVE-ASSET-MARKENSYSTEME AKTIV**
 
 ## 1. Unveränderliches Ziel
 
@@ -11,123 +11,116 @@ Eine eigenständige Premium-Markenidentität für die private kuratierte Discove
 
 Öffentliche Marke, `staging`, `main` und Live bleiben bis zur späteren ausdrücklichen Integrationsfreigabe unverändert.
 
-## 2. Kanonische Prozesskorrektur
+## 2. Kanonische Prozessgrundlage
 
 Verbindlich:
 
 - `docs/brand/phase5/PROCESS_REVALIDATION_AND_RESTART.md`
+- `docs/brand/phase5/R1_VISUAL_CALIBRATION.md`
 
-Der frühere Ablauf hat trotz bereits dokumentiertem Phase-2-Postmortem erneut eine visuell mittelmäßige Wortmarke durch AI-Selbstbewertung, technische Sauberkeit und Präsentationsqualität bis zum Status `Endkandidat` hochqualifiziert.
-
-Deshalb sind ab jetzt abgeschafft:
-
-- absolute ästhetische AI-Scores als Freigabegate;
-- AI-Rollen als behauptete unabhängige Premiumgutachter;
-- Logo-first als primärer Differenzierungsweg;
-- Mikro-Modifikation einer neutralen Fontbasis als Ersatz für ein tragendes Markenprinzip;
-- Product Owner als Ersatz-Designer.
+R1 ist abgeschlossen. Qualitätsanker und Anti-Referenzen sind operationalisiert. Es gibt weiterhin **keinen Premiumkandidaten**.
 
 ## 3. Erhalten
 
-Weiterhin gültig:
-
 - Name `Bocholt erleben`;
 - Produktkern `relevante Auswahl statt Masse`;
-- eigenständiger privater Absender;
 - mobile-first;
+- bestehendes Produkt unverändert;
 - reale Produktgrößen vor Hochglanzdarstellung;
-- generatorische Bilder nur als Suchmaterial;
+- Generatoroutput nur als Suchmaterial;
 - technische Produktionsassets später deterministisch;
-- keine Pflicht zu Monogramm, Einzelbuchstabenicon oder separatem Symbol;
-- keine öffentliche Änderung vor echter Freigabe.
-
-Creative Direction `Klar ausgewählt` bleibt strategisches Lernmaterial, aber keine automatisch freigegebene visuelle Lösung.
+- keine Pflicht zu Monogramm, Einzelbuchstabenicon oder separatem Symbol.
 
 ## 4. Verworfen als Premiumkandidaten
 
 - Candidate 201;
-- `docs/brand/phase5/step5/construction-a-mono.svg`;
-- `docs/brand/phase5/step8/app-mark-mono.svg`;
-- `docs/brand/phase5/step8/app-icon-source.svg`;
-- Step-8-Scores `91/100` und `90/100` als ästhetischer Beweis;
-- der Status `Marken-Endkandidat`.
-
-Die Dateien bleiben ausschließlich als historische Studien-/Negativartefakte erhalten.
+- frühere `Präzise Humanität`-Wortmarke;
+- frühere `e`-Kleinmarke;
+- alle ästhetischen 90/91-Scores;
+- Status `Marken-Endkandidat`.
 
 ## 5. Aktueller Schritt
 
-**R1 – VISUELLE KALIBRIERUNGSLEITER**
+**R2 – HÖCHSTENS DREI DISTINCTIVE-ASSET-MARKENSYSTEME MIT IDENTISCHER NEUTRALER WORTMARKE**
 
 Zweck:
 
-Vor jeder neuen Gestaltung einen kleinen, konkreten visuellen Qualitätsmaßstab aufbauen, gegen den spätere Systeme vergleichend geprüft werden können.
+Beweisen, dass ein eigenständiger visueller Markenmechanismus **vor** individuellem Logo/Lettering existiert und im realen Produkt wiederholbar funktioniert.
 
-Zu erstellen:
+Zulässige Suchräume aus R1:
 
-- 6–8 hochwertige reale Consumer-Marken-/Identitätssysteme als Qualitätsanker;
-- 4–6 Anti-Referenzen für generische SaaS-, Stadtmarketing-, Tourismus-, Eventportal- oder Local-App-Wirkung;
-- pro Referenz konkrete sichtbare Mechanismen statt allgemeiner Adjektive:
-  - Typografiedichte;
-  - Bildlogik;
-  - Farbverhalten;
-  - Layoutcode;
-  - Bewegungsprinzip;
-  - Wiedererkennungsasset;
-  - Verhältnis Logo zu Gesamtsystem.
+1. `Auswahlfenster`;
+2. `Fundstücke`;
+3. `Von hier ins echte Leben`.
 
-Die Referenzen sind keine Kopiervorlagen.
+Diese Bezeichnungen sind interne Suchraumtitel, keine Claims oder Kandidatennamen.
 
-## 6. In R1 erlaubt
+## 6. Verbindliche R2-Regeln
 
-- aktuelle Referenzrecherche;
-- Analyse realer Markenassets und Brand-Systeme;
-- visuelle Kalibrierungsmatrix;
-- Identifikation der Merkmale, die zu `Bocholt erleben` passen oder bewusst nicht passen;
-- dokumentierter Qualitätskorridor für R2.
+Alle Systeme verwenden:
 
-## 7. In R1 verboten
+- exakt dieselbe neutrale Wortsetzung `Bocholt erleben`;
+- dieselben realen Inhalte;
+- dieselben mobilen/desktop Größen;
+- zunächst reduzierte Zwei-Farben-Fassung plus echte Fotografie;
+- keine individuelle Wortmarke;
+- kein App-Icon.
 
-- kein neues Logo;
-- keine neue Wortmarke;
-- kein App-Icon;
-- keine SVG-Konstruktion;
-- keine neuen ästhetischen Scores;
-- keine Candidate-Nummern;
-- kein Übergang zu einer einzelnen Formidee;
-- keine Product-Owner-Auswahl aus Designrichtungen;
-- keine Produktintegration;
-- kein Merge oder Deploy.
+Jedes System muss einen primären wiederkehrenden visuellen Mechanismus besitzen, der in mindestens folgenden Kontexten funktioniert:
 
-## 8. R1-Abschlusskriterium
+- mobiler Header beziehungsweise Startbereich;
+- Today-/Auswahlkarten;
+- Detailseite;
+- Fotobehandlung/Zuschnitt;
+- einfache Social-/Avatarfläche;
+- ein Motion-/Übergangsprinzip.
 
-R1 ist nur abgeschlossen, wenn:
+## 7. Harte R2-Abbruchkriterien
 
-1. der Referenzsatz klein und klar genug ist, um tatsächlich als Vergleichsanker zu dienen;
-2. sichtbare Mechanismen statt nur Markennamen/Adjektive dokumentiert sind;
-3. mindestens vier typische Fehlrichtungen als Anti-Referenzen operationalisiert sind;
-4. daraus klare Anforderungen für drei Distinctive-Asset-Systeme in R2 folgen;
-5. noch keine neue Logo-/Wortmarkenlösung privilegiert wurde.
+Ein System wird sofort beendet, wenn:
 
-## 9. Nächster zulässiger Übergang
+- der Mechanismus nur als Logo funktioniert;
+- er Kamera-, Scan-, Karten-, Navigation-, Ticket-, Festival-, SaaS-, Stadtmarketing- oder Tourismuswirkung dominiert;
+- er permanente Dekoration benötigt;
+- er bei 390px Produktbreite nicht klar funktioniert;
+- die Eigenheit nur über Farbe entsteht;
+- der Mechanismus die eigentlichen Inhalte überlagert;
+- er eine bekannte Referenz sichtbar nachahmt;
+- eine Erklärung nötig ist, um die Form überhaupt sinnvoll zu lesen.
 
-Nur nach R1-PASS:
+## 8. R2-Ausgabe
 
-**R2 – HÖCHSTENS DREI DISTINCTIVE-ASSET-MARKENSYSTEME MIT IDENTISCHER NEUTRALER WORTMARKE.**
+R2 liefert höchstens drei anonymisierbare Systemboards beziehungsweise identische Produktkontexte.
 
-Dort wird erstmals wieder gestaltet – als System, nicht als Logo.
+Noch **keine Premiumfreigabe**.
 
-## 10. Spätere Premiumvalidierung
+R2 endet ausschließlich mit:
 
-AI darf technische und harte Fehlassoziationsprüfungen durchführen, aber die Premiumfreigabe nicht mehr allein erteilen.
+- `R3 freigeben`, wenn mindestens zwei Systeme sichtbar genügend Eigenhöhe und Produktpassung besitzen;
+- oder `R2 neu öffnen`, wenn weniger als zwei Systeme tragen.
 
-Vor der Bezeichnung `premium-validiert` ist ein anonymisiertes unabhängiges menschliches Wahrnehmungssignal aus der Zielgruppe erforderlich. Keine Designausbildung notwendig; geprüft werden Wirkung, Vertrauen, Differenzierung und Erinnerung in Alltagssprache.
+Keine 0–100-Designscores.
 
-Wenn dieser Test nicht erfolgt, darf ein späteres Ergebnis höchstens `AI-intern qualifiziert` heißen.
+## 9. In R2 verboten
+
+- individuelles Logo/Lettering;
+- App-Icon;
+- Candidate-Nummern als Qualitätsargument;
+- ästhetische Scores;
+- Product-Owner-Auswahl als Ersatz für fachliche Vorfilterung;
+- Produktintegration;
+- Merge oder Deploy.
+
+## 10. Nächster zulässiger Übergang
+
+Nur bei mindestens zwei tragenden Systemen:
+
+**R3 – ANONYMISIERTER BLINDVERGLEICH + UNABHÄNGIGES MENSCHLICHES WAHRNEHMUNGSSIGNAL.**
 
 ## 11. Rollen
 
-- ChatGPT: Strategie-, Recherche-, Design-, Produktions- und Prozessowner; darf keinen eigenen Entwurf durch Selbstscore freigeben.
-- Product Owner: Produktziele, Grenzen und reale Einführungsentscheidung; keine Ersatz-Designerrolle.
-- unabhängiges Zielgruppenfeedback: späteres Wahrnehmungssignal, keine Kreativbeauftragung.
+- ChatGPT: entwickelt und filtert R2; darf die Systeme nicht als `premium-validiert` freigeben.
+- Product Owner: keine Designarbeit in R2.
+- Zielgruppenfeedback: erst R3.
 
 Kein stiller Prozesswechsel.
