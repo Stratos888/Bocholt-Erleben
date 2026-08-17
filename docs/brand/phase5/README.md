@@ -3,7 +3,7 @@
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
 Stand: 2026-08-17
-Status: **SCHRITT 3 VON 9 – ZWEI VISUELLE MARKENRICHTUNGEN**
+Status: **R3 BLINDTEST AKTIV – 0 PREMIUMVALIDIERTE RICHTUNGEN**
 
 ## Zweck
 
@@ -11,140 +11,107 @@ Phase 5 entwickelt eine eigenständige Premium-Markenidentität für `Bocholt er
 
 ## Kanonischer Ausführungsstatus
 
-Der jeweils aktive Prozessschritt steht ausschließlich in:
+Der aktive Schritt steht ausschließlich in:
 
 - `docs/brand/phase5/ACTIVE_EXECUTION_LOCK.md`
 
-Dieser Lock hat Vorrang vor spontanen Tool-Ideen, Zwischenresultaten oder lokalen Optimierungen und verhindert stille Prozesswechsel.
+Die aktuelle Prozessgrundlage ist:
 
-## Verbindlicher Prozessstand
+- `docs/brand/phase5/PROCESS_REVALIDATION_AND_RESTART.md`
 
-Der bisherige interne Bewertungsweg hat Candidate 201 fälschlich mit `90/100` in zwei Pässen als designqualifiziert eingestuft. Die anschließende tatsächliche Product-Owner-Sichtung und erneute visuelle Bewertung widersprachen diesem Befund klar.
+## Warum der Prozess neu gestartet wurde
 
-Candidate 201 ist daher verworfen. Seine früheren Scores und Gate-Freigaben sind historische Prozessartefakte und keine gültige Evidenz.
+Mehrere frühere AI-intern hochbewertete Wortmarken-/Icon-Kandidaten wirkten bei tatsächlicher Sichtung sichtbar nicht premiumfähig. Deshalb sind abgeschafft:
 
-Der korrigierte Ablauf steht in:
+- ästhetische 0–100-Scores als Freigabegate;
+- AI-Rollen als angeblich unabhängige Premiumgutachter;
+- Logo-first als primärer Differenzierungsweg;
+- Mikro-Modifikation einer neutralen Schriftbasis als Ersatz für ein tragendes Markensystem;
+- Product Owner als Ersatz-Designer.
 
-- `docs/brand/phase5/VISUAL_DIRECTION_GATE.md`
-- `docs/brand/phase5/ACTIVE_EXECUTION_LOCK.md`
+Verworfen als Premiumkandidaten bleiben unter anderem:
 
-## Abgeschlossener Schritt 2 – visuelle Premium-Referenzanalyse
+- Candidate 201;
+- frühere `Präzise Humanität`-Wortmarke;
+- frühere `e`-Kleinmarke;
+- Status `Marken-Endkandidat`.
 
-Dokumentiert in:
+## R1 – abgeschlossen
 
-- `docs/brand/phase5/VISUAL_PREMIUM_REFERENCE_ANALYSIS.md`
+Dokumentation:
 
-Enthalten:
+- `docs/brand/phase5/R1_VISUAL_CALIBRATION.md`
 
-- sieben relevante Referenzsysteme;
-- vier Anti-Referenzmuster;
-- Visual-DNA-Matrix für `Bocholt erleben`;
-- genau zwei Creative-Direction-Hypothesen;
-- gemeinsames Produktversprechen;
-- visuelle Abbruchkriterien je Richtung.
+Sechs reale Consumer-Identitätssysteme wurden als Qualitätsanker analysiert:
 
-Die beiden verbindlichen Richtungen für Schritt 3 sind:
+- Headout;
+- Wise;
+- Monzo;
+- Spotify;
+- Eventbrite;
+- Duolingo.
 
-1. `A – Klar ausgewählt` – ruhig, präzise, souverän, kuratiert;
-2. `B – Nah am echten Leben` – menschlicher, wärmer, unmittelbar, aber digital präzise.
+Daraus wurden konkrete Anforderungen für Typografie, Fotologik, Layoutcode, Distinctive Assets, Motion und Brand/Product-Verzahnung abgeleitet.
 
-## Was aus den bisherigen Zyklen erhalten bleibt
+Anti-Familien:
 
-Die früheren Such-, Generator- und Konstruktionspfade bleiben als Negativwissen erhalten. Insbesondere gesperrt bleiben:
+- Standardschrift + Einzelgimmick;
+- generisches Stadt-/Tourismusportal;
+- generische SaaS-/Startup-Identität;
+- Event-/Festival-Klischee;
+- Lifestyle-/Wellness-Mood ohne System.
 
-- Standardschrift plus Schnitt, Punkt, Öffnung oder Einzelgimmick;
-- generische geometrische Icons und UI-Schemata;
-- austauschbare Initialmonogramme;
-- überzeichnete Buchstabendefekte;
-- App-Icon vor überzeugender Primäridentität;
-- Mock-up- oder Präsentationsqualität als Ersatz für sichtbare Markenqualität;
-- Scorecards als selbstständiger Premiumdetektor;
-- weitere Recraft-/Ideogram-Logo-Generator-Runden derselben Art.
+## R2 – abgeschlossen
 
-## Aktiver Schritt 3 – zwei visuelle Markenrichtungen
+Dokumentation:
 
-Noch vor jeder neuen Logo- oder Wortmarkenkonstruktion werden ausschließlich die beiden festgelegten Markenwelten sichtbar operationalisiert:
+- `docs/brand/phase5/R2_SYSTEM_EXPLORATION.md`
 
-### A – Klar ausgewählt
+Alle Systeme nutzten identische neutrale Wortsetzung, Farben, Inhalte und Fotos. Kein individuelles Logo oder App-Icon.
 
-Führende Idee: `Vertrauen durch gute Auswahl.`
+Verworfen:
 
-Visuelle Gewichtung:
+- `Fundstücke` – zu nah an Pinterest-/Editorial-/UI-Stacking.
 
-- Klarheit und Souveränität führen;
-- Menschlichkeit bleibt sichtbar;
-- Aktivierung wird dosiert.
+Für R3 weitergeführt:
 
-### B – Nah am echten Leben
+- `Momentstreifen`;
+- `Von hier ins echte Leben` / Foto-Breakout;
+- `Auswahlfenster`;
+- neutrale Kontrollvariante.
 
-Führende Idee: `Lust auf das, was direkt um mich herum passiert.`
+R2 ist ausdrücklich **keine Premiumfreigabe**.
 
-Visuelle Gewichtung:
+## R3 – aktuell aktiv
 
-- Menschlichkeit und Nähe führen;
-- Klarheit bleibt verbindlich;
-- Aktivierung wird dosiert.
+Dokumentation:
 
-Die Richtungsdarstellungen dürfen keine finalen Logos, App-Icons, Candidate-Nummern, Design-Scores oder erfundenen Claims enthalten.
+- `docs/brand/phase5/R3_BLIND_TEST_PROTOCOL.md`
 
-Der Product Owner entscheidet ausschließlich:
+Ein anonymisierter Vergleich ist vorbereitet. Testpersonen sehen nur `A/B/C/D`, keine Herleitungen oder Konzeptnamen.
 
-- `A`;
-- `B`;
-- `keine`.
+Ziel:
 
-Ohne diese ausdrückliche Gate-Entscheidung darf nicht in Schritt 4 gewechselt werden.
+- 8–12 normale potenzielle Nutzer;
+- Fragen zu Qualität/Vertrauen, Produktpassung, Wiedererkennbarkeit und spontaner Assoziation;
+- kurze Erinnerung ohne Bild nach 3–5 Minuten.
 
-## Danach – Formsprachenerkundung
+Erst ein System, das die neutrale Kontrolle sichtbar übertrifft und ohne dominante Fehlassoziation erinnert wird, darf in R4 Wortmarkenarbeit erhalten.
 
-Nur die gewählte Welt wird anschließend in Formbausteine übersetzt:
+## Weiterhin gesperrt
 
-- Buchstabenproportionen;
-- Terminals und Rundungen;
-- Wortdichte und Rhythmus;
-- Verhältnis `Bocholt` / `erleben`;
-- Architektur der Primäridentität;
-- nur bei echter visueller Begründung ein Zeichen.
-
-## Gate 2 – Primäridentität
-
-Später entstehen höchstens zwei bewusst konstruierte Identitäten. Sie werden zunächst monochrom und in realer mobiler Größe verglichen mit:
-
-- aktuellem öffentlichen Stand;
-- hochwertiger neutraler Kontrollsetzung;
-- Kandidat A;
-- gegebenenfalls Kandidat B.
-
-Keine Konzepttitel, Häkchen, Scores oder Hochglanz-Mock-ups vor der sichtbaren Entscheidung.
-
-## Erst nach Gate 2
-
-Nur eine sichtbar freigegebene Primäridentität erhält:
-
-- Marken-Minisystem;
-- reale Today-, Detail-, Veranstalter- und Partnerkontexte;
-- responsive Kleinform und App-Marke;
-- getrennte Bewertungspässe und Red Team;
-- Ähnlichkeits-, Lizenz- und Herkunftsprüfung;
-- technische Vektorhärtung;
-- Scorecard als dokumentierende, nicht ersetzende Qualitätskontrolle.
-
-## Qualitätsgrenze
-
-Der Premiumanspruch bleibt hoch. Eine Richtung muss am Ende unter anderem:
-
-- sichtbar eigenständig und hochwertig sein;
-- die aktuelle Identität klar übertreffen;
-- ohne Erklärung als passende Consumer-Marke funktionieren;
-- mobil belastbar sein;
-- keine dominante Verwaltungs-, Tourismus-, SaaS-, Kultur-, Gastro- oder sonstige Fehlkategorie erzeugen;
-- systemfähig und nachvollziehbar konstruiert sein.
+- kein individuelles Logo/Lettering vor R3-PASS;
+- kein App-Icon vor bewiesenem System;
+- keine Produktintegration;
+- kein Merge nach `staging` oder `main`;
+- kein Deploy;
+- keine Bezeichnung `premium-validiert` ohne unabhängiges menschliches Wahrnehmungssignal.
 
 ## Aktueller Stand
 
-- qualifizierte Richtungen: `0`;
-- Candidate 201: `verworfen / Negativwissen`;
-- Schritt 2: `abgeschlossen`;
-- Schritt 3: `aktiv`;
-- öffentliche Änderungen: `0`;
-- Änderungen an `staging`, `main` oder Live: `0`.
+- Name: `Bocholt erleben`;
+- Premiumkandidaten: `0`;
+- R1: bestanden;
+- R2: abgeschlossen als System-Exploration;
+- R3: Testpaket bereit, Feedback ausstehend;
+- öffentliche Produktänderungen: `0`.
