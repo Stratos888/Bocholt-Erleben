@@ -111,6 +111,12 @@ PY
     --profile all \
     --check event-navigation \
     --out-dir "$SMOKE_OUT_DIR"
+
+  if [ -f "$ROOT/tests/startpartner_public_funnel_browser_test.mjs" ]; then
+    node "$ROOT/tests/startpartner_public_funnel_browser_test.mjs" \
+      --base-url "http://127.0.0.1:$port" \
+      --out-dir "$SMOKE_OUT_DIR/startpartner-public-funnel"
+  fi
 )
 smoke_status=$?
 set -e

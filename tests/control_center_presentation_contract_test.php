@@ -4,7 +4,7 @@ require_once __DIR__ . '/../api/control-center/_presentation.php';
 function assert_true(bool $condition,string $message):void{if(!$condition){fwrite(STDERR,"FAIL: {$message}\n");exit(1);}}
 function assert_contains_text(string $haystack,string $needle,string $message):void{assert_true(str_contains($haystack,$needle),$message);}
 $payload=[
-    'id_suggestion'=>'event-1','title'=>'Kunstmarkt','date'=>'2026-08-15','time'=>'18:00','time_status'=>'fixed_time','time_details'=>'18:00–21:00 Uhr',
+    'id_suggestion'=>'event-1','title'=>'Kunstmarkt','date'=>'2099-08-15','time'=>'18:00','time_status'=>'fixed_time','time_details'=>'18:00–21:00 Uhr',
     'city'=>'Bocholt','location'=>'Testhalle','kategorie_suggestion'=>'Kultur','source_url'=>'https://example.org/source',
     'event_url'=>'https://example.org/event','description'=>'Sachliche Beschreibung des Testevents.',
     'visual_key'=>'art_exhibition_gallery','visual_motif'=>'art_market','visual_asset_id'=>'motif-gap-art-market-01','visual_asset_role'=>'specific',
