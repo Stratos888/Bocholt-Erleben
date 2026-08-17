@@ -11,99 +11,135 @@ Eine eigenständige Premium-Markenidentität für `Bocholt erleben` entwickeln, 
 
 Öffentliche Marke, `staging`, `main` und Live bleiben bis zu einer späteren vollständigen Markenfreigabe unverändert.
 
-## 2. Aktueller Schritt
+## 2. Abgeschlossener Schritt
 
-**SCHRITT 2 VON 9 – VISUELLE PREMIUM-REFERENZANALYSE**
+**SCHRITT 2 VON 9 – VISUELLE PREMIUM-REFERENZANALYSE: ABGESCHLOSSEN**
 
-Zweck dieses Schritts:
+Nachweis:
 
-- sichtbare Qualitätsmechanismen erfolgreicher Consumer-/Discovery-Marken analysieren;
-- daraus eine für `Bocholt erleben` geeignete visuelle DNA ableiten;
-- zwei klar unterscheidbare Creative-Direction-Hypothesen formulieren;
-- noch keine Logo- oder Wortmarkenlösung erzeugen.
+- `docs/brand/phase5/VISUAL_PREMIUM_REFERENCE_ANALYSIS.md`
 
-## 3. Erlaubte Aktionen in Schritt 2
+Erfüllt:
 
-- Recherche aktueller offizieller Brand-/Designquellen;
-- Analyse von Typografiecharakter, Dichte, Weißraum, Farbe, Bildsprache, Produktintegration und Motion;
-- Vergleich von Premium-Consumer-Marken und relevanten Anti-Referenzen;
-- Ableitung konkreter visueller Prinzipien für `Bocholt erleben`;
-- Dokumentation von genau zwei Creative-Direction-Hypothesen;
-- Dokumentation von Unsicherheiten und Fehlkategorien.
+- sieben relevante Referenzsysteme;
+- vier Anti-Referenzmuster;
+- Visual-DNA-Matrix;
+- genau zwei Creative-Direction-Hypothesen;
+- gemeinsames Produktversprechen;
+- visuelle Abbruchkriterien je Richtung.
 
-## 4. Verbotene Aktionen in Schritt 2
-
-Bis Schritt 2 ausdrücklich abgeschlossen ist:
-
-- keine Logoerzeugung;
-- keine Wortmarkenkonstruktion;
-- keine App-Icons;
-- keine Recraft-/Ideogram-Runden;
-- keine SVG-Kandidaten;
-- keine Candidate-Nummern;
-- keine Design-Scores;
-- keine Red-Team-Qualifikation;
-- keine erfundenen Claims als Markenbestandteil;
-- keine Product-Owner-Entscheidung über ein Logo;
-- kein Übergang in Formsprachenerkundung.
-
-## 5. Abschlusskriterium Schritt 2
-
-Schritt 2 ist erst abgeschlossen, wenn im Repository eine belastbare Referenzanalyse vorliegt mit:
-
-1. mindestens fünf relevanten visuellen Referenzsystemen;
-2. mindestens drei klaren Anti-Referenzmustern;
-3. einer konkreten Visual-DNA-Matrix für `Bocholt erleben`;
-4. genau zwei deutlich unterschiedlichen Creative-Direction-Hypothesen;
-5. einer Begründung, warum beide das gleiche Produktversprechen unterschiedlich übersetzen;
-6. klaren visuellen Abbruchkriterien je Richtung.
-
-## 6. Nächster zulässiger Übergang
-
-Nach dokumentiertem Abschluss von Schritt 2 darf der Lock auf
+## 3. Aktueller Schritt
 
 **SCHRITT 3 VON 9 – ZWEI VISUELLE MARKENRICHTUNGEN**
 
-umgestellt werden.
+Zweck:
 
-Schritt 3 darf ausschließlich die beiden in Schritt 2 abgeleiteten Richtungen visualisieren. Er darf noch keine finale Wortmarke oder App-Marke erzeugen.
+Die beiden in Schritt 2 definierten Richtungen werden sichtbar und verständlich operationalisiert, damit der Product Owner früh die Creative Direction wählen kann, bevor Logo- oder Wortmarkenkonstruktion beginnt.
 
-Der Product Owner erhält in Schritt 3 eine verständliche Richtungsentscheidung mit `A`, `B` oder `keine`.
+Verbindliche Richtungen:
 
-## 7. Anti-Drift-Regeln
+### A – Klar ausgewählt
+
+Führende Idee: Vertrauen durch gute Auswahl.
+
+Visueller Schwerpunkt:
+
+- ruhig;
+- souverän;
+- kuratiert;
+- hochwertige Consumer-Marke;
+- klar und digital, aber nicht SaaS oder Verwaltung.
+
+### B – Nah am echten Leben
+
+Führende Idee: Lust auf das, was direkt um mich herum passiert.
+
+Visueller Schwerpunkt:
+
+- menschlich;
+- warm;
+- unmittelbar;
+- lokal ohne Tourismusklischee;
+- digital präzise, aber sichtbar nahbar.
+
+## 4. Erlaubte Aktionen in Schritt 3
+
+- genau zwei Richtungsdarstellungen A und B;
+- visuelle Beispiele für Typografiecharakter, Dichte, Weißraum, Farbtemperatur, Bildsprache und Produktnähe;
+- reale oder realitätsnahe Produktausschnitte nur zur Demonstration der Grundwirkung;
+- klare Beschriftung ausschließlich als `A – Klar ausgewählt` und `B – Nah am echten Leben`;
+- kurze Erklärung dessen, was der Product Owner beurteilen soll;
+- Product-Owner-Gate mit genau `A`, `B` oder `keine`.
+
+## 5. Verbotene Aktionen in Schritt 3
+
+Bis zum Product-Owner-Gate:
+
+- keine finale Wortmarke;
+- keine Logo-Kandidaten;
+- keine App-Icons;
+- keine Candidate-Nummern;
+- keine SVG-Master;
+- keine Design-Scores;
+- kein Red Team;
+- keine Ähnlichkeitsprüfung;
+- keine erfundenen Claims oder neuen Markennamen;
+- keine dritte Markenrichtung;
+- keine Vermischung von A und B zu einer automatischen Kompromissrichtung;
+- kein Beginn von Schritt 4 ohne explizite Product-Owner-Entscheidung `A` oder `B`.
+
+## 6. Abschlusskriterium Schritt 3
+
+Schritt 3 ist erst abgeschlossen, wenn:
+
+1. A und B eindeutig und ohne falsche Bezeichnungen visualisiert wurden;
+2. beide dasselbe Produktversprechen sichtbar unterschiedlich übersetzen;
+3. keine Logoentscheidung in die Richtungsdarstellung eingeschmuggelt wurde;
+4. der Product Owner verstanden hat, was bewertet wird;
+5. der Product Owner ausdrücklich `A`, `B` oder `keine` gewählt hat.
+
+Bei `keine` wird Schritt 3 neu formuliert; es wird nicht automatisch zu Schritt 4 gewechselt.
+
+## 7. Nächster zulässiger Übergang
+
+Nur nach Product-Owner-Auswahl `A` oder `B`:
+
+**SCHRITT 4 VON 9 – FORMSPRACHENERKUNDUNG INNERHALB DER GEWÄHLTEN WELT**
+
+Dort dürfen erstmals formale Bausteine der Primäridentität untersucht werden. Auch dort entsteht noch nicht automatisch ein freigegebenes Logo.
+
+## 8. Anti-Drift-Regeln
 
 Vor jeder kreativen oder schreibenden Aktion muss intern geprüft werden:
 
-1. **CURRENT STEP:** Passt die Aktion exakt zu Abschnitt 2?
-2. **ALLOWED:** Ist sie in Abschnitt 3 erlaubt?
-3. **FORBIDDEN:** Verletzt sie Abschnitt 4?
+1. **CURRENT STEP:** Ist die Aktion Teil von Schritt 3?
+2. **ALLOWED:** Ist sie in Abschnitt 4 ausdrücklich erlaubt?
+3. **FORBIDDEN:** Verletzt sie Abschnitt 5?
 4. **DONE:** Ist das Abschlusskriterium bereits erfüllt?
-5. **TRANSITION:** Falls nein, darf kein nächster Prozessschritt begonnen werden.
+5. **TRANSITION:** Ohne explizite Gate-Entscheidung kein nächster Schritt.
 
-Ein neues Tool, ein interessanter Zwischenfund, ein generiertes Bild oder ein spontaner Verbesserungsvorschlag ändert den aktiven Schritt nicht.
+Ein neues Tool, ein interessantes Bild, eine spontane Logoidee oder ein generiertes Zwischenergebnis ändert den aktiven Schritt nicht.
 
-## 8. Warum dieser Lock notwendig ist
+## 9. Warum dieser Lock notwendig ist
 
 Die bisherigen Abweichungen entstanden wiederholt durch:
 
-- mehrere gleichzeitig gültig wirkende Prozessdokumente ohne einzelnen Ausführungszeiger;
-- Vermischung von Forschung, Exploration, Konstruktion und Bewertung in derselben Runde;
+- mehrere Prozessdokumente ohne einzelnen Ausführungszeiger;
+- Vermischung von Forschung, Exploration, Konstruktion und Bewertung;
 - Tool-Salienz: verfügbare Bild-/Logo-Tools verleiteten zu vorgezogener Generierung;
 - lokale Optimierung eines Zwischenresultats statt Prüfung des Gesamtprozesses;
 - Selbstbewertung durch denselben AI-Orchestrator;
-- Präsentationsqualität als unbewusster Verstärker schwacher Grundideen;
+- Präsentationsqualität als Verstärker schwacher Grundideen;
 - Interpretation eines allgemeinen `mach weiter` als Erlaubnis zum Überspringen von Gates.
 
-Der Execution Lock macht diese Übergänge explizit und überprüfbar.
-
-## 9. Änderungskontrolle
+## 10. Änderungskontrolle
 
 Dieser Lock darf nur geändert werden, wenn:
 
 - das aktuelle Abschlusskriterium nachweislich erfüllt wurde; oder
 - ein belegter Prozessfehler den Schritt selbst ungültig macht.
 
-Jede Änderung muss im Commit erklären:
+Jede Änderung muss erklären:
 
 - warum der alte Schritt beendet oder korrigiert wurde;
 - welcher neue Schritt aktiv ist;
