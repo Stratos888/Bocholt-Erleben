@@ -184,10 +184,10 @@
     try {
       await submitStartpartnerRequest();
       form.reset();
-      showResult("Deine Startpartner-Anfrage ist angekommen. Bocholt erleben prüft sie und meldet sich danach zurück.");
+      showResult("Deine Anfrage zum Startpartner-Pilot ist angekommen. Bocholt erleben prüft sie und meldet sich danach zurück.");
     } catch (error) {
       console.warn("Startpartner request failed.", error);
-      showResult("Die Anfrage konnte gerade nicht gesendet werden. Bitte später erneut versuchen oder über Feedback Kontakt aufnehmen.");
+      showResult("Die Anfrage konnte gerade nicht gesendet werden. Bitte versuche es später erneut.");
     } finally {
       setSubmitting(false);
     }
