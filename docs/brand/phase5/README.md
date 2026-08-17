@@ -1,79 +1,104 @@
-# Phase 5 – Qualifizierte Neusuche
+# Phase 5 – Premium-Markenentwicklung
 
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **PRODUCT-OWNER-GATE – CANDIDATE 201 INTERN DESIGNQUALIFIZIERT**
+Stand: 2026-08-17
+Status: **VISUAL-DIRECTION-GATE – 0 QUALIFIZIERTE RICHTUNGEN**
 
 ## Zweck
 
-Phase 5 entwickelt eine Premium-Markenidentität für `Bocholt erleben`, ohne schwache Rohideen, generische Icons oder formale Prüfergebnisse als Qualitätsersatz weiterzugeben.
+Phase 5 entwickelt eine eigenständige Premium-Markenidentität für `Bocholt erleben`. Die öffentliche Marke und das Produkt bleiben bis zu einer späteren vollständigen Freigabe unverändert.
 
-Die öffentliche Marke und das Produkt bleiben unverändert.
+## Verbindlicher Prozessstand
 
-## Verbindliche Qualitätsgrenze
+Der bisherige interne Bewertungsweg hat Candidate 201 fälschlich mit `90/100` in zwei Pässen als designqualifiziert eingestuft. Die anschließende tatsächliche Product-Owner-Sichtung und erneute visuelle Bewertung widersprachen diesem Befund klar.
 
-- mindestens `90/100`;
-- alle Dimensionsmindestwerte;
-- kein architekturabhängig belegter Knock-out;
-- zwei getrennte positive Bewertungspässe;
-- kein ungelöster Red-Team-Befund;
-- keine Integration ohne Product-Owner-Entscheidung und separates Workpack.
+Candidate 201 ist daher verworfen. Seine früheren Scores und Gate-Freigaben sind historische Prozessartefakte und keine gültige Evidenz.
 
-## Vorherige Zyklen
+Der korrigierte Ablauf steht in:
 
-Die früheren Such- und Konstruktionspfade bleiben beendet. Sie lieferten insgesamt `45` ernsthafte interne Hypothesen ohne Kandidaten. Ihre Fehlerklassen bleiben als Sperren erhalten.
+- `docs/brand/phase5/VISUAL_DIRECTION_GATE.md`
 
-## Konstruktiver Reset
+## Was aus den bisherigen Zyklen erhalten bleibt
 
-Statt einer weiteren offenen Variantensuche wurden genau zwei vollständige Architekturansätze konstruiert:
+Die früheren Such-, Generator- und Konstruktionspfade bleiben als Negativwissen erhalten. Insbesondere gesperrt bleiben:
 
-1. neutraler zweizeiliger `7/7`-Wortblock;
-2. humanistischer responsiver `7/7`-Wortblock.
+- Standardschrift plus Schnitt, Punkt, Öffnung oder Einzelgimmick;
+- generische geometrische Icons und UI-Schemata;
+- austauschbare Initialmonogramme;
+- überzeichnete Buchstabendefekte;
+- App-Icon vor überzeugender Primäridentität;
+- Mock-up- oder Präsentationsqualität als Ersatz für sichtbare Markenqualität;
+- Scorecards als selbstständiger Premiumdetektor;
+- weitere Recraft-/Ideogram-Logo-Generator-Runden derselben Art.
 
-Die Namensbestandteile `bocholt` und `erleben` besitzen jeweils sieben Buchstaben. Daraus entsteht eine kompakte zweizeilige Primäridentität mit gleicher optischer Zeilenbreite.
+## Neuer Arbeitsweg
 
-### Richtung A
+### Gate 1 – Visual Direction
 
-Der neutrale `7/7`-Block wurde wegen zu geringer Eigenhöhe gegenüber einer hochwertigen Standardschrift beendet.
+Vor jeder neuen Logo- oder Wortmarkenkonstruktion werden genau zwei vollständige Markenwelten entwickelt:
 
-### Candidate 201
+1. `Klar ausgewählt` – ruhig, präzise, souverän, kuratiert;
+2. `Nah am echten Leben` – menschlicher, wärmer, unmittelbar, aber digital präzise.
 
-Der humanistische responsive `7/7`-Block wurde weitergeführt:
+Die Markenwelten zeigen keine finalen Logos oder App-Icons. Sie operationalisieren die visuelle DNA über Typografiecharakter, Dichte, Weißraum, Bildverhalten, Farbtemperatur, Consumer-Markenwirkung und reale mobile Produktnähe.
 
-- gemeinsames Buchstabensystem;
-- optisch korrigierte Oberlängen, Rundungen, Breiten und Laufweiten;
-- dunkles `bocholt` und dunkles Markengrün für `erleben`;
-- responsive Kleinform als erste Spalte `b/e` desselben Systems;
-- Pfadmaster ohne externe Laufzeitabhängigkeit.
+Der Product Owner entscheidet ausschließlich `A`, `B` oder `keine`.
 
-Dokumentation und Assets:
+### Formsprachenerkundung
 
-- `docs/brand/phase5/candidate-201/README.md`
-- `docs/brand/phase5/candidate-201/primary-color.svg`
-- `docs/brand/phase5/candidate-201/app-icon.svg`
-- `docs/brand/phase5/candidate-201/compact-mono.svg`
+Nur die gewählte Welt wird anschließend in Formbausteine übersetzt:
 
-## Prüfstatus Candidate 201
+- Buchstabenproportionen;
+- Terminals und Rundungen;
+- Wortdichte und Rhythmus;
+- Verhältnis `Bocholt` / `erleben`;
+- Architektur der Primäridentität;
+- nur bei echter visueller Begründung ein Zeichen.
 
-- Gate W0 vollständige Wortmarke: bestanden;
-- Gate W1 Marken-Minisystem: bestanden;
-- Gate W2 responsive Kleinform: bestanden;
-- interner Pass A: `90/100`;
-- interner Pass B: `90/100`;
-- harter Red-Team-Knock-out: keiner.
+### Gate 2 – Primäridentität
 
-Die getrennten Pässe sind methodisch diszipliniert, aber keine externe unabhängige Begutachtung.
+Es entstehen höchstens zwei bewusst konstruierte Identitäten. Sie werden zunächst monochrom und in realer mobiler Größe verglichen mit:
 
-## Restliche Sperren vor Integration
+- aktuellem öffentlichen Stand;
+- hochwertiger neutraler Kontrollsetzung;
+- Kandidat A;
+- gegebenenfalls Kandidat B.
 
-1. Product-Owner-Entscheidung;
-2. formale Marken- und Ähnlichkeitsrecherche;
-3. finale optische Pfadbereinigung und Größenexporte;
-4. separates Integrationsworkpack.
+Keine Konzepttitel, Häkchen, Scores oder Hochglanz-Mock-ups vor der sichtbaren Entscheidung.
+
+Product-Owner-Entscheidung: `weiter` oder `keine`.
+
+### Erst nach Gate 2
+
+Nur eine sichtbar freigegebene Primäridentität erhält:
+
+- Marken-Minisystem;
+- reale Today-, Detail-, Veranstalter- und Partnerkontexte;
+- responsive Kleinform und App-Marke;
+- getrennte Bewertungspässe und Red Team;
+- Ähnlichkeits-, Lizenz- und Herkunftsprüfung;
+- technische Vektorhärtung;
+- Scorecard als dokumentierende, nicht ersetzende Qualitätskontrolle.
+
+## Qualitätsgrenze
+
+Der Premiumanspruch bleibt hoch. Eine Richtung muss am Ende unter anderem:
+
+- sichtbar eigenständig und hochwertig sein;
+- die aktuelle Identität klar übertreffen;
+- ohne Erklärung als passende Consumer-Marke funktionieren;
+- mobil belastbar sein;
+- keine dominante Verwaltungs-, Tourismus-, SaaS-, Kultur-, Gastro- oder sonstige Fehlkategorie erzeugen;
+- systemfähig und nachvollziehbar konstruiert sein.
+
+Die spätere formale Qualifikation kann weiterhin `90/100` und Dimensionsmindestwerte verwenden, aber nur nach vorherigem tatsächlichem visuellen Product-Owner-Gate.
 
 ## Aktueller Stand
 
-- intern designqualifizierte Richtungen: `1`;
-- Product-Owner-Präsentationen: `1` zulässig;
+- qualifizierte Richtungen: `0`;
+- Candidate 201: `verworfen / Negativwissen`;
+- Gate 1: `aktiv`;
 - öffentliche Änderungen: `0`;
-- Änderungen an `staging`, `main` oder Live: `0`.
+- Änderungen an `staging`, `main` oder Live: `0`;
+- nächster konkreter Schritt: zwei visuelle Markenwelten erzeugen und dem Product Owner ausschließlich als Richtungsentscheidung zeigen.
