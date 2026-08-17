@@ -311,6 +311,7 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_html_page(base_url, "/startpartner/", "Startpartner-Pilot"),
         lambda: check_html_page(base_url, "/bildnachweise/", "Bildnachweise-Seite"),
         lambda: check_html_page(base_url, "/events-veroeffentlichen/einreichen/", "Event-Einreichen-Seite"),
+        lambda: check_html_page(base_url, "/events-veroeffentlichen/mitgliedschaft/", "Event-Mitgliedschaft"),
         lambda: check_status_api(base_url),
         lambda: check_public_events_api(base_url),
         lambda: check_checkout_validation(base_url),
