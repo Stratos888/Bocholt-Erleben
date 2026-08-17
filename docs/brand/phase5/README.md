@@ -3,11 +3,19 @@
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
 Stand: 2026-08-17
-Status: **VISUAL-DIRECTION-GATE – 0 QUALIFIZIERTE RICHTUNGEN**
+Status: **SCHRITT 3 VON 9 – ZWEI VISUELLE MARKENRICHTUNGEN**
 
 ## Zweck
 
 Phase 5 entwickelt eine eigenständige Premium-Markenidentität für `Bocholt erleben`. Die öffentliche Marke und das Produkt bleiben bis zu einer späteren vollständigen Freigabe unverändert.
+
+## Kanonischer Ausführungsstatus
+
+Der jeweils aktive Prozessschritt steht ausschließlich in:
+
+- `docs/brand/phase5/ACTIVE_EXECUTION_LOCK.md`
+
+Dieser Lock hat Vorrang vor spontanen Tool-Ideen, Zwischenresultaten oder lokalen Optimierungen und verhindert stille Prozesswechsel.
 
 ## Verbindlicher Prozessstand
 
@@ -18,6 +26,27 @@ Candidate 201 ist daher verworfen. Seine früheren Scores und Gate-Freigaben sin
 Der korrigierte Ablauf steht in:
 
 - `docs/brand/phase5/VISUAL_DIRECTION_GATE.md`
+- `docs/brand/phase5/ACTIVE_EXECUTION_LOCK.md`
+
+## Abgeschlossener Schritt 2 – visuelle Premium-Referenzanalyse
+
+Dokumentiert in:
+
+- `docs/brand/phase5/VISUAL_PREMIUM_REFERENCE_ANALYSIS.md`
+
+Enthalten:
+
+- sieben relevante Referenzsysteme;
+- vier Anti-Referenzmuster;
+- Visual-DNA-Matrix für `Bocholt erleben`;
+- genau zwei Creative-Direction-Hypothesen;
+- gemeinsames Produktversprechen;
+- visuelle Abbruchkriterien je Richtung.
+
+Die beiden verbindlichen Richtungen für Schritt 3 sind:
+
+1. `A – Klar ausgewählt` – ruhig, präzise, souverän, kuratiert;
+2. `B – Nah am echten Leben` – menschlicher, wärmer, unmittelbar, aber digital präzise.
 
 ## Was aus den bisherigen Zyklen erhalten bleibt
 
@@ -32,20 +61,41 @@ Die früheren Such-, Generator- und Konstruktionspfade bleiben als Negativwissen
 - Scorecards als selbstständiger Premiumdetektor;
 - weitere Recraft-/Ideogram-Logo-Generator-Runden derselben Art.
 
-## Neuer Arbeitsweg
+## Aktiver Schritt 3 – zwei visuelle Markenrichtungen
 
-### Gate 1 – Visual Direction
+Noch vor jeder neuen Logo- oder Wortmarkenkonstruktion werden ausschließlich die beiden festgelegten Markenwelten sichtbar operationalisiert:
 
-Vor jeder neuen Logo- oder Wortmarkenkonstruktion werden genau zwei vollständige Markenwelten entwickelt:
+### A – Klar ausgewählt
 
-1. `Klar ausgewählt` – ruhig, präzise, souverän, kuratiert;
-2. `Nah am echten Leben` – menschlicher, wärmer, unmittelbar, aber digital präzise.
+Führende Idee: `Vertrauen durch gute Auswahl.`
 
-Die Markenwelten zeigen keine finalen Logos oder App-Icons. Sie operationalisieren die visuelle DNA über Typografiecharakter, Dichte, Weißraum, Bildverhalten, Farbtemperatur, Consumer-Markenwirkung und reale mobile Produktnähe.
+Visuelle Gewichtung:
 
-Der Product Owner entscheidet ausschließlich `A`, `B` oder `keine`.
+- Klarheit und Souveränität führen;
+- Menschlichkeit bleibt sichtbar;
+- Aktivierung wird dosiert.
 
-### Formsprachenerkundung
+### B – Nah am echten Leben
+
+Führende Idee: `Lust auf das, was direkt um mich herum passiert.`
+
+Visuelle Gewichtung:
+
+- Menschlichkeit und Nähe führen;
+- Klarheit bleibt verbindlich;
+- Aktivierung wird dosiert.
+
+Die Richtungsdarstellungen dürfen keine finalen Logos, App-Icons, Candidate-Nummern, Design-Scores oder erfundenen Claims enthalten.
+
+Der Product Owner entscheidet ausschließlich:
+
+- `A`;
+- `B`;
+- `keine`.
+
+Ohne diese ausdrückliche Gate-Entscheidung darf nicht in Schritt 4 gewechselt werden.
+
+## Danach – Formsprachenerkundung
 
 Nur die gewählte Welt wird anschließend in Formbausteine übersetzt:
 
@@ -56,9 +106,9 @@ Nur die gewählte Welt wird anschließend in Formbausteine übersetzt:
 - Architektur der Primäridentität;
 - nur bei echter visueller Begründung ein Zeichen.
 
-### Gate 2 – Primäridentität
+## Gate 2 – Primäridentität
 
-Es entstehen höchstens zwei bewusst konstruierte Identitäten. Sie werden zunächst monochrom und in realer mobiler Größe verglichen mit:
+Später entstehen höchstens zwei bewusst konstruierte Identitäten. Sie werden zunächst monochrom und in realer mobiler Größe verglichen mit:
 
 - aktuellem öffentlichen Stand;
 - hochwertiger neutraler Kontrollsetzung;
@@ -67,9 +117,7 @@ Es entstehen höchstens zwei bewusst konstruierte Identitäten. Sie werden zunä
 
 Keine Konzepttitel, Häkchen, Scores oder Hochglanz-Mock-ups vor der sichtbaren Entscheidung.
 
-Product-Owner-Entscheidung: `weiter` oder `keine`.
-
-### Erst nach Gate 2
+## Erst nach Gate 2
 
 Nur eine sichtbar freigegebene Primäridentität erhält:
 
@@ -92,13 +140,11 @@ Der Premiumanspruch bleibt hoch. Eine Richtung muss am Ende unter anderem:
 - keine dominante Verwaltungs-, Tourismus-, SaaS-, Kultur-, Gastro- oder sonstige Fehlkategorie erzeugen;
 - systemfähig und nachvollziehbar konstruiert sein.
 
-Die spätere formale Qualifikation kann weiterhin `90/100` und Dimensionsmindestwerte verwenden, aber nur nach vorherigem tatsächlichem visuellen Product-Owner-Gate.
-
 ## Aktueller Stand
 
 - qualifizierte Richtungen: `0`;
 - Candidate 201: `verworfen / Negativwissen`;
-- Gate 1: `aktiv`;
+- Schritt 2: `abgeschlossen`;
+- Schritt 3: `aktiv`;
 - öffentliche Änderungen: `0`;
-- Änderungen an `staging`, `main` oder Live: `0`;
-- nächster konkreter Schritt: zwei visuelle Markenwelten erzeugen und dem Product Owner ausschließlich als Richtungsentscheidung zeigen.
+- Änderungen an `staging`, `main` oder Live: `0`.
