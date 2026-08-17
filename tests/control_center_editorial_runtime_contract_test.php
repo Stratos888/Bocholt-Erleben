@@ -12,7 +12,7 @@ $assert = static function(bool $condition, string $label) use (&$failures): void
 $complete = [
     'id_suggestion'=>'fixture-event-1',
     'title'=>'Fixture Event',
-    'date'=>'2026-08-15',
+    'date'=>'2099-08-15',
     'time'=>'18:00',
     'time_status'=>'fixed_time',
     'city'=>'Bocholt',
@@ -76,7 +76,7 @@ $directDuplicateUpdates = be_cc_inbox_direct_updates($expectedDuplicateWriteback
 $assert($directDuplicateUpdates === ['status'=>'verworfen','ablehnungsgrund'=>'Dublette'], 'Direkter Ablehnungsplan schreibt Status und Grund in die führende Inbox.');
 $fixtureTable = be_cc_inbox_direct_table_from_values([
     ['status','ablehnungsgrund','id_suggestion','title','date','source_url'],
-    ['review','','fixture-event-1','Fixture Event','2026-08-15','https://example.org/events/fixture'],
+    ['review','','fixture-event-1','Fixture Event','2099-08-15','https://example.org/events/fixture'],
 ], 'Inbox_Staging');
 $assert($fixtureTable['header_row'] === 1 && count($fixtureTable['rows']) === 1, 'Inbox-spezifischer Header mit id_suggestion wird erkannt.');
 $batchBody = be_cc_inbox_direct_batch_body($fixtureTable, 2, $directDuplicateUpdates);
@@ -106,7 +106,7 @@ try {
     $failures[] = 'Abweichender Ablehnungsgrund wurde fälschlich als bestätigter Writeback akzeptiert.';
 } catch (RuntimeException $expected) {}
 
-$snooze = be_cc_editorial_validate_action($case, 'snooze', ['decision_class'=>'snoozed','suppress_until'=>'2026-08-20']);
+$snooze = be_cc_editorial_validate_action($case, 'snooze', ['decision_class'=>'snoozed','suppress_until'=>'2099-08-20']);
 $assert($snooze['decision_class'] === 'snoozed', 'Zurückstellung verwendet kanonische Klasse.');
 $expectedSnoozeWriteback = be_cc_inbox_expected_writeback('snooze', $snooze);
 $directSnoozeUpdates = be_cc_inbox_direct_updates($expectedSnoozeWriteback);
@@ -118,7 +118,7 @@ $modern = be_cc_editorial_operation_id(['operation_id'=>'cc:test:operation:0001'
 $assert($modern['legacy'] === false && $modern['id'] === 'cc:test:operation:0001', 'Explizite operation_id bleibt stabil.');
 
 $fingerprintBase = [
-    'id'=>'event-1','title'=>'Titel','date'=>'2026-08-15','end_date'=>'','time'=>'18:00','city'=>'Bocholt',
+    'id'=>'event-1','title'=>'Titel','date'=>'2099-08-15','end_date'=>'','time'=>'18:00','city'=>'Bocholt',
     'location'=>'Marktplatz','address'=>'Markt 1','category'=>'Kultur','source_url'=>'https://example.org/event',
 ];
 $fingerprintChanged = $fingerprintBase;
