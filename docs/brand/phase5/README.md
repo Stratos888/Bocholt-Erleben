@@ -3,11 +3,11 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **B1 VOLLSTÄNDIGE LOGO-EXPLORATION AKTIV – 0 QUALIFIZIERTE KANDIDATEN**
+Status: **B5 PRODUCT-OWNER-GATE AKTIV – D1 INTERN BESTANDEN**
 
 ## Kanonischer Dokumentensatz
 
-Aktiv und verbindlich sind ausschließlich:
+Aktiv und verbindlich sind:
 
 - `ACTIVE_EXECUTION_LOCK.md`
 - `PREMIUM_LOGO_PROCESS.md`
@@ -15,61 +15,59 @@ Aktiv und verbindlich sind ausschließlich:
 - `LESSONS_LEARNED.md`
 - diese `README.md`
 
-Frühere Phase-5-Prozess-, Gate-, Kandidaten-, Score-, Prompt-, Studien- und Asset-Dateien bleiben außerhalb des aktiven Arbeitsbaums. Der Git-Verlauf ist Audit-Trail.
+Ernsthafte Produktionskandidaten dürfen zusätzlich unter `candidates/` liegen. Rohskizzen, Generatorboards und verworfene Varianten bleiben außerhalb des aktiven Arbeitsbaums.
 
-## A2-Ergebnis
+## Stand
 
-Die gezielte Standalone-Symbolsuche wurde über mehrere unterschiedliche Mechanismen durchgeführt.
+- A2 Standalone-Symbolsuche: **FAIL, 0 Kandidaten**;
+- B0 vollständige Logo-System-Architekturen: abgeschlossen;
+- B1 vollständige monochrome Exploration: abgeschlossen;
+- B2 harter Systemfilter: abgeschlossen;
+- B3 deterministische Konstruktion: abgeschlossen;
+- B4 Realproduktbeweis: abgeschlossen;
+- B5 Product-Owner-Wahrnehmungsgate: **aktiv**.
 
-Ergebnis:
+## B1/B2 Ergebnis
 
-- latente `B/E`-Formen blieben zu nah an Monogramm/Hybridglyphe;
-- freie Challenger blieben zu nah an generischen App-/Reveal-/Tech-Symbolen;
-- Heritage-Abstraktionen blieben zu nah an Vorhang/Öffnung/Auge/Portal oder verloren Eigenständigkeit;
-- kein System erreichte die absolute Qualitätsbarriere.
+Nur eine Makroarchitektur hat die interne Barriere überschritten:
 
-**A2 = FAIL, `0` Kandidaten.**
+**D1 – Initial Frame Signature**
 
-Kein Rohentwurf wird dem Product Owner präsentiert.
+Das `B` bildet die äußere tragende Form des vollständigen Logos; `ocholt` und `erleben` liegen als zwei Namensebenen innerhalb dieser Form. Das Zeichen ist damit weder ein separates Icon noch eine normale Wortmarke mit Gimmick.
 
-## Verbindliche Prozesskorrektur
+Combination-Logo-Gegenproben wurden beendet, weil sie zu nah an `Icon + Schrift`, Monogramm oder generischem App-Branding blieben. Heritage-Gegenproben wurden beendet, weil Vorhang-, Portal-, Auge-/Linsen-, Badge- oder Rahmenlesarten dominierten.
 
-`Logo zuerst` ist nicht gleichbedeutend mit `Standalone-Symbol zuerst`.
+## B3 Produktionskandidat
 
-Der aktive Prozess beweist zuerst das **vollständige Primärlogo**. Eine responsive Kleinmarke beziehungsweise das App-Icon wird erst daraus abgeleitet.
+`candidates/B3_D1_INITIAL_FRAME.svg`
 
-## B0 – abgeschlossen
+- deterministische Vektorpfade;
+- keine Laufzeit-Fontdatei;
+- keine Raster-/Generatorgrafik;
+- monochrom über `currentColor`;
+- ViewBox `64 × 40`.
 
-Drei vollständige Logo-System-Architekturen sind definiert:
+## B4 Ergebnis
 
-1. **D – Bespoke Full-Name Signature:** eigenständige Gesamtform `Bocholt erleben`, nicht bloß eine andere Schrift;
-2. **E – Combination Logo:** Zeichen und Name werden von Anfang an gemeinsam gestaltet;
-3. **F – Heritage Evolution:** heutige Öffnungs-/Enthüllungserinnerung als komplette moderne Logo-Evolution, nicht als isoliertes Flachsymbol.
+D1 wurde in Schwarz/Weiß, Reverse, 320-px-Mobile, 390-px-Mobile und Desktop geprüft.
 
-## B1 – aktiv
+Interne Gates:
 
-B1 arbeitet direkt in der realen mobilen Absendergröße und kombiniert bewusst unterschiedliche Produktionswege.
+- Lesbarkeit: PASS;
+- Eigenständigkeit in Originalgröße: PASS;
+- Consumer-Markenwirkung: PASS;
+- Klischeefreiheit: PASS;
+- technische Reproduzierbarkeit: PASS.
 
-Bereits erfolgt:
+Das ist **noch keine Premiumfreigabe**. Der Product Owner entscheidet B5 ausschließlich über die reale Wahrnehmung des vollständigen Logos.
 
-- weitere interne Full-Name-, Combination- und Heritage-Gegenproben;
-- harte Eliminierung von `Standardschrift + Gimmick`, sichtbaren Monogrammen, Stencil-/Cut-Effekten und generischen Symbolen;
-- Start einer spezialisierten Canva-Designroute als zusätzlicher Rohmaterialkanal für D und E.
+## B5
 
-Die Canva-Ausgaben sind **keine Kandidaten**. Die geplante F-Generation konnte wegen des aktuell erreichten Canva-Generierungskontingents noch nicht ausgeführt werden. Systembedingt sichtbare Canva-Karten sind Rohentwürfe ohne Gate-Status und erfordern keine Auswahl durch den Product Owner.
+Frage:
 
-Primäre Beweisansicht bleibt der echte mobile Header: `48px` Systemhöhe, aktuell ungefähr `24px` Logo und `18px` Titel. Großansichten und dekorative Boards dürfen eine in Originalgröße schwache Richtung nicht retten.
+> Wirkt D1 in realer Anwendung bereits wie ein eigenständiger, hochwertiger Absender für `Bocholt erleben` – und nicht nur wie eine Schrift, ein Icon oder ein Designexperiment?
 
-Aktuell hat noch kein B1-System die Qualifikationsschwelle erreicht.
+Bei Nein wird D1 beendet und B0/B1 neu geöffnet. Bei Ja folgen erst responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion und Rechts-/Technikpreflight.
 
-## Nächste Gates
-
-- **B1:** vollständige monochrome Logo-System-Exploration direkt in Realgröße – aktiv;
-- **B2:** harter interner Systemfilter auf `1–4` Richtungen oder `0`;
-- **B3:** maximal drei deterministische Konstruktionen;
-- **B4:** Mobile-/Desktop-Realproduktbeweis;
-- **B5:** Product Owner sieht maximal drei intern bestandene vollständige Logos;
-- erst danach responsive Kleinmarke/App-Icon, Farbe, Formensprache, Bildsprache, Motion, Rechts-/Technikpreflight und separate Integration.
-
-Aktueller intern qualifizierter Kandidat: `0`.
+Aktueller intern qualifizierter Finalist: `1` (`D1`).
 Öffentliche Wirkung: `0`.
