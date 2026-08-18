@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **B5 PRODUCT-OWNER-GATE AKTIV – D1 INTERN BESTANDEN**
+Status: **C0 PREMIUM-REFERENZKALIBRIERUNG / MARKENWELT-GATE AKTIV**
 
 ## Kanonischer Dokumentensatz
 
@@ -11,63 +11,47 @@ Aktiv und verbindlich sind:
 
 - `ACTIVE_EXECUTION_LOCK.md`
 - `PREMIUM_LOGO_PROCESS.md`
+- `PREMIUM_REFERENCE_CALIBRATION.md`
 - `CURRENT_IDENTITY_BASELINE.md`
 - `LESSONS_LEARNED.md`
 - diese `README.md`
 
-Ernsthafte Produktionskandidaten dürfen zusätzlich unter `candidates/` liegen. Rohskizzen, Generatorboards und verworfene Varianten bleiben außerhalb des aktiven Arbeitsbaums.
+Verworfene Kandidaten und Rohmaterial besitzen keinen aktiven Gate-Status. Git bleibt Audit-Trail.
 
-## Stand
+## Letzter Befund
 
-- A2 Standalone-Symbolsuche: **FAIL, 0 Kandidaten**;
-- B0 vollständige Logo-System-Architekturen: abgeschlossen;
-- B1 vollständige monochrome Exploration: abgeschlossen;
-- B2 harter Systemfilter: abgeschlossen;
-- B3 deterministische Konstruktion: abgeschlossen;
-- B4 Realproduktbeweis: abgeschlossen;
-- B5 Product-Owner-Wahrnehmungsgate: **aktiv**.
+`D1 – Initial Frame Signature` ist im Product-Owner-Gate klar durchgefallen.
 
-## B1/B2 Ergebnis
+Die vorherigen internen PASS-Urteile waren ein falsch positives Ergebnis: D1 war relativ stärker als andere interne Versuche, aber sichtbar nicht auf professionellem Premium-Niveau.
 
-Nur eine Makroarchitektur hat die interne Barriere überschritten:
+D1 wird nicht repariert oder weitergeführt.
 
-**D1 – Initial Frame Signature**
+## Prozesskorrektur
 
-Das `B` bildet die äußere tragende Form des vollständigen Logos; `ocholt` und `erleben` liegen als zwei Namensebenen innerhalb dieser Form. Das Zeichen ist damit weder ein separates Icon noch eine normale Wortmarke mit Gimmick.
+Vor weiteren Logos wird jetzt die visuelle Qualitätslatte gegen reale professionelle Consumer-Marken kalibriert.
 
-Combination-Logo-Gegenproben wurden beendet, weil sie zu nah an `Icon + Schrift`, Monogramm oder generischem App-Branding blieben. Heritage-Gegenproben wurden beendet, weil Vorhang-, Portal-, Auge-/Linsen-, Badge- oder Rahmenlesarten dominierten.
+Drei Markenwelten:
 
-## B3 Produktionskandidat
+1. **A – kuratiert & souverän**;
+2. **B – lebendig & erlebnisorientiert**;
+3. **C – kompakt & ikonisch**.
 
-`candidates/B3_D1_INITIAL_FRAME.svg`
+Aktuelle Creative-Direction-Hypothese:
 
-- deterministische Vektorpfade;
-- keine Laufzeit-Fontdatei;
-- keine Raster-/Generatorgrafik;
-- monochrom über `currentColor`;
-- ViewBox `64 × 40`.
+> **A als Basis + B als Energie + C als technische Disziplin.**
 
-## B4 Ergebnis
+Erst nach Bestätigung/Verwerfung dieser Markenwelt startet eine neue freie Logoexploration.
 
-D1 wurde in Schwarz/Weiß, Reverse, 320-px-Mobile, 390-px-Mobile und Desktop geprüft.
+## Neue Gate-Reihenfolge
 
-Interne Gates:
+- **C0:** Premium-Referenzkalibrierung + Markenwelt-Gate – aktiv;
+- **C1:** freie, breite Logoexploration ohne vorgeschriebene Architektur;
+- **C2:** technischer/formaler Rohfilter;
+- **C3:** anonymer Vergleich gegen professionelle Referenzlogos;
+- **C4:** maximal drei reproduzierbare Vektorkonstruktionen;
+- **C5:** Realproduktbeweis Mobile/Desktop;
+- **C6:** Product-Owner-Wahrnehmungsgate;
+- danach erst responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion, Rechts-/Technikpreflight und separate Integration.
 
-- Lesbarkeit: PASS;
-- Eigenständigkeit in Originalgröße: PASS;
-- Consumer-Markenwirkung: PASS;
-- Klischeefreiheit: PASS;
-- technische Reproduzierbarkeit: PASS.
-
-Das ist **noch keine Premiumfreigabe**. Der Product Owner entscheidet B5 ausschließlich über die reale Wahrnehmung des vollständigen Logos.
-
-## B5
-
-Frage:
-
-> Wirkt D1 in realer Anwendung bereits wie ein eigenständiger, hochwertiger Absender für `Bocholt erleben` – und nicht nur wie eine Schrift, ein Icon oder ein Designexperiment?
-
-Bei Nein wird D1 beendet und B0/B1 neu geöffnet. Bei Ja folgen erst responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion und Rechts-/Technikpreflight.
-
-Aktueller intern qualifizierter Finalist: `1` (`D1`).
+Aktueller Logo-Finalist: `0`.
 Öffentliche Wirkung: `0`.
