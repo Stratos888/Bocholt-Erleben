@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **C0 PREMIUM-REFERENZKALIBRIERUNG / MARKENWELT-GATE AKTIV**
+Status: **C0 REFERENZKALIBRIERUNG ABGESCHLOSSEN – MARKENWELT-GATE AKTIV**
 
 ## Kanonischer Dokumentensatz
 
@@ -20,34 +20,34 @@ Verworfene Kandidaten und Rohmaterial besitzen keinen aktiven Gate-Status. Git b
 
 ## Letzter Befund
 
-`D1 – Initial Frame Signature` ist im Product-Owner-Gate klar durchgefallen.
+`D1 – Initial Frame Signature` ist im Product-Owner-Gate klar durchgefallen. Die vorherigen internen ästhetischen PASS-Urteile waren falsch positiv. D1 wird nicht repariert oder weitergeführt.
 
-Die vorherigen internen PASS-Urteile waren ein falsch positives Ergebnis: D1 war relativ stärker als andere interne Versuche, aber sichtbar nicht auf professionellem Premium-Niveau.
+## C0 – reale Kalibrierung
 
-D1 wird nicht repariert oder weitergeführt.
+Es wurden 16 reale Referenzmarken in drei Rollen geprüft:
 
-## Prozesskorrektur
+- **A – kuratierte kulturelle Souveränität:** MUBI, Monocle, MUJI, Aesop, COS, Letterboxd;
+- **B – Discovery, Erlebnis und menschliche Energie:** Airbnb, Headout, GetYourGuide, Fever, DICE, Eventbrite;
+- **C – ikonische digitale Disziplin:** Spotify, komoot, AllTrails, Strava.
 
-Vor weiteren Logos wird jetzt die visuelle Qualitätslatte gegen reale professionelle Consumer-Marken kalibriert.
+Creative-Direction-Empfehlung:
 
-Drei Markenwelten:
+> **A + B als Markencharakter; C nur als Qualitätsdisziplin.**
 
-1. **A – kuratiert & souverän**;
-2. **B – lebendig & erlebnisorientiert**;
-3. **C – kompakt & ikonisch**.
+Gesuchte Wirkung:
 
-Aktuelle Creative-Direction-Hypothese:
+> hochwertig kuratiert, lebendig genug für Freizeit und Entdeckung, persönlich und zugänglich, aber kleinformatig so prägnant und selbstverständlich wie starke digitale Consumer-Marken.
 
-> **A als Basis + B als Energie + C als technische Disziplin.**
+## Neue Kandidatenprüfung
 
-Erst nach Bestätigung/Verwerfung dieser Markenwelt startet eine neue freie Logoexploration.
+Ein eigener Entwurf darf erst nach anonymisiertem, monochromem Größenvergleich gegen reale professionelle Referenzlogos zum Product Owner gelangen. Ein internes AI-PASS allein reicht nicht mehr.
 
-## Neue Gate-Reihenfolge
+## Nächste Gates
 
-- **C0:** Premium-Referenzkalibrierung + Markenwelt-Gate – aktiv;
-- **C1:** freie, breite Logoexploration ohne vorgeschriebene Architektur;
+- **C0:** Markenwelt-Gate – aktiv;
+- **C1:** freie breite Logoexploration ohne vorgeschriebene Architektur;
 - **C2:** technischer/formaler Rohfilter;
-- **C3:** anonymer Vergleich gegen professionelle Referenzlogos;
+- **C3:** anonymer externer Referenzvergleich;
 - **C4:** maximal drei reproduzierbare Vektorkonstruktionen;
 - **C5:** Realproduktbeweis Mobile/Desktop;
 - **C6:** Product-Owner-Wahrnehmungsgate;
