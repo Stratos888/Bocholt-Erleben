@@ -2,7 +2,7 @@
 
 Stand: 2026-08-18
 Workpack: #259
-Status: **KANONISCH – ARCHITEKTUR ZUERST, DANACH GEZIELTE FORMEXPLORATION**
+Status: **KANONISCH – ARCHITEKTUR ZUERST, A2 FORMDIVERGENZ AKTIV**
 
 ## 1. Ziel
 
@@ -10,11 +10,11 @@ Für `Bocholt erleben` wird ohne externe Kreativbeauftragung eine eigenständige
 
 Der zentrale Markenanker soll ein kompaktes Markenzeichen sein, das im App-/Header-Kontext eigenständig funktioniert und anschließend Wortmarke, Farbe, Formensprache, Motion und App-Icon trägt.
 
-Wichtig: Der Prozess beginnt **nicht** mehr mit 120 zufälligen Symbolen. Zuerst wird geklärt, welche Logo-Architektur für diese konkrete Marke sinnvoll ist. Erst danach wird innerhalb weniger klar definierter Architekturen breit gestaltet.
+Wichtig: Der Prozess beginnt **nicht** mit Symbolmassenproduktion. Zuerst wird die geeignete Logo-Architektur geklärt. Erst danach wird innerhalb der bestandenen Architektur(en) gezielt gestaltet.
 
-## 2. Korrektur des verworfenen L1-Ansatzes
+## 2. Verworfener Mengenansatz
 
-Der vorher definierte Pflichtlauf `6 Territorien / 120+ Rohsymbole` ist aufgehoben.
+Der frühere Pflichtlauf `6 Territorien / 120+ Rohsymbole` ist aufgehoben.
 
 Grund:
 
@@ -25,11 +25,9 @@ Grund:
 
 Die bereits erzeugte generische Symboltafel ist ungültiges Suchmaterial und zählt für keinen Gate-Nachweis.
 
-## 3. Verbindliche Logo-Architekturen
+## 3. A0 – drei geprüfte Logo-Architekturen
 
-Es werden genau drei Architekturklassen gegeneinander geprüft.
-
-### A – Latentes `BE`-Markenzeichen – Primärhypothese
+### A – Latentes `BE`-Markenzeichen
 
 Ziel:
 
@@ -38,13 +36,6 @@ Ziel:
 - das Ergebnis soll wie **ein eigenständiges Symbol** funktionieren, nicht wie zwei zusammengeschobene Initialen;
 - die Buchstabenbeziehung schafft trotzdem eine direkte Verbindung zu `Bocholt erleben`.
 
-Warum Primärhypothese:
-
-- der Markenname liefert zwei klare Initialen;
-- ein kompaktes Zeichen ist für App, Header und kleine Absenderflächen wertvoll;
-- die Namensverbindung verhindert, dass eine abstrakte Form völlig beliebig wird;
-- eine latent lesbare Buchstabenstruktur kann später in Wortmarke, Motion und Formensystem weitergeführt werden.
-
 Sperren:
 
 - kein Standard-`BE`-Monogramm;
@@ -52,7 +43,7 @@ Sperren:
 - kein typischer Kreis-/Shield-/Badge-Container als Ersatz für Eigenständigkeit;
 - kein `B/e`-Gimmick wie in früheren Versuchen.
 
-### B – Explizites `BE`-Lettermark – Kontrollhypothese
+### B – Explizites `BE`-Lettermark
 
 Ziel:
 
@@ -60,17 +51,13 @@ Ziel:
 - starke Eigenzeichnung statt Standardschrift;
 - maximal kompakt und merkfähig.
 
-Rolle:
-
-Diese Richtung prüft, ob eine klar lesbare Initialenmarke stärker ist als die latente Symbolform.
-
 Sperren:
 
 - keine Fontsetzung plus Ligaturtrick;
 - keine generische Luxus-/Fashion-/Immobilien-Monogrammästhetik;
 - kein Ornament, Wappen oder Siegel.
 
-### C – Nicht-letterales Symbol – Kontrollhypothese
+### C – Nicht-letterales Symbol
 
 Ziel:
 
@@ -78,77 +65,93 @@ Ziel:
 - kann aus Produktwahrheit, Bewegung, Auswahl, Übergang oder freier Form entstehen;
 - muss ohne Konzepttext als starke Marke funktionieren.
 
-Rolle:
-
-Diese Richtung verhindert, dass `BE` nur aus Bequemlichkeit erzwungen wird.
-
 Sperren:
 
 - keine Pins, Tickets, Filter, Scanner, Herzen, Blätter, Fahrräder;
 - keine generischen Sparks, Loops, Portale, Fenster, Augen oder AI-App-Geometrien;
 - keine Form, die nur durch Story interessant wird.
 
-## 4. A0 – Architektur-Sprint
+## 4. A0 – Pflichtumfang
 
-Vor detaillierter Logoentwicklung entstehen pro Architektur **8–12 klar unterschiedliche Grundkonzepte**.
-
-Zielgröße:
-
-- A: 8–12 latente BE-Systeme;
-- B: 8–12 explizite BE-Lettermarks;
-- C: 8–12 nicht-letterale Symbole.
-
-Insgesamt reichen etwa **24–36 ernsthaft unterschiedliche Konzepte**. Varianten desselben Grundprinzips zählen nicht mehrfach.
-
-Erzeugungswege dürfen kombiniert werden:
-
-- freie generative Formsuche als Rohmaterial;
-- manuelle/geometrische Konstruktion;
-- typografische bzw. Negativraumkonstruktion;
-- prozedurale Variation.
+Pro Architektur wurden mehrere substanziell unterschiedliche Schwarz-Weiß-Grundkonzepte als interne Gegenproben betrachtet. Varianten desselben Grundprinzips zählen nicht mehrfach.
 
 Generatoroutput bleibt Skizzenmaterial und wird nie direkt zum Final-Logo.
 
-## 5. A1 – Architekturfilter
+Der Product Owner sieht A0-Rohmaterial nicht.
 
-Jede Architektur wird zuerst als Klasse bewertet, nicht über ihren hübschesten Einzelentwurf.
+## 5. A1 – Architekturfilter: abgeschlossen
 
-Prüffragen:
+Bewertet wurde die Architektur als Klasse, nicht der hübscheste Einzelentwurf.
 
-- erzeugt sie einen merkfähigen, eigenständigen Markenanker?
-- besitzt sie eine glaubwürdige Verbindung zu `Bocholt erleben`?
-- funktioniert sie bei 16–64 px?
-- ist sie frei von dominanter Branchen-/UI-/Symbolklischee-Lesart?
-- kann daraus ein vollständiges Markensystem entstehen?
-- ist die Form stärker als eine neutrale Wortmarke allein?
+### Architektur A – PASS als Primärarchitektur
 
-Ergebnis:
+Begründung:
 
-- eine Architektur kann vollständig ausscheiden;
-- mehrere können weiterlaufen;
-- keine Architektur wird nur deshalb weitergeführt, weil sie relativ am besten war.
+- stärkste natürliche Verbindung zu `Bocholt erleben`;
+- kompakter Markenanker für Header/App grundsätzlich plausibel;
+- Systempotenzial vorhanden;
+- aber nur dann zulässig, wenn `B`/`E` als **latente Form-DNA** dienen und nicht als direkt sichtbares Monogramm.
+
+Verschärfte Sperre:
+
+> `B außen + E innen`, `zwei Initialen ineinanderschieben` oder eine bloße Hybridglyphe gilt nicht als bestandene Lösung.
+
+### Architektur B – FAIL
+
+Begründung:
+
+- starke Namenslesbarkeit, aber zu hohe strukturelle Nähe zu Agentur-, Immobilien-, Fashion-, Firmen- und Wappenmonogrammen;
+- die Gegenproben boten zu wenig Raum für eine eigenständige Consumer-Marke, ohne erneut in typografische Gimmicklogik zu kippen.
+
+Architektur B wird nicht weitergeführt.
+
+### Architektur C – PASS als Challenger
+
+Begründung:
+
+- grundsätzlich hoher formaler Freiheitsgrad;
+- verhindert erzwungene Buchstabenlogik;
+- aktuelle Gegenproben kippen jedoch sehr schnell in generische App-/Reveal-/Portal-/Geometrieformen;
+- schwächere natürliche Verbindung zum Namen als A.
+
+C läuft nur weiter, wenn eine konkrete Form A sichtbar schlägt. Es gibt keine künstliche Gleichverteilung.
 
 ## 6. A2 – Formdivergenz innerhalb der bestandenen Architektur(en)
 
-Erst jetzt wird innerhalb der bestandenen Architektur(en) breiter variiert.
+### Primärpfad A
 
-Ziel:
+Gesucht werden 12–24 zusätzliche, substanziell unterschiedliche Formlösungen mit:
 
-- 12–24 zusätzliche, **substanziell unterschiedliche** Formlösungen je bestandener Architektur;
-- keine künstliche Mengenvorgabe;
-- keine kleinen Variationen als neue Konzepte zählen.
+- latenter `B`/`E`-DNA;
+- Form zuerst, Buchstabenlesbarkeit höchstens sekundär;
+- unterschiedlichen Makroformen statt Varianten desselben Monogramms;
+- bewusst entwickeltem Positiv-/Negativraum;
+- eigenständiger Silhouette;
+- Kleinformatfähigkeit.
 
-Harte Eliminierung:
+Nicht zulässig:
 
-- generisch;
-- bekannte App-/SaaS-Form;
-- zu ähnlich zu bestehenden bekannten Marken;
-- nur mit Erklärung interessant;
-- im Kleinformat schwach;
-- typografisch beliebig;
-- visuell unausgewogen.
+- offensichtliche `B/E`-Hybridglyphe;
+- `B`-Silhouette mit hineingeschnittenem `E` als alleinige Idee;
+- Standardschrift oder Standardmonogramm als Ausgangspunkt;
+- bekannte SaaS-/App-Geometrie.
 
-A2 endet mit **3–6 ernsthaften Rohformen insgesamt** oder `0` und neuem Architektur-Sprint.
+### Challenger C
+
+Nicht-letterale Formen werden nur weitergeführt, wenn sie:
+
+- ohne Story stärker als die A-Formen wirken;
+- nicht generisch sind;
+- eine glaubwürdige spätere Markenbedeutung zulassen.
+
+### A2-Ausgang
+
+A2 endet mit:
+
+- **3–6 ernsthaften Rohformen insgesamt**, oder
+- **0** und einem erneuten Architektur-/Formneustart.
+
+Erste A2-Gegenproben wurden bereits verworfen: technisch stabil, aber noch zu deutlich als konstruierte `B/E`-Hybride beziehungsweise generische Reveal-Symbole wahrnehmbar. Sie zählen nicht als Kandidaten.
 
 ## 7. A3 – Vektorneukonstruktion
 
@@ -246,11 +249,17 @@ Keine Designerrolle. Keine Rohskizzenauswahl. Keine Mikrotypografie. Einstieg er
 - keine Farbe oder Präsentation als Rettung;
 - keine Standardschrift + Gimmick;
 - keine erzwungene Story;
+- kein offensichtliches `BE`-Monogramm nur wegen Namensbezug;
 - kein Kandidat wird `Premium` genannt, bevor der Product Owner das Wahrnehmungsgate bestanden hat;
 - `staging`, `main`, Live und öffentliche Marke bleiben bis zur späteren Integrationsfreigabe unverändert.
 
-## 14. Aktive Arbeitshypothese
+## 14. Aktiver Stand
 
-Die **wahrscheinlich sinnvollste Zielarchitektur** ist derzeit A: ein eigenständiges Markenzeichen mit **latenter `B`/`E`-DNA**.
-
-Das ist ausdrücklich noch kein Designentscheid. Architektur B und C müssen als echte Gegenproben bestehen, damit A nicht nur aus theoretischer Plausibilität gewählt wird.
+- A0: abgeschlossen;
+- A1: abgeschlossen;
+- Architektur A: **PASS als Primärarchitektur**;
+- Architektur B: **FAIL**;
+- Architektur C: **PASS als Challenger**;
+- A2: aktiv;
+- aktueller Premiumkandidat: `0`;
+- öffentliche Wirkung: `0`.
