@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **C0 REFERENZKALIBRIERUNG ABGESCHLOSSEN – MARKENWELT-GATE AKTIV – 0 LOGOFINALISTEN**
+Status: **C0 PASS – C1 FREIE LOGOEXPLORATION AKTIV – 0 LOGOFINALISTEN**
 
 ## 1. Ziel
 
@@ -27,62 +27,93 @@ Rohskizzen, Generatorboards und verworfene Kandidaten besitzen keinen aktiven Ga
 
 ## 4. C0 – reale Premium-Referenzkalibrierung abgeschlossen
 
-Aktuelle reale Referenzen wurden in drei Rollen geprüft:
+Geprüfte Rollen:
 
-### A – kuratierte kulturelle Souveränität
+- **A – kuratierte kulturelle Souveränität:** MUBI, Monocle, MUJI, Aesop, COS, Letterboxd;
+- **B – Discovery, Erlebnis und menschliche Energie:** Airbnb, Headout, GetYourGuide, Fever, DICE, Eventbrite;
+- **C – ikonische digitale Disziplin:** Spotify, komoot, AllTrails, Strava.
 
-MUBI, Monocle, MUJI, Aesop, COS, Letterboxd.
+## 5. C0 Product-Owner-Entscheidung
 
-Nutzen für `Bocholt erleben`: Ruhe, erwachsene Wertigkeit, Kuratierung, wenige belastbare Codes.
-
-### B – Discovery, Erlebnis und menschliche Energie
-
-Airbnb, Headout, GetYourGuide, Fever, DICE, Eventbrite.
-
-Nutzen: Zugänglichkeit, Entdeckung, Freude, persönliche Consumer-Nähe.
-
-### C – ikonische digitale Disziplin
-
-Spotify, komoot, AllTrails, Strava.
-
-Nutzen: Kleinformatstärke, Prägnanz, responsive Robustheit. C ist Qualitätsmaßstab, nicht gewünschte Tonalität.
-
-## 5. Creative-Direction-Empfehlung
+Am 2026-08-18 wurde die Creative Direction bestätigt:
 
 > **A + B als Markencharakter; C ausschließlich als Qualitätsdisziplin.**
 
 Gesuchte Wirkung:
 
-> hochwertig kuratiert, lebendig genug für Freizeit und Entdeckung, persönlich und zugänglich, aber visuell so diszipliniert, dass das Logo in kleiner digitaler Anwendung selbstverständlich besteht.
+> hochwertig kuratiert und souverän, gleichzeitig lebendig, persönlich und entdeckungsfreudig; nicht luxuriös oder elitär, nicht Stadtverwaltung/Tourismusbüro und nicht laut wie ein Ticketportal; technisch so prägnant, dass die Marke klein digital selbstverständlich funktioniert.
 
-Diese Empfehlung befindet sich jetzt im Product-Owner-Markenwelt-Gate.
+Orientierende Wahrnehmungsgewichtung:
 
-## 6. Neue Pflicht vor Kandidatenstatus
+- hochwertig: etwa `8/10`;
+- lebendig: etwa `6/10`;
+- verspielt: etwa `2/10`.
 
-Ein eigener Logoentwurf darf künftig erst nach einer **externen Referenzprobe** zum Product Owner gelangen:
+Damit ist **C0 PASS**. Eine weitere Nutzerentscheidung ist vor C6 nicht erforderlich.
+
+## 6. C1 – jetzt aktiv: freie Logoexploration
+
+Die Suche ist bewusst nicht mehr auf `BE`, Monogramm, Portal, Heritage oder eine bestimmte Logoarchitektur festgelegt.
+
+Parallel zulässig sind:
+
+- eigenständige Wortmarken;
+- eigenständige Zeichen;
+- Combination Marks;
+- typografische Signaturen;
+- freie abstrakte Formen;
+- Heritage-Impulse nur, wenn sie aus eigener visueller Stärke bestehen.
+
+Pflicht:
+
+- mehrere voneinander unabhängige kreative Produktionswege;
+- Schwarz/Weiß vor Farbe;
+- reale Headergröße früh mitprüfen;
+- keine Mengenquote als Qualitätsersatz;
+- keine Mikrovarianten als angebliche Breite;
+- Product Owner sieht keine Rohideen.
+
+## 7. C2/C3 – neue harte Vorqualifikation
+
+### C2 – technischer/formaler Rohfilter
+
+Raus fallen insbesondere:
+
+- Standardschrift plus Gimmick/Icon;
+- sichtbare Monogramm-/Portal-/Spark-/Loop-/Badge-Klischees;
+- unlesbare oder nur groß funktionierende Formen;
+- generisches App-/SaaS-/Tourismusbranding;
+- nicht reproduzierbare Generatorartefakte.
+
+C2 erteilt **keinen Premiumstatus**.
+
+### C3 – anonymer externer Referenzvergleich
+
+Jeder ernsthafte eigene Entwurf wird vor Kandidatenstatus anonymisiert zwischen professionellen Referenzlogos geprüft:
 
 - monochrom;
 - gleiche optische Größe;
 - neutraler Hintergrund;
-- anonymisiert zwischen professionellen Referenzlogos aus der bestätigten Markenwelt;
-- keine Erklärung, Farbe oder Mock-up-Rettung.
+- keine Erklärung;
+- keine Bocholt-erleben-Farbe;
+- keine Mock-up-Rettung.
 
-Wenn der Entwurf sichtbar weniger selbstverständlich, prägnant oder markenreif wirkt: **FAIL**.
+Wenn der Entwurf hinsichtlich Selbstverständlichkeit, Prägnanz oder Markenreife sichtbar abfällt: **FAIL**.
 
-Ein internes AI-PASS allein besitzt keinen Kandidatenstatus mehr.
+Ein internes AI-PASS allein besitzt keinen Kandidatenstatus.
 
-## 7. Gate-Reihenfolge
+## 8. Weitere Gate-Reihenfolge
 
-1. **C0:** Referenzkalibrierung abgeschlossen; Markenwelt-Gate aktiv;
-2. **C1:** breite Logoexploration ohne vorgeschriebene `BE`-, Symbol- oder Heritage-Architektur;
+1. **C0:** PASS;
+2. **C1:** freie breite Logoexploration – aktiv;
 3. **C2:** technischer/formaler Rohfilter;
 4. **C3:** anonymer externer Referenzvergleich;
 5. **C4:** maximal drei reproduzierbare Vektorkonstruktionen;
 6. **C5:** Realproduktbeweis Mobile/Desktop;
-7. **C6:** Product-Owner-Wahrnehmungsgate;
+7. **C6:** Product-Owner-Wahrnehmungsgate mit maximal drei tatsächlich bestandenen Kandidaten;
 8. erst nach PASS: responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion, Rechts-/Technikpreflight, Endgate und separate Integration.
 
-## 8. Harte Regeln
+## 9. Harte Regeln
 
 - keine ästhetischen AI-Scores;
 - keine relative Siegerlogik;
