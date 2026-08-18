@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **R2 RESTART BESTANDEN – R3 ZWEI-PARTEIEN-GATE AKTIV**
+Status: **PRIMARY IDENTITY RESET AKTIV – PRIMÄRIDENTITÄT WIRD ZUERST BEWIESEN**
 
 ## 1. Unveränderliches Ziel
 
@@ -11,119 +11,91 @@ Eine eigenständige Premium-Markenidentität für die private kuratierte Discove
 
 Öffentliche Marke, `staging`, `main` und Live bleiben bis zur späteren ausdrücklichen Integrationsfreigabe unverändert.
 
-## 2. Kanonische Prozessgrundlage
+## 2. Aktuell verbindliche Prozessgrundlage
 
-Verbindlich:
+In dieser Reihenfolge verbindlich:
 
-- `docs/brand/phase5/PROCESS_REVALIDATION_AND_RESTART.md`
-- `docs/brand/phase5/R1_VISUAL_CALIBRATION.md`
-- `docs/brand/phase5/R3_TWO_PARTY_RESULT.md`
+1. `docs/brand/phase5/PRIMARY_IDENTITY_RESET.md`
+2. `docs/brand/phase5/PROCESS_REVALIDATION_AND_RESTART.md` – soweit nicht durch den Reset korrigiert
+3. `docs/brand/phase5/R1_VISUAL_CALIBRATION.md`
+
+Historisches Lernmaterial, aber **kein aktives Gate**:
+
 - `docs/brand/phase5/R2_RESTART_RESULT.md`
+- `docs/brand/phase5/R3_TWO_PARTY_RESULT.md`
 
-Der frühere externe 8–12-Personen-Test ist optional und nicht mehr Voraussetzung.
+Bei Widerspruch gilt `PRIMARY_IDENTITY_RESET.md`.
 
-## 3. R2-Restart-Ergebnis
+## 3. Prozesskorrektur
 
-Verworfen:
+Der bisher aktive Vergleich `Fokusfarbe` gegen neutrale Kontrolle wird ohne PASS/FAIL beendet.
 
-- `Kuratierte Kerbe` – Ticket-/Coupon-Nähe;
-- `Auswahlklammer` – Scan-/Crop-/Fokus-UI-Nähe;
-- `Doppelperspektive` – zu nah an redaktionellem Vergrößerungseffekt und an `Fokusfarbe`.
+Grund:
 
-Für R3 weitergeführt:
+- Fotodarstellung war kein belegtes Produktproblem;
+- ein Bildmechanismus darf die noch ungelöste Primäridentität nicht ersetzen;
+- die frühere Korrektur `nicht Logo-first` war zu `Bildsystem zuerst` übersteuert worden.
 
-### A – Fokusfarbe
-
-- reduzierter visueller Kontext;
-- ein ausgewählter realer Moment bleibt in natürlicher Farbe;
-- funktioniert in Hero, Karte, Detail/Social und Motion;
-- übersetzt `relevante Auswahl statt Masse` direkt;
-- fachlich stärkster Systemkandidat.
-
-### C – Erlebnis-Saum
-
-- feste weiche Übergangskante zwischen reduziertem Kontext und natürlicher Fotografie;
-- funktioniert ebenfalls über Hero, Karte, Detail/Social und Motion;
-- eigenständig, aber schwächer als Fokusfarbe;
-- Risiko allgemeiner Bildbearbeitungs-/Before-After-Assoziation bleibt offen.
-
-### B – neutrale Kontrolle
-
-- funktionale Nullmessung ohne Distinctive Asset;
-- kein Kandidat.
+`Fokusfarbe` und `Erlebnis-Saum` bleiben ausschließlich als mögliche spätere Sekundärbausteine erhalten.
 
 ## 4. Aktueller Schritt
 
-**R3 – ZWEI-PARTEIEN-WAHRNEHMUNGSGATE**
+**P1 – PRIMÄRIDENTITÄTS-DIVERGENZ, MONOCHROM ZUERST**
 
-Zweck:
+ChatGPT entwickelt intern breit und prüft mindestens:
 
-Prüfen, ob der fachlich empfohlene Systemkandidat `Fokusfarbe` auch für den Product Owner als normaler Nutzer sichtbar markenfähiger, eigenständiger und überzeugender wirkt als die neutrale Kontrolle und der schwächere Gegenkandidat `Erlebnis-Saum`.
+- individuelle Wortmarke ohne separates Zeichen;
+- Wortmarke plus typografisches Zeichen;
+- Wortmarke plus abstraktes Zeichen.
+
+Keine Pflicht zu `B`, `e`, `B/e`, Kartenpin, Stadtklischee oder separatem Symbol.
+
+Bestehende Fotos, Farben und UI werden nicht neu gestaltet. Sie dienen später als identisches reales Prüfgerüst.
 
 ## 5. Rollen
 
 ### ChatGPT
 
-- trägt die fachliche Designempfehlung;
-- darf keinen relativen Sieger künstlich zu Premium hochstufen;
-- Empfehlung aktuell: **Fokusfarbe weiterführen**.
+ChatGPT trägt die operative Designarbeit und die Methodik vollständig:
+
+- breite Exploration;
+- harte interne Eliminierung;
+- deterministische Konstruktion;
+- reale Größenprüfung;
+- Vergleich gegen neutrale Kontrolle;
+- spätere Farb-, Bild-, Motion- und Icon-Ableitung.
+
+Schwache Zwischenstände werden nicht an den Product Owner delegiert.
 
 ### Product Owner
 
-Keine Designbegründung erforderlich.
+Der Product Owner wird erst wieder benötigt, wenn mindestens eine intern belastbare Richtung in realen Produktgrößen vorliegt.
 
-Er beantwortet nur die Wahrnehmungsfrage:
+Dann nur:
 
-> Wirkt `Fokusfarbe` in der gezeigten realen Anwendung für dich sichtbar wie eine stärkere, eigenständigere Markenrichtung als die neutrale Kontrolle – oder wirkt es weiterhin wie ein Gestaltungseffekt ohne echte Markenqualität?
+- klaren visuellen Knock-out benennen; oder
+- bestätigen, dass eine Richtung als hochwertiger Absender überzeugt.
 
-Zulässige Antworten:
+Keine Designerrolle und keine Mikroentscheidungen.
 
-- `überzeugend / weiter`;
-- `nicht überzeugend / zurück zu R2`.
+## 6. Harte aktive Regeln
 
-Optional kann ein spontaner Störpunkt genannt werden; keine Designerrolle.
+- monochrom zuerst;
+- keine ästhetischen 0–100-Scores;
+- keine relative Siegerlogik;
+- keine Präsentation von Rohideen als vermeintliche Kandidaten;
+- reale Header-/Produktgröße vor Hochglanzboard;
+- Farbe darf keine schwache Primärform retten;
+- Bildbearbeitung ist keine Voraussetzung;
+- App-Icon erst nach bewiesener Primäridentität;
+- keine Produktintegration, kein Merge und kein Deploy.
 
-## 6. In R3 verboten
+## 7. Nächste Gates
 
-- keine neue Wortmarke;
-- kein Logo;
-- kein App-Icon;
-- kein ästhetischer 0–100-Score;
-- keine neue Systemidee parallel;
-- keine Produktintegration;
-- kein Merge oder Deploy.
-
-## 7. R3-Abschluss
-
-### PASS
-
-Nur wenn:
-
-- ChatGPT hält `Fokusfarbe` fachlich für den stärksten Kandidaten;
-- Product Owner empfindet die Richtung ebenfalls sichtbar überzeugender als die neutrale Kontrolle;
-- kein klarer Kategorie-/Qualitäts-Knock-out benannt wird.
-
-Dann weiter zu:
-
-**R4 – Wortmarkenarbeit ausschließlich innerhalb des bewiesenen Systems `Fokusfarbe`.**
-
-### FAIL
-
-Wenn der Product Owner die Richtung weiterhin als bloßen Gestaltungseffekt oder nicht markenfähig wahrnimmt:
-
-- zurück zu R2;
-- keine Wortmarkenarbeit.
-
-## 8. Aktuelles Vergleichsmaterial
-
-Arbeitslauf:
-
-- `bocholt_erleben_R2_restart_final_compare.png`
-
-Vergleich:
-
-- A = Fokusfarbe;
-- B = neutrale Kontrolle;
-- C = Erlebnis-Saum.
+1. **P1/P2 intern:** breite Primäridentitätssuche plus harte Filter;
+2. **P3 intern:** maximal drei deterministisch konstruierte ernsthafte Systeme;
+3. **P4 intern:** reale Produktprüfung gegen neutrale Kontrolle bei identischem UI, Inhalt, Foto und Arbeitsfarbgerüst;
+4. **P5 Product Owner:** nur belastbare Finalrichtungen zeigen;
+5. danach Farb-/Sekundärsystem, App-Icon, technische Härtung und separate Integration.
 
 Kein stiller Prozesswechsel.
