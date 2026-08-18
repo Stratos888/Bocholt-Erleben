@@ -2,264 +2,243 @@
 
 Stand: 2026-08-18
 Workpack: #259
-Status: **KANONISCH – ARCHITEKTUR ZUERST, A2 FORMDIVERGENZ AKTIV**
+Status: **KANONISCH – VOLLSTÄNDIGES PRIMÄRLOGO VOR RESPONSIVER KLEINMARKE**
 
 ## 1. Ziel
 
 Für `Bocholt erleben` wird ohne externe Kreativbeauftragung eine eigenständige, hochwertige Consumer-Marke entwickelt.
 
-Der zentrale Markenanker soll ein kompaktes Markenzeichen sein, das im App-/Header-Kontext eigenständig funktioniert und anschließend Wortmarke, Farbe, Formensprache, Motion und App-Icon trägt.
+`Logo zuerst` bedeutet ab jetzt:
 
-Wichtig: Der Prozess beginnt **nicht** mit Symbolmassenproduktion. Zuerst wird die geeignete Logo-Architektur geklärt. Erst danach wird innerhalb der bestandenen Architektur(en) gezielt gestaltet.
+> Zuerst wird ein eigenständiges **vollständiges Primärlogo** bewiesen. Es muss nicht zuerst ein separates Symbol geben.
 
-## 2. Verworfener Mengenansatz
+Ein gutes Endsystem kann später selbstverständlich ein kompaktes Zeichen oder App-Icon besitzen. Dieses wird aber erst aus einer bereits überzeugenden Primäridentität abgeleitet beziehungsweise gemeinsam mit ihr gehärtet.
 
-Der frühere Pflichtlauf `6 Territorien / 120+ Rohsymbole` ist aufgehoben.
+## 2. Warum der Symbol-first-Weg beendet ist
 
-Grund:
+Die Architekturphase A0–A2 prüfte drei Symbolklassen:
 
-- reine Mengenproduktion erzeugt viele generische App-, SaaS- und Symbolformen;
-- eine zufällige abstrakte Form besitzt ohne starke Markenlogik geringe Anschlussfähigkeit an den Namen;
-- ein wörtliches `B + E` kann dagegen schnell wie ein austauschbares Monogramm wirken;
-- die zentrale Entscheidung ist deshalb zuerst die **Architektur des Markenzeichens**, nicht die Zahl der Skizzen.
+- latentes `BE`-Markenzeichen;
+- explizites `BE`-Lettermark;
+- nicht-letterales Symbol.
 
-Die bereits erzeugte generische Symboltafel ist ungültiges Suchmaterial und zählt für keinen Gate-Nachweis.
+A2 wurde anschließend über mehrere unterschiedliche Formmechanismen vertieft. Ergebnis: **0 Kandidaten**.
 
-## 3. A0 – drei geprüfte Logo-Architekturen
+Wiederkehrende Probleme:
 
-### A – Latentes `BE`-Markenzeichen
+- `BE` bleibt trotz Abstraktion zu schnell Monogramm oder Hybridglyphe;
+- freie Symbole werden ohne den Namen schnell zu generischen App-/SaaS-/Reveal-Zeichen;
+- die bestehende Öffnungs-Heritage wird als isoliertes Flachzeichen schnell zu Vorhang, Auge, Portal, Linse oder Badge;
+- der Mark-only-Beweis zwang ein kleines Symbol, die gesamte Markenidentität bereits allein zu tragen.
 
-Ziel:
+Die Konsequenz ist kein Verzicht auf ein späteres Markenzeichen. Korrigiert wird nur die Reihenfolge.
 
-- `B` und `E` bilden die formale DNA;
-- sie müssen nicht auf den ersten Blick als zwei Buchstaben gelesen werden;
-- das Ergebnis soll wie **ein eigenständiges Symbol** funktionieren, nicht wie zwei zusammengeschobene Initialen;
-- die Buchstabenbeziehung schafft trotzdem eine direkte Verbindung zu `Bocholt erleben`.
+## 3. Primäre Beweiseinheit
 
-Sperren:
+Ab B0 ist die Beweiseinheit das **vollständige Primärlogo**.
 
-- kein Standard-`BE`-Monogramm;
-- keine zwei sichtbaren Buchstaben nebeneinander;
-- kein typischer Kreis-/Shield-/Badge-Container als Ersatz für Eigenständigkeit;
-- kein `B/e`-Gimmick wie in früheren Versuchen.
+Das kann sein:
 
-### B – Explizites `BE`-Lettermark
+- eine vollständig eigengezeichnete Namenssignatur;
+- eine gemeinsam entwickelte Zeichen-/Wortmarkenkombination;
+- eine Heritage-Evolution als Gesamtlock-up.
 
-Ziel:
+Nicht automatisch zulässig sind:
 
-- bewusst typografischer, klarer Initialenanker;
-- starke Eigenzeichnung statt Standardschrift;
-- maximal kompakt und merkfähig.
+- normale Schriftsetzung mit neuem Font;
+- Mikroänderung einzelner Buchstaben;
+- Standardschrift plus beliebiges Icon;
+- generisches `BE`-Monogramm;
+- ein dekoratives Symbol, das nur über Story Bedeutung erhält.
 
-Sperren:
+## 4. B0 – drei Logo-System-Architekturen
 
-- keine Fontsetzung plus Ligaturtrick;
-- keine generische Luxus-/Fashion-/Immobilien-Monogrammästhetik;
-- kein Ornament, Wappen oder Siegel.
+### D – Bespoke Full-Name Signature
 
-### C – Nicht-letterales Symbol
+Der vollständige Name `Bocholt erleben` ist das Logo.
 
-Ziel:
+Qualitätsanforderung:
 
-- eigenständige Form ohne Buchstabenpflicht;
-- kann aus Produktwahrheit, Bewegung, Auswahl, Übergang oder freier Form entstehen;
-- muss ohne Konzepttext als starke Marke funktionieren.
+- sichtbare Eigenzeichnung auf Makroebene;
+- eigene Proportion, Rhythmik und Silhouette;
+- charakteristische Gesamtform bereits im realen Header;
+- keine Abhängigkeit von einer einzelnen Spezialglyphe;
+- keine bloße Fontwahl.
 
-Sperren:
+Die Richtung darf horizontal, kompakt, zweizeilig oder anderweitig organisiert sein, sofern sie im realen Produkt funktioniert. Eine generische gestapelte Blockschrift ist kein ausreichendes Konzept.
 
-- keine Pins, Tickets, Filter, Scanner, Herzen, Blätter, Fahrräder;
-- keine generischen Sparks, Loops, Portale, Fenster, Augen oder AI-App-Geometrien;
-- keine Form, die nur durch Story interessant wird.
+### E – Combination Logo
 
-## 4. A0 – Pflichtumfang
+Zeichen und Name werden gleichzeitig entwickelt.
 
-Pro Architektur wurden mehrere substanziell unterschiedliche Schwarz-Weiß-Grundkonzepte als interne Gegenproben betrachtet. Varianten desselben Grundprinzips zählen nicht mehrfach.
+Qualitätsanforderung:
 
-Generatoroutput bleibt Skizzenmaterial und wird nie direkt zum Final-Logo.
+- Zeichen und Wortform besitzen eine erkennbare gemeinsame Formlogik;
+- das Zeichen ist nicht bloß links angehängt;
+- die vollständige Kombination ist eigenständiger als eine neutrale Wortsetzung;
+- eine spätere responsive Kleinmarke ist plausibel, aber noch keine Voraussetzung.
 
-Der Product Owner sieht A0-Rohmaterial nicht.
+`B/E`, freie Abstraktion und andere Quellen dürfen verwendet werden, wenn das Ergebnis nicht in bekannte Monogramm-/App-Symbolklischees fällt.
 
-## 5. A1 – Architekturfilter: abgeschlossen
+### F – Heritage Evolution als vollständiges Logo
 
-Bewertet wurde die Architektur als Klasse, nicht der hübscheste Einzelentwurf.
+Die heutige öffentliche Marke besitzt reale Wiedererkennbarkeit durch Öffnung, helle Seitenflächen und räumliches Zentrum.
 
-### Architektur A – PASS als Primärarchitektur
+Diese Richtung darf genau diese Erinnerung weiterentwickeln, aber:
 
-Begründung:
+- nicht den bisherigen Vorhang flach abzeichnen;
+- nicht Theater-/Buch-/Portal-Lesart verstärken;
+- nicht 3D, Glanz oder Verlauf als Identitätsersatz konservieren;
+- nicht das Zeichen isoliert optimieren und den Namen später ankleben.
 
-- stärkste natürliche Verbindung zu `Bocholt erleben`;
-- kompakter Markenanker für Header/App grundsätzlich plausibel;
-- Systempotenzial vorhanden;
-- aber nur dann zulässig, wenn `B`/`E` als **latente Form-DNA** dienen und nicht als direkt sichtbares Monogramm.
+Ziel ist ein modernes vollständiges Logo, das eine glaubwürdige Evolution statt einen beliebigen Neustart darstellt.
 
-Verschärfte Sperre:
+## 5. B1 – gezielte vollständige Logo-Exploration
 
-> `B außen + E innen`, `zwei Initialen ineinanderschieben` oder eine bloße Hybridglyphe gilt nicht als bestandene Lösung.
-
-### Architektur B – FAIL
-
-Begründung:
-
-- starke Namenslesbarkeit, aber zu hohe strukturelle Nähe zu Agentur-, Immobilien-, Fashion-, Firmen- und Wappenmonogrammen;
-- die Gegenproben boten zu wenig Raum für eine eigenständige Consumer-Marke, ohne erneut in typografische Gimmicklogik zu kippen.
-
-Architektur B wird nicht weitergeführt.
-
-### Architektur C – PASS als Challenger
-
-Begründung:
-
-- grundsätzlich hoher formaler Freiheitsgrad;
-- verhindert erzwungene Buchstabenlogik;
-- aktuelle Gegenproben kippen jedoch sehr schnell in generische App-/Reveal-/Portal-/Geometrieformen;
-- schwächere natürliche Verbindung zum Namen als A.
-
-C läuft nur weiter, wenn eine konkrete Form A sichtbar schlägt. Es gibt keine künstliche Gleichverteilung.
-
-## 6. A2 – Formdivergenz innerhalb der bestandenen Architektur(en)
-
-### Primärpfad A
-
-Gesucht werden 12–24 zusätzliche, substanziell unterschiedliche Formlösungen mit:
-
-- latenter `B`/`E`-DNA;
-- Form zuerst, Buchstabenlesbarkeit höchstens sekundär;
-- unterschiedlichen Makroformen statt Varianten desselben Monogramms;
-- bewusst entwickeltem Positiv-/Negativraum;
-- eigenständiger Silhouette;
-- Kleinformatfähigkeit.
-
-Nicht zulässig:
-
-- offensichtliche `B/E`-Hybridglyphe;
-- `B`-Silhouette mit hineingeschnittenem `E` als alleinige Idee;
-- Standardschrift oder Standardmonogramm als Ausgangspunkt;
-- bekannte SaaS-/App-Geometrie.
-
-### Challenger C
-
-Nicht-letterale Formen werden nur weitergeführt, wenn sie:
-
-- ohne Story stärker als die A-Formen wirken;
-- nicht generisch sind;
-- eine glaubwürdige spätere Markenbedeutung zulassen.
-
-### A2-Ausgang
-
-A2 endet mit:
-
-- **3–6 ernsthaften Rohformen insgesamt**, oder
-- **0** und einem erneuten Architektur-/Formneustart.
-
-Erste A2-Gegenproben wurden bereits verworfen: technisch stabil, aber noch zu deutlich als konstruierte `B/E`-Hybride beziehungsweise generische Reveal-Symbole wahrnehmbar. Sie zählen nicht als Kandidaten.
-
-## 7. A3 – Vektorneukonstruktion
-
-Maximal fünf Rohformen werden vollständig neu und kontrolliert als Vektor gebaut.
+Pro Architektur werden mehrere **substanziell unterschiedliche vollständige Logoideen** entwickelt. Es gibt keine künstliche Mengenquote.
 
 Pflicht:
 
-- kontrollierte Kurven und Tangenten;
-- optisch ausgeglichene Positiv-/Negativflächen;
-- eindeutige Silhouette;
-- saubere Kleinformatgeometrie;
-- reproduzierbare SVG-Pfade;
-- keine automatische Vektorisierung eines Generatorbilds als Finalmaster.
+- monochrom;
+- primär in realer mobiler Headergröße;
+- Name immer lesbar, wenn er Bestandteil der Architektur ist;
+- unterschiedliche Makroarchitekturen statt Mikrovarianten;
+- keine Hochglanzboards als Qualifikationsmittel;
+- Generatoren dürfen freie Rohimpulse liefern, aber kein Generatorbild ist Finalmaster.
 
-## 8. A4 – Mark-only Proof
+Der Product Owner sieht B1-Rohmaterial nicht.
 
-Jeder Kandidat wird ohne Wortmarke und ohne Farbe geprüft:
+## 6. B2 – harter Systemfilter
 
-- schwarz auf weiß;
-- weiß auf schwarz;
-- 64 / 48 / 32 / 24 / 16 px;
-- quadratische und freie Fläche;
-- direkte Silhouettengegenüberstellung;
-- Spiegel-/Rotations-/Negativraum-Gegenprobe, sofern relevant.
+Ein vollständiges Logo wird beendet, wenn mindestens einer dieser strukturellen Befunde dominiert:
 
-Binäre Gates:
+- wirkt im echten Header nur wie eine andere Schrift;
+- wirkt wie Standardschrift plus Icon;
+- generisches Agentur-/SaaS-/Tourismus-/Stadtmarketing-/Eventportal-Design;
+- Namenslesbarkeit bricht in realer Größe;
+- Eigenheit existiert nur in Großansicht;
+- Konzepttext ist nötig, damit die Form interessant erscheint;
+- Logo wirkt modisch/dekorativ, aber nicht glaubwürdig für das Produkt;
+- Nähe zu bereits verworfenen Monogramm-, Portal-, Spark-, Loop-, Auge-/Linsen-, Buch-/Vorhang- oder UI-Familien dominiert.
 
-- Eigenständigkeit;
-- Kleinformatstabilität;
-- optische Balance;
-- keine dominante Klischeelesart;
-- kein bloßer UI-Icon-Charakter;
-- ausreichend markenhafte Wirkung ohne Erklärung.
+B2 endet mit:
 
-## 9. A5 – Wortmarke und reales Produkt
+- `1–4` ernsthaften vollständigen Logorichtungen; oder
+- `0` und einem neuen B0/B1-Lauf.
 
-Erst nach bestandenem Mark-only Proof wird eine ruhige unterstützende Wortmarke `Bocholt erleben` entwickelt.
+Keine relative Siegerlogik.
 
-Die Wortmarke soll das Zeichen ergänzen, nicht künstlich zusätzlich differenzieren.
+## 7. B3 – deterministische Konstruktion
 
-Geprüft wird in:
+Maximal drei B2-Systeme werden vollständig neu und reproduzierbar konstruiert.
 
-- realem mobilen 48-px-Header;
+Je nach Architektur umfasst das:
+
+- eigene Vektorpfade der Signatur;
+- kontrollierte Buchstaben-/Formproportionen;
+- optisches Kerning und Rhythmus;
+- Positiv-/Negativraum;
+- Zeichen-/Namensrelation;
+- saubere Kurven und Tangenten;
+- responsive Varianten nur, wenn sie aus dem Primärlogo natürlich entstehen.
+
+Keine automatische Vektorisierung eines Generatorbilds als Produktionsasset.
+
+## 8. B4 – realer Logo-Beweis
+
+Die B3-Systeme werden in Schwarz/Weiß geprüft.
+
+Primär:
+
+- realer mobiler `48px`-Header;
+- aktueller Standard-Logo-Slot ungefähr `24px`;
+- aktueller Titel ungefähr `18px`;
+- sehr schmale Geräte mit ungefähr `23px` Logo und `17px` Titel.
+
+Sekundär:
+
 - Desktop-Header;
-- kleiner Absenderfläche;
-- Zeichen allein;
-- Zeichen + Name.
+- kleine Absenderfläche;
+- größere neutrale Kontrollansicht zur Geometrieprüfung;
+- helle und dunkle monochrome Fassung.
 
-Bestehende UI, Fotos und Inhalte bleiben identisch.
+Das bestehende UI, Fotos, Inhalte und die Produktfarbwelt bleiben als neutrales Prüfgerüst unverändert.
 
-## 10. A6 – Product-Owner-Gate
+### Binäre Gates
 
-Der Product Owner sieht maximal **1–3 intern bestandene Richtungen**.
+- reale Lesbarkeit: PASS/FAIL;
+- sichtbare Eigenständigkeit in Originalgröße: PASS/FAIL;
+- glaubwürdige Consumer-Markenwirkung: PASS/FAIL;
+- keine dominante Klischeelesart: PASS/FAIL;
+- technische Reproduzierbarkeit: PASS/FAIL.
 
-Erste Sichtung ohne Konzepttext.
+Ein separates Mark-only-Gate existiert an dieser Stelle **nicht mehr**.
 
-Frage:
+## 9. B5 – Product-Owner-Gate
 
-> Wirkt mindestens eine Richtung bereits wie ein eigenständiger, hochwertiger Markenabsender für `Bocholt erleben`?
+Nur `1–3` intern bestandene vollständige Logos werden gezeigt.
 
-Bei `nein`: zurück zu A0/A2, nicht mikroreparieren.
+Erste Sichtung ohne Konzepttext und ohne dekoratives Markenboard.
 
-Bei `ja`: nur die bestätigte Richtung wird weiterentwickelt.
+Die zentrale Frage lautet:
 
-## 11. Danach: Markensystem
+> Wirkt mindestens eine Richtung bereits in realer Anwendung wie ein eigenständiger, hochwertiger Absender für `Bocholt erleben` – und nicht nur wie eine Schrift, ein Icon oder ein Designexperiment?
 
-Erst nach A6-PASS:
+Bei `nein`:
 
-1. Wortmarkenfinalisierung;
-2. finale Markenfarben;
-3. wiederkehrende Formensprache;
-4. sekundäre grafische Assets;
-5. Bildsprache;
-6. Motion;
-7. App-Icon als Anwendung des bewiesenen Zeichens;
-8. Ähnlichkeits-/Rechts-/Technikpreflight;
-9. Endgate;
-10. separate Integration.
+- kein Mikroretten;
+- kein relativ bester Sieger;
+- zurück zu B0/B1 mit neuen Makroarchitekturen.
 
-## 12. Rollen
+Bei `ja`:
+
+- nur die bestätigte Richtung wird weiterentwickelt.
+
+## 10. Nach B5 – erst jetzt Markensystem und responsive Marke
+
+Aus der bestätigten Primäridentität werden entwickelt:
+
+1. finale Primär-/Sekundärlock-ups;
+2. responsive Kleinmarke, falls sinnvoll;
+3. App-Icon;
+4. finale Markenfarben und Farbhierarchie;
+5. wiederkehrende Formensprache;
+6. sekundäre grafische Assets;
+7. Bildsprache;
+8. Motionprinzip;
+9. Ähnlichkeits-/Rechts-/Technikpreflight;
+10. Endgate und separate Integration.
+
+Eine responsive Kleinmarke kann ein abstrahiertes Element des vollständigen Logos sein. Sie muss nicht vor dem Primärlogo erfunden werden.
+
+## 11. Rollen
 
 ### ChatGPT
 
-Verantwortet Creative Direction, Architekturvergleich, Exploration, Eliminierung, Vektorkonstruktion, Kleinformatprüfung und Systemableitung.
+Verantwortet Creative Direction, Exploration, interne Eliminierung, Konstruktion, Realgrößenprüfung und Vorbereitung der Finalisten.
 
 ### Product Owner
 
-Keine Designerrolle. Keine Rohskizzenauswahl. Keine Mikrotypografie. Einstieg erst bei maximal drei intern bestandenen Richtungen.
+Keine Designerrolle. Keine Rohskizzenauswahl. Keine Mikrotypografie. Einstieg erst bei maximal drei intern bestandenen vollständigen Logos.
 
-## 13. Harte Regeln
+## 12. Harte Regeln
 
 - keine ästhetischen AI-Scores;
 - keine relative Siegerlogik;
-- keine zufällige Symbolmenge als Qualitätsbeweis;
+- keine Symbolmassenproduktion;
 - keine Farbe oder Präsentation als Rettung;
 - keine Standardschrift + Gimmick;
 - keine erzwungene Story;
-- kein offensichtliches `BE`-Monogramm nur wegen Namensbezug;
-- kein Kandidat wird `Premium` genannt, bevor der Product Owner das Wahrnehmungsgate bestanden hat;
+- kein `BE`-Monogramm als Default;
+- kein separates Symbol als Pflicht;
+- reale Produktgröße ist die primäre Arbeitsansicht;
+- `Premium-Richtung` erst nach B5-PASS;
 - `staging`, `main`, Live und öffentliche Marke bleiben bis zur späteren Integrationsfreigabe unverändert.
 
-## 14. Aktiver Stand
+## 13. Aktiver Stand
 
-- A0: abgeschlossen;
-- A1: abgeschlossen;
-- Architektur A: **PASS als Primärarchitektur**;
-- Architektur B: **FAIL**;
-- Architektur C: **PASS als Challenger**;
-- A2: aktiv;
-- aktueller Premiumkandidat: `0`;
+- A0/A1: historisch abgeschlossen;
+- A2: **FAIL, 0 Kandidaten**;
+- B0: **aktiv**;
+- aktueller intern qualifizierter Kandidat: `0`;
 - öffentliche Wirkung: `0`.
