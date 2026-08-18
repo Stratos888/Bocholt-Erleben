@@ -139,7 +139,10 @@ async function openMissingFeedback(page) {
   await trigger.click();
   const form = page.locator('.feedback-form');
   await form.waitFor({ state: 'visible', timeout: 8000 });
-  assert(await form.locator('[name="feedback_type"]').inputValue() === 'missing', 'Feedback: Missing-Typ wurde nicht vorausgewählt');
+  assert(
+    (await form.locator('[data-feedback-prompt]').innerText()).includes('Was fehlt dir aktuell?'),
+    'Feedback: sichtbare Missing-Vorauswahl fehlt',
+  );
   return form;
 }
 
