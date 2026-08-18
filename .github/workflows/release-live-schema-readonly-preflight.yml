@@ -1,9 +1,9 @@
 name: Release live schema read-only preflight
 
 on:
-  pull_request:
+  push:
     branches:
-      - staging
+      - "evidence/release-live-schema-readonly-2026-08-18"
     paths:
       - ".github/workflows/release-live-schema-readonly-preflight.yml"
 
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   live-schema-readonly:
-    if: github.head_ref == 'evidence/release-live-schema-readonly-2026-08-18'
+    if: github.ref_name == 'evidence/release-live-schema-readonly-2026-08-18'
     name: Live schema metadata only
     runs-on: ubuntu-24.04
     timeout-minutes: 10
