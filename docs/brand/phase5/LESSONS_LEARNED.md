@@ -4,18 +4,20 @@ Stand: 2026-08-18
 Workpack: #259
 Status: **KANONISCHES LERNMATERIAL – KEIN AKTIVER DESIGNPFAD**
 
-Diese Datei enthält nur die Erkenntnisse aus den bisherigen Fehlversuchen, die für den neuen Prozess weiter relevant sind. Frühere Kandidaten-, Gate-, Score- und Prozessdateien sind nicht mehr aktiv und werden aus dem Arbeitsbaum entfernt. Der Git-Verlauf bleibt als Audit-Trail erhalten.
+Diese Datei enthält ausschließlich Erkenntnisse aus bisherigen Fehlversuchen, die für den aktuellen Prozess weiter relevant sind. Frühere Kandidaten-, Gate-, Score- und Prozessdateien sind nicht aktiv. Der Git-Verlauf bleibt Audit-Trail.
 
 ## 1. Was nachweislich nicht funktioniert hat
 
-### Wortmarke als alleiniger Premiumanker
+### Normale Wortsetzung als alleiniger Premiumanker
 
 Mehrere Versuche ergaben technisch saubere, aber in realer Größe im Wesentlichen nur anders gesetzte Schrift. Auch eine deutlichere Serif-Richtung wurde vom Product Owner genau so wahrgenommen.
 
 Folge:
 
-- keine erneute Wortmarken-first-Schleife;
-- keine Mikrotypografie als Ersatz für ein eigenständiges Primärzeichen.
+- keine erneute Schleife aus `Font auswählen + Gewicht/Tracking optimieren`;
+- keine Mikrotypografie als Ersatz für eine eigenständige Gesamtform.
+
+Wichtig: Das sperrt **keine genuinely bespoke Full-Name-Signature**. Eine eigengezeichnete Gesamtwortform mit eigenständiger Makrosilhouette ist eine andere Logoarchitektur als eine neu gesetzte Standardschrift.
 
 ### Standardschrift plus Spezialglyphe
 
@@ -24,7 +26,7 @@ Manipulierte `e`-/`c`-/`t`-Details waren groß erklärbar, klein aber kaum ident
 Folge:
 
 - keine Einzelgimmicks als Hauptidee;
-- Eigenständigkeit muss in der Gesamtform beziehungsweise im Primärzeichen sichtbar sein.
+- Eigenständigkeit muss in der Gesamtform beziehungsweise im vollständigen Primärlogo sichtbar sein.
 
 ### Bildmechanismus vor Primäridentität
 
@@ -42,7 +44,7 @@ Folge:
 Folge:
 
 - Konzept ist Suchinput, keine Formpflicht;
-- freie abstrakte Formen müssen einen großen Teil der Divergenz ausmachen.
+- eine spätere semantische Herleitung darf keine schwache Form retten.
 
 ### Geometrische Mittelmaßschleifen
 
@@ -52,6 +54,38 @@ Folge:
 
 - solche Lesarten sind harte Warnsignale;
 - eine Geometrie ist nicht abstrakt verboten, aber bei dominanter Klischeelesart wird sie beendet.
+
+### Latentes `BE` als isoliertes Symbol
+
+A0/A1 identifizierte latente `B/E`-DNA zunächst als plausibelste Symbolarchitektur. A2 prüfte sie anschließend über mehrere unterschiedliche Konstruktionsmechanismen.
+
+Befund:
+
+- selbst stark abstrahierte Varianten kippten wiederholt in Monogramm-/Hybridglyphenwirkung;
+- die Namensbindung war real, erzeugte aber noch keine eigenständige Consumer-Marke;
+- weitere Mikrovariation hätte nur dieselbe Formfamilie verlängert.
+
+Folge:
+
+- `BE` ist keine aktive Default-Architektur mehr;
+- Buchstaben-DNA darf künftig nur verwendet werden, wenn sie innerhalb eines vollständigen Logos tatsächlich trägt.
+
+### Standalone-Symbol-first als falsche Gleichsetzung mit Logo-first
+
+Die A-Architektur verlangte, dass ein kompaktes Markenzeichen **vor** der vollständigen Zeichen-/Namensbeziehung Premiumwirkung beweist.
+
+A2 zeigte:
+
+- freie Symbole kippen schnell in generische App-/SaaS-/Reveal-Zeichen;
+- Heritage-Flachformen kippen schnell in Vorhang, Auge, Portal, Linse oder Badge;
+- technisch gute 16–64-px-Symbole können trotzdem markenstrategisch schwach sein;
+- die isolierte Symbolpflicht erzeugte erneut geometrische Mittelmaßschleifen.
+
+Folge:
+
+- `Logo zuerst` bedeutet künftig `vollständiges Primärlogo zuerst`, nicht `Icon zuerst`;
+- Zeichen und Name dürfen gemeinsam die Identitätslast tragen;
+- responsive Kleinmarke und App-Icon werden erst aus einem bewiesenen Primärlogo abgeleitet.
 
 ### Relative Sieger
 
@@ -77,8 +111,8 @@ Bildgeneratoren liefern nützliche Überraschung, aber keine belastbare finale M
 
 Folge:
 
-- generative Bilder sind ausschließlich Rohskizzen;
-- ernsthafte Kandidaten werden danach neu als kontrollierte Vektorgeometrie gebaut.
+- generative Bilder sind ausschließlich Rohmaterial;
+- ernsthafte Kandidaten werden danach kontrolliert und reproduzierbar konstruiert.
 
 ### Präsentationsqualität als Rettung
 
@@ -86,27 +120,28 @@ Große Boards, Farbe, Mock-ups und Produktumgebung können schwache Formen hochw
 
 Folge:
 
-- Schwarz/Weiß und kleine Originalgrößen kommen zuerst;
-- das echte Produkt dient erst später als identisches Prüfgerüst.
+- reale mobile Absendergröße ist die primäre Arbeitsansicht;
+- Schwarz/Weiß kommt vor Farbe;
+- größere Darstellungen prüfen Geometrie, nicht Premiumwirkung.
 
 ## 2. Was weiterhin gilt
 
 - Name: `Bocholt erleben`.
 - Produktkern: `relevante Auswahl statt Masse`.
-- Das vorhandene UI, die Fotografie und die Informationsarchitektur sind nicht Gegenstand einer Reparatur, solange kein konkretes Problem belegt ist.
+- Das vorhandene UI, die Fotografie und die Informationsarchitektur werden nicht repariert, solange kein konkretes Problem belegt ist.
 - Der Product Owner ist Wahrnehmungs- und Freigabegate, nicht Ersatz-Designer.
 - Keine öffentliche Änderung vor finaler Freigabe.
 - Produktionsassets müssen reproduzierbar, skalierbar und rechtlich/technisch geprüft sein.
 
 ## 3. Öffentliche Ausgangsmarke
 
-Das heutige räumliche Öffnungs-/Vorhang-Icon besitzt trotz veralteter 3D-/Glossy-Sprache eine reale Wiedererkennbarkeit. Die Idee `Öffnung / Enthüllung / Eintritt` darf deshalb als **eine** Heritage-Quelle untersucht werden.
+Das heutige räumliche Öffnungs-/Vorhang-Icon besitzt trotz veralteter 3D-/Glossy-Sprache reale Wiedererkennbarkeit. Die Erinnerung `Öffnung / Enthüllung / Eintritt` darf deshalb als Heritage-Quelle untersucht werden.
 
-Sie hat keinen Vorrang. Wenn freie oder andere abstrakte Formen stärker sind, werden diese gewählt.
+Sie hat keinen Vorrang und muss nicht als isoliertes Symbol erhalten bleiben. Eine glaubwürdige Heritage-Evolution kann auch erst im vollständigen Logo-System entstehen.
 
 ## 4. Konsequenz
 
-Es gibt ab jetzt nur einen aktiven Produktionsweg:
+Es gibt einen aktiven Produktionsweg:
 
 - `docs/brand/phase5/PREMIUM_LOGO_PROCESS.md`
 
