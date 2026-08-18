@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **PRIMARY IDENTITY RESET AKTIV – PRIMÄRIDENTITÄT WIRD ZUERST BEWIESEN**
+Status: **P5 PRODUCT-OWNER-GATE AKTIV – EIN PRIMÄRIDENTITÄTSKANDIDAT QUALIFIZIERT**
 
 ## 1. Unveränderliches Ziel
 
@@ -16,86 +16,114 @@ Eine eigenständige Premium-Markenidentität für die private kuratierte Discove
 In dieser Reihenfolge verbindlich:
 
 1. `docs/brand/phase5/PRIMARY_IDENTITY_RESET.md`
-2. `docs/brand/phase5/PROCESS_REVALIDATION_AND_RESTART.md` – soweit nicht durch den Reset korrigiert
-3. `docs/brand/phase5/R1_VISUAL_CALIBRATION.md`
+2. `docs/brand/phase5/PRIMARY_IDENTITY_P1_P4_INTERNAL_RESULT.md`
+3. `docs/brand/phase5/PRIMARY_IDENTITY_P1B_P4_RESULT.md`
+4. `docs/brand/phase5/R1_VISUAL_CALIBRATION.md`
+5. `docs/brand/phase5/PROCESS_REVALIDATION_AND_RESTART.md` – nur soweit nicht durch die neueren Dateien korrigiert
 
 Historisches Lernmaterial, aber **kein aktives Gate**:
 
 - `docs/brand/phase5/R2_RESTART_RESULT.md`
 - `docs/brand/phase5/R3_TWO_PARTY_RESULT.md`
+- frühere Step-5-/Step-8-Wortmarken- und Icon-Kandidaten.
 
-Bei Widerspruch gilt `PRIMARY_IDENTITY_RESET.md`.
+## 3. Abgeschlossener erster P1–P4-Lauf
 
-## 3. Prozesskorrektur
+Der erste Lauf nach dem Reset prüfte:
 
-Der bisher aktive Vergleich `Fokusfarbe` gegen neutrale Kontrolle wird ohne PASS/FAIL beendet.
+- eigene Wortmarkenarchitekturen;
+- typografische Zeichen;
+- abstrakte Zeichen;
+- eine flache Heritage-Öffnungsrichtung.
 
-Grund:
+Ergebnis:
 
-- Fotodarstellung war kein belegtes Produktproblem;
-- ein Bildmechanismus darf die noch ungelöste Primäridentität nicht ersetzen;
-- die frühere Korrektur `nicht Logo-first` war zu `Bildsystem zuerst` übersteuert worden.
+**0 Kandidaten befördert.**
 
-`Fokusfarbe` und `Erlebnis-Saum` bleiben ausschließlich als mögliche spätere Sekundärbausteine erhalten.
+Eliminiert wurden insbesondere generische B/e-, Loop-, Spark-, Portal-, Pause-, Buch-, Vorhang- und Mikro-Glyphenfamilien. Der Product Owner wurde mit keinem dieser Rohstände belastet.
 
-## 4. Aktueller Schritt
+## 4. Zweite Suchachse P1b–P4
 
-**P1 – PRIMÄRIDENTITÄTS-DIVERGENZ, MONOCHROM ZUERST**
+Statt weiterer geometrischer Standardfamilien wurde die Primäridentität über eine klar von der funktionalen UI getrennte typografische Gesamtarchitektur geprüft.
 
-ChatGPT entwickelt intern breit und prüft mindestens:
+Qualifiziert wurde genau ein System:
 
-- individuelle Wortmarke ohne separates Zeichen;
-- Wortmarke plus typografisches Zeichen;
-- Wortmarke plus abstraktes Zeichen.
+### Kandidat A
 
-Keine Pflicht zu `B`, `e`, `B/e`, Kartenpin, Stadtklischee oder separatem Symbol.
+Asset:
 
-Bestehende Fotos, Farben und UI werden nicht neu gestaltet. Sie dienen später als identisches reales Prüfgerüst.
+- `docs/brand/phase5/primary-identity/p1b-candidate-a-mono.svg`
 
-## 5. Rollen
+Prinzip:
 
-### ChatGPT
+- Wortmarke vollständig klein: `bocholt erleben`;
+- `bocholt` kompakter und gewichtiger;
+- `erleben` etwas offener und leichter innerhalb derselben Serif-Familie;
+- keine manipulierte Einzelglyphe;
+- kein zusätzliches Logozeichen;
+- monochrom und path-only;
+- bei realer `48px`-Headergröße geprüft;
+- keine Foto-, Farb- oder Icon-Abhängigkeit.
 
-ChatGPT trägt die operative Designarbeit und die Methodik vollständig:
+Konstruktionsbasis: Noto Serif Display, SIL OFL 1.1.
 
-- breite Exploration;
-- harte interne Eliminierung;
-- deterministische Konstruktion;
-- reale Größenprüfung;
-- Vergleich gegen neutrale Kontrolle;
-- spätere Farb-, Bild-, Motion- und Icon-Ableitung.
+Interne P4-Prüfung:
 
-Schwache Zwischenstände werden nicht an den Product Owner delegiert.
+- Lesbarkeit: PASS;
+- Ruhe/Qualität in Realgröße: PASS;
+- sichtbare Brand-/UI-Trennung: PASS;
+- technische Reproduzierbarkeit: PASS;
+- kein SaaS-/Startup-Standardcode: PASS.
 
-### Product Owner
+Offenes menschliches Risiko:
 
-Der Product Owner wird erst wieder benötigt, wenn mindestens eine intern belastbare Richtung in realen Produktgrößen vorliegt.
+- kann hochwertig-kuratiert wirken;
+- kann bei falscher Wahrnehmung zu stark in Richtung Magazin/Editorial kippen.
 
-Dann nur:
+Dafür ist P5 erforderlich.
 
-- klaren visuellen Knock-out benennen; oder
-- bestätigen, dass eine Richtung als hochwertiger Absender überzeugt.
+## 5. Aktueller Schritt
 
-Keine Designerrolle und keine Mikroentscheidungen.
+**P5 – PRODUCT-OWNER-WAHRNEHMUNGSGATE**
+
+Der Product Owner entscheidet keine Mikrotypografie und keine Designmechanik.
+
+Einzige Frage:
+
+> Wirkt Kandidat A im direkten Realgrößenvergleich wie ein hochwertiger, eigenständiger Absender für `Bocholt erleben` – oder weiterhin nur wie eine andere Schrift beziehungsweise zu stark wie Magazin/Editorial?
+
+Antwort:
+
+- `weiter`;
+- `zurück`;
+- optional ein spontaner klarer Störpunkt.
 
 ## 6. Harte aktive Regeln
 
-- monochrom zuerst;
 - keine ästhetischen 0–100-Scores;
 - keine relative Siegerlogik;
-- keine Präsentation von Rohideen als vermeintliche Kandidaten;
+- keine schwächere zweite Richtung nur für künstliche Auswahlbreite;
+- keine Rohideenpräsentation;
 - reale Header-/Produktgröße vor Hochglanzboard;
 - Farbe darf keine schwache Primärform retten;
 - Bildbearbeitung ist keine Voraussetzung;
-- App-Icon erst nach bewiesener Primäridentität;
+- App-Icon erst nach bestandenem P5;
 - keine Produktintegration, kein Merge und kein Deploy.
 
-## 7. Nächste Gates
+## 7. Nach P5
 
-1. **P1/P2 intern:** breite Primäridentitätssuche plus harte Filter;
-2. **P3 intern:** maximal drei deterministisch konstruierte ernsthafte Systeme;
-3. **P4 intern:** reale Produktprüfung gegen neutrale Kontrolle bei identischem UI, Inhalt, Foto und Arbeitsfarbgerüst;
-4. **P5 Product Owner:** nur belastbare Finalrichtungen zeigen;
-5. danach Farb-/Sekundärsystem, App-Icon, technische Härtung und separate Integration.
+### PASS
+
+Dann in dieser Reihenfolge:
+
+1. Farbrolle aus der bewiesenen Primäridentität festlegen;
+2. prüfen, ob ein zusätzliches Sekundärasset überhaupt benötigt wird;
+3. App-Icon zuletzt ableiten;
+4. technische, rechtliche und reale Produkt-Härtung;
+5. separate Integrationsfreigabe.
+
+### FAIL
+
+Dann zurück in die Primäridentitätssuche, ohne Kandidat A durch Mikroänderungen künstlich zu retten.
 
 Kein stiller Prozesswechsel.
