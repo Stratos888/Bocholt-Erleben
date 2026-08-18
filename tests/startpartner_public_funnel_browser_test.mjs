@@ -67,6 +67,13 @@ function assertSame(actual, expected, label) {
   }
 }
 
+async function assertFeedbackOwner(page, profileName, label) {
+  assert(await page.locator('main [data-feedback-open="missing"]').count() === 0, `${profileName}: ${label}: eigener Missing-CTA im Main darf nicht vorhanden sein`);
+  assert(await page.locator('footer[data-site-footer] [data-feedback-open="missing"]').count() === 1, `${profileName}: ${label}: Footer-Missing-Trigger fehlt`);
+  assert(await page.locator('footer[data-site-footer] [data-feedback-open="global"]').count() === 1, `${profileName}: ${label}: Footer-Feedback-Trigger fehlt`);
+  assert(await page.locator('.feedback-launcher[data-feedback-open="global"]').count() === 1, `${profileName}: ${label}: globaler Feedback-Launcher fehlt`);
+}
+
 async function runProfile(browser, profileName, viewport) {
   const context = await browser.newContext({ viewport });
   const page = await context.newPage();
@@ -77,7 +84,7 @@ async function runProfile(browser, profileName, viewport) {
     await route.abort();
   });
 
-  // Event-Seite: reguläre Live-Wege, danach kompakter Startpartner-Pilot mit FAQ-Link, danach Tippkanal.
+  // Event-Seite: reguläre Live-Wege und kompakter Startpartner-Pilot; fehlende Inhalte ausschließlich über globales Feedback.
   await open(page, '/events-veroeffentlichen/');
   const eventText = await page.locator('body').innerText();
   for (const marker of [
@@ -88,20 +95,19 @@ async function runProfile(browser, profileName, viewport) {
     'Startpartner-Pilot',
     '6 Monate kostenlos testen',
     'Was ist der Startpartner-Pilot? Kurz erklärt',
-    'Noch nicht der richtige Weg?',
-    'Nur etwas vorschlagen',
   ]) {
     assert(eventText.includes(marker), `${profileName}: Event-Marker fehlt: ${marker}`);
   }
+  assert(!eventText.includes('Noch nicht der richtige Weg?'), `${profileName}: redundanter Event-Tipp-Kasten ist noch sichtbar`);
+  assert(!eventText.includes('Nur etwas vorschlagen'), `${profileName}: redundanter Event-Tipptext ist noch sichtbar`);
   assert(eventText.indexOf('Wähle den passenden Veröffentlichungsweg') < eventText.indexOf('Startpartner-Pilot'), `${profileName}: Event-Pilot steht nicht nach den regulären Wegen`);
-  assert(eventText.indexOf('Startpartner-Pilot') < eventText.indexOf('Noch nicht der richtige Weg?'), `${profileName}: Event-Pilot steht nicht vor dem Tippkanal`);
   assert(!eventText.includes('Begrenzte Startpartnerplätze'), `${profileName}: Event-Pilot ist noch mit Tippkanal gekoppelt`);
   assert(await page.locator('a[href="/fuer-veranstalter/"]').count() > 0, `${profileName}: Live-Membership-Link fehlt`);
   assert(await page.locator('a[href="/events-veroeffentlichen/mitgliedschaft/"]').count() === 0, `${profileName}: zusätzliche Membership-Unterroute ist noch verlinkt`);
   assert(await page.locator('a[href="/startpartner/?scope=events"]').count() === 1, `${profileName}: Event-Startpartner-Scope fehlt`);
   assert(await page.locator('a[href="/veroeffentlichung-erklaert/#startpartner"]').count() === 1, `${profileName}: Event-Startpartner-FAQ-Link fehlt`);
   assert(await page.getByRole('link', { name: 'Startpartner-Pilot anfragen' }).count() === 1, `${profileName}: Event-Pilot-CTA fehlt`);
-  assert(await page.locator('[data-feedback-open="missing"]').count() > 0, `${profileName}: bestehender Event-Tippweg fehlt`);
+  await assertFeedbackOwner(page, profileName, 'Event-Funnel');
   await assertSameElementStyle(
     page,
     'section[aria-labelledby="publish-paths-title"] .publish-model-copy strong',
@@ -118,7 +124,7 @@ async function runProfile(browser, profileName, viewport) {
   );
   await assertNoOverflow(page, `${profileName}: Event-Funnel`);
 
-  // Aktivitäts-Seite: Eignung und Tarife bleiben, kompakter Pilot mit FAQ-Link vor Tippkanal/Ablauf.
+  // Aktivitäts-Seite: Eignung, Tarife, kompakter Pilot und Ablauf bleiben; fehlende Inhalte ausschließlich über globales Feedback.
   await open(page, '/aktivitaeten/sichtbar-werden/');
   const activityText = await page.locator('body').innerText();
   for (const marker of [
@@ -127,20 +133,19 @@ async function runProfile(browser, profileName, viewport) {
     'Startpartner-Pilot',
     '6 Monate kostenlos testen',
     'Was ist der Startpartner-Pilot? Kurz erklärt',
-    'Noch nicht der richtige Weg?',
-    'Nur etwas vorschlagen',
     'So geht es weiter',
   ]) {
     assert(activityText.includes(marker), `${profileName}: Aktivitäts-Marker fehlt: ${marker}`);
   }
+  assert(!activityText.includes('Noch nicht der richtige Weg?'), `${profileName}: redundanter Aktivitäts-Tipp-Kasten ist noch sichtbar`);
+  assert(!activityText.includes('Nur etwas vorschlagen'), `${profileName}: redundanter Aktivitäts-Tipptext ist noch sichtbar`);
   assert(activityText.indexOf('Wähle den passenden Tarif') < activityText.indexOf('Startpartner-Pilot'), `${profileName}: Activity-Pilot steht nicht nach den Tarifen`);
-  assert(activityText.indexOf('Startpartner-Pilot') < activityText.indexOf('Noch nicht der richtige Weg?'), `${profileName}: Activity-Pilot steht nicht vor dem Tippkanal`);
-  assert(activityText.indexOf('Noch nicht der richtige Weg?') < activityText.indexOf('So geht es weiter'), `${profileName}: Activity-Tipp/Ablauf-Reihenfolge verändert`);
+  assert(activityText.indexOf('Startpartner-Pilot') < activityText.indexOf('So geht es weiter'), `${profileName}: Activity-Pilot steht nicht vor dem Ablauf`);
   assert(!activityText.includes('Begrenzte Startpartnerplätze'), `${profileName}: Activity-Pilot ist noch mit Tippkanal gekoppelt`);
   assert(await page.locator('a[href="/startpartner/?scope=activities"]').count() === 1, `${profileName}: Activity-Startpartner-Scope fehlt`);
   assert(await page.locator('a[href="/veroeffentlichung-erklaert/#startpartner"]').count() === 1, `${profileName}: Activity-Startpartner-FAQ-Link fehlt`);
   assert(await page.getByRole('link', { name: 'Startpartner-Pilot anfragen' }).count() === 1, `${profileName}: Activity-Pilot-CTA fehlt`);
-  assert(await page.locator('[data-feedback-open="missing"]').count() > 0, `${profileName}: bestehender Aktivitäts-Tippweg fehlt`);
+  await assertFeedbackOwner(page, profileName, 'Aktivitäts-Funnel');
   await assertSameElementStyle(
     page,
     'section[aria-labelledby="activity-presence-plan-title"] .publish-model-copy strong',
@@ -240,4 +245,4 @@ fs.writeFileSync(
   `${JSON.stringify({ status: 'OK', results }, null, 2)}\n`,
   'utf8',
 );
-console.log('Startpartner compact FAQ live-parity browser contract: OK');
+console.log('Startpartner compact FAQ feedback-owner browser contract: OK');
