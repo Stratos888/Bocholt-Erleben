@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **C1 AKTIV – KONTROLLIERTER EINZELKONSTRUKTIONSLAUF = 0 – REFERENZGRAMMATIK ALS NÄCHSTER SCHRITT**
+Status: **C1 AKTIV – REFERENZGRAMMATIK ABGESCHLOSSEN – NEUE FORMKONSTRUKTIONEN ALS NÄCHSTER SCHRITT**
 
 ## 1. Ziel
 
@@ -16,10 +16,11 @@ Vor jeder weiteren Markenaktion sind ausschließlich diese Dateien maßgeblich:
 1. `docs/brand/phase5/ACTIVE_EXECUTION_LOCK.md`
 2. `docs/brand/phase5/PREMIUM_LOGO_PROCESS.md`
 3. `docs/brand/phase5/PREMIUM_REFERENCE_CALIBRATION.md`
-4. `docs/brand/phase5/C1_C5_RESULT.md`
-5. `docs/brand/phase5/C1_CONTROLLED_CONSTRUCTION_RESULT.md`
-6. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
-7. `docs/brand/phase5/LESSONS_LEARNED.md`
+4. `docs/brand/phase5/FORMAL_REFERENCE_GRAMMAR.md`
+5. `docs/brand/phase5/C1_C5_RESULT.md`
+6. `docs/brand/phase5/C1_CONTROLLED_CONSTRUCTION_RESULT.md`
+7. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
+8. `docs/brand/phase5/LESSONS_LEARNED.md`
 
 Rohskizzen, Generatorboards und verworfene Kandidaten besitzen keinen aktiven Gate-Status.
 
@@ -49,7 +50,7 @@ Orientierende Wahrnehmungsgewichtung:
 
 `T1 – Stable / Alive Stack` fiel im C6-Wahrnehmungsgate als **eher nur ordentlich gesetzte/stilisierte Schrift** durch. T1 bleibt beendet; keine Mikrorettung.
 
-## 5. Neuer C1-Einzelkonstruktionslauf – abgeschlossen mit 0
+## 5. Letzter kontrollierter C1-Einzelkonstruktionslauf – 0
 
 Nach Beendigung des Board-/Template-Modus wurden drei kontrollierte Einzelkonstruktionen getrennt erzeugt und vor jeder Nutzerpräsentation in Schwarz/Weiß sowie kleiner digitaler Wirkung geprüft:
 
@@ -79,27 +80,49 @@ Konsequenz:
 - kein Ersatz durch schwächere interne Entwürfe;
 - kein Absenken der Qualitätsbarriere.
 
-## 7. Nächster effizienter Schritt
+## 7. Formale Referenzgrammatik – abgeschlossen
 
-Vor weiteren Konstruktionen wird aus wenigen realen Premiummarken der bestätigten A+B-Welt eine **formale Referenzgrammatik** extrahiert.
+Aus realen Premiummarken der bestätigten A+B-Welt wurden ausschließlich übertragbare Designprinzipien extrahiert; konkrete Markenformen werden nicht kopiert.
 
-Zu isolieren sind ausschließlich übertragbare Designprinzipien, nicht konkrete Formen:
+Verbindliche Kernprinzipien:
 
-- Silhouettenlogik;
-- Einfachheit / Anzahl visueller Entscheidungen;
-- Negativraum;
-- Verhältnis Zeichen zu Wortmarke;
-- Proportion / Rhythmus;
-- Verhalten bei 24–40 px;
-- Grad der semantischen Offenheit;
-- welche Eigenheit bereits ohne Farbe bestehen bleibt.
+- eine dominante Makroentscheidung statt vieler Tricks;
+- primitive Wiederholung oder eine klare kontinuierliche Formlogik;
+- Eigenheit muss monochrom bestehen;
+- Semantik darf offen bleiben;
+- vollständiger Name darf keine Dekodierung verlangen;
+- Wortmarke ist funktional und rettet kein schwaches Zeichen;
+- 24–40 px ist frühes Pflichtgate;
+- kein Badge-/Rahmen-/Container-Ersatz für Identität;
+- Zeichen und Wort müssen optisch gekoppelt sein;
+- absolute statt relative Qualitätsentscheidung.
 
-Erst danach werden neue einzelne Makroideen gebaut. Keine Kopie bestehender Markenformen.
+Kanonischer Beleg:
 
-## 8. Aktive Gate-Reihenfolge
+`docs/brand/phase5/FORMAL_REFERENCE_GRAMMAR.md`
+
+## 8. Nächster C1-Konstruktionslauf
+
+Es werden drei **Formmechanismen**, keine Bedeutungsmetaphern, untersucht:
+
+1. **Repeated Primitive** – 2–4 einfache Körper mit unverwechselbarem Rhythmus;
+2. **Single Open Contour** – eine einzige offene, nicht loop-/portalartige Hauptkontur;
+3. **Mass / Cut** – ein kompakter Körper mit genau einem robusten Negativraum als charakteristischem Eingriff.
+
+Für alle drei gilt:
+
+- keine BE-/Buchstabenpflicht;
+- keine Event-/Ort-/Tourismusmetapher;
+- keine bekannte Symbolfamilie kopieren;
+- erst isolierte Schwarz/Weiß-Form;
+- dann neutrale Wortmarkenkopplung;
+- dann 24–40-px-Test;
+- erst danach C2/C3.
+
+## 9. Aktive Gate-Reihenfolge
 
 1. **C0:** PASS;
-2. **C1:** aktiv – Referenzgrammatik, danach neue Einzelkonstruktionen;
+2. **C1:** aktiv – neue Formkonstruktionen auf Basis der Referenzgrammatik;
 3. **C2:** technischer/formaler Rohfilter;
 4. **C3:** anonymer externer Referenzvergleich;
 5. **C4:** maximal drei reproduzierbare Vektorkonstruktionen;
@@ -107,7 +130,7 @@ Erst danach werden neue einzelne Makroideen gebaut. Keine Kopie bestehender Mark
 7. **C6:** Product-Owner-Wahrnehmungsgate;
 8. erst nach PASS: responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion, Rechts-/Technikpreflight, Endgate und separate Integration.
 
-## 9. Harte Regeln
+## 10. Harte Regeln
 
 - keine ästhetischen AI-Scores;
 - keine relative Siegerlogik;
