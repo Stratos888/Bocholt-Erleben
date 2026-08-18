@@ -2,13 +2,13 @@
 
 Stand: 2026-08-18
 Workpack: #259
-Status: **C0 ABGESCHLOSSEN – PRODUCT-OWNER-MARKENWELT-GATE AKTIV**
+Status: **C0 PASS – CREATIVE DIRECTION BESTÄTIGT**
 
 ## 1. Zweck
 
-Vor einem weiteren `Bocholt erleben`-Logo wird die absolute Qualitätslatte außerhalb der bisherigen eigenen Entwürfe kalibriert.
+Vor einem weiteren `Bocholt erleben`-Logo wurde die absolute Qualitätslatte außerhalb der bisherigen eigenen Entwürfe kalibriert.
 
-Diese Datei ist **kein Inspirationskatalog zum Kopieren**. Sie definiert reale Referenzwelten und eine spätere Blindvergleichsmethode, damit ein relativ guter interner Entwurf nicht erneut fälschlich als Premiumkandidat qualifiziert wird.
+Diese Datei ist **kein Inspirationskatalog zum Kopieren**. Sie definiert reale Referenzwelten und die spätere Blindvergleichsmethode, damit ein relativ guter interner Entwurf nicht erneut fälschlich als Premiumkandidat qualifiziert wird.
 
 ## 2. Anlass
 
@@ -31,12 +31,11 @@ Referenzen:
 - COS
 - Letterboxd
 
-Gemeinsame relevante Qualität:
+Relevante Qualität:
 
-- hohe Ruhe und Selbstverständlichkeit;
-- klare inhaltliche Haltung statt Dekoration;
-- starke Typografie und kontrollierte Gesamtkomposition;
-- Premiumwirkung ohne Luxusornament;
+- Ruhe und Selbstverständlichkeit;
+- klare Haltung statt Dekoration;
+- erwachsene Wertigkeit;
 - glaubwürdige Kuratierungs-/Kulturkompetenz.
 
 Für `Bocholt erleben` übernehmen:
@@ -44,7 +43,7 @@ Für `Bocholt erleben` übernehmen:
 - Ruhe;
 - erwachsene Wertigkeit;
 - kuratierte Haltung;
-- wenige, belastbare Markencodes.
+- wenige belastbare Markencodes.
 
 Nicht übernehmen:
 
@@ -63,12 +62,12 @@ Referenzen:
 - DICE
 - Eventbrite
 
-Gemeinsame relevante Qualität:
+Relevante Qualität:
 
 - unmittelbarer Consumer-Zugang;
-- Erlebnis und Entdeckung stehen klar im Mittelpunkt;
-- digitale Nutzbarkeit und Markencharakter arbeiten zusammen;
-- positive Energie ohne behördliche/touristische Anmutung;
+- Erlebnis und Entdeckung im Mittelpunkt;
+- positive Energie;
+- persönliche Nähe;
 - starke Verbindung zwischen Marke und realem Tun.
 
 Für `Bocholt erleben` übernehmen:
@@ -96,20 +95,12 @@ Referenzen:
 
 Diese Welt ist **kein gewünschter Tonalitätsstil**, sondern Qualitätsmaßstab für Logo- und App-Verhalten.
 
-Relevante Qualität:
-
-- schnelle Wiedererkennbarkeit;
-- Kleinformatstärke;
-- wenige, wiederholbare Codes;
-- klare Beziehung zwischen Marke und digitalem Produkt;
-- hohe technische Robustheit.
-
 Für `Bocholt erleben` übernehmen:
 
 - Prägnanz;
-- 24–40-px-Stabilität;
-- responsive Ableitbarkeit;
-- eindeutige Silhouette beziehungsweise Wortbildwirkung.
+- Kleinformatstärke;
+- responsive Robustheit;
+- schnelle Wiedererkennbarkeit.
 
 Nicht übernehmen:
 
@@ -117,29 +108,27 @@ Nicht übernehmen:
 - generische App-Geometrie;
 - funktionale Kälte.
 
-## 4. Creative-Direction-Ergebnis
+## 4. Bestätigte Creative Direction
 
-Die drei Welten sind für `Bocholt erleben` **nicht gleichwertige Alternativen**.
+Der Product Owner bestätigte am 2026-08-18 folgende Richtung:
 
-Aus Produktkern und Referenzvergleich ergibt sich als stärkste Creative Direction:
-
-> **A + B als Markencharakter, C ausschließlich als Qualitätsdisziplin.**
-
-Präziser:
-
-- **A liefert Souveränität und Kuratierung**;
-- **B liefert Erlebnisenergie, Nähe und Consumer-Relevanz**;
-- **C definiert nur, wie prägnant und kleinformatfähig das Resultat sein muss.**
-
-Das Ziel ist damit weder eine reine Editorial-Marke noch ein typischer Ticketing-/Travel-Marktplatz und auch keine funktionale Outdoor-App.
+> **A + B als Markencharakter; C ausschließlich als Qualitätsdisziplin.**
 
 Gesuchte Gesamtwirkung:
 
-> **hochwertig kuratiert, lebendig genug für Freizeit und Entdeckung, persönlich und zugänglich, aber visuell so diszipliniert, dass das Logo in kleiner digitaler Anwendung selbstverständlich besteht.**
+> **hochwertig, ruhig und kuratiert, gleichzeitig lebendig, persönlich und entdeckungsfreudig; modern und eigenständig, aber weder elitär noch touristisch noch ticketportal-laut.**
+
+Orientierende Wahrnehmungsgewichtung:
+
+- hochwertig etwa `8/10`;
+- lebendig etwa `6/10`;
+- verspielt etwa `2/10`.
+
+Damit ist **C0 abgeschlossen und bestanden**.
 
 ## 5. Konsequenz für C1
 
-Die nächste Logoexploration startet **ohne vorgeschriebene Architektur**.
+Die neue Logoexploration startet **ohne vorgeschriebene Architektur**.
 
 Erlaubt sind:
 
@@ -150,7 +139,7 @@ Erlaubt sind:
 - freie abstrakte Form;
 - Heritage nur, wenn sie aus eigener Stärke überlebt.
 
-Nicht mehr vorgeschrieben:
+Nicht vorgeschrieben:
 
 - `BE`-DNA;
 - Monogramm;
@@ -169,7 +158,7 @@ Technische/formale Eliminierung, aber **keine Premiumfreigabe**.
 
 ### C3 – externer Blindvergleich
 
-Bevor ein Entwurf `Finalist` heißen darf, wird er anonymisiert zwischen realen professionellen Referenzlogos aus A/B/C geprüft:
+Bevor ein Entwurf `Finalist` heißen darf, wird er anonymisiert zwischen realen professionellen Referenzlogos aus der bestätigten Markenwelt geprüft:
 
 - monochrom;
 - gleiche optische Größe;
@@ -188,18 +177,9 @@ Bei `ja`: FAIL.
 
 Der Product Owner sieht maximal drei zuvor bestandene Kandidaten. Seine Aufgabe bleibt Wahrnehmung und Markenfit, nicht Mikrodesign.
 
-## 7. Aktuelles Product-Owner-Gate
+## 7. Aktiver Stand
 
-Die Recherche ergibt folgende Empfehlung:
-
-> **A + B, mit C nur als Disziplin.**
-
-Product Owner bestätigt entweder:
-
-- `passt` / `weiter`; oder
-- nennt eine klare Abweichung, z. B. `mehr A`, `mehr B`, `mehr C` oder einen konkreten Wahrnehmungsblocker.
-
-Erst danach startet C1.
-
-Aktueller Logo-Finalist: `0`.
-Öffentliche Wirkung: `0`.
+- C0: **PASS**;
+- C1: **freigegeben und aktiv**;
+- aktueller Logo-Finalist: `0`;
+- öffentliche Wirkung: `0`.
