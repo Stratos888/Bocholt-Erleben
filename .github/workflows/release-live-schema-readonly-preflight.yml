@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   live-schema-readonly:
@@ -70,7 +71,6 @@ jobs:
               return clean_rows(cursor.fetchall())
 
           def normalize_create(sql):
-              # Structural evidence only: do not expose current AUTO_INCREMENT counters.
               return re.sub(r"AUTO_INCREMENT=\d+", "AUTO_INCREMENT=<redacted>", sql or "")
 
           missing = [key for key in REQUIRED if not os.environ.get(key, "").strip()]
@@ -284,3 +284,42 @@ jobs:
           if report.get("status") != "PASS":
               raise SystemExit(1)
           PY
+
+      - name: Publish sanitized evidence pointer to workpack
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'evidence/release-live-schema-readonly.json';
+            let report = {status: 'FAIL', error_class: 'EvidenceFileMissing', tables: {}};
+            if (fs.existsSync(path)) {
+              report = JSON.parse(fs.readFileSync(path, 'utf8'));
+            }
+            let digest = 'unavailable';
+            const digestPath = 'evidence/release-live-schema-readonly.sha256';
+            if (fs.existsSync(digestPath)) {
+              digest = fs.readFileSync(digestPath, 'utf8').trim().split(/\s+/)[0] || 'unavailable';
+            }
+            const lines = [
+              '## Live-Schema Read-only Evidence Run',
+              '',
+              `- run_id: \`${context.runId}\``,
+              `- head_sha: \`${context.sha}\``,
+              `- status: **${report.status || 'UNKNOWN'}**`,
+              `- read_only_transaction_requested: \`${Boolean(report.read_only_transaction_requested)}\``,
+              `- db_writes_executed: \`${Boolean(report.write_operations_executed)}\``,
+              `- business_rows_exported: \`${Boolean(report.business_rows_exported)}\``,
+              `- live_filesystem_write_executed: \`${Boolean(report.live_filesystem_write_executed)}\``,
+              `- table_count: \`${Object.keys(report.tables || {}).length}\``,
+              `- artifact_sha256: \`${digest}\``,
+            ];
+            if (report.error_class) lines.push(`- error_class: \`${report.error_class}\``);
+            if (report.error_code !== undefined && report.error_code !== null) lines.push(`- error_code: \`${report.error_code}\``);
+            lines.push('', 'No migration, DDL, DML, host upload or live deploy was executed by this workflow.');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 290,
+              body: lines.join('\n'),
+            });
