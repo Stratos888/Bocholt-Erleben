@@ -13,9 +13,11 @@ function count(haystack, needle) {
 }
 
 function sectionFrom(haystack, marker) {
-  const start = haystack.indexOf(marker);
+  const markerIndex = haystack.indexOf(marker);
+  if (markerIndex < 0) return '';
+  const start = haystack.lastIndexOf('<section', markerIndex);
   if (start < 0) return '';
-  const end = haystack.indexOf('</section>', start);
+  const end = haystack.indexOf('</section>', markerIndex);
   return end < 0 ? haystack.slice(start) : haystack.slice(start, end + '</section>'.length);
 }
 
