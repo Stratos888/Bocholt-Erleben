@@ -28,14 +28,23 @@ const activityPublish = read('aktivitaeten/sichtbar-werden/index.html');
 const membership = read('fuer-veranstalter/index.html');
 const login = read('fuer-veranstalter/login/index.html');
 const explainer = read('veroeffentlichung-erklaert/index.html');
+const feedbackJs = read('js/feedback.js');
+const siteFooterJs = read('js/site-footer.js');
 const styleEntry = read('css/style.css');
 const pagesCss = read('css/pages.css');
 
-// #279-Leitplanke: Der freigegebene Live-Funnel bleibt Referenz.
-// Startpartner bleibt ein eigener begrenzter Sonderweg, nutzt aber kompakte gemeinsame Funnel-Primitives und die bestehende FAQ für Details.
+// #281-Leitplanke: Der kompakte Startpartner-Funnel bleibt unverändert; fehlende Inhalte laufen ausschließlich über das globale Feedback-System.
 assert(!fs.existsSync('events-veroeffentlichen/mitgliedschaft/index.html'), 'Live-Parität: zusätzliche Membership-Unterroute darf nicht existieren');
 
-// Event-Funnel: reguläre Live-Wege bleiben, danach kompakter Startpartner-Pilot, danach Tippkanal.
+// Globaler Feedback-Owner: Missing-Typ, Launcher und Footer-Tippweg bleiben vorhanden.
+assert(feedbackJs.includes('missing: {'), 'Feedback: Missing-Typ fehlt');
+assert(feedbackJs.includes('label: "Etwas fehlt"'), 'Feedback: Missing-Typ ist nicht verständlich benannt');
+assert(feedbackJs.includes('ensureLauncher();'), 'Feedback: globaler Launcher fehlt');
+assert(siteFooterJs.includes('data-feedback-open="missing"'), 'Footer: Missing-Trigger fehlt');
+assert(siteFooterJs.includes('Fehlt ein Event oder eine Aktivität?'), 'Footer: Tippkanal ist nicht verständlich benannt');
+assert(siteFooterJs.includes('data-feedback-open="global"'), 'Footer: globaler Feedback-Trigger fehlt');
+
+// Event-Funnel: reguläre Wege und kompakter Startpartner-Pilot bleiben; kein eigener Tipp-Kasten im Main.
 assert(eventPublish.includes('Wähle den passenden Veröffentlichungsweg'), 'Event-Funnel: Live-Wegwahl fehlt');
 assert(eventPublish.includes('href="/fuer-veranstalter/"'), 'Event-Funnel: Membership muss weiter auf /fuer-veranstalter/ führen');
 assert(!eventPublish.includes('/events-veroeffentlichen/mitgliedschaft/'), 'Event-Funnel: neue Membership-Unterroute ist nicht erlaubt');
@@ -46,11 +55,7 @@ assert(eventPublish.includes('<h2 id="publish-startpartner-title">Startpartner-P
 assert(eventPublish.includes('6 Monate kostenlos testen'), 'Event-Funnel: kostenlose Pilotdauer fehlt');
 assert(eventPublish.includes('href="/startpartner/?scope=events"'), 'Event-Funnel: Startpartner muss Events kontextuell vorauswählen');
 assert(eventPublish.includes('Startpartner-Pilot anfragen'), 'Event-Funnel: Pilot-CTA fehlt');
-assert(eventPublish.includes('Noch nicht der richtige Weg?'), 'Event-Funnel: bestehender Tippbereich fehlt');
-assert(eventPublish.includes('Nur etwas vorschlagen'), 'Event-Funnel: bestehender Tippweg fehlt');
-assert(eventPublish.includes('data-feedback-open="missing"'), 'Event-Funnel: bestehender Tipp-Trigger fehlt');
 assert(eventPublish.indexOf('Wähle den passenden Veröffentlichungsweg') < eventPublish.indexOf('<h2 id="publish-startpartner-title">Startpartner-Pilot</h2>'), 'Event-Funnel: Pilot muss nach regulären Wegen stehen');
-assert(eventPublish.indexOf('<h2 id="publish-startpartner-title">Startpartner-Pilot</h2>') < eventPublish.indexOf('Noch nicht der richtige Weg?'), 'Event-Funnel: Pilot muss vor dem Tippkanal stehen');
 const eventPilotSection = sectionFrom(eventPublish, 'aria-labelledby="publish-startpartner-title"');
 assert(eventPilotSection.includes('publish-membership-card publish-models-card'), 'Event-Funnel: Pilot muss gemeinsame Card-/Model-Primitives nutzen');
 assert(eventPilotSection.includes('class="publish-model-list"'), 'Event-Funnel: Pilot muss die gemeinsame Model-Liste nutzen');
@@ -58,16 +63,18 @@ assert(eventPilotSection.includes('class="publish-model-copy"'), 'Event-Funnel: 
 assert(!eventPilotSection.includes('content-card--primary'), 'Event-Funnel: Pilot darf keine abweichende Primary-Card-Sonderformatierung nutzen');
 assert(eventPilotSection.includes('href="/veroeffentlichung-erklaert/#startpartner"'), 'Event-Funnel: Pilot-FAQ-Link fehlt');
 assert(eventPilotSection.includes('Was ist der Startpartner-Pilot? Kurz erklärt'), 'Event-Funnel: verständlicher Pilot-FAQ-Link fehlt');
-const eventTipSection = sectionFrom(eventPublish, 'aria-labelledby="publish-secondary-paths-title"');
-assert(eventTipSection && !eventTipSection.includes('Startpartner'), 'Event-Funnel: Startpartner darf nicht mehr mit dem Tippkanal gekoppelt sein');
+assert(!eventPublish.includes('Noch nicht der richtige Weg?'), 'Event-Funnel: redundanter Tipp-Kasten darf nicht zurückkehren');
+assert(!eventPublish.includes('Nur etwas vorschlagen'), 'Event-Funnel: redundanter Tipptext darf nicht zurückkehren');
+assert(!eventPublish.includes('data-feedback-open="missing"'), 'Event-Funnel: eigener Missing-CTA im Main darf nicht zurückkehren');
+assert(eventPublish.includes('/js/site-footer.js?'), 'Event-Funnel: zentraler Footer-Renderer fehlt');
+assert(eventPublish.includes('/js/feedback.js?'), 'Event-Funnel: globale Feedback-Runtime fehlt');
 assert(!eventPublish.includes('Du möchtest nur einen fehlenden Termin melden?'), 'Event-Funnel: zusätzliche Tipp-Karte darf nicht eingeführt werden');
 assert(!eventPublish.includes('Etwas anderes sichtbar machen? Zur Auswahl für Veranstalter & Anbieter'), 'Event-Funnel: Provider-Hub-Navigation darf nicht eingeführt werden');
 
-// Aktivitäts-Funnel: Live-Reihenfolge bleibt; Pilot wird kompakt zwischen Tarifen und Tippkanal ergänzt.
+// Aktivitäts-Funnel: Eignung, Tarife, kompakter Pilot und Ablauf bleiben; kein eigener Tipp-Kasten im Main.
 for (const marker of [
   'Für welche Angebote ist die Aktivitätspräsenz gedacht?',
   'Wähle den passenden Tarif',
-  'Noch nicht der richtige Weg?',
   'So geht es weiter',
 ]) {
   assert(activityPublish.includes(marker), `Aktivitäts-Funnel: Live-Marker fehlt: ${marker}`);
@@ -76,12 +83,9 @@ assert(activityPublish.includes('<h2 id="activity-presence-startpartner-title">S
 assert(activityPublish.includes('6 Monate kostenlos testen'), 'Aktivitäts-Funnel: kostenlose Pilotdauer fehlt');
 assert(activityPublish.includes('href="/startpartner/?scope=activities"'), 'Aktivitäts-Funnel: Startpartner muss Aktivitäten kontextuell vorauswählen');
 assert(activityPublish.includes('Startpartner-Pilot anfragen'), 'Aktivitäts-Funnel: Pilot-CTA fehlt');
-assert(activityPublish.includes('Nur etwas vorschlagen'), 'Aktivitäts-Funnel: bestehender Tippweg fehlt');
-assert(activityPublish.includes('data-feedback-open="missing"'), 'Aktivitäts-Funnel: bestehender Tipp-Trigger fehlt');
 assert(activityPublish.indexOf('Für welche Angebote ist die Aktivitätspräsenz gedacht?') < activityPublish.indexOf('Wähle den passenden Tarif'), 'Aktivitäts-Funnel: Live-Reihenfolge Eignung/Tarife verändert');
 assert(activityPublish.indexOf('Wähle den passenden Tarif') < activityPublish.indexOf('<h2 id="activity-presence-startpartner-title">Startpartner-Pilot</h2>'), 'Aktivitäts-Funnel: Pilot muss nach Tarifen stehen');
-assert(activityPublish.indexOf('<h2 id="activity-presence-startpartner-title">Startpartner-Pilot</h2>') < activityPublish.indexOf('Noch nicht der richtige Weg?'), 'Aktivitäts-Funnel: Pilot muss vor dem Tippkanal stehen');
-assert(activityPublish.indexOf('Noch nicht der richtige Weg?') < activityPublish.indexOf('So geht es weiter'), 'Aktivitäts-Funnel: Live-Reihenfolge Tipp/Ablauf verändert');
+assert(activityPublish.indexOf('<h2 id="activity-presence-startpartner-title">Startpartner-Pilot</h2>') < activityPublish.indexOf('So geht es weiter'), 'Aktivitäts-Funnel: Pilot muss vor dem Ablauf stehen');
 const activityPilotSection = sectionFrom(activityPublish, 'aria-labelledby="activity-presence-startpartner-title"');
 assert(activityPilotSection.includes('publish-membership-card publish-models-card'), 'Aktivitäts-Funnel: Pilot muss gemeinsame Card-/Model-Primitives nutzen');
 assert(activityPilotSection.includes('class="publish-model-list"'), 'Aktivitäts-Funnel: Pilot muss die gemeinsame Model-Liste nutzen');
@@ -89,8 +93,11 @@ assert(activityPilotSection.includes('class="publish-model-copy"'), 'Aktivitäts
 assert(!activityPilotSection.includes('content-card--primary'), 'Aktivitäts-Funnel: Pilot darf keine abweichende Primary-Card-Sonderformatierung nutzen');
 assert(activityPilotSection.includes('href="/veroeffentlichung-erklaert/#startpartner"'), 'Aktivitäts-Funnel: Pilot-FAQ-Link fehlt');
 assert(activityPilotSection.includes('Was ist der Startpartner-Pilot? Kurz erklärt'), 'Aktivitäts-Funnel: verständlicher Pilot-FAQ-Link fehlt');
-const activityTipSection = sectionFrom(activityPublish, 'aria-labelledby="activity-presence-secondary-paths-title"');
-assert(activityTipSection && !activityTipSection.includes('Startpartner'), 'Aktivitäts-Funnel: Startpartner darf nicht mehr mit dem Tippkanal gekoppelt sein');
+assert(!activityPublish.includes('Noch nicht der richtige Weg?'), 'Aktivitäts-Funnel: redundanter Tipp-Kasten darf nicht zurückkehren');
+assert(!activityPublish.includes('Nur etwas vorschlagen'), 'Aktivitäts-Funnel: redundanter Tipptext darf nicht zurückkehren');
+assert(!activityPublish.includes('data-feedback-open="missing"'), 'Aktivitäts-Funnel: eigener Missing-CTA im Main darf nicht zurückkehren');
+assert(activityPublish.includes('/js/site-footer.js?'), 'Aktivitäts-Funnel: zentraler Footer-Renderer fehlt');
+assert(activityPublish.includes('/js/feedback.js?'), 'Aktivitäts-Funnel: globale Feedback-Runtime fehlt');
 assert(!activityPublish.includes('Du möchtest nur ein fehlendes Angebot melden?'), 'Aktivitäts-Funnel: zusätzliche Tipp-Karte darf nicht eingeführt werden');
 assert(!activityPublish.includes('Etwas anderes sichtbar machen? Zur Auswahl für Veranstalter & Anbieter'), 'Aktivitäts-Funnel: Provider-Hub-Navigation darf nicht eingeführt werden');
 
@@ -171,4 +178,4 @@ for (const selector of ['.page--organizers', '.content-hero--panel', '.content-c
   assert(pagesCss.includes(selector), `Shared CSS: Primitive fehlt: ${selector}`);
 }
 
-console.log('Startpartner compact FAQ live-parity contract: OK');
+console.log('Startpartner compact FAQ feedback-owner contract: OK');
