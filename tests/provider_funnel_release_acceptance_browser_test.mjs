@@ -143,9 +143,11 @@ async function runProfile(browser, profileName, viewport) {
   assert(interceptedRequests.length === beforeFeedbackSuccess + 1, `${profileName}: Feedback-Success hat nicht genau einen Request erzeugt`);
   const feedbackSuccessRequest = interceptedRequests.at(-1);
   assert(feedbackSuccessRequest.method === 'POST', `${profileName}: Feedback-Success ist kein POST`);
-  assert(includesMultipart(feedbackSuccessRequest.body, 'feedback_type', 'missing'), `${profileName}: Feedback-Payload enthält missing nicht`);
-  assert(includesMultipart(feedbackSuccessRequest.body, 'route', '/events-veroeffentlichen/'), `${profileName}: Feedback-Payload enthält Route nicht`);
+  assert(includesMultipart(feedbackSuccessRequest.body, 'feedback_type_label', 'Etwas fehlt'), `${profileName}: Feedback-Payload enthält sichtbaren Typ nicht`);
+  assert(includesMultipart(feedbackSuccessRequest.body, 'page_type', 'publish'), `${profileName}: Feedback-Payload enthält Seitentyp nicht`);
   assert(includesMultipart(feedbackSuccessRequest.body, 'message', 'synthetischer fehlender Termin'), `${profileName}: Feedback-Payload enthält Nachricht nicht`);
+  assert(!feedbackSuccessRequest.body.includes('name="feedback_type"'), `${profileName}: interner Feedback-Typ wurde entgegen Payload-Minimierung versendet`);
+  assert(!feedbackSuccessRequest.body.includes('name="route"'), `${profileName}: interne Route wurde entgegen Payload-Minimierung versendet`);
   await feedbackShell.locator('[data-feedback-close]').last().click();
   await feedbackShell.waitFor({ state: 'hidden' });
   mockMode = 'none';
