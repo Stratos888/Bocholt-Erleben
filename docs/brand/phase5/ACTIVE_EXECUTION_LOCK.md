@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **R3 FAIL – R2 STÄRKERE DISTINCTIVE-ASSET-EXPLORATION AKTIV**
+Status: **R2 RESTART BESTANDEN – R3 ZWEI-PARTEIEN-GATE AKTIV**
 
 ## 1. Unveränderliches Ziel
 
@@ -17,70 +17,113 @@ Verbindlich:
 
 - `docs/brand/phase5/PROCESS_REVALIDATION_AND_RESTART.md`
 - `docs/brand/phase5/R1_VISUAL_CALIBRATION.md`
-- `docs/brand/phase5/R2_SYSTEM_EXPLORATION.md`
 - `docs/brand/phase5/R3_TWO_PARTY_RESULT.md`
+- `docs/brand/phase5/R2_RESTART_RESULT.md`
 
-Das frühere 8–12-Personen-Protokoll ist optional und nicht mehr Pflicht.
+Der frühere externe 8–12-Personen-Test ist optional und nicht mehr Voraussetzung.
 
-## 3. R3-Ergebnis
+## 3. R2-Restart-Ergebnis
 
-Anonymisierte Vergleichsvarianten:
+Verworfen:
 
-- A = `Momentstreifen`;
-- B = neutrale Kontrolle;
-- C = `Von hier ins echte Leben` / Foto-Breakout;
-- D = `Auswahlfenster`.
+- `Kuratierte Kerbe` – Ticket-/Coupon-Nähe;
+- `Auswahlklammer` – Scan-/Crop-/Fokus-UI-Nähe;
+- `Doppelperspektive` – zu nah an redaktionellem Vergrößerungseffekt und an `Fokusfarbe`.
 
-Fachlicher Befund:
+Für R3 weitergeführt:
 
-- A: merkfähig, aber zu redaktionell/collageartig;
-- C: aktivierend, aber zu unruhig und layoutgetrieben;
-- D: relativ stärkste Richtung, aber noch zu sehr UI-Split-Layout statt eigenständiger Marke;
-- B: neutrale Kontrolle bleibt zu konkurrenzfähig.
+### A – Fokusfarbe
 
-**R3 = FAIL. Kein System wird zu R4 weitergeführt.**
+- reduzierter visueller Kontext;
+- ein ausgewählter realer Moment bleibt in natürlicher Farbe;
+- funktioniert in Hero, Karte, Detail/Social und Motion;
+- übersetzt `relevante Auswahl statt Masse` direkt;
+- fachlich stärkster Systemkandidat.
+
+### C – Erlebnis-Saum
+
+- feste weiche Übergangskante zwischen reduziertem Kontext und natürlicher Fotografie;
+- funktioniert ebenfalls über Hero, Karte, Detail/Social und Motion;
+- eigenständig, aber schwächer als Fokusfarbe;
+- Risiko allgemeiner Bildbearbeitungs-/Before-After-Assoziation bleibt offen.
+
+### B – neutrale Kontrolle
+
+- funktionale Nullmessung ohne Distinctive Asset;
+- kein Kandidat.
 
 ## 4. Aktueller Schritt
 
-**R2 – ZWEITE DISTINCTIVE-ASSET-EXPLORATION**
+**R3 – ZWEI-PARTEIEN-WAHRNEHMUNGSGATE**
 
 Zweck:
 
-Drei deutlich stärkere Markenprinzipien entwickeln, die bereits mit neutraler Wortsetzung eine eigenständige Markenwelt bilden und die Kontrolle sichtbar übertreffen.
+Prüfen, ob der fachlich empfohlene Systemkandidat `Fokusfarbe` auch für den Product Owner als normaler Nutzer sichtbar markenfähiger, eigenständiger und überzeugender wirkt als die neutrale Kontrolle und der schwächere Gegenkandidat `Erlebnis-Saum`.
 
-## 5. Anforderungen an die neue R2-Runde
+## 5. Rollen
 
-Jedes neue System muss:
+### ChatGPT
 
-- außerhalb einer einzelnen UI-Karte funktionieren;
-- einen wiederkehrenden visuellen Markenbaustein besitzen;
-- über Foto, Fläche, Typografie, Motion und Social-Anwendung skalieren;
-- den Produktkern `relevante Auswahl statt Masse` sichtbar tragen;
-- nicht von einem individuellen Logo oder App-Icon abhängen;
-- die neutrale Kontrolle im späteren Vergleich deutlich übertreffen.
+- trägt die fachliche Designempfehlung;
+- darf keinen relativen Sieger künstlich zu Premium hochstufen;
+- Empfehlung aktuell: **Fokusfarbe weiterführen**.
 
-## 6. Verboten
+### Product Owner
 
-- keine Wortmarkenarbeit;
+Keine Designbegründung erforderlich.
+
+Er beantwortet nur die Wahrnehmungsfrage:
+
+> Wirkt `Fokusfarbe` in der gezeigten realen Anwendung für dich sichtbar wie eine stärkere, eigenständigere Markenrichtung als die neutrale Kontrolle – oder wirkt es weiterhin wie ein Gestaltungseffekt ohne echte Markenqualität?
+
+Zulässige Antworten:
+
+- `überzeugend / weiter`;
+- `nicht überzeugend / zurück zu R2`.
+
+Optional kann ein spontaner Störpunkt genannt werden; keine Designerrolle.
+
+## 6. In R3 verboten
+
+- keine neue Wortmarke;
 - kein Logo;
 - kein App-Icon;
-- kein 0–100-Score;
-- keine reine UI-Flächenaufteilung als Markenprinzip;
-- keine Fotocollage-/Rastervariation als Hauptidee;
-- kein Foto-Breakout als bloßer Layouttrick;
-- keine Wiederholung von `Momentstreifen`, `Auswahlfenster` oder `Foto-Breakout` mit nur anderer Geometrie;
+- kein ästhetischer 0–100-Score;
+- keine neue Systemidee parallel;
 - keine Produktintegration;
 - kein Merge oder Deploy.
 
-## 7. R2-Abschlusskriterium
+## 7. R3-Abschluss
 
-Erst wenn mindestens zwei neue Systeme die neutrale Kontrolle bereits in der fachlichen Vorprüfung deutlich übertreffen, wird ein neuer R3-Vergleich gebaut.
+### PASS
 
-Wenn das nicht gelingt, bleibt der Prozess in R2.
+Nur wenn:
 
-## 8. Rollen
+- ChatGPT hält `Fokusfarbe` fachlich für den stärksten Kandidaten;
+- Product Owner empfindet die Richtung ebenfalls sichtbar überzeugender als die neutrale Kontrolle;
+- kein klarer Kategorie-/Qualitäts-Knock-out benannt wird.
 
-- ChatGPT: Design- und Prozessowner; trifft fachliche Designentscheidungen, darf aber keinen relativen Sieger künstlich hochqualifizieren.
-- Product Owner: menschliches Wahrnehmungs-/Produktgate; keine Designerrolle und keine Pflicht zu externen Testpersonen.
+Dann weiter zu:
+
+**R4 – Wortmarkenarbeit ausschließlich innerhalb des bewiesenen Systems `Fokusfarbe`.**
+
+### FAIL
+
+Wenn der Product Owner die Richtung weiterhin als bloßen Gestaltungseffekt oder nicht markenfähig wahrnimmt:
+
+- zurück zu R2;
+- keine Wortmarkenarbeit.
+
+## 8. Aktuelles Vergleichsmaterial
+
+Arbeitslauf:
+
+- `bocholt_erleben_R2_restart_final_compare.png`
+
+Vergleich:
+
+- A = Fokusfarbe;
+- B = neutrale Kontrolle;
+- C = Erlebnis-Saum.
 
 Kein stiller Prozesswechsel.
