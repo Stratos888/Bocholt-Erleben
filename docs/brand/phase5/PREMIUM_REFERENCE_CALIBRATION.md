@@ -2,191 +2,204 @@
 
 Stand: 2026-08-18
 Workpack: #259
-Status: **C0 MARKENWELT-GATE AKTIV – NOCH KEIN LOGOENTWURF**
+Status: **C0 ABGESCHLOSSEN – PRODUCT-OWNER-MARKENWELT-GATE AKTIV**
 
 ## 1. Zweck
 
-Vor einem weiteren Logoentwurf wird die absolute visuelle Qualitätslatte außerhalb der bisherigen eigenen Entwürfe kalibriert.
+Vor einem weiteren `Bocholt erleben`-Logo wird die absolute Qualitätslatte außerhalb der bisherigen eigenen Entwürfe kalibriert.
 
-Diese Datei ist **kein Inspirationskatalog zum Kopieren**. Sie definiert Referenzwelten und die spätere Vergleichsmethode, damit ein relativ guter interner Entwurf nicht erneut fälschlich als Premiumkandidat qualifiziert wird.
+Diese Datei ist **kein Inspirationskatalog zum Kopieren**. Sie definiert reale Referenzwelten und eine spätere Blindvergleichsmethode, damit ein relativ guter interner Entwurf nicht erneut fälschlich als Premiumkandidat qualifiziert wird.
 
 ## 2. Anlass
 
-`D1 – Initial Frame Signature` bestand die bisherigen internen B2/B4-Gates, fiel jedoch im ersten unabhängigen Product-Owner-Blick klar durch.
+`D1 – Initial Frame Signature` bestand interne Gates, fiel aber im ersten unabhängigen Product-Owner-Blick klar durch. Die Ursache war keine falsche `Logo-first`-Entscheidung, sondern eine zu geschlossene Bewertungslogik: dieselbe AI-Instanz erzeugte und qualifizierte ihre eigene Arbeit innerhalb desselben Suchraums.
 
-Befund:
+D1 ist beendet. Interne ästhetische PASS-Urteile allein besitzen ab jetzt keinen Finalistenstatus mehr.
 
-- Rahmen-/B-Lesart wirkte konstruiert und erklärungsbedürftig;
-- `ocholt` musste visuell dekodiert werden;
-- die Form wirkte eher wie Badge/Sprechblase/Etikett als wie eine selbstverständliche Premium-Marke;
-- die interne Qualifikation hatte erneut relative Stärke innerhalb des eigenen Suchraums mit absoluter Markenqualität verwechselt.
+## 3. Reale Kalibrierungsbasis
 
-D1 ist beendet und wird aus dem aktiven Kandidatenbaum entfernt.
+Am 2026-08-18 wurden aktuelle reale Markenauftritte und offizielle Brand-/Produktseiten aus Consumer-, Discovery-, Kultur-, Lifestyle- und Experience-Kontexten gegengeprüft.
 
-## 3. Externe Kalibrierungsprinzipien
+### Welt A – Kuratierte kulturelle Souveränität
 
-Aktuelle professionelle Consumer-Marken zeigen zwei für `Bocholt erleben` relevante Muster:
+Referenzen:
 
-1. Brand- und Product-System können klar getrennte Rollen besitzen. Wise nutzt im Produkt bewusst eine funktionale, gut lesbare Grundtypografie und setzt charakteristische Brand-Typografie selektiv ein; die Identität entsteht als System, nicht durch permanente Effektdichte.
-2. Eine Erlebnis-/Discovery-Marke kann einen klaren primären Markenanker besitzen und daraus ein flexibles System entwickeln. Eventbrite beschreibt seine aktuelle Marke genau als Kombination aus einem zentralen Markenzeichen und daraus abgeleiteten Farben, Typografie und Community-Ausprägungen.
+- MUBI
+- Monocle
+- MUJI
+- Aesop
+- COS
+- Letterboxd
 
-Diese Beispiele legitimieren **keine** konkrete Form für `Bocholt erleben`; sie kalibrieren nur den Qualitäts- und Systemanspruch.
+Gemeinsame relevante Qualität:
 
-## 4. Drei visuelle Markenwelten
+- hohe Ruhe und Selbstverständlichkeit;
+- klare inhaltliche Haltung statt Dekoration;
+- starke Typografie und kontrollierte Gesamtkomposition;
+- Premiumwirkung ohne Luxusornament;
+- glaubwürdige Kuratierungs-/Kulturkompetenz.
 
-### A – Kuratiert & souverän
+Für `Bocholt erleben` übernehmen:
 
-Referenzmarker:
+- Ruhe;
+- erwachsene Wertigkeit;
+- kuratierte Haltung;
+- wenige, belastbare Markencodes.
 
-- Wise
-- Notion
-- Monzo
+Nicht übernehmen:
+
+- Magazin-/Editorial-Distanz;
+- Kunst-/Fashion-Elitismus;
+- zu geringe Alltagsnähe.
+
+### Welt B – Discovery, Erlebnis und menschliche Energie
+
+Referenzen:
+
 - Airbnb
-- Headspace
-
-Gesuchte Wirkung:
-
-- ruhig;
-- erwachsen;
-- vertrauenswürdig;
-- eigenständig ohne Lautstärke;
-- wenige starke Codes statt dekorativer Dichte.
-
-Risiko für `Bocholt erleben`:
-
-- zu editorial;
-- zu brav;
-- zu wenig Erlebnisenergie.
-
-### B – Lebendig & erlebnisorientiert
-
-Referenzmarker:
-
+- Headout
+- GetYourGuide
+- Fever
+- DICE
 - Eventbrite
+
+Gemeinsame relevante Qualität:
+
+- unmittelbarer Consumer-Zugang;
+- Erlebnis und Entdeckung stehen klar im Mittelpunkt;
+- digitale Nutzbarkeit und Markencharakter arbeiten zusammen;
+- positive Energie ohne behördliche/touristische Anmutung;
+- starke Verbindung zwischen Marke und realem Tun.
+
+Für `Bocholt erleben` übernehmen:
+
+- Zugänglichkeit;
+- Freude und Entdeckung;
+- persönliche Nähe;
+- sichtbare Consumer-Marke statt Informationsportal.
+
+Nicht übernehmen:
+
+- Ticketing-/Marketplace-Lautstärke;
+- globale Travel-Ästhetik;
+- zu jugendliche Eventplakat-Sprache;
+- aggressive Promotion.
+
+### Welt C – Ikonische digitale Disziplin
+
+Referenzen:
+
 - Spotify
-- Meetup
-- Ticketmaster
-- SoundCloud
-
-Gesuchte Wirkung:
-
-- unmittelbare Energie;
-- Freude und kulturelle Nähe;
-- hohe Wiedererkennbarkeit;
-- dynamische Markenwelt.
-
-Risiko für `Bocholt erleben`:
-
-- zu laut;
-- zu event-plakativ;
-- zu jugendlich oder trendabhängig.
-
-### C – Kompakt & ikonisch
-
-Referenzmarker:
-
-- Komoot
+- komoot
 - AllTrails
 - Strava
-- Google Maps
-- Foursquare
 
-Gesuchte Wirkung:
+Diese Welt ist **kein gewünschter Tonalitätsstil**, sondern Qualitätsmaßstab für Logo- und App-Verhalten.
 
-- sehr schnelle Erkennbarkeit;
-- starke Kleinformat- und App-Tauglichkeit;
-- klare Form;
-- funktionale Selbstverständlichkeit.
+Relevante Qualität:
 
-Risiko für `Bocholt erleben`:
+- schnelle Wiedererkennbarkeit;
+- Kleinformatstärke;
+- wenige, wiederholbare Codes;
+- klare Beziehung zwischen Marke und digitalem Produkt;
+- hohe technische Robustheit.
 
-- generische App-Ästhetik;
-- zu funktional;
-- zu wenig kulturelle/persönliche Wärme.
+Für `Bocholt erleben` übernehmen:
 
-## 5. Arbeitshypothese für Bocholt erleben
+- Prägnanz;
+- 24–40-px-Stabilität;
+- responsive Ableitbarkeit;
+- eindeutige Silhouette beziehungsweise Wortbildwirkung.
 
-Aus dem bestehenden Markenvertrag ergibt sich als **Creative-Direction-Hypothese**, nicht als User-Freigabe:
+Nicht übernehmen:
 
-> **A als Basis, B als Energieanteil, C als technische Disziplin.**
+- Sport-/Tracking-Härte;
+- generische App-Geometrie;
+- funktionale Kälte.
 
-Das bedeutet:
+## 4. Creative-Direction-Ergebnis
 
-- primär ruhig, hochwertig und vertrauenswürdig;
-- sichtbar lebendiger und persönlicher als reine Editorial-/Fintech-Marken;
-- in Header/App technisch so kompakt und eindeutig wie starke digitale Consumer-Marken;
-- ausdrücklich nicht laut, verspielt oder touristisch.
+Die drei Welten sind für `Bocholt erleben` **nicht gleichwertige Alternativen**.
 
-Die Hypothese muss durch das Product-Owner-Markenwelt-Gate bestätigt oder verworfen werden, bevor neue `Bocholt erleben`-Logos entstehen.
+Aus Produktkern und Referenzvergleich ergibt sich als stärkste Creative Direction:
 
-## 6. Neue Qualitätsprüfung für spätere Logos
+> **A + B als Markencharakter, C ausschließlich als Qualitätsdisziplin.**
 
-### Stufe 1 – internes Rohfilter
+Präziser:
 
-Weiterhin erlaubt:
+- **A liefert Souveränität und Kuratierung**;
+- **B liefert Erlebnisenergie, Nähe und Consumer-Relevanz**;
+- **C definiert nur, wie prägnant und kleinformatfähig das Resultat sein muss.**
 
-- breite unabhängige Exploration;
-- mehrere Produktionswege;
-- technische und formale Eliminierung.
+Das Ziel ist damit weder eine reine Editorial-Marke noch ein typischer Ticketing-/Travel-Marktplatz und auch keine funktionale Outdoor-App.
 
-Nicht ausreichend für eine Qualifikation.
+Gesuchte Gesamtwirkung:
 
-### Stufe 2 – externe Referenzprobe
+> **hochwertig kuratiert, lebendig genug für Freizeit und Entdeckung, persönlich und zugänglich, aber visuell so diszipliniert, dass das Logo in kleiner digitaler Anwendung selbstverständlich besteht.**
 
-Bevor ein eigener Entwurf intern `Finalist` heißen darf, wird er anonymisiert zwischen professionellen Referenzlogos aus der bestätigten Markenwelt gezeigt:
+## 5. Konsequenz für C1
 
-- gleiche optische Größe;
+Die nächste Logoexploration startet **ohne vorgeschriebene Architektur**.
+
+Erlaubt sind:
+
+- eigenständige Wortmarke;
+- eigenständiges Zeichen;
+- Combination Mark;
+- typografische Signatur;
+- freie abstrakte Form;
+- Heritage nur, wenn sie aus eigener Stärke überlebt.
+
+Nicht mehr vorgeschrieben:
+
+- `BE`-DNA;
+- Monogramm;
+- Öffnung/Portal;
+- D/E/F;
+- Symbol-first;
+- Wortmarke-first.
+
+Ein Konzept muss zur bestätigten Markenwelt passen, ohne sie wörtlich zu illustrieren.
+
+## 6. Neue Kandidatenqualifikation
+
+### C2 – Rohfilter
+
+Technische/formale Eliminierung, aber **keine Premiumfreigabe**.
+
+### C3 – externer Blindvergleich
+
+Bevor ein Entwurf `Finalist` heißen darf, wird er anonymisiert zwischen realen professionellen Referenzlogos aus A/B/C geprüft:
+
 - monochrom;
+- gleiche optische Größe;
 - neutraler Hintergrund;
 - keine Erklärung;
 - keine Bocholt-erleben-Farbe;
-- keine Mock-up-Rettung.
+- keine Produktmock-up-Rettung.
 
 Pflichtfrage:
 
-> Fällt der eigene Entwurf hinsichtlich formaler Selbstverständlichkeit, Prägnanz und Markenreife sichtbar gegenüber den professionellen Referenzen ab?
+> Fällt der eigene Entwurf hinsichtlich Selbstverständlichkeit, Prägnanz und Markenreife sichtbar gegenüber professionellen Referenzen ab?
 
 Bei `ja`: FAIL.
 
-### Stufe 3 – unabhängige menschliche Wahrnehmung
+### C6 – unabhängige menschliche Wahrnehmung
 
-Der Product Owner wird **früher** als bisher eingebunden, aber nicht als Designer:
+Der Product Owner sieht maximal drei zuvor bestandene Kandidaten. Seine Aufgabe bleibt Wahrnehmung und Markenfit, nicht Mikrodesign.
 
-- Markenwelt-Gate vor der Entwurfsphase;
-- später Blind-/Realgrößen-Gate für maximal 1–3 bereits extern gegengeprüfte Kandidaten.
+## 7. Aktuelles Product-Owner-Gate
 
-Keine Mikrotypografie- oder Zeichenanweisungen.
+Die Recherche ergibt folgende Empfehlung:
 
-## 7. Was aufgehoben ist
+> **A + B, mit C nur als Disziplin.**
 
-Nicht mehr aktiv:
+Product Owner bestätigt entweder:
 
-- `BE`-DNA als bevorzugte Architektur;
-- D/E/F als verpflichtende Makroarchitekturen;
-- internes PASS allein als ausreichende Kandidatenqualifikation;
-- die Annahme, dieselbe AI-Instanz könne ihre eigene kreative Arbeit abschließend ästhetisch freigeben.
+- `passt` / `weiter`; oder
+- nennt eine klare Abweichung, z. B. `mehr A`, `mehr B`, `mehr C` oder einen konkreten Wahrnehmungsblocker.
 
-Weiterhin aktiv:
-
-- keine relative Siegerlogik;
-- keine AI-Designscores;
-- Generatoroutput nur als Rohmaterial;
-- Schwarz/Weiß und reale Produktgröße vor Farbe/Mock-up;
-- `0 Kandidaten` ist zulässig;
-- keine öffentliche Änderung ohne Endfreigabe.
-
-## 8. Aktuelles Gate
-
-Noch **kein neuer Logoentwurf**.
-
-Product Owner entscheidet ausschließlich die Creative Direction:
-
-- **A** – kuratiert & souverän;
-- **B** – lebendig & erlebnisorientiert;
-- **C** – kompakt & ikonisch;
-- oder die vorgeschlagene Mischung **A als Basis + B als Energie + C als Disziplin**.
-
-Erst danach startet C1: neue Logoexploration ohne vorgeschriebene Symbol-/Buchstabenarchitektur.
+Erst danach startet C1.
 
 Aktueller Logo-Finalist: `0`.
 Öffentliche Wirkung: `0`.
