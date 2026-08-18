@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **A2 GEZIELTE FORMDIVERGENZ AKTIV – ARCHITEKTUR A PRIMÄR, C CHALLENGER, B VERWORFEN**
+Status: **A2 FAIL – B0 LOGO-SYSTEM-ARCHITEKTUR-RESET AKTIV**
 
 ## 1. Ziel
 
@@ -18,103 +18,109 @@ Vor jeder weiteren Markenaktion sind ausschließlich diese Dateien maßgeblich:
 3. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
 4. `docs/brand/phase5/LESSONS_LEARNED.md`
 
-## 3. A0 – Architektur-Sprint abgeschlossen
+## 3. A2 – abgeschlossen mit FAIL
 
-Geprüft wurden drei echte Architekturklassen mit jeweils mehreren substanziell unterschiedlichen Schwarz-Weiß-Grundkonzepten:
+Die gezielte Formdivergenz wurde über mehrere voneinander getrennte Mechanismen ausgeführt. Geprüft wurden unter anderem:
 
-### A – Latentes `BE`-Markenzeichen
-
-Befund:
-
-- höchste natürliche Verbindung zu `Bocholt erleben`;
-- kompakt und grundsätzlich kleinformatfähig;
-- kann einen eigenständigen Markenanker erzeugen, wenn `B`/`E` nur als Form-DNA dienen;
-- großes Risiko, bei zu direkter Konstruktion in ein gewöhnliches `B/E`-Hybridzeichen zu kippen.
-
-**A1: PASS als Primärarchitektur – aber nur mit verschärfter Regel: keine direkt lesbare Buchstabenverschmelzung als Qualitätsersatz.**
-
-### B – Explizites `BE`-Lettermark
+- latente `B`/`E`-Makroformen mit unterschiedlichen Positiv-/Negativräumen;
+- transformierte und boolesche Buchstaben-DNA ohne direkte Initialensetzung;
+- rhythmische `2 + 3`-Abstraktionen als indirekte B-/E-Struktur;
+- Heritage-Öffnungsformen in flacher, weicher und gefalteter Konstruktion;
+- freie nicht-letterale Challenger;
+- Kleinformat- und Headergegenproben bereits während der Formsuche.
 
 Befund:
 
-- sofortiger Namensbezug;
-- in den Gegenproben jedoch sehr schnelle Nähe zu Agentur-, Immobilien-, Fashion-, Firmen- oder Wappenmonogrammen;
-- zu wenig Raum für eine eigenständige Consumer-Marke ohne erneute typografische Gimmicklogik.
+- direkte oder indirekte `B/E`-Konstruktionen kippen weiterhin zu schnell in Monogramm-/Hybridglyphenwirkung;
+- nicht-letterale Formen kippen zu schnell in generische App-, Reveal-, Portal-, Eye-, Tech- oder Badge-Lesarten;
+- Heritage-Abstraktionen verlieren entweder die Eigenständigkeit oder behalten zu viel Vorhang-/Öffnungs-/Linsencharakter;
+- technisch saubere Kleinformen waren nicht automatisch markenstark;
+- keine geprüfte Form erreichte die absolute Qualitätsbarriere.
 
-**A1: FAIL. Architektur B wird beendet.**
+**A2-Ergebnis: `0` Kandidaten.**
 
-### C – Nicht-letterales Symbol
+Keine dieser Rohformen wird weitergereicht oder dem Product Owner als Auswahl präsentiert.
 
-Befund:
+## 4. Root Cause der A-Architektur
 
-- grundsätzlich größter formaler Freiheitsgrad;
-- keine erzwungene Buchstabenlogik;
-- aktuelle Gegenproben kippen jedoch sehr schnell in generische App-/Portal-/Loop-/Reveal-/Geometrieformen;
-- schwächere natürliche Verbindung zum Namen als A.
+Die Prozessannahme `Logo zuerst` wurde zu eng als `eigenständiges kompaktes Symbol zuerst` operationalisiert.
 
-**A1: PASS nur als Challenger.** C darf A in A2 schlagen, wird aber nicht aus Gleichverteilungsgründen künstlich parallel gehalten.
+Das ist nicht zwingend. Ein Primärlogo kann als vollständige Signatur beziehungsweise als bewusst gemeinsam entwickelte Kombination aus Zeichen und Name funktionieren. Ein separates Kleinzeichen muss nicht schon vor dem vollständigen Logo die gesamte Markenlast tragen.
 
-## 4. Ungültiges Suchmaterial
+Die bisherige Reihenfolge erzeugte deshalb eine unnötige Zwangslage:
 
-Die frühere generische Symboltafel und alle zufälligen Symbolmassenläufe bleiben ausdrücklich ungültig.
+> Das Symbol musste Premiumwirkung beweisen, bevor die eigentliche Beziehung zwischen Markenform und Name überhaupt gestaltet werden durfte.
 
-Auch die A0-Rohkonzepte sind **keine Kandidaten** und werden dem Product Owner nicht gezeigt.
+Diese Regel ist aufgehoben.
 
-## 5. Aktueller Schritt
+## 5. Aktueller Schritt – B0 Logo-System-Architektur
 
-**A2 – GEZIELTE FORMDIVERGENZ**
+Geprüft werden genau drei vollständige Primärlogo-Architekturen:
 
-Primär:
+### D – Bespoke Full-Name Signature
 
-- Architektur A: latente `B`/`E`-DNA, aber Form zuerst und Buchstabenlesbarkeit höchstens sekundär;
-- keine Konstruktion nach Schema `B außen + E innen` oder `zwei Initialen zusammenschieben`;
-- unterschiedliche Makroformen, Negativräume, Gewichtsverteilungen und Silhouetten müssen geprüft werden.
+`Bocholt erleben` selbst wird als eigengezeichnete Gesamtform entwickelt.
 
-Challenger:
+Nicht zulässig:
 
-- Architektur C nur dann weiterführen, wenn eine nicht-letterale Form sichtbar stärker und weniger generisch als A wirkt.
+- Standardschrift plus Tracking/Gewicht;
+- Serif-/Sans-Wechsel als Hauptidee;
+- manipulierte Einzelglyphe;
+- generischer gestapelter Block ohne eigene Formlogik.
 
-A2 endet mit:
+Ziel ist eine makroskopisch eigenständige Signatur, deren Charakter schon in realer Headergröße sichtbar bleibt.
 
-- 3–6 ernsthaften Rohformen insgesamt; oder
-- `0` und einem erneuten Architektur-/Formneustart.
+### E – Combination Logo
 
-Aktuell hat **noch keine A2-Form** die Premiumbarriere erreicht. Erste Vektor-/Kleinformatgegenproben waren technisch stabil, wirkten aber noch zu deutlich wie konstruierte `B/E`-Hybride beziehungsweise generische Reveal-Symbole. Sie werden nicht weitergereicht.
+Zeichen und `Bocholt erleben` werden **von Anfang an gemeinsam** als ein Primärlogo entwickelt.
 
-## 6. Noch nicht zulässig
+Das Zeichen muss nicht isoliert die gesamte Differenzierung tragen. Entscheidend ist die Eigenständigkeit des vollständigen Lock-ups. Erst nach dessen Beweis wird geprüft, ob daraus eine responsive Kleinmarke ableitbar ist.
 
-Bis A2/A3/A4 bestanden sind:
+### F – Heritage Evolution als vollständiges Logo
 
-- keine Kandidatenpräsentation;
-- keine Wortmarkenfinalisierung;
-- keine Farbentwicklung;
-- kein Bildmechanismus;
-- keine Motionentwicklung;
-- kein App-Icon;
-- keine Produktintegration;
-- kein Merge oder Deploy.
+Die reale Wiedererkennbarkeit der heutigen Öffnungs-/Enthüllungs-Idee darf als Ausgangsmaterial dienen, aber nur im Zusammenspiel mit dem Namen.
 
-## 7. Harte Regeln
+Keine Pflicht, den bisherigen Vorhang flach nachzuzeichnen. Die Heritage darf abstrahiert, reduziert oder formal stark verändert werden, solange die neue Gesamtidentität klar moderner und eigenständiger wird.
+
+## 6. Reale Primäransicht
+
+Die Gestaltung wird ab B1 nicht auf einem Logo-Board, sondern primär in der tatsächlichen mobilen Absendergröße beurteilt.
+
+Belegter aktueller Produktkontext auf `staging`:
+
+- mobiler Header: `48px` Systemhöhe;
+- aktuelles Logo im Standardzustand: etwa `24px`;
+- aktueller Titel: etwa `18px`;
+- sehr schmale Geräte: Logo etwa `23px`, Titel etwa `17px`;
+- Desktop ist eine zusätzliche, nicht die primäre Beweisansicht.
+
+Großansichten dürfen Geometrie prüfen, aber keine Richtung qualifizieren, die im realen Header ihre Eigenheit verliert.
+
+## 7. Neue Gate-Reihenfolge
+
+1. **B0:** vollständige Logo-System-Architekturen D/E/F festlegen – aktiv;
+2. **B1:** pro Architektur mehrere substantiell unterschiedliche monochrome Primärlogo-Konzepte direkt in realer Headergröße entwickeln;
+3. **B2:** harter Filter auf Eigenständigkeit, Lesbarkeit, Klischeefreiheit und Produktpassung; Ergebnis `1–4` ernsthafte Systeme oder `0`;
+4. **B3:** maximal drei Systeme vollständig und reproduzierbar als Vektor neu konstruieren;
+5. **B4:** Schwarz/Weiß- und Realproduktbeweis Mobile + Desktop; responsive Kleinmarke nur als Ableitung prüfen, nicht als Vorbedingung;
+6. **B5:** Product-Owner-Gate mit maximal drei intern bestandenen vollständigen Logos;
+7. erst nach PASS: Farbe, Formensystem, Bildsprache, Motion, responsive Mark/App-Icon, Rechts-/Technikpreflight, Endgate und separate Integration.
+
+## 8. Harte Regeln
 
 - keine zufällige Symbolmenge als Qualitätsbeweis;
 - keine relative Siegerlogik;
 - keine ästhetischen AI-Scores;
 - keine Erklärung darf eine schwache Form retten;
-- keine Standardschrift + Icon;
-- kein offensichtliches `BE`-Monogramm nur wegen Namensbezug;
-- keine automatische Vektorisierung als Finalmaster;
-- Schwarz/Weiß und Kleinformat vor Farbe und Mock-up;
-- Product Owner sieht erst maximal drei intern bestandene Richtungen;
-- `staging`, `main`, Live und öffentliche Marke bleiben unverändert.
+- kein `BE`-Monogramm als Default;
+- keine Standardschrift plus Gimmick;
+- kein separates Symbol als Pflichtbestandteil;
+- kein Mark-only-Gate vor dem vollständigen Primärlogo;
+- Generatoroutput ist nur Suchmaterial, kein Finalmaster;
+- reale mobile Absendergröße vor Hochglanzdarstellung;
+- Product Owner sieht keine Rohideen;
+- `staging`, `main`, Live und öffentliche Marke bleiben unverändert;
+- kein Merge oder Deploy.
 
-## 8. Nächste Schritte
-
-1. **A2:** weitere gezielte Formdivergenz innerhalb A, C nur als Challenger;
-2. **A3:** maximal fünf Vektorneukonstruktionen;
-3. **A4:** Mark-only Proof 16–64 px;
-4. **A5:** ruhige Wortmarke + Realprodukt-/48-px-Headerbeweis;
-5. **A6:** Product-Owner-Gate mit maximal drei Richtungen;
-6. danach Markensystem, App-Icon, Rechts-/Technikpreflight, Endgate und separate Integration.
-
-Aktueller Premiumkandidat: `0`.
+Aktueller intern qualifizierter Kandidat: `0`.
 Öffentliche Wirkung: `0`.
