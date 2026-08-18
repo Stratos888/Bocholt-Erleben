@@ -15,81 +15,96 @@ function count(haystack, needle) {
 const startpartner = read('startpartner/index.html');
 const funnelJs = read('js/startpartner-funnel.js');
 const eventPublish = read('events-veroeffentlichen/index.html');
-const eventMembership = read('events-veroeffentlichen/mitgliedschaft/index.html');
 const activityPublish = read('aktivitaeten/sichtbar-werden/index.html');
-const providerEntry = read('fuer-veranstalter/index.html');
-const providerLogin = read('fuer-veranstalter/login/index.html');
+const membership = read('fuer-veranstalter/index.html');
+const login = read('fuer-veranstalter/login/index.html');
 const explainer = read('veroeffentlichung-erklaert/index.html');
 const styleEntry = read('css/style.css');
 const pagesCss = read('css/pages.css');
 
-const forbiddenWording = [
-  'danach den passenden Tarif wählen',
-  'vor dem regulären Tarif',
-  'danach passend wechseln',
-];
+// #274-Leitplanke: Der freigegebene Live-Funnel bleibt die Referenz.
+// Nur Startpartner-spezifische Inhalte/Links dürfen additiv präzisiert werden.
+assert(!fs.existsSync('events-veroeffentlichen/mitgliedschaft/index.html'), 'Live-Parität: zusätzliche Membership-Unterroute darf nicht existieren');
 
-for (const [label, content] of [
-  ['Startpartner', startpartner],
-  ['Veranstaltung veröffentlichen', eventPublish],
-  ['Aktivität sichtbar machen', activityPublish],
-  ['Anbieter-Einstieg', providerEntry],
-  ['Veröffentlichung erklärt', explainer],
+// Event-Funnel: bestehende Live-Struktur und Reihenfolge bleiben erhalten.
+assert(eventPublish.includes('Wähle den passenden Veröffentlichungsweg'), 'Event-Funnel: Live-Wegwahl fehlt');
+assert(eventPublish.includes('href="/fuer-veranstalter/"'), 'Event-Funnel: Membership muss weiter auf /fuer-veranstalter/ führen');
+assert(!eventPublish.includes('/events-veroeffentlichen/mitgliedschaft/'), 'Event-Funnel: neue Membership-Unterroute ist nicht erlaubt');
+assert(eventPublish.includes('Noch nicht der richtige Weg?'), 'Event-Funnel: bestehender Sekundärbereich fehlt');
+assert(eventPublish.includes('Nur etwas vorschlagen'), 'Event-Funnel: bestehender Tippweg fehlt');
+assert(eventPublish.includes('data-feedback-open="missing"'), 'Event-Funnel: bestehender Tipp-Trigger fehlt');
+assert(!eventPublish.includes('Du möchtest nur einen fehlenden Termin melden?'), 'Event-Funnel: aus #272 stammende zusätzliche Tipp-Karte darf nicht bleiben');
+assert(!eventPublish.includes('Etwas anderes sichtbar machen? Zur Auswahl für Veranstalter & Anbieter'), 'Event-Funnel: aus #272 stammende Anbieter-Navigation darf nicht bleiben');
+assert(eventPublish.includes('Begrenzte Startpartnerplätze'), 'Event-Funnel: Startpartner-Einstieg fehlt');
+assert(eventPublish.includes('href="/startpartner/?scope=events"'), 'Event-Funnel: Startpartner darf Events kontextuell vorauswählen');
+
+// Aktivitäts-Funnel: Live-Reihenfolge Eignung -> Tarife -> bestehende Alternativen -> Ablauf.
+for (const marker of [
+  'Für welche Angebote ist die Aktivitätspräsenz gedacht?',
+  'Wähle den passenden Tarif',
+  'Noch nicht der richtige Weg?',
+  'So geht es weiter',
 ]) {
-  for (const wording of forbiddenWording) {
-    assert(!content.includes(wording), `${label}: veraltete Startpartner-Formulierung gefunden: ${wording}`);
-  }
+  assert(activityPublish.includes(marker), `Aktivitäts-Funnel: Live-Marker fehlt: ${marker}`);
 }
+assert(activityPublish.indexOf('Für welche Angebote ist die Aktivitätspräsenz gedacht?') < activityPublish.indexOf('Wähle den passenden Tarif'), 'Aktivitäts-Funnel: Live-Reihenfolge Eignung/Tarife verändert');
+assert(activityPublish.indexOf('Wähle den passenden Tarif') < activityPublish.indexOf('Noch nicht der richtige Weg?'), 'Aktivitäts-Funnel: Live-Reihenfolge Tarife/Alternativen verändert');
+assert(activityPublish.indexOf('Noch nicht der richtige Weg?') < activityPublish.indexOf('So geht es weiter'), 'Aktivitäts-Funnel: Live-Reihenfolge Alternativen/Ablauf verändert');
+assert(activityPublish.includes('Nur etwas vorschlagen'), 'Aktivitäts-Funnel: bestehender Tippweg fehlt');
+assert(!activityPublish.includes('Du möchtest nur ein fehlendes Angebot melden?'), 'Aktivitäts-Funnel: aus #272 stammende zusätzliche Tipp-Karte darf nicht bleiben');
+assert(!activityPublish.includes('Etwas anderes sichtbar machen? Zur Auswahl für Veranstalter & Anbieter'), 'Aktivitäts-Funnel: aus #272 stammende Anbieter-Navigation darf nicht bleiben');
+assert(activityPublish.includes('href="/startpartner/?scope=activities"'), 'Aktivitäts-Funnel: Startpartner darf Aktivitäten kontextuell vorauswählen');
 
-// Informationsarchitektur: zuerst Inhaltstyp, Pilot als übergreifender Weg.
-assert(providerEntry.includes('Was möchtest du sichtbar machen?'), 'Anbieter-Einstieg: Inhaltstyp-Frage fehlt');
-assert(providerEntry.includes('Veranstaltungen / Events'), 'Anbieter-Einstieg: Event-Inhaltstyp fehlt');
-assert(providerEntry.includes('Aktivitäten / dauerhafte Angebote'), 'Anbieter-Einstieg: Aktivitäts-Inhaltstyp fehlt');
-assert(providerEntry.includes('href="/events-veroeffentlichen/"'), 'Anbieter-Einstieg: Event-Weg fehlt');
-assert(providerEntry.includes('href="/aktivitaeten/sichtbar-werden/"'), 'Anbieter-Einstieg: Aktivitäts-Weg fehlt');
-assert(providerEntry.includes('Kostenloser Startpartner-Pilot'), 'Anbieter-Einstieg: übergreifender Pilot fehlt');
-assert(providerEntry.includes('Veranstaltungen, Aktivitäten oder beidem') || providerEntry.includes('Veranstaltungen, Aktivitäten oder beides'), 'Anbieter-Einstieg: kombinierter Pilot-Scope fehlt');
-assert(!providerEntry.includes('id="organizer-membership-form"'), 'Anbieter-Einstieg darf nicht mehr direkt Membership-Checkout sein');
+// /fuer-veranstalter/ bleibt die freigegebene Membership-Seite, kein neuer Provider-Hub.
+assert(membership.includes('<h1>Mitgliedschaft für regelmäßige Veranstaltungen</h1>'), 'Membership: Live-Haupttitel fehlt');
+assert(membership.includes('id="organizer-membership-form"'), 'Membership: bestehendes Formular fehlt');
+assert(membership.includes('id="organizer-membership-submit"'), 'Membership: bestehender Submit fehlt');
+assert(membership.includes('/js/organizer-membership.js?'), 'Membership: bestehende Membership-Runtime fehlt');
+assert(membership.includes('Starter · 9,99 € / Monat'), 'Membership: Starter-Preis verändert');
+assert(membership.includes('Aktiv · 19,99 € / Monat'), 'Membership: Aktiv-Preis verändert');
+assert(membership.includes('Dauerhaft · 29,99 € / Monat'), 'Membership: Dauerhaft-Preis verändert');
+assert(membership.includes('Andere Ausgangslage?'), 'Membership: bestehender Alternativbereich fehlt');
+assert(membership.includes('Automatische Übernahme prüfen'), 'Membership: bestehender Automatikweg fehlt');
+assert(membership.includes('Begrenzter Startpartnerplatz'), 'Membership: bestehender Startpartner-Einstieg fehlt');
+assert(!membership.includes('Was möchtest du sichtbar machen?'), 'Membership: darf nicht zum Provider-Hub aus #272 umgebaut sein');
+assert(!membership.includes('Veranstaltungen / Events'), 'Membership: neutraler Provider-Hub aus #272 darf nicht bleiben');
 
-// Membership ist jetzt eine fokussierte Event-Unterroute, Mechanics bleiben gleich.
-assert(eventMembership.includes('canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/mitgliedschaft/"'), 'Membership: neue kanonische Route fehlt');
-assert(eventMembership.includes('id="organizer-membership-form"'), 'Membership: bestehendes Formular fehlt');
-assert(eventMembership.includes('id="organizer-membership-submit"'), 'Membership: bestehender Submit fehlt');
-assert(eventMembership.includes('/js/organizer-membership.js?'), 'Membership: bestehende Membership-Runtime fehlt');
-assert(eventMembership.includes('Starter · 9,99 € / Monat'), 'Membership: Starter-Preis verändert');
-assert(eventMembership.includes('Aktiv · 19,99 € / Monat'), 'Membership: Aktiv-Preis verändert');
-assert(eventMembership.includes('Dauerhaft · 29,99 € / Monat'), 'Membership: Dauerhaft-Preis verändert');
-assert(eventPublish.includes('href="/events-veroeffentlichen/mitgliedschaft/"'), 'Event-Funnel: Membership-Link zeigt nicht auf neue Route');
-assert(!eventPublish.includes('href="/fuer-veranstalter/">\n              Mitgliedschaft wählen'), 'Event-Funnel: alter Membership-Link ist noch vorhanden');
+// Login bleibt wie im freigegebenen Live-Funnel.
+assert(login.includes('Status oder Veranstalterbereich öffnen'), 'Login: Live-Titel fehlt');
+assert(login.includes('deine Veranstaltung eingereicht oder deine Mitgliedschaft gestartet'), 'Login: Live-Kontext wurde verändert');
+assert(login.includes('href="/events-veroeffentlichen/"'), 'Login: Live-Rückweg zur Event-Wegwahl fehlt');
+assert(!login.includes('Zurück zur Auswahl für Veranstalter & Anbieter'), 'Login: Provider-Hub-Rückweg aus #272 darf nicht bleiben');
 
-// Event- und Aktivitätsweg: reguläre Produkte zuerst, Pilot separat, Tipp separat.
-assert(eventPublish.includes('Kostenloser Startpartner-Pilot für Veranstaltungen'), 'Event-Funnel: eigener Pilotblock fehlt');
-assert(eventPublish.includes('href="/startpartner/?scope=events"'), 'Event-Funnel: Pilot-Scope events fehlt');
-assert(eventPublish.includes('Du möchtest nur einen fehlenden Termin melden?'), 'Event-Funnel: separater Tippweg fehlt');
-assert(activityPublish.includes('Kostenloser Startpartner-Pilot für Aktivitäten'), 'Aktivitäts-Funnel: eigener Pilotblock fehlt');
-assert(activityPublish.includes('href="/startpartner/?scope=activities"'), 'Aktivitäts-Funnel: Pilot-Scope activities fehlt');
-assert(activityPublish.includes('Du hast einen konkreten Termin? Veranstaltung veröffentlichen'), 'Aktivitäts-Funnel: direkter Event-Fallback fehlt');
-assert(activityPublish.indexOf('So geht es weiter') < activityPublish.indexOf('Kostenloser Startpartner-Pilot für Aktivitäten'), 'Aktivitäts-Funnel: Ablauf muss vor alternativen Pilotweg stehen');
-assert(activityPublish.includes('Du möchtest nur ein fehlendes Angebot melden?'), 'Aktivitäts-Funnel: separater Tippweg fehlt');
+// Erklärseite behält die Live-Struktur und ergänzt Startpartner nur als bestehenden Weg/FAQ.
+assert(explainer.includes('id="welcher-weg-passt"'), 'Erklärseite: Live-Einstieg "Welcher Weg passt?" fehlt');
+assert(explainer.includes('<h2 id="publish-explainer-paths-title">Welcher Weg passt?</h2>'), 'Erklärseite: Live-Wegwahl fehlt');
+assert(explainer.includes('href="/fuer-veranstalter/"'), 'Erklärseite: Membership-Link muss auf /fuer-veranstalter/ bleiben');
+assert(!explainer.includes('/events-veroeffentlichen/mitgliedschaft/'), 'Erklärseite: neue Membership-Unterroute darf nicht bleiben');
+assert(!explainer.includes('id="inhaltstyp"'), 'Erklärseite: IA-Neustrukturierung aus #272 darf nicht bleiben');
+assert(explainer.includes('id="startpartner-weg"'), 'Erklärseite: Startpartner-Weg fehlt');
+assert(explainer.includes('id="startpartner"'), 'Erklärseite: Startpartner-FAQ fehlt');
+assert(explainer.includes('keine Zahlungsart'), 'Erklärseite: fehlende Zahlungsart muss erklärt werden');
+assert(explainer.includes('nicht automatisch in einen kostenpflichtigen Tarif umgewandelt'), 'Erklärseite: automatische Bezahlumwandlung muss ausgeschlossen sein');
 
-// Startpartner ist eine gemeinsame Seite für Event, Activity, Kombination und Unsicherheit.
-assert(startpartner.includes('Startpartner-Pilot'), 'Startpartner: kanonischer Produktbegriff fehlt');
-assert(startpartner.includes('6 Monate kostenlos gemeinsam testen'), 'Startpartner: kostenlose sechsmonatige Pilotphase fehlt');
-assert(startpartner.includes('nach sechs Monaten gemeinsam entscheiden'), 'Startpartner: gemeinsame Entscheidung nach sechs Monaten fehlt');
-assert(startpartner.includes('keine Zahlungsart'), 'Startpartner: Hinweis auf fehlende Zahlungsart fehlt');
-assert(startpartner.includes('nicht automatisch in einen kostenpflichtigen Tarif umgewandelt'), 'Startpartner: Ausschluss automatischer Bezahlumwandlung fehlt');
-assert(startpartner.includes('Keine gekaufte Platzierung und keine bessere öffentliche Optik.'), 'Startpartner: Gleichbehandlungs-Hinweis fehlt');
+// Startpartner selbst darf als einziger Pilot-Funnel Events, Aktivitäten oder beides erfassen.
+for (const marker of [
+  'Startpartner-Pilot',
+  '6 Monate kostenlos gemeinsam testen',
+  'keine Zahlungsart',
+  'nicht automatisch in einen kostenpflichtigen Tarif umgewandelt',
+]) {
+  assert(startpartner.toLocaleLowerCase('de-DE').includes(marker.toLocaleLowerCase('de-DE')), `Startpartner: Marker fehlt: ${marker}`);
+}
 assert(startpartner.includes('id="startpartner-scope"'), 'Startpartner: Scope-Auswahl fehlt');
 for (const value of ['events', 'activities', 'both', 'unsure']) {
   assert(startpartner.includes(`value="${value}"`), `Startpartner: Scope-Option fehlt: ${value}`);
 }
-assert(startpartner.includes('Was möchtest du im Pilot testen?'), 'Startpartner: verständliche Scope-Frage fehlt');
 assert(funnelJs.includes('new URLSearchParams(window.location.search)'), 'Startpartner JS: Query-Scope-Auswertung fehlt');
 assert(funnelJs.includes('applyScopeFromUrl()'), 'Startpartner JS: Scope-Vorauswahl fehlt');
 assert(funnelJs.includes('allowedScopes'), 'Startpartner JS: Scope-Whitelist fehlt');
 
-// Bestehender Formspree-Weg bleibt unverändert.
-assert(count(startpartner, 'rel="stylesheet"') === 1, 'Startpartner: es muss genau einen Stylesheet-Link geben');
+// Bestehender Formspree-Weg und gemeinsames Designsystem bleiben unverändert.
+assert(count(startpartner, 'rel="stylesheet"') === 1, 'Startpartner: genau ein Stylesheet-Link erwartet');
 assert(startpartner.includes('href="/css/style.css?v=2026-06-22-css-governance-v1"'), 'Startpartner: zentraler CSS-Entry-Point fehlt');
 assert(!/<style(?:\s|>)/i.test(startpartner), 'Startpartner: route-spezifischer Style-Block ist nicht erlaubt');
 assert(!/\sstyle\s*=/i.test(startpartner), 'Startpartner: Inline-Styles sind nicht erlaubt');
@@ -97,37 +112,10 @@ assert(startpartner.includes('action="https://formspree.io/f/mrerpwjy"'), 'Start
 assert(startpartner.includes('method="POST"'), 'Startpartner: POST-Vertrag fehlt');
 assert(startpartner.includes('name="lead_type" value="startpartner_6_months_limited"'), 'Startpartner: stabiler lead_type fehlt');
 assert(startpartner.includes('name="pilot_scope"'), 'Startpartner: Scope wird nicht mit der Anfrage übertragen');
-for (const id of [
-  'startpartner-scope',
-  'startpartner-organization',
-  'startpartner-email',
-  'startpartner-note',
-  'startpartner-privacy-confirmed',
-  'startpartner-request-submit',
-]) {
-  assert(startpartner.includes(`id="${id}"`), `Startpartner: Formularfeld fehlt: ${id}`);
-}
-assert(!startpartner.includes('/api/startpartner/'), 'Startpartner: öffentlicher Funnel darf nicht auf internen Startpartner-API-Pfad umgestellt werden');
+assert(!startpartner.includes('/api/startpartner/'), 'Startpartner: öffentlicher Funnel darf nicht auf internen API-Pfad umgestellt werden');
 assert(funnelJs.includes('fetch(form.action'), 'Startpartner JS: bestehender Formspree-Submit-Vertrag fehlt');
 assert(!funnelJs.includes('/api/startpartner/'), 'Startpartner JS: interner Startpartner-API-Pfad ist nicht erlaubt');
-assert(funnelJs.includes('Bitte fülle die markierten Pflichtfelder aus.'), 'Startpartner JS: gemeinsamer Validierungszustand fehlt');
-assert(funnelJs.includes('Deine Anfrage zum Startpartner-Pilot ist angekommen.'), 'Startpartner JS: kanonischer Erfolgszustand fehlt');
 
-// Zentrale Erklärseite spiegelt die Hierarchie und den kombinierten Pilot-Scope.
-assert(explainer.includes('id="inhaltstyp"'), 'Erklärseite: Inhaltstyp-Ebene fehlt');
-assert(explainer.includes('1. Was möchtest du sichtbar machen?'), 'Erklärseite: erste Entscheidung fehlt');
-assert(explainer.includes('id="veranstaltungen"'), 'Erklärseite: Event-Wege fehlen');
-assert(explainer.includes('id="aktivitaeten"'), 'Erklärseite: Aktivitäts-Wege fehlen');
-assert(explainer.includes('Der Startpartner-Pilot ist kein dritter Inhaltstyp.'), 'Erklärseite: Pilot-Einordnung fehlt');
-assert(explainer.includes('Veranstaltungen, Aktivitäten oder beides'), 'Erklärseite: kombinierter Pilot-Scope fehlt');
-assert(explainer.includes('keine Zahlungsart erforderlich'), 'Erklärseite Schema: fehlende Zahlungsart wird nicht erklärt');
-assert(explainer.includes('keine automatische kostenpflichtige Umwandlung'), 'Erklärseite Schema: automatische Bezahlumwandlung wird nicht ausgeschlossen');
-
-// Rückkehrweg ist nicht Event-only formuliert.
-assert(providerLogin.includes('etwas eingereicht, eine Mitgliedschaft gestartet oder deinen Anbieterzugang erhalten'), 'Login: neutraler Anbieter-Kontext fehlt');
-assert(providerLogin.includes('href="/fuer-veranstalter/"'), 'Login: Rückweg zur neutralen Auswahl fehlt');
-
-// Gemeinsames Designsystem, keine neue CSS-Domäne.
 for (const importPath of ['./base.css', './pages.css', './components.css']) {
   assert(styleEntry.includes(`@import url("${importPath}`), `CSS-Governance: Import fehlt: ${importPath}`);
 }
@@ -135,7 +123,5 @@ assert(!styleEntry.toLowerCase().includes('startpartner.css'), 'CSS-Governance: 
 for (const selector of ['.page--organizers', '.content-hero--panel', '.content-card', '.content-cta', '.content-field']) {
   assert(pagesCss.includes(selector), `Shared CSS: Primitive fehlt: ${selector}`);
 }
-assert(pagesCss.includes('var(--cmp-btn-primary-bg)'), 'Shared CSS: Primary-CTA nutzt nicht den Komponenten-Token');
-assert(pagesCss.includes('var(--cmp-card-radius)'), 'Shared CSS: Kartenradius nutzt nicht den Komponenten-Token');
 
-console.log('Startpartner/provider public funnel contract: OK');
+console.log('Startpartner additive live-parity contract: OK');
