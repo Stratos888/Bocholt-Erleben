@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **A2 FAIL – B0 LOGO-SYSTEM-ARCHITEKTUR-RESET AKTIV**
+Status: **B1 VOLLSTÄNDIGE LOGO-EXPLORATION AKTIV – 0 QUALIFIZIERTE KANDIDATEN**
 
 ## 1. Ziel
 
@@ -20,7 +20,7 @@ Vor jeder weiteren Markenaktion sind ausschließlich diese Dateien maßgeblich:
 
 ## 3. A2 – abgeschlossen mit FAIL
 
-Die gezielte Formdivergenz wurde über mehrere voneinander getrennte Mechanismen ausgeführt. Geprüft wurden unter anderem:
+Die gezielte Standalone-Symbolsuche wurde über mehrere voneinander getrennte Mechanismen ausgeführt. Geprüft wurden unter anderem:
 
 - latente `B`/`E`-Makroformen mit unterschiedlichen Positiv-/Negativräumen;
 - transformierte und boolesche Buchstaben-DNA ohne direkte Initialensetzung;
@@ -41,50 +41,51 @@ Befund:
 
 Keine dieser Rohformen wird weitergereicht oder dem Product Owner als Auswahl präsentiert.
 
-## 4. Root Cause der A-Architektur
+## 4. Verbindliche Prozesskorrektur
 
-Die Prozessannahme `Logo zuerst` wurde zu eng als `eigenständiges kompaktes Symbol zuerst` operationalisiert.
+`Logo zuerst` wird nicht länger als `Standalone-Symbol zuerst` interpretiert.
 
-Das ist nicht zwingend. Ein Primärlogo kann als vollständige Signatur beziehungsweise als bewusst gemeinsam entwickelte Kombination aus Zeichen und Name funktionieren. Ein separates Kleinzeichen muss nicht schon vor dem vollständigen Logo die gesamte Markenlast tragen.
+Die primäre Beweiseinheit ist das **vollständige Primärlogo**. Eine responsive Kleinmarke beziehungsweise das App-Icon wird erst aus einer bewiesenen Primäridentität abgeleitet.
 
-Die bisherige Reihenfolge erzeugte deshalb eine unnötige Zwangslage:
+Dadurch entfällt die künstliche Zwangslage, dass ein kleines Symbol die gesamte Premiumwirkung beweisen muss, bevor die Beziehung zwischen Name, Form und Zeichen überhaupt gestaltet wurde.
 
-> Das Symbol musste Premiumwirkung beweisen, bevor die eigentliche Beziehung zwischen Markenform und Name überhaupt gestaltet werden durfte.
-
-Diese Regel ist aufgehoben.
-
-## 5. Aktueller Schritt – B0 Logo-System-Architektur
-
-Geprüft werden genau drei vollständige Primärlogo-Architekturen:
+## 5. B0 – abgeschlossen: vollständige Logo-System-Architekturen
 
 ### D – Bespoke Full-Name Signature
 
-`Bocholt erleben` selbst wird als eigengezeichnete Gesamtform entwickelt.
-
-Nicht zulässig:
-
-- Standardschrift plus Tracking/Gewicht;
-- Serif-/Sans-Wechsel als Hauptidee;
-- manipulierte Einzelglyphe;
-- generischer gestapelter Block ohne eigene Formlogik.
-
-Ziel ist eine makroskopisch eigenständige Signatur, deren Charakter schon in realer Headergröße sichtbar bleibt.
+`Bocholt erleben` wird als eigenständige Gesamtform entwickelt. Keine Standardschrift plus Tracking/Gewicht, kein Serif-/Sans-Wechsel als Hauptidee, keine manipulierte Einzelglyphe.
 
 ### E – Combination Logo
 
-Zeichen und `Bocholt erleben` werden **von Anfang an gemeinsam** als ein Primärlogo entwickelt.
-
-Das Zeichen muss nicht isoliert die gesamte Differenzierung tragen. Entscheidend ist die Eigenständigkeit des vollständigen Lock-ups. Erst nach dessen Beweis wird geprüft, ob daraus eine responsive Kleinmarke ableitbar ist.
+Zeichen und Name werden von Anfang an gemeinsam als ein Primärlogo entwickelt. Kein beliebiges Icon links neben normaler Schrift. Entscheidend ist die Eigenständigkeit des vollständigen Lock-ups.
 
 ### F – Heritage Evolution als vollständiges Logo
 
-Die reale Wiedererkennbarkeit der heutigen Öffnungs-/Enthüllungs-Idee darf als Ausgangsmaterial dienen, aber nur im Zusammenspiel mit dem Namen.
+Die reale Wiedererkennbarkeit der heutigen Öffnungs-/Enthüllungs-Idee darf als Ausgangsmaterial dienen, aber nur im Zusammenspiel mit dem Namen. Keine Pflicht, den bisherigen Vorhang flach nachzuzeichnen.
 
-Keine Pflicht, den bisherigen Vorhang flach nachzuzeichnen. Die Heritage darf abstrahiert, reduziert oder formal stark verändert werden, solange die neue Gesamtidentität klar moderner und eigenständiger wird.
+## 6. B1 – aktuell aktiv
 
-## 6. Reale Primäransicht
+**B1 entwickelt vollständige monochrome Primärlogos direkt in der realen mobilen Absendergröße.**
 
-Die Gestaltung wird ab B1 nicht auf einem Logo-Board, sondern primär in der tatsächlichen mobilen Absendergröße beurteilt.
+Arbeitswege werden bewusst getrennt, damit nicht erneut nur dieselbe interne geometrische Handschrift variiert wird:
+
+- kontrollierte eigene Vektor-/Lettering-Studien;
+- spezialisierte externe Design-Generierung als Rohmaterial;
+- Heritage-/Combination-Gegenproben direkt im Headerkontext.
+
+Die zusätzliche Canva-Designroute wurde gestartet:
+
+- Architektur D wurde mit einem eng geführten Full-Name-Brief generiert;
+- Architektur E wurde mit einem eng geführten Combination-Logo-Brief generiert;
+- diese Generatorausgaben sind ausschließlich **Rohmaterial** und weder Kandidaten noch Premiumbelege;
+- die geplante F-Generation konnte wegen des aktuell erreichten Canva-Generierungskontingents noch nicht ausgeführt werden;
+- dadurch wird kein schwacher Entwurf ersatzweise befördert und keine Architektur vorzeitig als bestanden markiert.
+
+Parallel durchgeführte eigene B1-Studien mit wiederkehrenden Öffnungsschnitten, Ankerbuchstaben, Gap-/Reveal-Mechaniken und kompakten Kombinationszeichen wurden intern verworfen, wenn sie erneut wie `Standardschrift + Gimmick`, Monogramm, Stencil-Effekt oder generisches Symbol wirkten.
+
+Aktuell hat **noch kein B1-System** die Qualifikationsschwelle erreicht.
+
+## 7. Reale Primäransicht
 
 Belegter aktueller Produktkontext auf `staging`:
 
@@ -96,17 +97,27 @@ Belegter aktueller Produktkontext auf `staging`:
 
 Großansichten dürfen Geometrie prüfen, aber keine Richtung qualifizieren, die im realen Header ihre Eigenheit verliert.
 
-## 7. Neue Gate-Reihenfolge
+## 8. B1-/B2-Ausgang
 
-1. **B0:** vollständige Logo-System-Architekturen D/E/F festlegen – aktiv;
-2. **B1:** pro Architektur mehrere substantiell unterschiedliche monochrome Primärlogo-Konzepte direkt in realer Headergröße entwickeln;
-3. **B2:** harter Filter auf Eigenständigkeit, Lesbarkeit, Klischeefreiheit und Produktpassung; Ergebnis `1–4` ernsthafte Systeme oder `0`;
-4. **B3:** maximal drei Systeme vollständig und reproduzierbar als Vektor neu konstruieren;
-5. **B4:** Schwarz/Weiß- und Realproduktbeweis Mobile + Desktop; responsive Kleinmarke nur als Ableitung prüfen, nicht als Vorbedingung;
-6. **B5:** Product-Owner-Gate mit maximal drei intern bestandenen vollständigen Logos;
-7. erst nach PASS: Farbe, Formensystem, Bildsprache, Motion, responsive Mark/App-Icon, Rechts-/Technikpreflight, Endgate und separate Integration.
+B1/B2 darf nur enden mit:
 
-## 8. Harte Regeln
+- `1–4` vollständigen Logo-Systemen, die ohne Farbe und ohne Erklärstory sichtbar eigenständig, lesbar und markenfähig sind; oder
+- `0` und einer erneuten Architektur-/Produktionswegkorrektur.
+
+Generatoroutput zählt nie automatisch als bestandene Richtung.
+
+Der Product Owner sieht keine Rohideen. Falls eine angeschlossene Designintegration systembedingt Rohentwürfe als UI-Karten einblendet, besitzen diese **keinen Gate-Status und erfordern keine Nutzerentscheidung**.
+
+## 9. Nächste Gates
+
+1. **B1:** vollständige monochrome Logoexploration in Realgröße – aktiv;
+2. **B2:** harter interner Systemfilter;
+3. **B3:** maximal drei deterministische Konstruktionen;
+4. **B4:** Mobile-/Desktop-Realproduktbeweis;
+5. **B5:** Product-Owner-Gate mit maximal drei intern bestandenen vollständigen Logos;
+6. erst nach PASS: responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion, Rechts-/Technikpreflight, Endgate und separate Integration.
+
+## 10. Harte Regeln
 
 - keine zufällige Symbolmenge als Qualitätsbeweis;
 - keine relative Siegerlogik;
@@ -118,7 +129,7 @@ Großansichten dürfen Geometrie prüfen, aber keine Richtung qualifizieren, die
 - kein Mark-only-Gate vor dem vollständigen Primärlogo;
 - Generatoroutput ist nur Suchmaterial, kein Finalmaster;
 - reale mobile Absendergröße vor Hochglanzdarstellung;
-- Product Owner sieht keine Rohideen;
+- Product Owner bewertet erst intern bestandene vollständige Logos;
 - `staging`, `main`, Live und öffentliche Marke bleiben unverändert;
 - kein Merge oder Deploy.
 
