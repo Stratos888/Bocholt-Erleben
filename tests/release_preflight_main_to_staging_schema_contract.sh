@@ -90,15 +90,21 @@ start_engine() {
     "$image" >/dev/null
 
   local ready=false
+  local consecutive_ready=0
   for _ in $(seq 1 60); do
     if docker exec "$container" "$client" -uroot "-p$DB_PASSWORD" -e 'SELECT 1' >/dev/null 2>&1; then
-      ready=true
-      break
+      consecutive_ready=$((consecutive_ready + 1))
+      if [ "$consecutive_ready" -ge 3 ]; then
+        ready=true
+        break
+      fi
+    else
+      consecutive_ready=0
     fi
     sleep 1
   done
   if [ "$ready" != true ]; then
-    echo "$label database did not become ready" >&2
+    echo "$label database did not become stably ready" >&2
     docker logs "$container" >&2 || true
     exit 1
   fi
@@ -316,8 +322,18 @@ run_observed_live_engine() {
   for file in "${OBSERVED_LIVE_TRACKED_MIGRATIONS[@]}"; do
     apply_file "$container" "mysql" "$file"
   done
+
+  # The real Live readback proved that both organizer edit columns exist but the
+  # legacy index does not. Migration 004 creates all three together, so remove
+  # only that index here to reproduce the observed structural shape exactly.
+  docker exec "$container" mysql -uroot "-p$DB_PASSWORD" "$DB_NAME" -e \
+    "ALTER TABLE submissions DROP INDEX idx_submissions_organizer_edited_at;" >/dev/null
+
   install_observed_live_runtime_schema "$container" "mysql"
 
+  assert_scalar "$container" "mysql" \
+    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='app_schema_migrations';" \
+    "0" "observed Live has no canonical migration owner before cutover"
   assert_scalar "$container" "mysql" \
     "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN ('content_ops_run','content_ops_metric_daily','content_ops_action_log','feedback_rule_effectiveness_daily');" \
     "0" "observed Live has no legacy Content-Ops tables before cutover"
@@ -325,8 +341,8 @@ run_observed_live_engine() {
     "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME LIKE 'startpartner\\_%';" \
     "0" "observed Live has no Startpartner tables before cutover"
   assert_scalar "$container" "mysql" \
-    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='submissions' AND COLUMN_NAME IN ('activity_opening_json','activity_image_json','organizer_edited_at');" \
-    "3" "observed Live reconciliation columns present"
+    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='submissions' AND COLUMN_NAME IN ('activity_opening_json','activity_image_json','organizer_edited_at','organizer_edit_count');" \
+    "4" "observed Live reconciliation columns present"
   assert_scalar "$container" "mysql" \
     "SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='submissions' AND INDEX_NAME='idx_submissions_organizer_edited_at';" \
     "0" "observed Live organizer edit index absent before cutover"
