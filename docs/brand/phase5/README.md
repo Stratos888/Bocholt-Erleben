@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **A2 GEZIELTE FORMDIVERGENZ AKTIV**
+Status: **A2 FAIL – B0 VOLLSTÄNDIGES LOGO-SYSTEM AKTIV**
 
 ## Kanonischer Dokumentensatz
 
@@ -15,27 +15,49 @@ Aktiv und verbindlich sind ausschließlich:
 - `LESSONS_LEARNED.md`
 - diese `README.md`
 
-Frühere Phase-5-Prozess-, Gate-, Kandidaten-, Score-, Prompt-, Studien- und Asset-Dateien wurden aus dem aktiven Arbeitsbaum entfernt. Der Git-Verlauf bleibt Audit-Trail.
+Frühere Phase-5-Prozess-, Gate-, Kandidaten-, Score-, Prompt-, Studien- und Asset-Dateien bleiben außerhalb des aktiven Arbeitsbaums. Der Git-Verlauf ist Audit-Trail.
 
-## Aktueller Stand
+## A2-Ergebnis
 
-A0/A1 sind abgeschlossen:
+Die gezielte Symbolformsuche wurde über mehrere unterschiedliche Mechanismen durchgeführt.
 
-- **A – latentes `BE`-Markenzeichen:** PASS als Primärarchitektur;
-- **B – explizites `BE`-Lettermark:** FAIL;
-- **C – nicht-letterales Symbol:** PASS nur als Challenger.
+Ergebnis:
 
-Die frühere Symbolmassenproduktion ist aufgehoben und zählt nicht als Suchnachweis.
+- latente `B/E`-Formen blieben zu nah an Monogramm/Hybridglyphe;
+- freie Challenger blieben zu nah an generischen App-/Reveal-/Tech-Symbolen;
+- Heritage-Abstraktionen blieben zu nah an Vorhang/Öffnung/Auge/Portal oder verloren Eigenständigkeit;
+- kein System erreichte die absolute Qualitätsbarriere.
 
-A2 entwickelt gezielt Formen innerhalb Architektur A. `B` und `E` dürfen nur als latente Form-DNA dienen; eine offensichtliche Hybridglyphe oder ein gewöhnliches Monogramm ist nicht ausreichend. Architektur C darf nur weiter, wenn eine konkrete freie Form sichtbar stärker ist.
+**A2 = FAIL, `0` Kandidaten.**
 
-Erste A2-Gegenproben wurden verworfen, weil sie trotz technischer Stabilität noch zu deutlich wie konstruierte `B/E`-Hybride oder generische Reveal-Symbole wirkten.
+Kein Rohentwurf wird dem Product Owner präsentiert.
 
-## Nächster Gate
+## Prozesskorrektur
 
-A2 muss mit 3–6 ernsthaften Rohformen oder `0` enden. Erst danach dürfen maximal fünf Formen in A3 neu als Vektor konstruiert und in A4 bei 16–64 px geprüft werden.
+Die entscheidende neue Erkenntnis lautet:
 
-Der Product Owner sieht weiterhin keine Rohideen.
+> `Logo zuerst` ist nicht gleichbedeutend mit `Standalone-Symbol zuerst`.
 
-Aktueller Premiumkandidat: `0`.
+Der aktive Prozess beweist deshalb künftig zuerst das **vollständige Primärlogo**. Eine responsive Kleinmarke beziehungsweise das App-Icon wird erst daraus abgeleitet.
+
+## B0 – aktiv
+
+Drei vollständige Logo-System-Architekturen werden gegeneinander entwickelt:
+
+1. **D – Bespoke Full-Name Signature:** eigengezeichnete Gesamtform `Bocholt erleben`, nicht bloß eine andere Schrift;
+2. **E – Combination Logo:** Zeichen und Name werden von Anfang an gemeinsam gestaltet;
+3. **F – Heritage Evolution:** heutige Öffnungs-/Enthüllungserinnerung als komplette moderne Logo-Evolution, nicht als isoliertes Flachsymbol.
+
+Primäre Beweisansicht ist der echte mobile Header: `48px` Systemhöhe, aktuell ungefähr `24px` Logo und `18px` Titel. Großansichten und dekorative Boards dürfen eine in Originalgröße schwache Richtung nicht retten.
+
+## Nächste Gates
+
+- **B1:** vollständige monochrome Logo-System-Exploration direkt in Realgröße;
+- **B2:** harter interner Systemfilter;
+- **B3:** maximal drei deterministische Konstruktionen;
+- **B4:** Mobile-/Desktop-Realproduktbeweis;
+- **B5:** Product Owner sieht maximal drei intern bestandene vollständige Logos;
+- erst danach responsive Kleinmarke/App-Icon, Farbe, Formensprache, Bildsprache, Motion, Rechts-/Technikpreflight und separate Integration.
+
+Aktueller intern qualifizierter Kandidat: `0`.
 Öffentliche Wirkung: `0`.
