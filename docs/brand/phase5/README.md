@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **A2 FAIL – B0 VOLLSTÄNDIGES LOGO-SYSTEM AKTIV**
+Status: **B1 VOLLSTÄNDIGE LOGO-EXPLORATION AKTIV – 0 QUALIFIZIERTE KANDIDATEN**
 
 ## Kanonischer Dokumentensatz
 
@@ -19,7 +19,7 @@ Frühere Phase-5-Prozess-, Gate-, Kandidaten-, Score-, Prompt-, Studien- und Ass
 
 ## A2-Ergebnis
 
-Die gezielte Symbolformsuche wurde über mehrere unterschiedliche Mechanismen durchgeführt.
+Die gezielte Standalone-Symbolsuche wurde über mehrere unterschiedliche Mechanismen durchgeführt.
 
 Ergebnis:
 
@@ -32,28 +32,40 @@ Ergebnis:
 
 Kein Rohentwurf wird dem Product Owner präsentiert.
 
-## Prozesskorrektur
+## Verbindliche Prozesskorrektur
 
-Die entscheidende neue Erkenntnis lautet:
+`Logo zuerst` ist nicht gleichbedeutend mit `Standalone-Symbol zuerst`.
 
-> `Logo zuerst` ist nicht gleichbedeutend mit `Standalone-Symbol zuerst`.
+Der aktive Prozess beweist zuerst das **vollständige Primärlogo**. Eine responsive Kleinmarke beziehungsweise das App-Icon wird erst daraus abgeleitet.
 
-Der aktive Prozess beweist deshalb künftig zuerst das **vollständige Primärlogo**. Eine responsive Kleinmarke beziehungsweise das App-Icon wird erst daraus abgeleitet.
+## B0 – abgeschlossen
 
-## B0 – aktiv
+Drei vollständige Logo-System-Architekturen sind definiert:
 
-Drei vollständige Logo-System-Architekturen werden gegeneinander entwickelt:
-
-1. **D – Bespoke Full-Name Signature:** eigengezeichnete Gesamtform `Bocholt erleben`, nicht bloß eine andere Schrift;
+1. **D – Bespoke Full-Name Signature:** eigenständige Gesamtform `Bocholt erleben`, nicht bloß eine andere Schrift;
 2. **E – Combination Logo:** Zeichen und Name werden von Anfang an gemeinsam gestaltet;
 3. **F – Heritage Evolution:** heutige Öffnungs-/Enthüllungserinnerung als komplette moderne Logo-Evolution, nicht als isoliertes Flachsymbol.
 
-Primäre Beweisansicht ist der echte mobile Header: `48px` Systemhöhe, aktuell ungefähr `24px` Logo und `18px` Titel. Großansichten und dekorative Boards dürfen eine in Originalgröße schwache Richtung nicht retten.
+## B1 – aktiv
+
+B1 arbeitet direkt in der realen mobilen Absendergröße und kombiniert bewusst unterschiedliche Produktionswege.
+
+Bereits erfolgt:
+
+- weitere interne Full-Name-, Combination- und Heritage-Gegenproben;
+- harte Eliminierung von `Standardschrift + Gimmick`, sichtbaren Monogrammen, Stencil-/Cut-Effekten und generischen Symbolen;
+- Start einer spezialisierten Canva-Designroute als zusätzlicher Rohmaterialkanal für D und E.
+
+Die Canva-Ausgaben sind **keine Kandidaten**. Die geplante F-Generation konnte wegen des aktuell erreichten Canva-Generierungskontingents noch nicht ausgeführt werden. Systembedingt sichtbare Canva-Karten sind Rohentwürfe ohne Gate-Status und erfordern keine Auswahl durch den Product Owner.
+
+Primäre Beweisansicht bleibt der echte mobile Header: `48px` Systemhöhe, aktuell ungefähr `24px` Logo und `18px` Titel. Großansichten und dekorative Boards dürfen eine in Originalgröße schwache Richtung nicht retten.
+
+Aktuell hat noch kein B1-System die Qualifikationsschwelle erreicht.
 
 ## Nächste Gates
 
-- **B1:** vollständige monochrome Logo-System-Exploration direkt in Realgröße;
-- **B2:** harter interner Systemfilter;
+- **B1:** vollständige monochrome Logo-System-Exploration direkt in Realgröße – aktiv;
+- **B2:** harter interner Systemfilter auf `1–4` Richtungen oder `0`;
 - **B3:** maximal drei deterministische Konstruktionen;
 - **B4:** Mobile-/Desktop-Realproduktbeweis;
 - **B5:** Product Owner sieht maximal drei intern bestandene vollständige Logos;
