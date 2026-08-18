@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **C6 PRODUCT-OWNER-WAHRNEHMUNGSGATE AKTIV – 1 C3–C5 QUALIFIZIERTER KANDIDAT – 0 PREMIUMFREIGABEN**
+Status: **C6 FAIL – T1 BEENDET – C1 NEUER SUCHRAUM AKTIV – 0 LOGOFINALISTEN**
 
 ## 1. Ziel
 
@@ -22,19 +22,9 @@ Vor jeder weiteren Markenaktion sind ausschließlich diese Dateien maßgeblich:
 
 Rohskizzen, Generatorboards und verworfene Kandidaten besitzen keinen aktiven Gate-Status.
 
-## 3. D1 beendet
+## 3. C0 – PASS
 
-`D1 – Initial Frame Signature` ist im Product-Owner-Wahrnehmungsgate klar durchgefallen. Die früheren internen ästhetischen PASS-Urteile gelten als falsch positiv. D1 wird nicht repariert oder weitergeführt.
-
-## 4. C0 – PASS
-
-Reale Premium-Referenzkalibrierung:
-
-- **A – kuratierte kulturelle Souveränität:** MUBI, Monocle, MUJI, Aesop, COS, Letterboxd;
-- **B – Discovery, Erlebnis und menschliche Energie:** Airbnb, Headout, GetYourGuide, Fever, DICE, Eventbrite;
-- **C – ikonische digitale Disziplin:** Spotify, komoot, AllTrails, Strava.
-
-Am 2026-08-18 bestätigte der Product Owner:
+Bestätigte Creative Direction:
 
 > **A + B als Markencharakter; C ausschließlich als Qualitätsdisziplin.**
 
@@ -48,103 +38,60 @@ Orientierende Wahrnehmungsgewichtung:
 - lebendig: etwa `6/10`;
 - verspielt: etwa `2/10`.
 
-## 5. C1/C2 – freie Exploration und Rohfilter abgeschlossen
+## 4. D1 – historischer FAIL
 
-Die Suche wurde ohne vorgeschriebene `BE`-, Monogramm-, Symbol-, Heritage-, D/E/F-, Symbol-first- oder Wortmarke-first-Architektur durchgeführt.
+`D1 – Initial Frame Signature` fiel im Product-Owner-Gate klar durch. Die vorherigen internen ästhetischen PASS-Urteile waren falsch positiv. D1 bleibt beendet.
 
-Genutzte unabhängige Suchwege:
+## 5. T1 – C6 FAIL
 
-- externe generative Rohsuche;
-- eigene abstrakte Zeichenstudien;
-- eigene typografische Signaturen;
-- gestapelte Vollnamensysteme;
-- statisch/dynamische Wortform-Gegenproben;
-- frühe Realgrößenprüfungen im 48-px-Header.
+`T1 – Stable / Alive Stack` war der einzige Entwurf, der den letzten C1–C5-Lauf überstand.
 
-Ein generatives Präsentationsboard enthielt automatisch erfundene Gate-Häkchen und Referenzvergleiche. Diese besaßen keinerlei Bewertungsstatus.
+Konstruktion:
 
-C2 beendete unter anderem Pin/Herz-, Blatt-, Skyline-, Spark-, Script-, Sonnenaufgang-, Outline-B-, Wellen- und farbcodierte Buchstabenfamilien als generisch, klischeehaft oder monochrom nicht belastbar.
+- `bocholt`: stabil, fett, aufrecht;
+- `erleben`: dynamischer, kursiv;
+- beide Wortzeilen optisch gleich breit;
+- vollständiger Name unmittelbar lesbar;
+- kein Icon, Monogramm oder erklärungsbedürftiges Sonderzeichen.
 
-## 6. C3 – externer Referenzfilter
-
-Die einzige Symbolfamilie aus dem externen Rohboard, die C2 überstand, war ein abstrahiertes `b` mit Wortmarke. Sie fiel in C3 durch: zu nah an `App-Icon + normale Wortmarke`, zu wenig eigene Formidee und ohne Farbe nicht ausreichend differenziert.
-
-Parallel entstand eine unabhängige typografische Vollnamenroute aus der natürlichen Struktur:
-
-- `bocholt` = 7 Buchstaben;
-- `erleben` = 7 Buchstaben.
-
-### T1 – Stable / Alive Stack
-
-- `bocholt` stabil, fett und aufrecht;
-- `erleben` dynamischer und kursiv;
-- beide Zeilen optisch gleich breit;
-- kein Symbol, Monogramm oder erklärungsbedürftiges Sonderzeichen;
-- vollständiger Name unmittelbar lesbar.
-
-Eine Uppercase-Gegenprobe `T2` wurde in C3 als zu editorial/institutionell beendet.
-
-**T1 ist der einzige Entwurf, der C3 als referenzgestützte Vorqualifikation überstanden hat.** Das ist ausdrücklich keine Premiumfreigabe.
-
-## 7. C4 – deterministische Konstruktion abgeschlossen
-
-Kanonischer Kandidat:
+Kanonisches Prüfasset:
 
 `docs/brand/phase5/candidates/C4_T1_STABLE_ALIVE_STACK.svg`
 
-Eigenschaften:
+Der Product Owner bewertete T1 am 2026-08-18 im C6-Wahrnehmungsgate als:
 
-- reine Vektorpfade;
-- kein `<text>`;
-- keine Laufzeit-Fontdatei;
-- keine Raster-/Generatorgrafik;
-- `currentColor`;
-- zwei Pfade;
-- ViewBox `348.143 × 153.408`.
+> **eher nur ordentlich gesetzte/stilisierte Schrift**
 
-Aktuelles typografisches Ausgangssubstrat: Inter Display Bold + Inter Display Medium Italic, in Pfade überführt. Vor einer finalen Markenfreigabe bleiben Font-/Lizenz-/Ähnlichkeitsprüfung und gegebenenfalls Individualisierung Pflicht.
+Der unabhängige Gegenblick bestätigt diesen Befund. T1 besitzt zwar Lesbarkeit, Ruhe und technische Stabilität, aber keine ausreichend eigenständige Markensilhouette beziehungsweise keinen charakteristischen Markenanker. Die Differenz zwischen aufrechter erster Zeile und kursiver zweiter Zeile bleibt eine typografische Behandlung, keine belastbare Premium-Identität.
 
-## 8. C5 – Realproduktbeweis abgeschlossen
+**C6-Ergebnis: FAIL. T1 ist beendet. Keine Mikrorettung.**
 
-T1 wurde geprüft in:
+## 6. Konsequenz aus T1
 
-- Schwarz auf Weiß;
-- Reverse Weiß auf Schwarz;
-- 320-px-Mobile-Engpass;
-- 390-px-Standard-Mobile;
-- Desktop-Header;
-- ungefähr 24–28 px Gesamthöhe im bestehenden 48-px-Header.
+Der nächste C1-Lauf darf nicht erneut primär auf `saubere Typografie + Kontrast zwischen zwei Schriftschnitten` setzen.
 
-Befund:
+Neue Suchanforderung:
 
-- vollständiger Name ohne Dekodierung lesbar;
-- keine Badge-/Rahmen-/Portal-/Sprechblasenwirkung;
-- stabile Zweizeilensilhouette in Realgröße;
-- bestehendes UI benötigt für den Test keinen Umbau;
-- Wirkung bleibt bewusst typografisch und zurückhaltend.
+- Eigenständigkeit muss auf Makroebene sichtbar sein;
+- vollständiger Name darf weiterhin zentral sein, aber nicht nur durch Fontgewicht/Kursivlage differenziert werden;
+- ein Zeichen ist erlaubt, aber nicht als generisches App-Icon links neben normaler Schrift;
+- freie Wortbild-, Zeichen-/Namens- und integrierte Kompositionslösungen sind ausdrücklich offen;
+- keine Rückkehr zu `BE`, Portal, Rahmen oder bekannten Tourismus-/Eventklischees;
+- externe Referenzprobe bleibt Pflicht;
+- `0 Kandidaten` bleibt ein zulässiges Ergebnis.
 
-## 9. C6 – jetzt aktiv
+## 7. Aktive Gate-Reihenfolge
 
-Aktueller C3–C5-qualifizierter Kandidat:
+1. **C0:** PASS;
+2. **C1:** neuer unabhängiger Suchraum – aktiv;
+3. **C2:** technischer/formaler Rohfilter;
+4. **C3:** anonymer externer Referenzvergleich;
+5. **C4:** maximal drei reproduzierbare Vektorkonstruktionen;
+6. **C5:** Realproduktbeweis Mobile/Desktop;
+7. **C6:** Product-Owner-Wahrnehmungsgate;
+8. erst nach PASS: responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion, Rechts-/Technikpreflight, Endgate und separate Integration.
 
-- **T1 – Stable / Alive Stack**
-
-Das Product-Owner-Gate entscheidet ausschließlich:
-
-> Wirkt T1 in realer Anwendung bereits wie eine eigenständige, hochwertige Consumer-Marke für `Bocholt erleben` – oder weiterhin eher wie saubere/stilisierte Typografie?
-
-Bei `nein`:
-
-- T1 wird beendet;
-- keine Mikrorettung als Default;
-- zurück zu C1 mit neuem unabhängigen Suchraum.
-
-Bei `ja`:
-
-- noch keine Produktintegration;
-- danach erst responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion, Marken-/Ähnlichkeits-/Rechts-/Technikpreflight und späteres Endgate.
-
-## 10. Harte Regeln
+## 8. Harte Regeln
 
 - keine ästhetischen AI-Scores;
 - keine relative Siegerlogik;
@@ -157,6 +104,6 @@ Bei `ja`:
 - `staging`, `main`, Live und öffentliche Marke bleiben unverändert;
 - kein Merge oder Deploy.
 
-Aktueller C3–C5-Kandidat: `1` (`T1`).
+Aktueller Logo-Finalist: `0`.
 Premiumfreigabe: `0`.
 Öffentliche Wirkung: `0`.
