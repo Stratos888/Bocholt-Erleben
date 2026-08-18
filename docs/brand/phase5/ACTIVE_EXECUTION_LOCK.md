@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **L1 LOGO-DIVERGENZ AKTIV – NOCH KEIN KANDIDAT**
+Status: **A0 ARCHITEKTUR-SPRINT AKTIV – KEINE ZUFÄLLIGE SYMBOLMASSENPRODUKTION**
 
 ## 1. Ziel
 
@@ -18,25 +18,55 @@ Vor jeder weiteren Markenaktion sind ausschließlich diese Dateien maßgeblich:
 3. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
 4. `docs/brand/phase5/LESSONS_LEARNED.md`
 
-Frühere Phase-5-Prozesse, Kandidaten, Gate-Dateien, Scores, SVGs und Studien sind aufgehoben und werden aus dem Arbeitsbaum entfernt. Der Git-Verlauf genügt als Audit-Trail.
+## 3. Prozesskorrektur
 
-## 3. Aktueller Schritt
+Der frühere L1-Pflichtlauf mit `6 Territorien / 120+ Rohsymbolen` ist aufgehoben.
 
-**L1 – MASSIVE LOGO-DIVERGENZ**
+Die erzeugte generische Symboltafel ist ungültiges Suchmaterial und darf für kein Gate gezählt oder weiterverwendet werden.
 
-Pflicht vor jeder Kandidatenbildung:
+Grund: Vor Formmenge muss die für `Bocholt erleben` geeignete **Logo-Architektur** geklärt werden.
 
-- mindestens 6 klar getrennte visuelle Territorien;
-- mindestens 20 Schwarz-Weiß-Rohskizzen pro Territorium;
-- mindestens 120 unterschiedliche Rohskizzen insgesamt;
-- mindestens 3 verschiedene Erzeugungswege;
-- erheblicher Anteil freier abstrakter Formen ohne erzwungene Metapher.
+## 4. Aktueller Schritt
 
-Der Product Owner sieht in L1 keine Rohideen.
+**A0 – ARCHITEKTUR-SPRINT**
 
-## 4. Noch nicht zulässig
+Es werden genau drei Klassen als echte Gegenproben entwickelt:
 
-Bis L1 und L2 vollständig abgeschlossen sind:
+### A – Latentes `BE`-Markenzeichen – Primärhypothese
+
+`B` und `E` liefern die formale DNA, sollen aber zu einem eigenständigen Symbol verschmelzen. Kein sichtbares Standardmonogramm und kein früheres `B/e`-Gimmick.
+
+### B – Explizites `BE`-Lettermark – Kontrollhypothese
+
+Klar lesbare Initialen, aber vollständig eigengezeichnet und ohne generische Monogramm-/Luxus-/Wappenästhetik.
+
+### C – Nicht-letterales Symbol – Kontrollhypothese
+
+Freie eigenständige Form ohne Buchstabenpflicht, damit `BE` nicht aus Bequemlichkeit erzwungen wird.
+
+Pflichtumfang A0:
+
+- 8–12 substanziell unterschiedliche Grundkonzepte je Architektur;
+- insgesamt ca. 24–36 ernsthafte Konzepte;
+- Varianten desselben Prinzips zählen nicht mehrfach;
+- Generatoroutput nur als Rohmaterial;
+- noch keine Nutzerpräsentation.
+
+## 5. Architekturentscheidung A1
+
+Eine Architektur darf nur weiter, wenn sie als Klasse:
+
+- einen merkfähigen Markenanker erzeugt;
+- glaubwürdig mit `Bocholt erleben` verbunden werden kann;
+- bei 16–64 px grundsätzlich tragfähig ist;
+- keine dominante UI-/Branchen-/Symbolklischee-Lesart besitzt;
+- Potenzial für ein vollständiges Markensystem hat.
+
+Aktuelle Arbeitshypothese: **A – latentes `BE`-Markenzeichen** ist am plausibelsten, aber nicht vorentschieden. B und C sind verpflichtende Gegenproben.
+
+## 6. Noch nicht zulässig
+
+Bis A0/A1 abgeschlossen sind:
 
 - keine Kandidatenpräsentation;
 - keine Wortmarkenfinalisierung;
@@ -44,38 +74,31 @@ Bis L1 und L2 vollständig abgeschlossen sind:
 - kein Bildmechanismus;
 - keine Motionentwicklung;
 - kein App-Icon;
-- keine Marken-/Ähnlichkeitsfreigabe als Ersatz für Designqualität;
 - keine Produktintegration;
 - kein Merge oder Deploy.
 
-## 5. Harte Regeln
+## 7. Harte Regeln
 
-- Generatoroutput ist nur Rohmaterial.
-- Keine relative Siegerlogik.
-- Keine ästhetischen AI-Scores.
-- Keine Erklärung darf eine schwache Form retten.
-- Keine Pflicht zu `B`, `e`, Öffnung, Auswahl oder Bocholt-Symbolik.
-- Dominante bekannte Symbol-/UI-Klischees werden verworfen.
-- Schwarz/Weiß und Kleinformat kommen vor Farbe und Mock-up.
-- Ernsthafte Kandidaten werden deterministisch als Vektor neu konstruiert.
-- Der Product Owner entscheidet erst über intern bestandene Richtungen.
-- `staging`, `main`, Live und die öffentliche Marke bleiben unverändert.
+- keine zufällige Symbolmenge als Qualitätsbeweis;
+- keine relative Siegerlogik;
+- keine ästhetischen AI-Scores;
+- keine Erklärung darf eine schwache Form retten;
+- keine Standardschrift + Icon;
+- keine automatische Vektorisierung als Finalmaster;
+- Schwarz/Weiß und Kleinformat vor Farbe und Mock-up;
+- Product Owner sieht erst maximal drei intern bestandene Richtungen;
+- `staging`, `main`, Live und öffentliche Marke bleiben unverändert.
 
-## 6. Nächste Schritte
+## 8. Nächste Schritte
 
-1. **L1:** massive Divergenz;
-2. **L2:** Clusterung und harte Eliminierung auf 3–8 ernsthafte Rohformen oder 0;
-3. **L3:** maximal fünf Vektorkonstruktionen;
-4. **L4:** Mark-only Proof in Schwarz/Weiß und 16–64 px;
-5. **L5:** ruhige Wortmarke + Realprodukt-/Headerbeweis;
-6. **L6:** Product-Owner-Wahrnehmungsgate mit maximal drei Richtungen;
-7. **L7–L10:** Markensystem, App-Icon, Rechts-/Technikpreflight, Endgate und separate Integration.
-
-## 7. Abbruch-/Neustartregel
-
-Wenn nach L2, L4, L5 oder L6 nichts die absolute Qualitätsbarriere erreicht, wird **nicht** der relativ beste Kandidat repariert.
-
-Es beginnt ein neuer breiter L1-Lauf mit neuen Territorien.
+1. **A0:** Architektur-Sprint A/B/C;
+2. **A1:** Architekturfilter;
+3. **A2:** gezielte Formdivergenz nur innerhalb bestandener Architektur(en);
+4. **A3:** maximal fünf Vektorneukonstruktionen;
+5. **A4:** Mark-only Proof 16–64 px;
+6. **A5:** ruhige Wortmarke + Realprodukt-/48-px-Headerbeweis;
+7. **A6:** Product-Owner-Gate mit maximal drei Richtungen;
+8. danach Markensystem, App-Icon, Rechts-/Technikpreflight, Endgate und separate Integration.
 
 Aktueller Premiumkandidat: `0`.
 Öffentliche Wirkung: `0`.
