@@ -2,267 +2,255 @@
 
 Stand: 2026-08-18
 Workpack: #259
-Status: **KANONISCH – MARK-LED, BREITE DIVERGENZ, HARTE ELIMINIERUNG**
+Status: **KANONISCH – ARCHITEKTUR ZUERST, DANACH GEZIELTE FORMEXPLORATION**
 
 ## 1. Ziel
 
 Für `Bocholt erleben` wird ohne externe Kreativbeauftragung eine eigenständige, hochwertige Consumer-Marke entwickelt.
 
-Der zentrale Einstieg ist ab jetzt ein **eigenständiges Markenzeichen**. Es muss bereits monochrom als starke Form funktionieren. Wortmarke, Farbe, Bildsprache, Motion und App-Icon werden erst danach zu einem konsistenten System entwickelt.
+Der zentrale Markenanker soll ein kompaktes Markenzeichen sein, das im App-/Header-Kontext eigenständig funktioniert und anschließend Wortmarke, Farbe, Formensprache, Motion und App-Icon trägt.
 
-Das Markenzeichen muss nicht die Produktfunktion illustrieren. Produktspezifische Bedeutung ist willkommen, aber **keine Voraussetzung für eine gute Form**. Eine starke abstrakte Form ist besser als eine schwache, übererklärte Metapher.
+Wichtig: Der Prozess beginnt **nicht** mehr mit 120 zufälligen Symbolen. Zuerst wird geklärt, welche Logo-Architektur für diese konkrete Marke sinnvoll ist. Erst danach wird innerhalb weniger klar definierter Architekturen breit gestaltet.
 
-## 2. Rollen
+## 2. Korrektur des verworfenen L1-Ansatzes
 
-### ChatGPT
+Der vorher definierte Pflichtlauf `6 Territorien / 120+ Rohsymbole` ist aufgehoben.
 
-Verantwortet vollständig:
+Grund:
 
-- Creative Direction;
-- Suchraum und Divergenz;
-- Generierung von Rohskizzen;
-- Clusterung und Eliminierung;
-- Vektorkonstruktion;
-- Kleinformat- und Realgrößenprüfung;
-- Vorbereitung des finalen Wahrnehmungsgates;
-- spätere Ableitung des Markensystems.
+- reine Mengenproduktion erzeugt viele generische App-, SaaS- und Symbolformen;
+- eine zufällige abstrakte Form besitzt ohne starke Markenlogik geringe Anschlussfähigkeit an den Namen;
+- ein wörtliches `B + E` kann dagegen schnell wie ein austauschbares Monogramm wirken;
+- die zentrale Entscheidung ist deshalb zuerst die **Architektur des Markenzeichens**, nicht die Zahl der Skizzen.
 
-### Product Owner
+Die bereits erzeugte generische Symboltafel ist ungültiges Suchmaterial und zählt für keinen Gate-Nachweis.
 
-Wird erst beteiligt, wenn maximal drei Richtungen die internen Gates bestanden haben.
+## 3. Verbindliche Logo-Architekturen
 
-Keine Designerrolle. Keine Mikroentscheidungen. Keine Auswahl aus Rohideen.
+Es werden genau drei Architekturklassen gegeneinander geprüft.
 
-## 3. Nicht verhandelbare Regeln
+### A – Latentes `BE`-Markenzeichen – Primärhypothese
 
-1. **Generatoroutput ist nur Skizzenmaterial.** Kein generiertes Rasterbild wird zum Final-Logo erklärt.
-2. **Keine relative Siegerlogik.** Wenn nichts die absolute Qualitätsbarriere erreicht, gibt es keinen Kandidaten.
-3. **Keine Konzeptpflicht.** Ein Zeichen darf zuerst als starke Form überzeugen und erst später Bedeutung aufladen.
-4. **Monochrom zuerst.** Farbe, Verlauf, Licht, 3D, Mock-up oder Fotografie dürfen keine schwache Form retten.
-5. **Keine AI-Premiumscores.** Objektive Messwerte sind erlaubt; ästhetische Zahlenwerte sind kein Gate.
-6. **Keine Selbstfreigabe.** Interne AI-Kritik filtert, ersetzt aber nicht das Product-Owner-Wahrnehmungsgate.
-7. **Keine Rohideenpräsentation.** Der Product Owner sieht nur intern qualifizierte Richtungen.
-8. **Keine Produktänderung vor finaler Freigabe.** `staging`, `main` und Live bleiben unverändert.
-9. **Keine erzwungene Symbolik.** `B`, `e`, Öffnung, Auswahl oder Bocholt-Motive sind Suchmöglichkeiten, keine Pflichten.
-10. **Dominante Klischeelesarten sind Knock-outs.** Entscheidend ist die tatsächliche Wahrnehmung, nicht ob eine Geometrie theoretisch erlaubt oder verboten ist.
+Ziel:
 
-## 4. L0 – Freeze
+- `B` und `E` bilden die formale DNA;
+- sie müssen nicht auf den ersten Blick als zwei Buchstaben gelesen werden;
+- das Ergebnis soll wie **ein eigenständiges Symbol** funktionieren, nicht wie zwei zusammengeschobene Initialen;
+- die Buchstabenbeziehung schafft trotzdem eine direkte Verbindung zu `Bocholt erleben`.
 
-Bis ein Primärzeichen bewiesen ist, bleiben unverändert:
+Warum Primärhypothese:
 
-- Name `Bocholt erleben`;
-- Produktkern `relevante Auswahl statt Masse`;
-- bestehendes UI und Informationsarchitektur;
-- bestehende Fotos;
-- bestehende Produktfarben als neutrales Arbeitsgerüst;
-- öffentliche Marke.
+- der Markenname liefert zwei klare Initialen;
+- ein kompaktes Zeichen ist für App, Header und kleine Absenderflächen wertvoll;
+- die Namensverbindung verhindert, dass eine abstrakte Form völlig beliebig wird;
+- eine latent lesbare Buchstabenstruktur kann später in Wortmarke, Motion und Formensystem weitergeführt werden.
 
-Die aktuelle Marke ist Referenz und Ausgangszustand, aber keine verpflichtende Formquelle.
+Sperren:
 
-## 5. L1 – Massive Logo-Divergenz
+- kein Standard-`BE`-Monogramm;
+- keine zwei sichtbaren Buchstaben nebeneinander;
+- kein typischer Kreis-/Shield-/Badge-Container als Ersatz für Eigenständigkeit;
+- kein `B/e`-Gimmick wie in früheren Versuchen.
 
-Ziel: **Breite vor Präzision.**
+### B – Explizites `BE`-Lettermark – Kontrollhypothese
 
-Vor jeder Kandidatenbildung werden mindestens **6 klar getrennte visuelle Territorien** untersucht. Pro Territorium entstehen mindestens **20 Rohskizzen**, insgesamt also mindestens **120 unterschiedliche Schwarz-Weiß-Ideen**.
+Ziel:
 
-Mindestens diese Sucharten müssen enthalten sein:
+- bewusst typografischer, klarer Initialenanker;
+- starke Eigenzeichnung statt Standardschrift;
+- maximal kompakt und merkfähig.
 
-1. **freie abstrakte Form** ohne vorgegebene Metapher;
-2. **Negativraum / Figur-Grund-Beziehung**;
-3. **organische oder asymmetrische Silhouette**;
-4. **reduzierte geometrische Form**, ohne Standard-App-Geometrie zu akzeptieren;
-5. **produktspezifische Abstraktion** aus Kuratierung, Auswahl, Moment oder Übergang – ohne wörtliches UI-Symbol;
-6. **Heritage-Exploration** aus der bisherigen Öffnungs-/Enthüllungs-Idee – nur als gleichberechtigte Option.
+Rolle:
 
-Zusätzliche Territorien sind zulässig und erwünscht, wenn die ersten sechs zu bekannte Formen erzeugen.
+Diese Richtung prüft, ob eine klar lesbare Initialenmarke stärker ist als die latente Symbolform.
 
-### Erzeugungswege
+Sperren:
 
-Mindestens drei unterschiedliche Wege werden kombiniert:
+- keine Fontsetzung plus Ligaturtrick;
+- keine generische Luxus-/Fashion-/Immobilien-Monogrammästhetik;
+- kein Ornament, Wappen oder Siegel.
 
-- generative Bildskizzen für formale Überraschung;
-- prozedurale/geometrische Variation;
-- bewusst neu zusammengesetzte beziehungsweise manuell konstruierte SVG-Skizzen.
+### C – Nicht-letterales Symbol – Kontrollhypothese
 
-Kein einzelnes Tool darf den Stil des Suchraums dominieren.
+Ziel:
 
-## 6. L2 – Harte Eliminierung
+- eigenständige Form ohne Buchstabenpflicht;
+- kann aus Produktwahrheit, Bewegung, Auswahl, Übergang oder freier Form entstehen;
+- muss ohne Konzepttext als starke Marke funktionieren.
 
-Die 120+ Skizzen werden zunächst **ohne Markenstory** betrachtet.
+Rolle:
 
-### Sofort raus
+Diese Richtung verhindert, dass `BE` nur aus Bequemlichkeit erzwungen wird.
 
-- generische App-/SaaS-/AI-Zeichen;
-- austauschbare Monogramme;
-- offensichtliche Pins, Herzen, Blätter, Fahrräder, Tickets, Filter, Scanner oder Navigationssymbole;
-- dominante Spark-/Stern-, Loop-/Knoten-, Portal-/Fenster-, Buch-/Vorhang-, Pause-, Auge-/Linsen-Lesarten;
-- Formen, die erst durch Erklärung interessant werden;
-- Formen, die nur mit Farbe oder 3D funktionieren;
-- visuell komplizierte Zeichen, die klein zerfallen;
-- nahe Varianten desselben Grundzeichens.
+Sperren:
 
-Diese Begriffe sind **keine geometrischen Verbotslisten**. Eine Form wird nur dann verworfen, wenn die jeweilige Klischeelesart tatsächlich dominiert.
+- keine Pins, Tickets, Filter, Scanner, Herzen, Blätter, Fahrräder;
+- keine generischen Sparks, Loops, Portale, Fenster, Augen oder AI-App-Geometrien;
+- keine Form, die nur durch Story interessant wird.
 
-### Clusterregel
+## 4. A0 – Architektur-Sprint
 
-Ähnliche Skizzen werden zu Familien zusammengefasst. Pro Familie darf höchstens eine Form weitergehen. Dadurch werden 20 kleine Varianten nicht fälschlich als 20 unabhängige Ideen gezählt.
+Vor detaillierter Logoentwicklung entstehen pro Architektur **8–12 klar unterschiedliche Grundkonzepte**.
 
-### Absolutschwelle
+Zielgröße:
 
-L2 endet nur mit:
+- A: 8–12 latente BE-Systeme;
+- B: 8–12 explizite BE-Lettermarks;
+- C: 8–12 nicht-letterale Symbole.
 
-- **3–8 ernsthaften Rohformen**, oder
-- **0 Kandidaten und einem neuen L1-Lauf**.
+Insgesamt reichen etwa **24–36 ernsthaft unterschiedliche Konzepte**. Varianten desselben Grundprinzips zählen nicht mehrfach.
 
-Ein schwacher „bester“ Entwurf wird nicht weitergereicht.
+Erzeugungswege dürfen kombiniert werden:
 
-## 7. L3 – Vektorkonstruktion
+- freie generative Formsuche als Rohmaterial;
+- manuelle/geometrische Konstruktion;
+- typografische bzw. Negativraumkonstruktion;
+- prozedurale Variation.
 
-Maximal fünf Rohformen werden **neu gebaut**, nicht einfach nachgezeichnet oder automatisch vektorisiert.
+Generatoroutput bleibt Skizzenmaterial und wird nie direkt zum Final-Logo.
+
+## 5. A1 – Architekturfilter
+
+Jede Architektur wird zuerst als Klasse bewertet, nicht über ihren hübschesten Einzelentwurf.
+
+Prüffragen:
+
+- erzeugt sie einen merkfähigen, eigenständigen Markenanker?
+- besitzt sie eine glaubwürdige Verbindung zu `Bocholt erleben`?
+- funktioniert sie bei 16–64 px?
+- ist sie frei von dominanter Branchen-/UI-/Symbolklischee-Lesart?
+- kann daraus ein vollständiges Markensystem entstehen?
+- ist die Form stärker als eine neutrale Wortmarke allein?
+
+Ergebnis:
+
+- eine Architektur kann vollständig ausscheiden;
+- mehrere können weiterlaufen;
+- keine Architektur wird nur deshalb weitergeführt, weil sie relativ am besten war.
+
+## 6. A2 – Formdivergenz innerhalb der bestandenen Architektur(en)
+
+Erst jetzt wird innerhalb der bestandenen Architektur(en) breiter variiert.
+
+Ziel:
+
+- 12–24 zusätzliche, **substanziell unterschiedliche** Formlösungen je bestandener Architektur;
+- keine künstliche Mengenvorgabe;
+- keine kleinen Variationen als neue Konzepte zählen.
+
+Harte Eliminierung:
+
+- generisch;
+- bekannte App-/SaaS-Form;
+- zu ähnlich zu bestehenden bekannten Marken;
+- nur mit Erklärung interessant;
+- im Kleinformat schwach;
+- typografisch beliebig;
+- visuell unausgewogen.
+
+A2 endet mit **3–6 ernsthaften Rohformen insgesamt** oder `0` und neuem Architektur-Sprint.
+
+## 7. A3 – Vektorneukonstruktion
+
+Maximal fünf Rohformen werden vollständig neu und kontrolliert als Vektor gebaut.
 
 Pflicht:
 
 - kontrollierte Kurven und Tangenten;
-- optisch ausgeglichene Flächen und Gegenräume;
-- bewusstes Verhältnis von Symmetrie und Asymmetrie;
+- optisch ausgeglichene Positiv-/Negativflächen;
 - eindeutige Silhouette;
-- reproduzierbare Geometrie;
-- saubere SVG-Pfade;
-- keine unnötigen Details.
+- saubere Kleinformatgeometrie;
+- reproduzierbare SVG-Pfade;
+- keine automatische Vektorisierung eines Generatorbilds als Finalmaster.
 
-Jede Form erhält genau die Korrekturschleifen, die zur Prüfung ihrer Grundidee nötig sind. Wenn die Grundidee nicht trägt, wird sie beendet statt endlos poliert.
+## 8. A4 – Mark-only Proof
 
-## 8. L4 – Mark-only Proof
-
-Jeder Kandidat muss **ohne Wortmarke und ohne Farbe** bestehen.
-
-Pflichtansichten:
+Jeder Kandidat wird ohne Wortmarke und ohne Farbe geprüft:
 
 - schwarz auf weiß;
 - weiß auf schwarz;
-- 64 px;
-- 48 px;
-- 32 px;
-- 24 px;
-- 16 px;
+- 64 / 48 / 32 / 24 / 16 px;
 - quadratische und freie Fläche;
-- direkte Silhouettengegenüberstellung.
+- direkte Silhouettengegenüberstellung;
+- Spiegel-/Rotations-/Negativraum-Gegenprobe, sofern relevant.
 
-### Binäre Gates
+Binäre Gates:
 
-- eindeutige Form: PASS/FAIL;
-- Kleinformatstabilität: PASS/FAIL;
-- keine dominante Klischeelesart: PASS/FAIL;
-- kein offensichtlicher UI-Icon-Charakter: PASS/FAIL;
-- hochwertige optische Balance: PASS/FAIL;
-- genügend Abstand zur neutralen/generischen Kontrolle: PASS/FAIL.
+- Eigenständigkeit;
+- Kleinformatstabilität;
+- optische Balance;
+- keine dominante Klischeelesart;
+- kein bloßer UI-Icon-Charakter;
+- ausreichend markenhafte Wirkung ohne Erklärung.
 
-Ein einziges strukturelles FAIL kann den Kandidaten beenden.
+## 9. A5 – Wortmarke und reales Produkt
 
-## 9. L5 – Lock-up und Realprodukt
+Erst nach bestandenem Mark-only Proof wird eine ruhige unterstützende Wortmarke `Bocholt erleben` entwickelt.
 
-Erst nach L4 erhält das Zeichen eine **ruhige unterstützende Wortmarke** `Bocholt erleben`.
+Die Wortmarke soll das Zeichen ergänzen, nicht künstlich zusätzlich differenzieren.
 
-Die Wortmarke muss nicht selbst die gesamte Differenzierung tragen. Ihre Aufgabe ist Lesbarkeit, Haltung und formale Verwandtschaft mit dem Zeichen.
+Geprüft wird in:
 
-Geprüft wird mit identischem Produktgerüst:
-
-- realer mobiler 48-px-Header;
+- realem mobilen 48-px-Header;
 - Desktop-Header;
-- kleine Absenderfläche;
-- neutrale Landing-/Detailansicht;
-- Zeichen allein und Zeichen + Name.
+- kleiner Absenderfläche;
+- Zeichen allein;
+- Zeichen + Name.
 
-Fotos, Inhalte und UI bleiben identisch. Es gibt kein Hochglanz-Mock-up als Beweisersatz.
+Bestehende UI, Fotos und Inhalte bleiben identisch.
 
-## 10. L6 – Product-Owner-Gate
+## 10. A6 – Product-Owner-Gate
 
-Nur **1–3 intern bestandene Richtungen** werden gezeigt.
+Der Product Owner sieht maximal **1–3 intern bestandene Richtungen**.
 
-Erste Sichtung ohne Konzepttext. Erst danach darf die Herleitung erklärt werden.
+Erste Sichtung ohne Konzepttext.
 
-Die Frage lautet sinngemäß:
+Frage:
 
-> Wirkt mindestens eine Richtung bereits wie ein eigenständiger hochwertiger Markenabsender – oder weiterhin wie generisches Design?
+> Wirkt mindestens eine Richtung bereits wie ein eigenständiger, hochwertiger Markenabsender für `Bocholt erleben`?
 
-Bei `nein` gehen alle betroffenen Richtungen zurück in L1. Keine Mikrorettung.
+Bei `nein`: zurück zu A0/A2, nicht mikroreparieren.
 
-Bei `ja` wird genau die bestätigte Richtung weiterentwickelt.
+Bei `ja`: nur die bestätigte Richtung wird weiterentwickelt.
 
-## 11. L7 – Markensystem aus dem Primärzeichen
+## 11. Danach: Markensystem
 
-Erst jetzt werden gemeinsam entwickelt:
+Erst nach A6-PASS:
 
-- Wortmarkenfinalisierung;
-- finale Markenfarben und Farbhierarchie;
-- wiederkehrende Formensprache;
-- sekundäre grafische Assets;
-- Icon-/Illustrationsbezug, falls sinnvoll;
-- Bildsprache;
-- Motionprinzip.
+1. Wortmarkenfinalisierung;
+2. finale Markenfarben;
+3. wiederkehrende Formensprache;
+4. sekundäre grafische Assets;
+5. Bildsprache;
+6. Motion;
+7. App-Icon als Anwendung des bewiesenen Zeichens;
+8. Ähnlichkeits-/Rechts-/Technikpreflight;
+9. Endgate;
+10. separate Integration.
 
-`Ableiten` bedeutet **formal und strategisch konsistent entwickeln**, nicht jede Farbe oder UI-Form mechanisch aus der Logo-Geometrie kopieren.
+## 12. Rollen
 
-## 12. L8 – App-Icon
+### ChatGPT
 
-Das App-Icon ist eine Anwendung des bewiesenen Primärzeichens.
+Verantwortet Creative Direction, Architekturvergleich, Exploration, Eliminierung, Vektorkonstruktion, Kleinformatprüfung und Systemableitung.
 
-Es wird für:
+### Product Owner
 
-- 16–512 px;
-- Kreis-/Squircle-/Maskable-Safe-Areas;
-- helle/dunkle Umfelder;
-- monochrome Fallbacks
+Keine Designerrolle. Keine Rohskizzenauswahl. Keine Mikrotypografie. Einstieg erst bei maximal drei intern bestandenen Richtungen.
 
-gehärtet.
+## 13. Harte Regeln
 
-Nur wenn das Primärzeichen technisch nicht als App-Icon funktioniert, darf eine formverwandte responsive Kleinform entwickelt werden.
+- keine ästhetischen AI-Scores;
+- keine relative Siegerlogik;
+- keine zufällige Symbolmenge als Qualitätsbeweis;
+- keine Farbe oder Präsentation als Rettung;
+- keine Standardschrift + Gimmick;
+- keine erzwungene Story;
+- kein Kandidat wird `Premium` genannt, bevor der Product Owner das Wahrnehmungsgate bestanden hat;
+- `staging`, `main`, Live und öffentliche Marke bleiben bis zur späteren Integrationsfreigabe unverändert.
 
-## 13. L9 – Ähnlichkeits-, Rechts- und Technikpreflight
+## 14. Aktive Arbeitshypothese
 
-Für den finalen Kandidaten:
+Die **wahrscheinlich sinnvollste Zielarchitektur** ist derzeit A: ein eigenständiges Markenzeichen mit **latenter `B`/`E`-DNA**.
 
-- Web-/Markenähnlichkeitssuche;
-- relevante DPMA-/EUIPO-Gegenprobe;
-- offensichtliche Branchen- und App-Icon-Kollisionen;
-- SVG-Validität;
-- Rastermaster;
-- Kontrast und Hintergründe;
-- Lizenz-/Provenienzprüfung sämtlicher verwendeter Ausgangsmaterialien.
-
-Ein bestandener Rechts-/Technikcheck macht ein mittelmäßiges Zeichen nicht premium. Er kann nur einen visuell bestandenen Kandidaten freigeben oder stoppen.
-
-## 14. L10 – Endgate und separate Integration
-
-Der Product Owner sieht das vollständige System im echten Produkt.
-
-Erst nach ausdrücklicher Freigabe:
-
-- eigener Integrationsworkpack;
-- aktuelle `staging`-Basis neu lesen;
-- minimaler Patch;
-- Browser-/Responsive-/PWA-/Accessibility-Prüfung;
-- danach separater Merge-/Deploy-Entscheid.
-
-## 15. Definition von `Premium`
-
-Ein Entwurf darf intern vor L6 höchstens **`intern qualifiziert`** heißen.
-
-`Premium-Richtung` ist erst zulässig, wenn:
-
-1. L4 und L5 bestanden sind;
-2. der Product Owner L6 bestanden hat;
-3. die Richtung ohne Präsentationstricks eigenständig wirkt.
-
-`Produktionsreife Premiummarke` ist erst nach L7–L10 zulässig.
-
-## 16. Neustartregel
-
-Wenn nach einem vollständigen L1–L5-Zyklus nichts überzeugt:
-
-- keine Reparatur des relativ besten Kandidaten;
-- keine Lockerung der Qualitätsbarriere;
-- keine neue Story um eine schwache Form;
-- stattdessen neue visuelle Territorien und ein weiterer breiter L1-Lauf.
-
-Das ist der zentrale Mechanismus gegen die bisherigen AI-Mittelmaßschleifen.
+Das ist ausdrücklich noch kein Designentscheid. Architektur B und C müssen als echte Gegenproben bestehen, damit A nicht nur aus theoretischer Plausibilität gewählt wird.
