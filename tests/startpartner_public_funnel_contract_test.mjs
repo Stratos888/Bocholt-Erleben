@@ -12,6 +12,13 @@ function count(haystack, needle) {
   return haystack.split(needle).length - 1;
 }
 
+function sectionFrom(haystack, marker) {
+  const start = haystack.indexOf(marker);
+  if (start < 0) return '';
+  const end = haystack.indexOf('</section>', start);
+  return end < 0 ? haystack.slice(start) : haystack.slice(start, end + '</section>'.length);
+}
+
 const startpartner = read('startpartner/index.html');
 const funnelJs = read('js/startpartner-funnel.js');
 const eventPublish = read('events-veroeffentlichen/index.html');
@@ -41,7 +48,8 @@ assert(eventPublish.includes('Nur etwas vorschlagen'), 'Event-Funnel: bestehende
 assert(eventPublish.includes('data-feedback-open="missing"'), 'Event-Funnel: bestehender Tipp-Trigger fehlt');
 assert(eventPublish.indexOf('Wähle den passenden Veröffentlichungsweg') < eventPublish.indexOf('Startpartner-Pilot – 6 Monate kostenlos testen'), 'Event-Funnel: Pilot muss nach regulären Wegen stehen');
 assert(eventPublish.indexOf('Startpartner-Pilot – 6 Monate kostenlos testen') < eventPublish.indexOf('Noch nicht der richtige Weg?'), 'Event-Funnel: Pilot muss vor dem Tippkanal stehen');
-assert(!eventPublish.includes('Begrenzte Startpartnerplätze'), 'Event-Funnel: Startpartner darf nicht mehr mit dem Tippkanal gekoppelt sein');
+const eventTipSection = sectionFrom(eventPublish, 'aria-labelledby="publish-secondary-paths-title"');
+assert(eventTipSection && !eventTipSection.includes('Startpartner'), 'Event-Funnel: Startpartner darf nicht mehr mit dem Tippkanal gekoppelt sein');
 assert(!eventPublish.includes('Du möchtest nur einen fehlenden Termin melden?'), 'Event-Funnel: zusätzliche Tipp-Karte darf nicht eingeführt werden');
 assert(!eventPublish.includes('Etwas anderes sichtbar machen? Zur Auswahl für Veranstalter & Anbieter'), 'Event-Funnel: Provider-Hub-Navigation darf nicht eingeführt werden');
 
@@ -63,7 +71,8 @@ assert(activityPublish.indexOf('Für welche Angebote ist die Aktivitätspräsenz
 assert(activityPublish.indexOf('Wähle den passenden Tarif') < activityPublish.indexOf('Startpartner-Pilot – 6 Monate kostenlos testen'), 'Aktivitäts-Funnel: Pilot muss nach Tarifen stehen');
 assert(activityPublish.indexOf('Startpartner-Pilot – 6 Monate kostenlos testen') < activityPublish.indexOf('Noch nicht der richtige Weg?'), 'Aktivitäts-Funnel: Pilot muss vor dem Tippkanal stehen');
 assert(activityPublish.indexOf('Noch nicht der richtige Weg?') < activityPublish.indexOf('So geht es weiter'), 'Aktivitäts-Funnel: Live-Reihenfolge Tipp/Ablauf verändert');
-assert(!activityPublish.includes('Begrenzte Startpartnerplätze'), 'Aktivitäts-Funnel: Startpartner darf nicht mehr mit dem Tippkanal gekoppelt sein');
+const activityTipSection = sectionFrom(activityPublish, 'aria-labelledby="activity-presence-secondary-paths-title"');
+assert(activityTipSection && !activityTipSection.includes('Startpartner'), 'Aktivitäts-Funnel: Startpartner darf nicht mehr mit dem Tippkanal gekoppelt sein');
 assert(!activityPublish.includes('Du möchtest nur ein fehlendes Angebot melden?'), 'Aktivitäts-Funnel: zusätzliche Tipp-Karte darf nicht eingeführt werden');
 assert(!activityPublish.includes('Etwas anderes sichtbar machen? Zur Auswahl für Veranstalter & Anbieter'), 'Aktivitäts-Funnel: Provider-Hub-Navigation darf nicht eingeführt werden');
 
