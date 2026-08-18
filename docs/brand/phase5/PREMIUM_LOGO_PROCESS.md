@@ -2,13 +2,15 @@
 
 Stand: 2026-08-18
 Workpack: #259
-Status: **KANONISCH – EXTERNE QUALITÄTSKALIBRIERUNG VOR LOGOKANDIDATEN**
+Status: **KANONISCH – C0 REFERENZKALIBRIERUNG ABGESCHLOSSEN, MARKENWELT-GATE AKTIV**
 
 ## 1. Ziel
 
 Für `Bocholt erleben` wird ohne externe Kreativbeauftragung eine eigenständige, hochwertige Consumer-Marke entwickelt.
 
 `Logo-first` bleibt gültig. Korrigiert wird die Methode, mit der kreative Qualität erzeugt und qualifiziert wird.
+
+> Ein interner Entwurf darf nicht mehr nur gegen andere interne Entwürfe bestehen. Er muss vor Kandidatenstatus im anonymisierten Realgrößenvergleich neben realen professionellen Marken bestehen.
 
 ## 2. Warum der bisherige Qualifikationsweg nicht ausreicht
 
@@ -41,33 +43,37 @@ Nicht mehr kanonisch:
 - Product Owner erst ganz am Ende sehen lassen;
 - Architekturfilter, die freie Formsuche vorab unnötig verengen.
 
-## 5. C0 – Premium-Referenzkalibrierung
+## 5. C0 – Premium-Referenzkalibrierung abgeschlossen
 
-Vor jedem neuen Entwurf wird die gewünschte visuelle Markenwelt gegen reale professionelle Consumer-Marken kalibriert.
+Aktuelle reale Referenzmarken wurden am 2026-08-18 in drei Rollen geprüft.
 
-Drei Referenzwelten:
+### A – kuratierte kulturelle Souveränität
 
-### A – Kuratiert & souverän
+MUBI, Monocle, MUJI, Aesop, COS, Letterboxd.
 
-Ruhig, erwachsen, vertrauenswürdig, wenige starke Codes.
+Relevanz: Ruhe, erwachsene Wertigkeit, Kuratierung, wenige belastbare Markencodes.
 
-### B – Lebendig & erlebnisorientiert
+### B – Discovery, Erlebnis und menschliche Energie
 
-Mehr Energie, Freude und kulturelle Nähe, ohne in Eventplakat-/Tourismuslautstärke zu kippen.
+Airbnb, Headout, GetYourGuide, Fever, DICE, Eventbrite.
 
-### C – Kompakt & ikonisch
+Relevanz: Zugänglichkeit, Entdeckung, Freude, persönliche Consumer-Nähe.
 
-Kleinformatstärke, unmittelbare Wiedererkennbarkeit und digitale Selbstverständlichkeit.
+### C – ikonische digitale Disziplin
 
-Arbeits-Hypothese für `Bocholt erleben`:
+Spotify, komoot, AllTrails, Strava.
 
-> **A als Basis + B als Energie + C als technische Disziplin.**
+Relevanz: Kleinformatstärke, Prägnanz, responsive Robustheit. C ist Qualitätsmaßstab, nicht gewünschte Tonalität.
 
-Der Product Owner bestätigt oder verwirft nur diese Creative Direction. Er gestaltet kein Logo.
+Creative-Direction-Empfehlung:
+
+> **A + B als Markencharakter; C ausschließlich als Qualitätsdisziplin.**
+
+Der Product Owner bestätigt oder korrigiert nur diese Creative Direction. Er gestaltet kein Logo.
 
 ## 6. C1 – breite unabhängige Logoexploration
 
-Erst nach C0-PASS.
+Erst nach C0-Markenwelt-PASS.
 
 Zulässig sind parallel:
 
@@ -86,7 +92,8 @@ Pflicht:
 - mehrere voneinander unabhängige Produktionswege;
 - keine Mengenquote als Qualitätsersatz;
 - keine Mikrovariation einer einzigen Grundidee als breite Exploration ausgeben;
-- reale Headergröße früh mitprüfen.
+- reale Headergröße früh mitprüfen;
+- keine erzwungene Übersetzung von `Bocholt`, `erleben`, `Auswahl`, `Öffnung`, `B` oder `E` in Geometrie.
 
 ## 7. C2 – technischer/formaler Rohfilter
 
@@ -103,9 +110,9 @@ C2 erteilt **keinen Premiumstatus**.
 
 ## 8. C3 – anonymer externer Referenzvergleich
 
-Dies ist das neue entscheidende Vorqualifikationsgate.
+Dies ist das entscheidende Vorqualifikationsgate.
 
-Jeder ernsthafte eigener Entwurf wird zwischen professionellen Referenzlogos aus der bestätigten Markenwelt geprüft.
+Jeder ernsthafte eigene Entwurf wird zwischen professionellen Referenzlogos aus der bestätigten Markenwelt geprüft.
 
 Bedingungen:
 
@@ -189,7 +196,7 @@ Verantwortet Recherche, Creative Direction, Exploration, interne technische Filt
 
 ### Product Owner
 
-Entscheidet ausschließlich an zwei frühen/späten Wahrnehmungsgates:
+Entscheidet ausschließlich an zwei Wahrnehmungsgates:
 
 - C0 Markenwelt;
 - C6 reale Markenwirkung.
@@ -206,12 +213,13 @@ Keine Mikrotypografie, keine Rohskizzenauswahl, keine Bézier-/Icon-Entscheidung
 - keine bevorzugte Buchstaben-/Symbolarchitektur;
 - internes AI-PASS allein ist wertlos als Premiumfreigabe;
 - externe Referenzprobe ist Pflicht vor Kandidatenstatus;
+- `0 Kandidaten` ist zulässig;
 - `staging`, `main`, Live und öffentliche Marke bleiben bis zur separaten Integrationsfreigabe unverändert.
 
 ## 15. Aktiver Stand
 
 - alle früheren A-/B-Gates: historisches Lernmaterial;
 - D1: **FAIL im Product-Owner-Gate, beendet**;
-- C0: **aktiv**;
+- C0: **Referenzkalibrierung abgeschlossen; Markenwelt-Gate aktiv**;
 - aktueller Logo-Finalist: `0`;
 - öffentliche Wirkung: `0`.
