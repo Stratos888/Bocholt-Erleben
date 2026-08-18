@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **C6 FAIL – T1 BEENDET – C1 NEUER SUCHRAUM AKTIV – 0 LOGOFINALISTEN**
+Status: **C1 AKTIV – KONTROLLIERTER EINZELKONSTRUKTIONSLAUF = 0 – REFERENZGRAMMATIK ALS NÄCHSTER SCHRITT**
 
 ## 1. Ziel
 
@@ -17,8 +17,9 @@ Vor jeder weiteren Markenaktion sind ausschließlich diese Dateien maßgeblich:
 2. `docs/brand/phase5/PREMIUM_LOGO_PROCESS.md`
 3. `docs/brand/phase5/PREMIUM_REFERENCE_CALIBRATION.md`
 4. `docs/brand/phase5/C1_C5_RESULT.md`
-5. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
-6. `docs/brand/phase5/LESSONS_LEARNED.md`
+5. `docs/brand/phase5/C1_CONTROLLED_CONSTRUCTION_RESULT.md`
+6. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
+7. `docs/brand/phase5/LESSONS_LEARNED.md`
 
 Rohskizzen, Generatorboards und verworfene Kandidaten besitzen keinen aktiven Gate-Status.
 
@@ -38,52 +39,67 @@ Orientierende Wahrnehmungsgewichtung:
 - lebendig: etwa `6/10`;
 - verspielt: etwa `2/10`.
 
-## 4. D1 – historischer FAIL
+## 4. Historische FAILs
+
+### D1
 
 `D1 – Initial Frame Signature` fiel im Product-Owner-Gate klar durch. Die vorherigen internen ästhetischen PASS-Urteile waren falsch positiv. D1 bleibt beendet.
 
-## 5. T1 – C6 FAIL
+### T1
 
-`T1 – Stable / Alive Stack` war der einzige Entwurf, der den letzten C1–C5-Lauf überstand.
+`T1 – Stable / Alive Stack` fiel im C6-Wahrnehmungsgate als **eher nur ordentlich gesetzte/stilisierte Schrift** durch. T1 bleibt beendet; keine Mikrorettung.
 
-Konstruktion:
+## 5. Neuer C1-Einzelkonstruktionslauf – abgeschlossen mit 0
 
-- `bocholt`: stabil, fett, aufrecht;
-- `erleben`: dynamischer, kursiv;
-- beide Wortzeilen optisch gleich breit;
-- vollständiger Name unmittelbar lesbar;
-- kein Icon, Monogramm oder erklärungsbedürftiges Sonderzeichen.
+Nach Beendigung des Board-/Template-Modus wurden drei kontrollierte Einzelkonstruktionen getrennt erzeugt und vor jeder Nutzerpräsentation in Schwarz/Weiß sowie kleiner digitaler Wirkung geprüft:
 
-Kanonisches Prüfasset:
+1. proprietäres Vollnamen-Wortbild;
+2. integriertes Zeichen-/Namenssystem;
+3. freie abstrakte Signatur.
 
-`docs/brand/phase5/candidates/C4_T1_STABLE_ALIVE_STACK.svg`
+C2-Befund:
 
-Der Product Owner bewertete T1 am 2026-08-18 im C6-Wahrnehmungsgate als:
+- Vollnamen-Kopplung: zu dekodierungsbedürftig / sichtbar konstruiert;
+- integriertes System: zu technisch-industriell beziehungsweise piktogrammartig;
+- freie Signatur: zu generisches Motion-/Digital-App-Symbol.
 
-> **eher nur ordentlich gesetzte/stilisierte Schrift**
+**Ergebnis: `0` C2-Survivor. Kein C3-Lauf. Keine Nutzerpräsentation.**
 
-Der unabhängige Gegenblick bestätigt diesen Befund. T1 besitzt zwar Lesbarkeit, Ruhe und technische Stabilität, aber keine ausreichend eigenständige Markensilhouette beziehungsweise keinen charakteristischen Markenanker. Die Differenz zwischen aufrechter erster Zeile und kursiver zweiter Zeile bleibt eine typografische Behandlung, keine belastbare Premium-Identität.
+Detailbeleg:
 
-**C6-Ergebnis: FAIL. T1 ist beendet. Keine Mikrorettung.**
+`docs/brand/phase5/C1_CONTROLLED_CONSTRUCTION_RESULT.md`
 
-## 6. Konsequenz aus T1
+## 6. Externe Rohsuche – aktuell blockiert
 
-Der nächste C1-Lauf darf nicht erneut primär auf `saubere Typografie + Kontrast zwischen zwei Schriftschnitten` setzen.
+Canva wurde erneut mit einem eng geführten Single-Logo-Brief als unabhängiger Produktionsweg aufgerufen. Das verbundene Konto meldet weiterhin `quota_exceeded` für AI-Designgeneration.
 
-Neue Suchanforderung:
+Konsequenz:
 
-- Eigenständigkeit muss auf Makroebene sichtbar sein;
-- vollständiger Name darf weiterhin zentral sein, aber nicht nur durch Fontgewicht/Kursivlage differenziert werden;
-- ein Zeichen ist erlaubt, aber nicht als generisches App-Icon links neben normaler Schrift;
-- freie Wortbild-, Zeichen-/Namens- und integrierte Kompositionslösungen sind ausdrücklich offen;
-- keine Rückkehr zu `BE`, Portal, Rahmen oder bekannten Tourismus-/Eventklischees;
-- externe Referenzprobe bleibt Pflicht;
-- `0 Kandidaten` bleibt ein zulässiges Ergebnis.
+- kein Canva-Kandidat;
+- kein Ersatz durch schwächere interne Entwürfe;
+- kein Absenken der Qualitätsbarriere.
 
-## 7. Aktive Gate-Reihenfolge
+## 7. Nächster effizienter Schritt
+
+Vor weiteren Konstruktionen wird aus wenigen realen Premiummarken der bestätigten A+B-Welt eine **formale Referenzgrammatik** extrahiert.
+
+Zu isolieren sind ausschließlich übertragbare Designprinzipien, nicht konkrete Formen:
+
+- Silhouettenlogik;
+- Einfachheit / Anzahl visueller Entscheidungen;
+- Negativraum;
+- Verhältnis Zeichen zu Wortmarke;
+- Proportion / Rhythmus;
+- Verhalten bei 24–40 px;
+- Grad der semantischen Offenheit;
+- welche Eigenheit bereits ohne Farbe bestehen bleibt.
+
+Erst danach werden neue einzelne Makroideen gebaut. Keine Kopie bestehender Markenformen.
+
+## 8. Aktive Gate-Reihenfolge
 
 1. **C0:** PASS;
-2. **C1:** neuer unabhängiger Suchraum – aktiv;
+2. **C1:** aktiv – Referenzgrammatik, danach neue Einzelkonstruktionen;
 3. **C2:** technischer/formaler Rohfilter;
 4. **C3:** anonymer externer Referenzvergleich;
 5. **C4:** maximal drei reproduzierbare Vektorkonstruktionen;
@@ -91,7 +107,7 @@ Neue Suchanforderung:
 7. **C6:** Product-Owner-Wahrnehmungsgate;
 8. erst nach PASS: responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion, Rechts-/Technikpreflight, Endgate und separate Integration.
 
-## 8. Harte Regeln
+## 9. Harte Regeln
 
 - keine ästhetischen AI-Scores;
 - keine relative Siegerlogik;
@@ -100,6 +116,7 @@ Neue Suchanforderung:
 - Generatoroutput bleibt Rohmaterial;
 - `0 Kandidaten` ist zulässig;
 - internes AI-PASS erzeugt keinen Premiumstatus;
+- keine weitere Logo-Board-Produktion;
 - Product Owner entscheidet Wahrnehmung, nicht Mikrodesign;
 - `staging`, `main`, Live und öffentliche Marke bleiben unverändert;
 - kein Merge oder Deploy.
