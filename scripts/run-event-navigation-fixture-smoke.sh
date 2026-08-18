@@ -45,6 +45,10 @@ set +e
 (
   set -euo pipefail
 
+  if [ -f "$ROOT/tests/release_preflight_main_to_staging_schema_contract.sh" ]; then
+    bash "$ROOT/tests/release_preflight_main_to_staging_schema_contract.sh"
+  fi
+
   tar -C "$ROOT" \
     --exclude=.git \
     --exclude=node_modules \
