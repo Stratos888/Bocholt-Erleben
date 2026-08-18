@@ -52,8 +52,9 @@ set +e
       if bash "$ROOT/tests/release_preflight_main_to_staging_schema_contract.sh"; then
         schema_status=0
         break
+      else
+        schema_status=$?
       fi
-      schema_status=$?
       if [ "$schema_attempt" -lt 2 ]; then
         echo "Release schema preflight attempt $schema_attempt failed; retrying after transient container startup window" >&2
         sleep 3
