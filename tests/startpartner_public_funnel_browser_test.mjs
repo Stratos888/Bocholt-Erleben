@@ -40,6 +40,14 @@ async function styleSignature(page, selector, properties) {
   }, properties);
 }
 
+async function assertSameElementStyle(page, referenceSelector, actualSelector, properties, label) {
+  const expected = await styleSignature(page, referenceSelector, properties);
+  const actual = await styleSignature(page, actualSelector, properties);
+  for (const property of properties) {
+    assert(actual[property] === expected[property], `${label}: ${property}: ${actual[property]} != ${expected[property]}`);
+  }
+}
+
 async function sharedSignature(page) {
   return {
     hero: await styleSignature(page, '.content-hero--panel', ['borderRadius', 'boxShadow', 'paddingTop', 'paddingLeft']),
@@ -69,7 +77,7 @@ async function runProfile(browser, profileName, viewport) {
     await route.abort();
   });
 
-  // Event-Seite: reguläre Live-Wege, danach eigener Startpartner-Pilot, danach Tippkanal.
+  // Event-Seite: reguläre Live-Wege, danach kompakter Startpartner-Pilot mit FAQ-Link, danach Tippkanal.
   await open(page, '/events-veroeffentlichen/');
   const eventText = await page.locator('body').innerText();
   for (const marker of [
@@ -77,42 +85,76 @@ async function runProfile(browser, profileName, viewport) {
     'Einzelne Veranstaltung einreichen',
     'Mitgliedschaft für regelmäßige Termine',
     'Automatische Übernahme prüfen',
-    'Startpartner-Pilot – 6 Monate kostenlos testen',
+    'Startpartner-Pilot',
+    '6 Monate kostenlos testen',
+    'Was ist der Startpartner-Pilot? Kurz erklärt',
     'Noch nicht der richtige Weg?',
     'Nur etwas vorschlagen',
   ]) {
     assert(eventText.includes(marker), `${profileName}: Event-Marker fehlt: ${marker}`);
   }
-  assert(eventText.indexOf('Wähle den passenden Veröffentlichungsweg') < eventText.indexOf('Startpartner-Pilot – 6 Monate kostenlos testen'), `${profileName}: Event-Pilot steht nicht nach den regulären Wegen`);
-  assert(eventText.indexOf('Startpartner-Pilot – 6 Monate kostenlos testen') < eventText.indexOf('Noch nicht der richtige Weg?'), `${profileName}: Event-Pilot steht nicht vor dem Tippkanal`);
+  assert(eventText.indexOf('Wähle den passenden Veröffentlichungsweg') < eventText.indexOf('Startpartner-Pilot'), `${profileName}: Event-Pilot steht nicht nach den regulären Wegen`);
+  assert(eventText.indexOf('Startpartner-Pilot') < eventText.indexOf('Noch nicht der richtige Weg?'), `${profileName}: Event-Pilot steht nicht vor dem Tippkanal`);
   assert(!eventText.includes('Begrenzte Startpartnerplätze'), `${profileName}: Event-Pilot ist noch mit Tippkanal gekoppelt`);
   assert(await page.locator('a[href="/fuer-veranstalter/"]').count() > 0, `${profileName}: Live-Membership-Link fehlt`);
   assert(await page.locator('a[href="/events-veroeffentlichen/mitgliedschaft/"]').count() === 0, `${profileName}: zusätzliche Membership-Unterroute ist noch verlinkt`);
   assert(await page.locator('a[href="/startpartner/?scope=events"]').count() === 1, `${profileName}: Event-Startpartner-Scope fehlt`);
+  assert(await page.locator('a[href="/veroeffentlichung-erklaert/#startpartner"]').count() === 1, `${profileName}: Event-Startpartner-FAQ-Link fehlt`);
   assert(await page.getByRole('link', { name: 'Startpartner-Pilot anfragen' }).count() === 1, `${profileName}: Event-Pilot-CTA fehlt`);
   assert(await page.locator('[data-feedback-open="missing"]').count() > 0, `${profileName}: bestehender Event-Tippweg fehlt`);
+  await assertSameElementStyle(
+    page,
+    'section[aria-labelledby="publish-paths-title"] .publish-model-copy strong',
+    'section[aria-labelledby="publish-startpartner-title"] .publish-model-copy strong',
+    ['fontSize', 'fontWeight', 'lineHeight', 'color'],
+    `${profileName}: Event-Pilot-Copy`,
+  );
+  await assertSameElementStyle(
+    page,
+    'section[aria-labelledby="publish-paths-title"] .content-cta--primary',
+    'section[aria-labelledby="publish-startpartner-title"] .content-cta--primary',
+    ['borderRadius', 'minHeight', 'fontSize', 'fontWeight'],
+    `${profileName}: Event-Pilot-CTA`,
+  );
   await assertNoOverflow(page, `${profileName}: Event-Funnel`);
 
-  // Aktivitäts-Seite: Eignung und Tarife bleiben, Pilot wird vor Tippkanal/Ablauf ergänzt.
+  // Aktivitäts-Seite: Eignung und Tarife bleiben, kompakter Pilot mit FAQ-Link vor Tippkanal/Ablauf.
   await open(page, '/aktivitaeten/sichtbar-werden/');
   const activityText = await page.locator('body').innerText();
   for (const marker of [
     'Für welche Angebote ist die Aktivitätspräsenz gedacht?',
     'Wähle den passenden Tarif',
-    'Startpartner-Pilot – 6 Monate kostenlos testen',
+    'Startpartner-Pilot',
+    '6 Monate kostenlos testen',
+    'Was ist der Startpartner-Pilot? Kurz erklärt',
     'Noch nicht der richtige Weg?',
     'Nur etwas vorschlagen',
     'So geht es weiter',
   ]) {
     assert(activityText.includes(marker), `${profileName}: Aktivitäts-Marker fehlt: ${marker}`);
   }
-  assert(activityText.indexOf('Wähle den passenden Tarif') < activityText.indexOf('Startpartner-Pilot – 6 Monate kostenlos testen'), `${profileName}: Activity-Pilot steht nicht nach den Tarifen`);
-  assert(activityText.indexOf('Startpartner-Pilot – 6 Monate kostenlos testen') < activityText.indexOf('Noch nicht der richtige Weg?'), `${profileName}: Activity-Pilot steht nicht vor dem Tippkanal`);
+  assert(activityText.indexOf('Wähle den passenden Tarif') < activityText.indexOf('Startpartner-Pilot'), `${profileName}: Activity-Pilot steht nicht nach den Tarifen`);
+  assert(activityText.indexOf('Startpartner-Pilot') < activityText.indexOf('Noch nicht der richtige Weg?'), `${profileName}: Activity-Pilot steht nicht vor dem Tippkanal`);
   assert(activityText.indexOf('Noch nicht der richtige Weg?') < activityText.indexOf('So geht es weiter'), `${profileName}: Activity-Tipp/Ablauf-Reihenfolge verändert`);
   assert(!activityText.includes('Begrenzte Startpartnerplätze'), `${profileName}: Activity-Pilot ist noch mit Tippkanal gekoppelt`);
   assert(await page.locator('a[href="/startpartner/?scope=activities"]').count() === 1, `${profileName}: Activity-Startpartner-Scope fehlt`);
+  assert(await page.locator('a[href="/veroeffentlichung-erklaert/#startpartner"]').count() === 1, `${profileName}: Activity-Startpartner-FAQ-Link fehlt`);
   assert(await page.getByRole('link', { name: 'Startpartner-Pilot anfragen' }).count() === 1, `${profileName}: Activity-Pilot-CTA fehlt`);
   assert(await page.locator('[data-feedback-open="missing"]').count() > 0, `${profileName}: bestehender Aktivitäts-Tippweg fehlt`);
+  await assertSameElementStyle(
+    page,
+    'section[aria-labelledby="activity-presence-plan-title"] .publish-model-copy strong',
+    'section[aria-labelledby="activity-presence-startpartner-title"] .publish-model-copy strong',
+    ['fontSize', 'fontWeight', 'lineHeight', 'color'],
+    `${profileName}: Activity-Pilot-Copy`,
+  );
+  await assertSameElementStyle(
+    page,
+    'section[aria-labelledby="activity-presence-plan-title"] .content-cta--primary',
+    'section[aria-labelledby="activity-presence-startpartner-title"] .content-cta--primary',
+    ['borderRadius', 'minHeight', 'fontSize', 'fontWeight'],
+    `${profileName}: Activity-Pilot-CTA`,
+  );
   await assertNoOverflow(page, `${profileName}: Aktivitäts-Funnel`);
 
   // /fuer-veranstalter/ bleibt der bestehende Membership-Funnel; Startpartner übernimmt Event-Scope.
@@ -148,12 +190,13 @@ async function runProfile(browser, profileName, viewport) {
   await open(page, '/startpartner/?scope=activities');
   assert(await page.locator('#startpartner-scope').inputValue() === 'activities', `${profileName}: Activity-Scope wurde nicht vorausgewählt`);
 
-  // Erklärseite trennt reguläre Wege und Pilot-Sonderweg.
+  // Erklärseite trennt reguläre Wege und Pilot-Sonderweg und bleibt zentraler FAQ-Owner.
   await open(page, '/veroeffentlichung-erklaert/');
   const explainerText = await page.locator('body').innerText();
   assert(explainerText.includes('Welcher reguläre Weg passt?'), `${profileName}: reguläre Erklär-Wegwahl fehlt`);
   assert(explainerText.includes('Sonderweg: Startpartner-Pilot'), `${profileName}: separater Startpartner-Sonderweg auf Erklärseite fehlt`);
   assert(explainerText.indexOf('Welcher reguläre Weg passt?') < explainerText.indexOf('Sonderweg: Startpartner-Pilot'), `${profileName}: Erklärseite ordnet Pilot nicht nach regulären Wegen ein`);
+  assert(await page.locator('#startpartner').count() === 1, `${profileName}: Startpartner-FAQ-Anker fehlt`);
   await assertNoOverflow(page, `${profileName}: Erklärseite`);
 
   // Login bleibt Live-kompatibel.
@@ -197,4 +240,4 @@ fs.writeFileSync(
   `${JSON.stringify({ status: 'OK', results }, null, 2)}\n`,
   'utf8',
 );
-console.log('Startpartner special-path live-parity browser contract: OK');
+console.log('Startpartner compact FAQ live-parity browser contract: OK');
