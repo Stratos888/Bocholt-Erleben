@@ -3,97 +3,79 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **P5 NICHT BESTANDEN – MARK-LED PRIMARY IDENTITY RESET AKTIV**
+Status: **L1 LOGO-DIVERGENZ AKTIV – NOCH KEIN KANDIDAT**
 
-## 1. Unveränderliches Ziel
+## 1. Ziel
 
 Eine eigenständige Premium-Markenidentität für die private kuratierte Discovery-/Freizeitplattform **Bocholt erleben** entwickeln, ohne externe Kreativbeauftragung und ohne schwache AI-Ergebnisse durch Prozess, Präsentation oder Scores künstlich aufzuwerten.
 
-Öffentliche Marke, `staging`, `main` und Live bleiben bis zur späteren ausdrücklichen Integrationsfreigabe unverändert.
+## 2. Kanonische Grundlage
 
-## 2. Aktuell verbindliche Prozessgrundlage
+Vor jeder weiteren Markenaktion sind ausschließlich diese Dateien maßgeblich:
 
-In dieser Reihenfolge verbindlich:
+1. `docs/brand/phase5/ACTIVE_EXECUTION_LOCK.md`
+2. `docs/brand/phase5/PREMIUM_LOGO_PROCESS.md`
+3. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
+4. `docs/brand/phase5/LESSONS_LEARNED.md`
 
-1. `docs/brand/phase5/PRIMARY_IDENTITY_P5_RESULT.md`
-2. `docs/brand/phase5/PRIMARY_IDENTITY_RESET.md`
-3. `docs/brand/phase5/PRIMARY_IDENTITY_P1_P4_INTERNAL_RESULT.md`
-4. `docs/brand/phase5/PRIMARY_IDENTITY_P1B_P4_RESULT.md`
-5. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
-6. `docs/brand/phase5/R1_VISUAL_CALIBRATION.md`
-7. `docs/brand/phase5/PROCESS_REVALIDATION_AND_RESTART.md` – nur soweit nicht durch die neueren Dateien korrigiert
+Frühere Phase-5-Prozesse, Kandidaten, Gate-Dateien, Scores, SVGs und Studien sind aufgehoben und werden aus dem Arbeitsbaum entfernt. Der Git-Verlauf genügt als Audit-Trail.
 
-Historisches Lernmaterial, aber **kein aktives Gate**:
+## 3. Aktueller Schritt
 
-- `docs/brand/phase5/R2_RESTART_RESULT.md`
-- `docs/brand/phase5/R3_TWO_PARTY_RESULT.md`
-- frühere Step-5-/Step-8-Wortmarken- und Icon-Kandidaten.
+**L1 – MASSIVE LOGO-DIVERGENZ**
 
-## 3. P5-Ergebnis
+Pflicht vor jeder Kandidatenbildung:
 
-Der einzige intern qualifizierte Serif-Wortmarkenkandidat wurde vom Product Owner nicht als eigenständiger Premium-Absender wahrgenommen.
+- mindestens 6 klar getrennte visuelle Territorien;
+- mindestens 20 Schwarz-Weiß-Rohskizzen pro Territorium;
+- mindestens 120 unterschiedliche Rohskizzen insgesamt;
+- mindestens 3 verschiedene Erzeugungswege;
+- erheblicher Anteil freier abstrakter Formen ohne erzwungene Metapher.
 
-Kernbefund:
+Der Product Owner sieht in L1 keine Rohideen.
 
-- wirkt weiterhin wie eine andere Schriftart;
-- daraus ist kein überzeugender Weg zu einer Premiummarke erkennbar;
-- ein eigenständiges Logo-/Markenzeichen wird als fehlender Primäranker wahrgenommen.
+## 4. Noch nicht zulässig
 
-Daraus folgt verbindlich:
+Bis L1 und L2 vollständig abgeschlossen sind:
 
-**P5 = FAIL. Kandidat A ist beendet.**
+- keine Kandidatenpräsentation;
+- keine Wortmarkenfinalisierung;
+- keine Farbentwicklung;
+- kein Bildmechanismus;
+- keine Motionentwicklung;
+- kein App-Icon;
+- keine Marken-/Ähnlichkeitsfreigabe als Ersatz für Designqualität;
+- keine Produktintegration;
+- kein Merge oder Deploy.
 
-Keine Mikrotypografie, Farbe oder nachträglich angehängte Kleinmarke darf ihn retten.
+## 5. Harte Regeln
 
-## 4. Prozesskorrektur
+- Generatoroutput ist nur Rohmaterial.
+- Keine relative Siegerlogik.
+- Keine ästhetischen AI-Scores.
+- Keine Erklärung darf eine schwache Form retten.
+- Keine Pflicht zu `B`, `e`, Öffnung, Auswahl oder Bocholt-Symbolik.
+- Dominante bekannte Symbol-/UI-Klischees werden verworfen.
+- Schwarz/Weiß und Kleinformat kommen vor Farbe und Mock-up.
+- Ernsthafte Kandidaten werden deterministisch als Vektor neu konstruiert.
+- Der Product Owner entscheidet erst über intern bestandene Richtungen.
+- `staging`, `main`, Live und die öffentliche Marke bleiben unverändert.
 
-Der nächste Lauf ist **mark-led**.
+## 6. Nächste Schritte
 
-Gesucht wird zuerst ein eigenständiger Distinctive-Asset-Kern, der gemeinsam mit einer ruhigen Wortmarke ein vollständiges Primär-Lock-up bildet.
+1. **L1:** massive Divergenz;
+2. **L2:** Clusterung und harte Eliminierung auf 3–8 ernsthafte Rohformen oder 0;
+3. **L3:** maximal fünf Vektorkonstruktionen;
+4. **L4:** Mark-only Proof in Schwarz/Weiß und 16–64 px;
+5. **L5:** ruhige Wortmarke + Realprodukt-/Headerbeweis;
+6. **L6:** Product-Owner-Wahrnehmungsgate mit maximal drei Richtungen;
+7. **L7–L10:** Markensystem, App-Icon, Rechts-/Technikpreflight, Endgate und separate Integration.
 
-Das ist nicht gleichbedeutend mit `irgendein Icon zuerst`. Zeichen und Wortmarke müssen als gemeinsames Identitätssystem funktionieren. Die Hauptlast der Wiedererkennbarkeit soll jedoch nicht erneut allein auf einer typografischen Gesamtform liegen.
+## 7. Abbruch-/Neustartregel
 
-## 5. Aktueller Schritt
+Wenn nach L2, L4, L5 oder L6 nichts die absolute Qualitätsbarriere erreicht, wird **nicht** der relativ beste Kandidat repariert.
 
-**P1c – DISTINCTIVE MARK DIVERGENCE, MONOCHROM ZUERST**
+Es beginnt ein neuer breiter L1-Lauf mit neuen Territorien.
 
-ChatGPT entwickelt intern breit und prüft mindestens drei deutlich getrennte Ursprünge:
-
-1. Heritage-Abstraktion aus Öffnung/Enthüllung/Eintritt, ohne Vorhang-, Buch-, Pause-, Portal- oder Fensterlesart;
-2. Produktkern-Abstraktion aus kuratierter Auswahl / relevantem Moment, ohne Filter-, Pin-, Ticket-, Scan- oder UI-Symbol;
-3. freie originäre Distinctive-Asset-Form, ohne Buchstabenmonogramm, Standardloop, Spark oder generische App-Geometrie.
-
-Kein Suchraum wird wegen Herkunft bevorzugt.
-
-## 6. Interne Prüfpflicht
-
-Ein Kandidat darf erst zum Product Owner, wenn er:
-
-- monochrom eigenständig wirkt;
-- bei 16, 24, 32, 48 und 64 px stabil bleibt;
-- keine dominante Kategorie-/UI-/Symbolklischee-Lesart hat;
-- zusammen mit einer ruhigen Wortmarke im realen 48-px-Header funktioniert;
-- die neutrale Kontrolle sichtbar übertrifft;
-- keine Farbe, 3D-Inszenierung oder Erklärung benötigt, um markenfähig zu wirken.
-
-## 7. Harte aktive Regeln
-
-- kein B-, e- oder B/e-Monogramm als Standardlösung;
-- kein Portal, Tür, Fenster, Auge, Linse, Buch, Vorhang, Pause, Butterfly, Pin, Ticket, Spark oder AI-Stern als dominante Lesart;
-- kein `Standardschrift + Icon` ohne Formverwandtschaft;
-- keine ästhetischen 0–100-Scores;
-- keine relative Siegerlogik;
-- keine Präsentation von Rohideen;
-- Farbe darf keine schwache Primärform retten;
-- bestehende Fotos und UI bleiben unverändert und dienen später nur als Prüfgerüst;
-- keine Produktintegration, kein Merge und kein Deploy.
-
-## 8. Nächste Gates
-
-1. **P1c/P2c intern:** breite Markensuche plus harte Eliminierung;
-2. **P3c intern:** maximal drei deterministisch konstruierte ernsthafte Markensysteme;
-3. **P4c intern:** Zeichen allein, Lock-up und realer Header gegen neutrale Kontrolle;
-4. **P5c Product Owner:** nur intern belastbare Finalrichtung(en) zeigen;
-5. danach Farbe, Motion, Sekundärsystem, App-Icon-Rolle, technische/rechtliche Härtung und separate Integration.
-
-Kein stiller Prozesswechsel.
+Aktueller Premiumkandidat: `0`.
+Öffentliche Wirkung: `0`.
