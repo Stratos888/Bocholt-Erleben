@@ -8,11 +8,11 @@ Status: **KANONISCH – VOLLSTÄNDIGES PRIMÄRLOGO VOR RESPONSIVER KLEINMARKE**
 
 Für `Bocholt erleben` wird ohne externe Kreativbeauftragung eine eigenständige, hochwertige Consumer-Marke entwickelt.
 
-`Logo zuerst` bedeutet ab jetzt:
+`Logo zuerst` bedeutet:
 
 > Zuerst wird ein eigenständiges **vollständiges Primärlogo** bewiesen. Es muss nicht zuerst ein separates Symbol geben.
 
-Ein gutes Endsystem kann später selbstverständlich ein kompaktes Zeichen oder App-Icon besitzen. Dieses wird aber erst aus einer bereits überzeugenden Primäridentität abgeleitet beziehungsweise gemeinsam mit ihr gehärtet.
+Ein gutes Endsystem kann später ein kompaktes Zeichen oder App-Icon besitzen. Dieses wird erst aus einer bereits überzeugenden Primäridentität abgeleitet beziehungsweise gemeinsam mit ihr gehärtet.
 
 ## 2. Warum der Symbol-first-Weg beendet ist
 
@@ -22,7 +22,7 @@ Die Architekturphase A0–A2 prüfte drei Symbolklassen:
 - explizites `BE`-Lettermark;
 - nicht-letterales Symbol.
 
-A2 wurde anschließend über mehrere unterschiedliche Formmechanismen vertieft. Ergebnis: **0 Kandidaten**.
+A2 wurde über mehrere unterschiedliche Formmechanismen vertieft. Ergebnis: **0 Kandidaten**.
 
 Wiederkehrende Probleme:
 
@@ -41,7 +41,7 @@ Das kann sein:
 
 - eine vollständig eigengezeichnete Namenssignatur;
 - eine gemeinsam entwickelte Zeichen-/Wortmarkenkombination;
-- eine Heritage-Evolution als Gesamtlock-up.
+- eine Heritage-Evolution als Gesamt-lock-up.
 
 Nicht automatisch zulässig sind:
 
@@ -239,6 +239,11 @@ Keine Designerrolle. Keine Rohskizzenauswahl. Keine Mikrotypografie. Einstieg er
 
 - A0/A1: historisch abgeschlossen;
 - A2: **FAIL, 0 Kandidaten**;
-- B0: **aktiv**;
-- aktueller intern qualifizierter Kandidat: `0`;
+- B0: **abgeschlossen**;
+- B1: **abgeschlossen**;
+- B2: **abgeschlossen, 1 System PASS (`D1 – Initial Frame Signature`)**;
+- B3: **abgeschlossen, deterministisches SVG vorhanden**;
+- B4: **abgeschlossen, D1 intern PASS**;
+- B5: **aktiv – Product-Owner-Wahrnehmungsgate**;
+- aktueller intern qualifizierter Finalist: `1`;
 - öffentliche Wirkung: `0`.
