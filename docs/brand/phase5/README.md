@@ -42,7 +42,9 @@ Gesuchte Wirkung:
 
 ## Formale Referenzgrammatik
 
-Vor dem nächsten Konstruktionslauf wurden aus realen professionellen Referenzen nur übertragbare Formprinzipien extrahiert:
+Vor dem nächsten Konstruktionslauf wurden aus realen professionellen Referenzen nur übertragbare Formprinzipien extrahiert. Offizielle Referenzbeobachtungen umfassen unter anderem Headouts vereinfachten Markenanker plus kleinformatfähige Wortmarke, Eventbrites zentralen `The Path`-Anker sowie stark reduzierte, wiederholbare Primärcodes bei Letterboxd/MUBI.
+
+Daraus gelten:
 
 - eine dominante Makroentscheidung;
 - primitive Wiederholung oder klare kontinuierliche Formlogik;
