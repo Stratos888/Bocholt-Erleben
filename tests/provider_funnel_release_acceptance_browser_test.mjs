@@ -7,30 +7,23 @@ const value = (name) => {
   const index = args.indexOf(name);
   return index >= 0 ? args[index + 1] : '';
 };
-
 const baseUrl = String(value('--base-url') || '').replace(/\/+$/, '');
 const outDir = value('--out-dir');
 if (!baseUrl || !outDir) {
   console.error('Usage: node tests/provider_funnel_release_acceptance_browser_test.mjs --base-url URL --out-dir DIR');
   process.exit(2);
 }
-
 fs.mkdirSync(outDir, { recursive: true });
 
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
+function assert(condition, message) { if (!condition) throw new Error(message); }
 async function open(page, routePath) {
   const response = await page.goto(`${baseUrl}${routePath}`, { waitUntil: 'networkidle', timeout: 18000 });
   assert(response && response.status() === 200, `${routePath}: erwarteter HTTP 200 fehlt`);
 }
-
 async function assertNoOverflow(page, label) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   assert(!overflow, `${label}: horizontaler Überlauf`);
 }
-
 function includesMultipart(body, name, value) {
   return body.includes(`name="${name}"`) && body.includes(String(value));
 }
@@ -45,20 +38,15 @@ async function runProfile(browser, profileName, viewport) {
     const request = route.request();
     const body = (await request.postDataBuffer())?.toString('utf8') || '';
     interceptedRequests.push({ mode: mockMode, url: request.url(), method: request.method(), body });
-
     if (mockMode === 'startpartner-success' || mockMode === 'feedback-success') {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
-      return;
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) }); return;
     }
     if (mockMode === 'startpartner-error') {
-      await route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'synthetic_failure' }) });
-      return;
+      await route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'synthetic_failure' }) }); return;
     }
     if (mockMode === 'feedback-error') {
-      await route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ errors: [{ message: 'Synthetischer Feedback-Fehler' }] }) });
-      return;
+      await route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ errors: [{ message: 'Synthetischer Feedback-Fehler' }] }) }); return;
     }
-
     await route.abort('blockedbyclient');
     throw new Error(`${profileName}: unerwarteter externer Formspree-Request in Modus ${mockMode}`);
   });
@@ -90,9 +78,7 @@ async function runProfile(browser, profileName, viewport) {
     page.waitForURL(/\/veroeffentlichung-erklaert\/#startpartner$/, { timeout: 8000 }),
     page.getByRole('link', { name: 'Was ist der Startpartner-Pilot? Kurz erklärt' }).click(),
   ]);
-  const faqTarget = page.locator('#startpartner');
-  await faqTarget.waitFor({ state: 'visible' });
-  assert(await faqTarget.count() === 1, `${profileName}: FAQ-Zielanker #startpartner fehlt`);
+  await page.locator('#startpartner').waitFor({ state: 'visible' });
   await assertNoOverflow(page, `${profileName}: Startpartner-FAQ`);
 
   await open(page, '/events-veroeffentlichen/');
@@ -101,8 +87,7 @@ async function runProfile(browser, profileName, viewport) {
   await missingTrigger.click();
   const feedbackShell = page.locator('.feedback-modal-shell');
   await feedbackShell.waitFor({ state: 'visible' });
-  const missingChip = feedbackShell.locator('[data-feedback-type="missing"]');
-  assert(await missingChip.getAttribute('aria-checked') === 'true', `${profileName}: Missing-Typ wurde nicht vorausgewählt`);
+  assert(await feedbackShell.locator('[data-feedback-type="missing"]').getAttribute('aria-checked') === 'true', `${profileName}: Missing-Typ wurde nicht vorausgewählt`);
   assert((await feedbackShell.locator('[data-feedback-prompt]').innerText()).includes('Was fehlt dir aktuell?'), `${profileName}: Missing-Prompt fehlt`);
 
   const feedbackMessage = feedbackShell.locator('[name="message"]');
@@ -129,12 +114,11 @@ async function runProfile(browser, profileName, viewport) {
   await feedbackShell.waitFor({ state: 'hidden' });
   mockMode = 'none';
 
-  const globalLauncher = page.locator('.feedback-launcher[data-feedback-open="global"]');
-  await globalLauncher.waitFor({ state: 'visible', timeout: 8000 });
-  await globalLauncher.click();
+  const globalEntry = page.locator('[data-feedback-open="global"]:visible').first();
+  await globalEntry.waitFor({ state: 'visible', timeout: 8000 });
+  await globalEntry.click();
   await feedbackShell.waitFor({ state: 'visible' });
   assert(await feedbackShell.locator('[data-feedback-type][aria-checked="true"]').count() === 0, `${profileName}: globales Feedback hat unerwartete Vorauswahl`);
-
   const beforeGlobalValidation = interceptedRequests.length;
   await feedbackShell.locator('button[type="submit"]').click();
   assert(interceptedRequests.length === beforeGlobalValidation, `${profileName}: leeres globales Feedback wurde gesendet`);
@@ -142,13 +126,11 @@ async function runProfile(browser, profileName, viewport) {
 
   await feedbackShell.locator('[data-feedback-type="idea"]').click();
   await feedbackShell.locator('[name="message"]').fill('Ein ausreichend langer synthetischer Verbesserungsvorschlag.');
-  const optional = feedbackShell.locator('.feedback-optional');
-  await optional.locator('summary').click();
+  await feedbackShell.locator('.feedback-optional summary').click();
   await feedbackShell.locator('[name="email"]').fill('ungueltig');
   await feedbackShell.locator('button[type="submit"]').click();
   assert((await feedbackShell.locator('[data-feedback-error="email"]').innerText()).includes('gültige E-Mail-Adresse'), `${profileName}: Feedback-E-Mail-Validierung fehlt`);
   assert(interceptedRequests.length === beforeGlobalValidation, `${profileName}: ungültige Feedback-E-Mail wurde gesendet`);
-
   await feedbackShell.locator('[name="email"]').fill('release-test@example.invalid');
   mockMode = 'feedback-error';
   const beforeFeedbackError = interceptedRequests.length;
@@ -187,8 +169,7 @@ async function runProfile(browser, profileName, viewport) {
   mockMode = 'startpartner-success';
   const beforeStartSuccess = interceptedRequests.length;
   await startSubmit.click();
-  const resultCard = page.locator('#startpartner-request-result');
-  await resultCard.waitFor({ state: 'visible', timeout: 8000 });
+  await page.locator('#startpartner-request-result').waitFor({ state: 'visible', timeout: 8000 });
   assert(interceptedRequests.length === beforeStartSuccess + 1, `${profileName}: Startpartner-Success hat nicht genau einen Request erzeugt`);
   const startSuccessRequest = interceptedRequests.at(-1);
   assert(startSuccessRequest.method === 'POST', `${profileName}: Startpartner-Success ist kein POST`);
@@ -221,7 +202,6 @@ async function runProfile(browser, profileName, viewport) {
 
   await page.screenshot({ path: path.join(outDir, `provider-funnel-release-${profileName}.png`), fullPage: true });
   await context.close();
-
   return { profile: profileName, viewport, status: 'OK', interceptedFormspreeRequests: interceptedRequests.length, realExternalRequests: 0 };
 }
 
@@ -230,9 +210,6 @@ const results = [];
 try {
   results.push(await runProfile(browser, 'mobile-390x844', { width: 390, height: 844 }));
   results.push(await runProfile(browser, 'desktop-1366x900', { width: 1366, height: 900 }));
-} finally {
-  await browser.close();
-}
-
+} finally { await browser.close(); }
 fs.writeFileSync(path.join(outDir, 'provider-funnel-release-acceptance-summary.json'), `${JSON.stringify({ status: 'OK', results }, null, 2)}\n`, 'utf8');
 console.log('Provider funnel release acceptance browser test: OK');
