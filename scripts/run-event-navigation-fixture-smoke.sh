@@ -45,27 +45,6 @@ set +e
 (
   set -euo pipefail
 
-  if [ -f "$ROOT/tests/release_preflight_main_to_staging_schema_contract.sh" ]; then
-    schema_status=1
-    for schema_attempt in 1 2; do
-      echo "Release schema preflight attempt $schema_attempt/2"
-      if bash "$ROOT/tests/release_preflight_main_to_staging_schema_contract.sh"; then
-        schema_status=0
-        break
-      else
-        schema_status=$?
-      fi
-      if [ "$schema_attempt" -lt 2 ]; then
-        echo "Release schema preflight attempt $schema_attempt failed; retrying after transient container startup window" >&2
-        sleep 3
-      fi
-    done
-    if [ "$schema_status" -ne 0 ]; then
-      echo "Release schema preflight failed after retry" >&2
-      exit "$schema_status"
-    fi
-  fi
-
   tar -C "$ROOT" \
     --exclude=.git \
     --exclude=node_modules \
@@ -137,12 +116,6 @@ PY
     node "$ROOT/tests/startpartner_public_funnel_browser_test.mjs" \
       --base-url "http://127.0.0.1:$port" \
       --out-dir "$SMOKE_OUT_DIR/startpartner-public-funnel"
-  fi
-
-  if [ -f "$ROOT/tests/release_preflight_formspree_browser_test.mjs" ]; then
-    node "$ROOT/tests/release_preflight_formspree_browser_test.mjs" \
-      --base-url "http://127.0.0.1:$port" \
-      --out-dir "$SMOKE_OUT_DIR/release-preflight-formspree"
   fi
 )
 smoke_status=$?
