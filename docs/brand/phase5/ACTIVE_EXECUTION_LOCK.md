@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **C0 PREMIUM-REFERENZKALIBRIERUNG / MARKENWELT-GATE AKTIV – 0 LOGOFINALISTEN**
+Status: **C0 REFERENZKALIBRIERUNG ABGESCHLOSSEN – MARKENWELT-GATE AKTIV – 0 LOGOFINALISTEN**
 
 ## 1. Ziel
 
@@ -21,52 +21,41 @@ Vor jeder weiteren Markenaktion sind ausschließlich diese Dateien maßgeblich:
 
 Rohskizzen, Generatorboards und verworfene Kandidaten besitzen keinen aktiven Gate-Status.
 
-## 3. B5 – D1 beendet
+## 3. D1 beendet
 
-`D1 – Initial Frame Signature` ist im Product-Owner-Wahrnehmungsgate klar durchgefallen.
+`D1 – Initial Frame Signature` ist im Product-Owner-Wahrnehmungsgate klar durchgefallen. Die früheren internen ästhetischen PASS-Urteile gelten als falsch positiv. D1 wird nicht repariert oder weitergeführt.
 
-Der visuelle Befund war eindeutig:
+## 4. C0 – reale Premium-Referenzkalibrierung abgeschlossen
 
-- keine Premiumwirkung;
-- äußere Form wirkte wie Badge/Sprechblase/Etikett beziehungsweise konstruierter Rahmen;
-- das fehlende sichtbare `B` erzeugte unnötige Dekodierung von `ocholt`;
-- der geschwungene Abschluss wirkte wie ein Gestaltungstrick;
-- die Form besaß keine selbstverständliche, langfristig tragfähige Markensilhouette.
+Aktuelle reale Referenzen wurden in drei Rollen geprüft:
 
-Die vorherigen internen B2/B4-PASS-Urteile gelten damit für die ästhetische Qualifikation als **falsch positiv**.
+### A – kuratierte kulturelle Souveränität
 
-D1 wird nicht mikrorepariert und nicht als Heritage weitergeführt.
+MUBI, Monocle, MUJI, Aesop, COS, Letterboxd.
 
-## 4. Root Cause
+Nutzen für `Bocholt erleben`: Ruhe, erwachsene Wertigkeit, Kuratierung, wenige belastbare Codes.
 
-Das Problem war nicht `Logo-first`, sondern die Qualifikationsmethode:
+### B – Discovery, Erlebnis und menschliche Energie
 
-- eigene Entwürfe wurden überwiegend innerhalb des eigenen Suchraums bewertet;
-- die relativ stärkste interne Lösung konnte dadurch wie ein absolut starker Kandidat erscheinen;
-- dieselbe AI-Instanz erzeugte und qualifizierte ihre eigene kreative Arbeit;
-- es fehlte eine externe visuelle Qualitätsreferenz **vor** der Kandidatenbeförderung.
+Airbnb, Headout, GetYourGuide, Fever, DICE, Eventbrite.
 
-## 5. C0 – Premium-Referenzkalibrierung
+Nutzen: Zugänglichkeit, Entdeckung, Freude, persönliche Consumer-Nähe.
 
-Vor jedem neuen `Bocholt erleben`-Logo werden drei visuelle Markenwelten als externe Kalibrierung verwendet:
+### C – ikonische digitale Disziplin
 
-### A – Kuratiert & souverän
+Spotify, komoot, AllTrails, Strava.
 
-Ruhig, erwachsen, vertrauenswürdig, wenige starke Codes.
+Nutzen: Kleinformatstärke, Prägnanz, responsive Robustheit. C ist Qualitätsmaßstab, nicht gewünschte Tonalität.
 
-### B – Lebendig & erlebnisorientiert
+## 5. Creative-Direction-Empfehlung
 
-Energie, Freude, kulturelle Nähe, starke Wiedererkennbarkeit ohne Eventplakat-Lautstärke.
+> **A + B als Markencharakter; C ausschließlich als Qualitätsdisziplin.**
 
-### C – Kompakt & ikonisch
+Gesuchte Wirkung:
 
-Sehr schnelle Erkennbarkeit, Kleinformatstärke und digitale Selbstverständlichkeit.
+> hochwertig kuratiert, lebendig genug für Freizeit und Entdeckung, persönlich und zugänglich, aber visuell so diszipliniert, dass das Logo in kleiner digitaler Anwendung selbstverständlich besteht.
 
-Creative-Direction-Hypothese:
-
-> **A als Basis + B als Energieanteil + C als technische Disziplin.**
-
-Diese Hypothese muss im aktuellen Product-Owner-Markenwelt-Gate bestätigt oder verworfen werden.
+Diese Empfehlung befindet sich jetzt im Product-Owner-Markenwelt-Gate.
 
 ## 6. Neue Pflicht vor Kandidatenstatus
 
@@ -82,9 +71,9 @@ Wenn der Entwurf sichtbar weniger selbstverständlich, prägnant oder markenreif
 
 Ein internes AI-PASS allein besitzt keinen Kandidatenstatus mehr.
 
-## 7. Neue Gate-Reihenfolge
+## 7. Gate-Reihenfolge
 
-1. **C0:** Premium-Referenzkalibrierung + Markenwelt-Gate – aktiv;
+1. **C0:** Referenzkalibrierung abgeschlossen; Markenwelt-Gate aktiv;
 2. **C1:** breite Logoexploration ohne vorgeschriebene `BE`-, Symbol- oder Heritage-Architektur;
 3. **C2:** technischer/formaler Rohfilter;
 4. **C3:** anonymer externer Referenzvergleich;
