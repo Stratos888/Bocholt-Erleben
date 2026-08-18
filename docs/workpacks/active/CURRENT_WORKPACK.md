@@ -1,23 +1,21 @@
 # Current Workpack Router
 
-Diese Datei ist kein Statusjournal und enthält bewusst keine wechselnde Issue-Nummer.
+Ein aktives Workpack ist optional.
 
-## Verbindliche Auswahlregel
+## Normaler Fall
 
-Das aktive Workpack ist genau das eine **offene GitHub-Issue**, dessen Titel den Marker
+Kleine und mittlere Änderungen benötigen kein Workpack-Issue. Bestehende Branches und Pull Requests zur Aufgabe werden geprüft und passende Arbeit wird fortgesetzt.
+
+## Workpack-Fall
+
+Ein Issue mit `[ACTIVE WORKPACK]` wird nur verwendet, wenn die Aufgabe mehrere Chats, Systeme oder Owner umfasst oder Schema-, Berechtigungs-, Zahlungs-, externe Write-, Deployment- oder Governancegrenzen berührt.
+
+Jedes Workpack nennt genau einen `branch`. Der zugehörige PR enthält:
 
 ```text
-[ACTIVE WORKPACK]
+Workpack: #123
 ```
 
-enthält.
+Mehrere voneinander unabhängige aktive Workpacks dürfen existieren. Für dasselbe Workpack ist nur ein offener PR zulässig.
 
-- **Genau ein Treffer:** Dieses Issue vollständig lesen. Es ist der einzige Scope-, Status- und Evidence-Owner.
-- **Kein Treffer:** Es gibt kein aktives Workpack. Schreibende Repository-Arbeit stoppen, bis Chat einen Workpack aktiviert und Gate A schließt.
-- **Mehr als ein Treffer:** Fail-closed stoppen und den Konflikt im GitHub-Issue-Bestand bereinigen.
-
-Beim Abschluss wird der Marker im selben finalen Issue-Update entfernt. Queue-, vorbereitete und abgeschlossene Issues tragen den Marker nicht.
-
-## Arbeitsgrenze
-
-Repository-Dateien enthalten nur dauerhafte Regeln und Architektur. Operativer Fortschritt, Entscheidungen, Evidence und der nächste Schritt stehen ausschließlich im aktiven Issue.
+Operativer Status gehört ausschließlich in das jeweilige Issue. Beim Abschluss wird der Active-Marker entfernt.

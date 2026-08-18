@@ -1,0 +1,94 @@
+{
+  "workpack_issue": 225,
+  "design_owner": "ChatGPT",
+  "external_designer_used": false,
+  "stock_graphics_used": false,
+  "image_generation_used_for_final_assets": false,
+  "construction": "deterministic SVG geometry and outlined wordmarks",
+  "fonts_used_as_outline_sources": [
+    {
+      "name": "Inter Display",
+      "files_not_distributed": true
+    }
+  ],
+  "legal_status": "not cleared or approved for public use",
+  "similarity_preflight": "limited web and image-environment preflight; no freedom-to-use conclusion",
+  "assets": [
+    {
+      "path": "candidates/a/icon-inverse.svg",
+      "sha256": "d43c66adbb37b3e0023f40ca281b5a620b83ae779bc1df07fd07534b98469615"
+    },
+    {
+      "path": "candidates/a/icon-mono.svg",
+      "sha256": "d5a6a3715045524c5db27cb907d36f3cda904e6fe22dc1414a858d758df9239f"
+    },
+    {
+      "path": "candidates/a/icon.svg",
+      "sha256": "b635a6b78989d604863befc9ab2e747b1e84ee3b4da5a2d2ca0bc1ab1211eeac"
+    },
+    {
+      "path": "candidates/a/lockup-mono.svg",
+      "sha256": "f97e597000e9631757d8b05d2087aedf964be64e624314912fc6c636f14bc691"
+    },
+    {
+      "path": "candidates/a/lockup.svg",
+      "sha256": "ba23b9df7c618701d775748fb001fb6c7075e92efeaedc96f4e122709de2f1d4"
+    },
+    {
+      "path": "candidates/a/sizes/16.png",
+      "sha256": "d972e7bb43b10869ea9882a99b47d22f1a8a655ef2759258876a380ca654ee57"
+    },
+    {
+      "path": "candidates/a/sizes/24.png",
+      "sha256": "5ece4500f6c8da9f4d2535febc9936e1ae45f104c17016c7c733fd11231f59d8"
+    },
+    {
+      "path": "candidates/a/sizes/32.png",
+      "sha256": "fe09b7644e59dd96e3ad1ea2d8905830d9e35902a6cf59fab0ac2781076243d4"
+    },
+    {
+      "path": "candidates/a/sizes/48.png",
+      "sha256": "fc2c73ef39dd1b7ac945c6b346a7e6662dd67d1d35b3c73d0bbd58707088ff6f"
+    },
+    {
+      "path": "candidates/b/app-icon-mono.svg",
+      "sha256": "a9432aa2a17321f62f39b2d0de01544026869629ec715547a0fa3b3f6e76298a"
+    },
+    {
+      "path": "candidates/b/app-icon.svg",
+      "sha256": "9000c50f6c6c88c4ba1795ffc3f04c84c83e7731739abbdf00bc3932d4a77b13"
+    },
+    {
+      "path": "candidates/b/lockup-mono.svg",
+      "sha256": "f4a5574a9ea65f92cc843c3fdf35134d32716810192fc942f97eddd2b862ac3b"
+    },
+    {
+      "path": "candidates/b/lockup.svg",
+      "sha256": "3c0c992f6fcf987db84b04bdc5cd63e6c2a4006f7bf27cd954b665a1a05b2e02"
+    },
+    {
+      "path": "candidates/b/sizes/16.png",
+      "sha256": "1f4930722dece4fb53962817b110f2ea7b989340b41557a4ca5538017841daf6"
+    },
+    {
+      "path": "candidates/b/sizes/24.png",
+      "sha256": "1d8656fa2cb0b9c0f51ff4d847b4d657b2c7ca597b138691a9170fe280bb2bbf"
+    },
+    {
+      "path": "candidates/b/sizes/32.png",
+      "sha256": "bf9f955e7b7c9237d77c74cd4d8119d7d8f76d8d63676252ad150d3ff27e9349"
+    },
+    {
+      "path": "candidates/b/sizes/48.png",
+      "sha256": "3bbc5cb5ef57a59d2f08d116089d1f5c6be97e564c7166caeb8b5848f15112fa"
+    },
+    {
+      "path": "candidates/b/small-mark-mono.svg",
+      "sha256": "defa97972aec5c629609c71a050e1c7a251eb9927ac71085078be2f3a4b675f9"
+    },
+    {
+      "path": "candidates/b/small-mark.svg",
+      "sha256": "0577ee8bc27b627a041a3af2d464e0907b055e95c6697961a19de1929116e81b"
+    }
+  ]
+}

@@ -10,11 +10,12 @@
   <header class="cc-header"><div><p class="cc-eyebrow">Bocholt erleben</p><h1 id="cc-title">Prüfen</h1></div></header>
   <main class="cc-main"><section id="cc-content"><div class="cc-status" id="cc-status"></div><div id="cc-view"></div></section></main>
   <nav class="cc-nav" aria-label="Steuerzentrale"><button type="button" data-view="overview"><span>Übersicht</span></button><button type="button" data-view="review" class="is-active"><span>Prüfen</span><b id="cc-badge-review" hidden></b></button><button type="button" data-view="backlog"><span>Backlog</span><b id="cc-badge-backlog" hidden></b></button><button type="button" data-view="manage"><span>Verwaltung</span></button><button type="button" data-view="development"><span>Entwicklung</span></button></nav>
-  <dialog id="cc-dialog"><div id="cc-dialog-body"></div><button id="cc-dialog-close">Schließen</button></dialog>
+  <dialog id="cc-dialog" class="cc-dialog"><form method="dialog" class="cc-dialog__card"><button class="cc-dialog__close" id="cc-dialog-close" type="button">×</button><div id="cc-dialog-body"></div></form></dialog>
   <form id="cc-auth-form" hidden><input id="cc-password"><button id="cc-refresh"></button><button id="cc-menu-button"></button></form><section id="cc-auth" hidden></section>
   <script type="module">
     import { state } from '../../js/control-center/shared.js?v=2026-07-16-e2e-state-v5';
-    import { configureReviewRenderer, renderReview } from '../../js/control-center/review-render.js?v=2026-07-24-mobile-exception-review-v1';
+    import { configureReviewRenderer, renderReview } from '../../js/control-center/review-render.js?v=2026-08-01-startpartner-gate4-audit-v1';
+    import { handleStartpartnerAction } from '../../js/control-center/startpartner-review.js?v=2026-08-01-startpartner-wording-v1';
 
     const scenario = new URLSearchParams(location.search).get('scenario') || 'duplicate';
     const baseReview = {
@@ -36,9 +37,54 @@
         {key:'snooze_case',label:'Unklar – zurückstellen'},
       ],
     };
+    const dimensions=['local_relevance','organization_contact','content_sources','editorial_fit','content_leverage','reach_leverage','user_need','maintenance_capability','cooperation_readiness','setup_effort','support_effort','regular_path','legal_technical','required_information'];
+    const qualificationRows=(blocked=false)=>dimensions.map((dimension,index)=>({dimension,assessment:blocked&&index===0?'weak':(index<4||index>11?'adequate':'weak'),reason:`Begründung ${dimension}`,evidence_text:`Nachweis ${dimension}`,operator_reference:'Fixture',evaluated_at:'2026-07-25 14:00:00',revision:1}));
+    const gate3State=(complete=false)=>complete?{
+      complete:true,blockers:[],
+      terms_acceptance:{id:301,terms_version:'pilot-terms-v1',terms_reference:'repo://pilot-terms-v1',terms_digest:'a'.repeat(64),accepting_person:'Erika Beispiel',accepting_organization:'GATE3_SYNTHETIC_Bocholt Kulturverein',accepted_at:'2026-07-27 20:00:00',confirmation_channel:'operator_recorded'},
+      organizer:{id:401,organization_name:'GATE3_SYNTHETIC_Bocholt Kulturverein',email:'erika@example.org'},
+      pilot:{id:'23100000-0000-4000-8000-000000000001',status:'onboarding',revision:1},
+      scopes:[{scope_key:'events',limit_value:8,is_unlimited:false,period_unit:'pilot_month'},{scope_key:'activities',limit_value:1,is_unlimited:false,period_unit:'concurrent'}],
+      entitlement:{id:'23100000-0000-4000-8000-000000000002',status:'pending_activation',starts_at:null,ends_at:null},
+      events:[{event_type:'gate3_pilot_created',actor_reference:'M. Muster',created_at:'2026-07-27 20:01:00'}],
+    }:{complete:false,terms_acceptance:null,organizer:null,pilot:null,scopes:[],entitlement:null,events:[],blockers:[{code:'terms_confirmation_required',message:'Pilotbedingungen müssen ausdrücklich bestätigt und einem Veranstalterzugang zugeordnet werden.'}]};
+    const startpartner=(status,options={})=>{
+      const blocked=Boolean(options.blocked);const active=Number(options.active??2);const hard=Boolean(options.hard);const soft=Boolean(options.soft);
+      return {
+        id:'19900000-0000-0000-0000-000000009999',organization_name:options.gate3Complete?'GATE3_SYNTHETIC_Bocholt Kulturverein':'GATE2_SYNTHETIC_199_Bocholt Kulturverein',source:'targeted_outreach',
+        desired_content_scope:'both',status,revision:Number(options.revision||4),assigned_to:'M. Muster',next_review_at:'2026-08-02 10:00:00',
+        website_url:'https://example.org/startpartner',description_text:'Lokaler Kulturverein mit regelmäßigem Event- und Aktivitätsangebot.',
+        contacts:[{contact_name:'Erika Beispiel',contact_role:'Vorstand',email:'erika@example.org',phone:'02871 12345',is_primary:true}],
+        qualifications:qualificationRows(blocked),readiness:{ready:!blocked,assessed_count:14,total_count:14,blockers:blocked?[{dimension:'local_relevance',code:'minimum_not_met',message:'Mindestanforderung nicht erfüllt.'}]:[]},
+        capacity:{active_reservations:active,available_slots:Math.max(0,8-active),soft_stop:soft||active>=6,hard_stop:hard||active>=8,soft_stop_at:6,hard_stop_at:8,consistent:true,anomalies:{}},
+        reservations:options.reserved?[{id:77,status:'active',starts_at:'2026-07-25 10:00:00',ends_at:'2026-08-20 10:00:00'}]:[],
+        active_reservation:options.reserved?{id:77,status:'active',starts_at:'2026-07-25 10:00:00',ends_at:'2026-08-20 10:00:00'}:null,
+        waitlist:options.waitlisted?{eligibility_reason:'Fachlich geeignet.',priority_reason:'Hoher lokaler Mehrwert.',next_review_at:'2026-08-15 10:00:00',contact_status:'paused',regular_alternative:'Reguläres Sichtbarkeitspaket'}:null,
+        decision:options.reserved?{result:'accepted_pending_terms',reason:'Gute fachliche Passung.'}:options.waitlisted?{result:'waitlisted',reason:'Kapazität derzeit ausgeschöpft.',regular_alternative:'Reguläres Sichtbarkeitspaket'}:null,
+        events:[{event_type:'candidate_created',actor_reference:'Fixture',created_at:'2026-07-25 12:00:00'},{event_type:'qualifications_updated',actor_reference:'M. Muster',created_at:'2026-07-25 14:00:00'}],
+        gate3:gate3State(Boolean(options.gate3Complete)),
+      };
+    };
+    const startpartnerItem=(data,primary,secondary=[])=>({
+      id:'fixture-startpartner',type:'intake',queue_group:'startpartner',case_kind:'startpartner_candidate',state:data.status==='waitlisted'?'parked':data.status==='decision_ready'?'decision_required':'in_progress',
+      title:`Startpartner prüfen: ${data.organization_name}`,display_status:data.gate3?.complete?'Piloteinrichtung':data.status==='accepted_pending_terms'?'Platz reserviert · Bedingungen offen':data.status==='decision_ready'?'Entscheidungsreif':data.status==='waitlisted'?'Warteliste':data.status==='qualifying'?'Qualifizierung':'Neu',
+      primary_action:primary,secondary_actions:[...secondary,{key:'details',label:'Nachweise und Verlauf'}],startpartner_candidate:data,
+      decision_context:{candidate_id:data.id,candidate_status:data.status,candidate_revision:data.revision,readiness:data.readiness,capacity:data.capacity,assigned_to:data.assigned_to,next_review_at:data.next_review_at,gate3:data.gate3},
+      source:{system:'startpartner_candidate',reference:data.id},object:{id:data.id,title:data.organization_name,type:'startpartner_candidate'},
+    });
+
     let review = structuredClone(baseReview);
     let item = { id:'fixture-event', type:'intake', queue_group:'new_content', case_kind:'event_candidate', state:'decision_required', title:review.facts.title, display_status:'Entscheidung erforderlich', review_contract:review, source_links:[{label:'Prüfquelle',url:'https://example.org/source'}] };
-    if (scenario === 'ready') {
+    if(scenario.startsWith('startpartner-')){
+      if(scenario==='startpartner-blocked')item=startpartnerItem(startpartner('qualifying',{blocked:true}),{key:'edit_qualification',label:'Wichtigsten offenen Punkt bearbeiten'},[{key:'edit_profile',label:'Profil bearbeiten'}]);
+      if(scenario==='startpartner-ready')item=startpartnerItem(startpartner('decision_ready',{active:4}),{key:'accept_pending_terms',label:'Platz reservieren'},[{key:'waitlist',label:'Auf Warteliste setzen'},{key:'route_regular',label:'Regulären Weg wählen'}]);
+      if(scenario==='startpartner-soft')item=startpartnerItem(startpartner('decision_ready',{active:6,soft:true}),{key:'accept_pending_terms',label:'Platz reservieren'},[{key:'waitlist',label:'Auf Warteliste setzen'}]);
+      if(scenario==='startpartner-hard')item=startpartnerItem(startpartner('decision_ready',{active:8,hard:true}),{key:'waitlist',label:'Auf Warteliste setzen'},[{key:'route_regular',label:'Regulären Weg wählen'}]);
+      if(scenario==='startpartner-reserved')item=startpartnerItem(startpartner('accepted_pending_terms',{active:5,reserved:true}),{key:'confirm_pilot_terms',label:'Bedingungen bestätigen und Pilot anlegen'},[{key:'extend_reservation',label:'Reservierung verlängern'},{key:'release_reservation',label:'Reservierung freigeben',destructive:true}]);
+      if(scenario==='startpartner-gate3-complete')item=startpartnerItem(startpartner('accepted_pending_terms',{active:5,reserved:true,gate3Complete:true,revision:5}),{key:'details',label:'Pilotstatus prüfen'},[{key:'edit_profile',label:'Profil bearbeiten'}]);
+      if(scenario==='startpartner-waitlisted')item=startpartnerItem(startpartner('waitlisted',{active:8,hard:true,waitlisted:true}),{key:'update_waitlist',label:'Warteliste aktualisieren'},[{key:'start_qualification',label:'Neu qualifizieren'}]);
+      if(scenario==='startpartner-mutation')item=startpartnerItem(startpartner('new',{active:2,revision:1}),{key:'start_prequalification',label:'Vorqualifizierung starten'},[]);
+    }else if (scenario === 'ready') {
       review.summary={open_task_count:0,headline:'Event entscheidungsreif'}; review.decision_gate={ready:true}; review.review_tasks=[]; item.display_status='Entscheidungsreif';
     } else if (scenario === 'waiting') {
       review.review_tasks=[{...duplicateTask,task_id:'visual.waiting',finding_code:'visual_waiting',state:'waiting_external',title:'Bildprüfung läuft',message:'Ein Folgeprozess erstellt das freigegebene Bild.',actions:[{key:'snooze_case',label:'Später erneut prüfen'}]}];
@@ -50,8 +96,9 @@
     }
     item.review_contract=review;
     state.reviewGroup='all'; state.reviewIndex=0; state.cases=[item];
-    window.__fixtureActions=[];
-    configureReviewRenderer({handleAction:async(...args)=>window.__fixtureActions.push(args)});
+    window.__fixtureActions=[];window.__fixtureReloads=0;
+    const reload=async()=>{window.__fixtureReloads+=1;return true;};
+    configureReviewRenderer({handleAction:async(current,action,context)=>current.case_kind==='startpartner_candidate'?handleStartpartnerAction(current,action,reload):window.__fixtureActions.push([current,action,context])});
     renderReview();
     document.documentElement.dataset.fixtureReady='true';
   </script>

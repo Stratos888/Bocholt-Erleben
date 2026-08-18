@@ -1,0 +1,27 @@
+{
+  "archive_status": "rejected",
+  "former_candidate_id": "open-impulse",
+  "former_candidate_name": "Offener Impuls",
+  "former_score_claim": 91,
+  "score_claim_valid": false,
+  "premium_gate_passed": false,
+  "microdrawing_authorized": false,
+  "public_cutover_authorized": false,
+  "further_development_authorized": false,
+  "reason": [
+    "generic typography after ablation",
+    "artifact-like diagonal interruption and accent",
+    "weak real-size identity",
+    "generic small mark",
+    "insufficient Bocholt erleben specificity"
+  ],
+  "source_basis": {
+    "typeface": "Inter Display SemiBold",
+    "license": "SIL Open Font License 1.1",
+    "use": "historical outline construction basis; no font file shipped"
+  },
+  "external_designer_used": false,
+  "image_generation_used_for_final_assets": false,
+  "automatic_tracing_used": false,
+  "legal_clearance_claimed": false
+}

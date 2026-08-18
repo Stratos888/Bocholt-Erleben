@@ -70,7 +70,6 @@
     </header>
     <!-- === END BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V5_VALUE_CENTER_COPY === -->
 
-
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 | Zweck: erklärt den fehlenden Login als notwendigen E-Mail-Zugangslink; Umfang: Auth-Required-Karte === -->
     <section class="content-card content-card--primary" id="organizer-dashboard-auth-required" aria-labelledby="organizer-dashboard-auth-required-head" hidden>
       <h2 id="organizer-dashboard-auth-required-head">Zugangslink erforderlich</h2>
@@ -82,6 +81,11 @@
       </div>
     </section>
     <!-- === END BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 === -->
+
+    <section class="content-card content-card--primary" id="organizer-dashboard-pilot-card" aria-live="polite" hidden>
+      <h2>Startpartner-Pilot wird geladen.</h2>
+      <p>Der Pilotstatus wird aus der fachlichen Pilotdomäne gelesen.</p>
+    </section>
 
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_CARD_V1 | Zweck: bereitet den Anbieterbereich als Wertzentrum mit sicher zugeordneten Nutzwert-Metriken vor; Umfang: neue statische Wirkungskarte === -->
     <section class="content-card content-card--primary" id="organizer-dashboard-impact-card" aria-labelledby="organizer-dashboard-impact-head" hidden>
@@ -132,15 +136,6 @@
     </div>
     <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V5_VALUE_CENTER_COPY === -->
 
-
-
-
-
-
-
-
-
-    
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_NAV_COPY_V4 | Zweck: entfernt den redundanten Zugangslink aus dem geöffneten Dashboard und lässt nur den Rückweg zur Auswahl; Umfang: untere Bereich-Navigation im Dashboard === -->
     <nav class="content-links" aria-label="Bereich-Navigation">
       <a class="content-link" href="/events-veroeffentlichen/">
@@ -156,6 +151,7 @@
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_PORTAL_SCRIPT_CACHE_BUST_V10_STATUS_SEMANTICS | Zweck: lädt die aktualisierte Dashboard-Copy für Einreichungen, Veröffentlichungsstatus und Mitgliedschaft; Umfang: organizer-portal.js Script-Referenz === -->
   <script src="/js/organizer-portal.js?v=2026-07-06-organizer-dashboard-status-semantics-v1" defer></script>
+  <script src="/js/organizer-pilot.js?v=2026-07-29-gate4-v1" defer></script>
   <!-- === END BLOCK: ORGANIZER_DASHBOARD_PORTAL_SCRIPT_CACHE_BUST_V10_STATUS_SEMANTICS === -->
   <!-- === END BLOCK: ORGANIZER_DASHBOARD_BODY_V2_AREA_SPLIT === -->
 </body>

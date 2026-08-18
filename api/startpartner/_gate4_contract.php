@@ -1,0 +1,182 @@
+<?php
+declare(strict_types=1);
+
+const BE_STARTPARTNER_GATE4_ONBOARDING_ITEMS = [
+    'terms_confirmed',
+    'organizer_linked',
+    'contact_confirmed',
+    'portal_access_tested',
+    'pilot_entitlement_readback',
+    'service_scope_confirmed',
+    'sources_recorded',
+    'maintenance_path_agreed',
+    'content_rights_cleared',
+    'first_content_ready',
+    'editorial_review_ready',
+    'measurement_ready',
+    'distribution_ready',
+    'activation_target_set',
+];
+
+const BE_STARTPARTNER_GATE4_MANUAL_ONBOARDING_ITEMS = [
+    'portal_access_tested',
+    'content_rights_cleared',
+    'activation_target_set',
+];
+
+const BE_STARTPARTNER_GATE4_CONTENT_TYPES = ['event', 'activity'];
+const BE_STARTPARTNER_GATE4_ITEM_STATUSES = ['pending', 'complete', 'blocked', 'not_applicable'];
+const BE_STARTPARTNER_GATE4_DISTRIBUTION_STATUSES = ['planned', 'ready', 'completed', 'blocked', 'cancelled'];
+
+function be_startpartner_gate4_reporting_target_id(int $organizerId): string
+{
+    if ($organizerId < 1) {
+        throw new InvalidArgumentException('organizer_id must be positive.');
+    }
+    return 'organizer-' . substr(hash('sha256', 'organizer:' . $organizerId), 0, 16);
+}
+
+function be_startpartner_gate4_validate_local_date(mixed $value): string
+{
+    $text = trim((string)$value);
+    $date = DateTimeImmutable::createFromFormat('!Y-m-d', $text, new DateTimeZone('Europe/Berlin'));
+    $errors = DateTimeImmutable::getLastErrors();
+    if (
+        !$date
+        || (is_array($errors) && (($errors['warning_count'] ?? 0) > 0 || ($errors['error_count'] ?? 0) > 0))
+        || $date->format('Y-m-d') !== $text
+    ) {
+        throw new InvalidArgumentException('activation_date_local must use YYYY-MM-DD.');
+    }
+    return $text;
+}
+
+function be_startpartner_gate4_add_calendar_months(string $localDate, int $months): string
+{
+    $dateText = be_startpartner_gate4_validate_local_date($localDate);
+    if ($months < 1 || $months > 24) {
+        throw new InvalidArgumentException('calendar month offset is invalid.');
+    }
+    [$year, $month, $day] = array_map('intval', explode('-', $dateText));
+    $monthIndex = ($year * 12 + ($month - 1)) + $months;
+    $targetYear = intdiv($monthIndex, 12);
+    $targetMonth = ($monthIndex % 12) + 1;
+    $lastDay = cal_days_in_month(CAL_GREGORIAN, $targetMonth, $targetYear);
+    return sprintf('%04d-%02d-%02d', $targetYear, $targetMonth, min($day, $lastDay));
+}
+
+function be_startpartner_gate4_activation_window(string $localDate): array
+{
+    $activationDate = be_startpartner_gate4_validate_local_date($localDate);
+    $plannedEndDate = be_startpartner_gate4_add_calendar_months($activationDate, 6);
+    $timezone = new DateTimeZone('Europe/Berlin');
+    $startLocal = new DateTimeImmutable($activationDate . ' 00:00:00', $timezone);
+    $endLocal = new DateTimeImmutable($plannedEndDate . ' 23:59:59', $timezone);
+    return [
+        'activation_date_local' => $activationDate,
+        'planned_end_date' => $plannedEndDate,
+        'starts_at_utc' => $startLocal->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s'),
+        'ends_at_utc' => $endLocal->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s'),
+    ];
+}
+
+function be_startpartner_gate4_onboarding_key(mixed $value): string
+{
+    $key = strtolower(trim((string)$value));
+    if (!in_array($key, BE_STARTPARTNER_GATE4_ONBOARDING_ITEMS, true)) {
+        throw new InvalidArgumentException('onboarding item_key is invalid.');
+    }
+    return $key;
+}
+
+function be_startpartner_gate4_onboarding_item_is_manual(string $key): bool
+{
+    return in_array($key, BE_STARTPARTNER_GATE4_MANUAL_ONBOARDING_ITEMS, true);
+}
+
+function be_startpartner_gate4_manual_onboarding_key(mixed $value): string
+{
+    $key = be_startpartner_gate4_onboarding_key($value);
+    if (!be_startpartner_gate4_onboarding_item_is_manual($key)) {
+        throw new DomainException('Dieser Onboardingpunkt wird aus dem fachlichen Quellsystem abgeleitet und kann nicht manuell überschrieben werden.');
+    }
+    return $key;
+}
+
+function be_startpartner_gate4_item_status(mixed $value): string
+{
+    $status = strtolower(trim((string)$value));
+    if (!in_array($status, BE_STARTPARTNER_GATE4_ITEM_STATUSES, true)) {
+        throw new InvalidArgumentException('onboarding status is invalid.');
+    }
+    return $status;
+}
+
+function be_startpartner_gate4_content_type(mixed $value): string
+{
+    $type = strtolower(trim((string)$value));
+    if (!in_array($type, BE_STARTPARTNER_GATE4_CONTENT_TYPES, true)) {
+        throw new InvalidArgumentException('content_type is invalid.');
+    }
+    return $type;
+}
+
+function be_startpartner_gate4_required_item_rows(array $rows): array
+{
+    $byKey = [];
+    foreach ($rows as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $key = strtolower(trim((string)($row['item_key'] ?? '')));
+        if (in_array($key, BE_STARTPARTNER_GATE4_ONBOARDING_ITEMS, true)) {
+            $byKey[$key] = $row;
+        }
+    }
+    $result = [];
+    foreach (BE_STARTPARTNER_GATE4_ONBOARDING_ITEMS as $key) {
+        $result[] = $byKey[$key] ?? [
+            'item_key' => $key,
+            'status' => 'pending',
+            'is_required' => 1,
+            'is_hard_blocker' => 1,
+            'evidence_text' => null,
+            'evidence_reference' => null,
+            'operator_reference' => null,
+            'completed_at' => null,
+            'revision' => 0,
+        ];
+    }
+    return $result;
+}
+
+function be_startpartner_gate4_onboarding_readiness(array $rows): array
+{
+    $items = be_startpartner_gate4_required_item_rows($rows);
+    $blockers = [];
+    $completed = 0;
+    foreach ($items as $item) {
+        $status = (string)($item['status'] ?? 'pending');
+        $required = (int)($item['is_required'] ?? 1) === 1;
+        if ($status === 'complete' || (!$required && $status === 'not_applicable')) {
+            $completed++;
+            continue;
+        }
+        if ($required) {
+            $blockers[] = [
+                'code' => $status === 'blocked' ? 'hard_blocker' : 'required_item_open',
+                'item_key' => (string)$item['item_key'],
+                'message' => $status === 'blocked'
+                    ? 'Onboardingpunkt ist blockiert.'
+                    : 'Verbindlicher Onboardingpunkt ist noch offen.',
+            ];
+        }
+    }
+    return [
+        'ready' => $blockers === [],
+        'completed_count' => $completed,
+        'total_count' => count($items),
+        'blockers' => $blockers,
+        'items' => $items,
+    ];
+}

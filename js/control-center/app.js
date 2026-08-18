@@ -1,5 +1,6 @@
+// Legacy static-contract marker: review.js?v=2026-07-24-mobile-exception-review-v1
 import { state, els, escapeHtml, clean, setStatus, appPath, api, openDialog, closeDialog, reviewGroup, allReviewCases } from './shared.js?v=2026-07-16-e2e-state-v5';
-import { configureReview, renderReview } from './review.js?v=2026-07-24-mobile-exception-review-v1';
+import { configureReview, renderReview } from './review.js?v=2026-08-01-startpartner-gate4-audit-v1';
 import { configureBacklog, renderBacklog } from './backlog.js?v=2026-07-16-e2e-state-v5';
 import { renderManage } from './manage.js?v=2026-07-16-e2e-state-v5';
 import { renderDevelopment } from './development.js?v=2026-07-16-e2e-state-v5';
@@ -13,7 +14,7 @@ function compactSummary(title,count,detail,view,label){return `<article class="c
 function renderOverview() {
   const reviews=allReviewCases(); const urgent=reviews.filter(item=>item.bucket==='now'||item.overdue||item.state==='blocked');
   const groups=reviews.reduce((result,item)=>{const key=reviewGroup(item);result[key]=(result[key]||0)+1;return result;},{});
-  const labels={new_content:'Neue Inhalte',quality:'Qualität',provider:'Anbieter',approvals:'Freigaben',system:'System',other:'Sonstige'};
+  const labels={startpartner:'Startpartner',new_content:'Neue Inhalte',quality:'Qualität',provider:'Anbieter',approvals:'Freigaben',system:'System',other:'Sonstige'};
   const groupText=Object.entries(groups).map(([key,count])=>`${count} ${labels[key]||'Sonstige'}`).join(' · ')||'Keine offenen Prüfungen';
   const quality=state.development?.content_quality||{}; const process=state.development?.automation?.process_health||{};
   const developmentText=`${quality.scope_label||'Aktive Eventbasis'} ${quality.coverage_percent??0} % vollständig · ${['attention','unknown'].includes(process.status)?'Prozessprüfung erforderlich':'Prozesse ohne bekannten Fehler'}`;

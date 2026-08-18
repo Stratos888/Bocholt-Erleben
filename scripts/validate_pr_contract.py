@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Validate a pull request against the frozen contract in its active workpack issue."""
+"""Validate an adaptive PR workflow for normal changes, workpacks and releases."""
 
 from __future__ import annotations
 
 import argparse
 import fnmatch
-import hashlib
 import json
 import os
 import re
@@ -20,17 +19,63 @@ from typing import Any, Callable, Iterable
 
 WORKPACK_START = "<!-- WORKPACK_CONTRACT_START -->"
 WORKPACK_END = "<!-- WORKPACK_CONTRACT_END -->"
-PR_START = "<!-- PR_EVIDENCE_START -->"
-PR_END = "<!-- PR_EVIDENCE_END -->"
 ACTIVE_MARKER = "[ACTIVE WORKPACK]"
-HEX_64 = re.compile(r"^[0-9a-f]{64}$")
+WORKPACK_REFERENCE = re.compile(r"(?mi)^[ \t]*Workpack:[ \t]*#([1-9][0-9]*)[ \t]*$")
 GIT_SHA = re.compile(r"^[0-9a-f]{40,64}$")
+BRANCH = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/-]*$")
 CONTROLLED_WRITES = {"controlled-staging-write", "controlled-live-admin"}
 EXTERNAL_ACCESS = {"none", "read-only", *CONTROLLED_WRITES}
 
+WORKPACK_REQUIRED_PATTERNS = (
+    ".github/workflows/**",
+    "AI_ENTRYPOINT.md",
+    "AGENTS.md",
+    "ENGINEERING.md",
+    "docs/workpacks/active/CURRENT_WORKPACK.md",
+    "scripts/validate_pr_contract.py",
+    "tests/test_pr_contract.py",
+    "api/sql/**",
+    "api/stripe/**",
+    "api/webhooks/**",
+    "api/organizer-portal/request-magic-link.php",
+    "api/organizer-portal/consume-magic-link.php",
+    "api/organizer-portal/create-billing-portal-session.php",
+    "api/submissions/release-payment.php",
+)
+
+DOC_PATTERNS = ("*.md", "*.txt", "docs/**")
+FRONTEND_PATTERNS = (
+    "*.html",
+    "*.css",
+    "*.js",
+    "*.mjs",
+    "js/**",
+    "css/**",
+    "icons/**",
+    "assets/**",
+    "tests/*.mjs",
+    "tests/**/*.mjs",
+)
+BACKEND_PATTERNS = (
+    "*.php",
+    "api/**/*.php",
+    "tests/*.php",
+    "tests/**/*.php",
+    "tests/run_*mysql*.sh",
+)
+QUICK_PATTERNS = (
+    "scripts/**",
+    "tools/**",
+    "tests/*.py",
+    "tests/**/*.py",
+    "tests/*.sh",
+    "tests/**/*.sh",
+    "*.json",
+)
+
 
 class ContractError(ValueError):
-    """Raised when a PR or workpack contract is invalid."""
+    """Raised when a PR violates the adaptive workflow."""
 
 
 def require(condition: bool, message: str) -> None:
@@ -64,11 +109,10 @@ def extract_toml_block(text: str, start: str, end: str, label: str) -> dict[str,
     return parsed
 
 
-def canonical_contract_hash(contract: dict[str, Any]) -> str:
-    payload = dict(contract)
-    payload.pop("contract_hash", None)
-    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+def optional_workpack_reference(text: str) -> int | None:
+    matches = WORKPACK_REFERENCE.findall(text or "")
+    require(len(matches) <= 1, "PR body may contain at most one line: Workpack: #<issue>")
+    return int(matches[0]) if matches else None
 
 
 def validate_relative_path(value: str, label: str, *, allow_glob: bool) -> None:
@@ -94,73 +138,46 @@ def validate_pattern_list(value: Any, label: str) -> list[str]:
     return patterns
 
 
+def validate_branch(value: Any) -> str:
+    require(non_empty_string(value), "workpack branch is required")
+    branch = value.strip()
+    require(BRANCH.fullmatch(branch) is not None, "workpack branch contains invalid characters")
+    require(branch not in {"staging", "main"}, "workpack branch must be a feature branch")
+    require(".." not in branch and "//" not in branch, "workpack branch is not normalized")
+    return branch
+
+
 def validate_issue_contract(
     contract: dict[str, Any], *, issue_number: int, issue_state: str, issue_title: str
 ) -> None:
+    require(contract.get("schema_version") == 2, "workpack schema_version must equal 2")
     require(issue_state == "open", "referenced workpack issue must be open")
     require(ACTIVE_MARKER in issue_title, "referenced issue is missing the active-workpack marker")
-    require(contract.get("schema_version") == 1, "workpack schema_version must equal 1")
     require(contract.get("workpack_issue") == issue_number, "workpack issue number does not match the loaded issue")
-    revision = contract.get("contract_revision")
-    require(isinstance(revision, int) and revision >= 1, "contract_revision must be a positive integer")
-    contract_hash = contract.get("contract_hash")
-    require(isinstance(contract_hash, str) and HEX_64.fullmatch(contract_hash) is not None, "contract_hash must be a lowercase SHA-256")
-    require(contract_hash == canonical_contract_hash(contract), "workpack contract_hash does not match normalized TOML")
+    validate_branch(contract.get("branch"))
     require(non_empty_string(contract.get("objective")), "workpack objective is required")
-    require(non_empty_string_list(contract.get("scope_classes")), "scope_classes must be a non-empty string list")
     validate_pattern_list(contract.get("allowed_paths"), "allowed_paths")
     validate_pattern_list(contract.get("locked_paths"), "locked_paths")
-    access = contract.get("implementation_external_access")
-    require(access in EXTERNAL_ACCESS, "implementation_external_access is invalid")
+    access = contract.get("external_access")
+    require(access in EXTERNAL_ACCESS, "external_access is invalid")
     require(non_empty_string_list(contract.get("required_tests")), "required_tests must be a non-empty string list")
+    require(non_empty_string_list(contract.get("done")), "done must be a non-empty string list")
+    require(non_empty_string_list(contract.get("forbidden_effects")), "forbidden_effects must be a non-empty string list")
     require(non_empty_string(contract.get("staging_smoke")), "staging_smoke is required")
-    require(non_empty_string_list(contract.get("evidence_scope")), "workpack evidence_scope is required")
-    require(non_empty_string_list(contract.get("not_proven")), "workpack not_proven is required")
-    require(non_empty_string(contract.get("rollback")), "workpack rollback is required")
-
-    scopes = set(contract["scope_classes"])
-    if scopes & {"ui", "rendering"}:
-        visible = contract.get("visible_contract")
-        require(isinstance(visible, dict), "UI/rendering scope requires visible_contract")
-        require(non_empty_string(visible.get("reference")), "visible_contract.reference is required")
-        require(non_empty_string_list(visible.get("viewports")), "visible_contract.viewports is required")
-        require(non_empty_string(visible.get("above_the_fold")), "visible_contract.above_the_fold is required")
-        require(isinstance(visible.get("new_visible_elements"), bool), "visible_contract.new_visible_elements must be boolean")
-        require(non_empty_string_list(visible.get("javascript_states")), "visible_contract.javascript_states is required")
-
     if access in CONTROLLED_WRITES:
-        write = contract.get("external_write_contract")
-        require(isinstance(write, dict), "controlled external write requires external_write_contract")
-        for field in ("resource", "stable_identity", "before_state", "exact_mutation", "readback", "rollback"):
-            require(non_empty_string(write.get(field)), f"external_write_contract.{field} is required")
-
-
-def validate_pr_evidence(evidence: dict[str, Any], contract: dict[str, Any]) -> None:
-    require(evidence.get("schema_version") == 1, "PR evidence schema_version must equal 1")
-    require(evidence.get("workpack_issue") == contract["workpack_issue"], "PR workpack_issue does not match issue contract")
-    require(evidence.get("contract_revision") == contract["contract_revision"], "PR contract_revision does not match issue contract")
-    require(evidence.get("contract_hash") == contract["contract_hash"], "PR contract_hash does not match issue contract")
-    require(non_empty_string_list(evidence.get("tests")), "PR tests must be a non-empty string list")
-    require(non_empty_string_list(evidence.get("evidence_scope")), "PR evidence_scope must be a non-empty string list")
-    require(non_empty_string_list(evidence.get("not_proven")), "PR not_proven must be a non-empty string list")
-    require(non_empty_string(evidence.get("rollback")), "PR rollback is required")
-
-    missing_tests = [test for test in contract["required_tests"] if test not in evidence["tests"]]
-    require(not missing_tests, f"PR evidence is missing required tests: {', '.join(missing_tests)}")
-    missing_boundaries = [item for item in contract["not_proven"] if item not in evidence["not_proven"]]
-    require(not missing_boundaries, "PR evidence omits a required not_proven boundary")
-    require(evidence["rollback"] == contract["rollback"], "PR rollback must match the frozen workpack rollback")
+        write = contract.get("external_write")
+        require(isinstance(write, dict), "controlled external write requires external_write")
+        for field in ("resource", "identity", "before", "mutation", "readback", "cleanup"):
+            require(non_empty_string(write.get(field)), f"external_write.{field} is required")
 
 
 def path_matches(path: str, patterns: Iterable[str]) -> bool:
     return any(fnmatch.fnmatchcase(path, pattern) for pattern in patterns)
 
 
-def validate_changed_paths(changed_paths: Iterable[str], contract: dict[str, Any]) -> list[str]:
+def validate_changed_paths(changed_paths: Iterable[str], contract: dict[str, Any] | None = None) -> list[str]:
     paths = list(dict.fromkeys(changed_paths))
     require(bool(paths), "PR diff contains no changed paths")
-    allowed = contract["allowed_paths"]
-    locked = contract["locked_paths"]
     errors: list[str] = []
     for path in paths:
         try:
@@ -168,10 +185,11 @@ def validate_changed_paths(changed_paths: Iterable[str], contract: dict[str, Any
         except ContractError as exc:
             errors.append(str(exc))
             continue
-        if path_matches(path, locked):
-            errors.append(f"changed path is locked: {path}")
-        elif not path_matches(path, allowed):
-            errors.append(f"changed path is outside allowed scope: {path}")
+        if contract is not None:
+            if path_matches(path, contract["locked_paths"]):
+                errors.append(f"changed path is locked: {path}")
+            elif not path_matches(path, contract["allowed_paths"]):
+                errors.append(f"changed path is outside allowed scope: {path}")
     require(not errors, "\n".join(errors))
     return paths
 
@@ -212,6 +230,163 @@ def git_changed_paths(base_sha: str, head_sha: str, root: str = ".") -> list[str
     return parse_name_status_z(result.stdout)
 
 
+def classify_changed_paths(paths: Iterable[str], *, workpack: bool) -> str:
+    values = list(paths)
+    if workpack:
+        return "full"
+
+    categories: set[str] = set()
+    for path in values:
+        if path_matches(path, DOC_PATTERNS):
+            categories.add("docs")
+        elif path_matches(path, FRONTEND_PATTERNS):
+            categories.add("frontend")
+        elif path_matches(path, BACKEND_PATTERNS):
+            categories.add("backend")
+        elif path_matches(path, QUICK_PATTERNS):
+            categories.add("quick")
+        else:
+            categories.add("full")
+
+    categories.discard("docs")
+    if not categories:
+        return "docs"
+    if "full" in categories or {"backend", "frontend"} <= categories:
+        return "full"
+    if categories == {"quick"}:
+        return "quick"
+    if categories <= {"frontend", "quick"}:
+        return "frontend"
+    if categories <= {"backend", "quick"}:
+        return "backend"
+    return "full"
+
+
+def select_test_targets(paths: Iterable[str], *, plan: str) -> tuple[str, bool, bool]:
+    values = list(paths)
+    if plan == "full":
+        return "all", True, True
+
+    backend_components: set[str] = set()
+    for path in values:
+        if path_matches(path, ("api/startpartner/**", "api/organizer-portal/**", "tests/startpartner_*", "tests/run_startpartner_*")):
+            backend_components.add("startpartner")
+        elif path_matches(path, ("api/control-center/**", "tests/control_center*", "js/control-center/**", "steuerzentrale/**")):
+            backend_components.add("control-center")
+        elif path_matches(path, ("api/submissions/**", "tests/submission_*", "events-veroeffentlichen/**", "js/publish-funnel.js")):
+            backend_components.add("submissions")
+        elif path_matches(path, BACKEND_PATTERNS):
+            backend_components.add("all")
+
+    if "all" in backend_components or not backend_components:
+        backend = "all"
+    else:
+        backend = ",".join(sorted(backend_components))
+
+    event_browser = plan == "frontend" and any(
+        path_matches(path, ("index.html", "events/**", "heute/**", "aktivitaeten/**", "js/app.js", "js/events*.js", "css/style.css"))
+        for path in values
+    )
+    control_browser = plan == "frontend" and any(
+        path_matches(path, ("steuerzentrale/**", "js/control-center.js", "js/control-center/**", "css/style.css"))
+        for path in values
+    )
+    if plan == "frontend" and not event_browser and not control_browser:
+        event_browser = True
+        control_browser = True
+    return backend, event_browser, control_browser
+
+
+def validate_parallel_prs(
+    *,
+    pr_number: int,
+    paths: list[str],
+    workpack_issue: int | None,
+    open_prs: Iterable[dict[str, Any]],
+) -> None:
+    current = set(paths)
+    for value in open_prs:
+        if not isinstance(value, dict):
+            continue
+        other_number = value.get("number")
+        if other_number == pr_number:
+            continue
+        if not isinstance(other_number, int):
+            continue
+
+        body = str(value.get("body") or "")
+        other_refs = [int(item) for item in WORKPACK_REFERENCE.findall(body)]
+        if workpack_issue is not None and workpack_issue in other_refs:
+            raise ContractError(f"workpack #{workpack_issue} already has open PR #{other_number}")
+
+        other_paths = {
+            item
+            for item in value.get("changed_paths", [])
+            if isinstance(item, str) and item
+        }
+        overlap = sorted(current & other_paths)
+        if overlap:
+            raise ContractError(
+                f"changed paths overlap open PR #{other_number}: {', '.join(overlap)}"
+            )
+
+
+def validate_pull_request(
+    *,
+    pr_number: int,
+    pr_body: str,
+    repository: str,
+    base_ref: str,
+    head_ref: str,
+    changed_paths: Iterable[str],
+    issue_loader: Callable[[int], dict[str, Any]],
+    open_feature_pr_loader: Callable[[], list[dict[str, Any]]],
+) -> tuple[dict[str, Any] | None, list[str], str, str]:
+    require(non_empty_string(repository) and "/" in repository, "repository must be owner/name")
+    paths = validate_changed_paths(changed_paths)
+
+    if base_ref == "main":
+        require(head_ref == "staging", "release PR must use staging -> main")
+        return None, paths, "release", "full"
+
+    require(base_ref == "staging", "feature PR must target staging")
+    require(validate_branch(head_ref) == head_ref, "feature PR head branch is invalid")
+
+    workpack_issue = optional_workpack_reference(pr_body)
+    contract: dict[str, Any] | None = None
+
+    if workpack_issue is not None:
+        issue = issue_loader(workpack_issue)
+        require(isinstance(issue, dict), "loaded issue is invalid")
+        contract = extract_toml_block(str(issue.get("body", "")), WORKPACK_START, WORKPACK_END, "workpack contract")
+        validate_issue_contract(
+            contract,
+            issue_number=workpack_issue,
+            issue_state=str(issue.get("state", "")),
+            issue_title=str(issue.get("title", "")),
+        )
+        require(head_ref == contract["branch"], f"PR head branch must equal workpack branch: {contract['branch']}")
+        paths = validate_changed_paths(paths, contract)
+    else:
+        risky = [path for path in paths if path_matches(path, WORKPACK_REQUIRED_PATTERNS)]
+        require(
+            not risky,
+            "workpack is required for high-risk paths: " + ", ".join(sorted(risky)),
+        )
+
+    open_prs = open_feature_pr_loader()
+    validate_parallel_prs(
+        pr_number=pr_number,
+        paths=paths,
+        workpack_issue=workpack_issue,
+        open_prs=open_prs,
+    )
+
+    plan = classify_changed_paths(paths, workpack=contract is not None)
+    mode = "workpack" if contract is not None else "normal"
+    return contract, paths, mode, plan
+
+
 def github_get_json(url: str, token: str) -> Any:
     require(non_empty_string(token), "GITHUB_TOKEN is required")
     request = urllib.request.Request(
@@ -231,61 +406,60 @@ def github_get_json(url: str, token: str) -> Any:
 
 
 def load_issue(api_url: str, repository: str, issue_number: int, token: str) -> dict[str, Any]:
-    url = f"{api_url.rstrip('/')}/repos/{repository}/issues/{issue_number}"
-    value = github_get_json(url, token)
+    value = github_get_json(f"{api_url.rstrip('/')}/repos/{repository}/issues/{issue_number}", token)
     require(isinstance(value, dict), "GitHub issue response is invalid")
     return value
 
 
-def load_active_issues(api_url: str, repository: str, token: str) -> list[dict[str, Any]]:
-    active: list[dict[str, Any]] = []
+def load_pull_paths(api_url: str, repository: str, pr_number: int, token: str) -> list[str]:
+    paths: list[str] = []
     for page in range(1, 11):
-        query = urllib.parse.urlencode({"state": "open", "per_page": 100, "page": page})
-        url = f"{api_url.rstrip('/')}/repos/{repository}/issues?{query}"
-        values = github_get_json(url, token)
-        require(isinstance(values, list), "GitHub issues response is invalid")
+        query = urllib.parse.urlencode({"per_page": 100, "page": page})
+        values = github_get_json(
+            f"{api_url.rstrip('/')}/repos/{repository}/pulls/{pr_number}/files?{query}",
+            token,
+        )
+        require(isinstance(values, list), "GitHub pull request files response is invalid")
         for value in values:
-            if not isinstance(value, dict) or "pull_request" in value:
+            if not isinstance(value, dict):
                 continue
-            if ACTIVE_MARKER in str(value.get("title", "")):
-                active.append(value)
+            filename = value.get("filename")
+            previous = value.get("previous_filename")
+            if isinstance(filename, str):
+                paths.append(filename)
+            if isinstance(previous, str):
+                paths.append(previous)
         if len(values) < 100:
             break
     else:
-        raise ContractError("active issue scan exceeded ten pages")
-    return active
+        raise ContractError(f"pull request #{pr_number} file scan exceeded ten pages")
+    return list(dict.fromkeys(paths))
 
 
-def validate_pull_request(
-    *,
-    pr_body: str,
-    repository: str,
-    changed_paths: Iterable[str],
-    issue_loader: Callable[[int], dict[str, Any]],
-    active_issue_loader: Callable[[], list[dict[str, Any]]],
-) -> tuple[dict[str, Any], dict[str, Any], list[str]]:
-    require(non_empty_string(repository) and "/" in repository, "repository must be owner/name")
-    evidence = extract_toml_block(pr_body, PR_START, PR_END, "PR evidence")
-    issue_number = evidence.get("workpack_issue")
-    require(isinstance(issue_number, int) and issue_number > 0, "PR workpack_issue must be a positive integer")
-
-    active_issues = active_issue_loader()
-    require(len(active_issues) == 1, f"repository must contain exactly one open {ACTIVE_MARKER} issue")
-    active_number = active_issues[0].get("number")
-    require(active_number == issue_number, "PR references a different issue than the unique active workpack")
-
-    issue = issue_loader(issue_number)
-    require(isinstance(issue, dict), "loaded issue is invalid")
-    contract = extract_toml_block(str(issue.get("body", "")), WORKPACK_START, WORKPACK_END, "workpack contract")
-    validate_issue_contract(
-        contract,
-        issue_number=issue_number,
-        issue_state=str(issue.get("state", "")),
-        issue_title=str(issue.get("title", "")),
-    )
-    validate_pr_evidence(evidence, contract)
-    paths = validate_changed_paths(changed_paths, contract)
-    return contract, evidence, paths
+def load_open_feature_prs(api_url: str, repository: str, token: str) -> list[dict[str, Any]]:
+    pulls: list[dict[str, Any]] = []
+    for page in range(1, 11):
+        query = urllib.parse.urlencode({"state": "open", "base": "staging", "per_page": 100, "page": page})
+        values = github_get_json(f"{api_url.rstrip('/')}/repos/{repository}/pulls?{query}", token)
+        require(isinstance(values, list), "GitHub pull request response is invalid")
+        for value in values:
+            if not isinstance(value, dict):
+                continue
+            number = value.get("number")
+            if not isinstance(number, int):
+                continue
+            pulls.append(
+                {
+                    "number": number,
+                    "body": value.get("body") or "",
+                    "changed_paths": load_pull_paths(api_url, repository, number, token),
+                }
+            )
+        if len(values) < 100:
+            break
+    else:
+        raise ContractError("open feature PR scan exceeded ten pages")
+    return pulls
 
 
 def load_event(path: str) -> dict[str, Any]:
@@ -298,12 +472,29 @@ def load_event(path: str) -> dict[str, Any]:
     return value
 
 
+def write_github_output(
+    path: str, *, mode: str, plan: str, workpack: int | None, changed_paths: Iterable[str]
+) -> None:
+    if not path:
+        return
+    backend, event_browser, control_browser = select_test_targets(changed_paths, plan=plan)
+    with open(path, "a", encoding="utf-8") as handle:
+        handle.write(f"mode={mode}\n")
+        handle.write(f"plan={plan}\n")
+        handle.write(f"backend_components={backend}\n")
+        handle.write(f"browser_event={'true' if event_browser else 'false'}\n")
+        handle.write(f"browser_control={'true' if control_browser else 'false'}\n")
+        handle.write(f"browser={'true' if event_browser or control_browser else 'false'}\n")
+        handle.write(f"workpack={workpack or ''}\n")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--event-path", default=os.environ.get("GITHUB_EVENT_PATH", ""))
     parser.add_argument("--token", default=os.environ.get("GITHUB_TOKEN", ""))
     parser.add_argument("--api-url", default=os.environ.get("GITHUB_API_URL", "https://api.github.com"))
     parser.add_argument("--root", default=".")
+    parser.add_argument("--github-output", default=os.environ.get("GITHUB_OUTPUT", ""))
     args = parser.parse_args()
 
     try:
@@ -314,25 +505,41 @@ def main() -> int:
         require(isinstance(pr, dict), "event does not contain pull_request")
         require(isinstance(repository_data, dict), "event does not contain repository")
         repository = str(repository_data.get("full_name", ""))
+        pr_number = int(pr.get("number") or event.get("number") or 0)
+        base_ref = str(pr.get("base", {}).get("ref", ""))
+        head_ref = str(pr.get("head", {}).get("ref", ""))
         base_sha = str(pr.get("base", {}).get("sha", ""))
         head_sha = str(pr.get("head", {}).get("sha", ""))
+        head_repository = str(pr.get("head", {}).get("repo", {}).get("full_name", ""))
+        require(head_repository == repository, "feature and release PRs must originate from the canonical repository")
         pr_body = str(pr.get("body") or "")
         changed = git_changed_paths(base_sha, head_sha, args.root)
-        contract, _, paths = validate_pull_request(
+        contract, paths, mode, plan = validate_pull_request(
+            pr_number=pr_number,
             pr_body=pr_body,
             repository=repository,
+            base_ref=base_ref,
+            head_ref=head_ref,
             changed_paths=changed,
             issue_loader=lambda number: load_issue(args.api_url, repository, number, args.token),
-            active_issue_loader=lambda: load_active_issues(args.api_url, repository, args.token),
+            open_feature_pr_loader=lambda: load_open_feature_prs(args.api_url, repository, args.token),
         )
-    except ContractError as exc:
+    except (ContractError, ValueError, TypeError) as exc:
         print(f"PR contract: FAIL\n- {str(exc).replace(chr(10), chr(10) + '- ')}", file=sys.stderr)
         return 1
 
+    workpack_issue = int(contract["workpack_issue"]) if contract is not None else None
+    write_github_output(
+        args.github_output,
+        mode=mode,
+        plan=plan,
+        workpack=workpack_issue,
+        changed_paths=paths,
+    )
     print(
-        "PR contract: OK "
-        f"(issue #{contract['workpack_issue']}, revision {contract['contract_revision']}, "
-        f"hash {contract['contract_hash'][:12]}, {len(paths)} changed paths)"
+        f"PR contract: OK ({mode}, plan {plan}, {len(paths)} changed paths"
+        + (f", workpack #{workpack_issue}" if workpack_issue else "")
+        + ")"
     )
     return 0
 

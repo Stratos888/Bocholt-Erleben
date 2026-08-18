@@ -54,16 +54,14 @@ def request_url(
     }
     if headers:
         request_headers.update(headers)
-
     request = Request(url, data=body, headers=request_headers, method=method)
-
     try:
         with urlopen(request, timeout=timeout) as response:
             raw = response.read()
             return HttpResult(
                 url=url,
                 status=int(response.status),
-                headers={k.lower(): v for k, v in response.headers.items()},
+                headers={key.lower(): value for key, value in response.headers.items()},
                 body=raw.decode("utf-8", errors="replace"),
             )
     except HTTPError as error:
@@ -71,7 +69,7 @@ def request_url(
         return HttpResult(
             url=url,
             status=int(error.code),
-            headers={k.lower(): v for k, v in error.headers.items()},
+            headers={key.lower(): value for key, value in error.headers.items()},
             body=raw.decode("utf-8", errors="replace"),
         )
     except URLError as error:
@@ -86,16 +84,14 @@ def retry(
     wait_seconds: int = 5,
 ) -> Any:
     last_error: Exception | None = None
-
     for attempt in range(1, attempts + 1):
         try:
             return callback()
-        except Exception as error:  # noqa: BLE001 - Smoke-Check soll robuste Diagnose liefern.
+        except Exception as error:  # noqa: BLE001
             last_error = error
             if attempt < attempts:
                 print(f"⚠️  Retry {attempt}/{attempts} für {label}: {error}")
                 time.sleep(wait_seconds)
-
     if last_error is not None:
         raise last_error
     raise RuntimeError(f"{label} konnte nicht geprüft werden.")
@@ -105,7 +101,7 @@ def request_with_retries(url: str, **kwargs: Any) -> HttpResult:
     def do_request() -> HttpResult:
         result = request_url(url, **kwargs)
         if result.status >= 500:
-            raise RuntimeError(f"{url} liefert HTTP {result.status}.")
+            raise RuntimeError(f"{url} liefert HTTP {result.status}: {result.body[:300]}")
         return result
 
     return retry(url, do_request)
@@ -116,10 +112,8 @@ def parse_json(result: HttpResult) -> dict[str, Any]:
         payload = json.loads(result.body)
     except json.JSONDecodeError as error:
         raise AssertionError(f"{result.url} liefert kein gültiges JSON: {error}") from error
-
     if not isinstance(payload, dict):
         raise AssertionError(f"{result.url} liefert kein JSON-Objekt.")
-
     return payload
 
 
@@ -128,28 +122,9 @@ def parse_json_array(result: HttpResult) -> list[Any]:
         payload = json.loads(result.body)
     except json.JSONDecodeError as error:
         raise AssertionError(f"{result.url} liefert kein gültiges JSON: {error}") from error
-
     if not isinstance(payload, list):
         raise AssertionError(f"{result.url} liefert kein JSON-Array.")
-
     return payload
-
-
-DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
-DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
-
-
-def is_download_document_url(value: Any) -> bool:
-    url = str(value or "").strip().lower()
-    if not url:
-        return False
-    if DOCUMENT_URL_RE.search(url):
-        return True
-    if DOWNLOAD_QUERY_RE.search(url):
-        return True
-    if "/bocholt_media/" in url and any(ext in url for ext in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
-        return True
-    return False
 
 
 def require_status(result: HttpResult, expected: set[int], label: str) -> None:
@@ -160,15 +135,28 @@ def require_status(result: HttpResult, expected: set[int], label: str) -> None:
         )
 
 
+DOCUMENT_URL_RE = re.compile(r"(?:\.pdf|\.docx?|\.xlsx?|\.pptx?)(?:$|[?#])", re.I)
+DOWNLOAD_QUERY_RE = re.compile(r"(?:^|[?&])download(?:=1|=true|&|$)", re.I)
+
+
+def is_download_document_url(value: Any) -> bool:
+    url = str(value or "").strip().lower()
+    if not url:
+        return False
+    if DOCUMENT_URL_RE.search(url) or DOWNLOAD_QUERY_RE.search(url):
+        return True
+    return "/bocholt_media/" in url and any(
+        extension in url for extension in (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")
+    )
+
+
 def check_html_page(base_url: str, path: str, label: str) -> None:
     result = request_with_retries(build_url(base_url, path))
     require_status(result, {200}, label)
-
-    content_type = result.headers.get("content-type", "")
+    content_type = result.headers.get("content-type", "").lower()
     body_lower = result.body.lower()
-    if "text/html" not in content_type.lower() and "<!doctype html" not in body_lower and "<html" not in body_lower:
+    if "text/html" not in content_type and "<!doctype html" not in body_lower and "<html" not in body_lower:
         raise AssertionError(f"{label}: Antwort sieht nicht wie HTML aus. Content-Type: {content_type}")
-
     print(f"✅ {label}: HTTP 200 HTML")
 
 
@@ -176,7 +164,6 @@ def check_build_file(base_url: str, expected_build: str | None) -> None:
     expected = (expected_build or "").strip()
     if not expected:
         return
-
     label = "Build-Datei"
 
     def do_check() -> str:
@@ -196,14 +183,14 @@ def check_status_api(base_url: str) -> None:
     result = request_with_retries(build_url(base_url, "/api/status.php"))
     require_status(result, {200}, label)
     payload = parse_json(result)
-
-    if payload.get("status") != "ok":
-        raise AssertionError(f"{label}: status ist nicht ok: {payload}")
-
     checks = payload.get("checks")
-    if not isinstance(checks, dict) or checks.get("config") is not True or checks.get("database") is not True:
+    if (
+        payload.get("status") != "ok"
+        or not isinstance(checks, dict)
+        or checks.get("config") is not True
+        or checks.get("database") is not True
+    ):
         raise AssertionError(f"{label}: config/database nicht beide ok: {payload}")
-
     print("✅ Status-API: status=ok, config=ok, database=ok")
 
 
@@ -212,11 +199,9 @@ def check_public_events_api(base_url: str) -> None:
     result = request_with_retries(build_url(base_url, "/api/events/public.php"))
     require_status(result, {200}, label)
     payload = parse_json(result)
-
     data = payload.get("data")
     if payload.get("status") != "ok" or not isinstance(data, dict) or not isinstance(data.get("events"), list):
         raise AssertionError(f"{label}: unerwartete Struktur: {payload}")
-
     print(f"✅ Public-Events-API: {len(data.get('events', []))} DB-Events")
 
 
@@ -227,12 +212,10 @@ def check_event_feed_details(base_url: str) -> None:
     events = parse_json_array(result)
     if not events:
         raise AssertionError(f"{label}: events.json ist leer.")
-
     base_origin = base_url.rstrip("/")
     detail_candidates: list[dict[str, Any]] = []
     unsafe_sources: list[str] = []
     wrong_origin: list[str] = []
-
     for item in events:
         if not isinstance(item, dict):
             continue
@@ -245,45 +228,26 @@ def check_event_feed_details(base_url: str) -> None:
             detail_candidates.append(item)
         if detail_url and not detail_url.startswith(base_origin + "/events/"):
             wrong_origin.append(f"{item.get('id', '')}: {detail_url}")
-
     if unsafe_sources:
         raise AssertionError(f"{label}: direkte Datei-/Download-URLs im Public-Feed: {unsafe_sources[:3]}")
     if wrong_origin:
-        raise AssertionError(f"{label}: detail_url zeigt nicht auf aktuelle Deploy-Basis {base_origin}: {wrong_origin[:3]}")
+        raise AssertionError(f"{label}: detail_url zeigt nicht auf aktuelle Deploy-Basis: {wrong_origin[:3]}")
     if not detail_candidates:
         raise AssertionError(f"{label}: kein Event mit detail_path/detail_url gefunden.")
-
     sample = next((item for item in detail_candidates if str(item.get("url") or "").strip()), detail_candidates[0])
-    sample_path = str(sample.get("detail_path"))
-    sample_result = request_with_retries(build_url(base_url, sample_path))
+    sample_result = request_with_retries(build_url(base_url, str(sample.get("detail_path"))))
     require_status(sample_result, {200}, f"Event-Detailseite ({sample.get('id', 'sample')})")
-    sample_html = sample_result.body
-    sample_html_lower = sample_html.lower()
+    sample_html_lower = sample_result.body.lower()
     if "text/html" not in sample_result.headers.get("content-type", "").lower() and "<html" not in sample_html_lower:
-        raise AssertionError(f"Event-Detailseite ({sample.get('id', 'sample')}): Antwort sieht nicht wie HTML aus.")
-    forbidden_fragments = [
-        "event-detail-back",
-        "event-detail-action--primary",
-        "href=\"/events/\">events</a>",
-    ]
-    found_forbidden = [frag for frag in forbidden_fragments if frag in sample_html_lower]
+        raise AssertionError("Event-Detailseite: Antwort sieht nicht wie HTML aus.")
+    forbidden = ["event-detail-back", "event-detail-action--primary", 'href="/events/">events</a>']
+    found_forbidden = [fragment for fragment in forbidden if fragment in sample_html_lower]
     if found_forbidden:
-        raise AssertionError(
-            f"Event-Detailseite ({sample.get('id', 'sample')}): alte Sonderseiten-Navigation/CTA gefunden: {found_forbidden}"
-        )
-    required_fragments = [
-        "event-detail-public",
-        "detail-panel-inner",
-        "event-detail-media",
-        "detail-meta-rows",
-        "detail-links--trust",
-    ]
-    missing_fragments = [frag for frag in required_fragments if frag not in sample_html_lower]
-    if missing_fragments:
-        raise AssertionError(
-            f"Event-Detailseite ({sample.get('id', 'sample')}): Detailpanel-Contract unvollstaendig: {missing_fragments}"
-        )
-
+        raise AssertionError(f"Event-Detailseite: alte Navigation/CTA gefunden: {found_forbidden}")
+    required = ["event-detail-public", "detail-panel-inner", "event-detail-media", "detail-meta-rows", "detail-links--trust"]
+    missing = [fragment for fragment in required if fragment not in sample_html_lower]
+    if missing:
+        raise AssertionError(f"Event-Detailseite: Panel-Contract unvollständig: {missing}")
     print(f"✅ {label}: {len(events)} Events, Detailseiten-URL, Panel-Contract und Source-Link-Guard ok")
 
 
@@ -296,11 +260,8 @@ def check_checkout_validation(base_url: str) -> None:
         headers={"Content-Type": "application/json"},
     )
     require_status(result, {422}, label)
-    payload = parse_json(result)
-
-    if payload.get("status") != "error":
-        raise AssertionError(f"{label}: erwarteter validierter Fehler, erhalten: {payload}")
-
+    if parse_json(result).get("status") != "error":
+        raise AssertionError(f"{label}: erwarteter validierter Fehler fehlt.")
     print("✅ Checkout-API Validierung: kontrollierter HTTP 422 statt 500")
 
 
@@ -314,18 +275,10 @@ def check_protected_json_endpoint(
     expected_status: int = 401,
 ) -> None:
     headers = {"Content-Type": "application/json"} if body is not None else None
-    result = request_with_retries(
-        build_url(base_url, path),
-        method=method,
-        body=body,
-        headers=headers,
-    )
+    result = request_with_retries(build_url(base_url, path), method=method, body=body, headers=headers)
     require_status(result, {expected_status}, label)
-    payload = parse_json(result)
-
-    if payload.get("status") != "error":
-        raise AssertionError(f"{label}: unerwartete JSON-Struktur: {payload}")
-
+    if parse_json(result).get("status") != "error":
+        raise AssertionError(f"{label}: unerwartete JSON-Struktur.")
     print(f"✅ {label}: ohne Berechtigung nicht öffentlich erreichbar")
 
 
@@ -338,43 +291,24 @@ def check_review_endpoint_protected(base_url: str) -> None:
 
 
 def check_push_endpoints_protected(base_url: str) -> None:
-    check_protected_json_endpoint(
-        base_url,
-        path="/api/push/config.php",
-        label="Push-Config Zugriffsschutz",
-    )
-    check_protected_json_endpoint(
-        base_url,
-        path="/api/push/subscribe.php",
-        label="Push-Subscribe Zugriffsschutz",
-        method="POST",
-        body=b"{}",
-    )
-    check_protected_json_endpoint(
-        base_url,
-        path="/api/push/test.php",
-        label="Push-Test Zugriffsschutz",
-        method="POST",
-        body=b"{}",
-    )
-    check_protected_json_endpoint(
-        base_url,
-        path="/api/push/notify-inbox.php",
-        label="Push-Notify Zugriffsschutz",
-        method="POST",
-        body=b"{}",
-    )
+    check_protected_json_endpoint(base_url, path="/api/push/config.php", label="Push-Config Zugriffsschutz")
+    for path, label in [
+        ("/api/push/subscribe.php", "Push-Subscribe Zugriffsschutz"),
+        ("/api/push/test.php", "Push-Test Zugriffsschutz"),
+        ("/api/push/notify-inbox.php", "Push-Notify Zugriffsschutz"),
+    ]:
+        check_protected_json_endpoint(base_url, path=path, label=label, method="POST", body=b"{}")
 
 
 def run(args: argparse.Namespace) -> None:
     base_url = normalize_base_url(args.base_url)
-
     checks = [
         lambda: check_build_file(base_url, args.expected_build),
         lambda: check_html_page(base_url, "/", "Startseite"),
         lambda: check_html_page(base_url, "/events/", "Events-Suchseite"),
         lambda: check_event_feed_details(base_url),
         lambda: check_html_page(base_url, "/aktivitaeten/", "Aktivitäten-Seite"),
+        lambda: check_html_page(base_url, "/startpartner/", "Startpartner-Pilot"),
         lambda: check_html_page(base_url, "/bildnachweise/", "Bildnachweise-Seite"),
         lambda: check_html_page(base_url, "/events-veroeffentlichen/einreichen/", "Event-Einreichen-Seite"),
         lambda: check_status_api(base_url),
@@ -383,24 +317,22 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_review_endpoint_protected(base_url),
         lambda: check_push_endpoints_protected(base_url),
     ]
-
     print(f"=== Deploy-Smoke-Check: {base_url} ===")
-
     for check in checks:
         check()
-
     print("✅ Deploy-Smoke-Check abgeschlossen.")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Prueft zentrale Bocholt-Erleben-Endpunkte nach einem STRATO-Deploy.")
-    parser.add_argument("--base-url", required=True, help="Deploy-Basis-URL, z. B. https://staging.bocholt-erleben.de")
-    parser.add_argument("--expected-build", default="", help="Optional: erwarteter Inhalt von /meta/build.txt")
+    parser = argparse.ArgumentParser(
+        description="Prueft zentrale Bocholt-Erleben-Endpunkte nach einem STRATO-Deploy."
+    )
+    parser.add_argument("--base-url", required=True, help="Deploy-Basis-URL")
+    parser.add_argument("--expected-build", default="", help="Erwarteter Inhalt von /meta/build.txt")
     args = parser.parse_args()
-
     try:
         run(args)
-    except Exception as error:  # noqa: BLE001 - Klare Fail-Fast-Ausgabe fuer GitHub Actions.
+    except Exception as error:  # noqa: BLE001
         fail(str(error))
 
 

@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "workpack_issue": 256,
+  "phase": "phase4_producer_exploration",
+  "candidate_count": 12,
+  "producer_assigns_final_score": false,
+  "producer_assigns_ranking": false,
+  "candidates": [
+    {
+      "candidate_id": "candidate-001",
+      "architecture_class": "symbol_plus_wordmark",
+      "construction_family": "offset_orbits",
+      "blind_asset_key": "candidate-001"
+    },
+    {
+      "candidate_id": "candidate-002",
+      "architecture_class": "abstract_nonletter_mark",
+      "construction_family": "graduated_columns",
+      "blind_asset_key": "candidate-002"
+    },
+    {
+      "candidate_id": "candidate-003",
+      "architecture_class": "integrated_sign_word",
+      "construction_family": "opposed_apertures",
+      "blind_asset_key": "candidate-003"
+    },
+    {
+      "candidate_id": "candidate-004",
+      "architecture_class": "responsive_identity",
+      "construction_family": "four_corners",
+      "blind_asset_key": "candidate-004"
+    },
+    {
+      "candidate_id": "candidate-005",
+      "architecture_class": "wordmark",
+      "construction_family": "shared_axis_wordmark",
+      "blind_asset_key": "candidate-005"
+    },
+    {
+      "candidate_id": "candidate-006",
+      "architecture_class": "symbol_plus_wordmark",
+      "construction_family": "woven_ribbons",
+      "blind_asset_key": "candidate-006"
+    },
+    {
+      "candidate_id": "candidate-007",
+      "architecture_class": "abstract_nonletter_mark",
+      "construction_family": "offset_frames",
+      "blind_asset_key": "candidate-007"
+    },
+    {
+      "candidate_id": "candidate-008",
+      "architecture_class": "integrated_sign_word",
+      "construction_family": "continuous_route",
+      "blind_asset_key": "candidate-008"
+    },
+    {
+      "candidate_id": "candidate-009",
+      "architecture_class": "wordmark",
+      "construction_family": "staggered_word_blocks",
+      "blind_asset_key": "candidate-009"
+    },
+    {
+      "candidate_id": "candidate-010",
+      "architecture_class": "responsive_identity",
+      "construction_family": "modular_cluster",
+      "blind_asset_key": "candidate-010"
+    },
+    {
+      "candidate_id": "candidate-011",
+      "architecture_class": "symbol_plus_wordmark",
+      "construction_family": "open_spiral",
+      "blind_asset_key": "candidate-011"
+    },
+    {
+      "candidate_id": "candidate-012",
+      "architecture_class": "abstract_nonletter_mark",
+      "construction_family": "complementary_crescents",
+      "blind_asset_key": "candidate-012"
+    }
+  ]
+}

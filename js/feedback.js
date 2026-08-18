@@ -216,7 +216,7 @@ function ensureInlineEntry() {
           <input type="hidden" name="submitted_at" value="">
 
           <div class="feedback-form__meta">
-            <p class="feedback-form__hint">Seite, Filter, Bezug und Bildschirmbreite werden automatisch mitgesendet.</p>
+            <p class="feedback-form__hint">Seite, Filter und Bezug werden automatisch mitgesendet.</p>
             <p class="feedback-form__privacy">Mit dem Absenden werden deine Angaben zur Bearbeitung über Formspree an Bocholt erleben übermittelt. Details in der <a href="${escapeHtml(cfg.privacyUrl || "/datenschutz/")}">Datenschutzerklärung</a>.</p>
           </div>
 

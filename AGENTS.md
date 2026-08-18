@@ -1,77 +1,66 @@
 # Codex-Router – Bocholt erleben
 
-Diese Datei ist der kurze Einstieg für Codex. Der verbindliche Arbeitsprozess, die Werkzeugwahl und die Nutzerartefaktregel stehen in `AI_ENTRYPOINT.md`.
+`AI_ENTRYPOINT.md` ist der verbindliche Prozess. Diese Datei enthält nur die Kurzfassung.
 
-## Pflichtstart
+## Start
 
-1. aktuellen `staging`-SHA und offene Pull Requests prüfen;
-2. `AI_ENTRYPOINT.md` vollständig lesen;
-3. `docs/workpacks/active/CURRENT_WORKPACK.md` lesen;
-4. das genau eine offene Issue mit `[ACTIVE WORKPACK]` und dessen eingefrorenen Vertrag lesen;
-5. `docs/architecture/SYSTEM_MAP.md` und nur die betroffenen Owner-Dateien lesen;
-6. `ENGINEERING.md` lesen;
-7. bei externen Ressourcen zusätzlich `docs/external-resource-matrix.md` lesen.
+1. aktuellen `staging`-Stand lesen;
+2. bestehende Branches und PRs zur Aufgabe prüfen;
+3. betroffenen Owner bestimmen;
+4. vorhandene passende Arbeit fortsetzen;
+5. erst dann schreiben.
 
-Aktueller Ref, owning Dateien, Abnahmevertrag und Workpack-Issue sind die Source of Truth. Nicht aus Chatverlauf, Memory, ZIPs oder vermuteten früheren Zuständen arbeiten.
+Analyse bleibt read-only.
 
-## Schreibgrenze
+## Normaler Write
 
-Codex schreibt nur, wenn Chat den Auftrag innerhalb eines geschlossenen Workpack-Vertrags ausdrücklich an Codex geroutet hat. Innerhalb dieses Auftrags ist Codex der einzige Repository-Schreiber.
+```text
+ein Branch
+-> ein PR nach staging
+-> passende Tests
+-> Merge
+-> Staging-Deploy prüfen
+-> fertig zur Prüfung melden
+```
 
-Vor einem Write müssen eindeutig sein:
+Ein Workpack-Issue ist nicht erforderlich.
 
-- Ziel und Nicht-Ziele;
-- erlaubte sichtbare Änderungen;
-- unveränderte Bereiche;
-- betroffene Owner;
-- Tests und Evidence;
-- Definition of Done;
-- Rollback;
-- notwendige dauerhafte Dokumentations-Owner.
+## Workpack
 
-Fehlt eine Angabe oder entsteht eine neue Grundsatzfrage, stoppen und an Chat zurückgeben.
+Nur bei mehreren Systemen oder Ownern, Schema, Berechtigungen, Zahlungen, externen Writes, zentraler Governance oder mehrchatfähiger Fortsetzung:
 
-## Arbeitsweise
+```text
+ein Issue
+-> ein deklarierter Branch
+-> ein PR mit Workpack: #<Issue>
+```
 
-- genau ein Codex-Task, ein Feature-Branch und ein PR nach `staging`;
-- Korrekturen vor dem Merge bleiben im selben Branch und PR;
-- keinen konkurrierenden Produkt- oder Workpack-Scope eröffnen;
-- keine parallelen Änderungen an denselben Ownern;
-- keine Feature-Branch-Deploys;
-- keine direkten Commits nach `staging` oder `main`;
-- keine Secrets, Zugangsdaten oder Live-Schreibaktionen;
-- keine neuen Wrapper, Workflows, Prozess- oder Statusdateien ohne belegten dauerhaften Bedarf;
-- bei langen bestehenden Dateien patchfähig arbeiten; keine unkontrollierte Volltext-Ersetzung.
+Keine zweite Branch- oder PR-Alternative eröffnen.
 
-Wenn der Auftrag keine Repository-Analyse oder -Umsetzung erfordert, nichts ändern und an Chat zurückgeben.
+## Parallelität
 
-## Prüfung vor dem PR
+Unabhängige PRs sind erlaubt. Stoppen bei:
 
-- relevante Syntax-, Unit- und Contracttests ausführen;
-- anschließend `bash scripts/validate-repo.sh` ausführen;
-- roten Zustand vor dem PR beheben;
-- bei Build oder Rendering den tatsächlich erzeugten Output prüfen;
-- bei UI-Änderungen Browser- oder Screenshotnachweis für die vereinbarten Viewports liefern;
-- bei Progressive Enhancement Zustand mit und ohne JavaScript prüfen;
-- keinen PR öffnen, solange eine bekannte Grundsatzfrage oder visuelle Zielunsicherheit besteht.
+- derselben Datei in einem anderen offenen PR;
+- demselben Workpack in einem anderen offenen PR;
+- fachlich abhängigem zentralem Owner.
 
-## Artefakte
+## Testen
 
-- Browserreports, Screenshots und CI-Artefakte dienen als interne Evidence.
-- Bevorzugt strukturierte Ergebnisse, Logs und Summaries liefern.
-- Keine ZIP-Datei oder Downloadartefakt als Nutzerlieferung erzeugen oder verlinken, sofern der Nutzer dies nicht ausdrücklich verlangt.
-- Screenshots nur bei sichtbarer Abnahme oder belegter Fehlerdiagnose.
+Draft:
 
-## Lieferung
+```bash
+bash scripts/validate-repo.sh quick
+```
 
-Kompakt liefern:
+Reviewbereit: den vom PR Gate ermittelten Plan `docs`, `quick`, `backend`, `frontend` oder `full` verwenden.
 
-1. Befund und umgesetzter Zielzustand;
-2. geänderte Dateien und Owner;
-3. Tests, Build-/Browserergebnisse und Evidence-Grenzen;
-4. Risiken und bewusst unveränderte Bereiche;
-5. PR nach `staging`;
-6. notwendiges dauerhaftes Dokumentationsdelta oder ausdrücklich `keines`;
-7. genau einen nächsten Schritt.
+Bei UI zusätzlich relevante Browser- beziehungsweise Screenshotnachweise ausführen.
 
-Operativen Status und Zwischen-Evidence im zuständigen GitHub-Issue aktualisieren. Repository-Dokumentation nur ändern, wenn der Vertrag ein dauerhaftes Wissensdelta vorsieht.
+## Schreiben und Lieferung
+
+- kein direkter Commit nach `staging` oder `main`;
+- größere Änderungen nur mit Checkout und lokalen Tests;
+- Merge nur mit aktuellem grünen Head-SHA;
+- normale Lieferung endet auf Staging;
+- Nutzer erst mit konkreter Prüfaufforderung oder echtem Blocker einbeziehen.

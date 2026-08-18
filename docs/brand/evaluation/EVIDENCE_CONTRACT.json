@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "purpose": "Validate evidence completeness and evaluator separation without certifying aesthetic quality.",
+  "candidate_identity": {
+    "pattern": "^candidate-[0-9]{3}$",
+    "anonymous_until": "blind_reviews_locked",
+    "forbid_concept_title_before_lock": true
+  },
+  "ci_boundary": {
+    "checks_aesthetic_quality": false,
+    "certifies_premium": false,
+    "candidate_specific_target_score": null,
+    "allowed_checks": [
+      "required_files",
+      "json_structure",
+      "anonymous_candidate_id",
+      "distinct_evaluator_ids",
+      "blindness_declarations",
+      "gate_order",
+      "knockout_completion",
+      "score_arithmetic",
+      "non_compensable_minima",
+      "technical_pass_fail_evidence",
+      "forbidden_self_certification"
+    ]
+  },
+  "roles": {
+    "producer": {
+      "may_assign_final_design_score": false,
+      "may_view_other_reviews_before_lock": false
+    },
+    "critic_a": {
+      "view": [
+        "monochrome_identity",
+        "real_sizes",
+        "app_masks",
+        "mobile_header_original_size"
+      ],
+      "hidden": [
+        "concept_title",
+        "rationale",
+        "color_story",
+        "prior_scores",
+        "critic_b",
+        "red_team"
+      ]
+    },
+    "critic_b": {
+      "view": [
+        "anonymized_product_contexts",
+        "homescreen",
+        "favicon",
+        "comparison_controls"
+      ],
+      "hidden": [
+        "concept_title",
+        "rationale",
+        "production_notes",
+        "prior_scores",
+        "critic_a",
+        "red_team"
+      ]
+    },
+    "red_team": {
+      "mission": "seek_rejection",
+      "tests": [
+        "genericity_ablation",
+        "explanation_dependency",
+        "substitutability",
+        "artifact_reading",
+        "real_size_failure",
+        "category_error",
+        "silhouette_failure",
+        "provenance_gap"
+      ]
+    },
+    "consolidator": {
+      "requires_locked_reviews": [
+        "critic_a",
+        "critic_b",
+        "red_team"
+      ],
+      "may_override_knockout": false,
+      "may_use_ci_success_as_quality_argument": false
+    }
+  },
+  "gates": [
+    {
+      "id": "P0",
+      "type": "original_size_preflight",
+      "must_precede": ["P1", "P2", "P3", "P4", "P5"]
+    },
+    {
+      "id": "P1",
+      "type": "hard_knockouts",
+      "must_precede": ["P2", "P3", "P4", "P5"]
+    },
+    {
+      "id": "P2",
+      "type": "blind_reviews",
+      "must_precede": ["P3", "P4", "P5"]
+    },
+    {
+      "id": "P3",
+      "type": "aesthetic_score",
+      "must_precede": ["P4", "P5"]
+    },
+    {
+      "id": "P4",
+      "type": "technical_pass_fail",
+      "must_precede": ["P5"]
+    },
+    {
+      "id": "P5",
+      "type": "product_owner_presentation",
+      "must_precede": []
+    }
+  ],
+  "hard_knockouts": [
+    "genericity_ablation_failed",
+    "explanation_test_failed",
+    "substitutability_test_failed",
+    "artifact_test_failed",
+    "real_size_test_failed",
+    "category_test_failed",
+    "silhouette_test_failed",
+    "provenance_test_failed"
+  ],
+  "design_score": {
+    "release_threshold": 90,
+    "dimensions": [
+      {"id": "distinctiveness", "weight": 25, "minimum": 22},
+      {"id": "bocholt_specific_fit", "weight": 20, "minimum": 17},
+      {"id": "primary_identity_quality", "weight": 20, "minimum": 17},
+      {"id": "works_without_explanation", "weight": 15, "minimum": 13},
+      {"id": "small_context_app_function", "weight": 10, "minimum": 8},
+      {"id": "product_system_integration", "weight": 10, "minimum": 8}
+    ],
+    "technical_points_included": false
+  },
+  "technical_pass_fail": [
+    "deterministic_vector_master",
+    "monochrome_and_inverse",
+    "true_raster_sizes",
+    "mask_safe_areas",
+    "contrast_accessibility",
+    "license_provenance",
+    "no_external_runtime_dependency",
+    "reproducible_asset_generation"
+  ],
+  "rating_anchors": {
+    "0-3": "unusable",
+    "4-5": "generic_or_weak",
+    "6": "competent_but_replaceable",
+    "7": "professional_and_recognizable",
+    "8": "clearly_distinctive_and_high_quality",
+    "9": "exceptional_and_clearly_above_market",
+    "10": "category_defining"
+  },
+  "required_candidate_files": [
+    "producer.json",
+    "critic-a.json",
+    "critic-b.json",
+    "red-team.json",
+    "consolidation.json"
+  ]
+}

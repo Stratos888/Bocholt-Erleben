@@ -1,4 +1,4 @@
-/* === BEGIN FILE: js/startpartner-funnel.js | Zweck: steuert die kompakte Startpartner-Anfrage mit bestehender Funnel-Validierung: keine nativen Browser-Bubbles, klare Feldmarkierung, Formspree-Submit; Umfang: komplette Datei === */
+/* === BEGIN FILE: js/startpartner-funnel.js | Zweck: steuert die Startpartner-Anfrage inklusive Scope-Vorauswahl, Validierung und bestehendem Formspree-Submit; Umfang: komplette Datei === */
 (() => {
   "use strict";
 
@@ -6,8 +6,9 @@
   const submitButton = document.getElementById("startpartner-request-submit");
   const resultCard = document.getElementById("startpartner-request-result");
   const resultText = document.getElementById("startpartner-request-result-text");
+  const scopeSelect = document.getElementById("startpartner-scope");
 
-  if (!form || !submitButton || !resultCard || !resultText) {
+  if (!form || !submitButton || !resultCard || !resultText || !scopeSelect) {
     return;
   }
 
@@ -15,10 +16,34 @@
   submitButton.formNoValidate = true;
 
   const safeText = (value) => String(value ?? "").trim();
+  const allowedScopes = new Set(["events", "activities", "both", "unsure"]);
+
+  function requestedScopeFromUrl() {
+    const rawScope = safeText(new URLSearchParams(window.location.search).get("scope")).toLowerCase();
+    const aliases = {
+      event: "events",
+      events: "events",
+      activity: "activities",
+      activities: "activities",
+      both: "both",
+      unsure: "unsure",
+    };
+    const normalized = aliases[rawScope] || "";
+    return allowedScopes.has(normalized) ? normalized : "";
+  }
+
+  function applyScopeFromUrl() {
+    const requestedScope = requestedScopeFromUrl();
+    if (requestedScope) {
+      scopeSelect.value = requestedScope;
+    }
+  }
+
+  applyScopeFromUrl();
 
   function setSubmitting(isSubmitting) {
     if (!submitButton.dataset.defaultLabel) {
-      submitButton.dataset.defaultLabel = submitButton.textContent || "Startpartner-Anfrage senden";
+      submitButton.dataset.defaultLabel = submitButton.textContent || "Startpartnerplatz anfragen";
     }
 
     submitButton.disabled = isSubmitting;
@@ -119,11 +144,13 @@
   function validateStartpartnerForm() {
     const invalidIds = [];
 
+    const scope = document.getElementById("startpartner-scope");
     const organization = document.getElementById("startpartner-organization");
     const email = document.getElementById("startpartner-email");
     const note = document.getElementById("startpartner-note");
     const privacy = document.getElementById("startpartner-privacy-confirmed");
 
+    if (!allowedScopes.has(safeText(scope?.value))) invalidIds.push("startpartner-scope");
     if (!safeText(organization?.value)) invalidIds.push("startpartner-organization");
     if (!safeText(email?.value) || (email && !email.validity.valid)) invalidIds.push("startpartner-email");
     if (safeText(note?.value).length < 8) invalidIds.push("startpartner-note");
@@ -184,10 +211,11 @@
     try {
       await submitStartpartnerRequest();
       form.reset();
-      showResult("Deine Startpartner-Anfrage ist angekommen. Bocholt erleben prüft sie und meldet sich danach zurück.");
+      applyScopeFromUrl();
+      showResult("Deine Anfrage zum Startpartner-Pilot ist angekommen. Bocholt erleben prüft sie und meldet sich danach zurück.");
     } catch (error) {
       console.warn("Startpartner request failed.", error);
-      showResult("Die Anfrage konnte gerade nicht gesendet werden. Bitte später erneut versuchen oder über Feedback Kontakt aufnehmen.");
+      showResult("Die Anfrage konnte gerade nicht gesendet werden. Bitte versuche es später erneut.");
     } finally {
       setSubmitting(false);
     }

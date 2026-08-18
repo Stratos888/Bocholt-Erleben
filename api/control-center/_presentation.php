@@ -20,9 +20,83 @@ function be_cc_display_status(string $state): string
     };
 }
 
+function be_cc_startpartner_display_status(string $status): string
+{
+    return match ($status) {
+        'new' => 'Neu',
+        'prequalifying' => 'Vorqualifizierung',
+        'contact_pending' => 'Kontakt ausstehend',
+        'awaiting_response' => 'Rückmeldung ausstehend',
+        'qualifying' => 'Qualifizierung',
+        'needs_information' => 'Angaben fehlen',
+        'decision_ready' => 'Entscheidungsreif',
+        'accepted_pending_terms' => 'Platz reserviert · Bedingungen offen',
+        'waitlisted' => 'Warteliste',
+        'routed_to_regular_product' => 'Regulärer Weg',
+        'rejected' => 'Abgelehnt',
+        'withdrawn' => 'Zurückgezogen',
+        'expired' => 'Abgelaufen',
+        default => 'Prüfung erforderlich',
+    };
+}
+
 function be_cc_action(string $key, string $label, bool $requiresInput = false, bool $destructive = false, bool $enabled = true): array
 {
     return ['key'=>$key,'label'=>$label,'requires_input'=>$requiresInput,'destructive'=>$destructive,'enabled'=>$enabled];
+}
+
+function be_cc_startpartner_actions(string $status, array $readiness, array $capacity): array
+{
+    $ready = (bool)($readiness['ready'] ?? false);
+    $hardStop = (bool)($capacity['hard_stop'] ?? false);
+    $primary = match ($status) {
+        'new' => be_cc_action('start_prequalification', 'Vorqualifizierung starten'),
+        'prequalifying' => be_cc_action('edit_qualification', 'Qualifizierung bearbeiten', true),
+        'contact_pending' => be_cc_action('mark_awaiting_response', 'Als angefragt markieren'),
+        'awaiting_response' => be_cc_action('start_qualification', 'Qualifizierung fortsetzen'),
+        'qualifying' => $ready
+            ? be_cc_action('mark_decision_ready', 'Entscheidungsreife bestätigen')
+            : be_cc_action('edit_qualification', 'Wichtigsten offenen Punkt bearbeiten', true),
+        'needs_information' => be_cc_action('edit_qualification', 'Fehlende Angaben klären', true),
+        'decision_ready' => $hardStop
+            ? be_cc_action('waitlist', 'Auf Warteliste setzen', true)
+            : be_cc_action('accept_pending_terms', 'Platz reservieren', true),
+        'accepted_pending_terms' => be_cc_action('extend_reservation', 'Reservierung prüfen', true),
+        'waitlisted' => be_cc_action('update_waitlist', 'Warteliste aktualisieren', true),
+        'routed_to_regular_product', 'rejected', 'withdrawn', 'expired' => be_cc_action('reopen', 'Erneut prüfen', true),
+        default => be_cc_action('edit_profile', 'Profil prüfen', true),
+    };
+
+    $secondary = [be_cc_action('edit_profile', 'Profil bearbeiten', true)];
+    if (!in_array($status, ['accepted_pending_terms','routed_to_regular_product','rejected','withdrawn','expired'], true)) {
+        $secondary[] = be_cc_action('edit_qualification', 'Qualifizierung bearbeiten', true);
+    }
+    if ($status === 'new') {
+        $secondary[] = be_cc_action('mark_contact_pending', 'Kontakt vorbereiten');
+    }
+    if (in_array($status, ['prequalifying','qualifying','needs_information'], true)) {
+        $secondary[] = be_cc_action('mark_contact_pending', 'Kontakt erforderlich');
+    }
+    if ($status === 'decision_ready') {
+        if (!$hardStop) $secondary[] = be_cc_action('waitlist', 'Auf Warteliste setzen', true);
+        $secondary[] = be_cc_action('route_regular', 'Regulären Weg wählen', true);
+        $secondary[] = be_cc_action('reject', 'Ablehnen', true, true);
+    }
+    if ($status === 'accepted_pending_terms') {
+        $secondary[] = be_cc_action('release_reservation', 'Reservierung freigeben', true, true);
+    }
+    if ($status === 'waitlisted') {
+        $secondary[] = be_cc_action('start_qualification', 'Neu qualifizieren');
+        $secondary[] = be_cc_action('route_regular', 'Regulären Weg wählen', true);
+        $secondary[] = be_cc_action('reject', 'Ablehnen', true, true);
+    }
+    if (!in_array($status, ['routed_to_regular_product','rejected','withdrawn','expired'], true)) {
+        $secondary[] = be_cc_action('withdraw', 'Rückzug dokumentieren', true, true);
+        $secondary[] = be_cc_action('expire', 'Als abgelaufen markieren', true, true);
+    }
+    $secondary[] = be_cc_action('details', 'Nachweise und Verlauf');
+
+    return ['primary' => $primary, 'secondary' => $secondary];
 }
 
 function be_cc_case_presentation(array $row): array
@@ -34,7 +108,28 @@ function be_cc_case_presentation(array $row): array
     $kind = 'other'; $group = 'other'; $primary = null; $secondary = []; $context = []; $links = []; $waitingFor = ''; $reviewContract = null;
     $displayStatus = be_cc_display_status($state);
 
-    if ($source === 'inbox_feed') {
+    if ($source === 'startpartner_candidate') {
+        $kind = 'startpartner_candidate';
+        $group = 'startpartner';
+        $candidateStatus = trim((string)($payload['candidate_status'] ?? 'new')) ?: 'new';
+        $readiness = is_array($payload['readiness'] ?? null) ? $payload['readiness'] : ['ready'=>false,'blockers'=>[]];
+        $capacity = is_array($payload['capacity'] ?? null) ? $payload['capacity'] : [];
+        $actions = be_cc_startpartner_actions($candidateStatus, $readiness, $capacity);
+        $primary = $actions['primary'];
+        $secondary = $actions['secondary'];
+        $displayStatus = be_cc_startpartner_display_status($candidateStatus);
+        $context = [
+            'candidate_id' => (string)($payload['candidate_id'] ?? $row['object_id'] ?? $row['source_reference'] ?? ''),
+            'candidate_status' => $candidateStatus,
+            'candidate_revision' => (int)($payload['candidate_revision'] ?? 0),
+            'candidate_source' => (string)($payload['candidate_source'] ?? ''),
+            'desired_content_scope' => (string)($payload['desired_content_scope'] ?? ''),
+            'assigned_to' => $payload['assigned_to'] ?? null,
+            'next_review_at' => $payload['next_review_at'] ?? null,
+            'readiness' => $readiness,
+            'capacity' => $capacity,
+        ];
+    } elseif ($source === 'inbox_feed') {
         $kind = (($payload['submission_kind'] ?? '') === 'activity') ? 'activity_candidate' : 'event_candidate';
         $group = 'new_content';
         if ($kind === 'event_candidate') {

@@ -2,10 +2,24 @@ import {
   state, els, reviewLabels, escapeHtml, clean, asArray, formatDate,
   reviewGroup, allReviewCases, reviewCases,
 } from './shared.js?v=2026-07-16-e2e-state-v5';
+import { renderStartpartnerReview } from './startpartner-review.js?v=2026-08-01-startpartner-wording-v1';
+import { renderGate4Panel, gate4PhaseLabel } from './startpartner-gate4.js?v=2026-08-01-startpartner-gate4-audit-v1';
 
 let handleAction = async () => {};
 export function configureReviewRenderer(callbacks = {}) { if (callbacks.handleAction) handleAction = callbacks.handleAction; }
 function contract(item) { return item.review_contract || item.decision_context?.review_contract || null; }
+function startpartnerData(item) {
+  return item?.startpartner_candidate || {
+    gate4: item?.decision_context?.gate4 || null,
+  };
+}
+function caseStatus(item) {
+  const data = startpartnerData(item);
+  if (item?.case_kind === 'startpartner_candidate' && data?.gate4?.pilot) {
+    return gate4PhaseLabel(data.gate4.phase);
+  }
+  return item?.display_status || '';
+}
 
 const evidenceLabels = {
   officially_verified:'Offiziell bestätigt', cross_checked:'Abgeglichen', format_validated:'Formal geprüft',
@@ -121,6 +135,7 @@ function generic(item) {
   return `${problem?`<section class="cc-detail-section"><h3>Worum es geht</h3><p>${escapeHtml(problem)}</p></section>`:''}${recommended?`<section class="cc-detail-section cc-detail-section--accent"><h3>Erforderlicher Schritt</h3><p>${escapeHtml(recommended)}</p></section>`:''}${current||suggested?`<div class="cc-copy-compare"><section><span class="cc-kicker">Aktuell</span><p>${escapeHtml(current||'Keine aktuelle Fassung.')}</p></section>${suggested?`<section class="cc-copy-compare__proposal"><span class="cc-kicker">Vorschlag</span><p>${escapeHtml(suggested||'Kein Vorschlag verfügbar.')}</p></section>`:''}</div>`:''}`;
 }
 function actions(item) {
+  if(item.case_kind==='startpartner_candidate')return {primary:item.primary_action,secondary:asArray(item.secondary_actions)};
   if(item.case_kind==='event_candidate') {
     const review=contract(item); const ready=Boolean(review?.decision_gate?.ready);
     return {primary:ready?{key:'approve',label:'Event übernehmen'}:{key:'resolve_review_task',label:review?.summary?.headline||'Offene Punkte klären'},secondary:[...(ready?[{key:'edit_and_approve',label:'Gesamtfassung bearbeiten'}]:[]),{key:'snooze',label:'Gesamten Fall zurückstellen'},{key:'reject',label:'Event ablehnen',destructive:true},{key:'details',label:'Quelldaten'}]};
@@ -133,20 +148,37 @@ function secondaryActions(available,links,className='') {
   return `<div class="cc-actions cc-actions--secondary ${className}">${available.secondary.map(action=>`<button class="cc-button ${action.destructive?'cc-button--danger':'cc-button--secondary'}" data-review-action="${escapeHtml(action.key)}">${escapeHtml(action.label)}</button>`).join('')}${links}</div>`;
 }
 function detail(item,index,total) {
-  const available=actions(item); const links=asArray(item.source_links).map(link=>`<a class="cc-button cc-button--secondary" href="${escapeHtml(link.url)}" target="_blank" rel="noopener">${escapeHtml(link.label)}</a>`).join(''); const review=contract(item); const body=item.case_kind==='event_candidate'?renderEventReview(review,item):generic(item);
+  const available=actions(item);
+  const links=asArray(item.source_links).map(link=>`<a class="cc-button cc-button--secondary" href="${escapeHtml(link.url)}" target="_blank" rel="noopener">${escapeHtml(link.label)}</a>`).join('');
+  const review=contract(item);
+  const startpartner=item.case_kind==='startpartner_candidate';
+  const data=startpartnerData(item);
+  const body=item.case_kind==='event_candidate'
+    ? renderEventReview(review,item)
+    : startpartner
+      ? `${renderStartpartnerReview(item)}${renderGate4Panel(data)}`
+      : generic(item);
   const blockerCount=Number(review?.summary?.open_task_count||0);
   const secondary=secondaryActions(available,links,'cc-actions--secondary-desktop');
   const mobileSecondary=`<details class="cc-mobile-case-options"><summary>Weitere Falloptionen und Quellen</summary>${secondaryActions(available,links,'cc-actions--secondary-mobile')}</details>`;
-  return `<article class="cc-work-detail" data-case-id="${escapeHtml(item.id)}" data-case-kind="${escapeHtml(item.case_kind||'')}"><header class="cc-work-head"><div><span class="cc-kicker">${escapeHtml(reviewLabels[reviewGroup(item)]||'Prüfung')} · ${index+1} von ${total}</span><h2>${escapeHtml(item.title)}</h2></div><div class="cc-work-head__status"><span class="cc-pill">${escapeHtml(item.display_status)}</span>${item.case_kind==='event_candidate'?`<span class="cc-mobile-blocker-count">${blockerCount===0?'Keine offenen Punkte':`${blockerCount} ${blockerCount===1?'offener Punkt':'offene Punkte'}`}</span>`:''}</div></header>${item.waiting_for?`<div class="cc-notice cc-notice--info"><strong>Folgeprozess aktiv</strong><span>${escapeHtml(item.waiting_for)}</span></div>`:''}${body}<div class="cc-action-primary ${item.case_kind==='event_candidate'?'cc-action-primary--event-candidate':''}">${available.primary?`<button class="cc-button cc-button--primary cc-button--large" data-review-action="${escapeHtml(available.primary.key)}">${escapeHtml(available.primary.label)}</button>`:`<div class="cc-empty">${escapeHtml(item.waiting_for||'Aktuell keine Aktion erforderlich.')}</div>`}</div>${secondary}${mobileSecondary}<footer class="cc-work-nav"><button class="cc-button cc-button--ghost" data-review-move="-1" ${index===0?'disabled':''}>‹ Zurück</button><button class="cc-button cc-button--ghost" data-review-move="1" ${index>=total-1?'disabled':''}>Weiter ›</button></footer></article>`;
+  const primary=startpartner?'':`<div class="cc-action-primary ${item.case_kind==='event_candidate'?'cc-action-primary--event-candidate':''}">${available.primary?`<button class="cc-button cc-button--primary cc-button--large" data-review-action="${escapeHtml(available.primary.key)}">${escapeHtml(available.primary.label)}</button>`:`<div class="cc-empty">${escapeHtml(item.waiting_for||'Aktuell keine Aktion erforderlich.')}</div>`}</div>`;
+  return `<article class="cc-work-detail" data-case-id="${escapeHtml(item.id)}" data-case-kind="${escapeHtml(item.case_kind||'')}"><header class="cc-work-head"><div><span class="cc-kicker">${escapeHtml(reviewLabels[reviewGroup(item)]||'Prüfung')} · ${index+1} von ${total}</span><h2>${escapeHtml(item.title)}</h2></div><div class="cc-work-head__status"><span class="cc-pill">${escapeHtml(caseStatus(item))}</span>${item.case_kind==='event_candidate'?`<span class="cc-mobile-blocker-count">${blockerCount===0?'Keine offenen Punkte':`${blockerCount} ${blockerCount===1?'offener Punkt':'offene Punkte'}`}</span>`:''}</div></header>${item.waiting_for?`<div class="cc-notice cc-notice--info"><strong>Folgeprozess aktiv</strong><span>${escapeHtml(item.waiting_for)}</span></div>`:''}${body}${primary}${secondary}${mobileSecondary}<footer class="cc-work-nav"><button class="cc-button cc-button--ghost" data-review-move="-1" ${index===0?'disabled':''}>‹ Zurück</button><button class="cc-button cc-button--ghost" data-review-move="1" ${index>=total-1?'disabled':''}>Weiter ›</button></footer></article>`;
 }
 function count(key){return key==='all'?allReviewCases().length:allReviewCases().filter(item=>reviewGroup(item)===key).length;}
 export function renderReview() {
-  const groups=Object.entries(reviewLabels).filter(([key])=>key==='all'||count(key)>0); if(!groups.some(([key])=>key===state.reviewGroup))state.reviewGroup='all'; const items=reviewCases(); if(state.reviewIndex>=items.length)state.reviewIndex=Math.max(0,items.length-1);
-  const queue=items.map((item,index)=>`<button class="cc-queue-item ${index===state.reviewIndex?'is-active':''}" data-review-index="${index}"><span>${escapeHtml(item.title)}</span><small>${escapeHtml(reviewLabels[reviewGroup(item)]||item.display_status)}</small></button>`).join('');
+  const groups=Object.entries(reviewLabels).filter(([key])=>key==='all'||count(key)>0);
+  if(!groups.some(([key])=>key===state.reviewGroup))state.reviewGroup='all';
+  const items=reviewCases();
+  if(state.reviewIndex>=items.length)state.reviewIndex=Math.max(0,items.length-1);
+  const queue=items.map((item,index)=>`<button class="cc-queue-item ${index===state.reviewIndex?'is-active':''}" data-review-index="${index}"><span>${escapeHtml(item.title)}</span><small>${escapeHtml(item.case_kind==='startpartner_candidate'?`${caseStatus(item)} · ${item.decision_context?.assigned_to||'nicht zugewiesen'}`:reviewLabels[reviewGroup(item)]||caseStatus(item))}</small></button>`).join('');
   const pills=groups.map(([key,label])=>`<button class="cc-filter ${state.reviewGroup===key?'is-active':''}" data-review-group="${key}">${escapeHtml(label)} (${count(key)})</button>`).join('');
   const options=groups.map(([key,label])=>`<option value="${key}" ${state.reviewGroup===key?'selected':''}>${escapeHtml(label)} (${count(key)})</option>`).join('');
   els.view.innerHTML=`<div class="cc-review-controls"><div class="cc-filter-row cc-review-pills">${pills}</div><label class="cc-work-filter cc-review-select"><span>Prüfbereich</span><select id="cc-review-select">${options}</select></label></div>${items.length?`<div class="cc-work-layout"><aside class="cc-queue">${queue}</aside><main>${detail(items[state.reviewIndex],state.reviewIndex,items.length)}</main></div>`:'<div class="cc-empty cc-empty--large">In diesem Bereich gibt es aktuell nichts zu prüfen.</div>'}`;
-  document.querySelectorAll('details.cc-mobile-decision, details.cc-review-task-evidence--mobile, details.cc-review-task-options, details.cc-reviewed-summary--mobile, details.cc-mobile-case-options').forEach(details=>{const summary=details.querySelector(':scope > summary');if(!summary)return;const syncExpanded=()=>summary.setAttribute('aria-expanded',details.open?'true':'false');syncExpanded();details.addEventListener('toggle',syncExpanded);});
-  document.querySelectorAll('[data-review-group]').forEach(button=>button.addEventListener('click',()=>{state.reviewGroup=button.dataset.reviewGroup;state.reviewIndex=0;renderReview();})); document.querySelector('#cc-review-select')?.addEventListener('change',event=>{state.reviewGroup=event.target.value;state.reviewIndex=0;renderReview();}); document.querySelectorAll('[data-review-index]').forEach(button=>button.addEventListener('click',()=>{state.reviewIndex=Number(button.dataset.reviewIndex);renderReview();})); document.querySelectorAll('[data-review-move]').forEach(button=>button.addEventListener('click',()=>{state.reviewIndex+=Number(button.dataset.reviewMove);renderReview();})); document.querySelectorAll('[data-review-action]').forEach(button=>button.addEventListener('click',()=>handleAction(reviewCases()[state.reviewIndex],button.dataset.reviewAction)));
+  document.querySelectorAll('details.cc-mobile-decision, details.cc-review-task-evidence--mobile, details.cc-review-task-options, details.cc-reviewed-summary--mobile, details.cc-mobile-case-options, details.cc-startpartner-evidence, details.cc-startpartner-qualifications, [data-gate4-panel] details').forEach(details=>{const summary=details.querySelector(':scope > summary');if(!summary)return;const syncExpanded=()=>summary.setAttribute('aria-expanded',details.open?'true':'false');syncExpanded();details.addEventListener('toggle',syncExpanded);});
+  document.querySelectorAll('[data-review-group]').forEach(button=>button.addEventListener('click',()=>{state.reviewGroup=button.dataset.reviewGroup;state.reviewIndex=0;renderReview();}));
+  document.querySelector('#cc-review-select')?.addEventListener('change',event=>{state.reviewGroup=event.target.value;state.reviewIndex=0;renderReview();});
+  document.querySelectorAll('[data-review-index]').forEach(button=>button.addEventListener('click',()=>{state.reviewIndex=Number(button.dataset.reviewIndex);renderReview();}));
+  document.querySelectorAll('[data-review-move]').forEach(button=>button.addEventListener('click',()=>{state.reviewIndex+=Number(button.dataset.reviewMove);renderReview();}));
+  document.querySelectorAll('[data-review-action]').forEach(button=>button.addEventListener('click',()=>handleAction(reviewCases()[state.reviewIndex],button.dataset.reviewAction)));
   document.querySelectorAll('[data-review-task-resolution]').forEach(button=>button.addEventListener('click',()=>handleAction(reviewCases()[state.reviewIndex],'resolve_review_task',{taskId:button.dataset.reviewTaskId,taskRevision:button.dataset.reviewTaskRevision,resolution:button.dataset.reviewTaskResolution})));
 }

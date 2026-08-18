@@ -17,8 +17,8 @@ assert SPEC.loader is not None
 SPEC.loader.exec_module(contract)
 
 
-def fenced(start: str, end: str, values: dict) -> str:
-    lines = []
+def toml_block(values: dict) -> str:
+    lines: list[str] = []
     for key, value in values.items():
         if isinstance(value, str):
             lines.append(f"{key} = {json.dumps(value, ensure_ascii=False)}")
@@ -41,225 +41,302 @@ def fenced(start: str, end: str, values: dict) -> str:
                     raise AssertionError(f"unsupported child value: {child_key}")
         else:
             raise AssertionError(f"unsupported value: {key}")
-    return f"{start}\n```toml\n" + "\n".join(lines) + f"\n```\n{end}"
+    return "\n".join(lines)
 
 
-def base_issue_contract() -> dict:
-    value = {
-        "schema_version": 1,
-        "workpack_issue": 172,
-        "contract_revision": 1,
-        "objective": "Bounded governance change",
-        "scope_classes": ["governance", "ci"],
-        "allowed_paths": ["scripts/validate_pr_contract.py", "tests/test_pr_contract.py"],
-        "locked_paths": ["data/**", "README.md"],
-        "implementation_external_access": "none",
-        "required_tests": ["python3 tests/test_pr_contract.py"],
-        "staging_smoke": "Normal staging smoke",
-        "evidence_scope": ["Contract behavior"],
-        "not_proven": ["Real event quality"],
-        "rollback": "Revert the governance PR",
-    }
-    value["contract_hash"] = contract.canonical_contract_hash(value)
-    return value
+def issue_body(values: dict) -> str:
+    return (
+        f"{contract.WORKPACK_START}\n```toml\n"
+        f"{toml_block(values)}\n```\n{contract.WORKPACK_END}"
+    )
 
 
-def base_pr_evidence(issue: dict | None = None) -> dict:
-    issue = issue or base_issue_contract()
+def workpack_contract() -> dict:
     return {
-        "schema_version": 1,
-        "workpack_issue": issue["workpack_issue"],
-        "contract_revision": issue["contract_revision"],
-        "contract_hash": issue["contract_hash"],
-        "tests": list(issue["required_tests"]),
-        "evidence_scope": ["Unit tests passed"],
-        "not_proven": list(issue["not_proven"]),
-        "rollback": issue["rollback"],
+        "schema_version": 2,
+        "workpack_issue": 300,
+        "branch": "agent/adaptive-workflow-300",
+        "objective": "Change a high-risk workflow through one bounded workpack.",
+        "allowed_paths": [
+            ".github/workflows/pr-gate.yml",
+            "AI_ENTRYPOINT.md",
+            "AGENTS.md",
+            "ENGINEERING.md",
+            "docs/workpacks/active/CURRENT_WORKPACK.md",
+            "scripts/validate_pr_contract.py",
+            "tests/test_pr_contract.py",
+        ],
+        "locked_paths": ["api/**", "main-only.txt"],
+        "external_access": "none",
+        "required_tests": ["python3 tests/test_pr_contract.py"],
+        "done": ["Normal and workpack PR paths are both validated."],
+        "forbidden_effects": ["No runtime or data write."],
+        "staging_smoke": "No runtime smoke required.",
     }
 
 
-def issue_object(values: dict | None = None, *, state: str = "open", title: str = "[ACTIVE WORKPACK] Test") -> dict:
-    values = values or base_issue_contract()
+def issue_object(values: dict | None = None, *, title: str = "[ACTIVE WORKPACK] Test", state: str = "open") -> dict:
+    values = values or workpack_contract()
     return {
         "number": values["workpack_issue"],
-        "state": state,
         "title": title,
-        "body": fenced(contract.WORKPACK_START, contract.WORKPACK_END, values),
+        "state": state,
+        "body": issue_body(values),
     }
-
-
-def pr_body(values: dict | None = None) -> str:
-    return fenced(contract.PR_START, contract.PR_END, values or base_pr_evidence())
 
 
 class PullRequestContractTests(unittest.TestCase):
-    def validate(self, *, issue=None, evidence=None, changed=None, active=None):
+    def validate(
+        self,
+        *,
+        issue: dict | None = None,
+        pr_body: str = "",
+        pr_number: int = 301,
+        base_ref: str = "staging",
+        head_ref: str = "agent/small-change",
+        changed: list[str] | None = None,
+        open_prs: list[dict] | None = None,
+    ):
         issue = issue or issue_object()
-        evidence = evidence or base_pr_evidence()
-        changed = ["scripts/validate_pr_contract.py"] if changed is None else changed
-        active = active if active is not None else [{"number": 172, "title": "[ACTIVE WORKPACK] Test"}]
+        changed = changed or ["docs/note.md"]
+        open_prs = open_prs if open_prs is not None else [
+            {"number": pr_number, "body": pr_body, "changed_paths": changed}
+        ]
         return contract.validate_pull_request(
-            pr_body=pr_body(evidence),
+            pr_number=pr_number,
+            pr_body=pr_body,
             repository="Stratos888/Bocholt-Erleben",
+            base_ref=base_ref,
+            head_ref=head_ref,
             changed_paths=changed,
             issue_loader=lambda _: issue,
-            active_issue_loader=lambda: active,
+            open_feature_pr_loader=lambda: open_prs,
         )
 
-    def assertRejected(self, message: str, **kwargs):
+    def assert_rejected(self, message: str, **kwargs):
         with self.assertRaisesRegex(contract.ContractError, message):
             self.validate(**kwargs)
 
-    def test_valid_issue_contract_and_pr_evidence_pass(self):
-        parsed, evidence, paths = self.validate()
-        self.assertEqual(parsed["workpack_issue"], 172)
-        self.assertEqual(evidence["contract_hash"], parsed["contract_hash"])
-        self.assertEqual(paths, ["scripts/validate_pr_contract.py"])
+    def test_normal_pr_without_workpack_passes(self):
+        parsed, paths, mode, plan = self.validate()
+        self.assertIsNone(parsed)
+        self.assertEqual(paths, ["docs/note.md"])
+        self.assertEqual(mode, "normal")
+        self.assertEqual(plan, "docs")
 
-    def test_missing_pr_block_fails(self):
-        with self.assertRaisesRegex(contract.ContractError, "exactly one start marker"):
-            contract.validate_pull_request(
-                pr_body="no block",
-                repository="Stratos888/Bocholt-Erleben",
-                changed_paths=["scripts/validate_pr_contract.py"],
-                issue_loader=lambda _: issue_object(),
-                active_issue_loader=lambda: [{"number": 172}],
-            )
+    def test_workpack_pr_passes_and_forces_full_plan(self):
+        parsed, paths, mode, plan = self.validate(
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md", "scripts/validate_pr_contract.py"],
+        )
+        self.assertEqual(parsed["workpack_issue"], 300)
+        self.assertEqual(paths, ["AI_ENTRYPOINT.md", "scripts/validate_pr_contract.py"])
+        self.assertEqual(mode, "workpack")
+        self.assertEqual(plan, "full")
 
-    def test_duplicate_pr_block_fails(self):
-        body = pr_body() + "\n" + pr_body()
-        with self.assertRaisesRegex(contract.ContractError, "exactly one start marker"):
-            contract.validate_pull_request(
-                pr_body=body,
-                repository="Stratos888/Bocholt-Erleben",
-                changed_paths=["scripts/validate_pr_contract.py"],
-                issue_loader=lambda _: issue_object(),
-                active_issue_loader=lambda: [{"number": 172}],
-            )
+    def test_high_risk_path_requires_workpack(self):
+        self.assert_rejected(
+            "workpack is required",
+            changed=[".github/workflows/pr-gate.yml"],
+        )
 
-    def test_invalid_toml_fails(self):
-        body = f"{contract.PR_START}\n```toml\nworkpack_issue = [\n```\n{contract.PR_END}"
-        with self.assertRaisesRegex(contract.ContractError, "invalid TOML"):
-            contract.extract_toml_block(body, contract.PR_START, contract.PR_END, "PR evidence")
+    def test_workpack_branch_mismatch_is_rejected(self):
+        self.assert_rejected(
+            "head branch",
+            pr_body="Workpack: #300",
+            changed=["AI_ENTRYPOINT.md"],
+        )
 
-    def test_closed_issue_fails(self):
-        self.assertRejected("must be open", issue=issue_object(state="closed"))
+    def test_closed_or_unmarked_workpack_is_rejected(self):
+        self.assert_rejected(
+            "must be open",
+            issue=issue_object(state="closed"),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
+        )
+        self.assert_rejected(
+            "active-workpack marker",
+            issue=issue_object(title="Prepared"),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
+        )
 
-    def test_missing_active_marker_fails(self):
-        self.assertRejected("missing the active-workpack marker", issue=issue_object(title="Test"))
+    def test_duplicate_workpack_line_is_rejected(self):
+        self.assert_rejected(
+            "at most one line",
+            pr_body="Workpack: #300\nWorkpack: #300",
+        )
 
-    def test_issue_number_conflict_fails(self):
-        evidence = base_pr_evidence()
-        evidence["workpack_issue"] = 173
-        self.assertRejected("different issue", evidence=evidence)
+    def test_duplicate_pr_for_same_workpack_is_rejected(self):
+        self.assert_rejected(
+            "already has open PR",
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
+            open_prs=[
+                {"number": 301, "body": "Workpack: #300", "changed_paths": ["AI_ENTRYPOINT.md"]},
+                {"number": 302, "body": "Workpack: #300", "changed_paths": ["other.md"]},
+            ],
+        )
+
+    def test_exact_file_overlap_is_rejected(self):
+        self.assert_rejected(
+            "overlap open PR #302",
+            changed=["js/example.js"],
+            open_prs=[
+                {"number": 301, "body": "", "changed_paths": ["js/example.js"]},
+                {"number": 302, "body": "", "changed_paths": ["js/example.js", "css/other.css"]},
+            ],
+        )
+
+    def test_independent_parallel_pr_is_allowed(self):
+        parsed, paths, mode, plan = self.validate(
+            changed=["js/example.js"],
+            open_prs=[
+                {"number": 301, "body": "", "changed_paths": ["js/example.js"]},
+                {"number": 302, "body": "", "changed_paths": ["api/other.php"]},
+            ],
+        )
+        self.assertIsNone(parsed)
+        self.assertEqual(paths, ["js/example.js"])
+        self.assertEqual(mode, "normal")
+        self.assertEqual(plan, "frontend")
+
+    def test_workpack_scope_and_locked_paths_are_enforced(self):
+        self.assert_rejected(
+            "outside allowed scope",
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["README.md"],
+        )
+        values = workpack_contract()
+        values["allowed_paths"].append("api/status.php")
+        self.assert_rejected(
+            "changed path is locked",
+            issue=issue_object(values),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["api/status.php"],
+        )
+
+    def test_controlled_write_requires_compact_write_contract(self):
+        values = workpack_contract()
+        values["external_access"] = "controlled-staging-write"
+        self.assert_rejected(
+            "external_write",
+            issue=issue_object(values),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
+        )
+        values["external_write"] = {
+            "resource": "Staging DB",
+            "identity": "Synthetic UUID",
+            "before": "No rows",
+            "mutation": "One bounded row",
+            "readback": "Exact row",
+            "cleanup": "Delete row and prove zero residue",
+        }
+        self.validate(
+            issue=issue_object(values),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
+        )
+
+    def test_release_path_accepts_only_staging_to_main(self):
+        parsed, paths, mode, plan = self.validate(
+            base_ref="main",
+            head_ref="staging",
+            changed=["docs/note.md"],
+            open_prs=[],
+        )
+        self.assertIsNone(parsed)
+        self.assertEqual(paths, ["docs/note.md"])
+        self.assertEqual(mode, "release")
+        self.assertEqual(plan, "full")
+        self.assert_rejected(
+            "release PR",
+            base_ref="main",
+            head_ref="agent/release",
+            changed=["docs/note.md"],
+            open_prs=[],
+        )
+
+    def test_rename_checks_old_and_new_path(self):
+        paths = contract.parse_name_status_z(
+            b"R100\0docs/old.md\0docs/new.md\0"
+        )
+        self.assertEqual(paths, ["docs/old.md", "docs/new.md"])
+
+    def test_unbounded_root_wildcard_is_rejected(self):
+        values = workpack_contract()
+        values["allowed_paths"] = ["**/*"]
+        self.assert_rejected(
+            "unbounded root wildcard",
+            issue=issue_object(values),
+            pr_body="Workpack: #300",
+            head_ref="agent/adaptive-workflow-300",
+            changed=["AI_ENTRYPOINT.md"],
+        )
+
+    def test_plan_classification(self):
+        cases = [
+            (["README.md", "docs/note.md"], False, "docs"),
+            (["js/example.js", "tests/example.mjs"], False, "frontend"),
+            (["api/example.php", "tests/example.php"], False, "backend"),
+            (["scripts/example.py", "tests/example.py"], False, "quick"),
+            (["api/example.php", "js/example.js"], False, "full"),
+            (["api/sql/013.sql"], True, "full"),
+        ]
+        for paths, is_workpack, expected in cases:
+            with self.subTest(paths=paths):
+                self.assertEqual(
+                    contract.classify_changed_paths(paths, workpack=is_workpack),
+                    expected,
+                )
+
+    def test_component_and_browser_target_selection(self):
+        cases = [
+            (["api/startpartner/action.php"], "backend", ("startpartner", False, False)),
+            (["api/control-center/action.php"], "backend", ("control-center", False, False)),
+            (["api/example.php"], "backend", ("all", False, False)),
+            (["events/index.html"], "frontend", ("all", True, False)),
+            (["steuerzentrale/index.html"], "frontend", ("control-center", False, True)),
+            (["css/component.css"], "frontend", ("all", True, True)),
+            (["api/startpartner/action.php", "js/control-center/startpartner.js"], "full", ("all", True, True)),
+        ]
+        for paths, plan, expected in cases:
+            with self.subTest(paths=paths, plan=plan):
+                self.assertEqual(contract.select_test_targets(paths, plan=plan), expected)
 
     def test_api_failure_fails_closed(self):
         with self.assertRaisesRegex(contract.ContractError, "simulated API failure"):
             contract.validate_pull_request(
-                pr_body=pr_body(),
+                pr_number=301,
+                pr_body="Workpack: #300",
                 repository="Stratos888/Bocholt-Erleben",
-                changed_paths=["scripts/validate_pr_contract.py"],
-                issue_loader=lambda _: (_ for _ in ()).throw(contract.ContractError("simulated API failure")),
-                active_issue_loader=lambda: [{"number": 172}],
+                base_ref="staging",
+                head_ref="agent/adaptive-workflow-300",
+                changed_paths=["AI_ENTRYPOINT.md"],
+                issue_loader=lambda _: (_ for _ in ()).throw(
+                    contract.ContractError("simulated API failure")
+                ),
+                open_feature_pr_loader=lambda: [],
             )
-
-    def test_zero_or_multiple_active_issues_fail(self):
-        self.assertRejected("exactly one", active=[])
-        self.assertRejected("exactly one", active=[{"number": 172}, {"number": 173}])
-
-    def test_empty_required_field_fails(self):
-        values = base_issue_contract()
-        values["objective"] = ""
-        values["contract_hash"] = contract.canonical_contract_hash(values)
-        self.assertRejected("objective is required", issue=issue_object(values))
-
-    def test_file_outside_allowed_scope_fails(self):
-        self.assertRejected("outside allowed scope", changed=["README.md.backup"])
-
-    def test_deleted_file_outside_scope_is_parsed_and_fails(self):
-        paths = contract.parse_name_status_z(b"D\0README.md.backup\0")
-        self.assertEqual(paths, ["README.md.backup"])
-        self.assertRejected("outside allowed scope", changed=paths)
-
-    def test_locked_path_wins_over_allowed_path(self):
-        values = base_issue_contract()
-        values["allowed_paths"].append("README.md")
-        values["contract_hash"] = contract.canonical_contract_hash(values)
-        self.assertRejected("changed path is locked", issue=issue_object(values), evidence=base_pr_evidence(values), changed=["README.md"])
-
-    def test_rename_checks_old_and_new_path(self):
-        paths = contract.parse_name_status_z(b"R100\0scripts/validate_pr_contract.py\0README.md.backup\0")
-        self.assertEqual(paths, ["scripts/validate_pr_contract.py", "README.md.backup"])
-        self.assertRejected("outside allowed scope", changed=paths)
-
-    def test_absolute_and_parent_paths_fail(self):
-        self.assertRejected("absolute path", changed=["/tmp/file"])
-        self.assertRejected("unsafe traversal", changed=["scripts/../README.md"])
-
-    def test_unbounded_root_wildcard_fails(self):
-        values = base_issue_contract()
-        values["allowed_paths"] = ["**/*"]
-        values["contract_hash"] = contract.canonical_contract_hash(values)
-        self.assertRejected("unbounded root wildcard", issue=issue_object(values), evidence=base_pr_evidence(values))
-
-    def test_incomplete_ui_contract_fails(self):
-        values = base_issue_contract()
-        values["scope_classes"].append("ui")
-        values["contract_hash"] = contract.canonical_contract_hash(values)
-        self.assertRejected("visible_contract", issue=issue_object(values), evidence=base_pr_evidence(values))
-
-    def test_complete_ui_contract_passes(self):
-        values = base_issue_contract()
-        values["scope_classes"].append("rendering")
-        values["visible_contract"] = {
-            "reference": "Current UI",
-            "viewports": ["1366x900", "390x844"],
-            "above_the_fold": "No new element",
-            "new_visible_elements": False,
-            "javascript_states": ["enabled", "disabled"],
-        }
-        values["contract_hash"] = contract.canonical_contract_hash(values)
-        self.validate(issue=issue_object(values), evidence=base_pr_evidence(values))
-
-    def test_incomplete_external_write_contract_fails(self):
-        values = base_issue_contract()
-        values["implementation_external_access"] = "controlled-staging-write"
-        values["external_write_contract"] = {"resource": "Events_Staging"}
-        values["contract_hash"] = contract.canonical_contract_hash(values)
-        self.assertRejected("stable_identity", issue=issue_object(values), evidence=base_pr_evidence(values))
-
-    def test_missing_pr_evidence_scope_fails(self):
-        evidence = base_pr_evidence()
-        evidence["evidence_scope"] = []
-        self.assertRejected("evidence_scope", evidence=evidence)
-
-    def test_missing_pr_not_proven_fails(self):
-        evidence = base_pr_evidence()
-        evidence["not_proven"] = []
-        self.assertRejected("not_proven", evidence=evidence)
-
-    def test_missing_pr_rollback_fails(self):
-        evidence = base_pr_evidence()
-        evidence["rollback"] = ""
-        self.assertRejected("rollback", evidence=evidence)
-
-    def test_hash_and_revision_mismatch_fail(self):
-        evidence = base_pr_evidence()
-        evidence["contract_hash"] = "0" * 64
-        self.assertRejected("contract_hash", evidence=evidence)
-        evidence = base_pr_evidence()
-        evidence["contract_revision"] = 2
-        self.assertRejected("contract_revision", evidence=evidence)
-
-    def test_changed_path_list_must_not_be_empty(self):
-        self.assertRejected("no changed paths", changed=[])
 
 
 class SyntheticFixtureSmokeTests(unittest.TestCase):
     def make_repo(self, base: Path) -> Path:
         repo = base / "repo"
         (repo / "scripts").mkdir(parents=True)
-        shutil.copy2(ROOT / "scripts/run-event-navigation-fixture-smoke.sh", repo / "scripts/run-event-navigation-fixture-smoke.sh")
+        shutil.copy2(
+            ROOT / "scripts/run-event-navigation-fixture-smoke.sh",
+            repo / "scripts/run-event-navigation-fixture-smoke.sh",
+        )
         (repo / "scripts/build-event-detail-pages.py").write_text(
             "from pathlib import Path\n"
             "Path('events').mkdir(exist_ok=True)\n"
@@ -272,8 +349,16 @@ class SyntheticFixtureSmokeTests(unittest.TestCase):
             encoding="utf-8",
         )
         subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
-        subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=repo, check=True)
-        subprocess.run(["git", "config", "user.name", "Test"], cwd=repo, check=True)
+        subprocess.run(
+            ["git", "config", "user.email", "test@example.invalid"],
+            cwd=repo,
+            check=True,
+        )
+        subprocess.run(
+            ["git", "config", "user.name", "Test"],
+            cwd=repo,
+            check=True,
+        )
         subprocess.run(["git", "add", "."], cwd=repo, check=True)
         subprocess.run(["git", "commit", "-qm", "fixture"], cwd=repo, check=True)
         return repo
@@ -281,11 +366,13 @@ class SyntheticFixtureSmokeTests(unittest.TestCase):
     def run_smoke(self, repo: Path, runner_temp: Path, **extra_env):
         runner_temp.mkdir(parents=True, exist_ok=True)
         env = os.environ.copy()
-        env.update({
-            "RUNNER_TEMP": str(runner_temp),
-            "SMOKE_OUT_DIR": str(runner_temp / "smoke-output"),
-            **extra_env,
-        })
+        env.update(
+            {
+                "RUNNER_TEMP": str(runner_temp),
+                "SMOKE_OUT_DIR": str(runner_temp / "smoke-output"),
+                **extra_env,
+            }
+        )
         return subprocess.run(
             ["bash", "scripts/run-event-navigation-fixture-smoke.sh"],
             cwd=repo,
@@ -303,7 +390,11 @@ class SyntheticFixtureSmokeTests(unittest.TestCase):
             result = self.run_smoke(repo, base / "runner")
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("SYNTHETIC_BOUNDED_FIXTURE: OK", result.stdout)
-            status = subprocess.check_output(["git", "status", "--porcelain"], cwd=repo, text=True)
+            status = subprocess.check_output(
+                ["git", "status", "--porcelain"],
+                cwd=repo,
+                text=True,
+            )
             self.assertEqual(status, "")
 
     def test_synthetic_fixture_smoke_detects_checkout_mutation(self):
@@ -311,7 +402,11 @@ class SyntheticFixtureSmokeTests(unittest.TestCase):
             base = Path(directory)
             repo = self.make_repo(base)
             mutation = repo / "mutated.txt"
-            result = self.run_smoke(repo, base / "runner", MUTATE_ROOT=str(mutation))
+            result = self.run_smoke(
+                repo,
+                base / "runner",
+                MUTATE_ROOT=str(mutation),
+            )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("checkout changed during smoke", result.stderr)
 

@@ -1,0 +1,20 @@
+{
+  "template": true,
+  "candidate_id": "candidate-000",
+  "role": "critic_a",
+  "evaluator_id": "critic-a-placeholder",
+  "created_at": null,
+  "review_locked": false,
+  "concept_title_seen": false,
+  "rationale_seen": false,
+  "prior_scores_seen": false,
+  "evidence_seen": [
+    "monochrome_identity",
+    "real_sizes",
+    "app_masks",
+    "mobile_header_original_size"
+  ],
+  "knockout_findings": {},
+  "dimension_scores": {},
+  "verdict": null
+}

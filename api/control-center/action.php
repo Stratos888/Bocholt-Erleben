@@ -67,6 +67,11 @@ try {
     $case = $lookup->fetch(PDO::FETCH_ASSOC);
     if (!$case) throw new RuntimeException('Case not found.');
 
+    $sourceSystem = (string)$case['source_system'];
+    if ($sourceSystem === 'startpartner_candidate') {
+        throw new DomainException('Startpartner-Fälle werden ausschließlich über die geschützte Startpartner-Domäne geändert.');
+    }
+
     if ($action === 'recheck') {
         $verification = be_cc_recheck_source_case($case);
         $result = be_cc_apply_action($caseId, 'complete', ['verification'=>$verification]);
@@ -74,7 +79,6 @@ try {
         be_json_response(200, ['status'=>'ok','data'=>$result + ['verification'=>$verification,'completion'=>['complete'=>true,'source_verified'=>true,'local'=>$local]]]);
     }
 
-    $sourceSystem = (string)$case['source_system'];
     $editorialAction = in_array($action, ['approve','reject','snooze'], true);
 
     // The approval gate must use the current authoritative Inbox row and a
