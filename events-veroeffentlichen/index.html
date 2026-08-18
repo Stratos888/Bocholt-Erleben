@@ -95,7 +95,7 @@
   </header>
   <!-- === END BLOCK: PUBLISH_HEADER_WITH_AREA_ACCESS_V2 === -->
 
-  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V13_STARTPARTNER_SPECIAL_PATH | Zweck: erhält die regulären Live-Veröffentlichungswege und ordnet den Startpartner-Pilot als eigenen begrenzten Sonderweg vor dem redaktionellen Tippkanal ein; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
+  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V14_STARTPARTNER_COMPACT_FAQ | Zweck: erhält die regulären Live-Veröffentlichungswege und ordnet den Startpartner-Pilot kompakt mit bestehender Listenformatierung und FAQ-Verweis vor dem redaktionellen Tippkanal ein; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
   <main class="page page--publish">
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
@@ -162,15 +162,30 @@
       <!-- === END BLOCK: PUBLISH_OVERVIEW_EXPLAINER_LINK_V1 === -->
     </section>
 
-    <section class="content-card content-card--primary" aria-labelledby="publish-startpartner-title">
+    <section class="content-card publish-membership-card publish-models-card" aria-labelledby="publish-startpartner-title">
       <div class="publish-section-head">
-        <h2 id="publish-startpartner-title">Startpartner-Pilot – 6 Monate kostenlos testen</h2>
+        <h2 id="publish-startpartner-title">Startpartner-Pilot</h2>
       </div>
-      <p>Für passende Veranstalter und Locations in der Aufbauphase: sechs Monate gemeinsam testen, Wirkung messen und danach ausdrücklich entscheiden, ob ein regulärer Tarif passt.</p>
-      <p class="content-note">Der Pilot ist begrenzt und wird individuell geprüft. Keine Zahlungsart und keine automatische kostenpflichtige Umwandlung.</p>
-      <div class="content-actions content-actions--inline">
-        <a class="content-cta content-cta--primary" href="/startpartner/?scope=events">Startpartner-Pilot anfragen</a>
-      </div>
+
+      <ul class="publish-model-list" aria-label="Startpartner-Pilot für Veranstaltungen">
+        <li>
+          <div class="publish-model-copy">
+            <strong>6 Monate kostenlos testen</strong>
+            <span>begrenzter Pilot · individuell geprüft</span>
+            <small>Für passende Veranstalter und Locations in der Aufbauphase.</small>
+          </div>
+          <div class="content-actions content-actions--inline">
+            <a class="content-cta content-cta--primary" href="/startpartner/?scope=events">Startpartner-Pilot anfragen</a>
+          </div>
+        </li>
+      </ul>
+
+      <nav class="content-links publish-explainer-context-link" aria-label="Startpartner-Pilot erklärt">
+        <a class="content-link" href="/veroeffentlichung-erklaert/#startpartner">
+          <span class="content-link__label">Was ist der Startpartner-Pilot? Kurz erklärt</span>
+          <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+        </a>
+      </nav>
     </section>
 
     <section class="content-card" aria-labelledby="publish-secondary-paths-title">
@@ -194,7 +209,7 @@
   <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 | Zweck: ergänzt den zentral gerenderten Site-Footer auf öffentlichen Unterseiten; Umfang: Footer-Slot direkt nach dem Hauptinhalt === -->
   <footer data-site-footer></footer>
   <!-- === END BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 === -->
-  <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V13_STARTPARTNER_SPECIAL_PATH === -->
+  <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V14_STARTPARTNER_COMPACT_FAQ === -->
 
   <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_RUNTIME_CHAIN_CLEANUP_V2 | Zweck: konsolidiert die Runtime-Chain der Veranstalter-Übersichtsseite auf genau eine Script-Ladekette, damit Feedback und globale Initialisierung nicht doppelt geladen werden; Umfang: Script-Block direkt vor </body> in /events-veroeffentlichen/ === -->
   <script src="/config.js?v=2026-02-04-1"></script>
