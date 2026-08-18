@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **C6 PRODUCT-OWNER-WAHRNEHMUNGSGATE AKTIV – 1 C3–C5 QUALIFIZIERTER KANDIDAT**
+Status: **C6 FAIL – T1 BEENDET – C1 NEUER SUCHRAUM AKTIV – 0 LOGOFINALISTEN**
 
 ## Kanonischer Dokumentensatz
 
@@ -21,66 +21,71 @@ Verworfene Kandidaten und Rohmaterial besitzen keinen aktiven Gate-Status. Git b
 
 ## C0 – PASS
 
-Der Product Owner bestätigte am 2026-08-18 die Creative Direction:
+Bestätigte Creative Direction:
 
 > **A + B als Markencharakter; C nur als Qualitätsdisziplin.**
 
 Gesuchte Wirkung:
 
-> hochwertig, ruhig und kuratiert, aber zugleich lebendig, persönlich und entdeckungsfreudig; modern und eigenständig, ohne elitär, touristisch oder ticketportal-laut zu wirken.
+> hochwertig, ruhig und kuratiert, zugleich lebendig, persönlich und entdeckungsfreudig; modern und eigenständig, ohne elitär, touristisch oder ticketportal-laut zu wirken.
 
-## C1/C2 – abgeschlossen
+## Letzter C1–C5-Lauf
 
 Die freie Exploration lief ohne vorgeschriebene `BE`-, Symbol-, Heritage-, D/E/F-, Symbol-first- oder Wortmarke-first-Architektur.
 
-Das externe generative Rohboard wurde nicht als Bewertung übernommen. Seine automatisch erzeugten C2/C3-Häkchen waren ungültig.
+Das externe generative Rohboard war nur Suchmaterial; seine automatisch erzeugten Gate-Häkchen waren ungültig.
 
-C2 eliminierte die üblichen Pin/Herz-, Blatt-, Skyline-, Spark-, Script-, Sonnenaufgang-, Monogramm-, Wellen- und Farbcodierungsfamilien als generisch beziehungsweise nicht monochrom belastbar.
+Die stärkste Symbolfamilie – abstrahiertes `b` plus Wortmarke – fiel als zu generisches `App-Icon + Wortmarke` aus.
 
-## C3 – Ergebnis
+Übrig blieb T1 – Stable / Alive Stack:
 
-Die einzige stärkere Symbolfamilie aus dem Rohboard – abstrahiertes `b` plus Wortmarke – fiel im Referenzvergleich als zu generisches `App-Icon + Wortmarke` aus.
+- `bocholt` stabil, fett, aufrecht;
+- `erleben` dynamischer, kursiv;
+- beide Wortzeilen optisch gleich breit;
+- vollständiger Name unmittelbar lesbar.
 
-Eine unabhängige typografische Route nutzte die natürliche 7+7-Struktur von `bocholt` und `erleben`.
+T1 wurde deterministisch als Vektor gebaut und im Mobile-/Desktop-Header technisch erfolgreich geprüft.
 
-### T1 – Stable / Alive Stack
+## C6 – Ergebnis
 
-- `bocholt`: fett und aufrecht;
-- `erleben`: dynamischer und kursiv;
-- beide Zeilen optisch gleich breit;
-- vollständiger Name ohne Symbol oder Dekodierung.
+Der Product Owner bewertete T1 am 2026-08-18 als:
 
-Eine Uppercase-Gegenprobe T2 wurde als zu editorial/institutionell beendet.
+> **eher nur ordentlich gesetzte/stilisierte Schrift**
 
-T1 ist der **einzige C3-Survivor**. Das ist eine Vorqualifikation, keine Premiumfreigabe.
+Dieser Befund ist bindend. T1 besitzt zwar Lesbarkeit und technische Stabilität, aber keine ausreichend eigenständige Markensilhouette oder einen charakteristischen Markenanker.
 
-## C4 – abgeschlossen
+**T1 = FAIL. Keine Mikrorettung.**
 
-Kanonisches SVG:
+## Neuer C1-Suchraum
 
-`docs/brand/phase5/candidates/C4_T1_STABLE_ALIVE_STACK.svg`
+Der nächste Lauf soll gezielt vermeiden, erneut bei `saubere Typografie + Schriftschnitt-Kontrast` zu landen.
 
-- reine Pfade;
-- kein Runtime-Font;
-- kein Raster-/Generatorasset;
-- `currentColor`;
-- zwei Pfade;
-- ViewBox `348.143 × 153.408`.
+Gesucht werden makro-eigenständige Lösungen, unter anderem:
 
-## C5 – abgeschlossen
+- integrierte Wortbildsysteme;
+- Zeichen-/Namenslösungen mit gemeinsamer Formlogik;
+- freie Kompositionsformen;
+- eigenständige Wortmarken, deren Differenzierung nicht nur aus Gewicht, Kursivlage oder einer Spezialglyphe stammt.
 
-T1 wurde monochrom/reverse sowie im 320-px-Mobile-, 390-px-Mobile- und Desktop-Kontext geprüft. Die vollständige Namenslesbarkeit und die kompakte Zweizeilenform bleiben im bestehenden 48-px-Header stabil.
+Weiterhin ausgeschlossen beziehungsweise kritisch:
 
-## C6 – aktiv
+- generisches App-Icon + normale Wortmarke;
+- `BE`-Default;
+- Portal/Rahmen/Badge;
+- Pin/Herz/Blatt/Spark/Sonne/Wellen/Tourismusklischees;
+- Farbe oder Mock-up als Rettung.
 
-Der Product Owner sieht genau **einen** C3–C5-qualifizierten Kandidaten: `T1 – Stable / Alive Stack`.
+## Nächste Gates
 
-Entscheidungsfrage:
+- **C0:** PASS;
+- **C1:** neuer unabhängiger Suchraum – aktiv;
+- **C2:** technischer/formaler Rohfilter;
+- **C3:** anonymer externer Referenzvergleich;
+- **C4:** maximal drei reproduzierbare Vektorkonstruktionen;
+- **C5:** Realproduktbeweis Mobile/Desktop;
+- **C6:** Product-Owner-Wahrnehmungsgate;
+- danach erst responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion, Rechts-/Technikpreflight und separate Integration.
 
-> Wirkt T1 bereits wie eine eigenständige, hochwertige Consumer-Marke für `Bocholt erleben` – oder weiterhin eher wie saubere/stilisierte Typografie?
-
-Bei Nein wird T1 beendet und C1 neu geöffnet. Bei Ja folgen erst danach responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion und Marken-/Ähnlichkeits-/Rechts-/Technikpreflight.
-
-Aktueller C3–C5-Kandidat: `1` (`T1`).
+Aktueller Logo-Finalist: `0`.
 Premiumfreigabe: `0`.
 Öffentliche Wirkung: `0`.
