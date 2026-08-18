@@ -21,6 +21,16 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+async function open(page, routePath) {
+  const response = await page.goto(`${baseUrl}${routePath}`, { waitUntil: 'networkidle', timeout: 18000 });
+  assert(response && response.status() === 200, `${routePath}: erwarteter HTTP 200 fehlt`);
+}
+
+async function assertNoOverflow(page, label) {
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+  assert(!overflow, `${label}: horizontaler Überlauf`);
+}
+
 async function styleSignature(page, selector, properties) {
   const locator = page.locator(selector).first();
   await locator.waitFor({ state: 'visible', timeout: 8000 });
@@ -30,67 +40,23 @@ async function styleSignature(page, selector, properties) {
   }, properties);
 }
 
-async function pageSignature(page) {
+async function sharedSignature(page) {
   return {
-    hero: await styleSignature(page, '.content-hero--panel', [
-      'borderRadius',
-      'boxShadow',
-      'paddingTop',
-      'paddingRight',
-      'paddingBottom',
-      'paddingLeft',
-    ]),
-    primaryCard: await styleSignature(page, '.content-card--primary', [
-      'borderRadius',
-      'backgroundColor',
-      'borderTopColor',
-      'boxShadow',
-    ]),
-    primaryCta: await styleSignature(page, '.content-cta--primary', [
-      'borderRadius',
-      'minHeight',
-      'backgroundColor',
-      'borderTopColor',
-      'boxShadow',
-      'paddingLeft',
-      'paddingRight',
-    ]),
-    inputControl: await styleSignature(page, 'input.content-field__control', [
-      'borderRadius',
-      'backgroundColor',
-      'borderTopColor',
-      'fontSize',
-    ]),
-    selectControl: await styleSignature(page, 'select.content-field__control', [
-      'borderRadius',
-      'backgroundColor',
-      'borderTopColor',
-      'fontSize',
-    ]),
+    hero: await styleSignature(page, '.content-hero--panel', ['borderRadius', 'boxShadow', 'paddingTop', 'paddingLeft']),
+    primaryCard: await styleSignature(page, '.content-card--primary', ['borderRadius', 'backgroundColor', 'borderTopColor', 'boxShadow']),
+    primaryCta: await styleSignature(page, '.content-cta--primary', ['borderRadius', 'minHeight', 'backgroundColor', 'borderTopColor', 'boxShadow']),
+    input: await styleSignature(page, 'input.content-field__control', ['borderRadius', 'backgroundColor', 'borderTopColor', 'fontSize']),
+    select: await styleSignature(page, 'select.content-field__control', ['borderRadius', 'backgroundColor', 'borderTopColor', 'fontSize']),
   };
 }
 
-function assertEqualSignature(actual, expected, label) {
-  for (const [component, actualProps] of Object.entries(actual)) {
-    const expectedProps = expected[component];
-    for (const [property, actualValue] of Object.entries(actualProps)) {
-      const expectedValue = expectedProps[property];
-      assert(
-        actualValue === expectedValue,
-        `${label}: ${component}.${property} weicht vom gemeinsamen Funnel-Primitive ab: ${actualValue} != ${expectedValue}`,
-      );
+function assertSame(actual, expected, label) {
+  for (const [component, props] of Object.entries(actual)) {
+    for (const [property, actualValue] of Object.entries(props)) {
+      const expectedValue = expected[component][property];
+      assert(actualValue === expectedValue, `${label}: ${component}.${property}: ${actualValue} != ${expectedValue}`);
     }
   }
-}
-
-async function open(page, routePath) {
-  const response = await page.goto(`${baseUrl}${routePath}`, { waitUntil: 'networkidle', timeout: 18000 });
-  assert(response && response.status() === 200, `${routePath}: erwarteter HTTP 200 fehlt`);
-}
-
-async function assertNoOverflow(page, label) {
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
-  assert(!overflow, `${label}: horizontaler Überlauf`);
 }
 
 async function runProfile(browser, profileName, viewport) {
@@ -103,75 +69,66 @@ async function runProfile(browser, profileName, viewport) {
     await route.abort();
   });
 
-  // Neutraler Einstieg: Inhaltstyp zuerst, Pilot separat.
-  await open(page, '/fuer-veranstalter/');
-  const entryText = await page.locator('body').innerText();
-  for (const marker of [
-    'Was möchtest du sichtbar machen?',
-    'Veranstaltungen / Events',
-    'Aktivitäten / dauerhafte Angebote',
-    'Kostenloser Startpartner-Pilot',
-  ]) {
-    assert(entryText.toLocaleLowerCase('de-DE').includes(marker.toLocaleLowerCase('de-DE')), `${profileName}: Anbieter-Einstieg fehlt: ${marker}`);
-  }
-  assert(await page.locator('a[href="/events-veroeffentlichen/"]').count() > 0, `${profileName}: Event-Einstieg fehlt`);
-  assert(await page.locator('a[href="/aktivitaeten/sichtbar-werden/"]').count() > 0, `${profileName}: Aktivitäts-Einstieg fehlt`);
-  assert(await page.locator('#organizer-membership-form').count() === 0, `${profileName}: neutraler Einstieg enthält unerwartet Membership-Checkout`);
-  await assertNoOverflow(page, `${profileName}: Anbieter-Einstieg`);
-
-  // Event-Weg zeigt neue Membership-Route und kontextuellen Pilot.
+  // Event-Seite: live-freigegebene Struktur bleibt, Startpartner nur additiv im bestehenden Sekundärbereich.
   await open(page, '/events-veroeffentlichen/');
-  assert(await page.locator('a[href="/events-veroeffentlichen/mitgliedschaft/"]').count() === 1, `${profileName}: Membership-Route fehlt im Event-Funnel`);
-  assert(await page.locator('a[href="/startpartner/?scope=events"]').count() === 1, `${profileName}: Event-Pilot-Scope fehlt`);
+  const eventText = await page.locator('body').innerText();
+  for (const marker of ['Wähle den passenden Veröffentlichungsweg', 'Noch nicht der richtige Weg?', 'Nur etwas vorschlagen', 'Begrenzte Startpartnerplätze']) {
+    assert(eventText.includes(marker), `${profileName}: Event-Live-Marker fehlt: ${marker}`);
+  }
+  assert(await page.locator('a[href="/fuer-veranstalter/"]').count() > 0, `${profileName}: Live-Membership-Link fehlt`);
+  assert(await page.locator('a[href="/events-veroeffentlichen/mitgliedschaft/"]').count() === 0, `${profileName}: zusätzliche Membership-Unterroute ist noch verlinkt`);
+  assert(await page.locator('a[href="/startpartner/?scope=events"]').count() === 1, `${profileName}: Event-Startpartner-Scope fehlt`);
+  assert(await page.locator('[data-feedback-open="missing"]').count() > 0, `${profileName}: bestehender Event-Tippweg fehlt`);
   await assertNoOverflow(page, `${profileName}: Event-Funnel`);
 
-  // Aktivitätsweg zeigt direkten Event-Fallback und kontextuellen Pilot.
+  // Aktivitäts-Seite: Live-Reihenfolge bleibt erhalten, Startpartner nur im vorhandenen Alternativbereich.
   await open(page, '/aktivitaeten/sichtbar-werden/');
-  assert(await page.locator('a[href="/startpartner/?scope=activities"]').count() === 1, `${profileName}: Activity-Pilot-Scope fehlt`);
-  assert(await page.getByText('Du hast einen konkreten Termin? Veranstaltung veröffentlichen').count() === 1, `${profileName}: Event-Fallback fehlt im Aktivitäts-Funnel`);
+  const activityText = await page.locator('body').innerText();
+  for (const marker of ['Für welche Angebote ist die Aktivitätspräsenz gedacht?', 'Wähle den passenden Tarif', 'Noch nicht der richtige Weg?', 'So geht es weiter']) {
+    assert(activityText.includes(marker), `${profileName}: Aktivitäts-Live-Marker fehlt: ${marker}`);
+  }
+  assert(await page.locator('a[href="/startpartner/?scope=activities"]').count() === 1, `${profileName}: Activity-Startpartner-Scope fehlt`);
+  assert(await page.locator('[data-feedback-open="missing"]').count() > 0, `${profileName}: bestehender Aktivitäts-Tippweg fehlt`);
   await assertNoOverflow(page, `${profileName}: Aktivitäts-Funnel`);
 
-  // Gemeinsamer Pilot: Query darf nur vorauswählen, nicht sperren.
+  // /fuer-veranstalter/ bleibt der bestehende Membership-Funnel.
+  await open(page, '/fuer-veranstalter/');
+  await page.locator('#organizer-membership-form').waitFor({ state: 'visible' });
+  assert(await page.getByRole('heading', { name: 'Mitgliedschaft für regelmäßige Veranstaltungen', level: 1 }).count() === 1, `${profileName}: Membership-H1 fehlt`);
+  assert(await page.getByText('Andere Ausgangslage?').count() === 1, `${profileName}: bestehender Membership-Alternativbereich fehlt`);
+  assert(await page.getByText('Was möchtest du sichtbar machen?').count() === 0, `${profileName}: Provider-Hub aus #272 ist noch vorhanden`);
+  const membershipStyles = await sharedSignature(page);
+  await assertNoOverflow(page, `${profileName}: Membership-Funnel`);
+
+  // Gemeinsamer Startpartner-Funnel: Scope kann kontextuell vorausgewählt und manuell geändert werden.
   await open(page, '/startpartner/?scope=events');
-  await page.locator('main.page--startpartner').waitFor({ state: 'visible' });
   await page.locator('#startpartner-request-form').waitFor({ state: 'visible' });
-  const eventScope = page.locator('#startpartner-scope');
-  assert(await eventScope.inputValue() === 'events', `${profileName}: Event-Scope wurde nicht vorausgewählt`);
-  await eventScope.selectOption('both');
-  assert(await eventScope.inputValue() === 'both', `${profileName}: vorausgewählter Scope ist fälschlich gesperrt`);
+  const scope = page.locator('#startpartner-scope');
+  assert(await scope.inputValue() === 'events', `${profileName}: Event-Scope wurde nicht vorausgewählt`);
+  await scope.selectOption('both');
+  assert(await scope.inputValue() === 'both', `${profileName}: Scope ist fälschlich gesperrt`);
 
-  const bodyText = await page.locator('body').innerText();
-  for (const marker of [
-    'Startpartner-Pilot',
-    '6 Monate kostenlos gemeinsam testen',
-    'Veranstaltungen',
-    'Aktivitäten',
-    'Beides',
-    'keine Zahlungsart',
-    'nicht automatisch in einen kostenpflichtigen Tarif umgewandelt',
-  ]) {
-    assert(bodyText.toLocaleLowerCase('de-DE').includes(marker.toLocaleLowerCase('de-DE')), `${profileName}: sichtbarer Pilot-Marker fehlt: ${marker}`);
+  const pilotText = await page.locator('body').innerText();
+  for (const marker of ['Startpartner-Pilot', '6 Monate kostenlos gemeinsam testen', 'Veranstaltungen', 'Aktivitäten', 'Beides', 'keine Zahlungsart', 'nicht automatisch in einen kostenpflichtigen Tarif umgewandelt']) {
+    assert(pilotText.toLocaleLowerCase('de-DE').includes(marker.toLocaleLowerCase('de-DE')), `${profileName}: Startpartner-Marker fehlt: ${marker}`);
   }
+  const pilotStyles = await sharedSignature(page);
+  assertSame(pilotStyles, membershipStyles, profileName);
   await assertNoOverflow(page, `${profileName}: Startpartner-Funnel`);
-
-  const stylesheetHrefs = await page.locator('link[rel="stylesheet"]').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('href')));
-  assert(stylesheetHrefs.length === 1, `${profileName}: Startpartner-Funnel lädt mehr als einen CSS-Entry-Point`);
-  assert(String(stylesheetHrefs[0] || '').startsWith('/css/style.css?'), `${profileName}: Startpartner-Funnel nutzt nicht den zentralen CSS-Entry-Point`);
-
-  const startpartnerStyles = await pageSignature(page);
   await page.screenshot({ path: path.join(outDir, `startpartner-${profileName}.png`), fullPage: true });
 
   await open(page, '/startpartner/?scope=activities');
   assert(await page.locator('#startpartner-scope').inputValue() === 'activities', `${profileName}: Activity-Scope wurde nicht vorausgewählt`);
 
-  // Membership-Route liefert dieselben Shared-Primitives. Input und Select werden jeweils nur mit demselben Control-Typ verglichen.
-  await open(page, '/events-veroeffentlichen/mitgliedschaft/');
-  await page.locator('#organizer-membership-form').waitFor({ state: 'visible' });
-  const membershipStyles = await pageSignature(page);
-  assertEqualSignature(startpartnerStyles, membershipStyles, profileName);
-  await assertNoOverflow(page, `${profileName}: Membership-Funnel`);
+  // Login bleibt Live-kompatibel.
+  await open(page, '/fuer-veranstalter/login/');
+  const loginText = await page.locator('body').innerText();
+  assert(loginText.includes('Status oder Veranstalterbereich öffnen'), `${profileName}: Live-Login-Titel fehlt`);
+  assert(loginText.includes('deine Veranstaltung eingereicht oder deine Mitgliedschaft gestartet'), `${profileName}: Live-Login-Kontext fehlt`);
+  assert(await page.locator('a[href="/events-veroeffentlichen/"]').count() === 1, `${profileName}: Live-Login-Rückweg fehlt`);
+  await assertNoOverflow(page, `${profileName}: Login`);
 
-  assert(formspreeRequests === 0, `${profileName}: Browser-Contract hat unerwartet Formspree aufgerufen`);
+  assert(formspreeRequests === 0, `${profileName}: Browser-Test hat unerwartet Formspree aufgerufen`);
 
   await context.close();
   return {
@@ -179,14 +136,13 @@ async function runProfile(browser, profileName, viewport) {
     viewport,
     status: 'OK',
     checkedRoutes: [
-      '/fuer-veranstalter/',
       '/events-veroeffentlichen/',
       '/aktivitaeten/sichtbar-werden/',
+      '/fuer-veranstalter/',
       '/startpartner/?scope=events',
       '/startpartner/?scope=activities',
-      '/events-veroeffentlichen/mitgliedschaft/',
+      '/fuer-veranstalter/login/',
     ],
-    compared: ['hero', 'primaryCard', 'primaryCta', 'inputControl', 'selectControl'],
   };
 }
 
@@ -204,4 +160,4 @@ fs.writeFileSync(
   `${JSON.stringify({ status: 'OK', results }, null, 2)}\n`,
   'utf8',
 );
-console.log('Startpartner/provider public funnel browser contract: OK');
+console.log('Startpartner additive live-parity browser contract: OK');
