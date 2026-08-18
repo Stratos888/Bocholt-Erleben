@@ -74,7 +74,7 @@
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_MOBILE_ENTERPRISE_V3_LIMITED_STARTPARTNER | Zweck: verdichtet /events-veroeffentlichen/ zu einer klaren Einstiegsseite, trennt Tipp-Kanal, bezahlte Veröffentlichung und begrenzte Startpartnerplätze sauber; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
+  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_MOBILE_ENTERPRISE_V3_LIMITED_STARTPARTNER | Zweck: verdichtet /events-veroeffentlichen/ zu einer klaren Einstiegsseite und trennt reguläre Veröffentlichung und begrenzte Startpartnerplätze sauber; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
   <!-- === BEGIN BLOCK: PUBLISH_HEADER_WITH_AREA_ACCESS_V2 | Zweck: benennt den Rückkehrpfad im Header als Bereich öffnen statt abstrakt Zugang; Umfang: kompletter Header von /events-veroeffentlichen/ === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
@@ -95,7 +95,7 @@
   </header>
   <!-- === END BLOCK: PUBLISH_HEADER_WITH_AREA_ACCESS_V2 === -->
 
-  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V14_STARTPARTNER_COMPACT_FAQ | Zweck: erhält die regulären Live-Veröffentlichungswege und ordnet den Startpartner-Pilot kompakt mit bestehender Listenformatierung und FAQ-Verweis vor dem redaktionellen Tippkanal ein; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
+  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V15_STARTPARTNER_COMPACT_FEEDBACK_OWNER | Zweck: erhält die regulären Veröffentlichungswege und ordnet den Startpartner-Pilot kompakt mit bestehender Listenformatierung und FAQ-Verweis ein; fehlende Inhalte laufen ausschließlich über das globale Feedback-System; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
   <main class="page page--publish">
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
@@ -187,29 +187,12 @@
         </a>
       </nav>
     </section>
-
-    <section class="content-card" aria-labelledby="publish-secondary-paths-title">
-      <div class="publish-section-head">
-        <h2 id="publish-secondary-paths-title">Noch nicht der richtige Weg?</h2>
-      </div>
-
-      <ul class="activity-presence-guidance-list" aria-label="Weitere Wege">
-        <li>
-          <strong>Nur etwas vorschlagen</strong>
-          <span>Wenn dir ein Event fehlt, reicht ein kurzer Tipp über das Feedback-Formular. Das ist ein redaktioneller Hinweis ohne Veröffentlichungsgarantie.</span>
-        </li>
-      </ul>
-
-      <div class="content-actions content-actions--inline">
-        <button class="content-cta content-cta--secondary" type="button" data-feedback-open="missing">Tipp senden</button>
-      </div>
-    </section>
   </main>
 
   <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 | Zweck: ergänzt den zentral gerenderten Site-Footer auf öffentlichen Unterseiten; Umfang: Footer-Slot direkt nach dem Hauptinhalt === -->
   <footer data-site-footer></footer>
   <!-- === END BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 === -->
-  <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V14_STARTPARTNER_COMPACT_FAQ === -->
+  <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V15_STARTPARTNER_COMPACT_FEEDBACK_OWNER === -->
 
   <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_RUNTIME_CHAIN_CLEANUP_V2 | Zweck: konsolidiert die Runtime-Chain der Veranstalter-Übersichtsseite auf genau eine Script-Ladekette, damit Feedback und globale Initialisierung nicht doppelt geladen werden; Umfang: Script-Block direkt vor </body> in /events-veroeffentlichen/ === -->
   <script src="/config.js?v=2026-02-04-1"></script>
