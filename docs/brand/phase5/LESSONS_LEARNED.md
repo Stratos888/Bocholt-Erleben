@@ -17,20 +17,18 @@ Folge:
 - keine erneute Schleife aus `Font auswählen + Gewicht/Tracking optimieren`;
 - keine Mikrotypografie als Ersatz für eine eigenständige Gesamtform.
 
-Wichtig: Das sperrt **keine genuinely bespoke Full-Name-Signature**. Eine eigengezeichnete Gesamtwortform mit eigenständiger Makrosilhouette ist eine andere Logoarchitektur als eine neu gesetzte Standardschrift.
-
 ### Standardschrift plus Spezialglyphe
 
-Manipulierte `e`-/`c`-/`t`-Details waren groß erklärbar, klein aber kaum identitätsstiftend oder wirkten wie Fehler.
+Manipulierte Einzelbuchstaben waren groß erklärbar, klein aber kaum identitätsstiftend oder wirkten wie Fehler.
 
 Folge:
 
 - keine Einzelgimmicks als Hauptidee;
-- Eigenständigkeit muss in der Gesamtform beziehungsweise im vollständigen Primärlogo sichtbar sein.
+- Eigenständigkeit muss in der Gesamtform sichtbar sein.
 
 ### Bildmechanismus vor Primäridentität
 
-`Fokusfarbe`, Bildausschnitte und ähnliche Mechanismen behandelten ein Problem, das das Produkt nicht hatte: Die Fotodarstellung war nicht der fehlende Markenanker.
+`Fokusfarbe`, Bildausschnitte und ähnliche Mechanismen behandelten nicht den fehlenden Markenanker.
 
 Folge:
 
@@ -39,12 +37,12 @@ Folge:
 
 ### Zu enge konzeptionelle Übersetzung
 
-`Auswahl`, `Öffnung`, `Eintritt`, `B/e` und ähnliche Begriffe wurden zu früh direkt in Geometrie übersetzt. Dadurch entstanden wiederholt bekannte Symbolfamilien.
+`Auswahl`, `Öffnung`, `Eintritt`, `B/e` und ähnliche Begriffe wurden zu früh direkt in Geometrie übersetzt. Dadurch entstanden bekannte Symbolfamilien.
 
 Folge:
 
 - Konzept ist Suchinput, keine Formpflicht;
-- eine spätere semantische Herleitung darf keine schwache Form retten.
+- eine semantische Herleitung darf keine schwache Form retten.
 
 ### Geometrische Mittelmaßschleifen
 
@@ -52,40 +50,34 @@ Loop, Spark, Portal, Fenster, Buch/Vorhang, Pause, Auge/Linse, Monogramm und äh
 
 Folge:
 
-- solche Lesarten sind harte Warnsignale;
-- eine Geometrie ist nicht abstrakt verboten, aber bei dominanter Klischeelesart wird sie beendet.
+- solche Lesarten sind Warnsignale;
+- dominante Klischeelesart beendet einen Ansatz.
 
-### Latentes `BE` als isoliertes Symbol
+### Latentes `BE` als bevorzugte Architektur
 
-A0/A1 identifizierte latente `B/E`-DNA zunächst als plausibelste Symbolarchitektur. A2 prüfte sie anschließend über mehrere unterschiedliche Konstruktionsmechanismen.
-
-Befund:
-
-- selbst stark abstrahierte Varianten kippten wiederholt in Monogramm-/Hybridglyphenwirkung;
-- die Namensbindung war real, erzeugte aber noch keine eigenständige Consumer-Marke;
-- weitere Mikrovariation hätte nur dieselbe Formfamilie verlängert.
+Mehrere Abstraktionsgrade kippten wiederholt in Monogramm-/Hybridglyphenwirkung.
 
 Folge:
 
-- `BE` ist keine aktive Default-Architektur mehr;
-- Buchstaben-DNA darf künftig nur verwendet werden, wenn sie innerhalb eines vollständigen Logos tatsächlich trägt.
+- `BE` ist keine aktive Default-Architektur;
+- Buchstaben-DNA darf nur verwendet werden, wenn sie in einer freien Gesamtlösung tatsächlich trägt.
 
-### Standalone-Symbol-first als falsche Gleichsetzung mit Logo-first
+### Standalone-Symbol-first
 
-Die A-Architektur verlangte, dass ein kompaktes Markenzeichen **vor** der vollständigen Zeichen-/Namensbeziehung Premiumwirkung beweist.
-
-A2 zeigte:
-
-- freie Symbole kippen schnell in generische App-/SaaS-/Reveal-Zeichen;
-- Heritage-Flachformen kippen schnell in Vorhang, Auge, Portal, Linse oder Badge;
-- technisch gute 16–64-px-Symbole können trotzdem markenstrategisch schwach sein;
-- die isolierte Symbolpflicht erzeugte erneut geometrische Mittelmaßschleifen.
+Ein kleines Zeichen sollte zu früh die gesamte Premiumwirkung beweisen.
 
 Folge:
 
-- `Logo zuerst` bedeutet künftig `vollständiges Primärlogo zuerst`, nicht `Icon zuerst`;
-- Zeichen und Name dürfen gemeinsam die Identitätslast tragen;
-- responsive Kleinmarke und App-Icon werden erst aus einem bewiesenen Primärlogo abgeleitet.
+- responsive Kleinmarke/App-Icon wird nicht mehr als Vorbedingung erzwungen.
+
+### D/E/F als zu enge Makroarchitekturen
+
+Die späteren vollständigen Logoarchitekturen strukturierten die Suche besser, verengten sie aber erneut zu früh.
+
+Folge:
+
+- keine verpflichtenden Architekturklassen mehr;
+- freie Wort-, Zeichen-, Combination-, Heritage- und nicht-semantische Ansätze dürfen parallel entstehen.
 
 ### Relative Sieger
 
@@ -93,36 +85,51 @@ Mehrfach wurde der vergleichsweise beste Entwurf weiterentwickelt, obwohl die ab
 
 Folge:
 
-- kein Kandidat ist ein gültiges Ergebnis;
 - `0 Kandidaten` ist besser als ein mittelmäßiger Sieger.
 
 ### AI-Scores und AI-Selbstfreigabe
 
-Hohe interne Design-Scores korrelierten nicht zuverlässig mit der späteren menschlichen Wahrnehmung.
+Hohe interne Design-Scores korrelierten nicht zuverlässig mit menschlicher Wahrnehmung.
 
 Folge:
 
 - keine ästhetischen 0–100-Scores;
 - AI-Kritik filtert, aber erteilt keine unabhängige Premiumfreigabe.
 
-### Generatoroutput als vermeintlicher Finalentwurf
+### Falsch positives internes PASS: D1
 
-Bildgeneratoren liefern nützliche Überraschung, aber keine belastbare finale Markenzeichnung.
+`D1 – Initial Frame Signature` bestand die damaligen internen B2/B4-Gates und fiel beim Product Owner sofort als nicht premiumtauglich auf.
+
+Befund:
+
+- Rahmen-/Badge-/Sprechblasenwirkung;
+- unnötige Dekodierung des fehlenden `B`;
+- Gestaltungstrick statt selbstverständlicher Markensilhouette;
+- interne Bewertung hatte die relativ stärkste eigene Lösung mit absoluter Markenqualität verwechselt.
 
 Folge:
 
-- generative Bilder sind ausschließlich Rohmaterial;
-- ernsthafte Kandidaten werden danach kontrolliert und reproduzierbar konstruiert.
+- ein internes AI-PASS reicht **nie** mehr für Kandidatenstatus;
+- vor jeder Beförderung ist ein anonymer Vergleich mit professionellen Referenzlogos Pflicht;
+- Product Owner wird bereits vor der Exploration einmal als Markenwelt-Gate eingebunden.
+
+### Generatoroutput als vermeintlicher Finalentwurf
+
+Generatoren liefern nützliche Überraschung, aber keine belastbare finale Markenzeichnung.
+
+Folge:
+
+- Generatorbilder sind Rohmaterial;
+- ernsthafte Kandidaten werden reproduzierbar neu konstruiert.
 
 ### Präsentationsqualität als Rettung
 
-Große Boards, Farbe, Mock-ups und Produktumgebung können schwache Formen hochwertiger erscheinen lassen, als sie sind.
+Boards, Farbe und Mock-ups können schwache Formen hochwertiger erscheinen lassen.
 
 Folge:
 
-- reale mobile Absendergröße ist die primäre Arbeitsansicht;
-- Schwarz/Weiß kommt vor Farbe;
-- größere Darstellungen prüfen Geometrie, nicht Premiumwirkung.
+- monochrome externe Referenzprobe kommt vor Produktmock-up;
+- reale Produktgröße bleibt technische/kontextuelle Pflichtprüfung.
 
 ## 2. Was weiterhin gilt
 
@@ -135,14 +142,13 @@ Folge:
 
 ## 3. Öffentliche Ausgangsmarke
 
-Das heutige räumliche Öffnungs-/Vorhang-Icon besitzt trotz veralteter 3D-/Glossy-Sprache reale Wiedererkennbarkeit. Die Erinnerung `Öffnung / Enthüllung / Eintritt` darf deshalb als Heritage-Quelle untersucht werden.
-
-Sie hat keinen Vorrang und muss nicht als isoliertes Symbol erhalten bleiben. Eine glaubwürdige Heritage-Evolution kann auch erst im vollständigen Logo-System entstehen.
+Das heutige räumliche Öffnungs-/Vorhang-Icon besitzt trotz veralteter 3D-/Glossy-Sprache reale Wiedererkennbarkeit. Diese Erinnerung darf als eine freie Heritage-Quelle untersucht werden, besitzt aber keinen Vorrang.
 
 ## 4. Konsequenz
 
 Es gibt einen aktiven Produktionsweg:
 
 - `docs/brand/phase5/PREMIUM_LOGO_PROCESS.md`
+- `docs/brand/phase5/PREMIUM_REFERENCE_CALIBRATION.md`
 
 Frühere Kandidaten und Prozesse besitzen keinerlei Gate- oder Präzedenzwirkung.
