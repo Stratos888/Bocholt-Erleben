@@ -44,37 +44,18 @@ async function runProfile(browser, profileName, viewport) {
   await page.route('https://formspree.io/**', async (route) => {
     const request = route.request();
     const body = (await request.postDataBuffer())?.toString('utf8') || '';
-    interceptedRequests.push({
-      mode: mockMode,
-      url: request.url(),
-      method: request.method(),
-      body,
-    });
+    interceptedRequests.push({ mode: mockMode, url: request.url(), method: request.method(), body });
 
     if (mockMode === 'startpartner-success' || mockMode === 'feedback-success') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ ok: true }),
-      });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
       return;
     }
-
     if (mockMode === 'startpartner-error') {
-      await route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({ error: 'synthetic_failure' }),
-      });
+      await route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'synthetic_failure' }) });
       return;
     }
-
     if (mockMode === 'feedback-error') {
-      await route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({ errors: [{ message: 'Synthetischer Feedback-Fehler' }] }),
-      });
+      await route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ errors: [{ message: 'Synthetischer Feedback-Fehler' }] }) });
       return;
     }
 
@@ -82,7 +63,6 @@ async function runProfile(browser, profileName, viewport) {
     throw new Error(`${profileName}: unerwarteter externer Formspree-Request in Modus ${mockMode}`);
   });
 
-  // 1) Tatsächliche Navigation Event -> Startpartner inklusive Scope-Vorauswahl und Änderbarkeit.
   await open(page, '/events-veroeffentlichen/');
   await Promise.all([
     page.waitForURL(/\/startpartner\/\?scope=events$/, { timeout: 8000 }),
@@ -95,7 +75,6 @@ async function runProfile(browser, profileName, viewport) {
   assert(await eventScope.inputValue() === 'both', `${profileName}: Event-Scope ist nicht änderbar`);
   await assertNoOverflow(page, `${profileName}: Event -> Startpartner`);
 
-  // 2) Tatsächliche Navigation Activity -> Startpartner inklusive Scope-Vorauswahl.
   await open(page, '/aktivitaeten/sichtbar-werden/');
   await Promise.all([
     page.waitForURL(/\/startpartner\/\?scope=activities$/, { timeout: 8000 }),
@@ -106,7 +85,6 @@ async function runProfile(browser, profileName, viewport) {
   assert(await activityScope.inputValue() === 'activities', `${profileName}: Activity-CTA setzt Scope nicht auf activities`);
   await assertNoOverflow(page, `${profileName}: Activity -> Startpartner`);
 
-  // 3) FAQ-Link tatsächlich klicken und Zielanker prüfen.
   await open(page, '/events-veroeffentlichen/');
   await Promise.all([
     page.waitForURL(/\/veroeffentlichung-erklaert\/#startpartner$/, { timeout: 8000 }),
@@ -117,7 +95,6 @@ async function runProfile(browser, profileName, viewport) {
   assert(await faqTarget.count() === 1, `${profileName}: FAQ-Zielanker #startpartner fehlt`);
   await assertNoOverflow(page, `${profileName}: Startpartner-FAQ`);
 
-  // 4) Footer-Missing-Trigger öffnet den globalen Feedback-Owner korrekt vorausgewählt.
   await open(page, '/events-veroeffentlichen/');
   const missingTrigger = page.locator('footer[data-site-footer] [data-feedback-open="missing"]');
   await missingTrigger.waitFor({ state: 'visible', timeout: 8000 });
@@ -148,11 +125,10 @@ async function runProfile(browser, profileName, viewport) {
   assert(includesMultipart(feedbackSuccessRequest.body, 'message', 'synthetischer fehlender Termin'), `${profileName}: Feedback-Payload enthält Nachricht nicht`);
   assert(!feedbackSuccessRequest.body.includes('name="feedback_type"'), `${profileName}: interner Feedback-Typ wurde entgegen Payload-Minimierung versendet`);
   assert(!feedbackSuccessRequest.body.includes('name="route"'), `${profileName}: interne Route wurde entgegen Payload-Minimierung versendet`);
-  await feedbackShell.locator('[data-feedback-close]').last().click();
+  await feedbackShell.locator('.feedback-modal__close[data-feedback-close]').click();
   await feedbackShell.waitFor({ state: 'hidden' });
   mockMode = 'none';
 
-  // 5) Globaler Feedback-Einstieg: keine Vorauswahl, Typ/Text/E-Mail-Validierung und Fehlerantwort.
   const globalLauncher = page.locator('.feedback-launcher[data-feedback-open="global"]');
   await globalLauncher.waitFor({ state: 'visible', timeout: 8000 });
   await globalLauncher.click();
@@ -181,11 +157,10 @@ async function runProfile(browser, profileName, viewport) {
   assert(interceptedRequests.length === beforeFeedbackError + 1, `${profileName}: Feedback-Fehlerpfad hat nicht genau einen Request erzeugt`);
   assert((await feedbackShell.locator('.feedback-form__status').innerText()).includes('Synthetischer Feedback-Fehler'), `${profileName}: Feedback-Serverfehler wird nicht verständlich angezeigt`);
   assert(!(await feedbackShell.locator('button[type="submit"]').isDisabled()), `${profileName}: Feedback-Submit bleibt nach Fehler gesperrt`);
-  await feedbackShell.locator('[data-feedback-close]').first().click();
+  await feedbackShell.locator('.feedback-modal__close[data-feedback-close]').click();
   await feedbackShell.waitFor({ state: 'hidden' });
   mockMode = 'none';
 
-  // 6) Startpartner: Pflichtfeld-/Formatvalidierung ohne externen Request.
   await open(page, '/startpartner/?scope=events');
   const form = page.locator('#startpartner-request-form');
   await form.waitFor({ state: 'visible' });
@@ -207,7 +182,6 @@ async function runProfile(browser, profileName, viewport) {
   assert(await page.locator('#startpartner-email').getAttribute('aria-invalid') === 'true', `${profileName}: ungültige Startpartner-E-Mail wird nicht markiert`);
   assert(await page.locator('#startpartner-note').getAttribute('aria-invalid') === 'true', `${profileName}: zu kurze Startpartner-Notiz wird nicht markiert`);
 
-  // 7) Startpartner-Success mit abgefangenem Formspree-Request: Payload, Resultat, Reset und Scope-Reapply.
   await page.locator('#startpartner-email').fill('release-test@example.invalid');
   await page.locator('#startpartner-note').fill('Synthetische Release-Anfrage mit ausreichend langer Beschreibung.');
   mockMode = 'startpartner-success';
@@ -228,7 +202,6 @@ async function runProfile(browser, profileName, viewport) {
   assert(!(await startSubmit.isDisabled()), `${profileName}: Startpartner-Submit bleibt nach Success gesperrt`);
   mockMode = 'none';
 
-  // 8) Startpartner-Serverfehler: verständliche Meldung, Werte bleiben erhalten, erneuter Submit möglich.
   await open(page, '/startpartner/?scope=activities');
   await page.locator('#startpartner-organization').fill('Synthetic Error Partner');
   await page.locator('#startpartner-email').fill('release-error@example.invalid');
@@ -249,13 +222,7 @@ async function runProfile(browser, profileName, viewport) {
   await page.screenshot({ path: path.join(outDir, `provider-funnel-release-${profileName}.png`), fullPage: true });
   await context.close();
 
-  return {
-    profile: profileName,
-    viewport,
-    status: 'OK',
-    interceptedFormspreeRequests: interceptedRequests.length,
-    realExternalRequests: 0,
-  };
+  return { profile: profileName, viewport, status: 'OK', interceptedFormspreeRequests: interceptedRequests.length, realExternalRequests: 0 };
 }
 
 const browser = await chromium.launch({ headless: true });
@@ -267,10 +234,5 @@ try {
   await browser.close();
 }
 
-fs.writeFileSync(
-  path.join(outDir, 'provider-funnel-release-acceptance-summary.json'),
-  `${JSON.stringify({ status: 'OK', results }, null, 2)}\n`,
-  'utf8',
-);
-
+fs.writeFileSync(path.join(outDir, 'provider-funnel-release-acceptance-summary.json'), `${JSON.stringify({ status: 'OK', results }, null, 2)}\n`, 'utf8');
 console.log('Provider funnel release acceptance browser test: OK');
