@@ -3,7 +3,7 @@
 Stand: 2026-08-18
 Workpack: #259
 Branch: `brand/phase5-qualified-search-2026-08-01`
-Status: **B1 VOLLSTÄNDIGE LOGO-EXPLORATION AKTIV – 0 QUALIFIZIERTE KANDIDATEN**
+Status: **B5 PRODUCT-OWNER-GATE AKTIV – 1 INTERN QUALIFIZIERTER FINALIST**
 
 ## 1. Ziel
 
@@ -18,120 +18,141 @@ Vor jeder weiteren Markenaktion sind ausschließlich diese Dateien maßgeblich:
 3. `docs/brand/phase5/CURRENT_IDENTITY_BASELINE.md`
 4. `docs/brand/phase5/LESSONS_LEARNED.md`
 
-## 3. A2 – abgeschlossen mit FAIL
+Ernsthafte Produktionskandidaten dürfen zusätzlich unter `docs/brand/phase5/candidates/` liegen. Rohskizzen, Generatorboards und verworfene Varianten bleiben außerhalb des aktiven Arbeitsbaums.
 
-Die gezielte Standalone-Symbolsuche wurde über mehrere voneinander getrennte Mechanismen ausgeführt. Geprüft wurden unter anderem:
+## 3. A2 – beendet
 
-- latente `B`/`E`-Makroformen mit unterschiedlichen Positiv-/Negativräumen;
-- transformierte und boolesche Buchstaben-DNA ohne direkte Initialensetzung;
-- rhythmische `2 + 3`-Abstraktionen als indirekte B-/E-Struktur;
-- Heritage-Öffnungsformen in flacher, weicher und gefalteter Konstruktion;
-- freie nicht-letterale Challenger;
-- Kleinformat- und Headergegenproben bereits während der Formsuche.
+Standalone-Symbolsuche: **FAIL, 0 Kandidaten.**
 
-Befund:
+Die Symbol-first-Zwangslage ist aufgehoben. Beweiseinheit ist das vollständige Primärlogo; responsive Kleinmarke und App-Icon folgen erst aus einer bestätigten Primäridentität.
 
-- direkte oder indirekte `B/E`-Konstruktionen kippen weiterhin zu schnell in Monogramm-/Hybridglyphenwirkung;
-- nicht-letterale Formen kippen zu schnell in generische App-, Reveal-, Portal-, Eye-, Tech- oder Badge-Lesarten;
-- Heritage-Abstraktionen verlieren entweder die Eigenständigkeit oder behalten zu viel Vorhang-/Öffnungs-/Linsencharakter;
-- technisch saubere Kleinformen waren nicht automatisch markenstark;
-- keine geprüfte Form erreichte die absolute Qualitätsbarriere.
+## 4. B0 – abgeschlossen
 
-**A2-Ergebnis: `0` Kandidaten.**
+Geprüfte vollständige Logo-System-Architekturen:
 
-Keine dieser Rohformen wird weitergereicht oder dem Product Owner als Auswahl präsentiert.
+- **D – Bespoke Full-Name Signature**;
+- **E – Combination Logo**;
+- **F – Heritage Evolution als vollständiges Logo**.
 
-## 4. Verbindliche Prozesskorrektur
+## 5. B1 – abgeschlossen
 
-`Logo zuerst` wird nicht länger als `Standalone-Symbol zuerst` interpretiert.
-
-Die primäre Beweiseinheit ist das **vollständige Primärlogo**. Eine responsive Kleinmarke beziehungsweise das App-Icon wird erst aus einer bewiesenen Primäridentität abgeleitet.
-
-Dadurch entfällt die künstliche Zwangslage, dass ein kleines Symbol die gesamte Premiumwirkung beweisen muss, bevor die Beziehung zwischen Name, Form und Zeichen überhaupt gestaltet wurde.
-
-## 5. B0 – abgeschlossen: vollständige Logo-System-Architekturen
+Die vollständige monochrome Logo-Exploration wurde direkt im realen Headerkontext durchgeführt und über mehrere Produktionswege gegengeprüft.
 
 ### D – Bespoke Full-Name Signature
 
-`Bocholt erleben` wird als eigenständige Gesamtform entwickelt. Keine Standardschrift plus Tracking/Gewicht, kein Serif-/Sans-Wechsel als Hauptidee, keine manipulierte Einzelglyphe.
+Geprüft wurden unter anderem einzeilige Eigenzeichnungen, gestapelte Signaturen, Initial-Anker, Rahmen-/Buchstabenverschmelzungen sowie unterschiedliche Positiv-/Negativraum- und Gewichtslogiken.
+
+Die meisten Varianten wurden beendet, weil sie erneut nur wie andere Typografie, `B + Text`, Stencil-/Cut-Effekt oder dekoratives Editorial-Layout wirkten.
+
+Eine Makroarchitektur blieb substanziell:
+
+**D1 – Initial Frame Signature**
+
+- das `B` ist kein separates Icon, sondern die tragende äußere Form des vollständigen Logos;
+- `ocholt` und `erleben` bilden die beiden inneren Namensebenen;
+- Eigenständigkeit entsteht aus der gesamten Silhouette und nicht aus einer Spezialglyphe;
+- die Konstruktion bleibt monochrom und kompakt im echten Header.
 
 ### E – Combination Logo
 
-Zeichen und Name werden von Anfang an gemeinsam als ein Primärlogo entwickelt. Kein beliebiges Icon links neben normaler Schrift. Entscheidend ist die Eigenständigkeit des vollständigen Lock-ups.
+**B1 FAIL.** Die ernsthaften Gegenproben blieben zu nah an `Zeichen + normale Schrift`, sichtbarem Initialenlogo oder generischer App-/Consumer-Kombination.
 
-### F – Heritage Evolution als vollständiges Logo
+### F – Heritage Evolution
 
-Die reale Wiedererkennbarkeit der heutigen Öffnungs-/Enthüllungs-Idee darf als Ausgangsmaterial dienen, aber nur im Zusammenspiel mit dem Namen. Keine Pflicht, den bisherigen Vorhang flach nachzuzeichnen.
+**B1 FAIL.** Öffnungs-/Enthüllungsableitungen kippten weiterhin zu schnell in Vorhang, Portal, Auge/Linse, Badge oder dekorativen Rahmen. Die bestehende Heritage wurde deshalb nicht künstlich weitergeführt.
 
-## 6. B1 – aktuell aktiv
+Generator- und Canva-Ausgaben waren ausschließlich Rohmaterial und erhielten keinen Gate-Status.
 
-**B1 entwickelt vollständige monochrome Primärlogos direkt in der realen mobilen Absendergröße.**
+## 6. B2 – harter Systemfilter abgeschlossen
 
-Arbeitswege werden bewusst getrennt, damit nicht erneut nur dieselbe interne geometrische Handschrift variiert wird:
+Ergebnis: **1 System PASS, alle übrigen Systeme FAIL.**
 
-- kontrollierte eigene Vektor-/Lettering-Studien;
-- spezialisierte externe Design-Generierung als Rohmaterial;
-- Heritage-/Combination-Gegenproben direkt im Headerkontext.
+### D1 – Initial Frame Signature: PASS zu B3
 
-Die zusätzliche Canva-Designroute wurde gestartet:
+Begründung:
 
-- Architektur D wurde mit einem eng geführten Full-Name-Brief generiert;
-- Architektur E wurde mit einem eng geführten Combination-Logo-Brief generiert;
-- diese Generatorausgaben sind ausschließlich **Rohmaterial** und weder Kandidaten noch Premiumbelege;
-- die geplante F-Generation konnte wegen des aktuell erreichten Canva-Generierungskontingents noch nicht ausgeführt werden;
-- dadurch wird kein schwacher Entwurf ersatzweise befördert und keine Architektur vorzeitig als bestanden markiert.
+- im 48-px-Header nicht nur als andere Schrift wahrnehmbar;
+- keine separate generische Icon-plus-Text-Konstruktion;
+- Name bleibt unmittelbar lesbar;
+- charakteristische Gesamtform ist bereits in Originalgröße sichtbar;
+- keine dominante Tourismus-, Stadtmarketing-, SaaS-, Portal-, Monogramm- oder Vorhanglesart;
+- keine Erklärstory nötig, um die Form wahrzunehmen.
 
-Parallel durchgeführte eigene B1-Studien mit wiederkehrenden Öffnungsschnitten, Ankerbuchstaben, Gap-/Reveal-Mechaniken und kompakten Kombinationszeichen wurden intern verworfen, wenn sie erneut wie `Standardschrift + Gimmick`, Monogramm, Stencil-Effekt oder generisches Symbol wirkten.
+Dies ist **keine Premiumfreigabe**. B2 qualifiziert D1 nur als ernsthaften Produktionsfinalisten für den menschlichen Wahrnehmungsgate.
 
-Aktuell hat **noch kein B1-System** die Qualifikationsschwelle erreicht.
+## 7. B3 – deterministische Konstruktion abgeschlossen
 
-## 7. Reale Primäransicht
+Produktionskandidat:
 
-Belegter aktueller Produktkontext auf `staging`:
+- `docs/brand/phase5/candidates/B3_D1_INITIAL_FRAME.svg`
 
-- mobiler Header: `48px` Systemhöhe;
-- aktuelles Logo im Standardzustand: etwa `24px`;
-- aktueller Titel: etwa `18px`;
-- sehr schmale Geräte: Logo etwa `23px`, Titel etwa `17px`;
-- Desktop ist eine zusätzliche, nicht die primäre Beweisansicht.
+Eigenschaften:
 
-Großansichten dürfen Geometrie prüfen, aber keine Richtung qualifizieren, die im realen Header ihre Eigenheit verliert.
+- vollständig deterministische SVG-Geometrie;
+- Namensschrift in Vektorpfade umgewandelt, keine Laufzeitabhängigkeit von einer Fontdatei;
+- monochrom über `currentColor`;
+- keine Raster-/Generatorgrafik;
+- keine externen Assets;
+- ViewBox `64 × 40`.
 
-## 8. B1-/B2-Ausgang
+## 8. B4 – Realproduktbeweis abgeschlossen
 
-B1/B2 darf nur enden mit:
+Geprüft wurden:
 
-- `1–4` vollständigen Logo-Systemen, die ohne Farbe und ohne Erklärstory sichtbar eigenständig, lesbar und markenfähig sind; oder
-- `0` und einer erneuten Architektur-/Produktionswegkorrektur.
+- Schwarz auf Weiß;
+- Weiß auf Schwarz;
+- 320-px-Mobile-Engpass;
+- 390-px-Standard-Mobile;
+- Desktop-Header;
+- bestehende Produktfarbwelt als neutrales Gerüst;
+- keine Änderung an übriger UI, Inhalt oder Bildsprache.
 
-Generatoroutput zählt nie automatisch als bestandene Richtung.
+Binäre interne Gates:
 
-Der Product Owner sieht keine Rohideen. Falls eine angeschlossene Designintegration systembedingt Rohentwürfe als UI-Karten einblendet, besitzen diese **keinen Gate-Status und erfordern keine Nutzerentscheidung**.
+- reale Namenslesbarkeit: **PASS**;
+- sichtbare Eigenständigkeit in Originalgröße: **PASS**;
+- glaubwürdige Consumer-Markenwirkung als vollständiges Logo: **PASS**;
+- keine dominante Klischeelesart: **PASS**;
+- technische Reproduzierbarkeit: **PASS**.
 
-## 9. Nächste Gates
+Noch ausdrücklich **nicht** geprüft oder freigegeben:
 
-1. **B1:** vollständige monochrome Logoexploration in Realgröße – aktiv;
-2. **B2:** harter interner Systemfilter;
-3. **B3:** maximal drei deterministische Konstruktionen;
-4. **B4:** Mobile-/Desktop-Realproduktbeweis;
-5. **B5:** Product-Owner-Gate mit maximal drei intern bestandenen vollständigen Logos;
-6. erst nach PASS: responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion, Rechts-/Technikpreflight, Endgate und separate Integration.
+- responsive Kleinmarke/App-Icon;
+- finale Markenfarbe;
+- Formensystem;
+- Bildsprache;
+- Motion;
+- Marken-/Ähnlichkeits-/Rechtsprüfung;
+- Produktintegration.
+
+## 9. Aktueller Schritt – B5
+
+Der Product Owner sieht genau **einen** intern bestandenen Finalisten: `D1 – Initial Frame Signature`.
+
+Wahrnehmungsfrage:
+
+> Wirkt D1 in realer Anwendung bereits wie ein eigenständiger, hochwertiger Absender für `Bocholt erleben` – und nicht nur wie eine Schrift, ein Icon oder ein Designexperiment?
+
+Bei **nein**:
+
+- D1 wird beendet;
+- kein Mikroretten und kein relativer Sieger;
+- neuer B0/B1-Lauf mit anderer Makroarchitektur.
+
+Bei **ja**:
+
+- D1 wird als Primäridentität weiterentwickelt;
+- danach responsive Kleinmarke/App-Icon, Farbe, Formensystem, Bildsprache, Motion und Rechts-/Technikpreflight.
 
 ## 10. Harte Regeln
 
-- keine zufällige Symbolmenge als Qualitätsbeweis;
-- keine relative Siegerlogik;
 - keine ästhetischen AI-Scores;
-- keine Erklärung darf eine schwache Form retten;
-- kein `BE`-Monogramm als Default;
-- keine Standardschrift plus Gimmick;
-- kein separates Symbol als Pflichtbestandteil;
-- kein Mark-only-Gate vor dem vollständigen Primärlogo;
-- Generatoroutput ist nur Suchmaterial, kein Finalmaster;
-- reale mobile Absendergröße vor Hochglanzdarstellung;
-- Product Owner bewertet erst intern bestandene vollständige Logos;
+- keine relative Siegerlogik;
+- keine Farbe oder Präsentation als Rettung;
+- keine Rohideen beim Product Owner;
+- `Premium-Richtung` erst nach B5-PASS;
 - `staging`, `main`, Live und öffentliche Marke bleiben unverändert;
 - kein Merge oder Deploy.
 
-Aktueller intern qualifizierter Kandidat: `0`.
+Aktueller intern qualifizierter Finalist: `1` (`D1`).
 Öffentliche Wirkung: `0`.
