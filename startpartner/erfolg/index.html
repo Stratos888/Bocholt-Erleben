@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <!-- === BEGIN BLOCK: STARTPARTNER_SUCCESS_HEAD_V1 | Zweck: eindeutiger noindex-Abschlusszustand nach einer Startpartner-Anfrage; Umfang: kompletter Head === -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#F3F2E6">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/style.css?v=2026-06-22-css-governance-v1">
+  <title>Anfrage erhalten | Bocholt erleben</title>
+  <!-- === END BLOCK: STARTPARTNER_SUCCESS_HEAD_V1 === -->
+</head>
+<body>
+  <!-- === BEGIN BLOCK: STARTPARTNER_SUCCESS_BODY_V1 | Zweck: bestätigt den Eingang und erklärt die nächsten Schritte ohne Aufnahmezusage; Umfang: kompletter Body === -->
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img src="/icons/app/icon-192.png" alt="Bocholt erleben Logo" class="app-logo">
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
+
+  <main class="page page--publish page--startpartner">
+    <header class="content-hero content-hero--panel">
+      <h1>Anfrage erhalten</h1>
+      <p class="content-lead">Danke. Wir prüfen jetzt, ob Startpartner zu deinem Angebot passt.</p>
+      <p class="content-note" id="startpartner-success-mail-note">Eine Eingangsbestätigung ist per E-Mail unterwegs.</p>
+      <div class="content-actions content-actions--inline">
+        <a class="content-cta content-cta--primary" href="/">Zur Startseite</a>
+        <a class="content-cta content-cta--secondary" href="/veroeffentlichung-erklaert/#startpartner">Startpartner erklärt</a>
+      </div>
+    </header>
+
+    <section class="content-card content-card--primary" aria-labelledby="startpartner-success-next-steps">
+      <h2 id="startpartner-success-next-steps">So geht es weiter</h2>
+      <div>
+        <p><strong>1. Wir prüfen deine Angaben und die vorhandene Quelle.</strong></p>
+        <p><strong>2. Falls noch etwas fehlt, melden wir uns per E-Mail.</strong></p>
+        <p><strong>3. Danach bekommst du eine klare Rückmeldung, ob und wie es weitergeht.</strong></p>
+      </div>
+      <p class="content-note">Die Anfrage ist noch keine Aufnahmezusage. Es wird keine Zahlungsart hinterlegt und kein kostenpflichtiger Tarif gestartet.</p>
+    </section>
+  </main>
+
+  <footer data-site-footer></footer>
+  <script src="/config.js?v=2026-02-04-1"></script>
+  <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+  <script src="/js/site-footer.js?v=2026-07-06-startpartner-funnel-v1" defer></script>
+  <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+  <script>
+    (() => {
+      const params = new URLSearchParams(window.location.search);
+      const mailState = String(params.get("mail") || "").trim().toLowerCase();
+      const note = document.getElementById("startpartner-success-mail-note");
+      if (!note || mailState === "sent") return;
+      note.textContent = "Deine Anfrage ist gespeichert. Falls du keine Eingangsbestätigung per E-Mail erhältst, ist sie trotzdem bei uns angekommen.";
+    })();
+  </script>
+  <!-- === END BLOCK: STARTPARTNER_SUCCESS_BODY_V1 === -->
+</body>
+</html>

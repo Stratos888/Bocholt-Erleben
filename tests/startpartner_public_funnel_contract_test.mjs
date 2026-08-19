@@ -22,7 +22,9 @@ function sectionFrom(haystack, marker) {
 }
 
 const startpartner = read('startpartner/index.html');
+const startpartnerSuccess = read('startpartner/erfolg/index.html');
 const funnelJs = read('js/startpartner-funnel.js');
+const intakePhp = read('api/startpartner/intake.php');
 const eventPublish = read('events-veroeffentlichen/index.html');
 const activityPublish = read('aktivitaeten/sichtbar-werden/index.html');
 const membership = read('fuer-veranstalter/index.html');
@@ -33,6 +35,7 @@ const siteFooterJs = read('js/site-footer.js');
 // Kanonische öffentliche Benennung: das Produkt heißt überall Startpartner.
 for (const [label, source] of [
   ['Startpartner', startpartner],
+  ['Startpartner-Erfolg', startpartnerSuccess],
   ['Event-Funnel', eventPublish],
   ['Aktivitäts-Funnel', activityPublish],
   ['Mitgliedschaft', membership],
@@ -95,7 +98,7 @@ assert(membership.includes('<strong>Startpartner</strong>'), 'Membership: Startp
 assert(membership.includes('href="/startpartner/?scope=events"'), 'Membership: Event-Scope fehlt');
 assert(membership.includes('>Startpartner anfragen</a>'), 'Membership: Startpartner-CTA inkonsistent');
 
-// /startpartner/: kurzer Funnel ohne Kicker und ohne redundante Detailblöcke.
+// /startpartner/: kurzer First-Party-Funnel ohne Kicker und ohne redundante Detailblöcke.
 assert(startpartner.includes('<main class="page page--publish page--startpartner">'), 'Startpartner: Publish-Funnel-Familie fehlt');
 assert(startpartner.includes('<h1>6 Monate kostenlos testen</h1>'), 'Startpartner: kompakte H1 fehlt');
 assert(startpartner.includes('Teste Bocholt erleben sechs Monate kostenlos und finde heraus, ob es zu deinem Angebot passt.'), 'Startpartner: kurzer Lead fehlt');
@@ -105,8 +108,12 @@ assert(!startpartner.includes('So läuft der Start ab'), 'Startpartner: redundan
 assert(startpartner.includes('<h2 id="startpartner-request-title">Startpartner anfragen</h2>'), 'Startpartner: Formulartitel fehlt');
 assert(startpartner.includes('Was möchtest du testen? *'), 'Startpartner: kompakte Scope-Frage fehlt');
 assert(startpartner.includes('id="startpartner-request-form"'), 'Startpartner: Anfrageformular fehlt');
-assert(startpartner.includes('action="https://formspree.io/f/mrerpwjy"'), 'Startpartner: bestehender Formspree-Weg verändert');
-assert(startpartner.includes('name="lead_type" value="startpartner_6_months_limited"'), 'Startpartner: internes Lead-Type verändert');
+assert(startpartner.includes('action="/api/startpartner/intake.php"'), 'Startpartner: First-Party-Endpoint fehlt');
+assert(!startpartner.includes('formspree.io'), 'Startpartner: Formspree darf nach First-Party-Cutover nicht mehr vorkommen');
+assert(startpartner.includes('id="startpartner-contact" name="contact_name"'), 'Startpartner: Ansprechperson fehlt');
+assert(startpartner.includes('id="startpartner-website" name="website"'), 'Startpartner: getrennte Website/Quelle fehlt');
+assert(startpartner.includes('id="startpartner-note" name="description"'), 'Startpartner: strukturierte Kurzbeschreibung fehlt');
+assert(startpartner.includes('id="startpartner-website-confirm" name="website_confirm"'), 'Startpartner: Honeypot fehlt');
 for (const value of ['events', 'activities', 'both', 'unsure']) {
   assert(startpartner.includes(`value="${value}"`), `Startpartner: Scope-Option fehlt: ${value}`);
 }
@@ -123,6 +130,14 @@ assert(regularPathsSection.includes('Zu den Veranstaltungswegen'), 'Startpartner
 assert(regularPathsSection.includes('Zu den Aktivitäts-Tarifen'), 'Startpartner: Activity-CTA fehlt');
 assert(count(startpartner, 'rel="stylesheet"') === 1, 'Startpartner: genau ein Stylesheet-Link erwartet');
 
+// Eindeutiger Abschlusszustand.
+assert(startpartnerSuccess.includes('<meta name="robots" content="noindex,nofollow">'), 'Startpartner-Erfolg: noindex fehlt');
+assert(startpartnerSuccess.includes('<h1>Anfrage erhalten</h1>'), 'Startpartner-Erfolg: eindeutige H1 fehlt');
+assert(startpartnerSuccess.includes('Wir prüfen jetzt, ob Startpartner zu deinem Angebot passt.'), 'Startpartner-Erfolg: Prüfzustand fehlt');
+assert(startpartnerSuccess.includes('So geht es weiter'), 'Startpartner-Erfolg: nächste Schritte fehlen');
+assert(startpartnerSuccess.includes('Die Anfrage ist noch keine Aufnahmezusage.'), 'Startpartner-Erfolg: No-Approval-Hinweis fehlt');
+assert(!startpartnerSuccess.includes('class="content-kicker"'), 'Startpartner-Erfolg: Kicker darf nicht vorkommen');
+
 // Die Erklärseite ist der Detail-Owner für Bedingungen und Ablauf.
 assert(explainer.includes('id="startpartner-weg"'), 'Erklärseite: Startpartner-Sonderweg fehlt');
 assert(explainer.includes('Sonderweg: Startpartner'), 'Erklärseite: kanonische Sonderweg-Überschrift fehlt');
@@ -133,13 +148,26 @@ assert(explainer.includes('keine Zahlungsart'), 'Erklärseite: Zahlungsart-Aussc
 assert(explainer.includes('keine automatische kostenpflichtige Umwandlung'), 'Erklärseite: automatische Bezahlumwandlung muss ausgeschlossen bleiben');
 assert(explainer.includes('Nach sechs Monaten werten wir die Wirkung gemeinsam aus'), 'Erklärseite: gemeinsame Auswertung fehlt');
 
-// Runtime: Query-Scope und bestehender Submit bleiben; sichtbare Rückmeldung nutzt die kanonische Benennung.
+// Runtime: First-Party-Submit, Idempotenz, Fehlererhalt und Redirect in Erfolgszustand.
 assert(funnelJs.includes('new URLSearchParams(window.location.search)'), 'Startpartner JS: Query-Scope-Auswertung fehlt');
 assert(funnelJs.includes('allowedScopes'), 'Startpartner JS: Scope-Whitelist fehlt');
 assert(funnelJs.includes('applyScopeFromUrl()'), 'Startpartner JS: Scope-Vorauswahl fehlt');
 assert(funnelJs.includes('Startpartner anfragen'), 'Startpartner JS: Default-CTA inkonsistent');
-assert(funnelJs.includes('Deine Startpartner-Anfrage ist angekommen.'), 'Startpartner JS: Erfolgsmeldung inkonsistent');
+assert(funnelJs.includes('fetch(form.action'), 'Startpartner JS: First-Party-Request fehlt');
+assert(funnelJs.includes('"Content-Type": "application/json"'), 'Startpartner JS: strukturierter JSON-Request fehlt');
+assert(funnelJs.includes('"Idempotency-Key": getIdempotencyKey()'), 'Startpartner JS: Idempotency-Key fehlt');
+assert(funnelJs.includes('window.location.assign'), 'Startpartner JS: Erfolgsredirect fehlt');
+assert(funnelJs.includes('/startpartner/erfolg/'), 'Startpartner JS: Erfolgsroute fehlt');
+assert(funnelJs.includes('Deine Angaben bleiben erhalten.'), 'Startpartner JS: klarer Fehlerzustand fehlt');
+assert(!funnelJs.includes('form.reset()'), 'Startpartner JS: Formular darf vor sichtbarem Abschluss nicht mehr geleert werden');
+assert(!funnelJs.includes('formspree'), 'Startpartner JS: Formspree darf nach First-Party-Cutover nicht mehr vorkommen');
 assert(!funnelJs.includes('Startpartner-Pilot'), 'Startpartner JS: alte Produktbezeichnung darf nicht zurückkehren');
 assert(!funnelJs.includes('Startpartnerplatz'), 'Startpartner JS: alte Produktbezeichnung darf nicht zurückkehren');
+
+// Backend-Grenze: Public-Self-Service und geschützter Outreach teilen die Domain, nicht die Authentifizierung.
+assert(intakePhp.includes("if ($source === 'targeted_outreach')"), 'Startpartner Intake: geschützter Outreach-Zweig fehlt');
+assert(intakePhp.includes('be_require_review_access();'), 'Startpartner Intake: Outreach-Schutz fehlt');
+assert(intakePhp.includes("if ($source !== 'self_service')"), 'Startpartner Intake: Public-Self-Service muss fail-closed abgegrenzt sein');
+assert(intakePhp.includes("'stored' => true"), 'Startpartner Intake: kompakte Public-Erfolgsantwort fehlt');
 
 console.log('startpartner_public_funnel_contract_test: OK');
