@@ -59,8 +59,11 @@ foreach ([
 }
 
 $publicHtml = (string)file_get_contents($root . '/startpartner/index.html');
-$assert(str_contains($publicHtml, 'https://formspree.io/f/mrerpwjy'), 'Öffentlicher Startpartner-Funnel muss weiterhin Formspree verwenden.');
-$assert(!str_contains($publicHtml, '/api/startpartner/'), 'Öffentlicher Funnel darf keinen Gate-2-Endpunkt verwenden.');
+$assert(!str_contains($publicHtml, 'formspree.io'), 'Öffentlicher Startpartner-Funnel muss nach dem autorisierten Cutover First-Party verwenden.');
+$assert(str_contains($publicHtml, 'action="/api/startpartner/intake.php"'), 'Öffentlicher Funnel darf ausschließlich den dedizierten Intake-Endpoint verwenden.');
+foreach (['profile.php', 'qualification.php', 'action.php', 'capacity.php', 'candidates.php'] as $protectedEndpoint) {
+    $assert(!str_contains($publicHtml, '/api/startpartner/' . $protectedEndpoint), "Öffentlicher Funnel darf keinen geschützten Gate-2-Endpunkt verwenden: {$protectedEndpoint}");
+}
 
 if ($failures !== []) {
     fwrite(STDERR, "=== Startpartner Gate-2 Side-Effect Contract: FAILED ===\n");
