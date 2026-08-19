@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: STARTPARTNER_HEAD_V9_CANONICAL_NAMING | Zweck: führt Startpartner als kanonische öffentliche Benennung und hält das Sechs-Monats-Modell als Leistungsbeschreibung; Umfang: kompletter Head === -->
+  <!-- === BEGIN BLOCK: STARTPARTNER_HEAD_V10_FIRST_PARTY | Zweck: führt Startpartner als kanonische öffentliche Benennung und bindet den First-Party-Anfrageweg ein; Umfang: kompletter Head === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Startpartner | Bocholt erleben</title>
@@ -38,10 +38,10 @@
   }
   </script>
   <link rel="stylesheet" href="/css/style.css?v=2026-06-22-css-governance-v1">
-  <!-- === END BLOCK: STARTPARTNER_HEAD_V9_CANONICAL_NAMING === -->
+  <!-- === END BLOCK: STARTPARTNER_HEAD_V10_FIRST_PARTY === -->
 </head>
 <body>
-  <!-- === BEGIN BLOCK: STARTPARTNER_BODY_V12_COMPACT_FUNNEL | Zweck: verdichtet Startpartner auf Hero, Anfrage und reguläre Alternativen; Details bleiben im zentralen Erklär-/FAQ-Owner; Umfang: kompletter Body === -->
+  <!-- === BEGIN BLOCK: STARTPARTNER_BODY_V13_FIRST_PARTY | Zweck: hält den kompakten Funnel und übergibt öffentliche Anfragen an den kanonischen First-Party-Intake; Umfang: kompletter Body === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img src="/icons/app/icon-192.png" alt="Bocholt erleben Logo" class="app-logo">
@@ -69,26 +69,21 @@
       <div class="publish-section-head publish-section-head--form">
         <h2 id="startpartner-request-title">Startpartner anfragen</h2>
         <p class="content-note content-note--form-meta">* Pflichtfelder</p>
-        <p class="content-note">Ein Link oder kurzer Hinweis reicht. Die Anfrage ist unverbindlich.</p>
+        <p class="content-note">Ein kurzer Hinweis reicht. Wir prüfen die Anfrage und melden uns, falls noch etwas fehlt.</p>
       </div>
 
-      <form class="content-form" id="startpartner-request-form" action="https://formspree.io/f/mrerpwjy" method="POST" novalidate>
-        <input type="hidden" name="subject" value="[Bocholt erleben] Startpartner-Anfrage">
-        <input type="hidden" name="lead_type" value="startpartner_6_months_limited">
-        <input type="hidden" name="source_label" value="bocholt-erleben-startpartner">
-        <input type="hidden" name="page_url" value="">
-
+      <form class="content-form" id="startpartner-request-form" action="/api/startpartner/intake.php" method="POST" novalidate>
         <div class="content-form-grid">
           <label class="content-field content-field--full" for="startpartner-scope">
             <span class="content-field__label">Was möchtest du testen? *</span>
-            <select class="content-field__control" id="startpartner-scope" name="pilot_scope" required>
+            <select class="content-field__control" id="startpartner-scope" name="desired_content_scope" required>
               <option value="">Bitte auswählen</option>
               <option value="events">Veranstaltungen</option>
               <option value="activities">Aktivitäten</option>
               <option value="both">Veranstaltungen und Aktivitäten</option>
               <option value="unsure">Noch nicht sicher</option>
             </select>
-            <p class="content-field__hint">Wenn du über eine Event- oder Aktivitätsseite kommst, ist die passende Auswahl bereits vorausgewählt. Du kannst sie jederzeit ändern.</p>
+            <p class="content-field__hint">Wenn du über eine Event- oder Aktivitätsseite kommst, ist die passende Auswahl bereits vorausgewählt.</p>
           </label>
 
           <label class="content-field content-field--full" for="startpartner-organization">
@@ -96,14 +91,26 @@
             <input class="content-field__control" id="startpartner-organization" name="organization" type="text" autocomplete="organization" required>
           </label>
 
+          <label class="content-field content-field--full" for="startpartner-contact">
+            <span class="content-field__label">Ansprechperson *</span>
+            <input class="content-field__control" id="startpartner-contact" name="contact_name" type="text" autocomplete="name" required>
+            <p class="content-field__hint">Für Rückfragen und die persönliche Rückmeldung zu deiner Anfrage.</p>
+          </label>
+
           <label class="content-field content-field--full" for="startpartner-email">
             <span class="content-field__label">E-Mail-Adresse *</span>
             <input class="content-field__control" id="startpartner-email" name="email" type="email" inputmode="email" autocomplete="email" required>
           </label>
 
+          <label class="content-field content-field--full" for="startpartner-website">
+            <span class="content-field__label">Website oder Quelle (optional)</span>
+            <input class="content-field__control" id="startpartner-website" name="website" type="text" inputmode="url" autocomplete="url" placeholder="z. B. deine Website, Veranstaltungsseite oder Angebotsseite">
+            <p class="content-field__hint">Hilft uns, dein Angebot vor einer Rückfrage selbst einzuordnen.</p>
+          </label>
+
           <label class="content-field content-field--full" for="startpartner-note">
-            <span class="content-field__label">Kurzbeschreibung oder Link *</span>
-            <textarea class="content-field__control" id="startpartner-note" name="message" rows="3" required placeholder="Link, Termine, Angebot oder kurze Einordnung."></textarea>
+            <span class="content-field__label">Kurzbeschreibung *</span>
+            <textarea class="content-field__control" id="startpartner-note" name="description" rows="3" required placeholder="Was bietest du an und was möchtest du mit Bocholt erleben testen?"></textarea>
           </label>
         </div>
 
@@ -112,11 +119,16 @@
           <span class="content-field__hint"><input id="startpartner-privacy-confirmed" type="checkbox" name="privacy_confirmed" required> Ich bin einverstanden, dass Bocholt erleben meine Angaben zur Bearbeitung der Anfrage nutzt.</span>
         </label>
 
+        <div hidden aria-hidden="true">
+          <label for="startpartner-website-confirm">Website bestätigen</label>
+          <input id="startpartner-website-confirm" name="website_confirm" type="text" autocomplete="off" tabindex="-1">
+        </div>
+
+        <p class="content-form-note" id="startpartner-request-result" role="status" aria-live="polite" hidden></p>
+
         <div class="content-actions content-actions--inline publish-final-actions">
           <button class="content-cta content-cta--primary" id="startpartner-request-submit" type="submit">Startpartner anfragen</button>
         </div>
-
-        <section class="content-card content-card--primary" id="startpartner-request-result" hidden><p id="startpartner-request-result-text"></p></section>
       </form>
 
       <nav class="content-links publish-explainer-context-link" aria-label="Startpartner erklärt">
@@ -160,7 +172,7 @@
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/site-footer.js?v=2026-07-06-startpartner-funnel-v1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <script src="/js/startpartner-funnel.js?v=2026-08-19-startpartner-naming-v2" defer></script>
-  <!-- === END BLOCK: STARTPARTNER_BODY_V12_COMPACT_FUNNEL === -->
+  <script src="/js/startpartner-funnel.js?v=2026-08-19-first-party-v1" defer></script>
+  <!-- === END BLOCK: STARTPARTNER_BODY_V13_FIRST_PARTY === -->
 </body>
 </html>

@@ -65,14 +65,66 @@ async function assertCanonicalNaming(page, label) {
   return text;
 }
 
+async function fillStartpartnerForm(page, suffix) {
+  await page.locator('#startpartner-scope').selectOption('both');
+  await page.locator('#startpartner-organization').fill(`Browser Test Organisation ${suffix}`);
+  await page.locator('#startpartner-contact').fill('Erika Beispiel');
+  await page.locator('#startpartner-email').fill(`erika.${suffix.toLowerCase()}@example.test`);
+  await page.locator('#startpartner-website').fill('https://example.test/angebot');
+  await page.locator('#startpartner-note').fill('Lokales Angebot mit regelmäßigen Veranstaltungen und Aktivitäten für den Browser-Contract.');
+  await page.locator('#startpartner-privacy-confirmed').check();
+}
+
 async function runProfile(browser, profileName, viewport) {
   const context = await browser.newContext({ viewport });
   const page = await context.newPage();
   let formspreeRequests = 0;
+  let intakeMode = 'success';
+  const intakeRequests = [];
 
   await page.route('https://formspree.io/**', async (route) => {
     formspreeRequests += 1;
     await route.abort();
+  });
+
+  await page.route('**/api/startpartner/intake.php', async (route) => {
+    const request = route.request();
+    let payload = null;
+    try {
+      payload = request.postDataJSON();
+    } catch (_) {
+      payload = null;
+    }
+    intakeRequests.push({
+      method: request.method(),
+      headers: request.headers(),
+      payload,
+      mode: intakeMode,
+    });
+
+    if (intakeMode === 'error') {
+      await route.fulfill({
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          status: 'error',
+          message: 'synthetic intake unavailable',
+        }),
+      });
+      return;
+    }
+
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        status: 'ok',
+        data: {
+          stored: true,
+          confirmation_mail_sent: true,
+        },
+      }),
+    });
   });
 
   // Referenz: bestehender Publish-Funnel mit Anfrageformular.
@@ -137,8 +189,8 @@ async function runProfile(browser, profileName, viewport) {
   assert(!startpartnerText.includes('So läuft der Start ab'), `${profileName}: redundanter Ablaufblock sichtbar`);
   assert(await page.getByRole('heading', { level: 2, name: 'Startpartner anfragen' }).count() === 1, `${profileName}: Formulartitel fehlt`);
   assert(await page.locator('#startpartner-scope').inputValue() === 'events', `${profileName}: Event-Scope nicht vorausgewählt`);
-  await page.locator('#startpartner-scope').selectOption('both');
-  assert(await page.locator('#startpartner-scope').inputValue() === 'both', `${profileName}: Scope ist nicht änderbar`);
+  assert(await page.locator('#startpartner-contact').count() === 1, `${profileName}: Ansprechperson fehlt`);
+  assert(await page.locator('#startpartner-website').count() === 1, `${profileName}: Website/Quelle fehlt`);
   assert(await page.getByRole('link', { name: 'Wie funktioniert Startpartner? Kurz erklärt' }).count() === 1, `${profileName}: zentraler Erklärlink fehlt`);
 
   const regularSection = page.locator('section[aria-labelledby="startpartner-regular-paths-title"]');
@@ -154,8 +206,46 @@ async function runProfile(browser, profileName, viewport) {
   await assertNoOverflow(page, `${profileName}: Startpartner`);
   await page.screenshot({ path: path.join(outDir, `startpartner-${profileName}.png`), fullPage: true });
 
+  // Synthetischer Erfolgs-Submit: Request wird im Browser intercepted, kein DB-/Mail-Write.
+  intakeMode = 'success';
+  await fillStartpartnerForm(page, profileName.replace(/[^a-z0-9]/gi, ''));
+  await Promise.all([
+    page.waitForURL('**/startpartner/erfolg/?mail=sent', { timeout: 8000 }),
+    page.locator('#startpartner-request-submit').click(),
+  ]);
+  assert(await page.getByRole('heading', { level: 1, name: 'Anfrage erhalten' }).count() === 1, `${profileName}: eindeutige Erfolgs-H1 fehlt`);
+  const successText = await page.locator('body').innerText();
+  assert(successText.includes('Wir prüfen jetzt, ob Startpartner zu deinem Angebot passt.'), `${profileName}: Erfolgs-Prüfzustand fehlt`);
+  assert(successText.includes('Eine Eingangsbestätigung ist per E-Mail unterwegs.'), `${profileName}: Mail-Bestätigung fehlt`);
+  assert(successText.includes('Die Anfrage ist noch keine Aufnahmezusage.'), `${profileName}: No-Approval-Hinweis fehlt`);
+  assert(await page.locator('.content-kicker').count() === 0, `${profileName}: Erfolgsseite darf keinen Kicker besitzen`);
+  await assertNoOverflow(page, `${profileName}: Startpartner-Erfolg`);
+
+  const successRequest = intakeRequests.at(-1);
+  assert(successRequest?.method === 'POST', `${profileName}: Intake muss POST verwenden`);
+  assert(String(successRequest?.headers?.['content-type'] || '').includes('application/json'), `${profileName}: Intake muss JSON senden`);
+  assert(String(successRequest?.headers?.['idempotency-key'] || '').length >= 16, `${profileName}: Idempotency-Key fehlt`);
+  assert(successRequest?.payload?.source === 'self_service', `${profileName}: Public-Source muss self_service sein`);
+  assert(successRequest?.payload?.desired_content_scope === 'both', `${profileName}: Scope-Payload falsch`);
+  assert(successRequest?.payload?.organization?.startsWith('Browser Test Organisation'), `${profileName}: Organisation fehlt im Payload`);
+  assert(successRequest?.payload?.contact_name === 'Erika Beispiel', `${profileName}: Ansprechperson fehlt im Payload`);
+  assert(successRequest?.payload?.email?.includes('@example.test'), `${profileName}: E-Mail fehlt im Payload`);
+  assert(successRequest?.payload?.website === 'https://example.test/angebot', `${profileName}: Website fehlt im Payload`);
+  assert(successRequest?.payload?.description?.includes('Lokales Angebot'), `${profileName}: Beschreibung fehlt im Payload`);
+  assert(successRequest?.payload?.privacy_confirmed === true, `${profileName}: Datenschutzbestätigung fehlt im Payload`);
+
+  // Synthetischer Fehler: Formular bleibt gefüllt und zeigt einen klaren Fehlerzustand.
   await open(page, '/startpartner/?scope=activities');
   assert(await page.locator('#startpartner-scope').inputValue() === 'activities', `${profileName}: Activity-Scope nicht vorausgewählt`);
+  intakeMode = 'error';
+  await fillStartpartnerForm(page, `Error${profileName.replace(/[^a-z0-9]/gi, '')}`);
+  const organizationBefore = await page.locator('#startpartner-organization').inputValue();
+  await page.locator('#startpartner-request-submit').click();
+  const errorNode = page.locator('#startpartner-request-result');
+  await errorNode.waitFor({ state: 'visible', timeout: 8000 });
+  assert((await errorNode.innerText()).includes('nicht sicher gespeichert'), `${profileName}: klarer Fehlertext fehlt`);
+  assert(await page.locator('#startpartner-organization').inputValue() === organizationBefore, `${profileName}: Fehler darf Formulardaten nicht leeren`);
+  assert(page.url().includes('/startpartner/?scope=activities'), `${profileName}: Fehler darf nicht auf Erfolgsseite navigieren`);
 
   // Detailwissen liegt nur auf der Erklärseite.
   await open(page, '/veroeffentlichung-erklaert/#startpartner');
@@ -170,6 +260,7 @@ async function runProfile(browser, profileName, viewport) {
   await assertNoOverflow(page, `${profileName}: Erklärseite`);
 
   assert(formspreeRequests === 0, `${profileName}: Browser-Test hat unerwartet Formspree aufgerufen`);
+  assert(intakeRequests.length === 2, `${profileName}: exakt zwei intercepted Intake-Requests erwartet`);
 
   await context.close();
   return {
@@ -183,6 +274,7 @@ async function runProfile(browser, profileName, viewport) {
       '/fuer-veranstalter/',
       '/startpartner/?scope=events',
       '/startpartner/?scope=activities',
+      '/startpartner/erfolg/?mail=sent',
       '/veroeffentlichung-erklaert/#startpartner',
     ],
   };

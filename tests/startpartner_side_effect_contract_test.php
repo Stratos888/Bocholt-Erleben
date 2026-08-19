@@ -11,6 +11,7 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
 
 $expectedStartpartnerFiles = [
     '_schema.php', '_contract.php', '_repository.php', '_domain.php',
+    '_public_intake.php',
     '_gate2_domain.php', '_gate3_domain.php', '_gate3_presentation.php',
     '_gate4_contract.php', '_gate4_domain.php', '_gate4_schema.php',
     '_gate4_state.php', '_gate4_projection.php', '_gate4_operation.php',
@@ -25,8 +26,9 @@ $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
 $assert(
     $actualNames === $expectedNames,
-    'Startpartner muss nach Gate 4 ausschließlich die kanonischen Runtime-Owner besitzen.'
+    'Startpartner muss ausschließlich die kanonischen Runtime-Owner einschließlich des öffentlichen Intake-Adapters besitzen.'
 );
+
 foreach ([
     'triage.php',
     'gate2-staging-smoke-199.php',
@@ -40,20 +42,27 @@ foreach ([
 }
 
 $combined = '';
+$publicIntakeSource = '';
 foreach ($startpartnerFiles as $file) {
     $source = (string)file_get_contents($file);
+    $name = basename($file);
     $combined .= "\n" . $source;
-    $assert(!preg_match('/\b(CREATE|ALTER|DROP)\s+TABLE\b/i', $source), basename($file) . ' darf kein Runtime-DDL enthalten.');
-    if (basename($file) !== '_gate3_domain.php') {
-        $assert(
-            !str_contains($source, 'INSERT INTO organizers'),
-            basename($file) . ' darf keinen Organizer anlegen.'
-        );
+
+    $assert(!preg_match('/\b(CREATE|ALTER|DROP)\s+TABLE\b/i', $source), $name . ' darf kein Runtime-DDL enthalten.');
+
+    if ($name !== '_gate3_domain.php') {
+        $assert(!str_contains($source, 'INSERT INTO organizers'), $name . ' darf keinen Organizer anlegen.');
+    }
+
+    if ($name === '_public_intake.php') {
+        $publicIntakeSource = $source;
+        $assert(substr_count($source, 'be_send_mail(') === 1, 'Nur der öffentliche Intake-Adapter darf genau einen kontrollierten Mail-Aufruf besitzen.');
+    } else {
+        $assert(!str_contains($source, 'be_send_mail('), $name . ' darf keine Mail versenden.');
     }
 }
 
 foreach ([
-    'be_send_mail',
     'stripe_checkout',
     'stripe_subscription',
     'INSERT INTO organizer_magic_links',
@@ -98,8 +107,14 @@ $controlAction = (string)file_get_contents($root . '/api/control-center/action.p
 $deploySmoke = (string)file_get_contents($root . '/tools/smoke-check-deploy.py');
 
 $assert(str_contains($intake, 'be_startpartner_require_gate1_environment'), 'Intake muss außerhalb Staging/Dev fail-closed sein.');
-$assert(str_contains($intake, 'be_require_review_access'), 'Gate-1-Intake muss bis zum öffentlichen Cutover vollständig geschützt sein.');
-$assert(str_contains($intake, "\$actorType = \$source === 'targeted_outreach' ? 'operator' : 'self_service'"), 'Beide Quellen müssen denselben Intake-Endpunkt mit korrektem Actor-Typ verwenden.');
+$assert(str_contains($intake, "if (\$source === 'targeted_outreach')"), 'Geschützter Outreach-Zweig muss explizit getrennt bleiben.');
+$assert(str_contains($intake, 'be_require_review_access'), 'Targeted-Outreach muss weiterhin Review-Zugriff verlangen.');
+$assert(str_contains($intake, "if (\$source !== 'self_service')"), 'Öffentlicher Zweig darf ausschließlich self_service akzeptieren.');
+$assert(str_contains($intake, 'be_startpartner_public_prepare_input'), 'Öffentlicher Intake muss den dedizierten Self-Service-Adapter verwenden.');
+$assert(str_contains($intake, "(\$result['created'] ?? false) === true"), 'Eine Eingangsbestätigung darf nur bei neu angelegtem Kandidaten versucht werden.');
+$assert(str_contains($intake, 'be_startpartner_public_send_received_mail'), 'Neu angelegte Self-Service-Anfragen benötigen die kontrollierte Eingangsbestätigung.');
+$assert(!str_contains($intake, "be_json_response(201, [\n        'status' => 'ok',\n        'data' => \$result"), 'Öffentlicher Self-Service darf keinen vollständigen Candidate mit PII zurückgeben.');
+
 foreach ([
     'candidates.php' => $candidates,
     'profile.php' => $profile,
@@ -113,6 +128,7 @@ foreach ([
     $assert(str_contains($source, 'be_require_review_access'), "{$name} muss geschützt sein.");
     $assert(str_contains($source, 'be_startpartner_require_gate1_environment'), "{$name} muss außerhalb Staging/Dev fail-closed sein.");
 }
+
 $assert(str_contains($content, 'be_startpartner_gate4_portal_session'), 'Pilotinhalt darf nur über eine vorhandene Organizer-Session eingereicht werden.');
 $assert(str_contains($content, 'be_startpartner_require_gate1_environment'), 'Pilotinhalt muss außerhalb Staging/Dev fail-closed sein.');
 $assert(!str_contains($content, 'be_require_review_access'), 'Der eingeloggte Pilotinhaltpfad darf nicht das interne Reviewpasswort verlangen.');
@@ -172,12 +188,27 @@ $assert(str_contains($domain, 'Idempotency-Key was already used with a different
 $assert(str_contains($domain, "'detected_after_unique_conflict' => true"), 'Konkurrierende Dubletten müssen denselben nachvollziehbaren Auditpfad besitzen.');
 $assert(str_contains($domain, 'be_startpartner_record_duplicate_after_race'), 'Unique-Konflikte müssen in einem eigenen atomaren Auditpfad nachgelesen werden.');
 
+$assert($publicIntakeSource !== '', 'Öffentlicher Intake-Adapter fehlt.');
+$assert(str_contains($publicIntakeSource, 'BE_STARTPARTNER_PUBLIC_OPERATIONAL_REVIEW_DAYS'), 'Öffentlicher Intake braucht einen explizit operativen Review-Zeitpunkt.');
+$assert(!preg_match('/RETENTION[^\n]*180|180[^\n]*RETENTION/i', $publicIntakeSource), 'Öffentlicher Intake darf keine 180-Tage-Retention einführen.');
+$assert(str_contains($publicIntakeSource, 'keine Lösch- oder'), 'Operativer Review-Zeitpunkt muss ausdrücklich von einer Retention-Policy abgegrenzt sein.');
+$assert(str_contains($publicIntakeSource, 'be_startpartner_public_is_honeypot'), 'Öffentlicher Intake benötigt den Honeypot-Schutz.');
+
 $publicHtml = (string)file_get_contents($root . '/startpartner/index.html');
 $publicJs = (string)file_get_contents($root . '/js/startpartner-funnel.js');
-$assert(str_contains($publicHtml, 'https://formspree.io/f/mrerpwjy'), 'Öffentliche Route muss in Gate 4 bei Formspree bleiben.');
-$assert(str_contains($publicHtml, 'startpartner_6_months_limited'), 'Öffentlicher Lead-Typ muss unverändert bleiben.');
-$assert(str_contains($publicJs, 'fetch('), 'Bestehender Formspree-Clientpfad muss unverändert vorhanden sein.');
-$assert(!str_contains($publicHtml, '/api/startpartner/intake.php'), 'Öffentliches Formular darf noch nicht auf First Party umgestellt werden.');
+$successHtml = (string)file_get_contents($root . '/startpartner/erfolg/index.html');
+
+$assert(!str_contains($publicHtml, 'formspree.io'), 'Öffentliche Startpartner-Route darf nach Cutover kein Formspree mehr referenzieren.');
+$assert(str_contains($publicHtml, 'action="/api/startpartner/intake.php"'), 'Öffentliches Formular muss auf den First-Party-Intake zeigen.');
+$assert(str_contains($publicHtml, 'name="contact_name"'), 'Öffentlicher Intake muss eine persönliche Ansprechperson erfassen.');
+$assert(str_contains($publicHtml, 'name="website"'), 'Öffentlicher Intake muss eine optionale Website/Quelle getrennt erfassen.');
+$assert(str_contains($publicJs, 'fetch(form.action'), 'First-Party-Clientpfad muss den Formular-Endpunkt verwenden.');
+$assert(str_contains($publicJs, '"Idempotency-Key"'), 'Client muss eine stabile Idempotency-ID mitsenden.');
+$assert(!str_contains($publicJs, 'formspree'), 'Startpartner-JS darf Formspree nach Cutover nicht mehr referenzieren.');
+$assert(str_contains($publicJs, '/startpartner/erfolg/'), 'Erfolgreiche Anfrage muss in einen eindeutigen Abschlusszustand wechseln.');
+$assert(str_contains($successHtml, '<h1>Anfrage erhalten</h1>'), 'Startpartner-Erfolgsseite fehlt.');
+$assert(!str_contains($successHtml, 'content-kicker'), 'Startpartner-Erfolgsseite darf keinen Kicker verwenden.');
+$assert(str_contains($successHtml, 'noindex,nofollow'), 'Startpartner-Erfolgsseite muss noindex sein.');
 
 $manifest = json_decode(
     (string)file_get_contents($root . '/api/sql/000_manifest.json'),
@@ -191,6 +222,7 @@ $candidateIndex = array_search('008_startpartner_candidates.sql', $files, true);
 $gate2Index = array_search('010_startpartner_gate2_qualification_capacity.sql', $files, true);
 $gate3Index = array_search('011_startpartner_gate3_terms_organizer_entitlement.sql', $files, true);
 $gate4Index = array_search('012_startpartner_gate4_onboarding_content_activation.sql', $files, true);
+
 $assert(
     $reconciliationIndex !== false && $candidateIndex === $reconciliationIndex + 1,
     'Manifest muss Reconciliation unmittelbar vor Kandidatenschema ausführen.'

@@ -84,6 +84,7 @@ validate_php_tests() {
     done
   fi
   if component_enabled startpartner; then
+    php tests/startpartner_public_intake_contract_test.php
     php tests/startpartner_domain_contract_test.php
     php tests/startpartner_side_effect_contract_test.php
     php tests/startpartner_gate2_domain_contract_test.php
