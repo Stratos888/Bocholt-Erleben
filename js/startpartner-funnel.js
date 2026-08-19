@@ -43,7 +43,7 @@
 
   function setSubmitting(isSubmitting) {
     if (!submitButton.dataset.defaultLabel) {
-      submitButton.dataset.defaultLabel = submitButton.textContent || "Startpartnerplatz anfragen";
+      submitButton.dataset.defaultLabel = submitButton.textContent || "Startpartner anfragen";
     }
 
     submitButton.disabled = isSubmitting;
@@ -212,7 +212,7 @@
       await submitStartpartnerRequest();
       form.reset();
       applyScopeFromUrl();
-      showResult("Deine Anfrage zum Startpartner-Pilot ist angekommen. Bocholt erleben prüft sie und meldet sich danach zurück.");
+      showResult("Deine Startpartner-Anfrage ist angekommen. Bocholt erleben prüft sie und meldet sich danach zurück.");
     } catch (error) {
       console.warn("Startpartner request failed.", error);
       showResult("Die Anfrage konnte gerade nicht gesendet werden. Bitte versuche es später erneut.");
