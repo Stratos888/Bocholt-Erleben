@@ -95,6 +95,37 @@ $normalizedQualification = be_startpartner_gate2_normalize_qualification([
 ]);
 $assert($normalizedQualification['assessment'] === 'adequate', 'Qualifikationsnormalisierung muss gültige Bewertungen erhalten.');
 
+// Der Operator sieht nur sechs Kriterien. Die kanonischen 14 Dimensionen bleiben bewusst Domain-/Speicherdetail.
+$qualificationEndpoint = (string)file_get_contents(dirname(__DIR__) . '/api/startpartner/qualification.php');
+$startpartnerReview = (string)file_get_contents(dirname(__DIR__) . '/js/control-center/startpartner-review.js');
+$compactKeys = [
+    'local_editorial_fit',
+    'content_sources',
+    'user_value_reach',
+    'cooperation_maintenance',
+    'effort_regular_path',
+    'legal_information',
+];
+foreach ($compactKeys as $key) {
+    $assert(str_contains($qualificationEndpoint, "'{$key}' => ["), "Serverseitiges Mapping fehlt für {$key}.");
+    $assert(str_contains($startpartnerReview, "key:'{$key}'"), "Control-Center-Check fehlt für {$key}.");
+}
+$assert(substr_count($qualificationEndpoint, "'dimensions' => [") === 6, 'Der kompakte Serververtrag muss exakt sechs Gruppen besitzen.');
+$assert(str_contains($qualificationEndpoint, "'fit' => ['label' => 'Passt', 'assessment' => 'adequate']"), 'Passt muss intern auf adequate abgebildet werden.');
+$assert(str_contains($qualificationEndpoint, "'unclear' => ['label' => 'Unklar', 'assessment' => 'unknown']"), 'Unklar muss intern auf unknown abgebildet werden.');
+$assert(str_contains($qualificationEndpoint, "'not_fit' => ['label' => 'Passt nicht', 'assessment' => 'weak']"), 'Passt nicht muss intern auf weak abgebildet werden.');
+$assert(str_contains($qualificationEndpoint, 'Compact Startpartner mapping must cover all qualification dimensions exactly once.'), 'Die vollständige 14-Dimensionen-Abdeckung muss fail-closed validiert werden.');
+$assert(str_contains($qualificationEndpoint, "array_key_exists('qualifications', \$input)"), 'Kompakter und Legacy-Payload dürfen nicht vermischt werden.');
+$assert(str_contains($qualificationEndpoint, 'be_startpartner_gate2_qualification_update'), 'Der bestehende Gate-2-Domainowner muss Speichern, Revision und Audit behalten.');
+$assert(str_contains($startpartnerReview, 'Sechs kurze Fragen reichen für die Startpartner-Entscheidung.'), 'Die kompakte Bedienlogik muss für den Operator erklärt sein.');
+$assert(str_contains($startpartnerReview, 'Notiz / offene Punkte'), 'Es muss genau ein gemeinsames Notizfeld geben.');
+$assert(str_contains($startpartnerReview, 'Alle 6 Kriterien'), 'Die Zusammenfassung muss den Sechs-Kriterien-Vertrag zeigen.');
+$assert(!str_contains($startpartnerReview, 'Alle 14 Prüfpunkte'), 'Die alte 14-Punkte-Bedienoberfläche darf nicht mehr sichtbar sein.');
+$assert(!str_contains($startpartnerReview, 'sp-reason-${dimension}'), 'Pro-Dimension-Begründungen dürfen nicht mehr gerendert werden.');
+$assert(!str_contains($startpartnerReview, 'sp-evidence-${dimension}'), 'Pro-Dimension-Nachweisfelder dürfen nicht mehr gerendert werden.');
+$assert(str_contains($startpartnerReview, "metric('Fälligkeit',data.next_review_at?formatDate(data.next_review_at):'Nicht gesetzt')"), 'Nicht gesetzte Fälligkeit muss neutral dargestellt werden.');
+$assert(str_contains($startpartnerReview, "metric('Bearbeiter',data.assigned_to||'Nicht zugewiesen')"), 'Nicht zugewiesener Bearbeiter muss neutral dargestellt werden.');
+
 if ($failures !== []) {
     fwrite(STDERR, "=== Startpartner Gate-2 Domain Contract: FAILED ===\n");
     foreach ($failures as $failure) {
