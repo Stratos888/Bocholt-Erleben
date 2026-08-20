@@ -86,6 +86,25 @@ async function startpartnerMutation(browser,conflict){
   }
   await context.close();results.push({name,status:'OK'});
 }
+async function compactEligibilityDialogContract(browser){
+  const compactCandidate={...latestCandidate(),status:'qualifying',revision:4};
+  const {page,context}=await openScenario(browser,'startpartner-blocked',{width:390,height:844},'startpartner-compact-eligibility-dialog',async current=>{
+    await current.route('**/api/control-center/case.php*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'ok',data:{id:'fixture-startpartner',startpartner_candidate:compactCandidate}})}));
+  });
+  await page.locator('.cc-startpartner-primary').click();
+  await page.waitForSelector('#cc-dialog[open] [data-sp-check]');
+  assert((await page.locator('#cc-dialog h2').innerText())==='Eignung prüfen','compact eligibility: Dialogtitel ist nicht vereinfacht');
+  assert(await page.locator('#cc-dialog [data-sp-check]').count()===6,'compact eligibility: exakt sechs Eignungsfragen erwartet');
+  assert(await page.locator('#cc-dialog [data-sp-check] select').count()===6,'compact eligibility: jede Eignungsfrage benötigt genau eine Auswahl');
+  assert(await page.locator('#cc-dialog #sp-eligibility-note').count()===1,'compact eligibility: gemeinsames Notizfeld fehlt');
+  assert(await page.locator('#cc-dialog textarea').count()===1,'compact eligibility: es darf nur ein gemeinsames Textfeld geben');
+  const dialogText=await page.locator('#cc-dialog').innerText();
+  for(const marker of ['Passt das Angebot lokal und redaktionell?','Sind geeignete Inhalte bzw. Quellen vorhanden?','Entsteht ein relevanter Mehrwert für Nutzer und Reichweite?','Ist die Zusammenarbeit und laufende Pflege realistisch?','Ist der Einrichtungs-/Betreuungsaufwand sinnvoll und der weitere Weg plausibel?','Sind Rechte, Technik und notwendige Angaben geklärt?','Notiz / offene Punkte'])assert(dialogText.includes(marker),`compact eligibility: Marker fehlt: ${marker}`);
+  const firstOptions=await page.locator('#cc-dialog [data-sp-check] select').first().locator('option').allTextContents();
+  assert(JSON.stringify(firstOptions)===JSON.stringify(['Passt','Unklar','Passt nicht']),'compact eligibility: Antwortoptionen stimmen nicht');
+  assert(!dialogText.includes('Begründung')&&!dialogText.includes('Nachweis'),'compact eligibility: alte Mehrfachfelder sind noch sichtbar');
+  await context.close();results.push({name:'startpartner-compact-eligibility-dialog',status:'OK'});
+}
 async function gate3DialogContract(browser){
   const reservedCandidate={
     ...latestCandidate(),
@@ -163,13 +182,14 @@ try{
   assert(await desktopRun.page.locator('.cc-actions--secondary-desktop:visible').count()===1,'desktop: bestehende Nebenaktionen fehlen');
   await desktopRun.context.close(); results.push({name:'desktop-contract',status:'OK'});
 
-  await startpartnerState(browser,'startpartner-blocked',{width:360,height:780},'startpartner-mobile-360x780-blocked',['Qualifizierung','Lokaler Bezug','Mindestanforderung nicht erfüllt.','Fälligkeit','Kapazität'],'Wichtigsten offenen Punkt bearbeiten');
-  await startpartnerState(browser,'startpartner-ready',{width:390,height:844},'startpartner-mobile-390x844-ready',['Entscheidungsreif','Alle 14 Prüfpunkte','4 von 8 Plätzen reserviert'],'Platz reservieren');
+  await startpartnerState(browser,'startpartner-blocked',{width:360,height:780},'startpartner-mobile-360x780-blocked',['Eignungscheck','Passt das Angebot lokal und redaktionell?','Mindestanforderung nicht erfüllt.','Fälligkeit','Kapazität'],'Eignung prüfen');
+  await startpartnerState(browser,'startpartner-ready',{width:390,height:844},'startpartner-mobile-390x844-ready',['Entscheidungsreif','Alle 6 Kriterien','4 von 8 Plätzen reserviert'],'Platz reservieren');
   await startpartnerState(browser,'startpartner-soft',{width:768,height:1024},'startpartner-tablet-768x1024-soft-stop',['Entscheidungsreif','Begründung für eine Ausnahme erforderlich','6 von 8 Plätzen reserviert'],'Platz reservieren');
   await startpartnerState(browser,'startpartner-hard',{width:360,height:780},'startpartner-mobile-360x780-hard-stop',['Entscheidungsreif','Grenze erreicht','8 von 8 Plätzen reserviert'],'Auf Warteliste setzen');
   await startpartnerState(browser,'startpartner-reserved',{width:1440,height:900},'startpartner-desktop-1440x900-reserved',['Platz reserviert · Bedingungen offen','Aktive Reservierung','Pilotbedingungen müssen ausdrücklich bestätigt','Vorbereitung noch offen'],'Bedingungen bestätigen und Pilot anlegen');
   await startpartnerState(browser,'startpartner-gate3-complete',{width:390,height:844},'startpartner-mobile-390x844-gate3-complete',['Piloteinrichtung','Pilotstart ausstehend','Noch nicht aktiv','Aktive Reservierung','Pilotphase beginnt erst nach der vollständigen Einrichtung'],'Pilotstatus prüfen');
   await startpartnerState(browser,'startpartner-waitlisted',{width:390,height:844},'startpartner-mobile-390x844-waitlisted',['Warteliste','Neubewertung','Hoher lokaler Mehrwert.'],'Warteliste aktualisieren');
+  await compactEligibilityDialogContract(browser);
   await gate3DialogContract(browser);
   await startpartnerMutation(browser,false);
   await startpartnerMutation(browser,true);
