@@ -47,15 +47,20 @@ $assert(str_contains($communicationEndpoint, 'be_startpartner_require_gate1_envi
 $assert(str_contains($communicationEndpoint, 'be_require_review_access'), 'Kommunikationsendpunkt muss Review-Zugriff verlangen.');
 $assert(str_contains($communicationEndpoint, 'be_startpartner_review_communication_send'), 'Kommunikationsendpunkt darf nur den dedizierten Kommunikationsowner aufrufen.');
 
-$assert(str_contains($frontend, 'Nachgereichte Angaben aus einer Rückfrage:'), 'Prüfprompt muss nachgereichte Angaben berücksichtigen.');
-$assert(str_contains($frontend, "entry?.from_status==='awaiting_response'"), 'Frontend muss die jüngste Rückmeldung aus dem Auditverlauf lesen.');
+$assert(str_contains($frontend, 'Nachgereichte Angaben aus einer Rückfrage:'), 'Prüfprompt muss bereits dokumentierte Alt-Angaben weiterhin berücksichtigen.');
+$assert(str_contains($frontend, "entry?.from_status==='awaiting_response'"), 'Frontend muss historische Rückmeldungen aus dem Auditverlauf weiterhin lesen können.');
 $assert(str_contains($frontend, 'function questionItems(text)'), 'Rückfragen müssen im Control Center in einzelne Punkte zerlegt werden.');
 $assert(str_contains($frontend, 'return `<ul>${items.map'), 'Rückfragen müssen im Control Center als echte Aufzählung gerendert werden.');
 $assert(str_contains($frontend, 'data-review-action="send_review_question"'), 'Vorbereitete Rückfrage braucht einen normalen Senden-Button.');
-$assert(str_contains($frontend, 'data-review-action="record_review_reply"'), 'Wartezustand braucht einen Antwort-eintragen-Pfad.');
+$assert(str_contains($frontend, 'data-review-action="copy_followup_review_prompt"'), 'Wartezustand braucht einen direkten Antwort-prüfen-Pfad.');
+$assert(str_contains($frontend, 'ANTWORT DES STARTPARTNERS'), 'Folgeprompt muss eine klar markierte Stelle für die E-Mail-Antwort enthalten.');
+$assert(str_contains($frontend, 'SIGNATUR UND KONTAKTDATEN SIND NICHT NÖTIG'), 'Folgeprompt muss Datensparsamkeit für die E-Mail-Antwort erklären.');
+$assert(str_contains($frontend, 'Eine separate Ablage in der Steuerzentrale ist nicht nötig.'), 'UI muss den redundanten Antwort-Ablageschritt ausdrücklich vermeiden.');
+$assert(str_contains($frontend, 'Nach der ChatGPT-Prüfung triffst du hier die verbindliche Entscheidung:'), 'Wartezustand muss die anschließende menschliche Entscheidung direkt anbieten.');
 $assert(str_contains($frontend, 'data-review-action="resend_review_question"'), 'Wartezustand braucht einen bewussten erneuten Versand.');
 $assert(str_contains($frontend, "'/api/startpartner/review-communication.php'"), 'Frontend muss den geschützten Kommunikationsendpunkt verwenden.');
-$assert(str_contains($frontend, "action:'start_qualification',reason:reply"), 'Nachgereichte Antwort muss kontrolliert zurück in die Prüfung führen.');
+$assert(!str_contains($frontend, 'record_review_reply'), 'Kundenantwort darf nicht mehr redundant in der Steuerzentrale erfasst werden.');
+$assert(!str_contains($frontend, "action:'start_qualification',reason:reply"), 'Kundenantwort darf keinen künstlichen Statuswechsel über start_qualification benötigen.');
 $assert(str_contains($frontend, "'sp-review-customer-message'"), 'Ablehnung muss interne Begründung und externe Nachricht trennen.');
 $assert(str_contains($frontend, 'Die interne Begründung wird nicht automatisch nach außen übernommen.'), 'UI muss die Trennung interner und externer Ablehnungsgründe erklären.');
 
@@ -64,6 +69,7 @@ $assert(!str_contains($reviewFrontend, "cc-startpartner-priority__facts\">\${met
 $assert(!str_contains($reviewFrontend, "\${metric('Fälligkeit',data.next_review_at"), 'Fälligkeit darf nicht mehr als Top-Metrik gerendert werden.');
 $assert(!str_contains($reviewFrontend, "\${metric('Bearbeiter',data.assigned_to"), 'Bearbeiter darf nicht mehr als Top-Metrik gerendert werden.');
 
+$assert(str_contains($decisionDomain, "'awaiting_response'"), 'Review-Domain muss nach einer E-Mail-Antwort direkt aus dem Wartezustand entscheiden können.');
 $assert(str_contains($decisionDomain, "'needs_information'"), 'Review-Domain muss den fachlichen Rückfrageentscheid weiterhin unterstützen.');
 $assert(!str_contains($decisionDomain, 'be_send_mail('), 'Fachliche Review-Domain bleibt frei vom physischen Mailversand.');
 
