@@ -14,6 +14,7 @@ $decisionDomain = (string)file_get_contents($root . '/api/startpartner/_review_d
 $communication = (string)file_get_contents($root . '/api/startpartner/_review_communication.php');
 $communicationEndpoint = (string)file_get_contents($root . '/api/startpartner/review-communication.php');
 $frontend = (string)file_get_contents($root . '/js/control-center/startpartner-ai-review.js');
+$reviewFrontend = (string)file_get_contents($root . '/js/control-center/startpartner-review.js');
 
 $assert(str_contains($decisionEndpoint, "require_once __DIR__ . '/_review_communication.php'"), 'Review-Entscheidung muss den dedizierten Kommunikationsowner laden.');
 $assert(str_contains($decisionEndpoint, 'be_startpartner_review_communication_topic_for_decision'), 'Review-Entscheidung muss jede Entscheidung auf ein festes Mail-Topic abbilden.');
@@ -30,6 +31,9 @@ $assert(str_contains($communication, "'review_mail_sent'"), 'Erfolgreicher Versa
 $assert(str_contains($communication, "'review_mail_failed'"), 'Fehlgeschlagener Versand muss im Startpartner-Audit protokolliert werden.');
 $assert(str_contains($communication, "'mark_contact_pending'"), 'Eine Rückfrage muss vor dem Versand als vorbereitet markiert werden können.');
 $assert(str_contains($communication, "'mark_awaiting_response'"), 'Rückmeldung ausstehend darf erst über den kontrollierten Versandpfad gesetzt werden.');
+$assert(str_contains($communication, 'be_startpartner_review_communication_question_items'), 'Rückfrage-Mail muss mehrere Fragen strukturiert aufbereiten.');
+$assert(str_contains($communication, "'• ' . \$question"), 'Rückfrage-Mail muss Fragen als sichtbare Aufzählung ausgeben.');
+$assert(str_contains($communication, 'fehlen uns noch ein paar Angaben'), 'Mehrere Rückfragen müssen sprachlich im Plural angekündigt werden.');
 $mailSendPos = strpos($communication, 'be_send_mail(');
 $awaitSyncPos = $mailSendPos === false ? false : strpos($communication, 'be_startpartner_review_communication_mark_awaiting(', $mailSendPos);
 $assert($mailSendPos !== false && $awaitSyncPos !== false && $mailSendPos < $awaitSyncPos, 'Rückmeldung ausstehend darf erst nach dem physischen Mailversuch gesetzt werden.');
@@ -45,6 +49,8 @@ $assert(str_contains($communicationEndpoint, 'be_startpartner_review_communicati
 
 $assert(str_contains($frontend, 'Nachgereichte Angaben aus einer Rückfrage:'), 'Prüfprompt muss nachgereichte Angaben berücksichtigen.');
 $assert(str_contains($frontend, "entry?.from_status==='awaiting_response'"), 'Frontend muss die jüngste Rückmeldung aus dem Auditverlauf lesen.');
+$assert(str_contains($frontend, 'function questionItems(text)'), 'Rückfragen müssen im Control Center in einzelne Punkte zerlegt werden.');
+$assert(str_contains($frontend, 'return `<ul>${items.map'), 'Rückfragen müssen im Control Center als echte Aufzählung gerendert werden.');
 $assert(str_contains($frontend, 'data-review-action="send_review_question"'), 'Vorbereitete Rückfrage braucht einen normalen Senden-Button.');
 $assert(str_contains($frontend, 'data-review-action="record_review_reply"'), 'Wartezustand braucht einen Antwort-eintragen-Pfad.');
 $assert(str_contains($frontend, 'data-review-action="resend_review_question"'), 'Wartezustand braucht einen bewussten erneuten Versand.');
@@ -52,6 +58,11 @@ $assert(str_contains($frontend, "'/api/startpartner/review-communication.php'"),
 $assert(str_contains($frontend, "action:'start_qualification',reason:reply"), 'Nachgereichte Antwort muss kontrolliert zurück in die Prüfung führen.');
 $assert(str_contains($frontend, "'sp-review-customer-message'"), 'Ablehnung muss interne Begründung und externe Nachricht trennen.');
 $assert(str_contains($frontend, 'Die interne Begründung wird nicht automatisch nach außen übernommen.'), 'UI muss die Trennung interner und externer Ablehnungsgründe erklären.');
+
+$assert(str_contains($reviewFrontend, "\${metric('Kapazität',capacityText(capacity)"), 'Priorisierter Startpartner-Stand muss die relevante Kapazität weiter anzeigen.');
+$assert(!str_contains($reviewFrontend, "cc-startpartner-priority__facts\">\${metric('Fälligkeit'"), 'Fälligkeit darf im priorisierten Startpartner-Stand nicht mehr erscheinen.');
+$assert(!str_contains($reviewFrontend, "\${metric('Fälligkeit',data.next_review_at"), 'Fälligkeit darf nicht mehr als Top-Metrik gerendert werden.');
+$assert(!str_contains($reviewFrontend, "\${metric('Bearbeiter',data.assigned_to"), 'Bearbeiter darf nicht mehr als Top-Metrik gerendert werden.');
 
 $assert(str_contains($decisionDomain, "'needs_information'"), 'Review-Domain muss den fachlichen Rückfrageentscheid weiterhin unterstützen.');
 $assert(!str_contains($decisionDomain, 'be_send_mail('), 'Fachliche Review-Domain bleibt frei vom physischen Mailversand.');
