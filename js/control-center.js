@@ -10,7 +10,7 @@
     // Storage cleanup is best effort. The current app never writes either key.
   }
   const resolve = path => window.beControlCenterPath ? window.beControlCenterPath(path) : path;
-  const path = resolve('/js/control-center/app.js?v=2026-08-01-startpartner-gate4-audit-v1');
+  const path = resolve('/js/control-center/app.js?v=2026-08-21-startpartner-ai-review-v1');
   import(path).catch(error => {
     const status = document.querySelector('#cc-status');
     if (status) status.textContent = `Steuerzentrale konnte nicht gestartet werden: ${error.message}`;
