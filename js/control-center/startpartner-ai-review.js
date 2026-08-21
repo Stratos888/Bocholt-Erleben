@@ -75,6 +75,16 @@ async function copyText(text){
 function mutationId(){return `gate2:299:review:${operationId().replace(/^cc:/,'')}`;}
 function operator(data){return clean(data.assigned_to)||'Steuerzentrale';}
 async function latest(item){return api(`/api/control-center/case.php?id=${encodeURIComponent(item.id)}`,{timeoutMs:15000});}
+function openQuestion(data={}){
+  if(String(data.status||'')!=='needs_information')return '';
+  const question=clean(data.status_reason);if(!question)return '';
+  const rendered=escapeHtml(question).replace(/\r?\n/g,'<br>');
+  return `<section class="cc-startpartner-panel cc-startpartner-open-question">
+    <header><div><span class="cc-kicker">Offene Rückfrage</span><h3>Diese Angaben fehlen noch</h3></div></header>
+    <p>${rendered}</p>
+    <button class="cc-button cc-button--secondary" data-review-action="copy_review_question">Rückfrage kopieren</button>
+  </section>`;
+}
 
 export function renderStartpartnerAiReview(data={}){
   if(!startpartnerAiReviewStatuses.has(String(data.status||'')))return '';
@@ -82,11 +92,12 @@ export function renderStartpartnerAiReview(data={}){
   const positive=hard
     ? '<button class="cc-button cc-button--primary" data-review-action="review_waitlist">Auf Warteliste</button>'
     : '<button class="cc-button cc-button--primary" data-review-action="review_approve">Startpartner aufnehmen</button>';
-  return `<section class="cc-startpartner-panel cc-startpartner-ai-review">
+  const questionActionLabel=String(data.status||'')==='needs_information'?'Rückfrage ändern':'Rückfrage nötig';
+  return `${openQuestion(data)}<section class="cc-startpartner-panel cc-startpartner-ai-review">
     <header><div><span class="cc-kicker">KI-gestützte Prüfung</span><h3>Prüfen lassen, selbst entscheiden</h3></div></header>
     <p>Der Prüfprompt enthält nur die fachlich nötigen Anfragedaten. ChatGPT recherchiert und gibt eine Empfehlung; die verbindliche Entscheidung bleibt bei dir.</p>
     <button class="cc-button cc-button--secondary cc-button--large" data-review-action="copy_review_prompt">Prüfprompt kopieren</button>
-    <div class="cc-actions cc-actions--inline">${positive}<button class="cc-button cc-button--secondary" data-review-action="review_needs_information">Rückfrage nötig</button><button class="cc-button cc-button--danger" data-review-action="review_reject">Nicht geeignet</button></div>
+    <div class="cc-actions cc-actions--inline">${positive}<button class="cc-button cc-button--secondary" data-review-action="review_needs_information">${questionActionLabel}</button><button class="cc-button cc-button--danger" data-review-action="review_reject">Nicht geeignet</button></div>
   </section>`;
 }
 
@@ -96,6 +107,16 @@ export function aiReviewStatusLabel(status){
 }
 
 export async function handleStartpartnerAiReviewAction(item,action,reload){
+  if(action==='copy_review_question'){
+    setStatus('Aktuelle Rückfrage wird geladen …');
+    try{
+      const detail=await latest(item);const question=clean(detail.startpartner_candidate?.status_reason);
+      if(!question){setStatus('Keine offene Rückfrage gefunden.','attention');return true;}
+      const copied=await copyText(question);
+      setStatus(copied?'Rückfrage kopiert.':'Rückfrage konnte nicht automatisch kopiert werden.',copied?'success':'attention');
+    }catch(error){setStatus(error.message,'attention');}
+    return true;
+  }
   if(action==='copy_review_prompt'||action==='edit_qualification'||action==='start_prequalification'){
     setStatus('Aktuelle Anfragedaten werden geladen …');
     try{
