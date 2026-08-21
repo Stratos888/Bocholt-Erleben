@@ -9,6 +9,13 @@ const BE_STARTPARTNER_REVIEW_ACTIVE_STATUSES = [
     'qualifying', 'needs_information', 'decision_ready', 'waitlisted',
 ];
 
+function be_startpartner_review_default_future(int $days): string
+{
+    return (new DateTimeImmutable('now', new DateTimeZone('UTC')))
+        ->modify('+' . $days . ' days')
+        ->format('Y-m-d H:i:s');
+}
+
 function be_startpartner_review_decision(PDO $pdo, string $candidateId, array $input): array
 {
     $decision = be_startpartner_validate_enum_value(
@@ -54,11 +61,14 @@ function be_startpartner_review_decision(PDO $pdo, string $candidateId, array $i
                 if ($reason === null) {
                     $reason = 'KI-gestützte Prüfung durchgeführt; Aufnahme durch den Betreiber bestätigt.';
                 }
-                $endsAt = be_startpartner_gate2_parse_future_datetime(
-                    $input['reservation_ends_at'] ?? null,
-                    'reservation_ends_at',
-                    BE_STARTPARTNER_RESERVATION_MAX_DAYS
-                );
+                $requestedEndsAt = trim((string)($input['reservation_ends_at'] ?? ''));
+                $endsAt = $requestedEndsAt === ''
+                    ? be_startpartner_review_default_future(20)
+                    : be_startpartner_gate2_parse_future_datetime(
+                        $requestedEndsAt,
+                        'reservation_ends_at',
+                        BE_STARTPARTNER_RESERVATION_MAX_DAYS
+                    );
                 $decisionId = be_startpartner_gate2_insert_decision(
                     $pdo,
                     $candidate,
@@ -137,10 +147,10 @@ function be_startpartner_review_decision(PDO $pdo, string $candidateId, array $i
                     throw new DomainException('Waitlist is only offered when the hard capacity stop is reached.');
                 }
                 $reason ??= 'Fachlich geeigneter Kandidat; aktuell ist kein Startpartnerplatz frei.';
-                $nextReviewAt = be_startpartner_gate2_parse_future_datetime(
-                    $input['next_review_at'] ?? null,
-                    'next_review_at'
-                );
+                $requestedReviewAt = trim((string)($input['next_review_at'] ?? ''));
+                $nextReviewAt = $requestedReviewAt === ''
+                    ? be_startpartner_review_default_future(14)
+                    : be_startpartner_gate2_parse_future_datetime($requestedReviewAt, 'next_review_at');
                 be_startpartner_gate2_insert_decision(
                     $pdo,
                     $candidate,
