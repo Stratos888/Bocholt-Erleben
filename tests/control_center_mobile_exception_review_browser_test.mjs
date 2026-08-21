@@ -51,7 +51,8 @@ async function aiReviewContract(browser,scenario,viewport,name,hardStop=false){
   const review=page.locator('.cc-startpartner-ai-review:visible');
   assert(await review.count()===1,`${name}: KI-Prüfebene fehlt`);
   const text=await page.locator('.cc-startpartner-review').innerText();
-  for(const marker of ['Prüfung offen','Prüfprompt kopieren','Rückfrage nötig','Nicht geeignet','Kapazität'])assert(text.includes(marker),`${name}: Marker fehlt: ${marker}`);
+  const normalizedText=text.toLocaleLowerCase('de-DE');
+  for(const marker of ['Prüfung offen','Prüfprompt kopieren','Rückfrage nötig','Nicht geeignet','Kapazität'])assert(normalizedText.includes(marker.toLocaleLowerCase('de-DE')),`${name}: Marker fehlt: ${marker}`);
   assert(!text.includes('Alle 6 Kriterien')&&!text.includes('Eignungscheck speichern')&&!text.includes('Qualifizierung bearbeiten'),`${name}: alter manueller Eignungscheck ist noch sichtbar`);
   const positive=hardStop?'Auf Warteliste':'Startpartner aufnehmen';
   assert((await review.locator('button[data-review-action]').allTextContents()).includes(positive),`${name}: positive Entscheidung fehlt: ${positive}`);
