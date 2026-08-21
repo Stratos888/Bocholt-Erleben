@@ -92,13 +92,26 @@ async function copyText(text){
 function mutationId(prefix='gate2:304:review'){return `${prefix}:${operationId().replace(/^cc:/,'')}`;}
 function operator(data){return clean(data.assigned_to)||'Steuerzentrale';}
 async function latest(item){return api(`/api/control-center/case.php?id=${encodeURIComponent(item.id)}`,{timeoutMs:15000});}
-function renderedText(text){return escapeHtml(text).replace(/\r?\n/g,'<br>');}
+function questionItems(text){
+  const normalized=clean(text).replace(/\r/g,'\n');if(!normalized)return [];
+  const lines=normalized.split(/\n+/).map(line=>line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/u,'').trim()).filter(Boolean);
+  const sources=lines.length>1?lines:[normalized];const items=[];
+  sources.forEach(source=>{
+    const parts=source.match(/[^?]+(?:\?|$)/g)||[source];
+    parts.map(part=>part.trim()).filter(Boolean).forEach(part=>items.push(part));
+  });
+  return items;
+}
+function renderedQuestionList(text){
+  const items=questionItems(text);if(!items.length)return '';
+  return `<ul>${items.map(item=>`<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+}
 function openQuestion(data={},mode='prepared'){
   const question=clean(data.status_reason);if(!question)return '';
   const waiting=mode==='waiting';
   return `<section class="cc-startpartner-panel cc-startpartner-open-question">
     <header><div><span class="cc-kicker">${waiting?'Versendete Rückfrage':'Rückfrage vorbereitet'}</span><h3>${waiting?'Rückmeldung ausstehend':'Diese Angaben fehlen noch'}</h3></div></header>
-    <p>${renderedText(question)}</p>
+    ${renderedQuestionList(question)}
     <div class="cc-actions cc-actions--inline">${waiting
       ? '<button class="cc-button cc-button--primary" data-review-action="record_review_reply">Antwort eintragen</button><button class="cc-button cc-button--secondary" data-review-action="resend_review_question">Rückfrage erneut senden</button>'
       : '<button class="cc-button cc-button--primary" data-review-action="send_review_question">Rückfrage senden</button><button class="cc-button cc-button--secondary" data-review-action="review_needs_information">Rückfrage ändern und senden</button>'}
