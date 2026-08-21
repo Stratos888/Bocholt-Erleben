@@ -38,6 +38,7 @@ AUFGABE
    f) erkennbare Rechte-, Technik- oder Pflichtangaben-Risiken; nicht öffentlich klärbare Rechtefragen als Rückfrage markieren
 4. Eine grundsätzlich passende Organisation darf nicht allein deshalb als ungeeignet gelten, weil interne Kooperationsdetails oder Rechtebestätigungen noch erfragt werden müssen. Dann ist „RÜCKFRAGE NÖTIG“ die richtige Empfehlung.
 5. Recherchiere keine privaten personenbezogenen Daten und versuche nicht, Kontaktinformationen zu ergänzen.
+6. Führe unter QUELLEN ausschließlich belastbare öffentliche Quellen auf, die konkrete Aussagen über die zu prüfende Organisation oder deren Angebote belegen. Allgemeine Referenzseiten zu Bocholt, Veranstaltungskalender oder Bocholt erleben sind keine Kandidatenbelege und dürfen dort nicht erscheinen. Verwende möglichst die kanonische Quell-URL und entferne unnötige Trackingparameter wie utm_*. Wenn keine belastbare kandidatenbezogene öffentliche Quelle gefunden wurde, gib unter QUELLEN ausschließlich „Keine belastbare kandidatenbezogene öffentliche Quelle gefunden.“ aus.
 
 GIB GENAU DIESE STRUKTUR AUS
 EMPFEHLUNG: AUFNEHMEN | RÜCKFRAGE NÖTIG | NICHT GEEIGNET
@@ -56,7 +57,7 @@ OFFENE PUNKTE / KONKRETE RÜCKFRAGEN
 - <nur tatsächlich notwendige Punkte; sonst „Keine“>
 
 QUELLEN
-- <Quelle und URL>
+- <ausschließlich kandidatenbezogene Quelle und kanonische URL ohne Trackingparameter; falls keine: „Keine belastbare kandidatenbezogene öffentliche Quelle gefunden.“>
 
 Schließe mit einem Satz ab: „Verbindliche Entscheidung bleibt beim Betreiber von Bocholt erleben.“`;
 }
