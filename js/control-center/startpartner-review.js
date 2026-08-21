@@ -107,7 +107,11 @@ function actionLabel(action){return action?.label||'';}
 export function renderStartpartnerReview(item={}){
   const data=candidate(item);const capacity=data.capacity||{};const reviewing=startpartnerAiReviewStatuses.has(String(data.status||''));
   const primary=reviewing?null:item.primary_action;
-  const displayStatus=data?.gate3?.complete?'Piloteinrichtung':(item.display_status||statusLabels[data.status]||'Prüfung erforderlich');
+  const displayStatus=data?.gate3?.complete
+    ? 'Piloteinrichtung'
+    : data.status==='accepted_pending_terms'
+      ? (item.display_status||statusLabels[data.status]||'Prüfung erforderlich')
+      : (statusLabels[data.status]||item.display_status||'Prüfung erforderlich');
   return `<section class="cc-startpartner-review" data-startpartner-status="${escapeHtml(data.status||'')}">
     <section class="cc-startpartner-priority" aria-label="Priorisierte Startpartner-Prüfung">
       <div class="cc-startpartner-priority__status"><span class="cc-kicker">Aktueller Stand</span><strong>${escapeHtml(displayStatus)}</strong><p>${escapeHtml(blockerText(data))}</p></div>
