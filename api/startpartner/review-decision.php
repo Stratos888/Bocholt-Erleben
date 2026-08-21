@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/_review_decision_domain.php';
+require_once __DIR__ . '/_review_communication.php';
 
 be_startpartner_require_gate1_environment();
 be_require_review_access();
@@ -21,7 +21,57 @@ try {
         throw new InvalidArgumentException('candidate_id is required.');
     }
 
-    $result = be_startpartner_review_decision(be_db(), $candidateId, $input);
+    $pdo = be_db();
+    $result = be_startpartner_review_decision($pdo, $candidateId, $input);
+    $decision = trim((string)($input['decision'] ?? ''));
+    $topic = be_startpartner_review_communication_topic_for_decision($decision);
+    $decisionOperationId = be_startpartner_gate2_operation_id($input['operation_id'] ?? null);
+    $attemptState = be_startpartner_review_communication_event_state(
+        $pdo,
+        $candidateId,
+        $topic,
+        $decisionOperationId
+    );
+    $communication = [
+        'status' => $attemptState ?? 'skipped',
+        'sent' => $attemptState === 'sent',
+        'idempotent_replay' => $attemptState !== null,
+        'candidate' => $attemptState !== null
+            ? be_startpartner_gate2_candidate_detail($pdo, $candidateId)
+            : (array)($result['candidate'] ?? []),
+    ];
+
+    if (($result['idempotent_replay'] ?? false) !== true || $attemptState === null) {
+        $candidate = (array)($result['candidate'] ?? []);
+        $customerMessage = $decision === 'needs_information'
+            ? be_startpartner_clean_text($input['reason'] ?? null, 5000, 'reason')
+            : ($decision === 'reject'
+                ? be_startpartner_clean_text($input['customer_message'] ?? null, 5000, 'customer_message')
+                : null);
+        try {
+            $communication = be_startpartner_review_communication_send($pdo, $candidateId, [
+                'topic' => $topic,
+                'operation_id' => $decisionOperationId,
+                'expected_revision' => (int)($candidate['revision'] ?? 0),
+                'operator_name' => $input['operator_name'] ?? null,
+                'customer_message' => $customerMessage,
+            ]);
+        } catch (Throwable $mailError) {
+            error_log('Startpartner review communication orchestration failed: ' . $mailError->getMessage());
+            $communication = [
+                'status' => 'failed',
+                'sent' => false,
+                'idempotent_replay' => false,
+                'failure_code' => 'orchestration_failed',
+                'candidate' => be_startpartner_gate2_candidate_detail($pdo, $candidateId),
+            ];
+        }
+    }
+
+    if (is_array($communication['candidate'] ?? null)) {
+        $result['candidate'] = $communication['candidate'];
+    }
+    $result['communication'] = $communication;
     be_json_response(200, ['status' => 'ok', 'data' => $result]);
 } catch (BeStartpartnerConflictException $error) {
     be_json_response(409, [
