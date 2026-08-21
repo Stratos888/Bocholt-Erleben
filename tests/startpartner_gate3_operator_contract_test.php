@@ -110,8 +110,8 @@ $retryActions = array_values(array_filter(
 ));
 $assert(count($retryActions) === 1, 'After terms send, exactly one controlled resend action must be available.');
 $assert(str_contains((string)($retryActions[0]['label'] ?? ''), 'erika@example.org'), 'Resend action must expose the current target address.');
-$assert(($item['decision_context']['gate3_delivery']['transport_status'] ?? null) === 'smtp_accepted', 'Readback must distinguish SMTP acceptance from external delivery.');
-$assert(($item['decision_context']['gate3_delivery']['smtp_data_code'] ?? null) === 250, 'Readback must expose final SMTP DATA acceptance code 250.');
+$assert(($item['decision_context']['gate3_delivery']['transport_status'] ?? null) === 'accepted', 'Readback must distinguish transport acceptance from external delivery.');
+$assert(($item['decision_context']['gate3_delivery']['transport_final_code'] ?? null) === 250, 'Readback must expose final transport acceptance code 250.');
 
 $resentCandidate = $eventsCandidate;
 $resentCandidate['events'] = [[
@@ -119,8 +119,8 @@ $resentCandidate['events'] = [[
     'payload' => [
         'terms_snapshot' => $snapshot,
         'recipient_address' => 'erika@example.org',
-        'transport_status' => 'smtp_accepted',
-        'smtp_data_code' => 250,
+        'transport_status' => 'accepted',
+        'transport_final_code' => 250,
     ],
 ]];
 $itemResent = be_startpartner_gate3_present_case([
