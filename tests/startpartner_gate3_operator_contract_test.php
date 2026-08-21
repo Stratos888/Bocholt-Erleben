@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/api/startpartner/_gate3_communication.php';
+require_once dirname(__DIR__) . '/api/startpartner/_gate3_delivery_retry.php';
 
 $failures = [];
 $assert = static function(bool $condition, string $message) use (&$failures): void {
@@ -29,6 +29,8 @@ $contact = [
     'email' => 'erika@example.org',
     'is_primary' => 1,
 ];
+
+$assert(function_exists('be_startpartner_gate3_resend_terms'), 'Controlled Gate-3 resend function must exist.');
 
 $snapshot = be_startpartner_gate3_terms_snapshot($candidate);
 $assert($snapshot['terms_version'] === BE_STARTPARTNER_GATE3_TERMS_VERSION, 'Canonical terms version must be system owned.');
@@ -84,6 +86,7 @@ $expect(
 );
 
 $eventsCandidate = $candidate;
+$eventsCandidate['contacts'] = [$contact];
 $eventsCandidate['events'] = [[
     'event_type' => 'pilot_terms_sent',
     'payload' => ['terms_snapshot' => $snapshot],
@@ -101,6 +104,37 @@ $item = be_startpartner_gate3_present_case([
     'gate3' => ['complete' => false, 'blockers' => []],
 ]));
 $assert(($item['primary_action']['key'] ?? null) === 'confirm_pilot_terms_simple', 'After terms send, the primary action must be simplified partner confirmation.');
+$retryActions = array_values(array_filter(
+    (array)($item['secondary_actions'] ?? []),
+    static fn(array $action): bool => ($action['key'] ?? null) === 'resend_pilot_terms'
+));
+$assert(count($retryActions) === 1, 'After terms send, exactly one controlled resend action must be available.');
+$assert(str_contains((string)($retryActions[0]['label'] ?? ''), 'erika@example.org'), 'Resend action must expose the current target address.');
+$assert(($item['decision_context']['gate3_delivery']['transport_status'] ?? null) === 'accepted', 'Readback must distinguish transport acceptance from external delivery.');
+$assert(($item['decision_context']['gate3_delivery']['transport_final_code'] ?? null) === 250, 'Readback must expose final transport acceptance code 250.');
+
+$resentCandidate = $eventsCandidate;
+$resentCandidate['events'] = [[
+    'event_type' => 'pilot_terms_resent',
+    'payload' => [
+        'terms_snapshot' => $snapshot,
+        'recipient_address' => 'erika@example.org',
+        'transport_status' => 'accepted',
+        'transport_final_code' => 250,
+    ],
+]];
+$itemResent = be_startpartner_gate3_present_case([
+    'primary_action' => null,
+    'secondary_actions' => [],
+], array_merge($resentCandidate, [
+    'status' => 'accepted_pending_terms',
+    'readiness' => [],
+    'capacity' => [],
+    'assigned_to' => null,
+    'next_review_at' => null,
+    'gate3' => ['complete' => false, 'blockers' => []],
+]));
+$assert(($itemResent['primary_action']['key'] ?? null) === 'confirm_pilot_terms_simple', 'A successful resend must remain in confirmation-waiting state.');
 
 $unsent = $eventsCandidate;
 $unsent['events'] = [];
@@ -116,6 +150,10 @@ $itemUnsent = be_startpartner_gate3_present_case([
     'gate3' => ['complete' => false, 'blockers' => []],
 ]));
 $assert(($itemUnsent['primary_action']['key'] ?? null) === 'send_pilot_terms', 'Before terms send, the primary action must be send_pilot_terms.');
+$assert(
+    !in_array('resend_pilot_terms', array_column((array)($itemUnsent['secondary_actions'] ?? []), 'key'), true),
+    'Before a successful terms send, no resend action may be exposed.'
+);
 
 if ($failures !== []) {
     fwrite(STDERR, "=== Startpartner Gate-3 Operator Contract: FAILED ===\n");

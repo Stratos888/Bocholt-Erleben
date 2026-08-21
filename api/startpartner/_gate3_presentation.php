@@ -25,7 +25,7 @@ function be_startpartner_gate3_terms_were_sent(array $candidate): bool
     foreach (array_reverse($events) as $event) {
         if (
             is_array($event)
-            && (string)($event['event_type'] ?? '') === 'pilot_terms_sent'
+            && in_array((string)($event['event_type'] ?? ''), ['pilot_terms_sent', 'pilot_terms_resent'], true)
             && is_array(($event['payload'] ?? null))
             && is_array(($event['payload']['terms_snapshot'] ?? null))
         ) {
@@ -33,6 +33,20 @@ function be_startpartner_gate3_terms_were_sent(array $candidate): bool
         }
     }
     return false;
+}
+
+function be_startpartner_gate3_primary_email(array $candidate): string
+{
+    $contacts = is_array($candidate['contacts'] ?? null) ? $candidate['contacts'] : [];
+    foreach ($contacts as $contact) {
+        if (is_array($contact) && !empty($contact['is_primary'])) {
+            return trim((string)($contact['email'] ?? ''));
+        }
+    }
+    if (isset($contacts[0]) && is_array($contacts[0])) {
+        return trim((string)($contacts[0]['email'] ?? ''));
+    }
+    return '';
 }
 
 function be_startpartner_gate3_present_case(array $item, array $candidate): array
@@ -71,6 +85,7 @@ function be_startpartner_gate3_present_case(array $item, array $candidate): arra
     }
 
     $termsSent = be_startpartner_gate3_terms_were_sent($candidate);
+    $primaryEmail = be_startpartner_gate3_primary_email($candidate);
     $item['display_status'] = $termsSent
         ? 'Platz reserviert · Bestätigung ausstehend'
         : 'Platz reserviert · Bedingungen offen';
@@ -83,7 +98,22 @@ function be_startpartner_gate3_present_case(array $item, array $candidate): arra
             'send_pilot_terms',
             'Pilotbedingungen senden'
         );
-    $item['secondary_actions'] = [
+    $item['secondary_actions'] = [];
+    if ($termsSent) {
+        $retryLabel = $primaryEmail !== ''
+            ? 'Keine Mail angekommen – erneut senden an ' . $primaryEmail
+            : 'Keine Mail angekommen – Pilotbedingungen erneut senden';
+        $item['secondary_actions'][] = be_startpartner_gate3_case_action(
+            'resend_pilot_terms',
+            $retryLabel
+        );
+        $item['decision_context']['gate3_delivery'] = [
+            'recipient_address' => $primaryEmail,
+            'transport_status' => 'accepted',
+            'transport_final_code' => 250,
+        ];
+    }
+    $item['secondary_actions'] = array_merge($item['secondary_actions'], [
         be_startpartner_gate3_case_action('edit_profile', 'Profil bearbeiten', true),
         be_startpartner_gate3_case_action('extend_reservation', 'Reservierung verlängern', true),
         be_startpartner_gate3_case_action(
@@ -93,9 +123,11 @@ function be_startpartner_gate3_present_case(array $item, array $candidate): arra
             true
         ),
         be_startpartner_gate3_case_action('details', 'Nachweise und Verlauf'),
-    ];
+    ]);
     $item['next_action'] = $termsSent
-        ? 'Ausdrückliche Partnerbestätigung prüfen und anschließend die Piloteinrichtung anlegen.'
+        ? ($primaryEmail !== ''
+            ? 'SMTP hat den Versand an ' . $primaryEmail . ' angenommen. Externe Zustellung prüfen; erst nach ausdrücklicher Partnerbestätigung die Piloteinrichtung anlegen.'
+            : 'SMTP hat den Versand angenommen. Externe Zustellung prüfen; erst nach ausdrücklicher Partnerbestätigung die Piloteinrichtung anlegen.')
         : 'Kanonische Pilotbedingungen an den Hauptkontakt senden.';
     return $item;
 }
