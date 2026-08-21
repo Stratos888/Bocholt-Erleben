@@ -10,7 +10,7 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
 $expectedStartpartnerFiles = [
     '_schema.php', '_contract.php', '_repository.php', '_domain.php',
     '_public_intake.php', '_review_decision_domain.php', '_review_communication.php',
-    '_gate2_domain.php', '_gate3_domain.php', '_gate3_communication.php', '_gate3_presentation.php',
+    '_gate2_domain.php', '_gate3_domain.php', '_gate3_communication.php', '_gate3_delivery_retry.php', '_gate3_presentation.php',
     '_gate4_contract.php', '_gate4_domain.php', '_gate4_schema.php',
     '_gate4_state.php', '_gate4_projection.php', '_gate4_operation.php',
     '_gate4_readiness_actions.php', '_gate4_activation_domain.php', '_gate4_portal_domain.php',
@@ -21,7 +21,7 @@ $expectedStartpartnerFiles = [
 $startpartnerFiles = glob($root . '/api/startpartner/*.php') ?: [];
 $actualNames = array_map('basename', $startpartnerFiles);
 sort($actualNames); $expectedNames = $expectedStartpartnerFiles; sort($expectedNames);
-$assert($actualNames === $expectedNames, 'Startpartner muss ausschließlich die kanonischen Runtime-Owner einschließlich Intake, Review, Review-Kommunikation und Gate-3-Bedingungskommunikation besitzen.');
+$assert($actualNames === $expectedNames, 'Startpartner muss ausschließlich die kanonischen Runtime-Owner einschließlich Intake, Review, Review-Kommunikation und kontrollierter Gate-3-Bedingungskommunikation besitzen.');
 
 foreach ([
     'triage.php','gate2-staging-smoke-199.php','gate2-staging-smoke-auto-199.php',
@@ -35,6 +35,7 @@ $combined = '';
 $publicIntakeSource = '';
 $reviewCommunicationSource = '';
 $gate3CommunicationSource = '';
+$gate3DeliveryRetrySource = '';
 foreach ($startpartnerFiles as $file) {
     $source = (string)file_get_contents($file);
     $name = basename($file);
@@ -52,6 +53,9 @@ foreach ($startpartnerFiles as $file) {
     } elseif ($name === '_gate3_communication.php') {
         $gate3CommunicationSource = $source;
         $assert(substr_count($source, 'be_send_mail(') === 1, 'Der Gate-3-Bedingungskommunikationsowner muss genau einen kontrollierten Mail-Aufruf besitzen.');
+    } elseif ($name === '_gate3_delivery_retry.php') {
+        $gate3DeliveryRetrySource = $source;
+        $assert(substr_count($source, 'be_send_mail(') === 1, 'Der Gate-3-Zustellretry muss genau einen kontrollierten Mail-Aufruf besitzen.');
     } else {
         $assert(!str_contains($source, 'be_send_mail('), $name . ' darf keinen physischen Mailversand besitzen.');
     }
@@ -91,6 +95,7 @@ $activation = $read('/api/startpartner/activation.php');
 $gate2Domain = $read('/api/startpartner/_gate2_domain.php');
 $gate3Domain = $read('/api/startpartner/_gate3_domain.php');
 $gate3Communication = $read('/api/startpartner/_gate3_communication.php');
+$gate3DeliveryRetry = $read('/api/startpartner/_gate3_delivery_retry.php');
 $gate3Presentation = $read('/api/startpartner/_gate3_presentation.php');
 $contract = $read('/api/startpartner/_contract.php');
 $domain = $read('/api/startpartner/_domain.php');
@@ -167,6 +172,19 @@ $assert(str_contains($gate3CommunicationSource, "'pilot_terms_mail_failed'"), 'G
 $assert(str_contains($gate3CommunicationSource, 'six_calendar_months_after_gate4_activation'), 'Gate 3 darf die sechsmonatige Laufzeit nur als spätere Aktivierungsregel binden.');
 $assert(str_contains($gate3CommunicationSource, 'terms_digest'), 'Die versendete Bedingungenfassung muss unveränderlich per Digest gebunden werden.');
 
+$assert($gate3DeliveryRetrySource !== '', 'Kontrollierter Gate-3-Zustellretry fehlt.');
+foreach ([
+    'INSERT INTO organizers','INSERT INTO organizer_magic_links','INSERT INTO organizer_portal_sessions',
+    'INSERT INTO submissions','INSERT INTO publication_entitlements','INSERT INTO publication_consumptions',
+    'stripe_checkout','stripe_subscription',
+] as $forbiddenGate3RetryEffect) {
+    $assert(!str_contains($gate3DeliveryRetrySource, $forbiddenGate3RetryEffect), "Gate-3-Zustellretry darf keine Portal-/Publikations-/Payment-Nebenwirkung besitzen: {$forbiddenGate3RetryEffect}");
+}
+foreach (['delivery_not_received_confirmed', "'pilot_terms_resent'", "'pilot_terms_resend_failed'", 'transport_final_code', 'idempotent_replay'] as $marker) {
+    $assert(str_contains($gate3DeliveryRetrySource, $marker), "Gate-3-Zustellretry-Vertrag fehlt: {$marker}");
+}
+$assert(str_contains($action, "\$requestedAction === 'resend_pilot_terms'"), 'Geschützter Action-Endpunkt muss den bewussten Zustellretry routen.');
+
 $assert(str_contains($gate2Domain, 'expected_revision'), 'Jede Gate-2-Mutation benötigt eine erwartete Candidate-Revision.');
 $assert(str_contains($gate2Domain, 'payload_hash'), 'Gate-2-Operationen müssen payloadgebunden sein.');
 $assert(str_contains($gate2Domain, 'be_startpartner_gate2_project_control_case'), 'Control-Center-Projektion muss aus der Startpartner-Domäne erfolgen.');
@@ -179,6 +197,7 @@ $assert(substr_count($gate3Domain, 'INSERT INTO organizers') === 1, 'Nur der ato
 $assert(str_contains($gate3Presentation, 'Bedingungen bestätigen und Pilot anlegen'), 'Legacy-Gate-3-Marker muss für Kompatibilität dokumentiert bleiben.');
 $assert(str_contains($gate3Presentation, 'Pilotbedingungen senden'), 'Vereinfachte Gate-3-Hauptaktion zum Bedingungenversand fehlt.');
 $assert(str_contains($gate3Presentation, 'confirm_pilot_terms_simple'), 'Vereinfachte Gate-3-Bestätigungsaktion fehlt.');
+$assert(str_contains($gate3Presentation, 'resend_pilot_terms'), 'Kontrollierte Gate-3-Zustellretry-Aktion fehlt.');
 $assert(str_contains($pilot, 'be_startpartner_gate3_state'), 'Pilot-Readback muss den bestehenden Gate-3-Owner einschließen.');
 $assert(str_contains($gate4Combined, 'expected_pilot_revision'), 'Jede Gate-4-Mutation benötigt eine erwartete Pilotrevision.');
 $assert(str_contains($gate4Combined, 'payload_hash'), 'Gate-4-Operationen müssen payloadgebunden sein.');
