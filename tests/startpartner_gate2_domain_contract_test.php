@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/api/startpartner/_gate2_domain.php';
+require_once dirname(__DIR__) . '/api/startpartner/_review_decision_domain.php';
 
 $failures = [];
 $assert = static function(bool $condition, string $message) use (&$failures): void {
@@ -20,16 +21,16 @@ $expectException = static function(callable $callback, string $message) use (&$f
 $assert(count(BE_STARTPARTNER_GATE2_STATUSES) === 13, 'Gate-2-Statussatz muss genau 13 Zustände besitzen.');
 $assert(!in_array('qualified', BE_STARTPARTNER_GATE2_STATUSES, true), 'Legacy qualified darf kein kanonischer Gate-2-Zustand sein.');
 $assert(be_startpartner_gate2_validate_status('qualified') === 'decision_ready', 'Legacy qualified muss am API-Rand deterministisch nach decision_ready abgebildet werden.');
-$assert(count(BE_STARTPARTNER_QUALIFICATION_DIMENSIONS) === 14, 'Gate 2 benötigt genau 14 Qualifikationsdimensionen.');
-$assert(count(BE_STARTPARTNER_HARD_QUALIFICATION_DIMENSIONS) === 6, 'Gate 2 benötigt genau sechs harte Mindestdimensionen.');
+$assert(count(BE_STARTPARTNER_QUALIFICATION_DIMENSIONS) === 14, 'Gate 2 behält genau 14 Legacy-Qualifikationsdimensionen für Kompatibilität.');
+$assert(count(BE_STARTPARTNER_HARD_QUALIFICATION_DIMENSIONS) === 6, 'Gate 2 behält genau sechs Legacy-Mindestdimensionen.');
 
 $unknown = array_map(
     static fn(string $dimension): array => ['dimension' => $dimension, 'assessment' => 'unknown'],
     BE_STARTPARTNER_QUALIFICATION_DIMENSIONS
 );
 $unknownReadiness = be_startpartner_gate2_readiness($unknown);
-$assert(!$unknownReadiness['ready'], 'Unbewertete Dimensionen dürfen nicht entscheidungsreif sein.');
-$assert(count($unknownReadiness['blockers']) === 14, 'Jede unbewertete Dimension muss als Blocker sichtbar sein.');
+$assert(!$unknownReadiness['ready'], 'Legacy-Readiness bleibt bei unbewerteten Dimensionen false.');
+$assert(count($unknownReadiness['blockers']) === 14, 'Legacy-Readiness muss weiterhin alle unbewerteten Dimensionen abbilden.');
 
 $ready = array_map(
     static fn(string $dimension): array => [
@@ -39,12 +40,11 @@ $ready = array_map(
     BE_STARTPARTNER_QUALIFICATION_DIMENSIONS
 );
 $readyState = be_startpartner_gate2_readiness($ready);
-$assert($readyState['ready'], 'Bewusste Bewertungen mit erfüllten Mindestdimensionen müssen entscheidungsreif sein.');
-
+$assert($readyState['ready'], 'Der bestehende Legacy-Readiness-Vertrag darf nicht gebrochen werden.');
 $ready[0]['assessment'] = 'weak';
 $blockedState = be_startpartner_gate2_readiness($ready);
-$assert(!$blockedState['ready'], 'Eine schwache harte Mindestdimension muss blockieren.');
-$assert(($blockedState['blockers'][0]['code'] ?? '') === 'minimum_not_met', 'Harter Mindestblocker benötigt einen stabilen Code.');
+$assert(!$blockedState['ready'], 'Der bestehende Legacy-Mindestblocker muss intakt bleiben.');
+$assert(($blockedState['blockers'][0]['code'] ?? '') === 'minimum_not_met', 'Harter Legacy-Mindestblocker benötigt einen stabilen Code.');
 
 $hashA = be_startpartner_gate2_payload_hash('candidate-1', 'profile.update', [
     'operation_id' => 'gate2:199:test',
@@ -84,7 +84,7 @@ $expectException(
         'dimension' => 'local_relevance',
         'assessment' => 'adequate',
     ]),
-    'Bewertete Dimensionen ohne Reason und Evidence müssen abgelehnt werden.'
+    'Legacy-Bewertungen ohne Reason und Evidence müssen weiterhin abgelehnt werden.'
 );
 
 $normalizedQualification = be_startpartner_gate2_normalize_qualification([
@@ -93,38 +93,52 @@ $normalizedQualification = be_startpartner_gate2_normalize_qualification([
     'reason' => 'Lokaler Bezug ist belegt.',
     'evidence_text' => 'Sitz und Angebot liegen in Bocholt.',
 ]);
-$assert($normalizedQualification['assessment'] === 'adequate', 'Qualifikationsnormalisierung muss gültige Bewertungen erhalten.');
+$assert($normalizedQualification['assessment'] === 'adequate', 'Legacy-Qualifikationsnormalisierung muss gültige Bewertungen erhalten.');
 
-// Der Operator sieht nur sechs Kriterien. Die kanonischen 14 Dimensionen bleiben bewusst Domain-/Speicherdetail.
-$qualificationEndpoint = (string)file_get_contents(dirname(__DIR__) . '/api/startpartner/qualification.php');
-$startpartnerReview = (string)file_get_contents(dirname(__DIR__) . '/js/control-center/startpartner-review.js');
-$compactKeys = [
-    'local_editorial_fit',
-    'content_sources',
-    'user_value_reach',
-    'cooperation_maintenance',
-    'effort_regular_path',
-    'legal_information',
-];
-foreach ($compactKeys as $key) {
-    $assert(str_contains($qualificationEndpoint, "'{$key}' => ["), "Serverseitiges Mapping fehlt für {$key}.");
-    $assert(str_contains($startpartnerReview, "key:'{$key}'"), "Control-Center-Check fehlt für {$key}.");
+$assert(BE_STARTPARTNER_REVIEW_DECISIONS === ['approve', 'needs_information', 'reject', 'waitlist'], 'Der neue Review-Vertrag benötigt exakt vier systemische Entscheidungen.');
+foreach (['new','prequalifying','contact_pending','awaiting_response','qualifying','needs_information','decision_ready','waitlisted'] as $status) {
+    $assert(in_array($status, BE_STARTPARTNER_REVIEW_ACTIVE_STATUSES, true), "KI-gestützte Entscheidung muss aus {$status} möglich sein.");
 }
-$assert(substr_count($qualificationEndpoint, "'dimensions' => [") === 6, 'Der kompakte Serververtrag muss exakt sechs Gruppen besitzen.');
-$assert(str_contains($qualificationEndpoint, "'fit' => ['label' => 'Passt', 'assessment' => 'adequate']"), 'Passt muss intern auf adequate abgebildet werden.');
-$assert(str_contains($qualificationEndpoint, "'unclear' => ['label' => 'Unklar', 'assessment' => 'unknown']"), 'Unklar muss intern auf unknown abgebildet werden.');
-$assert(str_contains($qualificationEndpoint, "'not_fit' => ['label' => 'Passt nicht', 'assessment' => 'weak']"), 'Passt nicht muss intern auf weak abgebildet werden.');
-$assert(str_contains($qualificationEndpoint, 'Compact Startpartner mapping must cover all qualification dimensions exactly once.'), 'Die vollständige 14-Dimensionen-Abdeckung muss fail-closed validiert werden.');
-$assert(str_contains($qualificationEndpoint, "array_key_exists('qualifications', \$input)"), 'Kompakter und Legacy-Payload dürfen nicht vermischt werden.');
-$assert(str_contains($qualificationEndpoint, 'be_startpartner_gate2_qualification_update'), 'Der bestehende Gate-2-Domainowner muss Speichern, Revision und Audit behalten.');
-$assert(str_contains($startpartnerReview, 'Sechs kurze Fragen reichen für die Startpartner-Entscheidung.'), 'Die kompakte Bedienlogik muss für den Operator erklärt sein.');
-$assert(str_contains($startpartnerReview, 'Notiz / offene Punkte'), 'Es muss genau ein gemeinsames Notizfeld geben.');
-$assert(str_contains($startpartnerReview, 'Alle 6 Kriterien'), 'Die Zusammenfassung muss den Sechs-Kriterien-Vertrag zeigen.');
-$assert(!str_contains($startpartnerReview, 'Alle 14 Prüfpunkte'), 'Die alte 14-Punkte-Bedienoberfläche darf nicht mehr sichtbar sein.');
-$assert(!str_contains($startpartnerReview, 'sp-reason-${dimension}'), 'Pro-Dimension-Begründungen dürfen nicht mehr gerendert werden.');
-$assert(!str_contains($startpartnerReview, 'sp-evidence-${dimension}'), 'Pro-Dimension-Nachweisfelder dürfen nicht mehr gerendert werden.');
-$assert(str_contains($startpartnerReview, "metric('Fälligkeit',data.next_review_at?formatDate(data.next_review_at):'Nicht gesetzt')"), 'Nicht gesetzte Fälligkeit muss neutral dargestellt werden.');
-$assert(str_contains($startpartnerReview, "metric('Bearbeiter',data.assigned_to||'Nicht zugewiesen')"), 'Nicht zugewiesener Bearbeiter muss neutral dargestellt werden.');
+$future20 = new DateTimeImmutable(be_startpartner_review_default_future(20), new DateTimeZone('UTC'));
+$future14 = new DateTimeImmutable(be_startpartner_review_default_future(14), new DateTimeZone('UTC'));
+$now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+$assert($future20 > $now->modify('+19 days') && $future20 < $now->modify('+21 days'), 'Standardreservierung muss ungefähr 20 Tage laufen.');
+$assert($future14 > $now->modify('+13 days') && $future14 < $now->modify('+15 days'), 'Wartelisten-Neubewertung muss ungefähr 14 Tage vorausliegen.');
+
+$reviewDomain = (string)file_get_contents(dirname(__DIR__) . '/api/startpartner/_review_decision_domain.php');
+$reviewEndpoint = (string)file_get_contents(dirname(__DIR__) . '/api/startpartner/review-decision.php');
+$startpartnerReview = (string)file_get_contents(dirname(__DIR__) . '/js/control-center/startpartner-review.js');
+$aiReview = (string)file_get_contents(dirname(__DIR__) . '/js/control-center/startpartner-ai-review.js');
+$reviewRenderer = (string)file_get_contents(dirname(__DIR__) . '/js/control-center/review-render.js');
+
+foreach (['ai_assisted_human_decision','be_startpartner_gate2_run_operation','be_startpartner_gate2_insert_decision','Hard capacity stop reached.','accepted_pending_terms','needs_information','rejected','waitlisted'] as $marker) {
+    $assert(str_contains($reviewDomain, $marker), "Review-Domainmarker fehlt: {$marker}");
+}
+$assert(!str_contains($reviewDomain, 'be_startpartner_gate2_qualification_update'), 'Die menschliche Entscheidung darf keine 14 Legacy-Dimensionen künstlich befüllen.');
+$assert(str_contains($reviewDomain, 'be_startpartner_review_default_future(20)'), 'Aufnahme benötigt die automatische 20-Tage-Reservierung.');
+$assert(str_contains($reviewDomain, 'be_startpartner_review_default_future(14)'), 'Warteliste benötigt die automatische 14-Tage-Neubewertung.');
+foreach (['be_require_review_access','be_startpartner_review_decision','STARTPARTNER_CONFLICT'] as $marker) {
+    $assert(str_contains($reviewEndpoint, $marker), "Review-Endpunktmarker fehlt: {$marker}");
+}
+
+foreach (['Prüfprompt kopieren','EMPFEHLUNG: AUFNEHMEN | RÜCKFRAGE NÖTIG | NICHT GEEIGNET','SICHERHEIT: hoch | mittel | niedrig','Startpartner aufnehmen','Rückfrage nötig','Nicht geeignet','review_approve','review_needs_information','review_reject','/api/startpartner/review-decision.php'] as $marker) {
+    $assert(str_contains($aiReview, $marker), "KI-Prüfmarker fehlt: {$marker}");
+}
+foreach (['lokale und redaktionelle Passung','geeignete Inhalte bzw. belastbare Quellen','relevanter Mehrwert für Nutzer','realistische Zusammenarbeit und laufende Pflege','Einrichtungs-/Betreuungsaufwand','Rechte-, Technik- oder Pflichtangaben'] as $marker) {
+    $assert(str_contains($aiReview, $marker), "Fachkriterium fehlt im Prüfprompt: {$marker}");
+}
+foreach (['Organisation: ${organization}','Website / öffentliche Quelle: ${website}','Gewünschter Bereich: ${scope}','Beschreibung aus der Anfrage: ${description}'] as $marker) {
+    $assert(str_contains($aiReview, $marker), "Minimierter Anfragedatenmarker fehlt: {$marker}");
+}
+foreach (['data.contacts','contact.email','contact.phone'] as $forbidden) {
+    $assert(!str_contains($aiReview, $forbidden), "Der Prüfprompt darf keine unnötigen Kontaktdaten referenzieren: {$forbidden}");
+}
+foreach (['Eignungscheck speichern','sp-check-','Sechs kurze Fragen reichen für die Startpartner-Entscheidung.'] as $forbidden) {
+    $assert(!str_contains($startpartnerReview, $forbidden) && !str_contains($aiReview, $forbidden), "Manuelle Eignungscheck-Bedienung darf nicht mehr sichtbar sein: {$forbidden}");
+}
+$assert(str_contains($startpartnerReview, 'renderStartpartnerAiReview'), 'Startpartner-Renderer muss den KI-gestützten Review einbetten.');
+$assert(str_contains($reviewRenderer, "startpartnerAiReviewStatuses.has(status)"), 'Alte Startpartner-Aktionen müssen im aktiven KI-Prüfzustand gefiltert werden.');
+$assert(str_contains($reviewRenderer, "'edit_qualification'"), 'Der Renderer muss die alte Qualifikationsaktion explizit ausblenden.');
 
 if ($failures !== []) {
     fwrite(STDERR, "=== Startpartner Gate-2 Domain Contract: FAILED ===\n");
