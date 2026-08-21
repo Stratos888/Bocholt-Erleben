@@ -11,13 +11,13 @@ $assert = static function(bool $condition, string $message) use (&$failures): vo
 
 $expectedStartpartnerFiles = [
     '_schema.php', '_contract.php', '_repository.php', '_domain.php',
-    '_public_intake.php',
+    '_public_intake.php', '_review_decision_domain.php',
     '_gate2_domain.php', '_gate3_domain.php', '_gate3_presentation.php',
     '_gate4_contract.php', '_gate4_domain.php', '_gate4_schema.php',
     '_gate4_state.php', '_gate4_projection.php', '_gate4_operation.php',
     '_gate4_readiness_actions.php', '_gate4_activation_domain.php', '_gate4_portal_domain.php',
     'intake.php', 'candidates.php', 'profile.php', 'qualification.php',
-    'action.php', 'capacity.php', 'pilot.php', 'onboarding.php', 'content.php', 'activation.php',
+    'action.php', 'review-decision.php', 'capacity.php', 'pilot.php', 'onboarding.php', 'content.php', 'activation.php',
 ];
 $startpartnerFiles = glob($root . '/api/startpartner/*.php') ?: [];
 $actualNames = array_map('basename', $startpartnerFiles);
@@ -26,7 +26,7 @@ $expectedNames = $expectedStartpartnerFiles;
 sort($expectedNames);
 $assert(
     $actualNames === $expectedNames,
-    'Startpartner muss ausschließlich die kanonischen Runtime-Owner einschließlich des öffentlichen Intake-Adapters besitzen.'
+    'Startpartner muss ausschließlich die kanonischen Runtime-Owner einschließlich des öffentlichen Intake-Adapters und des geschützten Review-Writers besitzen.'
 );
 
 foreach ([
@@ -91,6 +91,8 @@ $candidates = (string)file_get_contents($root . '/api/startpartner/candidates.ph
 $profile = (string)file_get_contents($root . '/api/startpartner/profile.php');
 $qualification = (string)file_get_contents($root . '/api/startpartner/qualification.php');
 $action = (string)file_get_contents($root . '/api/startpartner/action.php');
+$reviewDecision = (string)file_get_contents($root . '/api/startpartner/review-decision.php');
+$reviewDecisionDomain = (string)file_get_contents($root . '/api/startpartner/_review_decision_domain.php');
 $capacity = (string)file_get_contents($root . '/api/startpartner/capacity.php');
 $pilot = (string)file_get_contents($root . '/api/startpartner/pilot.php');
 $onboarding = (string)file_get_contents($root . '/api/startpartner/onboarding.php');
@@ -120,6 +122,7 @@ foreach ([
     'profile.php' => $profile,
     'qualification.php' => $qualification,
     'action.php' => $action,
+    'review-decision.php' => $reviewDecision,
     'capacity.php' => $capacity,
     'pilot.php' => $pilot,
     'onboarding.php' => $onboarding,
@@ -135,6 +138,25 @@ $assert(!str_contains($content, 'be_require_review_access'), 'Der eingeloggte Pi
 $assert(str_contains($profile, 'BeStartpartnerConflictException'), 'Profiländerungen müssen Konflikte als HTTP 409 behandeln.');
 $assert(str_contains($qualification, 'BeStartpartnerConflictException'), 'Qualifikationsänderungen müssen Konflikte als HTTP 409 behandeln.');
 $assert(str_contains($action, 'BeStartpartnerConflictException'), 'Fachaktionen müssen Konflikte als HTTP 409 behandeln.');
+$assert(str_contains($reviewDecision, 'BeStartpartnerConflictException'), 'Review-Entscheidungen müssen Konflikte als HTTP 409 behandeln.');
+$assert(str_contains($reviewDecision, 'be_startpartner_review_decision'), 'Review-Endpunkt muss ausschließlich den dedizierten Review-Domainowner aufrufen.');
+$assert(str_contains($reviewDecisionDomain, 'be_startpartner_gate2_run_operation'), 'Review-Entscheidungen müssen den revisions- und idempotenzgesicherten Gate-2-Operationsrahmen verwenden.');
+$assert(str_contains($reviewDecisionDomain, 'be_startpartner_gate2_insert_decision'), 'Review-Entscheidungen müssen den kanonischen Decision-Owner verwenden.');
+$assert(str_contains($reviewDecisionDomain, 'Hard capacity stop reached.'), 'Review-Aufnahme muss die harte Kapazitätsgrenze fail-closed respektieren.');
+$assert(!str_contains($reviewDecisionDomain, 'be_startpartner_gate2_qualification_update'), 'Review-Entscheidungen dürfen die 14 Legacy-Qualifikationsdimensionen nicht künstlich befüllen.');
+foreach ([
+    'be_send_mail(',
+    'INSERT INTO organizers',
+    'INSERT INTO organizer_magic_links',
+    'INSERT INTO organizer_portal_sessions',
+    'INSERT INTO submissions',
+    'INSERT INTO publication_entitlements',
+    'INSERT INTO publication_consumptions',
+    'stripe_checkout',
+    'stripe_subscription',
+] as $forbiddenReviewEffect) {
+    $assert(!str_contains($reviewDecisionDomain, $forbiddenReviewEffect), "Review-Writer darf keine externe oder Pilot-Nebenwirkung besitzen: {$forbiddenReviewEffect}");
+}
 $assert(str_contains($gate2Domain, 'expected_revision'), 'Jede Gate-2-Mutation benötigt eine erwartete Candidate-Revision.');
 $assert(str_contains($gate2Domain, 'payload_hash'), 'Gate-2-Operationen müssen payloadgebunden sein.');
 $assert(str_contains($gate2Domain, 'be_startpartner_gate2_project_control_case'), 'Control-Center-Projektion muss aus der Startpartner-Domäne erfolgen.');
