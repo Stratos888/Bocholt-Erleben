@@ -64,7 +64,7 @@ function be_startpartner_gate3_terms_snapshot(array $candidate): array
         'terms_clauses' => $termsClauses,
         'no_automatic_paid_renewal' => true,
         'payment_method_required' => false,
-        'stripe_subscription_created' => false,
+        'paid_subscription_created' => false,
     ];
     $termsDigest = hash(
         'sha256',
