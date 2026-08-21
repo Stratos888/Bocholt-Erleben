@@ -48,7 +48,9 @@ function blockerText(data){
     const blocker=asArray(gate3.blockers)[0];
     return blocker?.message||'Die Pilotbedingungen müssen bestätigt und einem Veranstalterzugang zugeordnet werden.';
   }
-  if(status==='needs_information')return 'Für die Entscheidung fehlen noch Angaben. Die offene Rückfrage steht unten.';
+  if(status==='contact_pending')return 'Rückfrage ist vorbereitet. Der Versand an den Hauptkontakt steht noch aus.';
+  if(status==='awaiting_response')return 'Rückfrage wurde per E-Mail versendet. Wir warten auf die Rückmeldung.';
+  if(status==='needs_information')return 'Für die Entscheidung fehlen noch Angaben. Die Rückfrage kann unten versendet oder angepasst werden.';
   if(startpartnerAiReviewStatuses.has(status))return 'Prüfprompt kopieren, ChatGPT-Auswertung prüfen und anschließend selbst entscheiden.';
   if(status==='waitlisted')return data.status_reason||'Kandidat ist vorgemerkt und wird bei verfügbarer Kapazität erneut geprüft.';
   return data.status_reason||'Aktuellen Stand prüfen.';
