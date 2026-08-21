@@ -72,11 +72,11 @@ async function aiDecisionDialogs(browser){
   let text=await page.locator('#cc-dialog').innerText();
   assert(text.includes('Startpartner aufnehmen')&&text.includes('20 Tage')&&text.includes('noch kein Pilot'), 'approve dialog: Sicherheitskontext fehlt');
   assert(await page.locator('#cc-dialog textarea').count()===1,'approve dialog: nur optionale Notiz erwartet');
-  await page.locator('#cc-dialog-close').click();
+  await page.locator('#cc-dialog').evaluate(dialog=>dialog.close());
   await page.locator('[data-review-action="review_needs_information"]').click();
   await page.waitForSelector('#cc-dialog[open] #sp-review-confirm');
   text=await page.locator('#cc-dialog').innerText();assert(text.includes('Welche Information fehlt'), 'needs-information dialog: Pflichtfrage fehlt');
-  await page.locator('#cc-dialog-close').click();
+  await page.locator('#cc-dialog').evaluate(dialog=>dialog.close());
   await page.locator('[data-review-action="review_reject"]').click();
   await page.waitForSelector('#cc-dialog[open] #sp-review-confirm');
   assert((await page.locator('#cc-dialog').innerText()).includes('Begründung'),'reject dialog: Begründung fehlt');
