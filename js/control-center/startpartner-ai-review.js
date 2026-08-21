@@ -226,7 +226,7 @@ export async function handleStartpartnerAiReviewAction(item,action,reload){
     let title='Entscheidung speichern',body='',tone='primary';
     if(decision==='approve'){
       title='Startpartner aufnehmen';
-      body=`<p class="cc-hint">Du bestätigst die Aufnahme selbst. Das System reserviert den Platz für 20 Tage und sendet anschließend die Aufnahmebestätigung. Pilot, Tarif und Zahlung starten dadurch noch nicht.</p>${textarea('sp-review-reason','Interne Notiz zur Aufnahme (optional)','')}${data.capacity?.soft_stop?textarea('sp-capacity-reason','Begründung für die Kapazitätsausnahme','','required'):''}`;
+      body=`<p class="cc-hint">Du bestätigst die Aufnahme selbst. Das System reserviert den Platz für 20 Tage und sendet anschließend die Aufnahmebestätigung. Es wird dadurch noch kein Pilot gestartet; Tarif und Zahlung starten ebenfalls nicht.</p>${textarea('sp-review-reason','Interne Notiz zur Aufnahme (optional)','')}${data.capacity?.soft_stop?textarea('sp-capacity-reason','Begründung für die Kapazitätsausnahme','','required'):''}`;
     }else if(decision==='needs_information'){
       title='Rückfrage senden';body=`<p class="cc-hint">Die bestätigte Rückfrage wird automatisch an den hinterlegten Hauptkontakt gesendet. Erst nach erfolgreichem Versand wechselt der Fall auf „Rückmeldung ausstehend“.</p>${textarea('sp-review-reason','Welche Information fehlt bzw. soll zurückgefragt werden?','','required')}`;
     }else if(decision==='reject'){
