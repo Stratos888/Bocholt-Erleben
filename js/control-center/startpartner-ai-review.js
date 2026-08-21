@@ -24,12 +24,19 @@ function latestMailEvent(data={},topic=''){
     && String(entry?.payload?.topic||'')===topic
   )||null;
 }
-function reviewPrompt(data={}){
+function reviewPrompt(data={},followUpQuestion=''){
   const organization=clean(data.organization_name)||'Nicht angegeben';
   const website=clean(data.website_url)||'Nicht angegeben';
   const scope=scopeLabels[data.desired_content_scope]||clean(data.desired_content_scope)||'Noch offen';
   const description=clean(data.description_text)||'Nicht angegeben';
   const reply=latestRecordedReply(data)||'Keine nachgereichten Angaben vorhanden.';
+  const followUp=clean(followUpQuestion);
+  const followUpBlock=followUp?`\n\nBISHERIGE RÜCKFRAGE\n${followUp}\n\nANTWORT DES STARTPARTNERS\n<<< HIER NUR DIE FACHLICH RELEVANTE E-MAIL-ANTWORT EINFÜGEN; SIGNATUR UND KONTAKTDATEN SIND NICHT NÖTIG >>>`:'';
+  const step2=followUp
+    ? '2. Berücksichtige ausdrücklich die unter ANTWORT DES STARTPARTNERS eingefügte Antwort sowie ggf. bereits dokumentierte frühere Angaben. Wiederhole keine bereits beantworteten Rückfragen. Trenne belegte Fakten klar von Angaben des Antragstellers und von Annahmen.'
+    : '2. Berücksichtige ausdrücklich die nachgereichten Angaben, falls vorhanden. Trenne belegte Fakten klar von Angaben des Antragstellers und von Annahmen.';
+  const missingReplyGuard=followUp?'\n3. Wenn der Platzhalter unter ANTWORT DES STARTPARTNERS noch unverändert vorhanden ist, führe keine Bewertung durch und antworte ausschließlich: „Bitte zuerst die E-Mail-Antwort des Startpartners an der markierten Stelle einfügen.“':'';
+  const followingNumber=followUp?4:3;
   return `Du prüfst für die lokale Plattform „Bocholt erleben“, ob eine Organisation als Startpartner für einen kostenlosen sechsmonatigen Test geeignet ist.
 
 WICHTIGER ROLLENRAHMEN
@@ -40,22 +47,22 @@ Organisation: ${organization}
 Website / öffentliche Quelle: ${website}
 Gewünschter Bereich: ${scope}
 Beschreibung aus der Anfrage: ${description}
-Nachgereichte Angaben aus einer Rückfrage: ${reply}
+Nachgereichte Angaben aus einer Rückfrage: ${reply}${followUpBlock}
 
 AUFGABE
 1. Prüfe zuerst die angegebene Website/Quelle. Wenn keine Website angegeben ist, recherchiere anhand des Organisationsnamens. Nutze bei Bedarf weitere belastbare öffentliche Quellen.
-2. Berücksichtige ausdrücklich die nachgereichten Angaben, falls vorhanden. Trenne belegte Fakten klar von Angaben des Antragstellers und von Annahmen.
-3. Erfinde nichts. Wenn eine Information öffentlich oder durch die Anfrage nicht verlässlich feststellbar ist, markiere sie als offen.
-4. Prüfe diese sechs Punkte:
+${step2}${missingReplyGuard}
+${followingNumber}. Erfinde nichts. Wenn eine Information öffentlich oder durch die Anfrage nicht verlässlich feststellbar ist, markiere sie als offen.
+${followingNumber+1}. Prüfe diese sechs Punkte:
    a) lokale und redaktionelle Passung zu Bocholt erleben
    b) geeignete Inhalte bzw. belastbare Quellen für Veranstaltungen/Aktivitäten
    c) relevanter Mehrwert für Nutzer und potenzieller Beitrag zur Reichweite
    d) realistische Zusammenarbeit und laufende Pflege; soweit nicht prüfbar, als Rückfrage markieren statt negativ zu unterstellen
    e) sinnvoller Einrichtungs-/Betreuungsaufwand und plausibler späterer regulärer Weg
    f) erkennbare Rechte-, Technik- oder Pflichtangaben-Risiken; nicht klärbare Rechtefragen als Rückfrage markieren
-5. Eine grundsätzlich passende Organisation darf nicht allein deshalb als ungeeignet gelten, weil interne Kooperationsdetails oder Rechtebestätigungen noch erfragt werden müssen. Dann ist „RÜCKFRAGE NÖTIG“ die richtige Empfehlung.
-6. Recherchiere keine privaten personenbezogenen Daten und versuche nicht, Kontaktinformationen zu ergänzen.
-7. Führe unter QUELLEN ausschließlich belastbare öffentliche Quellen auf, die konkrete Aussagen über die zu prüfende Organisation oder deren Angebote belegen. Allgemeine Referenzseiten zu Bocholt, Veranstaltungskalender oder Bocholt erleben sind keine Kandidatenbelege und dürfen dort nicht erscheinen. Verwende möglichst die kanonische Quell-URL und entferne unnötige Trackingparameter wie utm_*. Wenn keine belastbare kandidatenbezogene öffentliche Quelle gefunden wurde, gib unter QUELLEN ausschließlich „Keine belastbare kandidatenbezogene öffentliche Quelle gefunden.“ aus.
+${followingNumber+2}. Eine grundsätzlich passende Organisation darf nicht allein deshalb als ungeeignet gelten, weil interne Kooperationsdetails oder Rechtebestätigungen noch erfragt werden müssen. Dann ist „RÜCKFRAGE NÖTIG“ die richtige Empfehlung.
+${followingNumber+3}. Recherchiere keine privaten personenbezogenen Daten und versuche nicht, Kontaktinformationen zu ergänzen.
+${followingNumber+4}. Führe unter QUELLEN ausschließlich belastbare öffentliche Quellen auf, die konkrete Aussagen über die zu prüfende Organisation oder deren Angebote belegen. Allgemeine Referenzseiten zu Bocholt, Veranstaltungskalender oder Bocholt erleben sind keine Kandidatenbelege und dürfen dort nicht erscheinen. Verwende möglichst die kanonische Quell-URL und entferne unnötige Trackingparameter wie utm_*. Wenn keine belastbare kandidatenbezogene öffentliche Quelle gefunden wurde, gib unter QUELLEN ausschließlich „Keine belastbare kandidatenbezogene öffentliche Quelle gefunden.“ aus.
 
 GIB GENAU DIESE STRUKTUR AUS
 EMPFEHLUNG: AUFNEHMEN | RÜCKFRAGE NÖTIG | NICHT GEEIGNET
@@ -106,16 +113,23 @@ function renderedQuestionList(text){
   const items=questionItems(text);if(!items.length)return '';
   return `<ul>${items.map(item=>`<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
 }
+function positiveDecisionButton(data={}){
+  return Boolean(data.capacity?.hard_stop)
+    ? '<button class="cc-button cc-button--primary" data-review-action="review_waitlist">Auf Warteliste</button>'
+    : '<button class="cc-button cc-button--primary" data-review-action="review_approve">Startpartner aufnehmen</button>';
+}
 function openQuestion(data={},mode='prepared'){
   const question=clean(data.status_reason);if(!question)return '';
   const waiting=mode==='waiting';
   return `<section class="cc-startpartner-panel cc-startpartner-open-question">
     <header><div><span class="cc-kicker">${waiting?'Versendete Rückfrage':'Rückfrage vorbereitet'}</span><h3>${waiting?'Rückmeldung ausstehend':'Diese Angaben fehlen noch'}</h3></div></header>
     ${renderedQuestionList(question)}
+    ${waiting?'<p class="cc-muted">Wenn die Antwort per E-Mail eingetroffen ist, prüfst du sie direkt in ChatGPT. Eine separate Ablage in der Steuerzentrale ist nicht nötig.</p>':''}
     <div class="cc-actions cc-actions--inline">${waiting
-      ? '<button class="cc-button cc-button--primary" data-review-action="record_review_reply">Antwort eintragen</button><button class="cc-button cc-button--secondary" data-review-action="resend_review_question">Rückfrage erneut senden</button>'
+      ? '<button class="cc-button cc-button--primary" data-review-action="copy_followup_review_prompt">Antwort prüfen</button><button class="cc-button cc-button--secondary" data-review-action="resend_review_question">Rückfrage erneut senden</button>'
       : '<button class="cc-button cc-button--primary" data-review-action="send_review_question">Rückfrage senden</button><button class="cc-button cc-button--secondary" data-review-action="review_needs_information">Rückfrage ändern und senden</button>'}
     </div>
+    ${waiting?`<p class="cc-muted">Nach der ChatGPT-Prüfung triffst du hier die verbindliche Entscheidung:</p><div class="cc-actions cc-actions--inline">${positiveDecisionButton(data)}<button class="cc-button cc-button--secondary" data-review-action="review_needs_information">Weitere Rückfrage</button><button class="cc-button cc-button--danger" data-review-action="review_reject">Nicht geeignet</button></div>`:''}
   </section>`;
 }
 function decisionCommunicationPanel(data={}){
@@ -144,15 +158,11 @@ export function renderStartpartnerAiReview(data={}){
   if(status==='contact_pending'||status==='needs_information')return openQuestion(data,'prepared');
   if(status==='awaiting_response')return openQuestion(data,'waiting');
   if(!startpartnerAiReviewStatuses.has(status))return '';
-  const hard=Boolean(data.capacity?.hard_stop);
-  const positive=hard
-    ? '<button class="cc-button cc-button--primary" data-review-action="review_waitlist">Auf Warteliste</button>'
-    : '<button class="cc-button cc-button--primary" data-review-action="review_approve">Startpartner aufnehmen</button>';
   return `<section class="cc-startpartner-panel cc-startpartner-ai-review">
     <header><div><span class="cc-kicker">KI-gestützte Prüfung</span><h3>Prüfen lassen, selbst entscheiden</h3></div></header>
     <p>Der Prüfprompt enthält nur die fachlich nötigen Anfragedaten. ChatGPT recherchiert und gibt eine Empfehlung; die verbindliche Entscheidung bleibt bei dir.</p>
     <button class="cc-button cc-button--secondary cc-button--large" data-review-action="copy_review_prompt">Prüfprompt kopieren</button>
-    <div class="cc-actions cc-actions--inline">${positive}<button class="cc-button cc-button--secondary" data-review-action="review_needs_information">Rückfrage nötig</button><button class="cc-button cc-button--danger" data-review-action="review_reject">Nicht geeignet</button></div>
+    <div class="cc-actions cc-actions--inline">${positiveDecisionButton(data)}<button class="cc-button cc-button--secondary" data-review-action="review_needs_information">Rückfrage nötig</button><button class="cc-button cc-button--danger" data-review-action="review_reject">Nicht geeignet</button></div>
   </section>`;
 }
 
@@ -183,29 +193,6 @@ async function sendCommunication(item,topic,reload,customerMessage=''){
 function failedCustomerMessage(data={},topic=''){
   const event=latestMailEvent(data,topic);return clean(event?.payload?.customer_message);
 }
-async function recordReplyDialog(item,reload){
-  setStatus('Aktuelle Rückfrage wird geladen …');
-  try{
-    const detail=await latest(item);const data=detail.startpartner_candidate||{};
-    openDialog(`<h2>Antwort eintragen</h2><p class="cc-hint">Übernimm die relevante Rückmeldung des Startpartners. Danach ist die Anfrage wieder offen für die nächste Prüfung.</p><div id="cc-dialog-message"></div><div class="cc-stack">${textarea('sp-review-reply','Nachgereichte Angaben','','required')}<button type="button" class="cc-button cc-button--primary" id="sp-review-reply-confirm">Antwort speichern</button></div>`,'cc-dialog--wide');
-    setStatus('');
-    document.querySelector('#sp-review-reply-confirm')?.addEventListener('click',async event=>{
-      event.currentTarget.disabled=true;const reply=value('#sp-review-reply');
-      if(!reply){dialogMessage('Bitte die nachgereichten Angaben eintragen.');event.currentTarget.disabled=false;return;}
-      try{
-        await api('/api/startpartner/action.php',{method:'POST',body:JSON.stringify({
-          candidate_id:data.id,operation_id:mutationId('gate2:304:reply'),expected_revision:Number(data.revision),operator_name:operator(data),
-          action:'start_qualification',reason:reply,
-        }),timeoutMs:70000});
-        await reload({throwOnError:true});closeDialog();setStatus('Antwort gespeichert. Die Anfrage ist wieder zur Prüfung offen.','success');
-      }catch(error){
-        if(error.status===409){await reload({throwOnError:true}).catch(()=>{});dialogMessage('Zwischenzeitlich geändert. Die Ansicht wurde neu geladen; bitte prüfe den aktuellen Stand.');}
-        else dialogMessage(error.message||'Die Antwort konnte nicht gespeichert werden.');
-        event.currentTarget.disabled=false;
-      }
-    });
-  }catch(error){setStatus(error.message,'attention');}
-}
 
 export async function handleStartpartnerAiReviewAction(item,action,reload){
   if(action==='copy_review_prompt'||action==='edit_qualification'||action==='start_prequalification'){
@@ -216,13 +203,22 @@ export async function handleStartpartnerAiReviewAction(item,action,reload){
     }catch(error){setStatus(error.message,'attention');}
     return true;
   }
+  if(action==='copy_followup_review_prompt'){
+    setStatus('Aktuelle Rückfrage wird geladen …');
+    try{
+      const detail=await latest(item);const data=detail.startpartner_candidate||{};const question=clean(data.status_reason);
+      if(String(data.status||'')!=='awaiting_response'||!question){setStatus('Aktuell gibt es keine versendete Rückfrage zur Folgeprüfung.','attention');return true;}
+      const copied=await copyText(reviewPrompt(data,question));
+      setStatus(copied?'Folgeprompt kopiert. In ChatGPT einfügen, die fachlich relevante E-Mail-Antwort an der markierten Stelle ergänzen und die Auswertung anschließend hier entscheiden.':'Folgeprompt konnte nicht automatisch kopiert werden.',copied?'success':'attention');
+    }catch(error){setStatus(error.message,'attention');}
+    return true;
+  }
   if(action==='send_review_question'||action==='resend_review_question'){
     const detail=await latest(item).catch(error=>{setStatus(error.message,'attention');return null;});if(!detail)return true;
     const question=clean(detail.startpartner_candidate?.status_reason);
     if(!question){setStatus('Keine Rückfrage zum Versenden gefunden.','attention');return true;}
     await sendCommunication(item,'question',reload,question);return true;
   }
-  if(action==='record_review_reply'){await recordReplyDialog(item,reload);return true;}
   const retryTopicByAction={retry_review_accepted:'accepted',retry_review_rejected:'rejected',retry_review_waitlisted:'waitlisted'};
   if(retryTopicByAction[action]){
     const detail=await latest(item).catch(error=>{setStatus(error.message,'attention');return null;});if(!detail)return true;
