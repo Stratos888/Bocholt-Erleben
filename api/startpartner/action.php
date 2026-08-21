@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/_gate3_domain.php';
+require_once __DIR__ . '/_gate3_communication.php';
 
 be_startpartner_require_gate1_environment();
 be_require_review_access();
@@ -23,7 +23,15 @@ try {
 
     $pdo = be_db();
     $requestedAction = trim((string)($input['action'] ?? ''));
-    if ($requestedAction === 'confirm_pilot_terms') {
+    if ($requestedAction === 'send_pilot_terms') {
+        $result = be_startpartner_gate3_send_terms($pdo, $candidateId, $input);
+    } elseif ($requestedAction === 'confirm_pilot_terms_simple') {
+        // Der bewusst bestätigte Dialog-Button ist die Operator-Aussage,
+        // dass eine ausdrückliche Partnerbestätigung tatsächlich vorliegt.
+        $input['partner_acceptance_confirmed'] = true;
+        $result = be_startpartner_gate3_confirm_from_sent_terms($pdo, $candidateId, $input);
+    } elseif ($requestedAction === 'confirm_pilot_terms') {
+        // Legacy-/Contract-Kompatibilität für bestehende synthetische Gate-3-Aufrufer.
         $result = be_startpartner_gate3_confirm($pdo, $candidateId, $input);
     } else {
         be_startpartner_gate3_guard_gate2_action($pdo, $candidateId, $requestedAction);
