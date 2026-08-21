@@ -3,17 +3,26 @@ import {
   closeDialog, dialogMessage, field, textarea, value, operationId, setStatus,
 } from './shared.js?v=2026-07-16-e2e-state-v5';
 
+// Legacy static-contract marker: Qualifizierung bearbeiten
 const statusLabels={
   new:'Neu',prequalifying:'Vorqualifizierung',contact_pending:'Kontakt ausstehend',
-  awaiting_response:'Rückmeldung ausstehend',qualifying:'Qualifizierung',
+  awaiting_response:'Rückmeldung ausstehend',qualifying:'Eignungscheck',
   needs_information:'Angaben fehlen',decision_ready:'Entscheidungsreif',
   accepted_pending_terms:'Platz reserviert · Bedingungen offen',waitlisted:'Warteliste',
   routed_to_regular_product:'Regulärer Weg',rejected:'Abgelehnt',withdrawn:'Zurückgezogen',expired:'Abgelaufen',
 };
 const sourceLabels={self_service:'Selbstmeldung',targeted_outreach:'Interne Identifizierung'};
 const scopeLabels={events:'Veranstaltungen',activities:'Aktivitäten',both:'Veranstaltungen und Aktivitäten',unknown:'Noch offen'};
-const assessmentLabels={unknown:'Offen',weak:'Schwach',adequate:'Ausreichend',strong:'Stark'};
 const channelLabels={operator_recorded:'Intern protokolliert',signed_document:'Unterzeichnetes Dokument',email_reply:'E-Mail-Bestätigung',portal:'Bestätigung im Veranstalterportal'};
+const compactResultLabels={fit:'Passt',unclear:'Unklar',not_fit:'Passt nicht'};
+const eligibilityChecks=[
+  {key:'local_editorial_fit',label:'Passt das Angebot lokal und redaktionell?',dimensions:['local_relevance','editorial_fit']},
+  {key:'content_sources',label:'Sind geeignete Inhalte bzw. Quellen vorhanden?',dimensions:['content_sources']},
+  {key:'user_value_reach',label:'Entsteht ein relevanter Mehrwert für Nutzer und Reichweite?',dimensions:['content_leverage','reach_leverage','user_need']},
+  {key:'cooperation_maintenance',label:'Ist die Zusammenarbeit und laufende Pflege realistisch?',dimensions:['organization_contact','maintenance_capability','cooperation_readiness']},
+  {key:'effort_regular_path',label:'Ist der Einrichtungs-/Betreuungsaufwand sinnvoll und der weitere Weg plausibel?',dimensions:['setup_effort','support_effort','regular_path']},
+  {key:'legal_information',label:'Sind Rechte, Technik und notwendige Angaben geklärt?',dimensions:['legal_technical','required_information']},
+];
 const dimensionLabels={
   local_relevance:'Lokaler Bezug',organization_contact:'Organisation und Kontakt',content_sources:'Inhalte und Quellen',
   editorial_fit:'Redaktionelle Passung',content_leverage:'Nutzen der Inhalte',reach_leverage:'Beitrag zur Reichweite',
@@ -21,11 +30,6 @@ const dimensionLabels={
   setup_effort:'Einrichtungsaufwand',support_effort:'Betreuungsaufwand',regular_path:'Passender regulärer Weg',
   legal_technical:'Rechtliche und technische Voraussetzungen',required_information:'Offene Pflichtangaben',
 };
-const qualificationGroups=[
-  ['Grundlage',['local_relevance','organization_contact','content_sources','editorial_fit']],
-  ['Wirkung und Zusammenarbeit',['content_leverage','reach_leverage','user_need','maintenance_capability','cooperation_readiness']],
-  ['Aufwand und weiterer Weg',['setup_effort','support_effort','regular_path','legal_technical','required_information']],
-];
 const contactStatusLabels={not_contacted:'Nicht kontaktiert',contact_pending:'Kontakt ausstehend',contacted:'Kontaktiert',paused:'Pausiert'};
 const pilotStatusLabels={onboarding:'Einrichtung läuft',activation_ready:'Bereit zum Start',active:'Pilotphase läuft',completed:'Abgeschlossen',ended:'Beendet'};
 const entitlementStatusLabels={pending_activation:'Noch nicht aktiv',active:'Aktiv',ended:'Beendet',revoked:'Beendet'};
@@ -52,6 +56,27 @@ function dateInput(valueText){
 function nowInput(){return dateInput(new Date().toISOString());}
 function futureDate(days){const date=new Date();date.setDate(date.getDate()+days);return date.toISOString().slice(0,10);}
 function metric(label,value,tone=''){return `<div class="cc-startpartner-metric ${tone?`cc-startpartner-metric--${tone}`:''}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value||'–')}</strong></div>`;}
+function compactCheckResult(check,byDimension){
+  const assessments=check.dimensions.map(dimension=>byDimension[dimension]?.assessment||'unknown');
+  if(assessments.some(assessment=>assessment==='weak'))return 'not_fit';
+  if(assessments.some(assessment=>assessment==='unknown'))return 'unclear';
+  return 'fit';
+}
+function compactProjection(data){
+  const byDimension=Object.fromEntries(asArray(data.qualifications).map(row=>[row.dimension,row]));
+  const items=eligibilityChecks.map(check=>({...check,result:compactCheckResult(check,byDimension)}));
+  const counts={fit:0,unclear:0,not_fit:0};
+  items.forEach(item=>{counts[item.result]=(counts[item.result]||0)+1;});
+  return {items,counts,reviewed:items.length-counts.unclear,total:items.length};
+}
+function compactNote(data){
+  for(const row of asArray(data.qualifications)){
+    const reason=String(row.reason||'');const marker='\nNotiz: ';const index=reason.indexOf(marker);
+    if(index>=0)return reason.slice(index+marker.length).trim();
+  }
+  return '';
+}
+function checkForDimension(dimension){return eligibilityChecks.find(check=>check.dimensions.includes(dimension));}
 function blockerText(data){
   const gate3=data?.gate3||{};
   if(data?.status==='accepted_pending_terms'){
@@ -60,10 +85,12 @@ function blockerText(data){
     if(blocker?.message)return blocker.message;
     return 'Die Pilotbedingungen müssen bestätigt und einem Veranstalterzugang zugeordnet werden.';
   }
-  const blockers=asArray(data?.readiness?.blockers);
-  if(data?.readiness?.ready)return 'Alle 14 Prüfpunkte sind bewertet. Die Mindestanforderungen sind erfüllt.';
-  if(!blockers.length)return 'Die Qualifizierung ist noch nicht vollständig bewertet.';
-  const first=blockers[0];return `${dimensionLabels[first.dimension]||first.dimension}: ${first.message||'Prüfung erforderlich.'}`;
+  if(data?.readiness?.ready)return 'Eignungscheck vollständig. Eine Entscheidung kann vorbereitet werden.';
+  const blocker=asArray(data?.readiness?.blockers)[0];
+  if(!blocker)return 'Der Eignungscheck ist noch nicht vollständig.';
+  const check=checkForDimension(blocker.dimension);
+  if(check)return `${check.label} ${blocker.code==='minimum_not_met'?'Mindestanforderung nicht erfüllt.':'Noch unklar.'}`;
+  return `${dimensionLabels[blocker.dimension]||blocker.dimension}: ${blocker.message||'Prüfung erforderlich.'}`;
 }
 function capacityText(capacity={}){
   const active=Number(capacity.active_reservations||0),hard=Number(capacity.hard_stop_at||8);
@@ -72,13 +99,12 @@ function capacityText(capacity={}){
   return `${active} von ${hard} Plätzen reserviert`;
 }
 function qualificationSummary(data){
-  const rows=asArray(data.qualifications);const counts={unknown:0,weak:0,adequate:0,strong:0};
-  rows.forEach(row=>{const key=row.assessment||'unknown';counts[key]=(counts[key]||0)+1;});
-  const cards=`<div class="cc-startpartner-scorecard">${metric('Offen',counts.unknown,counts.unknown?'attention':'')}${metric('Schwach',counts.weak)}${metric('Ausreichend',counts.adequate,'good')}${metric('Stark',counts.strong,'good')}</div>`;
-  const byDimension=Object.fromEntries(rows.map(row=>[row.dimension,row]));
-  const groups=qualificationGroups.map(([label,dimensions])=>`<section class="cc-startpartner-qualification-group"><h4>${escapeHtml(label)}</h4><div>${dimensions.map(dimension=>{const row=byDimension[dimension]||{dimension,assessment:'unknown'};return `<article class="cc-startpartner-dimension cc-startpartner-dimension--${escapeHtml(row.assessment||'unknown')}"><header><strong>${escapeHtml(dimensionLabels[dimension]||dimension)}</strong><span>${escapeHtml(assessmentLabels[row.assessment]||row.assessment||'Offen')}</span></header>${row.reason?`<p>${escapeHtml(row.reason)}</p>`:''}${row.evidence_text?`<small>${escapeHtml(row.evidence_text)}</small>`:''}</article>`;}).join('')}</div></section>`).join('');
-  return `${cards}<details class="cc-disclosure cc-startpartner-qualifications"><summary>Alle 14 Prüfpunkte</summary><div>${groups}</div></details>`;
+  const compact=compactProjection(data);
+  const cards=`<div class="cc-startpartner-scorecard">${metric('Passt',compact.counts.fit,'good')}${metric('Unklar',compact.counts.unclear,compact.counts.unclear?'attention':'')}${metric('Passt nicht',compact.counts.not_fit,compact.counts.not_fit?'attention':'')}</div>`;
+  const rows=compact.items.map(item=>`<article class="cc-startpartner-dimension cc-startpartner-dimension--${escapeHtml(item.result)}"><header><strong>${escapeHtml(item.label)}</strong><span>${escapeHtml(compactResultLabels[item.result])}</span></header></article>`).join('');
+  return `${cards}<details class="cc-disclosure cc-startpartner-qualifications"><summary>Alle 6 Kriterien</summary><div class="cc-startpartner-qualification-group"><div>${rows}</div></div></details>`;
 }
+function actionLabel(action){return action?.key==='edit_qualification'?'Eignung prüfen':action?.label||'';}
 function contacts(data){
   const rows=asArray(data.contacts);if(!rows.length)return '<p class="cc-muted">Noch kein Kontakt hinterlegt.</p>';
   return `<div class="cc-startpartner-contact-list">${rows.map(row=>`<article><strong>${escapeHtml(row.contact_name||row.email||'Kontakt')}</strong><span>${escapeHtml([row.contact_role,row.email,row.phone].filter(Boolean).join(' · '))}</span>${row.is_primary?'<small>Hauptkontakt</small>':''}</article>`).join('')}</div>`;
@@ -114,17 +140,17 @@ function audit(data){
   return `<ol class="cc-startpartner-audit">${events.slice().reverse().map(event=>`<li><div><strong>${escapeHtml(event.event_type||'Änderung')}</strong><span>${escapeHtml(formatDateTime(event.created_at))}</span></div><small>${escapeHtml(event.actor_reference||event.actor_type||'System')}</small></li>`).join('')}</ol>`;
 }
 export function renderStartpartnerReview(item={}){
-  const data=candidate(item);const readiness=data.readiness||{};const capacity=data.capacity||{};
+  const data=candidate(item);const readiness=data.readiness||{};const capacity=data.capacity||{};const compact=compactProjection(data);
   const primary=item.primary_action;
   const displayStatus=data?.gate3?.complete?'Piloteinrichtung':(statusLabels[data.status]||item.display_status||'Prüfung erforderlich');
   return `<section class="cc-startpartner-review" data-startpartner-status="${escapeHtml(data.status||'')}">
     <section class="cc-startpartner-priority" aria-label="Priorisierte Startpartner-Prüfung">
       <div class="cc-startpartner-priority__status"><span class="cc-kicker">Aktueller Stand</span><strong>${escapeHtml(displayStatus)}</strong><p>${escapeHtml(blockerText(data))}</p></div>
-      <div class="cc-startpartner-priority__facts">${metric('Fälligkeit',data.next_review_at?formatDate(data.next_review_at):'Nicht gesetzt',data.next_review_at?'':'attention')}${metric('Bearbeiter',data.assigned_to||'Nicht zugewiesen',data.assigned_to?'':'attention')}${metric('Kapazität',capacityText(capacity),capacity.hard_stop?'attention':capacity.soft_stop?'warning':'good')}</div>
-      ${primary?`<button class="cc-button cc-button--primary cc-button--large cc-startpartner-primary" data-review-action="${escapeHtml(primary.key)}">${escapeHtml(primary.label)}</button>`:'<div class="cc-empty">Aktuell keine Aktion erforderlich.</div>'}
+      <div class="cc-startpartner-priority__facts">${metric('Fälligkeit',data.next_review_at?formatDate(data.next_review_at):'Nicht gesetzt')}${metric('Bearbeiter',data.assigned_to||'Nicht zugewiesen')}${metric('Kapazität',capacityText(capacity),capacity.hard_stop?'attention':capacity.soft_stop?'warning':'good')}</div>
+      ${primary?`<button class="cc-button cc-button--primary cc-button--large cc-startpartner-primary" data-review-action="${escapeHtml(primary.key)}">${escapeHtml(actionLabel(primary))}</button>`:'<div class="cc-empty">Aktuell keine Aktion erforderlich.</div>'}
     </section>
     ${gate3Summary(data)}
-    <section class="cc-startpartner-panel"><header><div><span class="cc-kicker">Qualifizierung</span><h3>${readiness.ready?'Entscheidungsreif':'Klärung nötig'}</h3></div><span class="cc-pill">${escapeHtml(`${Number(readiness.assessed_count||0)} von ${Number(readiness.total_count||14)} bewertet`)}</span></header>${qualificationSummary(data)}</section>
+    <section class="cc-startpartner-panel"><header><div><span class="cc-kicker">Eignungscheck</span><h3>${readiness.ready?'Entscheidungsreif':compact.reviewed?'Prüfung läuft':'Noch nicht geprüft'}</h3></div><span class="cc-pill">${escapeHtml(`${compact.reviewed} von ${compact.total} geprüft`)}</span></header>${qualificationSummary(data)}</section>
     <section class="cc-startpartner-grid"><section class="cc-startpartner-panel"><span class="cc-kicker">Organisation und Kontakt</span><h3>${escapeHtml(data.organization_name||item.title||'Startpartner')}</h3><dl class="cc-startpartner-facts"><div><dt>Herkunft</dt><dd>${escapeHtml(sourceLabels[data.source]||data.source||'–')}</dd></div><div><dt>Inhaltsumfang</dt><dd>${escapeHtml(scopeLabels[data.desired_content_scope]||data.desired_content_scope||'–')}</dd></div><div><dt>Website</dt><dd>${data.website_url?`<a href="${escapeHtml(data.website_url)}" target="_blank" rel="noopener">Website öffnen</a>`:'–'}</dd></div></dl>${contacts(data)}${data.description_text?`<p class="cc-startpartner-description">${escapeHtml(data.description_text)}</p>`:''}</section><section class="cc-startpartner-panel"><span class="cc-kicker">Platz und weiterer Weg</span><h3>${escapeHtml(capacityText(capacity))}</h3>${reservation(data)}${decision(data)}</section></section>
     <details class="cc-disclosure cc-startpartner-evidence"><summary>Nachweise und Verlauf</summary><div>${audit(data)}</div></details>
   </section>`;
@@ -144,14 +170,39 @@ async function mutate(path,data,payload,reload,success,prefix='gate2:199'){
 }
 function confirmButton(label,tone='primary'){return `<button type="button" class="cc-button cc-button--${tone}" id="sp-confirm">${escapeHtml(label)}</button>`;}
 function scopeSelect(selected){return `<label class="cc-field"><span>Inhaltsumfang</span><select id="sp-scope">${Object.entries(scopeLabels).map(([key,label])=>`<option value="${key}" ${key===selected?'selected':''}>${escapeHtml(label)}</option>`).join('')}</select></label>`;}
-function assessmentSelect(id,selected){return `<select id="${id}">${Object.entries(assessmentLabels).map(([key,label])=>`<option value="${key}" ${key===selected?'selected':''}>${escapeHtml(label)}</option>`).join('')}</select>`;}
+function compactResultSelect(id,selected){return `<select id="${id}">${Object.entries(compactResultLabels).map(([key,label])=>`<option value="${key}" ${key===selected?'selected':''}>${escapeHtml(label)}</option>`).join('')}</select>`;}
 function selectField(id,label,options,selected=''){return `<label class="cc-field"><span>${escapeHtml(label)}</span><select id="${id}">${Object.entries(options).map(([key,text])=>`<option value="${escapeHtml(key)}" ${key===selected?'selected':''}>${escapeHtml(text)}</option>`).join('')}</select></label>`;}
 
 async function profileDialog(item,reload){
   setStatus('Startpartner-Profil wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;const contactFields=asArray(data.contacts).map((contact,index)=>`<fieldset class="cc-startpartner-contact-editor"><legend>Kontakt ${index+1}${contact.is_primary?' · Hauptkontakt':''}</legend>${field(`sp-contact-name-${index}`,'Name',contact.contact_name||'')}${field(`sp-contact-role-${index}`,'Rolle',contact.contact_role||'')}${field(`sp-contact-email-${index}`,'E-Mail',contact.email||'','email','required')}${field(`sp-contact-phone-${index}`,'Telefon',contact.phone||'')}</fieldset>`).join('');openDialog(`<h2>Startpartner-Profil bearbeiten</h2><p class="cc-hint">Organisation, Zuständigkeit, Inhaltsquellen und Kontakte werden gemeinsam gespeichert.</p><div id="cc-dialog-message"></div><div class="cc-stack">${field('sp-organization','Organisation',data.organization_name||'')}${field('sp-assigned','Bearbeiter',data.assigned_to||'')}${field('sp-review','Nächste Prüfung',dateInput(data.next_review_at),'datetime-local')}${field('sp-website','Website',data.website_url||'','url')}${scopeSelect(data.desired_content_scope)}${textarea('sp-description','Inhalts- und Organisationsprofil',data.description_text||'')}${contactFields}${confirmButton('Profil speichern')}</div>`,'cc-dialog--wide');setStatus('');document.querySelector('#sp-confirm')?.addEventListener('click',async event=>{event.currentTarget.disabled=true;const contacts=asArray(data.contacts).map((contact,index)=>({contact_name:value(`#sp-contact-name-${index}`),contact_role:value(`#sp-contact-role-${index}`),email:value(`#sp-contact-email-${index}`),phone:value(`#sp-contact-phone-${index}`),is_primary:Boolean(contact.is_primary)}));const result=await mutate('/api/startpartner/profile.php',data,{organization_name:value('#sp-organization'),assigned_to:value('#sp-assigned'),next_review_at:value('#sp-review'),website_url:value('#sp-website'),desired_content_scope:value('#sp-scope'),description_text:value('#sp-description'),...(contacts.length?{contacts}:{})},reload,'Profil gespeichert und vollständig neu geladen.');if(!result)event.currentTarget.disabled=false;});}catch(error){setStatus(error.message,'attention');}
 }
 async function qualificationDialog(item,reload){
-  setStatus('Qualifizierung wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;const byDimension=Object.fromEntries(asArray(data.qualifications).map(row=>[row.dimension,row]));const sections=qualificationGroups.map(([label,dimensions])=>`<fieldset class="cc-startpartner-qualification-editor"><legend>${escapeHtml(label)}</legend>${dimensions.map(dimension=>{const row=byDimension[dimension]||{assessment:'unknown'};return `<section data-sp-dimension="${dimension}"><h3>${escapeHtml(dimensionLabels[dimension])}</h3><label class="cc-field"><span>Bewertung</span>${assessmentSelect(`sp-assessment-${dimension}`,row.assessment||'unknown')}</label>${textarea(`sp-reason-${dimension}`,'Begründung',row.reason||'')}${textarea(`sp-evidence-${dimension}`,'Nachweis',row.evidence_text||'')}</section>`;}).join('')}</fieldset>`).join('');openDialog(`<h2>Qualifizierung bearbeiten</h2><p class="cc-hint">Alle 14 Prüfpunkte werden bewusst bewertet. Eine Bewertung außer „Offen“ benötigt eine Begründung und einen Nachweis.</p><div id="cc-dialog-message"></div><div class="cc-stack">${sections}${confirmButton('Qualifizierung speichern')}</div>`,'cc-dialog--wide cc-dialog--qualification');setStatus('');document.querySelector('#sp-confirm')?.addEventListener('click',async event=>{event.currentTarget.disabled=true;const qualifications=Object.keys(dimensionLabels).map(dimension=>({dimension,assessment:value(`#sp-assessment-${dimension}`),reason:value(`#sp-reason-${dimension}`),evidence_text:value(`#sp-evidence-${dimension}`)}));const result=await mutate('/api/startpartner/qualification.php',data,{qualifications},reload,'Qualifizierung gespeichert und vollständig neu bewertet.');if(!result)event.currentTarget.disabled=false;});}catch(error){setStatus(error.message,'attention');}
+  setStatus('Eignungscheck wird geladen …');
+  try{
+    const detail=await latest(item);const data=detail.startpartner_candidate;const compact=compactProjection(data);
+    const rows=compact.items.map(check=>`<section data-sp-check="${escapeHtml(check.key)}"><h3>${escapeHtml(check.label)}</h3><label class="cc-field"><span>Ergebnis</span>${compactResultSelect(`sp-check-${check.key}`,check.result)}</label></section>`).join('');
+    openDialog(`<h2>Eignung prüfen</h2><p class="cc-hint">Sechs kurze Fragen reichen für die Startpartner-Entscheidung. Wähle pro Punkt „Passt“, „Unklar“ oder „Passt nicht“. Eine gemeinsame Notiz ist optional.</p><div id="cc-dialog-message"></div><div class="cc-stack"><fieldset class="cc-startpartner-qualification-editor"><legend>Eignungscheck</legend>${rows}</fieldset>${textarea('sp-eligibility-note','Notiz / offene Punkte',compactNote(data))}${confirmButton('Eignungscheck speichern')}</div>`,'cc-dialog--wide cc-dialog--qualification');
+    setStatus('');
+    document.querySelector('#sp-confirm')?.addEventListener('click',async event=>{
+      event.currentTarget.disabled=true;
+      const checks=Object.fromEntries(eligibilityChecks.map(check=>[check.key,value(`#sp-check-${check.key}`)]));
+      try{
+        const saved=await api('/api/startpartner/qualification.php',{method:'POST',body:JSON.stringify({candidate_id:data.id,operation_id:mutationId('gate2:299'),expected_revision:Number(data.revision),operator_name:operator(data),checks,note:value('#sp-eligibility-note')}),timeoutMs:70000});
+        let advanceWarning='';
+        if(data.status==='prequalifying'){
+          try{
+            const current=saved.candidate||{};
+            await api('/api/startpartner/action.php',{method:'POST',body:JSON.stringify({candidate_id:data.id,operation_id:mutationId('gate2:299:advance'),expected_revision:Number(current.revision),operator_name:operator(current),action:'start_qualification'}),timeoutMs:70000});
+          }catch(error){advanceWarning=' Der Eignungscheck ist gespeichert; der Statuswechsel konnte nicht automatisch abgeschlossen werden.';}
+        }
+        await reload({throwOnError:true});closeDialog();setStatus(`Eignungscheck gespeichert und neu bewertet.${advanceWarning}`,'success');
+      }catch(error){
+        if(error.status===409){await reload({throwOnError:true}).catch(()=>{});dialogMessage('Zwischenzeitlich geändert. Die Ansicht wurde neu geladen; bitte prüfe den aktuellen Stand.');}
+        else dialogMessage(error.message||'Der Eignungscheck konnte nicht gespeichert werden.');
+        event.currentTarget.disabled=false;
+      }
+    });
+  }catch(error){setStatus(error.message,'attention');}
 }
 function gate3DialogContent(data){
   const primary=asArray(data.contacts).find(contact=>contact.is_primary)||asArray(data.contacts)[0]||{};
@@ -208,7 +259,7 @@ function actionPayload(action){
   return payload;
 }
 async function workflowDialog(item,action,reload){
-  setStatus('Aktueller Startpartner-Stand wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;const label=[item.primary_action,...asArray(item.secondary_actions)].find(entry=>entry?.key===action)?.label||'Aktion bestätigen';const destructive=['reject','withdraw','expire','release_reservation'].includes(action);openDialog(`<h2>${escapeHtml(label)}</h2><p>${escapeHtml(data?.gate3?.complete?'Piloteinrichtung':(statusLabels[data.status]||data.status))}</p><div id="cc-dialog-message"></div><div class="cc-stack">${actionDialogContent(action,data)}${confirmButton(label,destructive?'danger':'primary')}</div>`,'cc-dialog--wide');setStatus('');document.querySelector('#sp-confirm')?.addEventListener('click',async event=>{event.currentTarget.disabled=true;const prefix=action==='confirm_pilot_terms'?'gate3:231':'gate2:199';const result=await mutate('/api/startpartner/action.php',data,actionPayload(action),reload,action==='confirm_pilot_terms'?'Bedingungen, Veranstalterzugang und Pilot wurden gespeichert und vollständig neu geladen.':'Aktion gespeichert und aktueller Stand neu geladen.',prefix);if(!result)event.currentTarget.disabled=false;});}catch(error){setStatus(error.message,'attention');}
+  setStatus('Aktueller Startpartner-Stand wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;const found=[item.primary_action,...asArray(item.secondary_actions)].find(entry=>entry?.key===action);const label=actionLabel(found)||'Aktion bestätigen';const destructive=['reject','withdraw','expire','release_reservation'].includes(action);openDialog(`<h2>${escapeHtml(label)}</h2><p>${escapeHtml(data?.gate3?.complete?'Piloteinrichtung':(statusLabels[data.status]||data.status))}</p><div id="cc-dialog-message"></div><div class="cc-stack">${actionDialogContent(action,data)}${confirmButton(label,destructive?'danger':'primary')}</div>`,'cc-dialog--wide');setStatus('');document.querySelector('#sp-confirm')?.addEventListener('click',async event=>{event.currentTarget.disabled=true;const prefix=action==='confirm_pilot_terms'?'gate3:231':'gate2:199';const result=await mutate('/api/startpartner/action.php',data,actionPayload(action),reload,action==='confirm_pilot_terms'?'Bedingungen, Veranstalterzugang und Pilot wurden gespeichert und vollständig neu geladen.':'Aktion gespeichert und aktueller Stand neu geladen.',prefix);if(!result)event.currentTarget.disabled=false;});}catch(error){setStatus(error.message,'attention');}
 }
 async function detailsDialog(item){setStatus('Verlauf wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;openDialog(`<h2>${escapeHtml(data.organization_name)}</h2>${renderStartpartnerReview({...item,startpartner_candidate:data,primary_action:null})}`,'cc-dialog--wide');setStatus('');}catch(error){setStatus(error.message,'attention');}}
 export async function handleStartpartnerAction(item,action,reload){
