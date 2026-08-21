@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/_gate3_communication.php';
+require_once __DIR__ . '/_gate3_delivery_retry.php';
 
 be_startpartner_require_gate1_environment();
 be_require_review_access();
@@ -25,6 +25,11 @@ try {
     $requestedAction = trim((string)($input['action'] ?? ''));
     if ($requestedAction === 'send_pilot_terms') {
         $result = be_startpartner_gate3_send_terms($pdo, $candidateId, $input);
+    } elseif ($requestedAction === 'resend_pilot_terms') {
+        // Der bewusst bestätigte Dialog-Button ist die Operator-Aussage,
+        // dass die zuvor SMTP-angenommene Nachricht extern nicht angekommen ist.
+        $input['delivery_not_received_confirmed'] = true;
+        $result = be_startpartner_gate3_resend_terms($pdo, $candidateId, $input);
     } elseif ($requestedAction === 'confirm_pilot_terms_simple') {
         // Der bewusst bestätigte Dialog-Button ist die Operator-Aussage,
         // dass eine ausdrückliche Partnerbestätigung tatsächlich vorliegt.
