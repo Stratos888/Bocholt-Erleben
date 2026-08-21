@@ -109,8 +109,8 @@ function be_startpartner_gate3_present_case(array $item, array $candidate): arra
         );
         $item['decision_context']['gate3_delivery'] = [
             'recipient_address' => $primaryEmail,
-            'transport_status' => 'smtp_accepted',
-            'smtp_data_code' => 250,
+            'transport_status' => 'accepted',
+            'transport_final_code' => 250,
         ];
     }
     $item['secondary_actions'] = array_merge($item['secondary_actions'], [
