@@ -104,7 +104,7 @@ export function renderStartpartnerReview(item={}){
   return `<section class="cc-startpartner-review" data-startpartner-status="${escapeHtml(data.status||'')}">
     <section class="cc-startpartner-priority" aria-label="Priorisierte Startpartner-Prüfung">
       <div class="cc-startpartner-priority__status"><span class="cc-kicker">Aktueller Stand</span><strong>${escapeHtml(displayStatus)}</strong><p>${escapeHtml(blockerText(data))}</p></div>
-      <div class="cc-startpartner-priority__facts">${metric('Fälligkeit',data.next_review_at?formatDate(data.next_review_at):'Nicht gesetzt')}${metric('Bearbeiter',data.assigned_to||'Nicht zugewiesen')}${metric('Kapazität',capacityText(capacity),capacity.hard_stop?'attention':capacity.soft_stop?'warning':'good')}</div>
+      ${metric('Kapazität',capacityText(capacity),capacity.hard_stop?'attention':capacity.soft_stop?'warning':'good')}
       ${primary?`<button class="cc-button cc-button--primary cc-button--large cc-startpartner-primary" data-review-action="${escapeHtml(primary.key)}">${escapeHtml(actionLabel(primary))}</button>`:reviewing?'':'<div class="cc-empty">Aktuell keine Aktion erforderlich.</div>'}
     </section>
     ${renderStartpartnerAiReview(data)}
