@@ -50,9 +50,9 @@ function be_startpartner_gate3_retry_record(
         'recipient_name' => trim((string)($contact['contact_name'] ?? '')),
         'transport_status' => $transportStatus,
     ];
-    if ($transportStatus === 'smtp_accepted') {
+    if ($transportStatus === 'accepted') {
         // be_send_mail() kehrt erst nach der finalen SMTP-DATA-Antwort 250 zurück.
-        $payload['smtp_data_code'] = 250;
+        $payload['transport_final_code'] = 250;
         $payload['transport_accepted_at'] = gmdate('c');
     }
     if ($failureCode !== null) {
@@ -185,7 +185,7 @@ function be_startpartner_gate3_resend_terms(PDO $pdo, string $candidateId, array
         $operationId,
         $snapshot,
         $contact,
-        'smtp_accepted'
+        'accepted'
     );
 
     return [
@@ -195,8 +195,8 @@ function be_startpartner_gate3_resend_terms(PDO $pdo, string $candidateId, array
         'terms_snapshot' => $snapshot,
         'delivery' => [
             'recipient_address' => $toAddress,
-            'transport_status' => 'smtp_accepted',
-            'smtp_data_code' => 250,
+            'transport_status' => 'accepted',
+            'transport_final_code' => 250,
         ],
         'candidate' => be_startpartner_gate3_candidate_detail($pdo, $candidateId),
     ];
