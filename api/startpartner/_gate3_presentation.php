@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 // Begriffswechsel: Der frühere sichtbare Status „Pilot-Onboarding“ heißt jetzt „Piloteinrichtung“.
+// Legacy-UI: confirm_pilot_terms / „Bedingungen bestätigen und Pilot anlegen“ wird nicht mehr angeboten.
 
 function be_startpartner_gate3_case_action(
     string $key,
@@ -16,6 +17,22 @@ function be_startpartner_gate3_case_action(
         'destructive' => $destructive,
         'enabled' => true,
     ];
+}
+
+function be_startpartner_gate3_terms_were_sent(array $candidate): bool
+{
+    $events = is_array($candidate['events'] ?? null) ? $candidate['events'] : [];
+    foreach (array_reverse($events) as $event) {
+        if (
+            is_array($event)
+            && (string)($event['event_type'] ?? '') === 'pilot_terms_sent'
+            && is_array(($event['payload'] ?? null))
+            && is_array(($event['payload']['terms_snapshot'] ?? null))
+        ) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function be_startpartner_gate3_present_case(array $item, array $candidate): array
@@ -53,12 +70,19 @@ function be_startpartner_gate3_present_case(array $item, array $candidate): arra
         return $item;
     }
 
-    $item['display_status'] = 'Platz reserviert · Bedingungen offen';
-    $item['primary_action'] = be_startpartner_gate3_case_action(
-        'confirm_pilot_terms',
-        'Bedingungen bestätigen und Pilot anlegen',
-        true
-    );
+    $termsSent = be_startpartner_gate3_terms_were_sent($candidate);
+    $item['display_status'] = $termsSent
+        ? 'Platz reserviert · Bestätigung ausstehend'
+        : 'Platz reserviert · Bedingungen offen';
+    $item['primary_action'] = $termsSent
+        ? be_startpartner_gate3_case_action(
+            'confirm_pilot_terms_simple',
+            'Partnerbestätigung erfassen und Pilot anlegen'
+        )
+        : be_startpartner_gate3_case_action(
+            'send_pilot_terms',
+            'Pilotbedingungen senden'
+        );
     $item['secondary_actions'] = [
         be_startpartner_gate3_case_action('edit_profile', 'Profil bearbeiten', true),
         be_startpartner_gate3_case_action('extend_reservation', 'Reservierung verlängern', true),
@@ -70,6 +94,8 @@ function be_startpartner_gate3_present_case(array $item, array $candidate): arra
         ),
         be_startpartner_gate3_case_action('details', 'Nachweise und Verlauf'),
     ];
-    $item['next_action'] = 'Pilotbedingungen bestätigen und Veranstalterzugang zuordnen.';
+    $item['next_action'] = $termsSent
+        ? 'Ausdrückliche Partnerbestätigung prüfen und anschließend die Piloteinrichtung anlegen.'
+        : 'Kanonische Pilotbedingungen an den Hauptkontakt senden.';
     return $item;
 }
