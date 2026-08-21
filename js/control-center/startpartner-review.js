@@ -41,10 +41,14 @@ function dateInput(valueText){
 function nowInput(){return dateInput(new Date().toISOString());}
 function futureDate(days){const date=new Date();date.setDate(date.getDate()+days);return date.toISOString().slice(0,10);}
 function metric(label,value,tone=''){return `<div class="cc-startpartner-metric ${tone?`cc-startpartner-metric--${tone}`:''}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value||'–')}</strong></div>`;}
+function pilotTermsWereSent(data){
+  return asArray(data?.events).some(event=>event?.event_type==='pilot_terms_sent'&&event?.payload?.terms_snapshot&&typeof event.payload.terms_snapshot==='object');
+}
 function blockerText(data){
   const status=String(data?.status||'');const gate3=data?.gate3||{};
   if(status==='accepted_pending_terms'){
     if(gate3.complete)return 'Bedingungen bestätigt. Die Piloteinrichtung kann beginnen; Pilotphase und Laufzeit starten noch nicht.';
+    if(pilotTermsWereSent(data))return 'Pilotbedingungen wurden versendet. Die ausdrückliche Partnerbestätigung steht noch aus.';
     const blocker=asArray(gate3.blockers)[0];
     return blocker?.message||'Die Pilotbedingungen müssen bestätigt und einem Veranstalterzugang zugeordnet werden.';
   }
@@ -70,7 +74,9 @@ function reservation(data){
   if(active){
     const message=data?.gate3?.complete
       ? 'Die Reservierung belegt den Platz weiterhin. Die Pilotphase beginnt erst nach der vollständigen Einrichtung.'
-      : 'Der Platz ist reserviert. Bedingungen und Pilotstart sind noch offen.';
+      : pilotTermsWereSent(data)
+        ? 'Der Platz ist reserviert. Die Partnerbestätigung steht noch aus; der Pilotstart bleibt gesperrt.'
+        : 'Der Platz ist reserviert. Bedingungen und Pilotstart sind noch offen.';
     return `<section class="cc-startpartner-state-card"><span class="cc-kicker">Aktive Reservierung</span><strong>Bis ${escapeHtml(formatDate(active.ends_at))}</strong><p>${escapeHtml(message)}</p></section>`;
   }
   if(data.waitlist)return `<section class="cc-startpartner-state-card"><span class="cc-kicker">Warteliste</span><strong>Neubewertung ${escapeHtml(formatDate(data.waitlist.next_review_at))}</strong><p>${escapeHtml(data.waitlist.priority_reason||data.waitlist.eligibility_reason||'Erneute Prüfung vorgesehen.')}</p><small>${escapeHtml(contactStatusLabels[data.waitlist.contact_status]||data.waitlist.contact_status||'')}</small></section>`;
@@ -84,6 +90,7 @@ function gate3Summary(data){
   if(data.status!=='accepted_pending_terms'&&!data?.gate3?.pilot)return '';
   const gate3=data.gate3||{};
   if(!gate3.complete){
+    if(pilotTermsWereSent(data))return `<section class="cc-startpartner-panel"><header><div><span class="cc-kicker">Pilotbedingungen und Veranstalterzugang</span><h3>Bestätigung ausstehend</h3></div><span class="cc-pill">Bestätigung ausstehend</span></header><p>Pilotbedingungen wurden versendet. Nach ausdrücklicher Partnerbestätigung kann die Piloteinrichtung angelegt werden.</p></section>`;
     const blocker=asArray(gate3.blockers)[0];
     return `<section class="cc-startpartner-panel"><header><div><span class="cc-kicker">Pilotbedingungen und Veranstalterzugang</span><h3>Vorbereitung noch offen</h3></div><span class="cc-pill">Bedingungen offen</span></header><p>${escapeHtml(blocker?.message||'Bestätigung, Veranstalterzugang und Pilotfreigabe fehlen.')}</p></section>`;
   }
@@ -100,7 +107,7 @@ function actionLabel(action){return action?.label||'';}
 export function renderStartpartnerReview(item={}){
   const data=candidate(item);const capacity=data.capacity||{};const reviewing=startpartnerAiReviewStatuses.has(String(data.status||''));
   const primary=reviewing?null:item.primary_action;
-  const displayStatus=data?.gate3?.complete?'Piloteinrichtung':(statusLabels[data.status]||item.display_status||'Prüfung erforderlich');
+  const displayStatus=data?.gate3?.complete?'Piloteinrichtung':(item.display_status||statusLabels[data.status]||'Prüfung erforderlich');
   return `<section class="cc-startpartner-review" data-startpartner-status="${escapeHtml(data.status||'')}">
     <section class="cc-startpartner-priority" aria-label="Priorisierte Startpartner-Prüfung">
       <div class="cc-startpartner-priority__status"><span class="cc-kicker">Aktueller Stand</span><strong>${escapeHtml(displayStatus)}</strong><p>${escapeHtml(blockerText(data))}</p></div>
