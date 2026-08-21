@@ -51,7 +51,7 @@ function be_startpartner_gate3_retry_record(
         'transport_status' => $transportStatus,
     ];
     if ($transportStatus === 'accepted') {
-        // be_send_mail() kehrt erst nach der finalen SMTP-DATA-Antwort 250 zurück.
+        // Der zentrale Mailtransport kehrt erst nach der finalen SMTP-DATA-Antwort 250 zurück.
         $payload['transport_final_code'] = 250;
         $payload['transport_accepted_at'] = gmdate('c');
     }
