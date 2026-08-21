@@ -26,6 +26,39 @@ function be_startpartner_review_communication_scope_label(string $scope): string
     };
 }
 
+function be_startpartner_review_communication_question_items(string $message): array
+{
+    $normalized = trim(str_replace(["\r\n", "\r"], "\n", $message));
+    if ($normalized === '') {
+        return [];
+    }
+
+    $lines = preg_split('/\n+/', $normalized) ?: [];
+    $cleanLines = [];
+    foreach ($lines as $line) {
+        $line = trim((string)$line);
+        $line = preg_replace('/^\s*(?:[-*•]|\d+[.)])\s*/u', '', $line) ?? $line;
+        if ($line !== '') {
+            $cleanLines[] = $line;
+        }
+    }
+
+    $sources = count($cleanLines) > 1 ? $cleanLines : [$normalized];
+    $items = [];
+    foreach ($sources as $source) {
+        $parts = preg_split('/(?<=\?)\s+/u', trim($source)) ?: [$source];
+        foreach ($parts as $part) {
+            $part = trim((string)$part);
+            $part = preg_replace('/^\s*(?:[-*•]|\d+[.)])\s*/u', '', $part) ?? $part;
+            if ($part !== '') {
+                $items[] = $part;
+            }
+        }
+    }
+
+    return $items;
+}
+
 function be_startpartner_review_communication_primary_contact(PDO $pdo, string $candidateId): ?array
 {
     foreach (be_startpartner_gate2_contacts($pdo, $candidateId) as $contact) {
@@ -118,16 +151,28 @@ function be_startpartner_review_communication_mail_data(
     ];
 
     if ($topic === 'question') {
+        $questions = be_startpartner_review_communication_question_items((string)$customerMessage);
+        $questionBody = $questions === []
+            ? trim((string)$customerMessage)
+            : implode("\n", array_map(
+                static fn(string $question): string => '• ' . $question,
+                $questions
+            ));
+        $singleQuestion = count($questions) === 1;
         return [
             'subject' => 'Rückfrage zu deiner Startpartner-Anfrage',
             'to_name' => $contactName !== '' ? $contactName : null,
             'mail_data' => [
                 'title' => 'Noch eine Rückfrage zu deiner Startpartner-Anfrage',
-                'preheader' => 'Für die Prüfung deiner Startpartner-Anfrage fehlt uns noch eine Angabe.',
+                'preheader' => $singleQuestion
+                    ? 'Für die Prüfung deiner Startpartner-Anfrage fehlt uns noch eine Angabe.'
+                    : 'Für die Prüfung deiner Startpartner-Anfrage fehlen uns noch ein paar Angaben.',
                 'greeting' => be_mail_greeting($contactName),
-                'intro' => 'Vielen Dank für deine Startpartner-Anfrage. Für unsere Prüfung fehlt uns noch eine Angabe:',
+                'intro' => $singleQuestion
+                    ? 'Vielen Dank für deine Startpartner-Anfrage. Für unsere Prüfung fehlt uns noch eine Angabe:'
+                    : 'Vielen Dank für deine Startpartner-Anfrage. Für unsere Prüfung fehlen uns noch ein paar Angaben:',
                 'details' => $details,
-                'body' => (string)$customerMessage . "\n\nBitte sende uns die fehlenden Angaben als Antwort auf diese Nachricht. Danach prüfen wir deine Anfrage weiter.",
+                'body' => $questionBody . "\n\nBitte sende uns die fehlenden Angaben als Antwort auf diese Nachricht. Danach prüfen wir deine Anfrage weiter.",
                 'notice_title' => '',
                 'notice_text' => '',
             ],
