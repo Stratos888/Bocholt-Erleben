@@ -15,6 +15,7 @@ EXPECTED_WORKFLOWS = {
     "growth-intelligence-backlog.yml",
     "inbox-cleanup.yml",
     "pr-gate.yml",
+    "startpartner-organizer-dependency-audit.yml",
     "weekly-ki-websearch-to-manual-inbox.yml",
 }
 
