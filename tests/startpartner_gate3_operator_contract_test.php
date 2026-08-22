@@ -31,6 +31,10 @@ $contact = [
 ];
 
 $assert(function_exists('be_startpartner_gate3_resend_terms'), 'Controlled Gate-3 resend function must exist.');
+$actionSource = (string)file_get_contents(dirname(__DIR__) . '/api/startpartner/action.php');
+$assert(str_contains($actionSource, 'be_startpartner_gate3_identity_conflict_message'), 'Gate-3 action must expose a read-only organizer identity diagnostic for blocked confirmation.');
+$assert(str_contains($actionSource, 'Organizer-Zuordnung blockiert:'), 'Organizer identity conflicts must be operator-readable instead of exposing only an internal English exception.');
+$assert(str_contains($actionSource, 'Es wurde nichts angelegt.'), 'Organizer identity conflict diagnostics must state that Gate 3 stayed fail-closed.');
 
 $snapshot = be_startpartner_gate3_terms_snapshot($candidate);
 $assert($snapshot['terms_version'] === BE_STARTPARTNER_GATE3_TERMS_VERSION, 'Canonical terms version must be system owned.');
