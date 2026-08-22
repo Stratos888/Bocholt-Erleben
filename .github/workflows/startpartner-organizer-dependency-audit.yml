@@ -1,0 +1,339 @@
+name: Startpartner Organizer Dependency Audit
+
+on:
+  push:
+    branches: ["staging"]
+    paths:
+      - ".github/workflows/startpartner-organizer-dependency-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    if: github.ref_name == 'staging'
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    timeout-minutes: 10
+
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install read-only DB client
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check pymysql==1.1.1
+
+      - name: Audit single organizer dependencies read-only
+        shell: bash
+        env:
+          DB_HOST: ${{ secrets.STAGING_DB_HOST }}
+          DB_PORT: ${{ secrets.STAGING_DB_PORT }}
+          DB_NAME: ${{ secrets.STAGING_DB_NAME }}
+          DB_USER: ${{ secrets.STAGING_DB_USER }}
+          DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+          TARGET_ORGANIZATION: Testlocation2
+          TARGET_EMAIL_SHA256: c847e3977351152103747445c160cf0f2ad610a48984365f877942fb9fbfbc1b
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import re
+          import sys
+          from collections import defaultdict
+
+          import pymysql
+
+          def fail(message: str) -> None:
+              print(f"AUDIT_FAIL: {message}", file=sys.stderr)
+              raise SystemExit(1)
+
+          required_env = ["DB_HOST", "DB_NAME", "DB_USER", "DB_PASSWORD", "TARGET_ORGANIZATION", "TARGET_EMAIL_SHA256"]
+          missing = [name for name in required_env if not os.environ.get(name, "").strip()]
+          if missing:
+              fail("missing required environment values: " + ", ".join(missing))
+
+          target_org = os.environ["TARGET_ORGANIZATION"].strip()
+          target_hash = os.environ["TARGET_EMAIL_SHA256"].strip().lower()
+          if not re.fullmatch(r"[0-9a-f]{64}", target_hash):
+              fail("target email fingerprint is not a SHA-256")
+
+          db_name = os.environ["DB_NAME"].strip()
+          port = int(os.environ.get("DB_PORT", "3306") or "3306")
+
+          connection = pymysql.connect(
+              host=os.environ["DB_HOST"].strip(),
+              port=port,
+              user=os.environ["DB_USER"].strip(),
+              password=os.environ["DB_PASSWORD"],
+              database=db_name,
+              charset="utf8mb4",
+              autocommit=True,
+              cursorclass=pymysql.cursors.DictCursor,
+              connect_timeout=15,
+              read_timeout=30,
+              write_timeout=15,
+          )
+
+          safe_name = re.compile(r"^[A-Za-z0-9_]+$")
+
+          def quote_identifier(value: str) -> str:
+              if not safe_name.fullmatch(value):
+                  fail(f"unsafe schema identifier encountered: {value!r}")
+              return f"`{value}`"
+
+          report = {
+              "audit": "STARTPARTNER_ORGANIZER_DEPENDENCY_READ_ONLY_V1",
+              "environment": "staging",
+              "database_mutation": False,
+              "identity": {},
+              "direct_dependencies": [],
+              "logical_references": [],
+              "summary": {},
+          }
+
+          safe_group_fields = {
+              "status",
+              "submission_kind",
+              "requested_model_key",
+              "payment_kind",
+              "plan_key",
+              "pending_plan_key",
+              "source_type",
+              "source_provider",
+              "content_type",
+              "intended_action",
+              "consumed_reason",
+              "event_type",
+              "scope_type",
+              "scope_key",
+              "period_unit",
+          }
+          presence_fields = {
+              "stripe_customer_id",
+              "stripe_subscription_id",
+              "stripe_checkout_session_id",
+              "stripe_price_id",
+              "token_hash",
+              "session_token_hash",
+              "paid_at",
+              "consumed_at",
+              "revoked_at",
+              "canceled_at",
+              "last_sent_at",
+              "last_seen_at",
+          }
+
+          try:
+              with connection.cursor() as cursor:
+                  # Explicit DB-level write guard for the entire audit.
+                  cursor.execute("START TRANSACTION READ ONLY")
+
+                  cursor.execute(
+                      """
+                      SELECT
+                          id,
+                          organization_name,
+                          default_plan_key,
+                          (stripe_customer_id IS NOT NULL AND stripe_customer_id <> '') AS has_stripe_customer,
+                          created_at,
+                          updated_at
+                      FROM organizers
+                      WHERE organization_name = %s
+                        AND SHA2(LOWER(TRIM(email_normalized)), 256) = %s
+                      """,
+                      (target_org, target_hash),
+                  )
+                  matches = cursor.fetchall()
+                  if len(matches) != 1:
+                      fail(f"target organizer match count must be exactly 1, got {len(matches)}")
+
+                  organizer = matches[0]
+                  organizer_id = int(organizer["id"])
+                  report["identity"] = {
+                      "organizer_id": organizer_id,
+                      "organization_name": organizer["organization_name"],
+                      "identity_match": "organization_name + normalized_email_sha256",
+                      "default_plan_key": organizer["default_plan_key"],
+                      "has_stripe_customer": bool(organizer["has_stripe_customer"]),
+                      "created_at": str(organizer["created_at"]) if organizer["created_at"] is not None else None,
+                      "updated_at": str(organizer["updated_at"]) if organizer["updated_at"] is not None else None,
+                  }
+
+                  cursor.execute(
+                      """
+                      SELECT TABLE_NAME, COLUMN_NAME, 'fk' AS source_kind
+                      FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+                      WHERE TABLE_SCHEMA = %s
+                        AND REFERENCED_TABLE_SCHEMA = %s
+                        AND REFERENCED_TABLE_NAME = 'organizers'
+                        AND REFERENCED_COLUMN_NAME = 'id'
+                      UNION ALL
+                      SELECT TABLE_NAME, COLUMN_NAME, 'column' AS source_kind
+                      FROM INFORMATION_SCHEMA.COLUMNS
+                      WHERE TABLE_SCHEMA = %s
+                        AND COLUMN_NAME = 'organizer_id'
+                      ORDER BY TABLE_NAME, COLUMN_NAME, source_kind
+                      """,
+                      (db_name, db_name, db_name),
+                  )
+                  discovered = cursor.fetchall()
+
+                  dependencies = defaultdict(lambda: {"is_fk": False, "is_organizer_id_column": False})
+                  for row in discovered:
+                      key = (str(row["TABLE_NAME"]), str(row["COLUMN_NAME"]))
+                      if row["source_kind"] == "fk":
+                          dependencies[key]["is_fk"] = True
+                      if row["source_kind"] == "column":
+                          dependencies[key]["is_organizer_id_column"] = True
+
+                  total_direct_rows = 0
+                  nonzero_tables = 0
+
+                  for (table, column), meta in sorted(dependencies.items()):
+                      q_table = quote_identifier(table)
+                      q_column = quote_identifier(column)
+                      cursor.execute(f"SELECT COUNT(*) AS n FROM {q_table} WHERE {q_column} = %s", (organizer_id,))
+                      count = int(cursor.fetchone()["n"])
+
+                      item = {
+                          "table": table,
+                          "column": column,
+                          "is_fk_to_organizers_id": bool(meta["is_fk"]),
+                          "row_count": count,
+                      }
+
+                      if count > 0:
+                          total_direct_rows += count
+                          nonzero_tables += 1
+
+                          cursor.execute(
+                              """
+                              SELECT COLUMN_NAME
+                              FROM INFORMATION_SCHEMA.COLUMNS
+                              WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s
+                              """,
+                              (db_name, table),
+                          )
+                          columns = {str(r["COLUMN_NAME"]) for r in cursor.fetchall()}
+
+                          groups = {}
+                          for field in sorted(columns & safe_group_fields):
+                              q_field = quote_identifier(field)
+                              cursor.execute(
+                                  f"""
+                                  SELECT COALESCE(CAST({q_field} AS CHAR), '<NULL>') AS value, COUNT(*) AS n
+                                  FROM {q_table}
+                                  WHERE {q_column} = %s
+                                  GROUP BY {q_field}
+                                  ORDER BY n DESC, value ASC
+                                  LIMIT 25
+                                  """,
+                                  (organizer_id,),
+                              )
+                              groups[field] = [
+                                  {"value": str(r["value"]), "count": int(r["n"])}
+                                  for r in cursor.fetchall()
+                              ]
+                          if groups:
+                              item["groups"] = groups
+
+                          presence = {}
+                          for field in sorted(columns & presence_fields):
+                              q_field = quote_identifier(field)
+                              cursor.execute(
+                                  f"SELECT COUNT(*) AS n FROM {q_table} WHERE {q_column} = %s AND {q_field} IS NOT NULL",
+                                  (organizer_id,),
+                              )
+                              presence[field] = int(cursor.fetchone()["n"])
+                          if presence:
+                              item["non_null_presence_only"] = presence
+
+                          if "expires_at" in columns:
+                              cursor.execute(
+                                  f"""
+                                  SELECT
+                                      SUM(expires_at > UTC_TIMESTAMP()) AS unexpired,
+                                      SUM(expires_at <= UTC_TIMESTAMP()) AS expired
+                                  FROM {q_table}
+                                  WHERE {q_column} = %s
+                                  """,
+                                  (organizer_id,),
+                              )
+                              expiry = cursor.fetchone()
+                              item["expiry_state"] = {
+                                  "unexpired": int(expiry["unexpired"] or 0),
+                                  "expired": int(expiry["expired"] or 0),
+                              }
+
+                      report["direct_dependencies"].append(item)
+
+                  # Some reporting/measurement tables use a typed logical target instead of a FK.
+                  for type_column, id_column in [
+                      ("reporting_target_type", "reporting_target_id"),
+                      ("target_type", "target_id"),
+                      ("owner_type", "owner_id"),
+                      ("entity_type", "entity_id"),
+                  ]:
+                      cursor.execute(
+                          """
+                          SELECT c1.TABLE_NAME
+                          FROM INFORMATION_SCHEMA.COLUMNS c1
+                          JOIN INFORMATION_SCHEMA.COLUMNS c2
+                            ON c2.TABLE_SCHEMA = c1.TABLE_SCHEMA
+                           AND c2.TABLE_NAME = c1.TABLE_NAME
+                          WHERE c1.TABLE_SCHEMA = %s
+                            AND c1.COLUMN_NAME = %s
+                            AND c2.COLUMN_NAME = %s
+                          ORDER BY c1.TABLE_NAME
+                          """,
+                          (db_name, type_column, id_column),
+                      )
+                      for row in cursor.fetchall():
+                          table = str(row["TABLE_NAME"])
+                          q_table = quote_identifier(table)
+                          q_type = quote_identifier(type_column)
+                          q_id = quote_identifier(id_column)
+                          cursor.execute(
+                              f"SELECT COUNT(*) AS n FROM {q_table} WHERE LOWER(CAST({q_type} AS CHAR)) = 'organizer' AND CAST({q_id} AS CHAR) = %s",
+                              (str(organizer_id),),
+                          )
+                          count = int(cursor.fetchone()["n"])
+                          if count > 0:
+                              report["logical_references"].append({
+                                  "table": table,
+                                  "type_column": type_column,
+                                  "id_column": id_column,
+                                  "row_count": count,
+                              })
+
+                  report["summary"] = {
+                      "discovered_direct_reference_columns": len(dependencies),
+                      "direct_reference_tables_with_rows": nonzero_tables,
+                      "direct_reference_rows_total": total_direct_rows,
+                      "logical_reference_rows_total": sum(int(x["row_count"]) for x in report["logical_references"]),
+                      "read_only_transaction": True,
+                      "rollback_performed": True,
+                  }
+
+                  connection.rollback()
+
+              print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+              print("AUDIT_PASS: read-only organizer dependency inventory completed")
+          except Exception as error:
+              try:
+                  connection.rollback()
+              except Exception:
+                  pass
+              fail(f"{type(error).__name__}: {error}")
+          finally:
+              connection.close()
+          PY
