@@ -1,0 +1,85 @@
+name: Startpartner Organizer Dependency Audit Cleanup Proof
+
+on:
+  push:
+    branches: ["staging"]
+    paths:
+      - ".github/workflows/startpartner-organizer-dependency-audit.yml"
+      - "scripts/audit_github_workflows.py"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  prove-removed-endpoint:
+    if: github.ref_name == 'staging'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Wait for exact cleanup build
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          EXPECTED_BUILD="${EXPECTED_SHA:0:12}"
+          DEPLOYED_BUILD=""
+
+          for attempt in $(seq 1 60); do
+            DEPLOYED_BUILD="$(curl --silent --show-error --max-time 20 \
+              --header 'User-Agent: Bocholt-Erleben-Workpack-316-Cleanup-Proof/1' \
+              'https://staging.bocholt-erleben.de/meta/build.txt' || true)"
+            DEPLOYED_BUILD="$(printf '%s' "$DEPLOYED_BUILD" | tr -d '\r\n')"
+            if [ "$DEPLOYED_BUILD" = "$EXPECTED_BUILD" ]; then
+              echo "AUDIT_316_CLEANUP_BUILD_BINDING=PASS build=$DEPLOYED_BUILD"
+              exit 0
+            fi
+            echo "Waiting for exact staging build: attempt=$attempt expected=$EXPECTED_BUILD actual=${DEPLOYED_BUILD:-unavailable}"
+            sleep 5
+          done
+
+          echo "AUDIT_316_CLEANUP_BUILD_BINDING=FAIL expected=$EXPECTED_BUILD actual=${DEPLOYED_BUILD:-unavailable}" >&2
+          exit 1
+
+      - name: Prove former audit endpoint returns HTTP 404
+        id: proof
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          EXPECTED_BUILD="${EXPECTED_SHA:0:12}"
+          ENDPOINT='https://staging.bocholt-erleben.de/api/organizer-dependency-audit-316.php'
+          BODY_FILE="$(mktemp)"
+          trap 'rm -f "$BODY_FILE"' EXIT
+
+          HTTP_STATUS="$(curl --silent --show-error --max-time 30 \
+            --header 'User-Agent: Bocholt-Erleben-Workpack-316-Cleanup-Proof/1' \
+            --output "$BODY_FILE" \
+            --write-out '%{http_code}' \
+            "$ENDPOINT" || true)"
+
+          if [ "$HTTP_STATUS" != "404" ]; then
+            echo "AUDIT_316_CLEANUP_HTTP_404=FAIL status=${HTTP_STATUS:-request_failed}" >&2
+            exit 1
+          fi
+
+          echo "AUDIT_316_CLEANUP_HTTP_404=PASS status=404 build=$EXPECTED_BUILD"
+          echo "build=$EXPECTED_BUILD" >> "$GITHUB_OUTPUT"
+
+      - name: Publish sanitized cleanup proof to Issue 316
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD: ${{ steps.proof.outputs.build }}
+        run: |
+          set -euo pipefail
+          cat > /tmp/comment.json <<EOF
+          {
+            "body": "## Organizer dependency audit — CLEANUP HTTP 404 PASS\n\nExact-build staging proof completed after the temporary audit infrastructure was removed.\n\n- build: \`${BUILD}\`\n- former endpoint: \`/api/organizer-dependency-audit-316.php\`\n- HTTP status: **404**\n- database mutation: **false**\n- organizer/candidate mutation: **false**\n\nThis workflow exists only to produce the required cleanup evidence and must be removed again before #316 is closed."
+          }
+          EOF
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/316/comments" --input /tmp/comment.json >/dev/null
+          echo "AUDIT_316_CLEANUP_EVIDENCE_WRITE=PASS issue=316"
