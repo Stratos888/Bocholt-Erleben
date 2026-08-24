@@ -17,54 +17,39 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install read-only DB client
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install --disable-pip-version-check pymysql==1.1.1
-
-      - name: Audit single organizer dependencies read-only
+      - name: Collect exact-build host-side read-only audit evidence
         id: audit
         shell: bash
         env:
-          DB_HOST: ${{ secrets.STAGING_DB_HOST }}
-          DB_PORT: ${{ secrets.STAGING_DB_PORT }}
-          DB_NAME: ${{ secrets.STAGING_DB_NAME }}
-          DB_USER: ${{ secrets.STAGING_DB_USER }}
-          DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
-          TARGET_ORGANIZATION: Testlocation2
-          TARGET_EMAIL_SHA256: c847e3977351152103747445c160cf0f2ad610a48984365f877942fb9fbfbc1b
+          STAGING_REVIEW_PASSWORD: ${{ secrets.STAGING_REVIEW_PASSWORD }}
           AUDIT_COMMIT_SHA: ${{ github.sha }}
           AUDIT_RUN_ID: ${{ github.run_id }}
         run: |
           set -euo pipefail
-          python - <<'PY'
+          python3 - <<'PY'
           import json
           import os
-          import re
-          import sys
-          from collections import defaultdict
+          import time
+          import urllib.error
+          import urllib.request
 
-          import pymysql
+          base_url = "https://staging.bocholt-erleben.de"
+          build_url = base_url + "/meta/build.txt"
+          audit_url = base_url + "/api/organizer-dependency-audit-316.php"
+          user_agent = "Bocholt-Erleben-Deploy-Smoke/1.0"
+          commit_sha = os.environ.get("AUDIT_COMMIT_SHA", "").strip()
+          run_id = os.environ.get("AUDIT_RUN_ID", "").strip()
+          review_password = os.environ.get("STAGING_REVIEW_PASSWORD", "").strip()
+          expected_build = commit_sha[:12]
 
-          class AuditFailure(RuntimeError):
-              def __init__(self, code: str, details=None):
-                  super().__init__(code)
-                  self.code = code
-                  self.details = details or {}
-
-          def write_comment(status: str, payload: dict) -> None:
+          def write_terminal(status, payload):
               body = (
                   f"## Organizer dependency audit — {status}\n\n"
-                  "Staging-DB audit terminal evidence. No database cleanup was performed.\n\n"
+                  "Host-side Staging terminal evidence for Workpack #316. "
+                  "No organizer cleanup or database mutation was performed.\n\n"
                   "```json\n"
                   + json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
                   + "\n```\n"
@@ -72,302 +57,109 @@ jobs:
               with open("audit-comment.json", "w", encoding="utf-8") as handle:
                   json.dump({"body": body}, handle, ensure_ascii=False)
 
-          phase = "preflight"
-          connection = None
-          rollback_attempted = False
-          rollback_succeeded = False
-          commit_sha = os.environ.get("AUDIT_COMMIT_SHA", "").strip()
-          run_id = os.environ.get("AUDIT_RUN_ID", "").strip()
-          target_org = os.environ.get("TARGET_ORGANIZATION", "").strip()
-          target_hash = os.environ.get("TARGET_EMAIL_SHA256", "").strip().lower()
-          db_name = os.environ.get("DB_NAME", "").strip()
-
-          safe_identifier = re.compile(r"^[A-Za-z0-9_]+$")
-
-          def q(value: str) -> str:
-              if not safe_identifier.fullmatch(value):
-                  raise AuditFailure("unsafe_schema_identifier")
-              return f"`{value}`"
-
-          safe_group_fields = {
-              "status", "submission_kind", "requested_model_key", "payment_kind",
-              "plan_key", "pending_plan_key", "source_type", "source_provider",
-              "content_type", "intended_action", "consumed_reason", "event_type",
-              "scope_type", "scope_key", "period_unit",
-          }
-          sensitive_presence_fields = {
-              "stripe_customer_id", "stripe_subscription_id", "stripe_checkout_session_id",
-              "stripe_price_id", "token_hash", "session_token_hash", "paid_at",
-              "consumed_at", "revoked_at", "canceled_at", "last_sent_at", "last_seen_at",
-          }
-
+          failure_code = None
           try:
-              required_env = [
-                  "DB_HOST", "DB_NAME", "DB_USER", "DB_PASSWORD",
-                  "TARGET_ORGANIZATION", "TARGET_EMAIL_SHA256",
-                  "AUDIT_COMMIT_SHA", "AUDIT_RUN_ID",
-              ]
-              missing = [name for name in required_env if not os.environ.get(name, "").strip()]
-              if missing:
-                  raise AuditFailure("missing_required_environment", {"missing_names": missing})
-              if not re.fullmatch(r"[0-9a-f]{64}", target_hash):
-                  raise AuditFailure("invalid_target_email_fingerprint")
+              if len(commit_sha) != 40 or any(ch not in "0123456789abcdef" for ch in commit_sha):
+                  raise RuntimeError("invalid_commit_sha")
+              if not review_password:
+                  raise RuntimeError("missing_review_password")
 
-              phase = "connect"
-              port = int(os.environ.get("DB_PORT", "3306") or "3306")
-              connection = pymysql.connect(
-                  host=os.environ["DB_HOST"].strip(),
-                  port=port,
-                  user=os.environ["DB_USER"].strip(),
-                  password=os.environ["DB_PASSWORD"],
-                  database=db_name,
-                  charset="utf8mb4",
-                  autocommit=True,
-                  cursorclass=pymysql.cursors.DictCursor,
-                  connect_timeout=15,
-                  read_timeout=30,
-                  write_timeout=15,
-              )
-
-              report = {
-                  "audit": "STARTPARTNER_ORGANIZER_DEPENDENCY_READ_ONLY_V2",
-                  "status": "AUDIT_PASS",
-                  "environment": "staging",
-                  "database_mutation": False,
-                  "commit_sha": commit_sha,
-                  "run_id": run_id,
-                  "identity": {},
-                  "direct_dependencies": [],
-                  "logical_references": [],
-                  "summary": {},
-              }
-
-              with connection.cursor() as cursor:
-                  phase = "start_read_only_transaction"
-                  cursor.execute("START TRANSACTION READ ONLY")
-
-                  phase = "identity_match"
-                  cursor.execute(
-                      """
-                      SELECT id, organization_name, default_plan_key,
-                             (stripe_customer_id IS NOT NULL AND stripe_customer_id <> '') AS has_stripe_customer
-                      FROM organizers
-                      WHERE organization_name = %s
-                        AND SHA2(LOWER(TRIM(email_normalized)), 256) = %s
-                      """,
-                      (target_org, target_hash),
+              deployed_build = ""
+              deadline = time.monotonic() + 720
+              while time.monotonic() < deadline:
+                  request = urllib.request.Request(
+                      build_url,
+                      headers={"User-Agent": user_agent, "Cache-Control": "no-cache"},
                   )
-                  matches = cursor.fetchall()
-                  if len(matches) != 1:
-                      raise AuditFailure("target_match_count_not_one", {"match_count": len(matches)})
-
-                  organizer = matches[0]
-                  organizer_id = int(organizer["id"])
-                  report["identity"] = {
-                      "organizer_id": organizer_id,
-                      "organization_name": str(organizer["organization_name"]),
-                      "identity_match": "organization_name + normalized_email_sha256",
-                      "default_plan_key": organizer["default_plan_key"],
-                      "has_stripe_customer": bool(organizer["has_stripe_customer"]),
-                  }
-
-                  phase = "discover_direct_references"
-                  cursor.execute(
-                      """
-                      SELECT TABLE_NAME, COLUMN_NAME, 'fk' AS source_kind
-                      FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-                      WHERE TABLE_SCHEMA = %s
-                        AND REFERENCED_TABLE_SCHEMA = %s
-                        AND REFERENCED_TABLE_NAME = 'organizers'
-                        AND REFERENCED_COLUMN_NAME = 'id'
-                      UNION ALL
-                      SELECT TABLE_NAME, COLUMN_NAME, 'column' AS source_kind
-                      FROM INFORMATION_SCHEMA.COLUMNS
-                      WHERE TABLE_SCHEMA = %s
-                        AND COLUMN_NAME = 'organizer_id'
-                      ORDER BY TABLE_NAME, COLUMN_NAME, source_kind
-                      """,
-                      (db_name, db_name, db_name),
-                  )
-                  discovered = cursor.fetchall()
-                  refs = defaultdict(lambda: {"is_fk": False, "is_organizer_id_column": False})
-                  for row in discovered:
-                      key = (str(row["TABLE_NAME"]), str(row["COLUMN_NAME"]))
-                      refs[key]["is_fk"] |= row["source_kind"] == "fk"
-                      refs[key]["is_organizer_id_column"] |= row["source_kind"] == "column"
-
-                  phase = "inventory_direct_references"
-                  direct_rows = 0
-                  nonzero_tables = 0
-                  for (table, column), meta in sorted(refs.items()):
-                      qt, qc = q(table), q(column)
-                      cursor.execute(f"SELECT COUNT(*) AS n FROM {qt} WHERE {qc} = %s", (organizer_id,))
-                      count = int(cursor.fetchone()["n"])
-                      item = {
-                          "table": table,
-                          "column": column,
-                          "is_fk_to_organizers_id": bool(meta["is_fk"]),
-                          "row_count": count,
-                      }
-
-                      if count:
-                          direct_rows += count
-                          nonzero_tables += 1
-                          cursor.execute(
-                              "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
-                              "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s",
-                              (db_name, table),
-                          )
-                          columns = {str(row["COLUMN_NAME"]) for row in cursor.fetchall()}
-
-                          groups = {}
-                          for field in sorted(columns & safe_group_fields):
-                              qf = q(field)
-                              cursor.execute(
-                                  f"SELECT COALESCE(CAST({qf} AS CHAR), '<NULL>') AS value, COUNT(*) AS n "
-                                  f"FROM {qt} WHERE {qc} = %s GROUP BY {qf} "
-                                  "ORDER BY n DESC, value ASC LIMIT 25",
-                                  (organizer_id,),
-                              )
-                              groups[field] = [
-                                  {"value": str(row["value"]), "count": int(row["n"])}
-                                  for row in cursor.fetchall()
-                              ]
-                          if groups:
-                              item["groups"] = groups
-
-                          presence = {}
-                          for field in sorted(columns & sensitive_presence_fields):
-                              qf = q(field)
-                              cursor.execute(
-                                  f"SELECT COUNT(*) AS n FROM {qt} "
-                                  f"WHERE {qc} = %s AND {qf} IS NOT NULL",
-                                  (organizer_id,),
-                              )
-                              presence[field] = int(cursor.fetchone()["n"])
-                          if presence:
-                              item["non_null_presence_only"] = presence
-
-                          if "expires_at" in columns:
-                              cursor.execute(
-                                  f"SELECT SUM(expires_at > UTC_TIMESTAMP()) AS unexpired, "
-                                  f"SUM(expires_at <= UTC_TIMESTAMP()) AS expired "
-                                  f"FROM {qt} WHERE {qc} = %s",
-                                  (organizer_id,),
-                              )
-                              expiry = cursor.fetchone()
-                              item["expiry_state"] = {
-                                  "unexpired": int(expiry["unexpired"] or 0),
-                                  "expired": int(expiry["expired"] or 0),
-                              }
-
-                      report["direct_dependencies"].append(item)
-
-                  phase = "inventory_logical_references"
-                  for type_column, id_column in [
-                      ("reporting_target_type", "reporting_target_id"),
-                      ("target_type", "target_id"),
-                      ("owner_type", "owner_id"),
-                      ("entity_type", "entity_id"),
-                  ]:
-                      cursor.execute(
-                          """
-                          SELECT c1.TABLE_NAME
-                          FROM INFORMATION_SCHEMA.COLUMNS c1
-                          JOIN INFORMATION_SCHEMA.COLUMNS c2
-                            ON c2.TABLE_SCHEMA = c1.TABLE_SCHEMA
-                           AND c2.TABLE_NAME = c1.TABLE_NAME
-                          WHERE c1.TABLE_SCHEMA = %s
-                            AND c1.COLUMN_NAME = %s
-                            AND c2.COLUMN_NAME = %s
-                          ORDER BY c1.TABLE_NAME
-                          """,
-                          (db_name, type_column, id_column),
-                      )
-                      for row in cursor.fetchall():
-                          table = str(row["TABLE_NAME"])
-                          qt, qty, qid = q(table), q(type_column), q(id_column)
-                          cursor.execute(
-                              f"SELECT COUNT(*) AS n FROM {qt} "
-                              f"WHERE LOWER(CAST({qty} AS CHAR)) = 'organizer' "
-                              f"AND CAST({qid} AS CHAR) = %s",
-                              (str(organizer_id),),
-                          )
-                          count = int(cursor.fetchone()["n"])
-                          if count:
-                              report["logical_references"].append({
-                                  "table": table,
-                                  "type_column": type_column,
-                                  "id_column": id_column,
-                                  "row_count": count,
-                              })
-
-                  phase = "rollback"
-                  rollback_attempted = True
-                  connection.rollback()
-                  rollback_succeeded = True
-
-                  report["summary"] = {
-                      "discovered_direct_reference_columns": len(refs),
-                      "direct_reference_tables_with_rows": nonzero_tables,
-                      "direct_reference_rows_total": direct_rows,
-                      "logical_reference_rows_total": sum(
-                          int(item["row_count"]) for item in report["logical_references"]
-                      ),
-                      "read_only_transaction": True,
-                      "rollback_attempted": rollback_attempted,
-                      "rollback_performed": rollback_succeeded,
-                  }
-
-              phase = "prepare_terminal_evidence"
-              write_comment("AUDIT_PASS", report)
-              print("AUDIT_PASS: read-only organizer dependency inventory completed; rollback succeeded")
-
-          except Exception as error:
-              if connection is not None and not rollback_succeeded:
-                  rollback_attempted = True
                   try:
-                      connection.rollback()
-                      rollback_succeeded = True
+                      with urllib.request.urlopen(request, timeout=20) as response:
+                          deployed_build = response.read().decode("utf-8", errors="replace").strip()
                   except Exception:
-                      rollback_succeeded = False
-
-              if isinstance(error, AuditFailure):
-                  failure_code = error.code
-                  safe_details = error.details
-                  error_class = "AuditFailure"
+                      deployed_build = ""
+                  if deployed_build == expected_build:
+                      break
+                  time.sleep(10)
               else:
-                  failure_code = "unexpected_exception"
-                  safe_details = {}
-                  error_class = type(error).__name__
+                  raise RuntimeError("exact_build_timeout")
 
-              failure = {
-                  "audit": "STARTPARTNER_ORGANIZER_DEPENDENCY_READ_ONLY_V2",
-                  "status": "AUDIT_FAIL",
-                  "environment": "staging",
-                  "database_mutation": False,
+              request_body = json.dumps({"expected_build": expected_build}).encode("utf-8")
+              request = urllib.request.Request(
+                  audit_url,
+                  data=request_body,
+                  method="POST",
+                  headers={
+                      "User-Agent": user_agent,
+                      "Accept": "application/json",
+                      "Content-Type": "application/json",
+                      "X-BE-Review-Password": review_password,
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=120) as response:
+                      status_code = int(response.status)
+                      raw = response.read().decode("utf-8", errors="replace")
+              except urllib.error.HTTPError as error:
+                  status_code = int(error.code)
+                  raw = error.read().decode("utf-8", errors="replace")
+
+              if status_code != 200:
+                  raise RuntimeError("audit_endpoint_non_200")
+              payload = json.loads(raw)
+              if not isinstance(payload, dict) or payload.get("status") != "ok":
+                  raise RuntimeError("audit_endpoint_invalid_envelope")
+              data = payload.get("data")
+              if not isinstance(data, dict):
+                  raise RuntimeError("audit_endpoint_missing_data")
+              summary = data.get("summary")
+              if not isinstance(summary, dict):
+                  raise RuntimeError("audit_endpoint_missing_summary")
+              if data.get("database_mutation") is not False:
+                  raise RuntimeError("audit_database_mutation_not_false")
+              if summary.get("read_only_transaction") is not True:
+                  raise RuntimeError("audit_read_only_not_proven")
+              if summary.get("rollback_performed") is not True:
+                  raise RuntimeError("audit_rollback_not_proven")
+              if data.get("build") != expected_build:
+                  raise RuntimeError("audit_build_mismatch")
+
+              evidence = {
+                  "status": "AUDIT_PASS",
+                  "collector": "host-side exact-build Staging owner",
                   "commit_sha": commit_sha,
                   "run_id": run_id,
-                  "phase": phase,
-                  "failure_code": failure_code,
-                  "error_class": error_class,
-                  "safe_details": safe_details,
-                  "rollback_attempted": rollback_attempted,
-                  "rollback_succeeded": rollback_succeeded,
+                  "database_mutation": False,
+                  "audit_data": data,
               }
-              write_comment("AUDIT_FAIL", failure)
-              print(
-                  f"AUDIT_FAIL: phase={phase}; code={failure_code}; "
-                  f"class={error_class}; rollback_succeeded={rollback_succeeded}",
-                  file=sys.stderr,
-              )
+              write_terminal("AUDIT_PASS", evidence)
+              print("AUDIT_PASS: exact-build host-side read-only inventory collected")
+          except Exception as error:
+              failure_code = str(error)
+              allowed = {
+                  "invalid_commit_sha",
+                  "missing_review_password",
+                  "exact_build_timeout",
+                  "audit_endpoint_non_200",
+                  "audit_endpoint_invalid_envelope",
+                  "audit_endpoint_missing_data",
+                  "audit_endpoint_missing_summary",
+                  "audit_database_mutation_not_false",
+                  "audit_read_only_not_proven",
+                  "audit_rollback_not_proven",
+                  "audit_build_mismatch",
+              }
+              if failure_code not in allowed:
+                  failure_code = "unexpected_collector_failure"
+              evidence = {
+                  "status": "AUDIT_FAIL",
+                  "collector": "host-side exact-build Staging owner",
+                  "commit_sha": commit_sha,
+                  "run_id": run_id,
+                  "database_mutation": False,
+                  "failure_code": failure_code,
+              }
+              write_terminal("AUDIT_FAIL", evidence)
+              print(f"AUDIT_FAIL: {failure_code}", file=__import__("sys").stderr)
               raise SystemExit(1)
-          finally:
-              if connection is not None:
-                  try:
-                      connection.close()
-                  except Exception:
-                      pass
           PY
 
       - name: Publish terminal evidence to Issue 316
@@ -385,21 +177,16 @@ jobs:
           import os
 
           payload = {
-              "audit": "STARTPARTNER_ORGANIZER_DEPENDENCY_READ_ONLY_V2",
               "status": "AUDIT_FAIL",
-              "environment": "staging",
-              "database_mutation": False,
+              "collector": "host-side exact-build Staging owner",
               "commit_sha": os.environ.get("AUDIT_COMMIT_SHA", ""),
               "run_id": os.environ.get("AUDIT_RUN_ID", ""),
-              "phase": "workflow_before_audit_evidence",
-              "failure_code": "audit_evidence_file_missing",
-              "rollback_attempted": False,
-              "rollback_succeeded": False,
+              "database_mutation": False,
+              "failure_code": "terminal_evidence_file_missing",
           }
           body = (
               "## Organizer dependency audit — AUDIT_FAIL\n\n"
-              "Sanitized terminal evidence: the audit did not reach its normal evidence file. "
-              "No database cleanup was performed.\n\n"
+              "Sanitized terminal evidence for Workpack #316. No organizer cleanup or database mutation was performed.\n\n"
               "```json\n"
               + json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
               + "\n```\n"
