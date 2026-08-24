@@ -21,13 +21,21 @@ function be_startpartner_gate3_case_action(
 
 function be_startpartner_gate3_terms_were_sent(array $candidate): bool
 {
+    $candidateRevision = (int)($candidate['revision'] ?? -1);
+    if ($candidateRevision < 0) {
+        return false;
+    }
+
     $events = is_array($candidate['events'] ?? null) ? $candidate['events'] : [];
     foreach (array_reverse($events) as $event) {
+        $snapshot = is_array($event) && is_array(($event['payload'] ?? null))
+            ? ($event['payload']['terms_snapshot'] ?? null)
+            : null;
         if (
             is_array($event)
             && in_array((string)($event['event_type'] ?? ''), ['pilot_terms_sent', 'pilot_terms_resent'], true)
-            && is_array(($event['payload'] ?? null))
-            && is_array(($event['payload']['terms_snapshot'] ?? null))
+            && is_array($snapshot)
+            && (int)($snapshot['candidate_revision'] ?? -1) === $candidateRevision
         ) {
             return true;
         }
