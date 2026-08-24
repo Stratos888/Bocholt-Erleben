@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/api/startpartner/_gate3_domain.php';
+require_once dirname(__DIR__) . '/api/startpartner/_gate3_presentation.php';
 
 $failures = [];
 $assert = static function(bool $condition, string $message) use (&$failures): void {
@@ -78,6 +79,66 @@ unset($unlimitedInput['event_limit_per_pilot_month']);
 $unlimited = be_startpartner_gate3_normalize_confirmation($candidate, $contact, $unlimitedInput);
 $assert($unlimited['is_event_unlimited'] === true, 'Explicit unlimited event scope must be retained.');
 $assert($unlimited['event_limit_per_pilot_month'] === null, 'Unlimited event scope must not carry a numeric limit.');
+
+$sentTermsSnapshot = [
+    'candidate_revision' => 7,
+];
+$presentationCandidate = [
+    'id' => 'candidate-309-revision-regression',
+    'organization_name' => 'Testpuper',
+    'desired_content_scope' => 'both',
+    'revision' => 7,
+    'status' => 'accepted_pending_terms',
+    'readiness' => [],
+    'capacity' => [],
+    'assigned_to' => null,
+    'next_review_at' => null,
+    'gate3' => ['complete' => false, 'blockers' => []],
+    'contacts' => [[
+        'contact_name' => 'Erika Beispiel',
+        'email' => 'erika@example.org',
+        'is_primary' => 1,
+    ]],
+    'events' => [[
+        'event_type' => 'pilot_terms_sent',
+        'payload' => ['terms_snapshot' => $sentTermsSnapshot],
+    ]],
+];
+$assert(
+    be_startpartner_gate3_terms_were_sent($presentationCandidate) === true,
+    'Terms sent for the current candidate revision must remain valid for presentation.'
+);
+$currentRevisionItem = be_startpartner_gate3_present_case(
+    ['primary_action' => null, 'secondary_actions' => []],
+    $presentationCandidate
+);
+$assert(
+    ($currentRevisionItem['primary_action']['key'] ?? null) === 'confirm_pilot_terms_simple',
+    'Current-revision terms must expose partner confirmation as the primary action.'
+);
+
+$stalePresentationCandidate = $presentationCandidate;
+$stalePresentationCandidate['revision'] = 8;
+$assert(
+    be_startpartner_gate3_terms_were_sent($stalePresentationCandidate) === false,
+    'Historical terms sent for an older candidate revision must be stale.'
+);
+$staleRevisionItem = be_startpartner_gate3_present_case(
+    ['primary_action' => null, 'secondary_actions' => []],
+    $stalePresentationCandidate
+);
+$assert(
+    ($staleRevisionItem['primary_action']['key'] ?? null) === 'send_pilot_terms',
+    'After a candidate revision change, the operator must be offered a fresh terms send.'
+);
+$assert(
+    !in_array('resend_pilot_terms', array_column((array)($staleRevisionItem['secondary_actions'] ?? []), 'key'), true),
+    'After a candidate revision change, retrying the stale terms snapshot must not be offered.'
+);
+$assert(
+    ($staleRevisionItem['display_status'] ?? null) === 'Platz reserviert · Bedingungen offen',
+    'After a candidate revision change, presentation must return to the terms-open state.'
+);
 
 $expect(
     static fn() => be_startpartner_gate3_digest('not-a-digest'),
