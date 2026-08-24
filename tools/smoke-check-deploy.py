@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import argparse
-import base64
 import json
 import re
 import sys
 import time
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin
@@ -302,68 +300,6 @@ def check_push_endpoints_protected(base_url: str) -> None:
         check_protected_json_endpoint(base_url, path=path, label=label, method="POST", body=b"{}")
 
 
-def load_audit_review_secret_316() -> str:
-    path = Path("deploy") / "api" / "_config.php"
-    if not path.is_file():
-        raise AssertionError("Private Deploy-Konfiguration für Organizer-Audit fehlt.")
-    source = path.read_text(encoding="utf-8")
-    match = re.search(r"base64_decode\('([^']+)'\)", source)
-    if match is None:
-        raise AssertionError("Private Deploy-Konfiguration ist nicht auslesbar.")
-    try:
-        config = json.loads(base64.b64decode(match.group(1)).decode("utf-8"))
-    except (ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
-        raise AssertionError("Private Deploy-Konfiguration ist ungültig.") from error
-    password = str((config.get("review") or {}).get("password") or "").strip()
-    if not password:
-        raise AssertionError("Staging-Review-Passwort fehlt in der privaten Deploy-Konfiguration.")
-    return password
-
-
-def check_organizer_dependency_audit_316(base_url: str, expected_build: str) -> None:
-    if base_url.rstrip("/") != "https://staging.bocholt-erleben.de":
-        return
-    build = expected_build.strip()
-    if not re.fullmatch(r"[0-9a-f]{12}", build):
-        raise AssertionError("Organizer-Audit #316 benötigt den exakten zwölfstelligen Deploy-Build.")
-
-    path = "/api/organizer-dependency-audit-316.php"
-    request_body = json.dumps({"expected_build": build}).encode("utf-8")
-    unauthenticated = request_url(
-        build_url(base_url, path),
-        method="POST",
-        body=request_body,
-        headers={"Content-Type": "application/json"},
-        timeout=30,
-    )
-    require_status(unauthenticated, {401}, "Organizer-Audit #316 Zugriffsschutz")
-
-    password = load_audit_review_secret_316()
-    result = request_url(
-        build_url(base_url, path),
-        method="POST",
-        body=request_body,
-        headers={"Content-Type": "application/json", "X-BE-Review-Password": password},
-        timeout=120,
-    )
-    require_status(result, {200}, "Organizer-Audit #316")
-    payload = parse_json(result)
-    data = payload.get("data")
-    if payload.get("status") != "ok" or not isinstance(data, dict):
-        raise AssertionError("Organizer-Audit #316 liefert keine gültige Evidence-Struktur.")
-    summary = data.get("summary")
-    if not isinstance(summary, dict):
-        raise AssertionError("Organizer-Audit #316 Summary fehlt.")
-    if data.get("database_mutation") is not False:
-        raise AssertionError("Organizer-Audit #316 database_mutation ist nicht false.")
-    if summary.get("read_only_transaction") is not True or summary.get("rollback_performed") is not True:
-        raise AssertionError("Organizer-Audit #316 belegt READ ONLY + ROLLBACK nicht vollständig.")
-
-    evidence = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    print(f"ORGANIZER_DEPENDENCY_AUDIT_316={evidence}")
-    print("✅ Organizer-Audit #316: hostseitig read-only, sanitisiert und zurückgerollt")
-
-
 def run(args: argparse.Namespace) -> None:
     base_url = normalize_base_url(args.base_url)
     checks = [
@@ -380,7 +316,6 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_checkout_validation(base_url),
         lambda: check_review_endpoint_protected(base_url),
         lambda: check_push_endpoints_protected(base_url),
-        lambda: check_organizer_dependency_audit_316(base_url, args.expected_build),
     ]
     print(f"=== Deploy-Smoke-Check: {base_url} ===")
     for check in checks:
