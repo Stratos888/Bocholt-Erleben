@@ -302,8 +302,8 @@ def check_push_endpoints_protected(base_url: str) -> None:
         check_protected_json_endpoint(base_url, path=path, label=label, method="POST", body=b"{}")
 
 
-def load_deploy_review_password() -> str:
-    path = Path("deploy/api/_config.php")
+def load_audit_review_secret_316() -> str:
+    path = Path("deploy") / "api" / "_config.php"
     if not path.is_file():
         raise AssertionError("Private Deploy-Konfiguration für Organizer-Audit fehlt.")
     source = path.read_text(encoding="utf-8")
@@ -338,7 +338,7 @@ def check_organizer_dependency_audit_316(base_url: str, expected_build: str) -> 
     )
     require_status(unauthenticated, {401}, "Organizer-Audit #316 Zugriffsschutz")
 
-    password = load_deploy_review_password()
+    password = load_audit_review_secret_316()
     result = request_url(
         build_url(base_url, path),
         method="POST",
