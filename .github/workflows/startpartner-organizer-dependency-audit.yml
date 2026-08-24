@@ -32,6 +32,7 @@ jobs:
           python -m pip install --disable-pip-version-check pymysql==1.1.1
 
       - name: Audit single organizer dependencies read-only
+        id: audit
         shell: bash
         env:
           DB_HOST: ${{ secrets.STAGING_DB_HOST }}
@@ -42,6 +43,7 @@ jobs:
           TARGET_ORGANIZATION: Testlocation2
           TARGET_EMAIL_SHA256: c847e3977351152103747445c160cf0f2ad610a48984365f877942fb9fbfbc1b
           AUDIT_COMMIT_SHA: ${{ github.sha }}
+          AUDIT_RUN_ID: ${{ github.run_id }}
         run: |
           set -euo pipefail
           python - <<'PY'
@@ -53,46 +55,38 @@ jobs:
 
           import pymysql
 
-          def fail(message: str) -> None:
-              print(f"AUDIT_FAIL: {message}", file=sys.stderr)
-              raise SystemExit(1)
+          class AuditFailure(RuntimeError):
+              def __init__(self, code: str, details=None):
+                  super().__init__(code)
+                  self.code = code
+                  self.details = details or {}
 
-          required_env = [
-              "DB_HOST", "DB_NAME", "DB_USER", "DB_PASSWORD",
-              "TARGET_ORGANIZATION", "TARGET_EMAIL_SHA256", "AUDIT_COMMIT_SHA",
-          ]
-          missing = [name for name in required_env if not os.environ.get(name, "").strip()]
-          if missing:
-              fail("missing required environment values: " + ", ".join(missing))
+          def write_comment(status: str, payload: dict) -> None:
+              body = (
+                  f"## Organizer dependency audit — {status}\n\n"
+                  "Staging-DB audit terminal evidence. No database cleanup was performed.\n\n"
+                  "```json\n"
+                  + json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
+                  + "\n```\n"
+              )
+              with open("audit-comment.json", "w", encoding="utf-8") as handle:
+                  json.dump({"body": body}, handle, ensure_ascii=False)
 
-          target_org = os.environ["TARGET_ORGANIZATION"].strip()
-          target_hash = os.environ["TARGET_EMAIL_SHA256"].strip().lower()
-          if not re.fullmatch(r"[0-9a-f]{64}", target_hash):
-              fail("target email fingerprint is not a SHA-256")
-
-          db_name = os.environ["DB_NAME"].strip()
-          port = int(os.environ.get("DB_PORT", "3306") or "3306")
-          commit_sha = os.environ["AUDIT_COMMIT_SHA"].strip()
-
-          connection = pymysql.connect(
-              host=os.environ["DB_HOST"].strip(),
-              port=port,
-              user=os.environ["DB_USER"].strip(),
-              password=os.environ["DB_PASSWORD"],
-              database=db_name,
-              charset="utf8mb4",
-              autocommit=True,
-              cursorclass=pymysql.cursors.DictCursor,
-              connect_timeout=15,
-              read_timeout=30,
-              write_timeout=15,
-          )
+          phase = "preflight"
+          connection = None
+          rollback_attempted = False
+          rollback_succeeded = False
+          commit_sha = os.environ.get("AUDIT_COMMIT_SHA", "").strip()
+          run_id = os.environ.get("AUDIT_RUN_ID", "").strip()
+          target_org = os.environ.get("TARGET_ORGANIZATION", "").strip()
+          target_hash = os.environ.get("TARGET_EMAIL_SHA256", "").strip().lower()
+          db_name = os.environ.get("DB_NAME", "").strip()
 
           safe_identifier = re.compile(r"^[A-Za-z0-9_]+$")
 
           def q(value: str) -> str:
               if not safe_identifier.fullmatch(value):
-                  fail(f"unsafe schema identifier encountered: {value!r}")
+                  raise AuditFailure("unsafe_schema_identifier")
               return f"`{value}`"
 
           safe_group_fields = {
@@ -107,21 +101,52 @@ jobs:
               "consumed_at", "revoked_at", "canceled_at", "last_sent_at", "last_seen_at",
           }
 
-          report = {
-              "audit": "STARTPARTNER_ORGANIZER_DEPENDENCY_READ_ONLY_V1",
-              "environment": "staging",
-              "database_mutation": False,
-              "commit_sha": commit_sha,
-              "identity": {},
-              "direct_dependencies": [],
-              "logical_references": [],
-              "summary": {},
-          }
-
           try:
+              required_env = [
+                  "DB_HOST", "DB_NAME", "DB_USER", "DB_PASSWORD",
+                  "TARGET_ORGANIZATION", "TARGET_EMAIL_SHA256",
+                  "AUDIT_COMMIT_SHA", "AUDIT_RUN_ID",
+              ]
+              missing = [name for name in required_env if not os.environ.get(name, "").strip()]
+              if missing:
+                  raise AuditFailure("missing_required_environment", {"missing_names": missing})
+              if not re.fullmatch(r"[0-9a-f]{64}", target_hash):
+                  raise AuditFailure("invalid_target_email_fingerprint")
+
+              phase = "connect"
+              port = int(os.environ.get("DB_PORT", "3306") or "3306")
+              connection = pymysql.connect(
+                  host=os.environ["DB_HOST"].strip(),
+                  port=port,
+                  user=os.environ["DB_USER"].strip(),
+                  password=os.environ["DB_PASSWORD"],
+                  database=db_name,
+                  charset="utf8mb4",
+                  autocommit=True,
+                  cursorclass=pymysql.cursors.DictCursor,
+                  connect_timeout=15,
+                  read_timeout=30,
+                  write_timeout=15,
+              )
+
+              report = {
+                  "audit": "STARTPARTNER_ORGANIZER_DEPENDENCY_READ_ONLY_V2",
+                  "status": "AUDIT_PASS",
+                  "environment": "staging",
+                  "database_mutation": False,
+                  "commit_sha": commit_sha,
+                  "run_id": run_id,
+                  "identity": {},
+                  "direct_dependencies": [],
+                  "logical_references": [],
+                  "summary": {},
+              }
+
               with connection.cursor() as cursor:
+                  phase = "start_read_only_transaction"
                   cursor.execute("START TRANSACTION READ ONLY")
 
+                  phase = "identity_match"
                   cursor.execute(
                       """
                       SELECT id, organization_name, default_plan_key,
@@ -134,7 +159,7 @@ jobs:
                   )
                   matches = cursor.fetchall()
                   if len(matches) != 1:
-                      fail(f"target organizer match count must be exactly 1, got {len(matches)}")
+                      raise AuditFailure("target_match_count_not_one", {"match_count": len(matches)})
 
                   organizer = matches[0]
                   organizer_id = int(organizer["id"])
@@ -146,6 +171,7 @@ jobs:
                       "has_stripe_customer": bool(organizer["has_stripe_customer"]),
                   }
 
+                  phase = "discover_direct_references"
                   cursor.execute(
                       """
                       SELECT TABLE_NAME, COLUMN_NAME, 'fk' AS source_kind
@@ -164,13 +190,13 @@ jobs:
                       (db_name, db_name, db_name),
                   )
                   discovered = cursor.fetchall()
-
                   refs = defaultdict(lambda: {"is_fk": False, "is_organizer_id_column": False})
                   for row in discovered:
                       key = (str(row["TABLE_NAME"]), str(row["COLUMN_NAME"]))
                       refs[key]["is_fk"] |= row["source_kind"] == "fk"
                       refs[key]["is_organizer_id_column"] |= row["source_kind"] == "column"
 
+                  phase = "inventory_direct_references"
                   direct_rows = 0
                   nonzero_tables = 0
                   for (table, column), meta in sorted(refs.items()):
@@ -188,7 +214,8 @@ jobs:
                           direct_rows += count
                           nonzero_tables += 1
                           cursor.execute(
-                              "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s",
+                              "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+                              "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s",
                               (db_name, table),
                           )
                           columns = {str(row["COLUMN_NAME"]) for row in cursor.fetchall()}
@@ -198,7 +225,8 @@ jobs:
                               qf = q(field)
                               cursor.execute(
                                   f"SELECT COALESCE(CAST({qf} AS CHAR), '<NULL>') AS value, COUNT(*) AS n "
-                                  f"FROM {qt} WHERE {qc} = %s GROUP BY {qf} ORDER BY n DESC, value ASC LIMIT 25",
+                                  f"FROM {qt} WHERE {qc} = %s GROUP BY {qf} "
+                                  "ORDER BY n DESC, value ASC LIMIT 25",
                                   (organizer_id,),
                               )
                               groups[field] = [
@@ -212,7 +240,8 @@ jobs:
                           for field in sorted(columns & sensitive_presence_fields):
                               qf = q(field)
                               cursor.execute(
-                                  f"SELECT COUNT(*) AS n FROM {qt} WHERE {qc} = %s AND {qf} IS NOT NULL",
+                                  f"SELECT COUNT(*) AS n FROM {qt} "
+                                  f"WHERE {qc} = %s AND {qf} IS NOT NULL",
                                   (organizer_id,),
                               )
                               presence[field] = int(cursor.fetchone()["n"])
@@ -222,7 +251,8 @@ jobs:
                           if "expires_at" in columns:
                               cursor.execute(
                                   f"SELECT SUM(expires_at > UTC_TIMESTAMP()) AS unexpired, "
-                                  f"SUM(expires_at <= UTC_TIMESTAMP()) AS expired FROM {qt} WHERE {qc} = %s",
+                                  f"SUM(expires_at <= UTC_TIMESTAMP()) AS expired "
+                                  f"FROM {qt} WHERE {qc} = %s",
                                   (organizer_id,),
                               )
                               expiry = cursor.fetchone()
@@ -233,6 +263,7 @@ jobs:
 
                       report["direct_dependencies"].append(item)
 
+                  phase = "inventory_logical_references"
                   for type_column, id_column in [
                       ("reporting_target_type", "reporting_target_id"),
                       ("target_type", "target_id"),
@@ -244,8 +275,11 @@ jobs:
                           SELECT c1.TABLE_NAME
                           FROM INFORMATION_SCHEMA.COLUMNS c1
                           JOIN INFORMATION_SCHEMA.COLUMNS c2
-                            ON c2.TABLE_SCHEMA = c1.TABLE_SCHEMA AND c2.TABLE_NAME = c1.TABLE_NAME
-                          WHERE c1.TABLE_SCHEMA = %s AND c1.COLUMN_NAME = %s AND c2.COLUMN_NAME = %s
+                            ON c2.TABLE_SCHEMA = c1.TABLE_SCHEMA
+                           AND c2.TABLE_NAME = c1.TABLE_NAME
+                          WHERE c1.TABLE_SCHEMA = %s
+                            AND c1.COLUMN_NAME = %s
+                            AND c2.COLUMN_NAME = %s
                           ORDER BY c1.TABLE_NAME
                           """,
                           (db_name, type_column, id_column),
@@ -255,7 +289,8 @@ jobs:
                           qt, qty, qid = q(table), q(type_column), q(id_column)
                           cursor.execute(
                               f"SELECT COUNT(*) AS n FROM {qt} "
-                              f"WHERE LOWER(CAST({qty} AS CHAR)) = 'organizer' AND CAST({qid} AS CHAR) = %s",
+                              f"WHERE LOWER(CAST({qty} AS CHAR)) = 'organizer' "
+                              f"AND CAST({qid} AS CHAR) = %s",
                               (str(organizer_id),),
                           )
                           count = int(cursor.fetchone()["n"])
@@ -267,40 +302,111 @@ jobs:
                                   "row_count": count,
                               })
 
+                  phase = "rollback"
+                  rollback_attempted = True
                   connection.rollback()
+                  rollback_succeeded = True
+
                   report["summary"] = {
                       "discovered_direct_reference_columns": len(refs),
                       "direct_reference_tables_with_rows": nonzero_tables,
                       "direct_reference_rows_total": direct_rows,
-                      "logical_reference_rows_total": sum(int(x["row_count"]) for x in report["logical_references"]),
+                      "logical_reference_rows_total": sum(
+                          int(item["row_count"]) for item in report["logical_references"]
+                      ),
                       "read_only_transaction": True,
-                      "rollback_performed": True,
+                      "rollback_attempted": rollback_attempted,
+                      "rollback_performed": rollback_succeeded,
                   }
 
-              report_json = json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True)
-              markdown = (
-                  "## Organizer dependency audit — AUDIT_PASS\n\n"
-                  "Staging-DB read-only inventory completed. No database mutation was performed.\n\n"
-                  "```json\n" + report_json + "\n```\n"
-              )
-              with open("audit-comment.json", "w", encoding="utf-8") as handle:
-                  json.dump({"body": markdown}, handle, ensure_ascii=False)
-              print("AUDIT_PASS: read-only organizer dependency inventory completed; sanitized evidence prepared")
+              phase = "prepare_terminal_evidence"
+              write_comment("AUDIT_PASS", report)
+              print("AUDIT_PASS: read-only organizer dependency inventory completed; rollback succeeded")
+
           except Exception as error:
-              try:
-                  connection.rollback()
-              except Exception:
-                  pass
-              fail(f"{type(error).__name__}: {error}")
+              if connection is not None and not rollback_succeeded:
+                  rollback_attempted = True
+                  try:
+                      connection.rollback()
+                      rollback_succeeded = True
+                  except Exception:
+                      rollback_succeeded = False
+
+              if isinstance(error, AuditFailure):
+                  failure_code = error.code
+                  safe_details = error.details
+                  error_class = "AuditFailure"
+              else:
+                  failure_code = "unexpected_exception"
+                  safe_details = {}
+                  error_class = type(error).__name__
+
+              failure = {
+                  "audit": "STARTPARTNER_ORGANIZER_DEPENDENCY_READ_ONLY_V2",
+                  "status": "AUDIT_FAIL",
+                  "environment": "staging",
+                  "database_mutation": False,
+                  "commit_sha": commit_sha,
+                  "run_id": run_id,
+                  "phase": phase,
+                  "failure_code": failure_code,
+                  "error_class": error_class,
+                  "safe_details": safe_details,
+                  "rollback_attempted": rollback_attempted,
+                  "rollback_succeeded": rollback_succeeded,
+              }
+              write_comment("AUDIT_FAIL", failure)
+              print(
+                  f"AUDIT_FAIL: phase={phase}; code={failure_code}; "
+                  f"class={error_class}; rollback_succeeded={rollback_succeeded}",
+                  file=sys.stderr,
+              )
+              raise SystemExit(1)
           finally:
-              connection.close()
+              if connection is not None:
+                  try:
+                      connection.close()
+                  except Exception:
+                      pass
           PY
 
-      - name: Publish sanitized evidence to Issue 316
+      - name: Publish terminal evidence to Issue 316
+        if: ${{ always() }}
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          AUDIT_COMMIT_SHA: ${{ github.sha }}
+          AUDIT_RUN_ID: ${{ github.run_id }}
         run: |
           set -euo pipefail
+          if [ ! -f audit-comment.json ]; then
+            python3 - <<'PY'
+          import json
+          import os
+
+          payload = {
+              "audit": "STARTPARTNER_ORGANIZER_DEPENDENCY_READ_ONLY_V2",
+              "status": "AUDIT_FAIL",
+              "environment": "staging",
+              "database_mutation": False,
+              "commit_sha": os.environ.get("AUDIT_COMMIT_SHA", ""),
+              "run_id": os.environ.get("AUDIT_RUN_ID", ""),
+              "phase": "workflow_before_audit_evidence",
+              "failure_code": "audit_evidence_file_missing",
+              "rollback_attempted": False,
+              "rollback_succeeded": False,
+          }
+          body = (
+              "## Organizer dependency audit — AUDIT_FAIL\n\n"
+              "Sanitized terminal evidence: the audit did not reach its normal evidence file. "
+              "No database cleanup was performed.\n\n"
+              "```json\n"
+              + json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
+              + "\n```\n"
+          )
+          with open("audit-comment.json", "w", encoding="utf-8") as handle:
+              json.dump({"body": body}, handle, ensure_ascii=False)
+          PY
+          fi
           gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/316/comments" --input audit-comment.json >/dev/null
-          echo "EVIDENCE_WRITE_PASS: sanitized audit evidence posted to Issue #316"
+          echo "EVIDENCE_WRITE_PASS: one sanitized terminal audit comment posted to Issue #316"
