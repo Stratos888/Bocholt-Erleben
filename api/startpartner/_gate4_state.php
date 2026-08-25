@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+const BE_STARTPARTNER_GATE4_TERMS_V2 = 'startpartner-pilot-2026-08-v2';
+
 function be_startpartner_gate4_scope_row(array $scopes, string $key): ?array
 {
     foreach ($scopes as $scope) {
@@ -69,6 +71,43 @@ function be_startpartner_gate4_item_row(
     ];
 }
 
+function be_startpartner_gate4_terms_v2_accepted(array $gate3): bool
+{
+    $terms = is_array($gate3['terms_acceptance'] ?? null) ? $gate3['terms_acceptance'] : [];
+    return (string)($terms['terms_version'] ?? '') === BE_STARTPARTNER_GATE4_TERMS_V2
+        && preg_match('/^[0-9a-f]{64}$/', (string)($terms['terms_digest'] ?? '')) === 1
+        && trim((string)($terms['accepted_at'] ?? '')) !== ''
+        && trim((string)($terms['confirmation_channel'] ?? '')) !== ''
+        && (int)($terms['no_automatic_paid_renewal'] ?? 0) === 1;
+}
+
+function be_startpartner_gate4_portal_access_readback(PDO $pdo, array $gate3): ?array
+{
+    $pilot = is_array($gate3['pilot'] ?? null) ? $gate3['pilot'] : [];
+    $organizerId = (int)($pilot['organizer_id'] ?? 0);
+    $email = strtolower(trim((string)($pilot['partner_contact_email_snapshot'] ?? '')));
+    if ($organizerId < 1 || $email === '') {
+        return null;
+    }
+
+    $statement = $pdo->prepare(
+        "SELECT s.id AS portal_session_id, s.created_at AS session_created_at,
+                ml.id AS magic_link_id, ml.consumed_at, ml.email_snapshot
+         FROM organizer_portal_sessions s
+         INNER JOIN organizer_magic_links ml ON ml.id = s.issued_from_magic_link_id
+         WHERE s.organizer_id = :organizer_id
+           AND s.revoked_at IS NULL
+           AND ml.revoked_at IS NULL
+           AND ml.consumed_at IS NOT NULL
+           AND LOWER(TRIM(ml.email_snapshot)) = :email
+         ORDER BY s.created_at DESC, s.id DESC
+         LIMIT 1"
+    );
+    $statement->execute(['organizer_id' => $organizerId, 'email' => $email]);
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
+    return is_array($row) ? $row : null;
+}
+
 function be_startpartner_gate4_automatic_onboarding_items(array $gate3, string $operator = 'gate3-readback'): array
 {
     $pilot = $gate3['pilot'] ?? null;
@@ -102,7 +141,7 @@ function be_startpartner_gate4_automatic_onboarding_items(array $gate3, string $
         'terms_confirmed' => be_startpartner_gate4_item_row(
             'terms_confirmed',
             $termsReady,
-            'Die bestätigten Pilotbedingungen sind hinterlegt. Eine automatische kostenpflichtige Verlängerung ist ausgeschlossen.',
+            'Die ausdrücklich bestätigten Pilotbedingungen sind gebunden hinterlegt. Eine automatische kostenpflichtige Verlängerung ist ausgeschlossen.',
             $termsReady ? (string)$terms['id'] : null,
             $operator
         ),
@@ -130,7 +169,7 @@ function be_startpartner_gate4_automatic_onboarding_items(array $gate3, string $
         'service_scope_confirmed' => be_startpartner_gate4_item_row(
             'service_scope_confirmed',
             $serviceScopeReady,
-            'Der vereinbarte Inhaltsumfang und die möglichen Tarife nach dem Pilot sind hinterlegt.',
+            'Der vereinbarte Inhaltsumfang und die Zielmodelle sind konsistent hinterlegt.',
             $serviceScopeReady ? 'gate3-scopes' : null,
             $operator
         ),
@@ -251,7 +290,8 @@ function be_startpartner_gate4_current_onboarding_items(
     array $persistedRows,
     ?array $firstContent,
     ?array $readyMeasurement,
-    ?array $readyDistribution
+    ?array $readyDistribution,
+    ?array $portalAccess = null
 ): array {
     $automatic = array_column(be_startpartner_gate4_automatic_onboarding_items($gate3), null, 'item_key');
     $persisted = array_column(be_startpartner_gate4_required_item_rows($persistedRows), null, 'item_key');
@@ -262,13 +302,45 @@ function be_startpartner_gate4_current_onboarding_items(
         $automatic[$key] = $row;
     }
 
+    if (be_startpartner_gate4_terms_v2_accepted($gate3)) {
+        $rights = be_startpartner_gate4_item_row(
+            'content_rights_cleared',
+            true,
+            'Die Nutzungsfreigabe für vom Partner bereitgestellte Texte und Bilder ist Bestandteil der ausdrücklich bestätigten Pilotbedingungen.',
+            BE_STARTPARTNER_GATE4_TERMS_V2,
+            'terms-readback'
+        );
+        $rights['is_manual'] = 0;
+        $automatic['content_rights_cleared'] = $rights;
+
+        $portal = be_startpartner_gate4_item_row(
+            'portal_access_tested',
+            is_array($portalAccess),
+            'Der Partner hat einen gebundenen Zugangslink eingelöst und eine Veranstalter-Portal-Session erzeugt.',
+            is_array($portalAccess) ? 'portal-session:' . (string)$portalAccess['portal_session_id'] : null,
+            'portal-session-readback'
+        );
+        $portal['is_manual'] = 0;
+        $automatic['portal_access_tested'] = $portal;
+
+        $activationTarget = be_startpartner_gate4_item_row(
+            'activation_target_set',
+            true,
+            'Das lokale Startdatum wird bei der ausdrücklichen Aktion „Pilot jetzt starten“ festgelegt; ein vorgelagerter Datums-Pflegeschritt ist nicht erforderlich.',
+            'activation-action-date',
+            'activation-contract'
+        );
+        $activationTarget['is_manual'] = 0;
+        $automatic['activation_target_set'] = $activationTarget;
+    }
+
     $contentReady = is_array($firstContent)
         && in_array((string)($firstContent['status'] ?? ''), ['editorial_ready', 'approved'], true);
     foreach (['first_content_ready', 'editorial_review_ready'] as $key) {
         $automatic[$key] = be_startpartner_gate4_item_row(
             $key,
             $contentReady,
-            'Der erste Inhalt kann redaktionell geprüft werden.',
+            'Der erste Inhalt ist redaktionell für den Pilotstart vorbereitet.',
             $contentReady ? (string)$firstContent['id'] : null
         );
     }
@@ -281,15 +353,13 @@ function be_startpartner_gate4_current_onboarding_items(
     $automatic['distribution_ready'] = be_startpartner_gate4_item_row(
         'distribution_ready',
         is_array($readyDistribution),
-        'Der Reichweitenbeitrag ist mit Kanal und Termin vorbereitet.',
+        'Der Reichweitenbeitrag ist mit dem Partner vereinbart und mit Kanal und Zieltermin vorbereitet.',
         is_array($readyDistribution) ? (string)$readyDistribution['id'] : null
     );
 
     $result = [];
     foreach (BE_STARTPARTNER_GATE4_ONBOARDING_ITEMS as $key) {
-        $row = $automatic[$key] ?? be_startpartner_gate4_item_row($key, false, null, null);
-        $row['is_manual'] = be_startpartner_gate4_onboarding_item_is_manual($key) ? 1 : 0;
-        $result[] = $row;
+        $result[] = $automatic[$key] ?? be_startpartner_gate4_item_row($key, false, null, null);
     }
     return $result;
 }
@@ -325,6 +395,7 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
     $measurements = be_startpartner_gate4_measurement_rows($pdo, $pilotId);
     $distribution = be_startpartner_gate4_distribution_rows($pdo, $pilotId);
     $usages = be_startpartner_gate4_usage_rows($pdo, $pilotId);
+    $portalAccess = be_startpartner_gate4_portal_access_readback($pdo, $gate3);
 
     $first = null;
     foreach ($content as $row) {
@@ -358,7 +429,8 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
         $persistedRows,
         $first,
         $measurement,
-        $reach
+        $reach,
+        $portalAccess
     );
     $onboarding = be_startpartner_gate4_onboarding_readiness($currentRows);
 
@@ -384,13 +456,13 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
     if ($measurement === null) {
         $blockers[] = [
             'code' => 'measurement_not_ready',
-            'message' => 'Die Erfolgsmessung ist noch nicht vollständig eingerichtet.',
+            'message' => 'Die technische Erfolgsmessung ist noch nicht erfolgreich geprüft.',
         ];
     }
     if ($reach === null) {
         $blockers[] = [
             'code' => 'distribution_not_ready',
-            'message' => 'Der Reichweitenbeitrag ist noch nicht mit Kanal und Termin vorbereitet.',
+            'message' => 'Der Reichweitenbeitrag ist noch nicht mit dem Partner vereinbart und mit Kanal und Zieltermin vorbereitet.',
         ];
     }
     $entitlement = $gate3['entitlement'] ?? null;
@@ -425,6 +497,7 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
         'first_content' => $first,
         'ready_measurement' => $measurement,
         'ready_distribution' => $reach,
+        'portal_access' => $portalAccess,
         'activation_ready' => $ready,
         'active' => $active,
         'blockers' => $blockers,
