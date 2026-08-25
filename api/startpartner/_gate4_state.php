@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 const BE_STARTPARTNER_GATE4_TERMS_V2 = 'startpartner-pilot-2026-08-v2';
+const BE_STARTPARTNER_GATE4_TERMS_REFERENCE_V2 = 'system://startpartner/pilot-terms/startpartner-pilot-2026-08-v2';
 
 function be_startpartner_gate4_scope_row(array $scopes, string $key): ?array
 {
@@ -74,19 +75,23 @@ function be_startpartner_gate4_item_row(
 function be_startpartner_gate4_terms_v2_accepted(array $gate3): bool
 {
     $terms = is_array($gate3['terms_acceptance'] ?? null) ? $gate3['terms_acceptance'] : [];
+    $channel = trim((string)($terms['confirmation_channel'] ?? ''));
     return (string)($terms['terms_version'] ?? '') === BE_STARTPARTNER_GATE4_TERMS_V2
+        && (string)($terms['terms_reference'] ?? '') === BE_STARTPARTNER_GATE4_TERMS_REFERENCE_V2
         && preg_match('/^[0-9a-f]{64}$/', (string)($terms['terms_digest'] ?? '')) === 1
         && trim((string)($terms['accepted_at'] ?? '')) !== ''
-        && trim((string)($terms['confirmation_channel'] ?? '')) !== ''
+        && in_array($channel, ['email_reply', 'signed_document', 'portal'], true)
         && (int)($terms['no_automatic_paid_renewal'] ?? 0) === 1;
 }
 
 function be_startpartner_gate4_portal_access_readback(PDO $pdo, array $gate3): ?array
 {
     $pilot = is_array($gate3['pilot'] ?? null) ? $gate3['pilot'] : [];
+    $terms = is_array($gate3['terms_acceptance'] ?? null) ? $gate3['terms_acceptance'] : [];
     $organizerId = (int)($pilot['organizer_id'] ?? 0);
     $email = strtolower(trim((string)($pilot['partner_contact_email_snapshot'] ?? '')));
-    if ($organizerId < 1 || $email === '') {
+    $acceptedAt = trim((string)($terms['accepted_at'] ?? ''));
+    if ($organizerId < 1 || $email === '' || $acceptedAt === '') {
         return null;
     }
 
@@ -96,14 +101,22 @@ function be_startpartner_gate4_portal_access_readback(PDO $pdo, array $gate3): ?
          FROM organizer_portal_sessions s
          INNER JOIN organizer_magic_links ml ON ml.id = s.issued_from_magic_link_id
          WHERE s.organizer_id = :organizer_id
+           AND ml.organizer_id = s.organizer_id
            AND s.revoked_at IS NULL
            AND ml.revoked_at IS NULL
+           AND ml.intended_action = 'portal_login'
            AND ml.consumed_at IS NOT NULL
+           AND ml.consumed_at >= :accepted_at
+           AND s.created_at >= :accepted_at
            AND LOWER(TRIM(ml.email_snapshot)) = :email
          ORDER BY s.created_at DESC, s.id DESC
          LIMIT 1"
     );
-    $statement->execute(['organizer_id' => $organizerId, 'email' => $email]);
+    $statement->execute([
+        'organizer_id' => $organizerId,
+        'accepted_at' => $acceptedAt,
+        'email' => $email,
+    ]);
     $row = $statement->fetch(PDO::FETCH_ASSOC);
     return is_array($row) ? $row : null;
 }
@@ -316,7 +329,7 @@ function be_startpartner_gate4_current_onboarding_items(
         $portal = be_startpartner_gate4_item_row(
             'portal_access_tested',
             is_array($portalAccess),
-            'Der Partner hat einen gebundenen Zugangslink eingelöst und eine Veranstalter-Portal-Session erzeugt.',
+            'Der Partner hat nach der Bestätigung einen gebundenen Zugangslink eingelöst und eine Veranstalter-Portal-Session erzeugt.',
             is_array($portalAccess) ? 'portal-session:' . (string)$portalAccess['portal_session_id'] : null,
             'portal-session-readback'
         );
