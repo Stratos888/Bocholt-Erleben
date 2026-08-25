@@ -36,7 +36,7 @@ $input = [
     'accepting_organization' => 'Bocholt Kulturverein',
     'accepted_at' => '2026-07-27T20:00:00+00:00',
     'confirmation_channel' => 'operator_recorded',
-    'target_plan_keys' => ['active', 'active'],
+    'target_plan_keys' => ['active', 'activity_basic', 'active'],
     'cohort_key' => 'pilot-2026-a',
     'event_limit_per_pilot_month' => 8,
     'activity_concurrent_limit' => 1,
@@ -53,7 +53,7 @@ $input = [
 
 $normalized = be_startpartner_gate3_normalize_confirmation($candidate, $contact, $input);
 $assert($normalized['terms_digest'] === hash('sha256', 'pilot-terms-v1'), 'Terms digest must remain stable.');
-$assert($normalized['target_plan_keys'] === ['active'], 'Target plan keys must be normalized and deduplicated.');
+$assert($normalized['target_plan_keys'] === ['active', 'activity_basic'], 'Both-scope target plan keys must retain active and activity_basic exactly once.');
 $assert($normalized['event_limit_per_pilot_month'] === 8, 'Event limit must be preserved.');
 $assert($normalized['activity_concurrent_limit'] === 1, 'Activity limit must be preserved.');
 $assert($normalized['planned_activation_start'] === '2026-08-10', 'Planned start must remain a date only.');
@@ -62,6 +62,7 @@ $assert($normalized['planned_activation_end'] === '2027-02-10', 'Planned end mus
 $eventsOnly = $candidate;
 $eventsOnly['desired_content_scope'] = 'events';
 $eventsInput = $input;
+$eventsInput['target_plan_keys'] = ['active'];
 unset($eventsInput['activity_concurrent_limit']);
 $eventsNormalized = be_startpartner_gate3_normalize_confirmation($eventsOnly, $contact, $eventsInput);
 $assert($eventsNormalized['activity_concurrent_limit'] === null, 'Events-only candidates must not require an activity limit.');
@@ -69,9 +70,27 @@ $assert($eventsNormalized['activity_concurrent_limit'] === null, 'Events-only ca
 $activitiesOnly = $candidate;
 $activitiesOnly['desired_content_scope'] = 'activities';
 $activitiesInput = $input;
+$activitiesInput['target_plan_keys'] = ['activity_basic'];
 unset($activitiesInput['event_limit_per_pilot_month']);
 $activitiesNormalized = be_startpartner_gate3_normalize_confirmation($activitiesOnly, $contact, $activitiesInput);
 $assert($activitiesNormalized['event_limit_per_pilot_month'] === null, 'Activities-only candidates must not require an event limit.');
+
+$expect(
+    static fn() => be_startpartner_gate3_normalize_confirmation(
+        $candidate,
+        $contact,
+        array_merge($input, ['target_plan_keys' => ['active']])
+    ),
+    'Both-scope confirmation must reject a contract without activity_basic.'
+);
+$expect(
+    static fn() => be_startpartner_gate3_normalize_confirmation(
+        $candidate,
+        $contact,
+        array_merge($input, ['target_plan_keys' => ['activity_basic']])
+    ),
+    'Both-scope confirmation must reject a contract without active.'
+);
 
 $unlimitedInput = $input;
 $unlimitedInput['is_event_unlimited'] = true;

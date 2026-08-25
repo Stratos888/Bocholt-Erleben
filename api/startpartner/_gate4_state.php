@@ -11,6 +11,43 @@ function be_startpartner_gate4_scope_row(array $scopes, string $key): ?array
     return null;
 }
 
+function be_startpartner_gate4_scope_target_plan_mismatches(array $gate3): array
+{
+    $pilot = is_array($gate3['pilot'] ?? null) ? $gate3['pilot'] : [];
+    $terms = is_array($gate3['terms_acceptance'] ?? null) ? $gate3['terms_acceptance'] : [];
+    $serviceScope = is_array($terms['service_scope'] ?? null) ? $terms['service_scope'] : [];
+    $desiredScope = trim((string)($serviceScope['desired_content_scope'] ?? ''));
+    $expectedScopeKeys = match ($desiredScope) {
+        'events' => ['events'],
+        'activities' => ['activities'],
+        'both' => ['events', 'activities'],
+        default => [],
+    };
+    if ($expectedScopeKeys === []) {
+        return [];
+    }
+
+    $scopes = array_values(array_filter((array)($gate3['scopes'] ?? []), 'is_array'));
+    $targetPlanKeys = is_array($pilot['target_plan_keys'] ?? null)
+        ? array_values(array_filter($pilot['target_plan_keys'], static fn(mixed $key): bool => trim((string)$key) !== ''))
+        : [];
+    $mismatches = [];
+    foreach ($expectedScopeKeys as $scopeKey) {
+        $expected = be_startpartner_gate3_scope_target_plan_key($scopeKey);
+        $scope = be_startpartner_gate4_scope_row($scopes, $scopeKey);
+        $actual = is_array($scope) ? trim((string)($scope['target_plan_key'] ?? '')) : '';
+        if ($actual !== $expected || !in_array($expected, $targetPlanKeys, true)) {
+            $mismatches[] = [
+                'scope_key' => $scopeKey,
+                'expected_target_plan_key' => $expected,
+                'actual_target_plan_key' => $actual !== '' ? $actual : null,
+                'pilot_target_plan_present' => in_array($expected, $targetPlanKeys, true),
+            ];
+        }
+    }
+    return $mismatches;
+}
+
 function be_startpartner_gate4_item_row(
     string $key,
     bool $complete,
@@ -56,7 +93,8 @@ function be_startpartner_gate4_automatic_onboarding_items(array $gate3, string $
     $targetPlanKeys = is_array($pilot) && is_array($pilot['target_plan_keys'] ?? null)
         ? array_values(array_filter($pilot['target_plan_keys'], static fn(mixed $key): bool => trim((string)$key) !== ''))
         : [];
-    $serviceScopeReady = $contentScopes !== [] && $targetPlanKeys !== [];
+    $scopeTargetPlanMismatches = be_startpartner_gate4_scope_target_plan_mismatches($gate3);
+    $serviceScopeReady = $contentScopes !== [] && $targetPlanKeys !== [] && $scopeTargetPlanMismatches === [];
     $sourceScope = be_startpartner_gate4_scope_row($scopes, 'automatic-source');
     $maintenanceScope = be_startpartner_gate4_scope_row($scopes, 'maintenance-service');
 
@@ -325,6 +363,18 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
     $onboarding = be_startpartner_gate4_onboarding_readiness($currentRows);
 
     $blockers = $onboarding['blockers'];
+    foreach (be_startpartner_gate4_scope_target_plan_mismatches($gate3) as $mismatch) {
+        $blockers[] = [
+            'code' => 'scope_target_plan_mismatch',
+            'scope_key' => $mismatch['scope_key'],
+            'expected_target_plan_key' => $mismatch['expected_target_plan_key'],
+            'actual_target_plan_key' => $mismatch['actual_target_plan_key'],
+            'message' => sprintf(
+                'Die Zielmodell-Zuordnung für %s ist inkonsistent und muss vor dem Pilotstart repariert werden.',
+                (string)$mismatch['scope_key']
+            ),
+        ];
+    }
     if ($first === null) {
         $blockers[] = [
             'code' => 'first_content_not_ready',

@@ -20,6 +20,7 @@ try {
     $pdo = be_db();
     $result = match ($action) {
         'update_item' => be_startpartner_gate4_update_onboarding($pdo, $candidateId, $input),
+        'repair_scope_target_plans' => be_startpartner_gate4_repair_scope_target_plans($pdo, $candidateId, $input),
         'mark_content_ready' => be_startpartner_gate4_mark_content_ready($pdo, $candidateId, $input),
         'set_measurement' => be_startpartner_gate4_set_measurement($pdo, $candidateId, $input),
         'set_distribution' => be_startpartner_gate4_set_distribution($pdo, $candidateId, $input),

@@ -147,6 +147,35 @@ function be_startpartner_gate3_plan_keys(mixed $value): array
     return array_keys($result);
 }
 
+function be_startpartner_gate3_scope_target_plan_key(string $scopeKey): string
+{
+    return match ($scopeKey) {
+        'events' => 'active',
+        'activities' => 'activity_basic',
+        default => throw new InvalidArgumentException('Unsupported content scope target-plan mapping.'),
+    };
+}
+
+function be_startpartner_gate3_validate_target_plan_contract(string $desiredScope, array $targetPlanKeys): array
+{
+    $expected = match ($desiredScope) {
+        'events' => ['active'],
+        'activities' => ['activity_basic'],
+        'both' => ['active', 'activity_basic'],
+        default => throw new DomainException('Candidate content scope must be resolved before Gate 3.'),
+    };
+    $actual = array_values(array_unique(array_map(
+        static fn(mixed $key): string => strtolower(trim((string)$key)),
+        $targetPlanKeys
+    )));
+    $missing = array_values(array_diff($expected, $actual));
+    $unexpected = array_values(array_diff($actual, $expected));
+    if ($missing !== [] || $unexpected !== []) {
+        throw new DomainException('target_plan_keys do not match the candidate content scope.');
+    }
+    return $expected;
+}
+
 function be_startpartner_gate3_positive_int(mixed $value, string $field, int $max): int
 {
     $number = filter_var($value, FILTER_VALIDATE_INT);
@@ -309,6 +338,10 @@ function be_startpartner_gate3_normalize_confirmation(
     if (!in_array($desiredScope, ['events', 'activities', 'both'], true)) {
         throw new DomainException('Candidate content scope must be resolved before Gate 3.');
     }
+    $targetPlanKeys = be_startpartner_gate3_validate_target_plan_contract(
+        $desiredScope,
+        be_startpartner_gate3_plan_keys($input['target_plan_keys'] ?? null)
+    );
 
     $isEventUnlimited = filter_var(
         $input['is_event_unlimited'] ?? false,
@@ -392,7 +425,7 @@ function be_startpartner_gate3_normalize_confirmation(
             BE_STARTPARTNER_GATE3_CHANNELS,
             'confirmation_channel'
         ),
-        'target_plan_keys' => be_startpartner_gate3_plan_keys($input['target_plan_keys'] ?? null),
+        'target_plan_keys' => $targetPlanKeys,
         'cohort_key' => (string)be_startpartner_clean_text(
             $input['cohort_key'] ?? null,
             64,
@@ -876,14 +909,13 @@ function be_startpartner_gate3_confirm(PDO $pdo, string $candidateId, array $inp
             'partner_contact_email_snapshot' => (string)$contact['email'],
         ]);
 
-        $primaryPlan = $confirmation['target_plan_keys'][0] ?? null;
         if (in_array($confirmation['desired_content_scope'], ['events', 'both'], true)) {
             be_startpartner_gate3_insert_scope(
                 $pdo,
                 $pilotId,
                 'events',
                 'events',
-                $primaryPlan,
+                be_startpartner_gate3_scope_target_plan_key('events'),
                 $confirmation['event_limit_per_pilot_month'],
                 $confirmation['is_event_unlimited'],
                 'pilot_month',
@@ -896,7 +928,7 @@ function be_startpartner_gate3_confirm(PDO $pdo, string $candidateId, array $inp
                 $pilotId,
                 'activities',
                 'activities',
-                $primaryPlan,
+                be_startpartner_gate3_scope_target_plan_key('activities'),
                 $confirmation['activity_concurrent_limit'],
                 false,
                 'concurrent',

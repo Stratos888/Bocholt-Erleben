@@ -53,9 +53,11 @@ function be_startpartner_gate4_create_portal_submission(PDO $pdo, array $session
         throw new DomainException('Pilot cannot create content in the current state.');
     }
     $contentType = be_startpartner_gate4_content_type($input['content_type'] ?? 'event');
+    $scopeKey = $contentType === 'event' ? 'events' : 'activities';
+    $expectedRequestedModel = be_startpartner_gate3_scope_target_plan_key($scopeKey);
     $scopeAllowed = false;
     foreach ((array)$candidate['gate3']['scopes'] as $scope) {
-        if ((string)$scope['scope_key'] === ($contentType === 'event' ? 'events' : 'activities')) {
+        if ((string)($scope['scope_key'] ?? '') === $scopeKey) {
             $scopeAllowed = true;
             break;
         }
@@ -93,6 +95,31 @@ function be_startpartner_gate4_create_portal_submission(PDO $pdo, array $session
         if (!is_array($lockedPilot)) {
             throw new RuntimeException('Pilot disappeared.');
         }
+        if (!in_array((string)$lockedPilot['status'], ['onboarding', 'activation_ready', 'active'], true)) {
+            throw new DomainException('Pilot cannot create content in the current state.');
+        }
+
+        $scopeLock = $pdo->prepare(
+            'SELECT id, scope_key, target_plan_key
+             FROM startpartner_pilot_scopes
+             WHERE pilot_id = :pilot_id AND scope_key = :scope_key
+             LIMIT 1 FOR UPDATE'
+        );
+        $scopeLock->execute([
+            'pilot_id' => (string)$lockedPilot['id'],
+            'scope_key' => $scopeKey,
+        ]);
+        $lockedScope = $scopeLock->fetch(PDO::FETCH_ASSOC);
+        $targetPlans = json_decode((string)$lockedPilot['target_plan_keys_json'], true);
+        if (
+            !is_array($lockedScope)
+            || (string)($lockedScope['target_plan_key'] ?? '') !== $expectedRequestedModel
+            || !is_array($targetPlans)
+            || !in_array($expectedRequestedModel, $targetPlans, true)
+        ) {
+            throw new DomainException('Pilot scope target-plan mapping is inconsistent; operator repair is required.');
+        }
+
         $existing = $pdo->prepare(
             'SELECT pcl.*, s.status AS submission_status, s.title
              FROM startpartner_pilot_content_links pcl
@@ -106,8 +133,7 @@ function be_startpartner_gate4_create_portal_submission(PDO $pdo, array $session
             return ['content_link' => $existingRow, 'idempotent_replay' => true];
         }
         $paymentReference = be_startpartner_gate4_uuid();
-        $targetPlans = json_decode((string)$lockedPilot['target_plan_keys_json'], true);
-        $requestedModel = is_array($targetPlans) && isset($targetPlans[0]) ? (string)$targetPlans[0] : 'startpartner_pilot';
+        $requestedModel = $expectedRequestedModel;
         $insertSubmission = $pdo->prepare(
             'INSERT INTO submissions (
                 organizer_id, submission_kind, status, requested_model_key, payment_kind,
@@ -185,6 +211,7 @@ function be_startpartner_gate4_create_portal_submission(PDO $pdo, array $session
                 'submission_id' => $submissionId,
                 'content_link_id' => $contentLinkId,
                 'content_type' => $contentType,
+                'requested_model_key' => $requestedModel,
                 'source_reference' => $sourceReference,
                 'mail_effect' => 'none',
                 'stripe_effect' => 'none',
