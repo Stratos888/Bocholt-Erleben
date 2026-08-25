@@ -164,7 +164,7 @@ try {
         'accepting_organization' => 'Gate 3 Domain Organisation',
         'accepted_at' => gmdate('c'),
         'confirmation_channel' => 'operator_recorded',
-        'target_plan_keys' => ['active'],
+        'target_plan_keys' => ['active', 'activity_basic'],
         'cohort_key' => 'pilot-contract-2026',
         'event_limit_per_pilot_month' => 8,
         'activity_concurrent_limit' => 1,
@@ -192,6 +192,8 @@ try {
     $assert((int)$scalar($pdo, 'SELECT COUNT(*) FROM startpartner_pilots WHERE candidate_id = :id', ['id' => $candidateId]) === 1, 'Exactly one pilot must be created.');
     $assert((int)$scalar($pdo, 'SELECT COUNT(*) FROM startpartner_pilot_terms_acceptances WHERE candidate_id = :id', ['id' => $candidateId]) === 1, 'Exactly one terms acceptance must be created.');
     $assert((int)$scalar($pdo, 'SELECT COUNT(*) FROM startpartner_pilot_scopes WHERE pilot_id = :id', ['id' => $pilotId]) === 7, 'Normalized Gate-3 scopes are incomplete.');
+    $assert((string)$scalar($pdo, "SELECT target_plan_key FROM startpartner_pilot_scopes WHERE pilot_id = :id AND scope_key = 'events'", ['id' => $pilotId]) === 'active', 'Events scope must persist target_plan_key=active.');
+    $assert((string)$scalar($pdo, "SELECT target_plan_key FROM startpartner_pilot_scopes WHERE pilot_id = :id AND scope_key = 'activities'", ['id' => $pilotId]) === 'activity_basic', 'Activities scope must persist target_plan_key=activity_basic.');
     $assert((string)$scalar($pdo, 'SELECT status FROM startpartner_pilot_entitlements WHERE pilot_id = :id', ['id' => $pilotId]) === 'pending_activation', 'Pilot grant must remain pending_activation.');
     $assert($scalar($pdo, 'SELECT starts_at FROM startpartner_pilot_entitlements WHERE pilot_id = :id', ['id' => $pilotId]) === null, 'Pending pilot grant must not have a start timestamp.');
     $assert($scalar($pdo, 'SELECT ends_at FROM startpartner_pilot_entitlements WHERE pilot_id = :id', ['id' => $pilotId]) === null, 'Pending pilot grant must not have an end timestamp.');
