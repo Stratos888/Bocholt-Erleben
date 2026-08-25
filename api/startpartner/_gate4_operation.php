@@ -175,3 +175,150 @@ function be_startpartner_gate4_update_onboarding(PDO $pdo, string $candidateId, 
         }
     );
 }
+
+function be_startpartner_gate4_repair_scope_target_plans(PDO $pdo, string $candidateId, array $input): array
+{
+    return be_startpartner_gate4_run_operation(
+        $pdo,
+        $candidateId,
+        'gate4.scope.repair',
+        $input,
+        static function(PDO $pdo, array $candidate, array $pilot, string $operator, string $operationId, array $input): array {
+            if (!in_array((string)$pilot['status'], ['onboarding', 'activation_ready'], true)) {
+                throw new DomainException('Scope target-plan repair is only allowed before pilot activation.');
+            }
+
+            $entitlementStatement = $pdo->prepare(
+                'SELECT id, status, starts_at, ends_at
+                 FROM startpartner_pilot_entitlements
+                 WHERE pilot_id = :pilot_id LIMIT 1 FOR UPDATE'
+            );
+            $entitlementStatement->execute(['pilot_id' => (string)$pilot['id']]);
+            $entitlement = $entitlementStatement->fetch(PDO::FETCH_ASSOC);
+            if (
+                !is_array($entitlement)
+                || (string)$entitlement['status'] !== 'pending_activation'
+                || $entitlement['starts_at'] !== null
+                || $entitlement['ends_at'] !== null
+            ) {
+                throw new DomainException('Scope target-plan repair requires a fail-closed pending pilot entitlement.');
+            }
+
+            $usageStatement = $pdo->prepare(
+                'SELECT id FROM startpartner_pilot_usages WHERE pilot_id = :pilot_id LIMIT 1 FOR UPDATE'
+            );
+            $usageStatement->execute(['pilot_id' => (string)$pilot['id']]);
+            if ($usageStatement->fetchColumn() !== false) {
+                throw new DomainException('Scope target-plan repair is blocked after pilot usage exists.');
+            }
+
+            $targetPlanKeys = json_decode((string)$pilot['target_plan_keys_json'], true);
+            if (!is_array($targetPlanKeys)) {
+                throw new DomainException('Pilot target-plan contract is invalid.');
+            }
+            $canonicalPlans = be_startpartner_gate3_validate_target_plan_contract(
+                (string)$candidate['desired_content_scope'],
+                $targetPlanKeys
+            );
+
+            $expectedScopeKeys = match ((string)$candidate['desired_content_scope']) {
+                'events' => ['events'],
+                'activities' => ['activities'],
+                'both' => ['events', 'activities'],
+                default => throw new DomainException('Candidate content scope is invalid.'),
+            };
+
+            $contentStatement = $pdo->prepare(
+                'SELECT pcl.id, pcl.content_type, s.requested_model_key
+                 FROM startpartner_pilot_content_links pcl
+                 INNER JOIN submissions s ON s.id = pcl.submission_id
+                 WHERE pcl.pilot_id = :pilot_id
+                 ORDER BY pcl.id FOR UPDATE'
+            );
+            $contentStatement->execute(['pilot_id' => (string)$pilot['id']]);
+            foreach ($contentStatement->fetchAll(PDO::FETCH_ASSOC) as $content) {
+                $scopeKey = (string)$content['content_type'] === 'activity' ? 'activities' : 'events';
+                $expectedModel = be_startpartner_gate3_scope_target_plan_key($scopeKey);
+                if ((string)$content['requested_model_key'] !== $expectedModel) {
+                    throw new DomainException('Existing pilot content conflicts with the scope target-plan contract.');
+                }
+            }
+
+            $scopeStatement = $pdo->prepare(
+                "SELECT id, scope_key, target_plan_key, status
+                 FROM startpartner_pilot_scopes
+                 WHERE pilot_id = :pilot_id AND scope_key IN ('events','activities')
+                 ORDER BY id FOR UPDATE"
+            );
+            $scopeStatement->execute(['pilot_id' => (string)$pilot['id']]);
+            $scopeRows = [];
+            foreach ($scopeStatement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $scopeRows[(string)$row['scope_key']] = $row;
+            }
+            if (array_diff(array_keys($scopeRows), $expectedScopeKeys) !== []) {
+                throw new DomainException('Unexpected content scope rows prevent an automatic target-plan repair.');
+            }
+
+            $changes = [];
+            foreach ($expectedScopeKeys as $scopeKey) {
+                $row = $scopeRows[$scopeKey] ?? null;
+                if (!is_array($row) || (string)$row['status'] !== 'planned') {
+                    throw new DomainException('Required planned content scope is missing or no longer safely repairable.');
+                }
+                $expectedModel = be_startpartner_gate3_scope_target_plan_key($scopeKey);
+                if (!in_array($expectedModel, $canonicalPlans, true)) {
+                    throw new DomainException('Expected scope target plan is missing from the bound pilot contract.');
+                }
+                $actualModel = trim((string)($row['target_plan_key'] ?? ''));
+                if ($actualModel === $expectedModel) {
+                    continue;
+                }
+                $update = $pdo->prepare(
+                    'UPDATE startpartner_pilot_scopes
+                     SET target_plan_key = :target_plan_key, updated_at = CURRENT_TIMESTAMP
+                     WHERE id = :id AND pilot_id = :pilot_id'
+                );
+                $update->execute([
+                    'target_plan_key' => $expectedModel,
+                    'id' => (int)$row['id'],
+                    'pilot_id' => (string)$pilot['id'],
+                ]);
+                if ($update->rowCount() !== 1) {
+                    throw new RuntimeException('Scope target-plan row could not be repaired.');
+                }
+                $changes[] = [
+                    'scope_key' => $scopeKey,
+                    'from_target_plan_key' => $actualModel !== '' ? $actualModel : null,
+                    'to_target_plan_key' => $expectedModel,
+                ];
+            }
+            if ($changes === []) {
+                throw new DomainException('Scope target-plan mapping is already consistent.');
+            }
+
+            $event = $pdo->prepare(
+                'INSERT INTO startpartner_pilot_events (pilot_id, event_type, actor_reference, payload_json)
+                 VALUES (:pilot_id, :event_type, :actor_reference, :payload_json)'
+            );
+            $event->execute([
+                'pilot_id' => (string)$pilot['id'],
+                'event_type' => 'gate4_scope_target_plan_repaired',
+                'actor_reference' => $operator,
+                'payload_json' => json_encode([
+                    'operation_id' => $operationId,
+                    'changes' => $changes,
+                    'mail_effect' => 'none',
+                    'magic_link_effect' => 'none',
+                    'submission_effect' => 'none',
+                    'publication_effect' => 'none',
+                    'payment_effect' => 'none',
+                ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
+            ]);
+
+            return [
+                'status_reason' => 'Scope-spezifische Zielmodell-Zuordnung revisionsgesichert repariert.',
+                'changes' => $changes,
+            ];
+        }
+    );
+}
