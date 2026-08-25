@@ -33,10 +33,10 @@
 
   function phaseLabel(phase) {
     return ({
-      onboarding: 'Einrichtung läuft',
-      activation_ready: 'Bereit zum Start',
+      onboarding: 'Pilot wird eingerichtet',
+      activation_ready: 'Pilot ist startbereit',
       active: 'Pilotphase läuft',
-    })[phase] || 'Einrichtung läuft';
+    })[phase] || 'Pilot wird eingerichtet';
   }
 
   function phaseBadge(phase) {
@@ -92,6 +92,51 @@
         </span>
       </div>
     `).join('')}</div>`;
+  }
+
+  function nextStep(gate4) {
+    const rows = gate4.content_links || [];
+    const first = rows[0] || null;
+    if (gate4.active) {
+      return {
+        title: 'Pilot läuft',
+        text: 'Deine freigegebenen Inhalte sind Teil des Startpartner-Piloten. Du kannst jederzeit weitere passende Inhalte zur redaktionellen Prüfung einreichen.',
+        action: 'submit',
+      };
+    }
+    if (!first) {
+      return {
+        title: 'Als Nächstes: ersten Inhalt einreichen',
+        text: 'Reiche eine Veranstaltung oder Aktivität ein. Wir prüfen und bereiten sie redaktionell vor; dadurch startet der Pilot noch nicht.',
+        action: 'submit',
+      };
+    }
+    if (first.status === 'draft') {
+      return {
+        title: 'Dein erster Inhalt wird geprüft',
+        text: 'Die Einreichung ist angekommen. Du musst aktuell nichts weiter tun; wir bereiten den Inhalt redaktionell vor.',
+        action: 'wait',
+      };
+    }
+    if (first.status === 'editorial_ready' || gate4.activation_ready) {
+      return {
+        title: 'Von dir ist aktuell nichts mehr nötig',
+        text: 'Der erste Inhalt ist vorbereitet. Bocholt erleben prüft die letzten Voraussetzungen und startet den Pilot anschließend ausdrücklich.',
+        action: 'wait',
+      };
+    }
+    if (first.status === 'rejected' || first.status === 'withdrawn') {
+      return {
+        title: 'Als Nächstes: neuen Inhalt einreichen',
+        text: 'Für den Pilot wird ein geeigneter erster Inhalt benötigt. Reiche bitte eine neue Veranstaltung oder Aktivität ein.',
+        action: 'submit',
+      };
+    }
+    return {
+      title: 'Einrichtung läuft',
+      text: 'Wir prüfen den aktuellen Stand. Sobald etwas von dir benötigt wird, erscheint es hier als nächster Schritt.',
+      action: 'wait',
+    };
   }
 
   function contentForm(gate4) {
@@ -163,6 +208,8 @@
     const gate4 = data.gate4 || {};
     const pilot = gate4.pilot || {};
     const active = Boolean(gate4.active);
+    const step = nextStep(gate4);
+    const hasContent = (gate4.content_links || []).length > 0;
 
     card.hidden = false;
     card.innerHTML = `
@@ -175,22 +222,32 @@
       </div>
       <p>${escape(active
         ? 'Die sechsmonatige Pilotphase läuft. Es gibt keine automatische kostenpflichtige Verlängerung.'
-        : 'Die Einrichtung läuft. Die sechs Monate beginnen erst nach dem vollständigen Start und der Freigabe des ersten Inhalts.')}</p>
+        : 'Die sechs Monate beginnen erst, wenn Bocholt erleben den Pilot ausdrücklich startet.')}</p>
       ${successMessage ? `<div class="content-note" role="status">${escape(successMessage)}</div>` : ''}
-      <dl class="organizer-tariff-table">
-        <div><dt>Vereinbarter Umfang</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
-        <div><dt>Einrichtung</dt><dd>${escape(`${Number(gate4.onboarding?.complete_count || 0)} von ${Number(gate4.onboarding?.total_count || 14)} Schritten erledigt`)}</dd></div>
-        <div><dt>Pilotstart</dt><dd>${escape(formatDate(pilot.activation_date_local))}</dd></div>
-        <div><dt>Geplantes Ende</dt><dd>${escape(formatDate(pilot.planned_end_date))}</dd></div>
-        <div><dt>Veröffentlichte Inhalte</dt><dd>${escape(String((gate4.content_links || []).filter(row => row.status === 'approved').length))}</dd></div>
-      </dl>
-      <details class="content-disclosure">
-        <summary>Inhalte im Pilot anzeigen</summary>
+
+      <section class="content-card content-card--primary organizer-pilot-next-step" aria-label="Nächster Schritt">
+        <span class="content-kicker">Nächster Schritt</span>
+        <h3>${escape(step.title)}</h3>
+        <p>${escape(step.text)}</p>
+      </section>
+
+      ${step.action === 'submit' ? contentForm(gate4) : ''}
+
+      <section class="organizer-pilot-content-area" aria-label="Inhalte im Pilot">
+        <h3>Deine Inhalte</h3>
         ${contentList(gate4.content_links)}
-      </details>
+        ${step.action !== 'submit' ? `<details class="content-disclosure"><summary>Weiteren Inhalt einreichen</summary>${contentForm(gate4)}</details>` : ''}
+      </section>
+
       <details class="content-disclosure">
-        <summary>Neuen Inhalt einreichen</summary>
-        ${contentForm(gate4)}
+        <summary>Pilotumfang und Laufzeit</summary>
+        <dl class="organizer-tariff-table">
+          <div><dt>Vereinbarter Umfang</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
+          <div><dt>Pilotstart</dt><dd>${escape(formatDate(pilot.activation_date_local))}</dd></div>
+          <div><dt>Geplantes Ende</dt><dd>${escape(formatDate(pilot.planned_end_date))}</dd></div>
+          <div><dt>Veröffentlichte Inhalte</dt><dd>${escape(String((gate4.content_links || []).filter(row => row.status === 'approved').length))}</dd></div>
+        </dl>
+        <p class="content-note">Der Pilot ist kostenlos und wird nicht automatisch kostenpflichtig verlängert. Veröffentlichungen bleiben redaktionell geprüft.</p>
       </details>
     `;
     bindForm();
@@ -243,7 +300,7 @@
       const payload = {
         ...values,
         location_public_confirmed: form.elements.location_public_confirmed.checked,
-        client_reference: `gate4-241-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+        client_reference: `gate4-340-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
       };
 
       try {
