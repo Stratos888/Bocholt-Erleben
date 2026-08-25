@@ -1,6 +1,6 @@
 # ENGINEERING – Bocholt erleben
 
-Diese Datei enthält dauerhafte technische Regeln. Der Arbeitsablauf steht in `AI_ENTRYPOINT.md`.
+Diese Datei enthält dauerhafte technische Regeln. Der verbindliche Arbeitsablauf und Qualitätsloop stehen in `AGENTS.md`.
 
 ## 1. Quellen der Wahrheit
 
@@ -46,7 +46,7 @@ Feature-Branch -> staging -> main
 
 Größere Codearbeit benötigt einen vollständigen Checkout mit lokaler Suche, Patchbearbeitung und Tests.
 
-Der GitHub-Connector dient primär für Lesen, Issues, PRs, Checks, Logs und Merge. Ohne Checkout sind nur kleine, vollständig gelesene und deterministische Änderungen zulässig.
+Der GitHub-Connector dient primär für Lesen, Issues, PRs, Checks, Logs und Merge. Ohne Checkout sind nur kleine, vollständig gelesene und deterministische Text- oder Konfigurationsänderungen zulässig.
 
 ## 5. Tests und CI
 
@@ -115,10 +115,10 @@ Release ausschließlich per `staging -> main`, anschließend normaler Live-Smoke
 
 ## 10. Dokumentation
 
-- `AI_ENTRYPOINT.md`: Arbeitsmodell;
-- `AGENTS.md`: Kurzrouter;
+- `AGENTS.md`: verbindlicher AI-Arbeitsvertrag, Task Routing und Qualitätsloop;
+- `AI_ENTRYPOINT.md`: reiner Kompatibilitätsrouter für ältere Verweise;
 - optionales aktives Issue: operativer Workpack-Status;
-- `SYSTEM_MAP.md`: Owner und Datenflüsse;
+- `docs/architecture/SYSTEM_MAP.md`: Owner und Datenflüsse;
 - `TEST_STATUS.md`: dauerhafte Evidence-Grenzen;
 - Roadmap und Produktverträge: nur echte Zieländerungen.
 
