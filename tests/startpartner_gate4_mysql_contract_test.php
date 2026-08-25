@@ -51,10 +51,10 @@ SQL);
   $exec("INSERT INTO startpartner_candidate_contacts(candidate_id,contact_name,email,email_normalized,is_primary) VALUES(:candidate,'Erika Test',:email,:email,1)",['candidate'=>$candidate,'email'=>$email]);
   $exec("INSERT INTO startpartner_candidate_decisions(candidate_id,result,reason,operator_reference,candidate_revision,qualification_snapshot_json,capacity_snapshot_json,is_current) VALUES(:candidate,'accepted_pending_terms','Contract fixture','Contract',1,JSON_OBJECT(),JSON_OBJECT(),1)",['candidate'=>$candidate]);$decision=(int)$pdo->lastInsertId();
   $exec("INSERT INTO startpartner_candidate_reservations(candidate_id,decision_id,status,starts_at,ends_at,capacity_snapshot_json,operator_reference) VALUES(:candidate,:decision,'active',UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 20 DAY),JSON_OBJECT(),'Contract')",['candidate'=>$candidate,'decision'=>$decision]);$reservation=(int)$pdo->lastInsertId();
-  $exec("INSERT INTO startpartner_pilot_terms_acceptances(candidate_id,decision_id,terms_version,terms_reference,terms_digest,accepting_person,accepting_organization,accepted_at,confirmation_channel,service_scope_json,source_care_json,reach_contribution_json,no_automatic_paid_renewal,operator_reference) VALUES(:candidate,:decision,'v1','repo://gate4',:digest,'Erika Test','Gate 4 Verein',UTC_TIMESTAMP(),'operator_recorded',JSON_OBJECT('target_plan_keys',JSON_ARRAY('active','activity_basic')),JSON_OBJECT('description','Automatische Quelle'),JSON_OBJECT('description','Newsletter'),1,'Contract')",['candidate'=>$candidate,'decision'=>$decision,'digest'=>hash('sha256','gate4')]);$terms=(int)$pdo->lastInsertId();
+  $exec("INSERT INTO startpartner_pilot_terms_acceptances(candidate_id,decision_id,terms_version,terms_reference,terms_digest,accepting_person,accepting_organization,accepted_at,confirmation_channel,service_scope_json,source_care_json,reach_contribution_json,no_automatic_paid_renewal,operator_reference) VALUES(:candidate,:decision,'v1','repo://gate4',:digest,'Erika Test','Gate 4 Verein',UTC_TIMESTAMP(),'operator_recorded',JSON_OBJECT('desired_content_scope','both','target_plan_keys',JSON_ARRAY('active','activity_basic')),JSON_OBJECT('description','Automatische Quelle'),JSON_OBJECT('description','Newsletter'),1,'Contract')",['candidate'=>$candidate,'decision'=>$decision,'digest'=>hash('sha256','gate4')]);$terms=(int)$pdo->lastInsertId();
   $exec("INSERT INTO startpartner_pilots(id,candidate_id,organizer_id,terms_acceptance_id,reservation_id,cohort_key,status,target_plan_keys_json,internal_owner,partner_contact_name_snapshot,partner_contact_email_snapshot,revision) VALUES(:id,:candidate,:organizer,:terms,:reservation,'gate4-241','onboarding',JSON_ARRAY('active','activity_basic'),'Contract','Erika Test',:email,1)",['id'=>$pilot,'candidate'=>$candidate,'organizer'=>$organizer,'terms'=>$terms,'reservation'=>$reservation,'email'=>$email]);
   foreach([
-    ['events','events','active',8,'pilot_month'],['activities','activities','activity_basic',1,'concurrent'],
+    ['events','events','active',8,'pilot_month'],['activities','activities','active',1,'concurrent'],
     ['automatic-source','automatic_source',null,null,'not_applicable'],['maintenance-service','maintenance_service',null,null,'not_applicable'],
     ['provider-portal','provider_portal',null,null,'not_applicable'],['measurement','measurement',null,null,'not_applicable'],
     ['reach-contribution','reach_contribution',null,null,'not_applicable']
@@ -64,8 +64,32 @@ SQL);
   $_COOKIE['be_organizer_portal_session']=$token;
 
   $session=be_startpartner_gate4_portal_session($pdo);
+  $preRepair=be_startpartner_gate4_candidate_detail($pdo,$candidate);
+  $preRepairCodes=array_column((array)$preRepair['gate4']['blockers'],'code');
+  $assert(in_array('scope_target_plan_mismatch',$preRepairCodes,true),'Inconsistent activities target plan must be a hard Gate-4 blocker.');
+  $serviceBefore=array_values(array_filter((array)$preRepair['gate4']['onboarding']['items'],static fn(array $row):bool=>($row['item_key']??'')==='service_scope_confirmed'))[0]??null;
+  $assert(is_array($serviceBefore)&&($serviceBefore['status']??'')==='pending','Service scope must not be reported complete while scope target plans disagree.');
+  $expectDomain(static function()use($pdo,$session):void{be_startpartner_gate4_create_portal_submission($pdo,$session,['content_type'=>'activity','client_reference'=>'gate4-241-blocked-activity','title'=>'Blocked activity','location_name'=>'Bocholt','location_address'=>'Testweg 1','location_public_confirmed'=>true]);},'Portal activity submission must fail closed while its scope target-plan mapping is inconsistent.');
+
+  $cr=(int)$preRepair['revision'];$pr=(int)$preRepair['gate4']['pilot']['revision'];
+  $repairPayload=['operation_id'=>'gate4:241:scope-repair','operator_name'=>'Contract','expected_revision'=>$cr,'expected_pilot_revision'=>$pr];
+  $repair=be_startpartner_gate4_repair_scope_target_plans($pdo,$candidate,$repairPayload);
+  $assert(($repair['idempotent_replay']??true)===false,'First scope repair must be a real mutation.');
+  $changes=$repair['meta']['changes']??[];
+  $assert(count($changes)===1&&($changes[0]['scope_key']??'')==='activities'&&($changes[0]['to_target_plan_key']??'')==='activity_basic','Scope repair must change only activities to activity_basic.');
+  $repairReplay=be_startpartner_gate4_repair_scope_target_plans($pdo,$candidate,$repairPayload);
+  $assert(($repairReplay['idempotent_replay']??false)===true,'Identical scope repair retry must replay idempotently.');
+  $repaired=$repair['candidate'];
+  $assert(!in_array('scope_target_plan_mismatch',array_column((array)$repaired['gate4']['blockers'],'code'),true),'Scope mismatch blocker must disappear after repair.');
+  $assert((string)$pdo->query("SELECT target_plan_key FROM startpartner_pilot_scopes WHERE pilot_id='24100000-0000-4000-8000-000000000002' AND scope_key='activities'")->fetchColumn()==='activity_basic','Persisted activities scope must be repaired to activity_basic.');
+
   $created=be_startpartner_gate4_create_portal_submission($pdo,$session,['content_type'=>'event','client_reference'=>'gate4-241-first','title'=>'Gate 4 Testevent','start_date'=>'2026-09-10','location_name'=>'Bocholt','location_address'=>'Testweg 1','location_public_confirmed'=>true]);
   $contentId=(string)$created['content_link']['id'];
+  $activityCreated=be_startpartner_gate4_create_portal_submission($pdo,$session,['content_type'=>'activity','client_reference'=>'gate4-241-activity','title'=>'Gate 4 Testaktivität','location_name'=>'Bocholt','location_address'=>'Testweg 2','location_public_confirmed'=>true]);
+  $activitySubmission=(int)$activityCreated['submission_id'];
+  $activityModel=$pdo->prepare('SELECT requested_model_key FROM submissions WHERE id=:id');$activityModel->execute(['id'=>$activitySubmission]);
+  $assert((string)$activityModel->fetchColumn()==='activity_basic','Portal activity submission must use requested_model_key=activity_basic.');
+
   $detail=be_startpartner_gate4_candidate_detail($pdo,$candidate);$cr=(int)$detail['revision'];$pr=(int)$detail['gate4']['pilot']['revision'];
   $mutate=static function(callable $fn,array $payload)use($pdo,$candidate,&$cr,&$pr):array{$payload+=['operation_id'=>'gate4:241:'.bin2hex(random_bytes(6)),'operator_name'=>'Contract','expected_revision'=>$cr,'expected_pilot_revision'=>$pr];$result=$fn($pdo,$candidate,$payload);$cr=(int)$result['candidate']['revision'];$pr=(int)$result['candidate']['gate4']['pilot']['revision'];return$result;};
 
@@ -108,6 +132,8 @@ SQL);
   $assert($state['active']===true,'Pilot must be active.');
   $assert((string)$state['pilot']['planned_end_date']===be_startpartner_gate4_add_calendar_months($activationDate,6),'Planned end date must use the explicit six-calendar-month rule.');
   $assert((string)$state['first_content']['status']==='approved','First content must be approved atomically.');
+  $activityStatus=$pdo->prepare('SELECT status FROM startpartner_pilot_content_links WHERE submission_id=:id');$activityStatus->execute(['id'=>$activitySubmission]);
+  $assert((string)$activityStatus->fetchColumn()==='draft','Second activity submission must remain draft and must not be published automatically.');
   $assert((int)$state['capacity']['occupied_slots']===1,'Occupied capacity must remain one.');
   $after=[(int)$pdo->query('SELECT COUNT(*) FROM subscriptions')->fetchColumn(),(int)$pdo->query('SELECT COUNT(*) FROM publication_entitlements')->fetchColumn(),(int)$pdo->query('SELECT COUNT(*) FROM publication_consumptions')->fetchColumn()];
   $assert($before===$after,'Locked subscription and regular entitlement owners must remain unchanged.');
