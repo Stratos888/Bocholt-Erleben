@@ -94,9 +94,8 @@ function readinessSummary(gate4) {
       <p>${measurement
         ? `Zuordnung geprüft ${escapeHtml(formatDateTime(measurement.checked_at) || '–')}`
         : firstReady
-          ? 'Die automatische Prüfung war noch nicht erfolgreich. Sie kann ohne zusätzliche Datenpflege erneut ausgeführt werden.'
+          ? 'Die automatische Prüfung war noch nicht erfolgreich. Die Wiederholungsprüfung erscheint als nächste Aktion, sobald sie erforderlich ist.'
           : 'Sobald der erste Inhalt redaktionell vorbereitet wird, prüft das System die Zuordnung automatisch.'}</p>
-      ${!gate4.active && firstReady && !measurement ? '<button class="cc-button cc-button--secondary" data-review-action="gate4:measurement">Technische Prüfung erneut ausführen</button>' : ''}
     </section>
     <section class="cc-startpartner-panel">
       <span class="cc-kicker">Reichweitenbeitrag</span>
@@ -104,13 +103,58 @@ function readinessSummary(gate4) {
       <p>${distribution
         ? `${escapeHtml(distribution.channel || 'Kanal')} · Zieltermin ${escapeHtml(formatDate(distribution.planned_at) || '–')}`
         : 'Vor dem Start wird mit dem Partner ein realistischer Beitrag mit Kanal und Zieltermin vereinbart. Die tatsächliche Erfüllung gehört in den laufenden Pilot.'}</p>
-      ${!gate4.active ? '<button class="cc-button cc-button--secondary" data-review-action="gate4:distribution">Vereinbarung erfassen</button>' : ''}
     </section>
   </section>`;
 }
 
 function scopeRepairBlockers(gate4 = {}) {
   return asArray(gate4.blockers).filter(blocker => blocker?.code === 'scope_target_plan_mismatch');
+}
+
+function firstRequiredBlocker(gate4 = {}) {
+  return asArray(gate4.blockers).find(blocker => blocker?.code !== 'scope_target_plan_mismatch') || null;
+}
+
+function gate4NextAction(gate4 = {}) {
+  const scopeMismatches = scopeRepairBlockers(gate4);
+  if (scopeMismatches.length && !gate4.active) {
+    return `<div class="cc-notice cc-notice--attention"><strong>Zielmodell-Zuordnung blockiert</strong><span>Die persistierte Event-/Aktivitätszuordnung stimmt nicht mit dem gebundenen Pilotvertrag überein. Vor weiteren Pilotschritten ist eine revisionsgesicherte Reparatur erforderlich.</span></div>
+      <button class="cc-button cc-button--primary" data-review-action="gate4:repair-scope">Zielmodell-Zuordnung reparieren</button>`;
+  }
+  if (gate4.active) {
+    return '<div class="cc-notice cc-notice--success"><strong>Sechsmonatige Pilotphase läuft</strong><span>Der Pilot und der erste Inhalt sind aktiv. Der aktuelle Stand wurde vollständig geprüft.</span></div>';
+  }
+  if (gate4.activation_ready) {
+    return `<div class="cc-notice cc-notice--success"><strong>Startbereit</strong><span>Alle Voraussetzungen sind erfüllt. Das Startdatum wird erst beim ausdrücklichen Pilotstart festgelegt.</span></div>
+      <button class="cc-button cc-button--primary cc-button--large" data-review-action="gate4:activate">Pilot jetzt starten</button>`;
+  }
+
+  const blocker = firstRequiredBlocker(gate4);
+  const first = gate4.first_content || null;
+  const firstReady = Boolean(first && ['editorial_ready', 'approved'].includes(first.status));
+
+  if (blocker?.item_key === 'portal_access_tested') {
+    return '<div class="cc-notice cc-notice--info"><strong>Warten auf Partnerzugang</strong><span>Der Partner muss den gebundenen Veranstalterzugang einmal nutzen. Danach wird dieser Schritt automatisch erkannt; der Operator pflegt keinen Nachweis.</span></div>';
+  }
+  if (!first) {
+    return '<div class="cc-notice cc-notice--info"><strong>Warten auf ersten Partnerinhalt</strong><span>Der Partner reicht den ersten Inhalt über den Veranstalterzugang ein. Danach erscheint die redaktionelle Vorbereitung als nächste Operatoraktion.</span></div>';
+  }
+  if (first.status === 'draft') {
+    return `<div class="cc-notice cc-notice--info"><strong>Nächste Aktion: Inhalt vorbereiten</strong><span>Der erste Partnerinhalt ist eingereicht und kann jetzt redaktionell für den Pilotstart vorbereitet werden.</span></div>
+      <button class="cc-button cc-button--primary" data-review-action="gate4:content:${escapeHtml(first.id)}">Für den Pilotstart vorbereiten</button>`;
+  }
+  if (firstReady && !gate4.ready_measurement) {
+    return `<div class="cc-notice cc-notice--attention"><strong>Nächste Aktion: technische Prüfung wiederholen</strong><span>Der Inhalt ist vorbereitet, aber die automatische Measurement-Prüfung war noch nicht erfolgreich. Es werden keine fachlichen Daten gepflegt.</span></div>
+      <button class="cc-button cc-button--primary" data-review-action="gate4:measurement">Technische Prüfung erneut ausführen</button>`;
+  }
+  if (!gate4.ready_distribution) {
+    return `<div class="cc-notice cc-notice--info"><strong>Nächste Aktion: Reichweitenbeitrag vereinbaren</strong><span>Inhalt und technische Messung sind vorbereitet. Jetzt fehlt nur noch die konkrete Vereinbarung mit Kanal und Zieltermin.</span></div>
+      <button class="cc-button cc-button--primary" data-review-action="gate4:distribution">Vereinbarung erfassen</button>`;
+  }
+  if (blocker) {
+    return `<div class="cc-notice cc-notice--attention"><strong>Nächster offener Punkt</strong><span>${escapeHtml(blocker.message || 'Ein erforderlicher Schritt ist noch offen.')}</span></div>`;
+  }
+  return `<div class="cc-notice cc-notice--info"><strong>Gesamtstand wird geprüft</strong><span>${escapeHtml(gate4PriorityMessage(gate4))}</span></div>`;
 }
 
 export function renderGate4Panel(candidate = {}) {
@@ -120,16 +164,6 @@ export function renderGate4Panel(candidate = {}) {
 
   const onboarding = gate4.onboarding || {};
   const first = gate4.first_content || {};
-  const scopeMismatches = scopeRepairBlockers(gate4);
-  const stateAction = scopeMismatches.length && !gate4.active
-    ? `<div class="cc-notice cc-notice--attention"><strong>Zielmodell-Zuordnung blockiert</strong><span>Die persistierte Event-/Aktivitätszuordnung stimmt nicht mit dem gebundenen Pilotvertrag überein. Vor weiteren Pilotschritten ist eine revisionsgesicherte Reparatur erforderlich.</span></div>
-       <button class="cc-button cc-button--primary" data-review-action="gate4:repair-scope">Zielmodell-Zuordnung reparieren</button>`
-    : gate4.activation_ready
-      ? '<button class="cc-button cc-button--primary cc-button--large" data-review-action="gate4:activate">Pilot jetzt starten</button>'
-      : gate4.active
-        ? '<div class="cc-notice cc-notice--success"><strong>Sechsmonatige Pilotphase läuft</strong><span>Der Pilot und der erste Inhalt sind aktiv. Der aktuelle Stand wurde vollständig geprüft.</span></div>'
-        : `<div class="cc-notice cc-notice--info"><strong>Nächster offener Punkt</strong><span>${escapeHtml(gate4PriorityMessage(gate4))}</span></div>`;
-
   return `<section class="cc-startpartner-panel" data-gate4-panel>
     <header>
       <div>
@@ -143,7 +177,7 @@ export function renderGate4Panel(candidate = {}) {
       <div><dt>Geplantes Ende</dt><dd>${escapeHtml(pilot.planned_end_date ? formatDate(pilot.planned_end_date) : 'Wird beim Start berechnet')}</dd></div>
       <div><dt>Erster Inhalt</dt><dd>${escapeHtml(contentStatusLabels[first.status] || first.status || 'Noch nicht vorbereitet')}</dd></div>
     </dl>
-    ${stateAction}
+    ${gate4NextAction(gate4)}
     <details class="cc-disclosure">
       <summary>Prüfdetails</summary>
       <div class="cc-startpartner-qualification-group">
