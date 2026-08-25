@@ -1,57 +1,44 @@
 ## Ziel
 
-- **Problem und Zielzustand:**
+- **Problem / gewünschte Wirkung:**
+- **Target State:**
 - **Ausgangs-SHA von `staging`:**
-- **Warum ist dies der kleinste nachhaltige Patch?**
+- **Warum ist dies der kleinste nachhaltige Zielzustand?**
 
 ## Scope
 
 - **Geänderte Owner-Dateien:**
-- **Bewusst nicht geändert:**
+- **Bestehendes Pattern, das weiterverwendet wird:**
+- **Wichtige Invarianten / bewusst unverändert:**
 - **Externe Ressourcen:** keine / read-only / kontrollierter Einzelwrite
-- **Repository-Schreiber:** Chat / Codex
 
 ## Prüfung
 
-- **Automatisierte Tests:**
+- **Automatisierte Tests / Evidence:**
 - **Erforderlicher Staging-Smoke nach dem Merge:**
-- **Rollback/Revert:**
-- **Nutzerartefakte:** keine / ausdrücklich angefordert
+- **Nicht belegt / aktuelle Evidence-Grenze:** keine / konkret benennen
+- **Rollback / Revert:**
 
-## Maschinenlesbare PR-Evidence
+## Workpack
 
-Den Block vollständig ausfüllen. Scope und erlaubte Dateien werden ausschließlich vom referenzierten aktiven Workpack-Issue vorgegeben.
+Für normale PRs leer lassen. Wenn ein Workpack erforderlich ist, ausschließlich eine Zeile mit der tatsächlichen Issue-Nummer verwenden; der PR Gate lädt den Vertrag live aus dem Issue. Keine Contract-, Hash- oder Statuskopie im PR führen.
 
-<!-- PR_EVIDENCE_START -->
-```toml
-schema_version = 1
-workpack_issue = 0
-contract_revision = 0
-contract_hash = ""
-tests = []
-evidence_scope = []
-not_proven = []
-rollback = ""
+```text
+Workpack: #123
 ```
-<!-- PR_EVIDENCE_END -->
 
 ## Dokumentations-Reconciliation
 
-Owner-Matrix aus `AI_ENTRYPOINT.md` prüfen und nur dauerhafte Änderungen dokumentieren.
+Nur dauerhaftes Wissensdelta dokumentieren. Operativer Status bleibt im jeweiligen Workpack-Issue; `ROADMAP.md`, `TEST_STATUS.md` und Produkt-/Architekturverträge werden nur in ihrer in `AGENTS.md` definierten Rolle geändert.
 
-- **Arbeitsmodell / Werkzeugwahl / Nutzerartefakte:** geändert / unverändert
-- **Technische Regeln / Workflowrollen / System Map:** geändert / unverändert
-- **Produktziel / Roadmap:** geändert / unverändert
-- **Proofstand / Evidence-Grenze:** geändert / unverändert
-- **Externe Ressourcenmatrix:** geändert / unverändert
-- **Operativer Status:** ausschließlich im aktiven Issue aktualisiert
-- **Ergebnis:** geänderte kanonische Dokumente auflisten oder ausdrücklich `kein dauerhaftes Wissensdelta`
+- **Dauerhaftes Wissensdelta:** keines / geänderte kanonische Owner nennen
 
 ## Abschluss
 
 - [ ] PR zielt auf `staging` oder ist der reguläre Release-PR `staging -> main`
-- [ ] Diff ist auf den im aktiven Workpack-Issue eingefrorenen Scope begrenzt
-- [ ] Keine parallele Änderung am selben Owner oder an derselben externen Ressource
+- [ ] vorhandene passende Arbeit / Owner-Kollisionen wurden geprüft
+- [ ] Workpack-Scope wird eingehalten, falls ein Workpack erforderlich ist
 - [ ] `PR Gate` ist auf dem aktuellen Head-SHA grün
-- [ ] Nach dem Merge genügt genau ein normaler Staging- beziehungsweise Main-Deploy oder es ist dokumentations-only ohne fachlichen Runtime-Smoke
-- [ ] Keine ZIP-Datei oder Downloadartefakt als Nutzerlieferung, sofern nicht ausdrücklich angefordert
+- [ ] relevante reale Evidence ist stärker gewichtet als weitere interne Iteration
+- [ ] keine unnötige Parallel-, Wrapper-, Override- oder Sonderlogik eingeführt
+- [ ] nach dem Merge relevanten Staging-Deploy/Smoke prüfen, sofern der normale Prozess oder die Runtimewirkung ihn erfordert
