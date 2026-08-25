@@ -300,7 +300,7 @@ try {
         $candidateHashes = [];
         $candidates = [];
         foreach ($candidateRows as $candidateRow) {
-            $hash = strtolower(trim((string)($candidateRow['primary_contact_sha256'] ?? ''));
+            $hash = strtolower(trim((string)($candidateRow['primary_contact_sha256'] ?? '')));
             if ($hash !== '') {
                 $candidateHashes[$hash] = true;
             }
@@ -317,7 +317,7 @@ try {
 
         $latestCandidateHash = '';
         if ($candidateRows !== []) {
-            $latestCandidateHash = strtolower(trim((string)($candidateRows[0]['primary_contact_sha256'] ?? ''));
+            $latestCandidateHash = strtolower(trim((string)($candidateRows[0]['primary_contact_sha256'] ?? '')));
         }
 
         $referenceMap = be_organizer_audit_328_reference_map($pdo, $database);
