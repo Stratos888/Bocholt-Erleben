@@ -106,6 +106,10 @@ function readinessSummary(gate4) {
   </section>`;
 }
 
+function scopeRepairBlockers(gate4 = {}) {
+  return asArray(gate4.blockers).filter(blocker => blocker?.code === 'scope_target_plan_mismatch');
+}
+
 export function renderGate4Panel(candidate = {}) {
   const gate4 = candidate.gate4 || {};
   const pilot = gate4.pilot;
@@ -113,11 +117,15 @@ export function renderGate4Panel(candidate = {}) {
 
   const onboarding = gate4.onboarding || {};
   const first = gate4.first_content || {};
-  const stateAction = gate4.activation_ready
-    ? '<button class="cc-button cc-button--primary cc-button--large" data-review-action="gate4:activate">Pilot jetzt starten</button>'
-    : gate4.active
-      ? '<div class="cc-notice cc-notice--success"><strong>Sechsmonatige Pilotphase läuft</strong><span>Der Pilot und der erste Inhalt sind aktiv. Der aktuelle Stand wurde vollständig geprüft.</span></div>'
-      : `<div class="cc-notice cc-notice--info"><strong>Nächster offener Punkt</strong><span>${escapeHtml(gate4PriorityMessage(gate4))}</span></div>`;
+  const scopeMismatches = scopeRepairBlockers(gate4);
+  const stateAction = scopeMismatches.length && !gate4.active
+    ? `<div class="cc-notice cc-notice--attention"><strong>Zielmodell-Zuordnung blockiert</strong><span>Die persistierte Event-/Aktivitätszuordnung stimmt nicht mit dem gebundenen Pilotvertrag überein. Vor weiteren Pilotschritten ist eine revisionsgesicherte Reparatur erforderlich.</span></div>
+       <button class="cc-button cc-button--primary" data-review-action="gate4:repair-scope">Zielmodell-Zuordnung reparieren</button>`
+    : gate4.activation_ready
+      ? '<button class="cc-button cc-button--primary cc-button--large" data-review-action="gate4:activate">Pilot jetzt starten</button>'
+      : gate4.active
+        ? '<div class="cc-notice cc-notice--success"><strong>Sechsmonatige Pilotphase läuft</strong><span>Der Pilot und der erste Inhalt sind aktiv. Der aktuelle Stand wurde vollständig geprüft.</span></div>'
+        : `<div class="cc-notice cc-notice--info"><strong>Nächster offener Punkt</strong><span>${escapeHtml(gate4PriorityMessage(gate4))}</span></div>`;
 
   return `<section class="cc-startpartner-panel" data-gate4-panel>
     <header>
@@ -210,6 +218,30 @@ async function mutate(path, data, payload, reload, success) {
 
 function confirmButton(label, tone = 'primary') {
   return `<button type="button" class="cc-button cc-button--${tone}" id="gate4-confirm">${escapeHtml(label)}</button>`;
+}
+
+async function scopeRepairDialog(item, reload) {
+  const detail = await latest(item);
+  const data = detail.startpartner_candidate;
+  const mismatches = scopeRepairBlockers(data.gate4 || {});
+  if (!mismatches.length) {
+    setStatus('Die Zielmodell-Zuordnung ist bereits konsistent. Es wurde nichts geändert.', 'success');
+    return;
+  }
+  const rows = mismatches.map(mismatch => `<li><strong>${escapeHtml(mismatch.scope_key || 'Scope')}</strong>: ${escapeHtml(mismatch.actual_target_plan_key || 'ohne Zuordnung')} → ${escapeHtml(mismatch.expected_target_plan_key || 'erwartetes Zielmodell')}</li>`).join('');
+  openDialog(`<h2>Zielmodell-Zuordnung reparieren</h2>
+    <p>Die gebundenen Pilotbedingungen bleiben unverändert. Korrigiert wird ausschließlich die falsche technische Zielmodell-Zuordnung der noch nicht aktivierten Event-/Aktivitäts-Scopes.</p>
+    <ul>${rows}</ul>
+    <div class="cc-notice cc-notice--info"><strong>Keine externe Wirkung</strong><span>Diese Reparatur versendet keine Mail oder Magic Link, legt keinen Inhalt an, veröffentlicht nichts, verändert keine Zahlung und startet den Pilot nicht.</span></div>
+    <div id="cc-dialog-message"></div>
+    ${confirmButton('Zielmodell-Zuordnung reparieren')}`,'cc-dialog--wide');
+  document.querySelector('#gate4-confirm')?.addEventListener('click', async event => {
+    event.currentTarget.disabled = true;
+    const result = await mutate('/api/startpartner/onboarding.php', data, {
+      action: 'repair_scope_target_plans',
+    }, reload, 'Zielmodell-Zuordnung repariert und aktueller Pilotstand vollständig neu geprüft.');
+    if (!result) event.currentTarget.disabled = false;
+  });
 }
 
 async function manualItemDialog(item, key, status, reload) {
@@ -347,6 +379,7 @@ async function activationDialog(item, reload) {
 export async function handleGate4Action(item, action, reload) {
   try {
     const parts = String(action || '').split(':');
+    if (parts[1] === 'repair-scope') return scopeRepairDialog(item, reload);
     if (parts[1] === 'item') return manualItemDialog(item, parts[2], parts[3], reload);
     if (parts[1] === 'content') return contentReadyDialog(item, parts[2], reload);
     if (parts[1] === 'measurement') return measurementDialog(item, reload);
