@@ -1,4 +1,4 @@
-name: Startpartner Organizer Identity Audit 328
+name: Startpartner Organizer Identity Audit 328 Cleanup Proof
 
 on:
   push:
@@ -6,202 +6,80 @@ on:
     paths:
       - ".github/workflows/startpartner-organizer-identity-audit-328.yml"
       - "api/organizer-identity-audit-328.php"
-  workflow_dispatch:
 
 permissions:
   contents: read
   issues: write
 
 jobs:
-  audit:
+  prove-removed-endpoint:
     if: github.ref_name == 'staging'
     runs-on: ubuntu-latest
-    environment:
-      name: staging
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     steps:
-      - name: Collect exact-build host-side read-only identity evidence
-        id: audit
+      - name: Wait for exact cleanup build
         shell: bash
         env:
-          STAGING_REVIEW_PASSWORD: ${{ secrets.STAGING_REVIEW_PASSWORD }}
-          AUDIT_COMMIT_SHA: ${{ github.sha }}
-          AUDIT_RUN_ID: ${{ github.run_id }}
+          EXPECTED_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          import json
-          import os
-          import time
-          import urllib.error
-          import urllib.request
+          EXPECTED_BUILD="${EXPECTED_SHA:0:12}"
+          DEPLOYED_BUILD=""
 
-          base_url = "https://staging.bocholt-erleben.de"
-          build_url = base_url + "/meta/build.txt"
-          audit_url = base_url + "/api/organizer-identity-audit-328.php"
-          user_agent = "Bocholt-Erleben-Deploy-Smoke/1.0"
-          commit_sha = os.environ.get("AUDIT_COMMIT_SHA", "").strip()
-          run_id = os.environ.get("AUDIT_RUN_ID", "").strip()
-          review_password = os.environ.get("STAGING_REVIEW_PASSWORD", "").strip()
-          expected_build = commit_sha[:12]
+          for attempt in $(seq 1 60); do
+            DEPLOYED_BUILD="$(curl --silent --show-error --max-time 20 \
+              --header 'User-Agent: Bocholt-Erleben-Workpack-328-Cleanup-Proof/1' \
+              'https://staging.bocholt-erleben.de/meta/build.txt' || true)"
+            DEPLOYED_BUILD="$(printf '%s' "$DEPLOYED_BUILD" | tr -d '\r\n')"
+            if [ "$DEPLOYED_BUILD" = "$EXPECTED_BUILD" ]; then
+              echo "AUDIT_328_CLEANUP_BUILD_BINDING=PASS build=$DEPLOYED_BUILD"
+              exit 0
+            fi
+            echo "Waiting for exact staging build: attempt=$attempt expected=$EXPECTED_BUILD actual=${DEPLOYED_BUILD:-unavailable}"
+            sleep 5
+          done
 
-          def write_terminal(status, payload):
-              body = (
-                  f"## Testpuper organizer identity audit — {status}\n\n"
-                  "Host-side Staging terminal evidence for Workpack #328. "
-                  "No organizer/candidate cleanup or database mutation was performed.\n\n"
-                  "```json\n"
-                  + json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
-                  + "\n```\n"
-              )
-              with open("audit-comment.json", "w", encoding="utf-8") as handle:
-                  json.dump({"body": body}, handle, ensure_ascii=False)
+          echo "AUDIT_328_CLEANUP_BUILD_BINDING=FAIL expected=$EXPECTED_BUILD actual=${DEPLOYED_BUILD:-unavailable}" >&2
+          exit 1
 
-          failure_code = None
-          try:
-              if len(commit_sha) != 40 or any(ch not in "0123456789abcdef" for ch in commit_sha):
-                  raise RuntimeError("invalid_commit_sha")
-              if not review_password:
-                  raise RuntimeError("missing_review_password")
+      - name: Prove former audit endpoint returns HTTP 404
+        id: proof
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          EXPECTED_BUILD="${EXPECTED_SHA:0:12}"
+          ENDPOINT='https://staging.bocholt-erleben.de/api/organizer-identity-audit-328.php'
+          BODY_FILE="$(mktemp)"
+          trap 'rm -f "$BODY_FILE"' EXIT
 
-              deployed_build = ""
-              deadline = time.monotonic() + 720
-              while time.monotonic() < deadline:
-                  request = urllib.request.Request(
-                      build_url,
-                      headers={"User-Agent": user_agent, "Cache-Control": "no-cache"},
-                  )
-                  try:
-                      with urllib.request.urlopen(request, timeout=20) as response:
-                          deployed_build = response.read().decode("utf-8", errors="replace").strip()
-                  except Exception:
-                      deployed_build = ""
-                  if deployed_build == expected_build:
-                      break
-                  time.sleep(10)
-              else:
-                  raise RuntimeError("exact_build_timeout")
+          HTTP_STATUS="$(curl --silent --show-error --max-time 30 \
+            --header 'User-Agent: Bocholt-Erleben-Workpack-328-Cleanup-Proof/1' \
+            --output "$BODY_FILE" \
+            --write-out '%{http_code}' \
+            "$ENDPOINT" || true)"
 
-              request_body = json.dumps({"expected_build": expected_build}).encode("utf-8")
-              request = urllib.request.Request(
-                  audit_url,
-                  data=request_body,
-                  method="POST",
-                  headers={
-                      "User-Agent": user_agent,
-                      "Accept": "application/json",
-                      "Content-Type": "application/json",
-                      "X-BE-Review-Password": review_password,
-                  },
-              )
-              try:
-                  with urllib.request.urlopen(request, timeout=180) as response:
-                      status_code = int(response.status)
-                      raw = response.read().decode("utf-8", errors="replace")
-              except urllib.error.HTTPError as error:
-                  status_code = int(error.code)
-                  raw = error.read().decode("utf-8", errors="replace")
+          if [ "$HTTP_STATUS" != "404" ]; then
+            echo "AUDIT_328_CLEANUP_HTTP_404=FAIL status=${HTTP_STATUS:-request_failed}" >&2
+            exit 1
+          fi
 
-              if status_code != 200:
-                  raise RuntimeError("audit_endpoint_non_200")
-              payload = json.loads(raw)
-              if not isinstance(payload, dict) or payload.get("status") != "ok":
-                  raise RuntimeError("audit_endpoint_invalid_envelope")
-              data = payload.get("data")
-              if not isinstance(data, dict):
-                  raise RuntimeError("audit_endpoint_missing_data")
-              summary = data.get("summary")
-              if not isinstance(summary, dict):
-                  raise RuntimeError("audit_endpoint_missing_summary")
-              if data.get("audit") != "ORGANIZER_IDENTITY_AUDIT_328_V1":
-                  raise RuntimeError("audit_contract_mismatch")
-              if data.get("database_mutation") is not False:
-                  raise RuntimeError("audit_database_mutation_not_false")
-              if summary.get("read_only_transaction") is not True:
-                  raise RuntimeError("audit_read_only_not_proven")
-              if summary.get("rollback_performed") is not True:
-                  raise RuntimeError("audit_rollback_not_proven")
-              if data.get("build") != expected_build:
-                  raise RuntimeError("audit_build_mismatch")
-              if int(data.get("organizer_match_count") or 0) < 1:
-                  raise RuntimeError("audit_missing_organizer_match")
+          echo "AUDIT_328_CLEANUP_HTTP_404=PASS status=404 build=$EXPECTED_BUILD"
+          echo "build=$EXPECTED_BUILD" >> "$GITHUB_OUTPUT"
 
-              evidence = {
-                  "status": "AUDIT_PASS",
-                  "collector": "host-side exact-build Staging owner",
-                  "commit_sha": commit_sha,
-                  "run_id": run_id,
-                  "database_mutation": False,
-                  "audit_data": data,
-              }
-              write_terminal("AUDIT_PASS", evidence)
-              print("AUDIT_PASS: exact-build host-side read-only Testpuper identity inventory collected")
-          except Exception as error:
-              failure_code = str(error)
-              allowed = {
-                  "invalid_commit_sha",
-                  "missing_review_password",
-                  "exact_build_timeout",
-                  "audit_endpoint_non_200",
-                  "audit_endpoint_invalid_envelope",
-                  "audit_endpoint_missing_data",
-                  "audit_endpoint_missing_summary",
-                  "audit_contract_mismatch",
-                  "audit_database_mutation_not_false",
-                  "audit_read_only_not_proven",
-                  "audit_rollback_not_proven",
-                  "audit_build_mismatch",
-                  "audit_missing_organizer_match",
-              }
-              if failure_code not in allowed:
-                  failure_code = "unexpected_collector_failure"
-              evidence = {
-                  "status": "AUDIT_FAIL",
-                  "collector": "host-side exact-build Staging owner",
-                  "commit_sha": commit_sha,
-                  "run_id": run_id,
-                  "database_mutation": False,
-                  "failure_code": failure_code,
-              }
-              write_terminal("AUDIT_FAIL", evidence)
-              print(f"AUDIT_FAIL: {failure_code}", file=__import__("sys").stderr)
-              raise SystemExit(1)
-          PY
-
-      - name: Publish terminal evidence to Issue 328
-        if: ${{ always() }}
+      - name: Publish sanitized cleanup proof to Issue 328
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          AUDIT_COMMIT_SHA: ${{ github.sha }}
-          AUDIT_RUN_ID: ${{ github.run_id }}
+          BUILD: ${{ steps.proof.outputs.build }}
         run: |
           set -euo pipefail
-          if [ ! -f audit-comment.json ]; then
-            python3 - <<'PY'
-          import json
-          import os
-
-          payload = {
-              "status": "AUDIT_FAIL",
-              "collector": "host-side exact-build Staging owner",
-              "commit_sha": os.environ.get("AUDIT_COMMIT_SHA", ""),
-              "run_id": os.environ.get("AUDIT_RUN_ID", ""),
-              "database_mutation": False,
-              "failure_code": "terminal_evidence_file_missing",
+          cat > /tmp/comment.json <<EOF
+          {
+            "body": "## Testpuper organizer identity audit — CLEANUP HTTP 404 PASS\n\nExact-build Staging proof completed after the temporary host audit owner was removed.\n\n- build: \`${BUILD}\`\n- former endpoint: \`/api/organizer-identity-audit-328.php\`\n- HTTP status: **404**\n- database mutation: **false**\n- organizer/candidate mutation: **false**\n\nThis workflow exists only to produce the required cleanup evidence and must be removed again before #328 is closed."
           }
-          body = (
-              "## Testpuper organizer identity audit — AUDIT_FAIL\n\n"
-              "Sanitized terminal evidence for Workpack #328. "
-              "No organizer/candidate cleanup or database mutation was performed.\n\n"
-              "```json\n"
-              + json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
-              + "\n```\n"
-          )
-          with open("audit-comment.json", "w", encoding="utf-8") as handle:
-              json.dump({"body": body}, handle, ensure_ascii=False)
-          PY
-          fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/328/comments" --input audit-comment.json >/dev/null
-          echo "EVIDENCE_WRITE_PASS: one sanitized terminal audit comment posted to Issue #328"
+          EOF
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/328/comments" --input /tmp/comment.json >/dev/null
+          echo "AUDIT_328_CLEANUP_EVIDENCE_WRITE=PASS issue=328"
