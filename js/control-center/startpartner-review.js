@@ -42,7 +42,13 @@ function nowInput(){return dateInput(new Date().toISOString());}
 function futureDate(days){const date=new Date();date.setDate(date.getDate()+days);return date.toISOString().slice(0,10);}
 function metric(label,value,tone=''){return `<div class="cc-startpartner-metric ${tone?`cc-startpartner-metric--${tone}`:''}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value||'–')}</strong></div>`;}
 function pilotTermsWereSent(data){
-  return asArray(data?.events).some(event=>event?.event_type==='pilot_terms_sent'&&event?.payload?.terms_snapshot&&typeof event.payload.terms_snapshot==='object');
+  const revision=Number(data?.revision);
+  if(!Number.isInteger(revision)||revision<1)return false;
+  return asArray(data?.events).some(event=>{
+    if(!['pilot_terms_sent','pilot_terms_resent'].includes(event?.event_type))return false;
+    const snapshot=event?.payload?.terms_snapshot;
+    return snapshot&&typeof snapshot==='object'&&Number(snapshot.candidate_revision)===revision;
+  });
 }
 function blockerText(data){
   const status=String(data?.status||'');const gate3=data?.gate3||{};
