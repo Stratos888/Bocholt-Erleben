@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_gate3_domain.php';
 
-const BE_STARTPARTNER_GATE3_TERMS_VERSION = 'startpartner-pilot-2026-08-v1';
-const BE_STARTPARTNER_GATE3_TERMS_REFERENCE = 'system://startpartner/pilot-terms/startpartner-pilot-2026-08-v1';
-const BE_STARTPARTNER_GATE3_COMMUNICATION_NOTICE_VERSION = 'startpartner-pilot-terms-mail-v1';
+const BE_STARTPARTNER_GATE3_TERMS_VERSION = 'startpartner-pilot-2026-08-v2';
+const BE_STARTPARTNER_GATE3_TERMS_REFERENCE = 'system://startpartner/pilot-terms/startpartner-pilot-2026-08-v2';
+const BE_STARTPARTNER_GATE3_COMMUNICATION_NOTICE_VERSION = 'startpartner-pilot-terms-mail-v2';
 
 function be_startpartner_gate3_terms_scope_label(string $scope): string
 {
@@ -32,16 +32,19 @@ function be_startpartner_gate3_terms_snapshot(array $candidate): array
     $month = (int)gmdate('n');
     $cohortKey = sprintf('startpartner-%s-h%d', gmdate('Y'), $month <= 6 ? 1 : 2);
 
-    $sourceCare = 'Der Startpartner stellt vollständige Inhaltsinformationen bereit und meldet Änderungen oder Absagen zeitnah.';
+    $sourceCare = 'Der Startpartner stellt vollständige Inhaltsinformationen bereit, meldet Änderungen oder Absagen zeitnah und bestätigt, dass Bocholt erleben die von ihm bereitgestellten Texte und Bilder für die vereinbarte Darstellung im Pilot redaktionell bearbeiten und veröffentlichen darf.';
     $maintenanceScope = 'Bocholt erleben übernimmt im Pilot die vereinbarte redaktionelle Aufbereitung und Pflege. Konkrete Quellen- und Betreuungsdetails werden vor der Aktivierung im Onboarding festgelegt.';
-    $reachContribution = 'Der konkrete Reichweitenbeitrag wird im Onboarding gemeinsam festgelegt und muss vor der Aktivierung dokumentiert sein.';
+    $reachContribution = 'Der Startpartner und Bocholt erleben vereinbaren vor dem Pilotstart einen realistischen Reichweitenbeitrag mit Kanal und Zieltermin. Die tatsächliche Erfüllung wird erst während des laufenden Piloten bewertet.';
     $termsClauses = [
         'Die Pilotphase läuft sechs Kalendermonate ab der späteren Aktivierung.',
         'Der Pilot ist kostenlos. Es wird keine Zahlungsart hinterlegt und kein Stripe-Abonnement angelegt.',
-        'Es gibt keine automatische kostenpflichtige Verlängerung oder Umwandlung.',
+        'Es gibt keine automatische kostenpflichtige Verlängerung oder Umwandlung. Eine spätere Fortführung erfordert eine neue ausdrückliche Entscheidung.',
         'Inhalte bleiben redaktionell prüfpflichtig; der Startpartnerstatus ist keine Veröffentlichungsgarantie.',
         'Der Startpartner stellt vollständige Informationen bereit und meldet Änderungen oder Absagen zeitnah.',
-        'Quellen-, Pflege- und Reichweitendetails werden vor der Aktivierung im Onboarding konkretisiert.',
+        'Der Startpartner bestätigt für die von ihm bereitgestellten Texte und Bilder die erforderliche Nutzungsfreigabe für die vereinbarte Darstellung auf Bocholt erleben; redaktionelle Anpassungen im Rahmen der Darstellung sind zulässig.',
+        'Quellen- und Pflegeweg werden im Pilot verbindlich dokumentiert.',
+        'Vor dem Pilotstart wird ein realistischer Reichweitenbeitrag mit Kanal und Zieltermin vereinbart; seine tatsächliche Erfüllung ist Teil des laufenden Piloten und keine Voraussetzung, die vorab künstlich nachgewiesen werden muss.',
+        'Bocholt erleben misst nachvollziehbare Nutzung und Interaktionen auf der Plattform; daraus werden keine Besucherzahlen vor Ort, Buchungen oder Umsätze abgeleitet.',
     ];
     $privacyVersion = trim((string)($candidate['privacy_policy_version'] ?? ''));
     if ($privacyVersion === '') {
@@ -58,6 +61,9 @@ function be_startpartner_gate3_terms_snapshot(array $candidate): array
         'source_care_text' => $sourceCare,
         'maintenance_scope_text' => $maintenanceScope,
         'reach_contribution_text' => $reachContribution,
+        'content_rights_granted' => true,
+        'content_rights_scope' => 'partner_provided_texts_and_images_for_pilot_publication',
+        'distribution_commitment_rule' => 'agreed_before_activation_fulfilled_during_active_pilot',
         'privacy_notice_version' => $privacyVersion,
         'communication_notice_version' => BE_STARTPARTNER_GATE3_COMMUNICATION_NOTICE_VERSION,
         'pilot_duration_rule' => 'six_calendar_months_after_gate4_activation',
@@ -210,7 +216,7 @@ function be_startpartner_gate3_terms_mail(array $candidate, array $contact, arra
                 ))
                 . "\n\nWenn du damit einverstanden bist, antworte bitte auf diese E-Mail mit einer eindeutigen Bestätigung, zum Beispiel: „Ich bestätige die Pilotbedingungen.“",
             'notice_title' => 'Noch kein Pilotstart',
-            'notice_text' => 'Mit deiner Bestätigung beginnt die sechsmonatige Pilotphase noch nicht. Sie startet erst nach der vollständigen Einrichtung und späteren Aktivierung.',
+            'notice_text' => 'Mit deiner Bestätigung beginnt die sechsmonatige Pilotphase noch nicht. Sie startet erst nach der vollständigen Einrichtung und der ausdrücklichen Aktion „Pilot jetzt starten“.',
         ],
     ];
 }
@@ -344,6 +350,12 @@ function be_startpartner_gate3_simple_confirmation_input(
         || (string)($snapshot['desired_content_scope'] ?? '') !== (string)($candidate['desired_content_scope'] ?? '')
     ) {
         throw new DomainException('Das Startpartner-Profil wurde nach dem Bedingungenversand geändert. Bitte sende die Pilotbedingungen erneut.');
+    }
+    if (
+        (string)($snapshot['terms_version'] ?? '') === BE_STARTPARTNER_GATE3_TERMS_VERSION
+        && (($snapshot['content_rights_granted'] ?? false) !== true)
+    ) {
+        throw new DomainException('Die gebundene Pilotbedingungen-Fassung enthält keine eindeutige Nutzungsfreigabe. Bitte sende die aktuellen Pilotbedingungen erneut.');
     }
 
     $acceptedAt = trim((string)($input['accepted_at'] ?? ''));
