@@ -13,15 +13,15 @@ $expectedStartpartnerFiles = [
     '_gate2_domain.php', '_gate3_domain.php', '_gate3_communication.php', '_gate3_delivery_retry.php', '_gate3_presentation.php',
     '_gate4_contract.php', '_gate4_domain.php', '_gate4_schema.php',
     '_gate4_state.php', '_gate4_projection.php', '_gate4_operation.php',
-    '_gate4_readiness_actions.php', '_gate4_activation_domain.php', '_gate4_portal_domain.php',
+    '_gate4_readiness_actions.php', '_gate4_activation_domain.php', '_gate4_lifecycle_domain.php', '_gate4_portal_domain.php',
     'intake.php', 'candidates.php', 'profile.php', 'qualification.php',
     'action.php', 'review-decision.php', 'review-communication.php', 'capacity.php',
-    'pilot.php', 'onboarding.php', 'content.php', 'activation.php',
+    'pilot.php', 'onboarding.php', 'content.php', 'activation.php', 'lifecycle.php',
 ];
 $startpartnerFiles = glob($root . '/api/startpartner/*.php') ?: [];
 $actualNames = array_map('basename', $startpartnerFiles);
 sort($actualNames); $expectedNames = $expectedStartpartnerFiles; sort($expectedNames);
-$assert($actualNames === $expectedNames, 'Startpartner muss ausschließlich die kanonischen Runtime-Owner einschließlich Intake, Review, Review-Kommunikation und kontrollierter Gate-3-Bedingungskommunikation besitzen.');
+$assert($actualNames === $expectedNames, 'Startpartner muss ausschließlich die kanonischen Runtime-Owner einschließlich Intake, Review, Review-Kommunikation, Gate-3-Bedingungskommunikation und aktivem Pilot-Lifecycle besitzen.');
 
 foreach ([
     'triage.php','gate2-staging-smoke-199.php','gate2-staging-smoke-auto-199.php',
@@ -92,6 +92,7 @@ $pilot = $read('/api/startpartner/pilot.php');
 $onboarding = $read('/api/startpartner/onboarding.php');
 $content = $read('/api/startpartner/content.php');
 $activation = $read('/api/startpartner/activation.php');
+$lifecycle = $read('/api/startpartner/lifecycle.php');
 $gate2Domain = $read('/api/startpartner/_gate2_domain.php');
 $gate3Domain = $read('/api/startpartner/_gate3_domain.php');
 $gate3Communication = $read('/api/startpartner/_gate3_communication.php');
@@ -117,6 +118,7 @@ foreach ([
     'candidates.php'=>$candidates,'profile.php'=>$profile,'qualification.php'=>$qualification,
     'action.php'=>$action,'review-decision.php'=>$reviewDecision,'review-communication.php'=>$reviewCommunication,
     'capacity.php'=>$capacity,'pilot.php'=>$pilot,'onboarding.php'=>$onboarding,'activation.php'=>$activation,
+    'lifecycle.php'=>$lifecycle,
 ] as $name=>$source) {
     $assert(str_contains($source, 'be_require_review_access'), "{$name} muss geschützt sein.");
     $assert(str_contains($source, 'be_startpartner_require_gate1_environment'), "{$name} muss außerhalb Staging/Dev fail-closed sein.");
@@ -133,6 +135,8 @@ $assert(str_contains($reviewDecision, 'be_startpartner_review_decision'), 'Revie
 $assert(str_contains($reviewDecision, 'be_startpartner_review_communication_send'), 'Review-Endpunkt muss die kontrollierte Kommunikation nach der fachlichen Entscheidung orchestrieren.');
 $assert(str_contains($reviewCommunication, 'BeStartpartnerConflictException'), 'Kommunikations-Retry muss Konflikte als HTTP 409 behandeln.');
 $assert(str_contains($reviewCommunication, 'be_startpartner_review_communication_send'), 'Kommunikationsendpunkt muss ausschließlich den Kommunikationsowner aufrufen.');
+$assert(str_contains($lifecycle, 'BeStartpartnerConflictException'), 'Lifecycle-Mutationen müssen Konflikte als HTTP 409 behandeln.');
+$assert(str_contains($lifecycle, 'be_startpartner_gate4_lifecycle_dispatch'), 'Lifecycle-Endpunkt muss ausschließlich den Gate-4-Lifecycle-Owner aufrufen.');
 
 $assert(str_contains($reviewDecisionDomain, 'be_startpartner_gate2_run_operation'), 'Review-Entscheidungen müssen den revisions- und idempotenzgesicherten Gate-2-Operationsrahmen verwenden.');
 $assert(str_contains($reviewDecisionDomain, 'be_startpartner_gate2_insert_decision'), 'Review-Entscheidungen müssen den kanonischen Decision-Owner verwenden.');
