@@ -45,7 +45,7 @@ foreach (['usage_observed', 'zero_usage', 'no_data_yet_or_too_short', 'query_or_
 $assert(str_contains($state, 'metric_date < :today_local'), 'Measurement runtime must not classify the current incomplete day as zero usage.');
 $assert(str_contains($state, 'closeout_required'), 'planned_end_date must produce an explicit closeout signal.');
 $assert(str_contains($state, 'next_review_at'), 'Lifecycle readback must expose the next review owner.');
-$assert(str_contains($projection, "'state' => $projectedState") || str_contains($projection, "'state' =>"), 'Control-case projection must carry lifecycle state.');
+$assert(str_contains($projection, "'state' => \$projectedState"), 'Control-case projection must carry lifecycle state.');
 $assert(str_contains($projection, "'done'"), 'Terminal pilot must close the existing control-case projection.');
 $assert(str_contains($projection, 'be_startpartner_gate4_partner_next_action'), 'Partner projection must expose one canonical next action.');
 
