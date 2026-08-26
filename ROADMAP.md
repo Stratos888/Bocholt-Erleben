@@ -3,7 +3,7 @@
 Stand: 2026-07-24
 Status: priorisierte Produktziele; kein operativer Workpack-Status
 
-Der operative Schritt steht ausschließlich im genau einen offenen GitHub-Issue mit `[ACTIVE WORKPACK]`. `docs/workpacks/active/CURRENT_WORKPACK.md` ist der statusfreie Router. Diese Roadmap nennt Produktziele und Kandidaten, keine laufenden SHAs, Gates oder Zwischenstände.
+Operativer Status steht ausschließlich im jeweiligen offenen GitHub-Issue mit `[ACTIVE WORKPACK]`. `docs/workpacks/active/CURRENT_WORKPACK.md` ist der statusfreie Router. Mehrere voneinander unabhängige aktive Workpacks dürfen existieren; derselbe oder fachlich abhängige zentrale Owner bleibt seriell. Diese Roadmap nennt Produktziele und Kandidaten, keine laufenden SHAs, Gates oder Zwischenstände.
 
 ## 1. Zuletzt abgeschlossene Grundlagen
 
@@ -55,7 +55,7 @@ Operative Evidence bleibt im abgeschlossenen Issue #128.
 
 Erreicht:
 
-- genau ein aktives Workpack-Issue als operativer Owner;
+- ein Workpack besitzt genau ein aktives Issue als operativen Owner; unabhängige Workpacks dürfen parallel existieren;
 - maschinenlesbarer, vorab eingefrorener PR-Scope;
 - ein Required Check `PR Gate`;
 - checkout-neutrale synthetische Browser-Evidence;
@@ -188,7 +188,7 @@ Ein Workpack wird erst aktiv, wenn:
 - Produktwirkung und Priorität gegenüber den anderen Kandidaten bestätigt sind;
 - Ziel, Scope, Risiko, Owner, Evidence, Dokumentationsdelta und Rollback dokumentiert sind;
 - es keine konkurrierende zentrale Änderung gibt;
-- genau ein offenes GitHub-Issue den Marker `[ACTIVE WORKPACK]` trägt;
+- für dieses Workpack genau ein offenes GitHub-Issue den Marker `[ACTIVE WORKPACK]` trägt;
 - Gate A geschlossen ist.
 
 Für den Startpartner-Wachstumspiloten gilt zusätzlich:
