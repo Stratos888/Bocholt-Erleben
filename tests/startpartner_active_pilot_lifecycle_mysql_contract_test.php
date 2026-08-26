@@ -226,7 +226,7 @@ $seedActivePilot = static function(int $seed) use (
             :approved_at,:approved_at
          )",
         [
-            'organizer'=>$organizer,'payment_reference'=>hash('sha256',"first-payment-{$seed}"),
+            'organizer'=>$organizer,'payment_reference'=>sprintf('sp344-first-%08d', $seed),
             'organization'=>$organization,'email'=>$email,'start_date'=>$activationDate,
             'approved_at'=>$activationWindow['starts_at_utc'],
         ]
@@ -314,7 +314,7 @@ $insertApprovedUsage = static function(array $fixture, string $contentType, int 
          )",
         [
             'organizer'=>$fixture['organizer'],'kind'=>$contentType,'model'=>$requestedModel,
-            'payment_reference'=>hash('sha256',"approved-usage-{$ordinal}"),
+            'payment_reference'=>sprintf('sp344-use-%08d', $ordinal),
             'organization'=>$fixture['organization'],'email'=>$fixture['email'],
             'title'=>"Synthetic approved {$contentType} {$ordinal}",
             'start_date'=>$contentType === 'event' ? gmdate('Y-m-d', strtotime('+30 days')) : null,
