@@ -13,109 +13,15 @@
   <dialog id="cc-dialog" class="cc-dialog"><form method="dialog" class="cc-dialog__card" id="cc-dialog-form" novalidate><button class="cc-dialog__close" id="cc-dialog-close" type="button">×</button><div id="cc-dialog-body"></div></form></dialog>
   <form id="cc-auth-form" hidden><input id="cc-password"><button id="cc-refresh"></button><button id="cc-menu-button"></button></form><section id="cc-auth" hidden></section><b id="cc-badge-review" hidden></b><b id="cc-badge-backlog" hidden></b>
   <script type="module">
-    import { state, els, closeDialog } from '../../js/control-center/shared.js?v=2026-07-16-e2e-state-v5';
+    import { state, closeDialog } from '../../js/control-center/shared.js?v=2026-07-16-e2e-state-v5';
     import { configureReviewRenderer, renderReview } from '../../js/control-center/review-render.js?v=2026-08-21-startpartner-ai-review-v1';
-    import { handleGate4Action } from '../../js/control-center/startpartner-gate4.js?v=2026-08-25-startpartner-journey-v2';
+    import { handleGate4Action } from '../../js/control-center/startpartner-gate4.js?v=2026-08-26-active-pilot-lifecycle-v1';
 
-    const scenario = new URLSearchParams(location.search).get('scenario') || 'access';
-    const keys = [
-      'terms_confirmed','organizer_linked','contact_confirmed','portal_access_tested',
-      'pilot_entitlement_readback','service_scope_confirmed','sources_recorded','maintenance_path_agreed',
-      'content_rights_cleared','first_content_ready','editorial_review_ready','measurement_ready',
-      'distribution_ready','activation_target_set',
-    ];
-    const baseComplete = new Set([
-      'terms_confirmed','organizer_linked','contact_confirmed','pilot_entitlement_readback',
-      'service_scope_confirmed','sources_recorded','maintenance_path_agreed',
-      'content_rights_cleared','activation_target_set',
-    ]);
-    const completeKeys = new Set(baseComplete);
-    if (['content','distribution','ready','active'].includes(scenario)) completeKeys.add('portal_access_tested');
-    if (['distribution','ready','active'].includes(scenario)) {
-      completeKeys.add('first_content_ready');
-      completeKeys.add('editorial_review_ready');
-      completeKeys.add('measurement_ready');
-    }
-    if (['ready','active'].includes(scenario)) completeKeys.add('distribution_ready');
-    const items = keys.map(key => ({
-      item_key:key,
-      status:completeKeys.has(key)?'complete':'pending',
-      is_required:1,
-      is_hard_blocker:1,
-      is_manual:0,
-      evidence_text:completeKeys.has(key)?`Synthetischer Systemnachweis: ${key}`:null,
-      revision:completeKeys.has(key)?2:0,
-    }));
+    const response = await fetch('/api/control-center/case.php?id=fixture-gate4', {cache:'no-store'});
+    const payload = await response.json();
+    const candidate = payload?.data?.startpartner_candidate;
+    if (!response.ok || !candidate) throw new Error('Synthetischer Gate-4-State fehlt.');
 
-    const contentStatus = scenario === 'content' ? 'draft' : scenario === 'active' ? 'approved' : ['distribution','ready'].includes(scenario) ? 'editorial_ready' : null;
-    const content = contentStatus ? [{
-      id:'24100000-0000-4000-8000-000000000010',submission_id:4241,content_type:'event',
-      status:contentStatus,title:'Synthetischer Startpartner-Kulturtag',start_date:'2026-09-12',
-    }] : [];
-    const firstContent = content[0] || null;
-    const phase = scenario === 'active' ? 'active' : scenario === 'ready' ? 'activation_ready' : 'onboarding';
-    const blocker = scenario === 'access'
-      ? {code:'required_item_open',item_key:'portal_access_tested',message:'Der Partnerzugang wurde noch nicht genutzt.'}
-      : scenario === 'content'
-        ? {code:'required_item_open',item_key:'first_content_ready',message:'Der erste Inhalt ist noch nicht für den Pilotstart vorbereitet.'}
-        : scenario === 'distribution'
-          ? {code:'required_item_open',item_key:'distribution_ready',message:'Der Reichweitenbeitrag ist noch nicht mit dem Partner vereinbart.'}
-          : null;
-
-    const gate4 = {
-      phase,
-      complete:scenario === 'active',
-      active:scenario === 'active',
-      activation_ready:scenario === 'ready',
-      pilot:{
-        id:'24100000-0000-4000-8000-000000000002',status:phase,revision:7,
-        activation_date_local:scenario === 'active'?'2026-08-01':null,
-        planned_end_date:scenario === 'active'?'2027-02-01':null,
-      },
-      onboarding:{
-        ready:['ready','active'].includes(scenario),
-        completed_count:items.filter(row=>row.status==='complete').length,
-        total_count:14,items,
-        blockers:blocker?[blocker]:[],
-      },
-      content_links:content,
-      first_content:firstContent,
-      ready_measurement:['distribution','ready','active'].includes(scenario)
-        ? {id:'24100000-0000-4000-8000-000000000020',metrics_owner:'value_metric_daily',checked_at:'2026-08-01 10:00:00'}
-        : null,
-      ready_distribution:['ready','active'].includes(scenario)
-        ? {id:'24100000-0000-4000-8000-000000000030',channel:'Newsletter',planned_at:'2026-08-08 22:00:00'}
-        : null,
-      blockers:blocker?[blocker]:[],
-      capacity:{occupied_slots:1,active_pilots:scenario==='active'?1:0,active_reservations:scenario==='active'?0:1,hard_stop_at:8,soft_stop_at:6},
-    };
-
-    const candidate = {
-      id:'19900000-0000-0000-0000-000000009999',
-      organization_name:'Gate-4-Kulturverein Bocholt',source:'targeted_outreach',desired_content_scope:'both',
-      status:'accepted_pending_terms',revision:12,assigned_to:'M. Muster',next_review_at:'2026-08-04 10:00:00',
-      website_url:'https://example.org/startpartner',description_text:'Lokaler Kulturverein mit Veranstaltungen und Aktivitäten.',
-      contacts:[{contact_name:'Erika Beispiel',contact_role:'Vorstand',email:'erika@example.org',phone:'02871 12345',is_primary:true}],
-      qualifications:[],readiness:{ready:true,assessed_count:14,total_count:14,blockers:[]},
-      capacity:gate4.capacity,reservations:scenario==='active'?[]:[{id:77,status:'active',starts_at:'2026-07-25 10:00:00',ends_at:'2026-08-20 10:00:00'}],
-      active_reservation:scenario==='active'?null:{id:77,status:'active',starts_at:'2026-07-25 10:00:00',ends_at:'2026-08-20 10:00:00'},
-      waitlist:null,decision:{result:'accepted_pending_terms',reason:'Fachlich geeignet.'},events:[],
-      gate3:{
-        complete:true,blockers:[],
-        terms_acceptance:{
-          id:301,terms_version:'startpartner-pilot-2026-08-v2',
-          terms_reference:'system://startpartner/pilot-terms/startpartner-pilot-2026-08-v2',
-          terms_digest:'a'.repeat(64),accepting_person:'Erika Beispiel',accepting_organization:'Gate-4-Kulturverein Bocholt',
-          accepted_at:'2026-08-25 12:00:00',confirmation_channel:'email_reply',no_automatic_paid_renewal:1,
-        },
-        organizer:{id:401,organization_name:'Gate-4-Kulturverein Bocholt',email:'erika@example.org'},
-        pilot:gate4.pilot,
-        scopes:[{scope_key:'events',limit_value:8,is_unlimited:false,period_unit:'pilot_month'},{scope_key:'activities',limit_value:1,is_unlimited:false,period_unit:'concurrent'}],
-        entitlement:{id:'23100000-0000-4000-8000-000000000002',status:scenario==='active'?'active':'pending_activation',starts_at:null,ends_at:null},
-        events:[],
-      },
-      gate4,
-    };
     const item = {
       id:'fixture-gate4',type:'intake',queue_group:'startpartner',case_kind:'startpartner_candidate',state:'in_progress',
       title:`Startpartner prüfen: ${candidate.organization_name}`,display_status:'Piloteinrichtung',

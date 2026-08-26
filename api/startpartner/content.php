@@ -38,7 +38,17 @@ try {
         !empty($result['idempotent_replay']) ? 200 : 201,
         ['status' => 'ok', 'data' => $result]
     );
-} catch (JsonException|InvalidArgumentException|DomainException $error) {
+} catch (DomainException $error) {
+    $isReplayConflict = str_contains($error->getMessage(), 'client_reference wurde bereits');
+    be_json_response(
+        $isReplayConflict ? 409 : 422,
+        [
+            'status' => 'error',
+            'code' => $isReplayConflict ? 'STARTPARTNER_CONTENT_REPLAY_CONFLICT' : 'STARTPARTNER_CONTENT_INVALID',
+            'message' => $error->getMessage(),
+        ]
+    );
+} catch (JsonException|InvalidArgumentException $error) {
     be_json_response(422, ['status' => 'error', 'message' => $error->getMessage()]);
 } catch (RuntimeException $error) {
     $missing = str_starts_with($error->getMessage(), 'STARTPARTNER_');

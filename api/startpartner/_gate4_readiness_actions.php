@@ -138,7 +138,7 @@ function be_startpartner_gate4_auto_measurement_preflight(
             $pilot,
             $content,
             'ready',
-            'Automatische technische Prüfung nach redaktioneller Vorbereitung des ersten Pilotinhalts.',
+            'Automatische technische Prüfung nach redaktioneller Vorbereitung des Pilotinhalts.',
             'automatic-measurement-readback',
             $operationId
         );
@@ -206,6 +206,15 @@ function be_startpartner_gate4_mark_content_ready(PDO $pdo, string $candidateId,
         'gate4.content.editorial_ready',
         $input,
         static function(PDO $pdo, array $candidate, array $pilot, string $operator, string $operationId, array $input): array {
+            $pilotStatus = (string)$pilot['status'];
+            $activePilot = $pilotStatus === 'active';
+            if ($activePilot) {
+                $entitlement = be_startpartner_gate4_lifecycle_entitlement($pdo, (string)$pilot['id']);
+                be_startpartner_gate4_lifecycle_window($pilot, $entitlement);
+            } elseif (!in_array($pilotStatus, ['onboarding', 'activation_ready'], true)) {
+                throw new DomainException('Pilot content cannot progress editorially in the current pilot state.');
+            }
+
             $contentLinkId = be_startpartner_gate4_required_text($input['content_link_id'] ?? null, 36, 'content_link_id');
             $statement = $pdo->prepare(
                 "UPDATE startpartner_pilot_content_links pcl
@@ -223,24 +232,27 @@ function be_startpartner_gate4_mark_content_ready(PDO $pdo, string $candidateId,
                 );
                 $check->execute(['id' => $contentLinkId, 'pilot_id' => (string)$pilot['id']]);
                 if ((string)$check->fetchColumn() !== 'editorial_ready') {
-                    throw new DomainException('Der Inhalt konnte nicht für den Pilotstart vorbereitet werden.');
+                    throw new DomainException('Der Inhalt konnte nicht für den Pilot vorbereitet werden.');
                 }
             }
-            foreach (['first_content_ready', 'editorial_review_ready'] as $itemKey) {
-                $item = $pdo->prepare(
-                    "UPDATE startpartner_pilot_onboarding_items
-                     SET status = 'complete', evidence_text = :evidence_text,
-                         evidence_reference = :evidence_reference, operator_reference = :operator,
-                         completed_at = CURRENT_TIMESTAMP, revision = revision + 1
-                     WHERE pilot_id = :pilot_id AND item_key = :item_key"
-                );
-                $item->execute([
-                    'evidence_text' => 'Der verknüpfte Inhalt ist redaktionell für den Pilotstart vorbereitet.',
-                    'evidence_reference' => $contentLinkId,
-                    'operator' => $operator,
-                    'pilot_id' => (string)$pilot['id'],
-                    'item_key' => $itemKey,
-                ]);
+
+            if (!$activePilot) {
+                foreach (['first_content_ready', 'editorial_review_ready'] as $itemKey) {
+                    $item = $pdo->prepare(
+                        "UPDATE startpartner_pilot_onboarding_items
+                         SET status = 'complete', evidence_text = :evidence_text,
+                             evidence_reference = :evidence_reference, operator_reference = :operator,
+                             completed_at = CURRENT_TIMESTAMP, revision = revision + 1
+                         WHERE pilot_id = :pilot_id AND item_key = :item_key"
+                    );
+                    $item->execute([
+                        'evidence_text' => 'Der verknüpfte Inhalt ist redaktionell für den Pilotstart vorbereitet.',
+                        'evidence_reference' => $contentLinkId,
+                        'operator' => $operator,
+                        'pilot_id' => (string)$pilot['id'],
+                        'item_key' => $itemKey,
+                    ]);
+                }
             }
 
             $contentQuery = $pdo->prepare(
@@ -260,8 +272,12 @@ function be_startpartner_gate4_mark_content_ready(PDO $pdo, string $candidateId,
 
             return [
                 'status_reason' => ($measurement['status'] ?? '') === 'ready'
-                    ? 'Der erste Inhalt ist für den Pilotstart vorbereitet; die Erfolgsmessung wurde automatisch geprüft.'
-                    : 'Der erste Inhalt ist vorbereitet. Die automatische Prüfung der Erfolgsmessung benötigt noch Klärung.',
+                    ? ($activePilot
+                        ? 'Der zusätzliche Pilotinhalt ist redaktionell vorbereitet; die Erfolgsmessung wurde automatisch geprüft.'
+                        : 'Der erste Inhalt ist für den Pilotstart vorbereitet; die Erfolgsmessung wurde automatisch geprüft.')
+                    : ($activePilot
+                        ? 'Der zusätzliche Pilotinhalt ist vorbereitet. Die automatische Messprüfung benötigt noch Klärung.'
+                        : 'Der erste Inhalt ist vorbereitet. Die automatische Prüfung der Erfolgsmessung benötigt noch Klärung.'),
                 'content_link_id' => $contentLinkId,
                 'measurement_status' => $measurement['status'] ?? 'blocked',
                 'measurement_error' => $measurement['error_message'] ?? null,
@@ -321,6 +337,9 @@ function be_startpartner_gate4_set_distribution(PDO $pdo, string $candidateId, a
         'gate4.distribution.set',
         $input,
         static function(PDO $pdo, array $candidate, array $pilot, string $operator, string $operationId, array $input): array {
+            if (!in_array((string)$pilot['status'], ['onboarding', 'activation_ready'], true)) {
+                throw new DomainException('Die Vorabvereinbarung des Reichweitenbeitrags gehört zur Piloteinrichtung. Im laufenden Pilot wird nur die tatsächliche Erfüllung gepflegt.');
+            }
             $distribution = be_startpartner_gate4_distribution_input($input);
             be_startpartner_gate4_supersede_distribution($pdo, (string)$pilot['id'], $operationId);
 
