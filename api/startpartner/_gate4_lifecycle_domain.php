@@ -55,11 +55,8 @@ function be_startpartner_gate4_lifecycle_scope(PDO $pdo, string $pilotId, string
     return $row;
 }
 
-function be_startpartner_gate4_lifecycle_window(array $pilot, array $entitlement): array
+function be_startpartner_gate4_effective_pilot_window(array $pilot): array
 {
-    if ((string)($pilot['status'] ?? '') !== 'active' || (string)($entitlement['status'] ?? '') !== 'active') {
-        throw new DomainException('Pilot must be active for this action.');
-    }
     $activationDate = trim((string)($pilot['activation_date_local'] ?? ''));
     $plannedEndDate = trim((string)($pilot['planned_end_date'] ?? ''));
     if ($activationDate === '' || $plannedEndDate === '') {
@@ -75,6 +72,14 @@ function be_startpartner_gate4_lifecycle_window(array $pilot, array $entitlement
         'pilot_month_index' => $monthIndex,
         'month_window' => be_startpartner_gate4_pilot_month_window($activationDate, $monthIndex, $plannedEndDate),
     ];
+}
+
+function be_startpartner_gate4_lifecycle_window(array $pilot, array $entitlement): array
+{
+    if ((string)($pilot['status'] ?? '') !== 'active' || (string)($entitlement['status'] ?? '') !== 'active') {
+        throw new DomainException('Pilot must be active for this action.');
+    }
+    return be_startpartner_gate4_effective_pilot_window($pilot);
 }
 
 function be_startpartner_gate4_lifecycle_content(PDO $pdo, string $pilotId, string $contentLinkId): array
@@ -341,6 +346,23 @@ function be_startpartner_gate4_withdraw_content(PDO $pdo, string $candidateId, a
     );
 }
 
+function be_startpartner_gate4_update_scope_statuses(PDO $pdo, string $pilotId, string $transition): void
+{
+    [$targetStatus, $allowedFrom] = match ($transition) {
+        'pause' => ['paused', ['active']],
+        'resume' => ['active', ['paused']],
+        'start_closeout' => ['paused', ['active']],
+        'end_without_conversion', 'terminate' => ['ended', ['active', 'paused']],
+        default => throw new InvalidArgumentException('Lifecycle transition is invalid.'),
+    };
+    $placeholders = implode(',', array_fill(0, count($allowedFrom), '?'));
+    $statement = $pdo->prepare(
+        "UPDATE startpartner_pilot_scopes SET status = ?
+         WHERE pilot_id = ? AND status IN ($placeholders)"
+    );
+    $statement->execute(array_merge([$targetStatus, $pilotId], $allowedFrom));
+}
+
 function be_startpartner_gate4_transition_lifecycle(
     PDO $pdo,
     string $candidateId,
@@ -348,11 +370,11 @@ function be_startpartner_gate4_transition_lifecycle(
     array $input
 ): array {
     $allowed = [
-        'pause' => ['from' => ['active'], 'to' => 'paused', 'entitlement' => 'paused', 'scopes' => 'paused'],
-        'resume' => ['from' => ['paused'], 'to' => 'active', 'entitlement' => 'active', 'scopes' => 'active'],
-        'start_closeout' => ['from' => ['active', 'paused'], 'to' => 'closing', 'entitlement' => 'paused', 'scopes' => 'paused'],
-        'end_without_conversion' => ['from' => ['closing'], 'to' => 'ended_without_conversion', 'entitlement' => 'ended', 'scopes' => 'ended'],
-        'terminate' => ['from' => ['active', 'paused', 'closing'], 'to' => 'terminated', 'entitlement' => 'revoked', 'scopes' => 'ended'],
+        'pause' => ['from' => ['active'], 'to' => 'paused', 'entitlement' => 'paused'],
+        'resume' => ['from' => ['paused'], 'to' => 'active', 'entitlement' => 'active'],
+        'start_closeout' => ['from' => ['active', 'paused'], 'to' => 'closing', 'entitlement' => 'paused'],
+        'end_without_conversion' => ['from' => ['closing'], 'to' => 'ended_without_conversion', 'entitlement' => 'ended'],
+        'terminate' => ['from' => ['active', 'paused', 'closing'], 'to' => 'terminated', 'entitlement' => 'revoked'],
     ];
     if (!isset($allowed[$transition])) {
         throw new InvalidArgumentException('Lifecycle transition is invalid.');
@@ -370,20 +392,17 @@ function be_startpartner_gate4_transition_lifecycle(
                 throw new DomainException('Pilot lifecycle transition is not allowed from the current state.');
             }
             $entitlement = be_startpartner_gate4_lifecycle_entitlement($pdo, $pilotId);
+            if ($transition === 'pause') {
+                if ((string)$entitlement['status'] !== 'active') {
+                    throw new DomainException('Active pilot entitlement is required for pause.');
+                }
+                be_startpartner_gate4_effective_pilot_window($pilot);
+            }
             if ($transition === 'resume') {
                 if ((string)$entitlement['status'] !== 'paused') {
                     throw new DomainException('Paused pilot entitlement is required for resume.');
                 }
-                $activationDate = trim((string)($pilot['activation_date_local'] ?? ''));
-                $plannedEndDate = trim((string)($pilot['planned_end_date'] ?? ''));
-                $today = (new DateTimeImmutable('today', new DateTimeZone('Europe/Berlin')))->format('Y-m-d');
-                if ($activationDate === '' || $plannedEndDate === ''
-                    || be_startpartner_gate4_pilot_month_index($activationDate, $today, $plannedEndDate) === null) {
-                    throw new DomainException('Pilot cannot be resumed outside its effective six-month window.');
-                }
-            }
-            if ($transition === 'pause' && (string)$entitlement['status'] !== 'active') {
-                throw new DomainException('Active pilot entitlement is required for pause.');
+                be_startpartner_gate4_effective_pilot_window($pilot);
             }
             if ($transition === 'start_closeout'
                 && !in_array((string)$entitlement['status'], ['active', 'paused'], true)) {
@@ -399,25 +418,18 @@ function be_startpartner_gate4_transition_lifecycle(
 
             $entitlementUpdate = $pdo->prepare(
                 'UPDATE startpartner_pilot_entitlements
-                 SET status = :status, revision = revision + 1,
-                     audit_json = JSON_SET(audit_json, :audit_path, :operation_id)
+                 SET status = :status, revision = revision + 1
                  WHERE id = :id'
             );
             $entitlementUpdate->execute([
                 'status' => $contract['entitlement'],
-                'audit_path' => '$.' . $transition . '_operation_id',
-                'operation_id' => $operationId,
                 'id' => (string)$entitlement['id'],
             ]);
             if ($entitlementUpdate->rowCount() !== 1) {
                 throw new RuntimeException('Pilot entitlement lifecycle could not be updated.');
             }
 
-            $scopeUpdate = $pdo->prepare(
-                'UPDATE startpartner_pilot_scopes SET status = :status
-                 WHERE pilot_id = :pilot_id AND status <> :status'
-            );
-            $scopeUpdate->execute(['status' => $contract['scopes'], 'pilot_id' => $pilotId]);
+            be_startpartner_gate4_update_scope_statuses($pdo, $pilotId, $transition);
 
             if (in_array($transition, ['end_without_conversion', 'terminate'], true)) {
                 $withdraw = $pdo->prepare(
@@ -450,7 +462,11 @@ function be_startpartner_gate4_transition_lifecycle(
                 'from_status' => $from,
                 'to_status' => $contract['to'],
                 'entitlement_status' => $contract['entitlement'],
-                'scope_status' => $contract['scopes'],
+                'scope_status' => match ($transition) {
+                    'pause', 'start_closeout' => 'paused',
+                    'resume' => 'active',
+                    default => 'ended',
+                },
                 'usage_effect' => 'none',
                 'publication_effect' => 'none',
                 'payment_effect' => 'none',
