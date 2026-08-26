@@ -74,18 +74,35 @@ function be_startpartner_gate4_effective_pilot_window(array $pilot): array
     ];
 }
 
+function be_startpartner_gate4_assert_entitlement_window(array $entitlement): void
+{
+    $startsAt = trim((string)($entitlement['starts_at'] ?? ''));
+    $endsAt = trim((string)($entitlement['ends_at'] ?? ''));
+    if ($startsAt === '' || $endsAt === '') {
+        throw new DomainException('Pilot entitlement window is incomplete.');
+    }
+    $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    $start = new DateTimeImmutable($startsAt, new DateTimeZone('UTC'));
+    $end = new DateTimeImmutable($endsAt, new DateTimeZone('UTC'));
+    if ($now < $start || $now > $end) {
+        throw new DomainException('Pilot entitlement is outside its effective window; closeout is required.');
+    }
+}
+
 function be_startpartner_gate4_lifecycle_window(array $pilot, array $entitlement): array
 {
     if ((string)($pilot['status'] ?? '') !== 'active' || (string)($entitlement['status'] ?? '') !== 'active') {
         throw new DomainException('Pilot must be active for this action.');
     }
+    be_startpartner_gate4_assert_entitlement_window($entitlement);
     return be_startpartner_gate4_effective_pilot_window($pilot);
 }
 
 function be_startpartner_gate4_lifecycle_content(PDO $pdo, string $pilotId, string $contentLinkId): array
 {
     $statement = $pdo->prepare(
-        'SELECT pcl.*, s.status AS submission_status, s.requested_model_key, s.organizer_id AS submission_organizer_id
+        'SELECT pcl.*, s.status AS submission_status, s.requested_model_key,
+                s.organizer_id AS submission_organizer_id
          FROM startpartner_pilot_content_links pcl
          INNER JOIN submissions s ON s.id = pcl.submission_id
          WHERE pcl.id = :id AND pcl.pilot_id = :pilot_id LIMIT 1 FOR UPDATE'
@@ -129,7 +146,6 @@ function be_startpartner_gate4_approve_content(PDO $pdo, string $candidateId, ar
                 throw new DomainException('Submission target plan does not match the pilot scope.');
             }
 
-            $limitMeta = [];
             if ($contentType === 'event') {
                 $unlimited = (int)($entitlement['is_event_unlimited'] ?? 0) === 1;
                 if ($unlimited !== ((int)($scope['is_unlimited'] ?? 0) === 1)) {
@@ -396,12 +412,14 @@ function be_startpartner_gate4_transition_lifecycle(
                 if ((string)$entitlement['status'] !== 'active') {
                     throw new DomainException('Active pilot entitlement is required for pause.');
                 }
+                be_startpartner_gate4_assert_entitlement_window($entitlement);
                 be_startpartner_gate4_effective_pilot_window($pilot);
             }
             if ($transition === 'resume') {
                 if ((string)$entitlement['status'] !== 'paused') {
                     throw new DomainException('Paused pilot entitlement is required for resume.');
                 }
+                be_startpartner_gate4_assert_entitlement_window($entitlement);
                 be_startpartner_gate4_effective_pilot_window($pilot);
             }
             if ($transition === 'start_closeout'
@@ -554,10 +572,7 @@ function be_startpartner_gate4_set_distribution_fulfillment(PDO $pdo, string $ca
                 throw new DomainException('Distribution fulfillment is not available in the current pilot state.');
             }
             $distributionId = be_startpartner_gate4_required_text($input['distribution_id'] ?? null, 36, 'distribution_id');
-            $status = strtolower(be_startpartner_gate4_required_text($input['status'] ?? null, 16, 'status'));
-            if (!in_array($status, ['completed', 'blocked', 'cancelled'], true)) {
-                throw new InvalidArgumentException('Distribution fulfillment status is invalid.');
-            }
+            $target = strtolower(be_startpartner_gate4_required_text($input['status'] ?? null, 16, 'status'));
             $evidenceText = be_startpartner_gate4_required_text($input['evidence_text'] ?? null, 5000, 'evidence_text');
             $statement = $pdo->prepare(
                 'SELECT * FROM startpartner_pilot_distribution_commitments
@@ -568,21 +583,30 @@ function be_startpartner_gate4_set_distribution_fulfillment(PDO $pdo, string $ca
             if (!is_array($row)) {
                 throw new DomainException('Distribution commitment was not found.');
             }
-            if (in_array((string)$row['status'], ['completed', 'cancelled'], true)) {
-                throw new DomainException('Distribution commitment is already terminal.');
+            $from = (string)$row['status'];
+            $allowedTargets = match ($from) {
+                'planned' => ['ready', 'blocked', 'cancelled'],
+                'ready' => ['completed', 'blocked', 'cancelled'],
+                'blocked' => ['completed', 'cancelled'],
+                'completed', 'cancelled' => [],
+                default => [],
+            };
+            if (!in_array($target, $allowedTargets, true)) {
+                throw new DomainException('Distribution transition is not allowed from the current state.');
             }
             $update = $pdo->prepare(
                 'UPDATE startpartner_pilot_distribution_commitments
                  SET status = :status, evidence_text = :evidence_text,
                      operator_reference = :operator, updated_at = CURRENT_TIMESTAMP
-                 WHERE id = :id AND pilot_id = :pilot_id'
+                 WHERE id = :id AND pilot_id = :pilot_id AND status = :from_status'
             );
             $update->execute([
-                'status' => $status,
+                'status' => $target,
                 'evidence_text' => $evidenceText,
                 'operator' => $operator,
                 'id' => $distributionId,
                 'pilot_id' => (string)$pilot['id'],
+                'from_status' => $from,
             ]);
             if ($update->rowCount() !== 1) {
                 throw new RuntimeException('Distribution fulfillment could not be saved.');
@@ -590,14 +614,14 @@ function be_startpartner_gate4_set_distribution_fulfillment(PDO $pdo, string $ca
             be_startpartner_gate4_lifecycle_event($pdo, (string)$pilot['id'], 'gate4_distribution_fulfillment', $operator, [
                 'operation_id' => $operationId,
                 'distribution_id' => $distributionId,
-                'from_status' => (string)$row['status'],
-                'to_status' => $status,
+                'from_status' => $from,
+                'to_status' => $target,
                 'evidence_text' => $evidenceText,
             ]);
             return [
                 'status_reason' => 'Reichweitenbeitrag im laufenden Pilot aktualisiert.',
                 'distribution_id' => $distributionId,
-                'status' => $status,
+                'status' => $target,
             ];
         },
         false
