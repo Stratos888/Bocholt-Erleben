@@ -57,22 +57,46 @@ SQL);
 $timezone = new DateTimeZone('Europe/Berlin');
 $today = new DateTimeImmutable('today', $timezone);
 $activationDate = $today->modify('-160 days')->format('Y-m-d');
-$window = be_startpartner_gate4_activation_window($activationDate);
+$activationWindow = be_startpartner_gate4_activation_window($activationDate);
+$currentMonthIndex = be_startpartner_gate4_pilot_month_index(
+    $activationDate,
+    $today->format('Y-m-d'),
+    $activationWindow['planned_end_date']
+);
+if ($currentMonthIndex === null) {
+    fwrite(STDERR, "Synthetic active-pilot date window is invalid.\n");
+    exit(2);
+}
 $yesterday = $today->modify('-1 day')->format('Y-m-d');
 $twoDaysAgo = $today->modify('-2 days')->format('Y-m-d');
 
-$seedActivePilot = static function(int $seed) use ($pdo, $exec, $activationDate, $window, $yesterday): array {
+$lockedBefore = [
+    (int)$pdo->query('SELECT COUNT(*) FROM subscriptions')->fetchColumn(),
+    (int)$pdo->query('SELECT COUNT(*) FROM publication_entitlements')->fetchColumn(),
+    (int)$pdo->query('SELECT COUNT(*) FROM publication_consumptions')->fetchColumn(),
+];
+
+$seedActivePilot = static function(int $seed) use (
+    $pdo,
+    $exec,
+    $activationDate,
+    $activationWindow,
+    $yesterday
+): array {
     $candidate = sprintf('3442%04d-0000-4000-8000-%012d', $seed, $seed);
     $pilot = sprintf('3440%04d-0000-4000-8000-%012d', $seed, $seed);
     $entitlement = sprintf('3441%04d-0000-4000-8000-%012d', $seed, $seed);
-    $contentLink = sprintf('3443%04d-0000-4000-8000-%012d', $seed, $seed);
+    $firstContent = sprintf('3443%04d-0000-4000-8000-%012d', $seed, $seed);
+    $measurement = sprintf('3444%04d-0000-4000-8000-%012d', $seed, $seed);
+    $distribution = sprintf('3445%04d-0000-4000-8000-%012d', $seed, $seed);
     $email = "lifecycle-{$seed}@example.invalid";
-    $token = hash('sha256', "lifecycle-session-{$seed}");
+    $sessionToken = hash('sha256', "lifecycle-session-{$seed}");
+    $organization = "Lifecycle Verein {$seed}";
 
     $exec(
         "INSERT INTO organizers(organization_name,contact_name,email,email_normalized)
          VALUES(:organization,'Lifecycle Test',:email,:email)",
-        ['organization' => "Lifecycle Verein {$seed}", 'email' => $email]
+        ['organization'=>$organization,'email'=>$email]
     );
     $organizer = (int)$pdo->lastInsertId();
     $exec(
@@ -84,35 +108,41 @@ $seedActivePilot = static function(int $seed) use ($pdo, $exec, $activationDate,
             :identity,:idem,'gate4-344-test',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 90 DAY),1,'Lifecycle Contract',UTC_TIMESTAMP()
          )",
         [
-            'id' => $candidate,
-            'organization' => "Lifecycle Verein {$seed}",
-            'normalized' => "lifecycle verein {$seed}",
-            'identity' => hash('sha256', "lifecycle-identity-{$seed}"),
-            'idem' => hash('sha256', "lifecycle-idem-{$seed}"),
+            'id'=>$candidate,'organization'=>$organization,'normalized'=>strtolower($organization),
+            'identity'=>hash('sha256',"lifecycle-identity-{$seed}"),
+            'idem'=>hash('sha256',"lifecycle-idem-{$seed}"),
         ]
     );
     $exec(
         "INSERT INTO startpartner_candidate_contacts(candidate_id,contact_name,email,email_normalized,is_primary)
          VALUES(:candidate,'Lifecycle Test',:email,:email,1)",
-        ['candidate' => $candidate, 'email' => $email]
+        ['candidate'=>$candidate,'email'=>$email]
     );
     $exec(
         "INSERT INTO startpartner_candidate_decisions(
             candidate_id,result,reason,operator_reference,candidate_revision,
             qualification_snapshot_json,capacity_snapshot_json,is_current
          ) VALUES(:candidate,'accepted_pending_terms','Synthetic fixture','Lifecycle Contract',1,JSON_OBJECT(),JSON_OBJECT(),1)",
-        ['candidate' => $candidate]
+        ['candidate'=>$candidate]
     );
     $decision = (int)$pdo->lastInsertId();
+
+    $reservationStart = (new DateTimeImmutable($activationDate . ' 00:00:00', new DateTimeZone('Europe/Berlin')))
+        ->modify('-5 days')->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+    $reservationEnd = (new DateTimeImmutable($activationDate . ' 00:00:00', new DateTimeZone('Europe/Berlin')))
+        ->modify('+5 days')->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
     $exec(
         "INSERT INTO startpartner_candidate_reservations(
             candidate_id,decision_id,status,starts_at,ends_at,capacity_snapshot_json,operator_reference,
             released_at,release_reference
          ) VALUES(
-            :candidate,:decision,'released',DATE_SUB(UTC_TIMESTAMP(),INTERVAL 180 DAY),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 20 DAY),
-            JSON_OBJECT(),'Lifecycle Contract',UTC_TIMESTAMP(),'synthetic-activation'
+            :candidate,:decision,'released',:starts_at,:ends_at,JSON_OBJECT(),'Lifecycle Contract',
+            :released_at,'synthetic-activation'
          )",
-        ['candidate' => $candidate, 'decision' => $decision]
+        [
+            'candidate'=>$candidate,'decision'=>$decision,'starts_at'=>$reservationStart,
+            'ends_at'=>$reservationEnd,'released_at'=>$activationWindow['starts_at_utc'],
+        ]
     );
     $reservation = (int)$pdo->lastInsertId();
     $exec(
@@ -122,15 +152,13 @@ $seedActivePilot = static function(int $seed) use ($pdo, $exec, $activationDate,
             reach_contribution_json,no_automatic_paid_renewal,operator_reference
          ) VALUES(
             :candidate,:decision,'v1','repo://gate4-lifecycle',:digest,'Lifecycle Test',:organization,
-            DATE_SUB(UTC_TIMESTAMP(),INTERVAL 170 DAY),'operator_recorded',
+            :accepted_at,'operator_recorded',
             JSON_OBJECT('desired_content_scope','both','target_plan_keys',JSON_ARRAY('active','activity_basic')),
             JSON_OBJECT('description','Synthetic source'),JSON_OBJECT('description','Synthetic reach'),1,'Lifecycle Contract'
          )",
         [
-            'candidate' => $candidate,
-            'decision' => $decision,
-            'digest' => hash('sha256', "lifecycle-terms-{$seed}"),
-            'organization' => "Lifecycle Verein {$seed}",
+            'candidate'=>$candidate,'decision'=>$decision,'digest'=>hash('sha256',"lifecycle-terms-{$seed}"),
+            'organization'=>$organization,'accepted_at'=>$reservationStart,
         ]
     );
     $terms = (int)$pdo->lastInsertId();
@@ -141,14 +169,13 @@ $seedActivePilot = static function(int $seed) use ($pdo, $exec, $activationDate,
             activated_at,activation_date_local,planned_end_date,starts_at,ends_at,revision
          ) VALUES(
             :id,:candidate,:organizer,:terms,:reservation,'gate4-344','active',JSON_ARRAY('active','activity_basic'),
-            'Lifecycle Contract','Lifecycle Test',:email,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 160 DAY),
-            :activation_date,:planned_end,:starts_at,:ends_at,1
+            'Lifecycle Contract','Lifecycle Test',:email,:activated_at,:activation_date,:planned_end,:starts_at,:ends_at,1
          )",
         [
-            'id' => $pilot, 'candidate' => $candidate, 'organizer' => $organizer,
-            'terms' => $terms, 'reservation' => $reservation, 'email' => $email,
-            'activation_date' => $activationDate, 'planned_end' => $window['planned_end_date'],
-            'starts_at' => $window['starts_at_utc'], 'ends_at' => $window['ends_at_utc'],
+            'id'=>$pilot,'candidate'=>$candidate,'organizer'=>$organizer,'terms'=>$terms,
+            'reservation'=>$reservation,'email'=>$email,'activated_at'=>$activationWindow['starts_at_utc'],
+            'activation_date'=>$activationDate,'planned_end'=>$activationWindow['planned_end_date'],
+            'starts_at'=>$activationWindow['starts_at_utc'],'ends_at'=>$activationWindow['ends_at_utc'],
         ]
     );
     foreach ([
@@ -178,12 +205,15 @@ $seedActivePilot = static function(int $seed) use ($pdo, $exec, $activationDate,
             :id,:pilot,:organizer,:pilot,'active',:starts_at,:ends_at,JSON_ARRAY('active','activity_basic'),
             8,1,0,JSON_OBJECT(),JSON_OBJECT('synthetic',true),1
          )",
-        ['id'=>$entitlement,'pilot'=>$pilot,'organizer'=>$organizer,'starts_at'=>$window['starts_at_utc'],'ends_at'=>$window['ends_at_utc']]
+        [
+            'id'=>$entitlement,'pilot'=>$pilot,'organizer'=>$organizer,
+            'starts_at'=>$activationWindow['starts_at_utc'],'ends_at'=>$activationWindow['ends_at_utc'],
+        ]
     );
     $exec(
         "INSERT INTO organizer_portal_sessions(organizer_id,session_token_hash,expires_at,last_seen_at)
          VALUES(:organizer,:hash,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 DAY),UTC_TIMESTAMP())",
-        ['organizer'=>$organizer,'hash'=>hash('sha256',$token)]
+        ['organizer'=>$organizer,'hash'=>hash('sha256',$sessionToken)]
     );
     $exec(
         "INSERT INTO submissions(
@@ -193,14 +223,15 @@ $seedActivePilot = static function(int $seed) use ($pdo, $exec, $activationDate,
          ) VALUES(
             :organizer,'event','approved','active','startpartner_pilot',:payment_reference,
             :organization,'Lifecycle Test',:email,'Historischer erster Pilotinhalt',:start_date,'Bocholt',1,
-            DATE_SUB(UTC_TIMESTAMP(),INTERVAL 160 DAY),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 160 DAY)
+            :approved_at,:approved_at
          )",
         [
-            'organizer'=>$organizer,'payment_reference'=>hash('sha256',"payment-{$seed}"),
-            'organization'=>"Lifecycle Verein {$seed}",'email'=>$email,'start_date'=>$activationDate,
+            'organizer'=>$organizer,'payment_reference'=>hash('sha256',"first-payment-{$seed}"),
+            'organization'=>$organization,'email'=>$email,'start_date'=>$activationDate,
+            'approved_at'=>$activationWindow['starts_at_utc'],
         ]
     );
-    $submission = (int)$pdo->lastInsertId();
+    $firstSubmission = (int)$pdo->lastInsertId();
     $targetId = be_startpartner_gate4_reporting_target_id($organizer);
     $exec(
         "INSERT INTO startpartner_pilot_content_links(
@@ -208,239 +239,297 @@ $seedActivePilot = static function(int $seed) use ($pdo, $exec, $activationDate,
             reporting_target_id,source_reference,editorial_ready_at,approved_at
          ) VALUES(
             :id,:pilot,:organizer,:submission,'event','approved','organizer',:target,'synthetic:first',
-            DATE_SUB(UTC_TIMESTAMP(),INTERVAL 160 DAY),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 160 DAY)
+            :approved_at,:approved_at
          )",
-        ['id'=>$contentLink,'pilot'=>$pilot,'organizer'=>$organizer,'submission'=>$submission,'target'=>$targetId]
+        [
+            'id'=>$firstContent,'pilot'=>$pilot,'organizer'=>$organizer,'submission'=>$firstSubmission,
+            'target'=>$targetId,'approved_at'=>$activationWindow['starts_at_utc'],
+        ]
     );
     $exec(
         "INSERT INTO startpartner_pilot_usages(
             pilot_id,pilot_entitlement_id,content_link_id,submission_id,content_type,pilot_month_index,units,consumed_at
-         ) VALUES(:pilot,:entitlement,:content,:submission,'event',1,1,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 160 DAY))",
-        ['pilot'=>$pilot,'entitlement'=>$entitlement,'content'=>$contentLink,'submission'=>$submission]
+         ) VALUES(:pilot,:entitlement,:content,:submission,'event',1,1,:consumed_at)",
+        [
+            'pilot'=>$pilot,'entitlement'=>$entitlement,'content'=>$firstContent,
+            'submission'=>$firstSubmission,'consumed_at'=>$activationWindow['starts_at_utc'],
+        ]
     );
     $exec(
         "INSERT INTO startpartner_pilot_measurement_preflights(
             id,pilot_id,organizer_id,content_link_id,status,metrics_owner,reporting_target_type,
             reporting_target_id,evidence_json,checked_by
-         ) VALUES(:id,:pilot,:organizer,:content,'ready','value_metric_daily','organizer',:target,JSON_OBJECT('synthetic',true),'Lifecycle Contract')",
+         ) VALUES(:id,:pilot,:organizer,:content,'ready','value_metric_daily','organizer',:target,
+            JSON_OBJECT('synthetic',true),'Lifecycle Contract')",
         [
-            'id'=>sprintf('3444%04d-0000-4000-8000-%012d',$seed,$seed),
-            'pilot'=>$pilot,'organizer'=>$organizer,'content'=>$contentLink,'target'=>$targetId,
+            'id'=>$measurement,'pilot'=>$pilot,'organizer'=>$organizer,'content'=>$firstContent,'target'=>$targetId,
         ]
     );
     $exec(
         "INSERT INTO startpartner_pilot_distribution_commitments(
             id,pilot_id,channel,planned_at,target_reference,status,evidence_text,operator_reference
-         ) VALUES(:id,:pilot,'newsletter',:planned_at,'https://example.invalid/lifecycle','ready','Synthetic agreement','Lifecycle Contract')",
+         ) VALUES(:id,:pilot,'newsletter',:planned_at,'https://example.invalid/lifecycle','ready',
+            'Synthetic agreement','Lifecycle Contract')",
+        ['id'=>$distribution,'pilot'=>$pilot,'planned_at'=>$yesterday . ' 08:00:00']
+    );
+    return compact(
+        'candidate','pilot','entitlement','organizer','sessionToken','firstContent',
+        'firstSubmission','targetId','distribution','organization','email'
+    );
+};
+
+$detail = static function(array $fixture) use ($pdo): array {
+    return be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
+};
+$operationPayload = static function(array $fixture, array $payload, ?string $operationId = null) use ($detail): array {
+    $current = $detail($fixture);
+    return $payload + [
+        'operation_id'=>$operationId ?? ('gate4:344:mysql:' . bin2hex(random_bytes(8))),
+        'operator_name'=>'Lifecycle Contract',
+        'expected_revision'=>(int)$current['revision'],
+        'expected_pilot_revision'=>(int)$current['gate4']['pilot']['revision'],
+    ];
+};
+$write = static function(array $fixture, callable|string $writer, array $payload, ?string $operationId = null) use (
+    $pdo,
+    $operationPayload
+): array {
+    return $writer($pdo, $fixture['candidate'], $operationPayload($fixture, $payload, $operationId));
+};
+$transition = static function(array $fixture, string $transition) use ($pdo, $operationPayload): array {
+    $payload = $operationPayload($fixture, []);
+    return be_startpartner_gate4_transition_lifecycle($pdo, $fixture['candidate'], $transition, $payload);
+};
+$insertApprovedUsage = static function(array $fixture, string $contentType, int $monthIndex, int $ordinal) use ($pdo, $exec): string {
+    $contentId = sprintf('346%05d-0000-4000-8000-%012d', $ordinal, $ordinal);
+    $requestedModel = $contentType === 'activity' ? 'activity_basic' : 'active';
+    $exec(
+        "INSERT INTO submissions(
+            organizer_id,submission_kind,status,requested_model_key,payment_kind,payment_reference_key,
+            organization_name_snapshot,contact_name_snapshot,email_snapshot,title,start_date,location_name,
+            location_public_confirmed,review_started_at,approved_at
+         ) VALUES(
+            :organizer,:kind,'approved',:model,'startpartner_pilot',:payment_reference,
+            :organization,'Lifecycle Test',:email,:title,:start_date,'Bocholt',1,UTC_TIMESTAMP(),UTC_TIMESTAMP()
+         )",
         [
-            'id'=>sprintf('3445%04d-0000-4000-8000-%012d',$seed,$seed),
-            'pilot'=>$pilot,'planned_at'=>$yesterday . ' 08:00:00',
+            'organizer'=>$fixture['organizer'],'kind'=>$contentType,'model'=>$requestedModel,
+            'payment_reference'=>hash('sha256',"approved-usage-{$ordinal}"),
+            'organization'=>$fixture['organization'],'email'=>$fixture['email'],
+            'title'=>"Synthetic approved {$contentType} {$ordinal}",
+            'start_date'=>$contentType === 'event' ? gmdate('Y-m-d', strtotime('+30 days')) : null,
         ]
     );
-    return compact('candidate','pilot','entitlement','organizer','token','contentLink','submission','targetId');
-};
-
-$refresh = static function(array $fixture) use ($pdo): array {
-    $detail = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
-    return [(int)$detail['revision'], (int)$detail['gate4']['pilot']['revision'], $detail];
-};
-
-$mutate = static function(array $fixture, callable|string $writer, array $payload, ?string $operationId = null) use ($pdo, $refresh): array {
-    [$candidateRevision, $pilotRevision] = $refresh($fixture);
-    $payload += [
-        'operation_id' => $operationId ?? ('gate4:344:mysql:' . bin2hex(random_bytes(8))),
-        'operator_name' => 'Lifecycle Contract',
-        'expected_revision' => $candidateRevision,
-        'expected_pilot_revision' => $pilotRevision,
-    ];
-    return $writer($pdo, $fixture['candidate'], $payload);
+    $submission = (int)$pdo->lastInsertId();
+    $exec(
+        "INSERT INTO startpartner_pilot_content_links(
+            id,pilot_id,organizer_id,submission_id,content_type,status,reporting_target_type,
+            reporting_target_id,source_reference,editorial_ready_at,approved_at
+         ) VALUES(
+            :id,:pilot,:organizer,:submission,:kind,'approved','organizer',:target,:source,UTC_TIMESTAMP(),UTC_TIMESTAMP()
+         )",
+        [
+            'id'=>$contentId,'pilot'=>$fixture['pilot'],'organizer'=>$fixture['organizer'],
+            'submission'=>$submission,'kind'=>$contentType,'target'=>$fixture['targetId'],
+            'source'=>"synthetic:approved:{$ordinal}",
+        ]
+    );
+    $exec(
+        "INSERT INTO startpartner_pilot_usages(
+            pilot_id,pilot_entitlement_id,content_link_id,submission_id,content_type,pilot_month_index,units
+         ) VALUES(:pilot,:entitlement,:content,:submission,:kind,:month_index,1)",
+        [
+            'pilot'=>$fixture['pilot'],'entitlement'=>$fixture['entitlement'],'content'=>$contentId,
+            'submission'=>$submission,'kind'=>$contentType,'month_index'=>$monthIndex,
+        ]
+    );
+    return $contentId;
 };
 
 try {
     $fixture = $seedActivePilot(1);
-    $_COOKIE['be_organizer_portal_session'] = $fixture['token'];
+    $_COOKIE['be_organizer_portal_session'] = $fixture['sessionToken'];
     $session = be_startpartner_gate4_portal_session($pdo);
-    $initial = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
-    $assert($initial['gate4']['phase'] === 'active' && $initial['gate4']['effective_active'] === true, 'Synthetic reference pilot must start effectively active.');
-    $assert((int)$initial['gate4']['capacity']['occupied_slots'] === 1, 'Active synthetic pilot must occupy exactly one capacity slot.');
-    $assert(($initial['gate4']['measurement_runtime']['status'] ?? '') === 'no_data_yet_or_too_short', 'No metric rows must be no_data_yet_or_too_short, never zero usage.');
-    $assert(($initial['gate4']['distribution_runtime']['status'] ?? '') === 'due', 'Past ready distribution must be due, not completed.');
+    $initial = $detail($fixture);
+    $assert($initial['gate4']['phase'] === 'active' && $initial['gate4']['effective_active'] === true, 'Synthetic pilot must start effectively active.');
+    $assert((int)$initial['gate4']['capacity']['occupied_slots'] === 1, 'Active pilot must occupy one capacity slot.');
+    $assert(($initial['gate4']['measurement_runtime']['status'] ?? '') === 'no_data_yet_or_too_short', 'Missing metric rows must never be interpreted as zero usage.');
+    $assert(($initial['gate4']['distribution_runtime']['status'] ?? '') === 'due', 'Past ready distribution must be due.');
 
     $replayInput = [
         'content_type'=>'event','client_reference'=>'gate4-344-replay-1','title'=>'Replay Event',
         'start_date'=>$today->modify('+10 days')->format('Y-m-d'),'location_name'=>'Bocholt',
         'location_address'=>'Testweg 1','location_public_confirmed'=>true,
     ];
-    $firstReplayWrite = be_startpartner_gate4_create_portal_submission($pdo, $session, $replayInput);
+    be_startpartner_gate4_create_portal_submission($pdo, $session, $replayInput);
     $sameReplay = be_startpartner_gate4_create_portal_submission($pdo, $session, $replayInput);
-    $assert(($sameReplay['idempotent_replay'] ?? false) === true, 'Same partner client_reference and same payload must replay.');
+    $assert(($sameReplay['idempotent_replay'] ?? false) === true, 'Same client_reference and payload must replay.');
     $changedReplay = $replayInput;
     $changedReplay['title'] = 'Changed replay payload';
     $expectDomain(
         static fn() => be_startpartner_gate4_create_portal_submission($pdo, $session, $changedReplay),
-        'Same partner client_reference with changed payload must fail closed.'
+        'Same client_reference with changed payload must fail closed.'
     );
 
-    $eventLinks = [];
-    for ($index = 1; $index <= 9; $index++) {
-        $created = be_startpartner_gate4_create_portal_submission($pdo, $session, [
-            'content_type'=>'event','client_reference'=>"gate4-344-event-{$index}",
-            'title'=>"Pilot Event {$index}",'start_date'=>$today->modify('+' . (20 + $index) . ' days')->format('Y-m-d'),
-            'location_name'=>'Bocholt','location_address'=>'Testweg 2','location_public_confirmed'=>true,
-        ]);
-        $eventLinks[] = (string)$created['content_link']['id'];
+    for ($i = 1; $i <= 7; $i++) {
+        $insertApprovedUsage($fixture, 'event', $currentMonthIndex, $i);
     }
-    $firstApprovalReplay = null;
-    $firstApprovalPayload = null;
-    for ($index = 0; $index < 8; $index++) {
-        $mutate($fixture, 'be_startpartner_gate4_mark_content_ready', ['content_link_id'=>$eventLinks[$index]]);
-        [$candidateRevision, $pilotRevision] = $refresh($fixture);
-        $operationId = 'gate4:344:mysql:event-approval-' . $index;
-        $payload = [
-            'operation_id'=>$operationId,'operator_name'=>'Lifecycle Contract',
-            'expected_revision'=>$candidateRevision,'expected_pilot_revision'=>$pilotRevision,
-            'content_link_id'=>$eventLinks[$index],
-        ];
-        $approval = be_startpartner_gate4_approve_content($pdo, $fixture['candidate'], $payload);
-        if ($index === 0) {
-            $firstApprovalReplay = be_startpartner_gate4_approve_content($pdo, $fixture['candidate'], $payload);
-            $firstApprovalPayload = $payload;
-        }
-        $assert(($approval['meta']['usage_units'] ?? null) === 1, "Event approval " . ($index + 1) . ' must write one usage.');
-    }
-    $assert(($firstApprovalReplay['idempotent_replay'] ?? false) === true, 'Identical approval operation retry must replay without second usage.');
-    if (is_array($firstApprovalPayload)) {
-        $changedOperation = $firstApprovalPayload;
-        $changedOperation['unexpected_change'] = 'different-payload';
-        $expectDomain(
-            static fn() => be_startpartner_gate4_approve_content($pdo, $fixture['candidate'], $changedOperation),
-            'Same operation_id with changed payload must conflict.'
-        );
-    }
-    $mutate($fixture, 'be_startpartner_gate4_mark_content_ready', ['content_link_id'=>$eventLinks[8]]);
+    $event8 = be_startpartner_gate4_create_portal_submission($pdo, $session, [
+        'content_type'=>'event','client_reference'=>'gate4-344-event-8','title'=>'Pilot Event 8',
+        'start_date'=>$today->modify('+20 days')->format('Y-m-d'),'location_name'=>'Bocholt',
+        'location_public_confirmed'=>true,
+    ]);
+    $event9 = be_startpartner_gate4_create_portal_submission($pdo, $session, [
+        'content_type'=>'event','client_reference'=>'gate4-344-event-9','title'=>'Pilot Event 9',
+        'start_date'=>$today->modify('+21 days')->format('Y-m-d'),'location_name'=>'Bocholt',
+        'location_public_confirmed'=>true,
+    ]);
+    $event8Id = (string)$event8['content_link']['id'];
+    $event9Id = (string)$event9['content_link']['id'];
+    $write($fixture, 'be_startpartner_gate4_mark_content_ready', ['content_link_id'=>$event8Id]);
+    $approvalPayload = $operationPayload(
+        $fixture,
+        ['content_link_id'=>$event8Id],
+        'gate4:344:mysql:event-eight'
+    );
+    $approval = be_startpartner_gate4_approve_content($pdo, $fixture['candidate'], $approvalPayload);
+    $assert(($approval['meta']['usage_units'] ?? null) === 1, 'Eighth event approval must write exactly one usage.');
+    $approvalReplay = be_startpartner_gate4_approve_content($pdo, $fixture['candidate'], $approvalPayload);
+    $assert(($approvalReplay['idempotent_replay'] ?? false) === true, 'Identical approval retry must replay.');
+    $changedApproval = $approvalPayload;
+    $changedApproval['changed_payload'] = true;
     $expectDomain(
-        static function() use ($pdo, $fixture, $eventLinks, $refresh): void {
-            [$cr, $pr] = $refresh($fixture);
-            be_startpartner_gate4_approve_content($pdo, $fixture['candidate'], [
-                'operation_id'=>'gate4:344:mysql:event-nine-blocked','operator_name'=>'Lifecycle Contract',
-                'expected_revision'=>$cr,'expected_pilot_revision'=>$pr,'content_link_id'=>$eventLinks[8],
-            ]);
+        static fn() => be_startpartner_gate4_approve_content($pdo, $fixture['candidate'], $changedApproval),
+        'Same operation_id with changed approval payload must conflict.'
+    );
+    $write($fixture, 'be_startpartner_gate4_mark_content_ready', ['content_link_id'=>$event9Id]);
+    $expectDomain(
+        static function() use ($pdo, $fixture, $event9Id, $operationPayload): void {
+            be_startpartner_gate4_approve_content(
+                $pdo,
+                $fixture['candidate'],
+                $operationPayload($fixture, ['content_link_id'=>$event9Id], 'gate4:344:mysql:event-nine')
+            );
         },
         'Ninth event approval in one pilot month must fail closed.'
     );
-    $monthIndex = be_startpartner_gate4_pilot_month_index($activationDate, $today->format('Y-m-d'), $window['planned_end_date']);
-    $usageCount = (int)$pdo->query(
-        "SELECT COUNT(*) FROM startpartner_pilot_usages
-         WHERE pilot_id='" . $fixture['pilot'] . "' AND content_type='event' AND pilot_month_index=" . (int)$monthIndex
-    )->fetchColumn();
-    $assert($usageCount === 8, 'Current pilot month must contain exactly eight event usage rows after the blocked ninth approval.');
+    $eventUsage = $pdo->prepare(
+        "SELECT COALESCE(SUM(units),0) FROM startpartner_pilot_usages
+         WHERE pilot_id=:pilot AND content_type='event' AND pilot_month_index=:month_index"
+    );
+    $eventUsage->execute(['pilot'=>$fixture['pilot'],'month_index'=>$currentMonthIndex]);
+    $assert((int)$eventUsage->fetchColumn() === 8, 'Current pilot month must contain exactly eight event usage units.');
 
-    $activityLinks = [];
-    for ($index = 1; $index <= 2; $index++) {
-        $created = be_startpartner_gate4_create_portal_submission($pdo, $session, [
-            'content_type'=>'activity','client_reference'=>"gate4-344-activity-{$index}",
-            'title'=>"Pilot Activity {$index}",'location_name'=>'Bocholt',
-            'location_address'=>'Testweg 3','location_public_confirmed'=>true,
-        ]);
-        $activityLinks[] = (string)$created['content_link']['id'];
-    }
-    $mutate($fixture, 'be_startpartner_gate4_mark_content_ready', ['content_link_id'=>$activityLinks[0]]);
-    $mutate($fixture, 'be_startpartner_gate4_approve_content', ['content_link_id'=>$activityLinks[0]]);
-    $mutate($fixture, 'be_startpartner_gate4_mark_content_ready', ['content_link_id'=>$activityLinks[1]]);
+    $activity1 = be_startpartner_gate4_create_portal_submission($pdo, $session, [
+        'content_type'=>'activity','client_reference'=>'gate4-344-activity-1','title'=>'Pilot Activity 1',
+        'location_name'=>'Bocholt','location_public_confirmed'=>true,
+    ]);
+    $activity2 = be_startpartner_gate4_create_portal_submission($pdo, $session, [
+        'content_type'=>'activity','client_reference'=>'gate4-344-activity-2','title'=>'Pilot Activity 2',
+        'location_name'=>'Bocholt','location_public_confirmed'=>true,
+    ]);
+    $activity1Id = (string)$activity1['content_link']['id'];
+    $activity2Id = (string)$activity2['content_link']['id'];
+    $write($fixture, 'be_startpartner_gate4_mark_content_ready', ['content_link_id'=>$activity1Id]);
+    $write($fixture, 'be_startpartner_gate4_approve_content', ['content_link_id'=>$activity1Id]);
+    $write($fixture, 'be_startpartner_gate4_mark_content_ready', ['content_link_id'=>$activity2Id]);
     $expectDomain(
-        static function() use ($pdo, $fixture, $activityLinks, $refresh): void {
-            [$cr, $pr] = $refresh($fixture);
-            be_startpartner_gate4_approve_content($pdo, $fixture['candidate'], [
-                'operation_id'=>'gate4:344:mysql:activity-two-blocked','operator_name'=>'Lifecycle Contract',
-                'expected_revision'=>$cr,'expected_pilot_revision'=>$pr,'content_link_id'=>$activityLinks[1],
-            ]);
+        static function() use ($pdo, $fixture, $activity2Id, $operationPayload): void {
+            be_startpartner_gate4_approve_content(
+                $pdo,
+                $fixture['candidate'],
+                $operationPayload($fixture, ['content_link_id'=>$activity2Id], 'gate4:344:mysql:activity-two-blocked')
+            );
         },
         'Second concurrent activity approval must fail closed.'
     );
     $usageBeforeWithdrawal = (int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_usages WHERE pilot_id='" . $fixture['pilot'] . "'")->fetchColumn();
-    $mutate($fixture, 'be_startpartner_gate4_withdraw_content', ['content_link_id'=>$activityLinks[0]]);
-    $mutate($fixture, 'be_startpartner_gate4_approve_content', ['content_link_id'=>$activityLinks[1]]);
+    $write($fixture, 'be_startpartner_gate4_withdraw_content', ['content_link_id'=>$activity1Id]);
+    $write($fixture, 'be_startpartner_gate4_approve_content', ['content_link_id'=>$activity2Id]);
     $usageAfterReplacement = (int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_usages WHERE pilot_id='" . $fixture['pilot'] . "'")->fetchColumn();
-    $assert($usageAfterReplacement === $usageBeforeWithdrawal + 1, 'Activity replacement must retain historical usage and add exactly one new usage.');
+    $assert($usageAfterReplacement === $usageBeforeWithdrawal + 1, 'Activity withdrawal must retain historical usage and allow exactly one replacement usage.');
 
     foreach (BE_STARTPARTNER_GATE4_CHECKPOINT_KEYS as $key) {
-        $mutate($fixture, 'be_startpartner_gate4_complete_checkpoint', [
+        $write($fixture, 'be_startpartner_gate4_complete_checkpoint', [
             'checkpoint_key'=>$key,'evidence_text'=>"Synthetic {$key} checkpoint.",
         ]);
     }
-    $checkpointEvents = (int)$pdo->query(
+    $checkpointCount = (int)$pdo->query(
         "SELECT COUNT(*) FROM startpartner_pilot_events WHERE pilot_id='" . $fixture['pilot'] . "' AND event_type='gate4_checkpoint_completed'"
     )->fetchColumn();
-    $assert($checkpointEvents === 4, 'All four lifecycle checkpoints must be recorded exactly once.');
+    $assert($checkpointCount === 4, 'All four lifecycle checkpoints must be recorded once.');
     $expectDomain(
-        static function() use ($pdo, $fixture, $refresh): void {
-            [$cr, $pr] = $refresh($fixture);
-            be_startpartner_gate4_complete_checkpoint($pdo, $fixture['candidate'], [
-                'operation_id'=>'gate4:344:mysql:duplicate-checkpoint','operator_name'=>'Lifecycle Contract',
-                'expected_revision'=>$cr,'expected_pilot_revision'=>$pr,
-                'checkpoint_key'=>'day_30','evidence_text'=>'Duplicate must fail.',
-            ]);
+        static function() use ($pdo, $fixture, $operationPayload): void {
+            be_startpartner_gate4_complete_checkpoint(
+                $pdo,
+                $fixture['candidate'],
+                $operationPayload(
+                    $fixture,
+                    ['checkpoint_key'=>'day_30','evidence_text'=>'Duplicate must fail.'],
+                    'gate4:344:mysql:duplicate-checkpoint'
+                )
+            );
         },
-        'A completed checkpoint must not be completed a second time.'
+        'Completed checkpoint must not be completed again.'
     );
 
-    $targetId = $fixture['targetId'];
     $exec(
         "INSERT INTO value_metric_daily(metric_date,metric_key,reporting_target_type,reporting_target_id,bucket_hash,count_value)
          VALUES(:date,'detail_view','organizer',:target,:hash,0)",
-        ['date'=>$yesterday,'target'=>$targetId,'hash'=>hash('sha256','gate4-344-zero')]
+        ['date'=>$yesterday,'target'=>$fixture['targetId'],'hash'=>hash('sha256','gate4-344-zero')]
     );
-    $zeroState = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
+    $zeroState = $detail($fixture);
     $assert(($zeroState['gate4']['measurement_runtime']['status'] ?? '') === 'zero_usage', 'Explicit completed zero bucket must classify as zero_usage.');
     $exec(
         "INSERT INTO value_metric_daily(metric_date,metric_key,reporting_target_type,reporting_target_id,bucket_hash,count_value)
          VALUES(:date,'detail_view','organizer',:target,:hash,3)",
-        ['date'=>$twoDaysAgo,'target'=>$targetId,'hash'=>hash('sha256','gate4-344-positive')]
+        ['date'=>$twoDaysAgo,'target'=>$fixture['targetId'],'hash'=>hash('sha256','gate4-344-positive')]
     );
-    $positiveState = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
-    $assert(($positiveState['gate4']['measurement_runtime']['status'] ?? '') === 'usage_observed', 'Positive completed metric bucket must classify as usage_observed.');
+    $usageState = $detail($fixture);
+    $assert(($usageState['gate4']['measurement_runtime']['status'] ?? '') === 'usage_observed', 'Positive completed bucket must classify as usage_observed.');
     $exec(
         "UPDATE startpartner_pilot_measurement_preflights SET reporting_target_id='wrong-target'
          WHERE pilot_id=:pilot AND content_link_id=:content",
-        ['pilot'=>$fixture['pilot'],'content'=>$fixture['contentLink']]
+        ['pilot'=>$fixture['pilot'],'content'=>$fixture['firstContent']]
     );
-    $problemState = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
+    $problemState = $detail($fixture);
     $assert(($problemState['gate4']['measurement_runtime']['status'] ?? '') === 'query_or_attribution_problem', 'Wrong attribution must classify as query_or_attribution_problem.');
     $exec(
         "UPDATE startpartner_pilot_measurement_preflights SET reporting_target_id=:target
          WHERE pilot_id=:pilot AND content_link_id=:content",
-        ['target'=>$targetId,'pilot'=>$fixture['pilot'],'content'=>$fixture['contentLink']]
+        ['target'=>$fixture['targetId'],'pilot'=>$fixture['pilot'],'content'=>$fixture['firstContent']]
     );
 
-    $distributionState = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
-    $distributionId = (string)$distributionState['gate4']['distribution_runtime']['commitment']['id'];
-    $mutate($fixture, 'be_startpartner_gate4_set_distribution_fulfillment', [
-        'distribution_id'=>$distributionId,'status'=>'blocked','evidence_text'=>'Synthetic blocker.',
+    $write($fixture, 'be_startpartner_gate4_set_distribution_fulfillment', [
+        'distribution_id'=>$fixture['distribution'],'status'=>'blocked','evidence_text'=>'Synthetic blocker.',
     ]);
-    $blockedDistribution = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
+    $blockedDistribution = $detail($fixture);
     $assert(($blockedDistribution['gate4']['distribution_runtime']['status'] ?? '') === 'blocked', 'Ready distribution may become blocked.');
-    $mutate($fixture, 'be_startpartner_gate4_set_distribution_fulfillment', [
-        'distribution_id'=>$distributionId,'status'=>'completed','evidence_text'=>'Synthetic completion.',
+    $write($fixture, 'be_startpartner_gate4_set_distribution_fulfillment', [
+        'distribution_id'=>$fixture['distribution'],'status'=>'completed','evidence_text'=>'Synthetic completion.',
     ]);
-    $completedDistribution = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
+    $completedDistribution = $detail($fixture);
     $assert(($completedDistribution['gate4']['distribution_runtime']['status'] ?? '') === 'completed', 'Resolved blocked distribution may become completed.');
     $expectDomain(
-        static function() use ($pdo, $fixture, $distributionId, $refresh): void {
-            [$cr, $pr] = $refresh($fixture);
-            be_startpartner_gate4_set_distribution_fulfillment($pdo, $fixture['candidate'], [
-                'operation_id'=>'gate4:344:mysql:completed-reopen','operator_name'=>'Lifecycle Contract',
-                'expected_revision'=>$cr,'expected_pilot_revision'=>$pr,
-                'distribution_id'=>$distributionId,'status'=>'blocked','evidence_text'=>'Terminal reopen must fail.',
-            ]);
+        static function() use ($pdo, $fixture, $operationPayload): void {
+            be_startpartner_gate4_set_distribution_fulfillment(
+                $pdo,
+                $fixture['candidate'],
+                $operationPayload(
+                    $fixture,
+                    ['distribution_id'=>$fixture['distribution'],'status'=>'blocked','evidence_text'=>'Terminal reopen must fail.'],
+                    'gate4:344:mysql:distribution-reopen'
+                )
+            );
         },
         'Completed distribution must be terminal.'
     );
 
     $usageBeforeLifecycle = (int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_usages WHERE pilot_id='" . $fixture['pilot'] . "'")->fetchColumn();
-    $mutate($fixture, 'be_startpartner_gate4_transition_lifecycle', ['transition'=>'pause']);
-    $paused = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
+    $transition($fixture, 'pause');
+    $paused = $detail($fixture);
     $assert($paused['gate4']['phase'] === 'paused', 'Pause must project paused state.');
-    $assert((string)$paused['gate3']['entitlement']['status'] === 'paused', 'Pause must pause the entitlement.');
+    $assert((string)$paused['gate3']['entitlement']['status'] === 'paused', 'Pause must pause entitlement.');
     $assert((int)$paused['gate4']['capacity']['occupied_slots'] === 1, 'Paused pilot must keep its capacity slot.');
     $expectDomain(
         static fn() => be_startpartner_gate4_create_portal_submission($pdo, $session, [
@@ -450,57 +539,51 @@ try {
         ]),
         'Paused pilot must reject new partner content.'
     );
-    $mutate($fixture, 'be_startpartner_gate4_transition_lifecycle', ['transition'=>'resume']);
-    $resumed = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
-    $assert($resumed['gate4']['phase'] === 'active', 'Resume must restore active state inside the effective window.');
+    $transition($fixture, 'resume');
+    $assert($detail($fixture)['gate4']['phase'] === 'active', 'Resume must restore active state inside effective lifetime.');
 
     $spare = be_startpartner_gate4_create_portal_submission($pdo, $session, [
-        'content_type'=>'event','client_reference'=>'gate4-344-spare-draft','title'=>'Spare draft',
+        'content_type'=>'event','client_reference'=>'gate4-344-spare','title'=>'Spare draft',
         'start_date'=>$today->modify('+50 days')->format('Y-m-d'),'location_name'=>'Bocholt',
         'location_public_confirmed'=>true,
     ]);
     $spareId = (string)$spare['content_link']['id'];
-    $mutate($fixture, 'be_startpartner_gate4_transition_lifecycle', ['transition'=>'start_closeout']);
-    $closing = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
+    $transition($fixture, 'start_closeout');
+    $closing = $detail($fixture);
     $assert($closing['gate4']['phase'] === 'closing', 'Closeout must enter closing.');
     $assert((int)$closing['gate4']['capacity']['occupied_slots'] === 1, 'Closing pilot must keep its capacity slot.');
-    $mutate($fixture, 'be_startpartner_gate4_transition_lifecycle', ['transition'=>'end_without_conversion']);
-    $ended = be_startpartner_gate4_candidate_detail($pdo, $fixture['candidate']);
+    $transition($fixture, 'end_without_conversion');
+    $ended = $detail($fixture);
     $assert($ended['gate4']['phase'] === 'ended_without_conversion', 'Orderly closeout must end without conversion.');
     $assert((int)$ended['gate4']['capacity']['occupied_slots'] === 0, 'Ended pilot must release capacity.');
     $spareStatus = $pdo->prepare('SELECT status FROM startpartner_pilot_content_links WHERE id=:id');
     $spareStatus->execute(['id'=>$spareId]);
-    $assert((string)$spareStatus->fetchColumn() === 'withdrawn', 'Orderly end must withdraw only open pilot links.');
+    $assert((string)$spareStatus->fetchColumn() === 'withdrawn', 'Orderly end must withdraw open pilot links.');
     $usageAfterEnd = (int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_usages WHERE pilot_id='" . $fixture['pilot'] . "'")->fetchColumn();
-    $assert($usageAfterEnd === $usageBeforeLifecycle, 'Pause, resume and orderly end must not delete historical usage.');
-    $caseState = $pdo->prepare("SELECT state FROM control_cases WHERE source_system='startpartner_candidate' AND source_reference=:candidate");
-    $caseState->execute(['candidate'=>$fixture['candidate']]);
-    $assert((string)$caseState->fetchColumn() === 'done', 'Terminal pilot must close the existing Control Center projection.');
+    $assert($usageAfterEnd === $usageBeforeLifecycle, 'Pause/resume/end must not delete historical usage.');
+    $case = $pdo->prepare("SELECT state FROM control_cases WHERE source_system='startpartner_candidate' AND source_reference=:candidate");
+    $case->execute(['candidate'=>$fixture['candidate']]);
+    $assert((string)$case->fetchColumn() === 'done', 'Terminal pilot must close the Control Center projection.');
 
     $terminatedFixture = $seedActivePilot(2);
     $terminateUsageBefore = (int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_usages WHERE pilot_id='" . $terminatedFixture['pilot'] . "'")->fetchColumn();
-    $mutate($terminatedFixture, 'be_startpartner_gate4_transition_lifecycle', ['transition'=>'terminate']);
-    $terminated = be_startpartner_gate4_candidate_detail($pdo, $terminatedFixture['candidate']);
-    $assert($terminated['gate4']['phase'] === 'terminated', 'Termination must enter terminal state.');
-    $assert((string)$terminated['gate3']['entitlement']['status'] === 'revoked', 'Termination must revoke the pilot entitlement.');
+    $transition($terminatedFixture, 'terminate');
+    $terminated = $detail($terminatedFixture);
+    $assert($terminated['gate4']['phase'] === 'terminated', 'Termination must enter terminated state.');
+    $assert((string)$terminated['gate3']['entitlement']['status'] === 'revoked', 'Termination must revoke entitlement.');
     $assert((int)$terminated['gate4']['capacity']['occupied_slots'] === 0, 'Terminated pilot must release capacity.');
     $terminateUsageAfter = (int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_usages WHERE pilot_id='" . $terminatedFixture['pilot'] . "'")->fetchColumn();
     $assert($terminateUsageAfter === $terminateUsageBefore, 'Termination must retain historical usage.');
-
-    $lockedBefore = [
-        (int)$pdo->query('SELECT COUNT(*) FROM subscriptions')->fetchColumn(),
-        (int)$pdo->query('SELECT COUNT(*) FROM publication_entitlements')->fetchColumn(),
-        (int)$pdo->query('SELECT COUNT(*) FROM publication_consumptions')->fetchColumn(),
-    ];
-    $lockedAfter = [
-        (int)$pdo->query('SELECT COUNT(*) FROM subscriptions')->fetchColumn(),
-        (int)$pdo->query('SELECT COUNT(*) FROM publication_entitlements')->fetchColumn(),
-        (int)$pdo->query('SELECT COUNT(*) FROM publication_consumptions')->fetchColumn(),
-    ];
-    $assert($lockedBefore === $lockedAfter, 'Lifecycle contract must not mutate regular subscription/publication entitlement owners.');
 } catch (Throwable $error) {
     $failures[] = $error::class . ': ' . $error->getMessage();
 }
+
+$lockedAfter = [
+    (int)$pdo->query('SELECT COUNT(*) FROM subscriptions')->fetchColumn(),
+    (int)$pdo->query('SELECT COUNT(*) FROM publication_entitlements')->fetchColumn(),
+    (int)$pdo->query('SELECT COUNT(*) FROM publication_consumptions')->fetchColumn(),
+];
+$assert($lockedAfter === $lockedBefore, 'Lifecycle contract must not mutate regular subscription/publication owners.');
 
 $pdo->exec('SET FOREIGN_KEY_CHECKS=0');
 foreach ([
@@ -515,8 +598,8 @@ foreach ([
     $pdo->exec("DELETE FROM {$table}");
 }
 $pdo->exec('SET FOREIGN_KEY_CHECKS=1');
-$assert((int)$pdo->query('SELECT COUNT(*) FROM startpartner_candidates')->fetchColumn() === 0, 'Lifecycle cleanup must leave zero synthetic candidates.');
-$assert((int)be_startpartner_gate4_capacity($pdo)['occupied_slots'] === 0, 'Lifecycle cleanup must leave capacity at zero.');
+$assert((int)$pdo->query('SELECT COUNT(*) FROM startpartner_candidates')->fetchColumn() === 0, 'Cleanup must leave zero synthetic candidates.');
+$assert((int)be_startpartner_gate4_capacity($pdo)['occupied_slots'] === 0, 'Cleanup must leave capacity at zero.');
 
 if ($failures) {
     fwrite(STDERR, "=== Startpartner Active-Pilot MySQL Contract: FAILED ===\n" . implode("\n", array_map(static fn(string $v): string => '- ' . $v, $failures)) . "\n");
