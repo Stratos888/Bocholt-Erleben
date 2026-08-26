@@ -137,7 +137,7 @@ function be_startpartner_gate4_automatic_onboarding_items(array $gate3, string $
     $contactReference = is_array($pilot) ? trim((string)($pilot['partner_contact_email_snapshot'] ?? '')) : '';
     $entitlementReady = is_array($entitlement)
         && trim((string)($entitlement['id'] ?? '')) !== ''
-        && in_array((string)($entitlement['status'] ?? ''), ['pending_activation', 'active'], true);
+        && in_array((string)($entitlement['status'] ?? ''), ['pending_activation', 'active', 'paused', 'ended', 'revoked'], true);
     $contentScopes = array_values(array_filter(
         $scopes,
         static fn(array $scope): bool => in_array((string)($scope['scope_key'] ?? ''), ['events', 'activities'], true)
@@ -298,6 +298,227 @@ function be_startpartner_gate4_usage_rows(PDO $pdo, string $pilotId): array
     return $statement->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function be_startpartner_gate4_checkpoint_readback(PDO $pdo, array $pilot): array
+{
+    $activationDate = trim((string)($pilot['activation_date_local'] ?? ''));
+    $plannedEndDate = trim((string)($pilot['planned_end_date'] ?? ''));
+    if ($activationDate === '' || $plannedEndDate === '') {
+        return [
+            'items' => [],
+            'next_review_at' => null,
+            'closeout_required' => false,
+        ];
+    }
+    $schedule = be_startpartner_gate4_checkpoint_schedule($activationDate, $plannedEndDate);
+    $statement = $pdo->prepare(
+        "SELECT id, actor_reference, payload_json, created_at
+         FROM startpartner_pilot_events
+         WHERE pilot_id = :pilot_id AND event_type = 'gate4_checkpoint_completed'
+         ORDER BY id"
+    );
+    $statement->execute(['pilot_id' => (string)$pilot['id']]);
+    $completed = [];
+    foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $event) {
+        $payload = json_decode((string)$event['payload_json'], true);
+        $key = is_array($payload) ? (string)($payload['checkpoint_key'] ?? '') : '';
+        if (in_array($key, BE_STARTPARTNER_GATE4_CHECKPOINT_KEYS, true)) {
+            $completed[$key] = [
+                'event_id' => (int)$event['id'],
+                'actor_reference' => (string)$event['actor_reference'],
+                'created_at' => $event['created_at'],
+                'payload' => $payload,
+            ];
+        }
+    }
+    $today = (new DateTimeImmutable('today', new DateTimeZone('Europe/Berlin')))->format('Y-m-d');
+    $items = [];
+    $nextReviewAt = null;
+    foreach (BE_STARTPARTNER_GATE4_CHECKPOINT_KEYS as $key) {
+        $row = $schedule[$key];
+        $isComplete = isset($completed[$key]);
+        $status = $isComplete ? 'completed' : ($today >= $row['due_date_local'] ? 'due' : 'upcoming');
+        $items[] = [
+            'checkpoint_key' => $key,
+            'due_date_local' => $row['due_date_local'],
+            'deadline_date_local' => $row['deadline_date_local'],
+            'status' => $status,
+            'completed' => $completed[$key] ?? null,
+        ];
+        if (!$isComplete && ($nextReviewAt === null || $row['due_date_local'] < $nextReviewAt)) {
+            $nextReviewAt = $row['due_date_local'];
+        }
+    }
+    $terminal = in_array((string)$pilot['status'], BE_STARTPARTNER_GATE4_TERMINAL_PILOT_STATUSES, true);
+    $closeoutRequired = !$terminal
+        && in_array((string)$pilot['status'], ['active', 'paused'], true)
+        && $today > $plannedEndDate;
+    return [
+        'items' => $items,
+        'next_review_at' => $terminal ? null : ($nextReviewAt ?? $plannedEndDate),
+        'closeout_required' => $closeoutRequired,
+        'today_local' => $today,
+    ];
+}
+
+function be_startpartner_gate4_limit_readback(
+    array $pilot,
+    ?array $entitlement,
+    array $scopes,
+    array $content,
+    array $usages
+): array {
+    $eventScope = be_startpartner_gate4_scope_row($scopes, 'events');
+    $activityScope = be_startpartner_gate4_scope_row($scopes, 'activities');
+    $activationDate = trim((string)($pilot['activation_date_local'] ?? ''));
+    $plannedEndDate = trim((string)($pilot['planned_end_date'] ?? ''));
+    $today = (new DateTimeImmutable('today', new DateTimeZone('Europe/Berlin')))->format('Y-m-d');
+    $monthIndex = null;
+    $monthWindow = null;
+    if ($activationDate !== '' && $plannedEndDate !== '') {
+        $monthIndex = be_startpartner_gate4_pilot_month_index($activationDate, $today, $plannedEndDate);
+        if ($monthIndex !== null) {
+            $monthWindow = be_startpartner_gate4_pilot_month_window($activationDate, $monthIndex, $plannedEndDate);
+        }
+    }
+
+    $eventUsed = 0;
+    if ($monthIndex !== null) {
+        foreach ($usages as $usage) {
+            if ((string)($usage['content_type'] ?? '') === 'event'
+                && (int)($usage['pilot_month_index'] ?? 0) === $monthIndex) {
+                $eventUsed += (int)($usage['units'] ?? 0);
+            }
+        }
+    }
+    $eventUnlimited = is_array($entitlement) && (int)($entitlement['is_event_unlimited'] ?? 0) === 1;
+    $eventLimit = is_array($entitlement) && $entitlement['event_limit_per_pilot_month'] !== null
+        ? (int)$entitlement['event_limit_per_pilot_month']
+        : null;
+    $activityUsed = 0;
+    foreach ($content as $row) {
+        if ((string)($row['content_type'] ?? '') === 'activity' && (string)($row['status'] ?? '') === 'approved') {
+            $activityUsed++;
+        }
+    }
+    $activityLimit = is_array($entitlement) && $entitlement['activity_concurrent_limit'] !== null
+        ? (int)$entitlement['activity_concurrent_limit']
+        : null;
+
+    return [
+        'event' => is_array($eventScope) ? [
+            'available' => true,
+            'scope_status' => (string)$eventScope['status'],
+            'pilot_month_index' => $monthIndex,
+            'used' => $eventUsed,
+            'limit' => $eventLimit,
+            'is_unlimited' => $eventUnlimited,
+            'full' => !$eventUnlimited && $eventLimit !== null && $eventUsed >= $eventLimit,
+            'reset_date_local' => is_array($monthWindow) ? ($monthWindow['next_start_date_local'] ?? null) : null,
+        ] : ['available' => false],
+        'activity' => is_array($activityScope) ? [
+            'available' => true,
+            'scope_status' => (string)$activityScope['status'],
+            'used' => $activityUsed,
+            'limit' => $activityLimit,
+            'is_unlimited' => false,
+            'full' => $activityLimit !== null && $activityUsed >= $activityLimit,
+        ] : ['available' => false],
+    ];
+}
+
+function be_startpartner_gate4_measurement_runtime_readback(PDO $pdo, array $pilot, ?array $readyMeasurement): array
+{
+    if (!is_array($readyMeasurement)) {
+        return [
+            'status' => 'technical_not_ready',
+            'query_status' => 'not_run',
+            'observed_actions' => null,
+            'completed_bucket_count' => 0,
+        ];
+    }
+    $targetType = trim((string)($readyMeasurement['reporting_target_type'] ?? ''));
+    $targetId = trim((string)($readyMeasurement['reporting_target_id'] ?? ''));
+    $expectedTargetId = be_startpartner_gate4_reporting_target_id((int)$pilot['organizer_id']);
+    if ($targetType !== 'organizer' || !hash_equals($expectedTargetId, $targetId)) {
+        return [
+            'status' => 'query_or_attribution_problem',
+            'query_status' => 'attribution_mismatch',
+            'observed_actions' => null,
+            'completed_bucket_count' => 0,
+        ];
+    }
+    try {
+        $today = (new DateTimeImmutable('today', new DateTimeZone('Europe/Berlin')))->format('Y-m-d');
+        $statement = $pdo->prepare(
+            "SELECT COUNT(*) AS bucket_count,
+                    COALESCE(SUM(count_value), 0) AS observed_actions,
+                    MAX(metric_date) AS last_completed_metric_date,
+                    MAX(updated_at) AS last_metric_update
+             FROM value_metric_daily
+             WHERE reporting_target_type = :target_type
+               AND reporting_target_id = :target_id
+               AND metric_date < :today_local"
+        );
+        $statement->execute([
+            'target_type' => $targetType,
+            'target_id' => $targetId,
+            'today_local' => $today,
+        ]);
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
+        if (!is_array($row)) {
+            throw new RuntimeException('Measurement query returned no aggregate row.');
+        }
+        $bucketCount = (int)($row['bucket_count'] ?? 0);
+        $observedActions = (int)($row['observed_actions'] ?? 0);
+        $status = $bucketCount === 0
+            ? 'no_data_yet_or_too_short'
+            : ($observedActions > 0 ? 'usage_observed' : 'zero_usage');
+        return [
+            'status' => $status,
+            'query_status' => 'ok',
+            'observed_actions' => $observedActions,
+            'completed_bucket_count' => $bucketCount,
+            'last_completed_metric_date' => $row['last_completed_metric_date'] ?? null,
+            'last_metric_update' => $row['last_metric_update'] ?? null,
+            'reporting_target_type' => $targetType,
+            'reporting_target_id' => $targetId,
+        ];
+    } catch (Throwable $error) {
+        return [
+            'status' => 'query_or_attribution_problem',
+            'query_status' => 'error',
+            'observed_actions' => null,
+            'completed_bucket_count' => 0,
+            'error_message' => $error->getMessage(),
+        ];
+    }
+}
+
+function be_startpartner_gate4_distribution_runtime_readback(array $distribution): array
+{
+    $current = $distribution[0] ?? null;
+    if (!is_array($current)) {
+        return ['status' => 'not_planned', 'commitment' => null];
+    }
+    $status = (string)$current['status'];
+    if ($status === 'ready') {
+        $plannedAt = trim((string)($current['planned_at'] ?? ''));
+        $due = false;
+        if ($plannedAt !== '') {
+            $planned = new DateTimeImmutable($plannedAt, new DateTimeZone('UTC'));
+            $due = $planned <= new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        }
+        return [
+            'status' => $due ? 'due' : 'planned',
+            'commitment' => $current,
+        ];
+    }
+    return [
+        'status' => in_array($status, ['completed', 'blocked', 'cancelled'], true) ? $status : 'not_ready',
+        'commitment' => $current,
+    ];
+}
+
 function be_startpartner_gate4_current_onboarding_items(
     array $gate3,
     array $persistedRows,
@@ -377,6 +598,92 @@ function be_startpartner_gate4_current_onboarding_items(
     return $result;
 }
 
+function be_startpartner_gate4_next_action(
+    array $pilot,
+    bool $ready,
+    array $checkpoints,
+    array $content,
+    array $distributionRuntime
+): array {
+    $status = (string)$pilot['status'];
+    if (in_array($status, BE_STARTPARTNER_GATE4_TERMINAL_PILOT_STATUSES, true)) {
+        return ['code' => 'none', 'label' => 'Pilot abgeschlossen', 'action' => null];
+    }
+    if ($status === 'closing') {
+        return [
+            'code' => 'end_without_conversion',
+            'label' => 'Pilot geordnet abschließen',
+            'action' => 'end_without_conversion',
+        ];
+    }
+    if (($checkpoints['closeout_required'] ?? false) === true) {
+        return [
+            'code' => 'closeout_required',
+            'label' => 'Pilotende jetzt entscheiden',
+            'action' => 'start_closeout',
+        ];
+    }
+    foreach ((array)($checkpoints['items'] ?? []) as $checkpoint) {
+        if ((string)($checkpoint['status'] ?? '') === 'due') {
+            return [
+                'code' => 'checkpoint_due',
+                'label' => 'Fälligen Pilot-Checkpoint abschließen',
+                'action' => 'complete_checkpoint',
+                'checkpoint_key' => (string)$checkpoint['checkpoint_key'],
+                'due_date_local' => (string)$checkpoint['due_date_local'],
+            ];
+        }
+    }
+    if ($status === 'paused') {
+        return [
+            'code' => 'paused',
+            'label' => 'Pilot fortsetzen oder Abschluss einleiten',
+            'action' => 'resume',
+        ];
+    }
+    if ($ready) {
+        return ['code' => 'activate', 'label' => 'Pilot jetzt starten', 'action' => 'activate'];
+    }
+    if ($status === 'active') {
+        foreach ($content as $row) {
+            if ((string)($row['status'] ?? '') === 'draft') {
+                return [
+                    'code' => 'content_review',
+                    'label' => 'Nächsten Pilotinhalt redaktionell prüfen',
+                    'action' => 'mark_content_ready',
+                    'content_link_id' => (string)$row['id'],
+                ];
+            }
+            if ((string)($row['status'] ?? '') === 'editorial_ready') {
+                return [
+                    'code' => 'content_approval',
+                    'label' => 'Vorbereiteten Pilotinhalt freigeben',
+                    'action' => 'approve_content',
+                    'content_link_id' => (string)$row['id'],
+                ];
+            }
+        }
+        if ((string)($distributionRuntime['status'] ?? '') === 'due') {
+            return [
+                'code' => 'distribution_due',
+                'label' => 'Reichweitenbeitrag als erfüllt, blockiert oder ausgefallen dokumentieren',
+                'action' => 'set_distribution_fulfillment',
+                'distribution_id' => (string)($distributionRuntime['commitment']['id'] ?? ''),
+            ];
+        }
+        return [
+            'code' => 'monitor_active_pilot',
+            'label' => 'Aktiven Pilot beobachten',
+            'action' => null,
+        ];
+    }
+    return [
+        'code' => 'onboarding',
+        'label' => 'Nächsten offenen Einrichtungsschritt bearbeiten',
+        'action' => null,
+    ];
+}
+
 function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includeEvents = true): array
 {
     be_startpartner_gate4_require_schema($pdo);
@@ -395,6 +702,13 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
             'first_content' => null,
             'activation_ready' => false,
             'active' => false,
+            'effective_active' => false,
+            'lifecycle' => ['status' => 'gate3_required'],
+            'limits' => [],
+            'measurement_runtime' => ['status' => 'technical_not_ready'],
+            'distribution_runtime' => ['status' => 'not_planned'],
+            'next_review_at' => null,
+            'next_action' => ['code' => 'gate3_required', 'action' => null],
             'blockers' => [[
                 'code' => 'gate3_pilot_required',
                 'message' => 'Pilotbedingungen und Veranstalterzugang müssen vor der Piloteinrichtung vollständig vorbereitet sein.',
@@ -487,20 +801,52 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
     }
 
     $status = (string)$pilot['status'];
-    $active = $status === 'active'
+    $terminal = in_array($status, BE_STARTPARTNER_GATE4_TERMINAL_PILOT_STATUSES, true);
+    $checkpoints = be_startpartner_gate4_checkpoint_readback($pdo, $pilot);
+    $limits = be_startpartner_gate4_limit_readback(
+        $pilot,
+        is_array($entitlement) ? $entitlement : null,
+        (array)($gate3['scopes'] ?? []),
+        $content,
+        $usages
+    );
+    $measurementRuntime = be_startpartner_gate4_measurement_runtime_readback($pdo, $pilot, $measurement);
+    $distributionRuntime = be_startpartner_gate4_distribution_runtime_readback($distribution);
+
+    $insideWindow = false;
+    $activationDate = trim((string)($pilot['activation_date_local'] ?? ''));
+    $plannedEndDate = trim((string)($pilot['planned_end_date'] ?? ''));
+    if ($activationDate !== '' && $plannedEndDate !== '') {
+        $today = (new DateTimeImmutable('today', new DateTimeZone('Europe/Berlin')))->format('Y-m-d');
+        $insideWindow = be_startpartner_gate4_pilot_month_index($activationDate, $today, $plannedEndDate) !== null;
+    }
+
+    $effectiveActive = $status === 'active'
         && is_array($entitlement)
         && (string)$entitlement['status'] === 'active'
+        && $insideWindow
         && $first !== null
         && (string)$first['status'] === 'approved';
-    $ready = !$active
+    $ready = !in_array($status, ['active', 'paused', 'closing'], true)
+        && !$terminal
         && in_array($status, ['onboarding', 'activation_ready'], true)
         && $blockers === []
         && is_array($entitlement)
         && (string)$entitlement['status'] === 'pending_activation';
+    $phase = $terminal || in_array($status, ['active', 'paused', 'closing'], true)
+        ? $status
+        : ($ready ? 'activation_ready' : 'onboarding');
+    $nextAction = be_startpartner_gate4_next_action(
+        $pilot,
+        $ready,
+        $checkpoints,
+        $content,
+        $distributionRuntime
+    );
 
     return [
-        'complete' => $active,
-        'phase' => $active ? 'active' : ($ready ? 'activation_ready' : 'onboarding'),
+        'complete' => $effectiveActive || $terminal,
+        'phase' => $phase,
         'pilot' => $pilot,
         'onboarding' => $onboarding,
         'content_links' => $content,
@@ -512,7 +858,21 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
         'ready_distribution' => $reach,
         'portal_access' => $portalAccess,
         'activation_ready' => $ready,
-        'active' => $active,
+        'active' => $effectiveActive,
+        'effective_active' => $effectiveActive,
+        'lifecycle' => [
+            'status' => $status,
+            'entitlement_status' => is_array($entitlement) ? (string)$entitlement['status'] : null,
+            'inside_effective_window' => $insideWindow,
+            'terminal' => $terminal,
+            'checkpoints' => $checkpoints['items'],
+            'closeout_required' => (bool)($checkpoints['closeout_required'] ?? false),
+        ],
+        'limits' => $limits,
+        'measurement_runtime' => $measurementRuntime,
+        'distribution_runtime' => $distributionRuntime,
+        'next_review_at' => $checkpoints['next_review_at'] ?? null,
+        'next_action' => $nextAction,
         'blockers' => $blockers,
         'capacity' => be_startpartner_gate4_capacity($pdo),
     ];
