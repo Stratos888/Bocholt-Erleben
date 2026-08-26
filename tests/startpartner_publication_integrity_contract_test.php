@@ -47,7 +47,7 @@ $contentPos = strpos($state, "'content_review'");
 $assert($distributionPos !== false && $contentPos !== false && $distributionPos < $contentPos, 'Backend next-action priority must evaluate distribution before active content review.');
 
 $assert(!str_contains($projection, '$today >= $plannedEnd'), 'Control-case projection must not re-derive planned-end next-action semantics.');
-$assert(str_contains($projection, "$next = is_array(\$gate4['next_action'] ?? null)"), 'Control-case projection must consume the backend next action.');
+$assert(str_contains($projection, "\$next = is_array(\$gate4['next_action'] ?? null)"), 'Control-case projection must consume the backend next action.');
 
 $assert(!str_contains($control, 'function plannedEndDue'), 'Control Center must not re-derive planned-end lifecycle semantics.');
 $assert(str_contains($control, "if(['onboarding','activation_ready'].includes(phase))return preactivationNextAction(gate4);"), 'Control Center may keep preactivation presentation helpers only for preactive phases.');
