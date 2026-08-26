@@ -99,19 +99,22 @@ function public_events_normalize_row(array $row): array
 
 try {
     $stmt = be_db()->prepare(
-        'SELECT id, organizer_id, organization_name_snapshot, title, start_date, time_text,
-                location_name, location_address, location_public_confirmed, event_url, ticket_url,
-                description_text, approved_at, updated_at
-         FROM submissions
-         WHERE submission_kind = :submission_kind
-           AND status = :status
-           AND approved_at IS NOT NULL
-           AND start_date IS NOT NULL
-           AND start_date >= CURRENT_DATE()
-           AND title IS NOT NULL AND title <> ""
-           AND location_name IS NOT NULL AND location_name <> ""
-           AND location_public_confirmed = 1
-         ORDER BY start_date ASC, time_text ASC, id ASC
+        'SELECT s.id, s.organizer_id, s.organization_name_snapshot, s.title, s.start_date, s.time_text,
+                s.location_name, s.location_address, s.location_public_confirmed, s.event_url, s.ticket_url,
+                s.description_text, s.approved_at, s.updated_at,
+                pcl.id AS pilot_content_link_id, pcl.status AS pilot_content_status
+         FROM submissions s
+         LEFT JOIN startpartner_pilot_content_links pcl ON pcl.submission_id = s.id
+         WHERE s.submission_kind = :submission_kind
+           AND s.status = :status
+           AND s.approved_at IS NOT NULL
+           AND s.start_date IS NOT NULL
+           AND s.start_date >= CURRENT_DATE()
+           AND s.title IS NOT NULL AND s.title <> ""
+           AND s.location_name IS NOT NULL AND s.location_name <> ""
+           AND s.location_public_confirmed = 1
+           AND (pcl.id IS NULL OR pcl.status = "approved")
+         ORDER BY s.start_date ASC, s.time_text ASC, s.id ASC
          LIMIT 250'
     );
     $stmt->execute(['submission_kind' => 'event', 'status' => 'approved']);
