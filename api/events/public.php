@@ -101,10 +101,8 @@ try {
     $stmt = be_db()->prepare(
         'SELECT s.id, s.organizer_id, s.organization_name_snapshot, s.title, s.start_date, s.time_text,
                 s.location_name, s.location_address, s.location_public_confirmed, s.event_url, s.ticket_url,
-                s.description_text, s.approved_at, s.updated_at,
-                pcl.id AS pilot_content_link_id, pcl.status AS pilot_content_status
+                s.description_text, s.approved_at, s.updated_at
          FROM submissions s
-         LEFT JOIN startpartner_pilot_content_links pcl ON pcl.submission_id = s.id
          WHERE s.submission_kind = :submission_kind
            AND s.status = :status
            AND s.approved_at IS NOT NULL
@@ -113,7 +111,21 @@ try {
            AND s.title IS NOT NULL AND s.title <> ""
            AND s.location_name IS NOT NULL AND s.location_name <> ""
            AND s.location_public_confirmed = 1
-           AND (pcl.id IS NULL OR pcl.status = "approved")
+           AND (
+                NOT EXISTS (
+                    SELECT 1
+                    FROM startpartner_pilot_content_links pcl_any
+                    WHERE pcl_any.submission_id = s.id
+                )
+                OR EXISTS (
+                    SELECT 1
+                    FROM startpartner_pilot_content_links pcl
+                    INNER JOIN startpartner_pilots sp ON sp.id = pcl.pilot_id
+                    WHERE pcl.submission_id = s.id
+                      AND pcl.status = "approved"
+                      AND sp.status IN ("active", "paused", "closing")
+                )
+           )
          ORDER BY s.start_date ASC, s.time_text ASC, s.id ASC
          LIMIT 250'
     );
