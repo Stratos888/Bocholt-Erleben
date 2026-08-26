@@ -8,7 +8,10 @@ $smoke=file_get_contents($root.'/tools/smoke-check-deploy.py');
 $failures=[];$assert=static function(bool $ok,string $message)use(&$failures):void{if(!$ok)$failures[]=$message;};
 foreach(['startpartner_pilot_onboarding_items','startpartner_pilot_content_links','startpartner_pilot_measurement_preflights','startpartner_pilot_distribution_commitments','startpartner_pilot_usages'] as $table){$assert(str_contains($sql,$table),"Gate-4 schema owner missing: {$table}");}
 foreach(['CREATE TABLE IF NOT EXISTS subscriptions','ALTER TABLE subscriptions','ALTER TABLE publication_entitlements','ALTER TABLE publication_consumptions','stripe_'] as $forbidden){$assert(!str_contains($sql,$forbidden),"Migration 012 must not mutate locked regular owner: {$forbidden}");}
-foreach(['organizer_magic_links','be_send_mail','stripe_checkout','publication_entitlements','publication_consumptions'] as $forbidden){$assert(!str_contains($domain,$forbidden),"Gate-4 domain contains forbidden side effect: {$forbidden}");}
+foreach(['be_send_mail','stripe_checkout','publication_entitlements','publication_consumptions'] as $forbidden){$assert(!str_contains($domain,$forbidden),"Gate-4 domain contains forbidden side effect: {$forbidden}");}
+$assert(str_contains($domain,'organizer_magic_links'),'Gate-4 v2 portal-access proof must read the canonical Magic-Link owner.');
+$magicLinkMutation='/\b(?:INSERT\s+INTO|REPLACE\s+INTO|UPDATE|DELETE\s+FROM)\s+organizer_magic_links\b/i';
+$assert(preg_match($magicLinkMutation,$domain)!==1,'Gate-4 may read organizer_magic_links but must never mutate the Magic-Link owner.');
 $temporaryOwners=glob($root.'/api/startpartner/evidence/*')?:[];
 $assert($temporaryOwners===[],'Temporary Gate-4 evidence endpoints must be removed.');
 $durableRuntime=$domain."\n".$smoke;

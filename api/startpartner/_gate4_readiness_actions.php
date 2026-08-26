@@ -51,6 +51,112 @@ function be_startpartner_gate4_measurement_readback(PDO $pdo, array $content): a
     ];
 }
 
+function be_startpartner_gate4_persist_measurement_preflight(
+    PDO $pdo,
+    array $pilot,
+    array $content,
+    string $status,
+    string $evidenceText,
+    string $checkedBy,
+    string $operationId
+): array {
+    if (!in_array($status, ['ready', 'blocked'], true)) {
+        throw new InvalidArgumentException('Die Erfolgsmessung muss als eingerichtet oder als klärungsbedürftig gespeichert werden.');
+    }
+    if (!in_array((string)($content['status'] ?? ''), ['editorial_ready', 'approved'], true)) {
+        throw new DomainException('Für die Erfolgsmessung muss zuerst ein Inhalt für den Pilotstart vorbereitet sein.');
+    }
+
+    $technicalReadback = $status === 'ready'
+        ? be_startpartner_gate4_measurement_readback($pdo, $content)
+        : null;
+    $id = be_startpartner_gate4_uuid();
+    $statement = $pdo->prepare(
+        "INSERT INTO startpartner_pilot_measurement_preflights (
+            id, pilot_id, organizer_id, content_link_id, status, metrics_owner,
+            reporting_target_type, reporting_target_id, evidence_json, checked_by
+         ) VALUES (
+            :id, :pilot_id, :organizer_id, :content_link_id, :status, 'value_metric_daily',
+            :reporting_target_type, :reporting_target_id, :evidence_json, :checked_by
+         )
+         ON DUPLICATE KEY UPDATE
+            status = VALUES(status), metrics_owner = VALUES(metrics_owner),
+            reporting_target_type = VALUES(reporting_target_type),
+            reporting_target_id = VALUES(reporting_target_id),
+            evidence_json = VALUES(evidence_json), checked_by = VALUES(checked_by),
+            checked_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP"
+    );
+    $statement->execute([
+        'id' => $id,
+        'pilot_id' => (string)$pilot['id'],
+        'organizer_id' => (int)$pilot['organizer_id'],
+        'content_link_id' => (string)$content['id'],
+        'status' => $status,
+        'reporting_target_type' => (string)$content['reporting_target_type'],
+        'reporting_target_id' => (string)$content['reporting_target_id'],
+        'evidence_json' => json_encode([
+            'evidence_text' => $evidenceText,
+            'technical_readback' => $technicalReadback,
+            'operation_id' => $operationId,
+            'pilot_id' => (string)$pilot['id'],
+            'content_link_id' => (string)$content['id'],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
+        'checked_by' => $checkedBy,
+    ]);
+    $item = $pdo->prepare(
+        "UPDATE startpartner_pilot_onboarding_items
+         SET status = :item_status, evidence_text = :evidence_text,
+             evidence_reference = :evidence_reference, operator_reference = :operator,
+             completed_at = CASE WHEN :is_ready = 1 THEN CURRENT_TIMESTAMP ELSE NULL END,
+             revision = revision + 1
+         WHERE pilot_id = :pilot_id AND item_key = 'measurement_ready'"
+    );
+    $item->execute([
+        'item_status' => $status === 'ready' ? 'complete' : 'blocked',
+        'evidence_text' => $evidenceText,
+        'evidence_reference' => (string)$content['id'],
+        'operator' => $checkedBy,
+        'is_ready' => $status === 'ready' ? 1 : 0,
+        'pilot_id' => (string)$pilot['id'],
+    ]);
+
+    return [
+        'status' => $status,
+        'technical_readback' => $technicalReadback,
+    ];
+}
+
+function be_startpartner_gate4_auto_measurement_preflight(
+    PDO $pdo,
+    array $pilot,
+    array $content,
+    string $operationId
+): array {
+    try {
+        return be_startpartner_gate4_persist_measurement_preflight(
+            $pdo,
+            $pilot,
+            $content,
+            'ready',
+            'Automatische technische Prüfung nach redaktioneller Vorbereitung des ersten Pilotinhalts.',
+            'automatic-measurement-readback',
+            $operationId
+        );
+    } catch (DomainException $error) {
+        $result = be_startpartner_gate4_persist_measurement_preflight(
+            $pdo,
+            $pilot,
+            $content,
+            'blocked',
+            'Automatische technische Prüfung nicht erfolgreich: ' . $error->getMessage(),
+            'automatic-measurement-readback',
+            $operationId
+        );
+        $result['error_message'] = $error->getMessage();
+        return $result;
+    }
+}
+
 function be_startpartner_gate4_distribution_input(array $input): array
 {
     $channel = be_startpartner_gate4_required_text($input['channel'] ?? null, 64, 'channel');
@@ -58,13 +164,13 @@ function be_startpartner_gate4_distribution_input(array $input): array
     $plannedLocalDate = be_startpartner_gate4_validate_local_date($input['planned_at'] ?? null);
     $status = strtolower(be_startpartner_gate4_required_text($input['status'] ?? null, 16, 'status'));
     if (!in_array($status, ['ready', 'blocked'], true)) {
-        throw new InvalidArgumentException('Der Reichweitenbeitrag muss als vorbereitet oder als klärungsbedürftig gespeichert werden.');
+        throw new InvalidArgumentException('Der Reichweitenbeitrag muss als vereinbart oder als klärungsbedürftig gespeichert werden.');
     }
     $timezone = new DateTimeZone('Europe/Berlin');
     $plannedLocal = new DateTimeImmutable($plannedLocalDate . ' 00:00:00', $timezone);
     $todayLocal = new DateTimeImmutable('today', $timezone);
     if ($status === 'ready' && $plannedLocal < $todayLocal) {
-        throw new DomainException('Der geplante Termin für den Reichweitenbeitrag darf nicht in der Vergangenheit liegen.');
+        throw new DomainException('Der vereinbarte Zieltermin für den Reichweitenbeitrag darf nicht in der Vergangenheit liegen.');
     }
     return [
         'channel' => $channel,
@@ -129,16 +235,36 @@ function be_startpartner_gate4_mark_content_ready(PDO $pdo, string $candidateId,
                      WHERE pilot_id = :pilot_id AND item_key = :item_key"
                 );
                 $item->execute([
-                    'evidence_text' => 'Der verknüpfte Inhalt ist für die redaktionelle Prüfung vorbereitet.',
+                    'evidence_text' => 'Der verknüpfte Inhalt ist redaktionell für den Pilotstart vorbereitet.',
                     'evidence_reference' => $contentLinkId,
                     'operator' => $operator,
                     'pilot_id' => (string)$pilot['id'],
                     'item_key' => $itemKey,
                 ]);
             }
+
+            $contentQuery = $pdo->prepare(
+                'SELECT * FROM startpartner_pilot_content_links WHERE id = :id AND pilot_id = :pilot_id LIMIT 1 FOR UPDATE'
+            );
+            $contentQuery->execute(['id' => $contentLinkId, 'pilot_id' => (string)$pilot['id']]);
+            $content = $contentQuery->fetch(PDO::FETCH_ASSOC);
+            if (!is_array($content)) {
+                throw new DomainException('Der vorbereitete Pilotinhalt konnte nicht zurückgelesen werden.');
+            }
+            $measurement = be_startpartner_gate4_auto_measurement_preflight(
+                $pdo,
+                $pilot,
+                $content,
+                $operationId
+            );
+
             return [
-                'status_reason' => 'Der erste Inhalt ist für den Pilotstart vorbereitet.',
+                'status_reason' => ($measurement['status'] ?? '') === 'ready'
+                    ? 'Der erste Inhalt ist für den Pilotstart vorbereitet; die Erfolgsmessung wurde automatisch geprüft.'
+                    : 'Der erste Inhalt ist vorbereitet. Die automatische Prüfung der Erfolgsmessung benötigt noch Klärung.',
                 'content_link_id' => $contentLinkId,
+                'measurement_status' => $measurement['status'] ?? 'blocked',
+                'measurement_error' => $measurement['error_message'] ?? null,
             ];
         }
     );
@@ -166,68 +292,22 @@ function be_startpartner_gate4_set_measurement(PDO $pdo, string $candidateId, ar
             if (!is_array($content)) {
                 throw new DomainException('Der ausgewählte Pilotinhalt wurde nicht gefunden.');
             }
-            if (!in_array((string)$content['status'], ['editorial_ready', 'approved'], true)) {
-                throw new DomainException('Für die Erfolgsmessung muss zuerst ein Inhalt für den Pilotstart vorbereitet sein.');
-            }
             $evidenceText = be_startpartner_gate4_required_text($input['evidence_text'] ?? null, 5000, 'evidence_text');
-            $technicalReadback = $status === 'ready'
-                ? be_startpartner_gate4_measurement_readback($pdo, $content)
-                : null;
-            $id = be_startpartner_gate4_uuid();
-            $statement = $pdo->prepare(
-                "INSERT INTO startpartner_pilot_measurement_preflights (
-                    id, pilot_id, organizer_id, content_link_id, status, metrics_owner,
-                    reporting_target_type, reporting_target_id, evidence_json, checked_by
-                 ) VALUES (
-                    :id, :pilot_id, :organizer_id, :content_link_id, :status, 'value_metric_daily',
-                    :reporting_target_type, :reporting_target_id, :evidence_json, :checked_by
-                 )
-                 ON DUPLICATE KEY UPDATE
-                    status = VALUES(status), metrics_owner = VALUES(metrics_owner),
-                    reporting_target_type = VALUES(reporting_target_type),
-                    reporting_target_id = VALUES(reporting_target_id),
-                    evidence_json = VALUES(evidence_json), checked_by = VALUES(checked_by),
-                    checked_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP"
+            $result = be_startpartner_gate4_persist_measurement_preflight(
+                $pdo,
+                $pilot,
+                $content,
+                $status,
+                $evidenceText,
+                $operator,
+                $operationId
             );
-            $statement->execute([
-                'id' => $id,
-                'pilot_id' => (string)$pilot['id'],
-                'organizer_id' => (int)$pilot['organizer_id'],
-                'content_link_id' => $contentLinkId,
-                'status' => $status,
-                'reporting_target_type' => (string)$content['reporting_target_type'],
-                'reporting_target_id' => (string)$content['reporting_target_id'],
-                'evidence_json' => json_encode([
-                    'evidence_text' => $evidenceText,
-                    'technical_readback' => $technicalReadback,
-                    'operation_id' => $operationId,
-                    'pilot_id' => (string)$pilot['id'],
-                    'content_link_id' => $contentLinkId,
-                ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
-                'checked_by' => $operator,
-            ]);
-            $item = $pdo->prepare(
-                "UPDATE startpartner_pilot_onboarding_items
-                 SET status = :item_status, evidence_text = :evidence_text,
-                     evidence_reference = :evidence_reference, operator_reference = :operator,
-                     completed_at = CASE WHEN :is_ready = 1 THEN CURRENT_TIMESTAMP ELSE NULL END,
-                     revision = revision + 1
-                 WHERE pilot_id = :pilot_id AND item_key = 'measurement_ready'"
-            );
-            $item->execute([
-                'item_status' => $status === 'ready' ? 'complete' : 'blocked',
-                'evidence_text' => $evidenceText,
-                'evidence_reference' => $contentLinkId,
-                'operator' => $operator,
-                'is_ready' => $status === 'ready' ? 1 : 0,
-                'pilot_id' => (string)$pilot['id'],
-            ]);
             return [
                 'status_reason' => $status === 'ready'
-                    ? 'Die Erfolgsmessung wurde geprüft und als eingerichtet gespeichert.'
+                    ? 'Die Erfolgsmessung wurde erneut technisch geprüft und ist eingerichtet.'
                     : 'Für die Erfolgsmessung wurde ein offener Punkt gespeichert.',
                 'content_link_id' => $contentLinkId,
-                'technical_readback' => $technicalReadback,
+                'technical_readback' => $result['technical_readback'] ?? null,
             ];
         }
     );
@@ -282,7 +362,7 @@ function be_startpartner_gate4_set_distribution(PDO $pdo, string $candidateId, a
             ]);
             return [
                 'status_reason' => $distribution['status'] === 'ready'
-                    ? 'Der Reichweitenbeitrag wurde mit Kanal und Termin gespeichert.'
+                    ? 'Der Reichweitenbeitrag wurde als mit dem Partner vereinbart gespeichert.'
                     : 'Für den Reichweitenbeitrag wurde ein offener Punkt gespeichert.',
                 'distribution_id' => $id,
                 'planned_date_local' => $distribution['planned_date_local'],
