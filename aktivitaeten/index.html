@@ -363,7 +363,7 @@ Umfang:
 <!-- FOOTER -->
 <footer data-site-footer></footer>
 
-<!-- === BEGIN BLOCK: JS INCLUDES (activities page final order V3) ===
+<!-- === BEGIN BLOCK: JS INCLUDES (activities page final order V4) ===
 Zweck:
 - gemeinsame Icon-Registry auch auf Aktivitätenseite verfügbar
 - rendert die mobile Primary-Navigation zentral aus genau einer JS-Quelle
@@ -372,6 +372,7 @@ Zweck:
   2) offers (shared visuals + cards)
   3) offers-details (mobile panel)
   4) offers-main (filter + boot)
+  5) activity-submission-feed (fail-soft DB-Projektion, wrappt OffersApp.init vor DOMContentLoaded)
 === -->
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
@@ -388,6 +389,7 @@ Zweck:
 <script src="/js/offers-details.js?v=2026-06-30-activity-favorites-silent-priority" defer></script>
 <script src="/js/neutral-selection.js?v=2026-07-22-seo-recovery-v1" defer></script>
 <script src="/js/offers-main.js?v=2026-07-22-seo-recovery-v1" defer></script>
-<!-- === END BLOCK: JS INCLUDES (activities page final order V3) === -->
+<script src="/js/activity-submission-feed.js?v=2026-08-26-publication-integrity-v1" defer></script>
+<!-- === END BLOCK: JS INCLUDES (activities page final order V4) === -->
 </body>
 </html>
