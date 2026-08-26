@@ -22,6 +22,17 @@ function be_startpartner_gate4_project_control_case(PDO $pdo, array $candidate, 
     $phase = (string)($gate4['phase'] ?? 'onboarding');
     $firstBlocker = (string)($gate4['blockers'][0]['message'] ?? 'Onboarding prüfen.');
     $next = is_array($gate4['next_action'] ?? null) ? $gate4['next_action'] : [];
+
+    $plannedEnd = trim((string)($gate4['pilot']['planned_end_date'] ?? ''));
+    $today = (new DateTimeImmutable('today', new DateTimeZone('Europe/Berlin')))->format('Y-m-d');
+    if (in_array($phase, ['active', 'paused'], true) && $plannedEnd !== '' && $today >= $plannedEnd) {
+        $next = [
+            'code' => 'closeout_required',
+            'label' => 'Pilotende jetzt entscheiden',
+            'action' => 'start_closeout',
+        ];
+    }
+
     $nextAction = trim((string)($next['label'] ?? '')) !== ''
         ? (string)$next['label']
         : $firstBlocker;
@@ -41,11 +52,15 @@ function be_startpartner_gate4_project_control_case(PDO $pdo, array $candidate, 
     };
     $priority = match (true) {
         $nextCode === 'closeout_required' => 'critical',
-        in_array($nextCode, ['checkpoint_due', 'end_without_conversion', 'activate'], true) => 'high',
+        in_array($nextCode, ['checkpoint_due', 'end_without_conversion', 'distribution_due', 'distribution_blocked', 'activate'], true) => 'high',
         default => 'normal',
     };
     $projectedState = $terminal ? 'done' : 'in_progress';
     $nextReviewAt = $gate4['next_review_at'] ?? null;
+    if ($nextCode === 'closeout_required' && $plannedEnd !== '') {
+        $nextReviewAt = $plannedEnd;
+    }
+
     $payload = json_encode([
         'candidate_id' => $candidateId,
         'candidate_status' => $candidate['status'],
@@ -159,6 +174,19 @@ function be_startpartner_gate4_partner_next_action(array $candidate, array $gate
         return ['code' => 'closeout_due', 'label' => 'Die Pilotlaufzeit ist beendet; neue Inhalte sind gesperrt.', 'content_type' => null];
     }
 
+    $contentLinks = array_values(array_filter((array)($gate4['content_links'] ?? []), 'is_array'));
+    if ($phase !== 'active') {
+        foreach ($contentLinks as $row) {
+            if (in_array((string)($row['status'] ?? ''), ['draft', 'editorial_ready', 'approved'], true)) {
+                return [
+                    'code' => 'wait_for_operator',
+                    'label' => 'Deine Einreichung wird von Bocholt erleben weiterbearbeitet.',
+                    'content_type' => null,
+                ];
+            }
+        }
+    }
+
     $limits = is_array($gate4['limits'] ?? null) ? $gate4['limits'] : [];
     $event = is_array($limits['event'] ?? null) ? $limits['event'] : ['available' => false];
     $activity = is_array($limits['activity'] ?? null) ? $limits['activity'] : ['available' => false];
@@ -228,6 +256,50 @@ function be_startpartner_gate4_portal_projection(array $candidate): array
         ];
     }
 
+    $safeLimits = [];
+    foreach (['event', 'activity'] as $key) {
+        $row = is_array($gate4['limits'][$key] ?? null) ? $gate4['limits'][$key] : null;
+        if (!is_array($row)) {
+            continue;
+        }
+        $safeLimits[$key] = [
+            'available' => !empty($row['available']),
+            'used' => isset($row['used']) ? (int)$row['used'] : 0,
+            'limit' => isset($row['limit']) ? (int)$row['limit'] : null,
+            'is_unlimited' => !empty($row['is_unlimited']),
+            'full' => !empty($row['full']),
+            'pilot_month_index' => isset($row['pilot_month_index']) ? (int)$row['pilot_month_index'] : null,
+            'reset_date_local' => $row['reset_date_local'] ?? null,
+        ];
+    }
+
+    $measurement = is_array($gate4['measurement_runtime'] ?? null) ? $gate4['measurement_runtime'] : [];
+    $safeMeasurement = [
+        'status' => (string)($measurement['status'] ?? 'technical_not_ready'),
+        'observed_actions' => isset($measurement['observed_actions']) ? (int)$measurement['observed_actions'] : null,
+        'completed_bucket_count' => isset($measurement['completed_bucket_count']) ? (int)$measurement['completed_bucket_count'] : 0,
+        'last_completed_metric_date' => $measurement['last_completed_metric_date'] ?? null,
+    ];
+
+    $distribution = is_array($gate4['distribution_runtime'] ?? null) ? $gate4['distribution_runtime'] : [];
+    $commitment = is_array($distribution['commitment'] ?? null) ? $distribution['commitment'] : null;
+    $safeDistribution = [
+        'status' => (string)($distribution['status'] ?? 'not_planned'),
+        'commitment' => is_array($commitment) ? [
+            'id' => (string)($commitment['id'] ?? ''),
+            'channel' => (string)($commitment['channel'] ?? ''),
+            'planned_at' => $commitment['planned_at'] ?? null,
+        ] : null,
+    ];
+
+    $lifecycle = is_array($gate4['lifecycle'] ?? null) ? $gate4['lifecycle'] : [];
+    $safeLifecycle = [
+        'status' => (string)($lifecycle['status'] ?? ($pilot['status'] ?? 'onboarding')),
+        'inside_effective_window' => !empty($lifecycle['inside_effective_window']),
+        'terminal' => !empty($lifecycle['terminal']),
+        'closeout_required' => !empty($lifecycle['closeout_required']),
+    ];
+
     $onboarding = is_array($gate4['onboarding'] ?? null) ? $gate4['onboarding'] : [];
     return [
         'phase' => (string)($gate4['phase'] ?? 'onboarding'),
@@ -245,10 +317,10 @@ function be_startpartner_gate4_portal_projection(array $candidate): array
             'total_count' => (int)($onboarding['total_count'] ?? 14),
         ],
         'content_links' => $contentLinks,
-        'limits' => $gate4['limits'] ?? [],
-        'lifecycle' => $gate4['lifecycle'] ?? [],
-        'measurement' => $gate4['measurement_runtime'] ?? ['status' => 'technical_not_ready'],
-        'distribution' => $gate4['distribution_runtime'] ?? ['status' => 'not_planned'],
+        'limits' => $safeLimits,
+        'lifecycle' => $safeLifecycle,
+        'measurement' => $safeMeasurement,
+        'distribution' => $safeDistribution,
         'next_review_at' => $gate4['next_review_at'] ?? null,
         'next_action' => be_startpartner_gate4_partner_next_action($candidate, $gate4),
     ];
