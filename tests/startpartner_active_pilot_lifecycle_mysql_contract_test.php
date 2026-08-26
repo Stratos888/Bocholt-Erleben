@@ -489,15 +489,15 @@ try {
     $assert(($usageState['gate4']['measurement_runtime']['status'] ?? '') === 'usage_observed', 'Positive completed bucket must classify as usage_observed.');
     $exec(
         "UPDATE startpartner_pilot_measurement_preflights SET reporting_target_id='wrong-target'
-         WHERE pilot_id=:pilot AND content_link_id=:content",
-        ['pilot'=>$fixture['pilot'],'content'=>$fixture['firstContent']]
+         WHERE pilot_id=:pilot AND status='ready'",
+        ['pilot'=>$fixture['pilot']]
     );
     $problemState = $detail($fixture);
     $assert(($problemState['gate4']['measurement_runtime']['status'] ?? '') === 'query_or_attribution_problem', 'Wrong attribution must classify as query_or_attribution_problem.');
     $exec(
         "UPDATE startpartner_pilot_measurement_preflights SET reporting_target_id=:target
-         WHERE pilot_id=:pilot AND content_link_id=:content",
-        ['target'=>$fixture['targetId'],'pilot'=>$fixture['pilot'],'content'=>$fixture['firstContent']]
+         WHERE pilot_id=:pilot AND status='ready'",
+        ['target'=>$fixture['targetId'],'pilot'=>$fixture['pilot']]
     );
 
     $write($fixture, 'be_startpartner_gate4_set_distribution_fulfillment', [
@@ -542,12 +542,7 @@ try {
     $transition($fixture, 'resume');
     $assert($detail($fixture)['gate4']['phase'] === 'active', 'Resume must restore active state inside effective lifetime.');
 
-    $spare = be_startpartner_gate4_create_portal_submission($pdo, $session, [
-        'content_type'=>'event','client_reference'=>'gate4-344-spare','title'=>'Spare draft',
-        'start_date'=>$today->modify('+50 days')->format('Y-m-d'),'location_name'=>'Bocholt',
-        'location_public_confirmed'=>true,
-    ]);
-    $spareId = (string)$spare['content_link']['id'];
+    $spareId = $event9Id;
     $transition($fixture, 'start_closeout');
     $closing = $detail($fixture);
     $assert($closing['gate4']['phase'] === 'closing', 'Closeout must enter closing.');
