@@ -201,8 +201,8 @@ try{
   await controlState(browser,'active',{width:1440,height:900},'gate4-desktop-active',['Pilotphase läuft','01.08.2026','01.02.2027','Nutzung vorhanden','Vereinbart, noch nicht fällig','Weiteren Partnerinhalt einreichen'],{visibleActionCount:0});
   await controlState(browser,'measurement_problem',{width:390,height:844},'gate4-mobile-measurement-problem',['Pilotphase läuft','Technische Zuordnung prüfen','Technische Erfolgsmessung prüfen'],{visibleAction:'gate4:measurement',visibleActionCount:1});
   await controlState(browser,'distribution_due',{width:390,height:844},'gate4-mobile-distribution-due',['Pilotphase läuft','Fällig','Reichweitenbeitrag klären'],{visibleAction:`gate4:distribution-fulfillment:${distributionId}`,visibleActionCount:1});
-  await controlState(browser,'active_draft',{width:390,height:844},'gate4-mobile-active-draft',['Pilotphase läuft','Nächsten Pilotinhalt redaktionell prüfen','Zur Prüfung eingereicht'],{visibleAction:`gate4:content-ready:${secondId}`,visibleActionCount:1});
-  await controlState(browser,'active_ready',{width:390,height:844},'gate4-mobile-active-ready',['Pilotphase läuft','Vorbereiteten Pilotinhalt freigeben','Redaktionell vorbereitet'],{visibleAction:`gate4:content-approve:${secondId}`,visibleActionCount:1});
+  await controlState(browser,'active_draft',{width:390,height:844},'gate4-mobile-active-draft',['Pilotphase läuft','Nächsten Pilotinhalt redaktionell prüfen'],{visibleAction:`gate4:content-ready:${secondId}`,visibleActionCount:1});
+  await controlState(browser,'active_ready',{width:390,height:844},'gate4-mobile-active-ready',['Pilotphase läuft','Vorbereiteten Pilotinhalt freigeben'],{visibleAction:`gate4:content-approve:${secondId}`,visibleActionCount:1});
   await controlState(browser,'paused',{width:390,height:844},'gate4-mobile-paused',['Pilot pausiert','Pilot fortsetzen'],{visibleAction:'gate4:lifecycle:resume',visibleActionCount:1});
   await controlState(browser,'closing',{width:390,height:844},'gate4-mobile-closing',['Pilotabschluss','Pilot geordnet abschließen'],{visibleAction:'gate4:lifecycle:end_without_conversion',visibleActionCount:1});
   await controlState(browser,'end_due',{width:390,height:844},'gate4-mobile-end-due',['Pilotphase läuft','26.08.2026','Pilotende jetzt entscheiden'],{visibleAction:'gate4:lifecycle:start_closeout',visibleActionCount:1});
@@ -222,7 +222,7 @@ try{
   await organizerPortal(browser,{width:390,height:844},'gate4-organizer-mobile');
   await organizerPortal(browser,{width:1440,height:900},'gate4-organizer-desktop');
   await organizerLifecycleState(browser,'active',['Pilotphase läuft','Weiteren Partnerinhalt einreichen'],1);
-  await organizerLifecycleState(browser,'event_limit_full',['Event-Limit erreicht','8 von 8'],0);
+  await organizerLifecycleState(browser,'event_limit_full',['Event-Limit erreicht'],0);
   await organizerLifecycleState(browser,'paused',['Pilot ist pausiert','keine neuen Pilotinhalte'],0);
   await organizerLifecycleState(browser,'closing',['Pilot wird abgeschlossen','Neue Pilotinhalte sind gesperrt'],0);
   await organizerLifecycleState(browser,'terminal',['Pilot abgeschlossen','keine weiteren Einreichungen'],0);
