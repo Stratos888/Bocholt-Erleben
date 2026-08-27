@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const read = path => fs.readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const html = read('fuer-veranstalter/dashboard/index.html');
+const fixture = read('tests/fixtures/organizer_gate4_portal.html');
 const js = read('js/organizer-pilot.js');
 const pilotApi = read('api/organizer-portal/pilot.php');
 const projection = read('api/startpartner/_gate4_projection.php');
@@ -12,6 +13,9 @@ const assert = (ok, message) => { if (!ok) failures.push(message); };
 
 assert(html.includes('organizer-dashboard-pilot-card'), 'Dashboard needs a dedicated pilot card inside the existing portal.');
 assert(html.includes('/js/organizer-pilot.js?v=2026-08-27-startpartner-premium-finish-v1'), 'Dashboard must load the premium pilot UI from the established asset owner.');
+assert(fixture.includes('<main class="page page--organizers" data-organizer-page="dashboard">'), 'Synthetic partner evidence must use the real organizer dashboard page shell.');
+assert(fixture.includes('class="content-card content-card--primary" id="organizer-dashboard-pilot-card"'), 'Synthetic partner evidence must use the real dashboard pilot-card primitives.');
+assert(!fixture.includes('class="content-shell"') && !fixture.includes('class="content-section"') && !fixture.includes('class="organizer-dashboard-card"'), 'Synthetic partner evidence must not reintroduce a parallel simplified dashboard layout.');
 assert(js.includes('/api/organizer-portal/pilot.php'), 'Portal must read the canonical pilot state.');
 assert(js.includes('/api/startpartner/content.php'), 'Portal must prepare content through the Gate-4 submission integration.');
 assert(js.includes('keine automatische kostenpflichtige Verlängerung'), 'Pilot UI must state the no-auto-renewal boundary in the canonical public wording.');
