@@ -66,21 +66,21 @@
       .map(row => {
         const label = row.scope_key === 'events' ? 'Veranstaltungen' : 'Aktivitäten';
         const amount = row.is_unlimited ? 'vereinbarter Rahmen' : row.limit_value || '–';
-        const period = row.period_unit === 'pilot_month' ? ' pro Pilotmonat'
+        const period = row.period_unit === 'pilot_month' ? ' pro Monat'
           : row.period_unit === 'concurrent' ? ' gleichzeitig' : '';
         return `${label}: ${amount}${period}`;
       })
       .join(' · ');
   }
 
-  function limitText(gate4) {
+  function usageText(gate4) {
     const parts = [];
     const event = gate4.limits?.event;
     const activity = gate4.limits?.activity;
     if (event?.available) {
       parts.push(event.is_unlimited
         ? 'Veranstaltungen: vereinbarter Rahmen'
-        : `Veranstaltungen: ${Number(event.used || 0)} von ${Number(event.limit || 0)} in diesem Pilotmonat`);
+        : `Veranstaltungen: ${Number(event.used || 0)} von ${Number(event.limit || 0)} in diesem Monat`);
     }
     if (activity?.available) {
       parts.push(`Aktivitäten: ${Number(activity.used || 0)} von ${Number(activity.limit || 0)} gleichzeitig belegt`);
@@ -88,64 +88,22 @@
     return parts.join(' · ');
   }
 
-  function contentList(rows = []) {
-    if (!rows.length) return '<p class="content-note">Noch kein Inhalt für den Pilot eingereicht.</p>';
-    return `<div class="content-links">${rows.slice().reverse().map(row => `
-      <div class="content-link"><span>
-        <strong>${escape(row.title || `${row.content_type === 'activity' ? 'Aktivität' : 'Veranstaltung'} ${row.submission_id || ''}`)}</strong>
-        <small>${escape(contentStatus(row.status))}${row.start_date ? ` · ${escape(formatDate(row.start_date))}` : ''}</small>
-      </span></div>
-    `).join('')}</div>`;
+  function contentRow(row) {
+    return `<div class="content-link"><span>
+      <strong>${escape(row.title || `${row.content_type === 'activity' ? 'Aktivität' : 'Veranstaltung'} ${row.submission_id || ''}`)}</strong>
+      <small>${escape(contentStatus(row.status))}${row.start_date ? ` · ${escape(formatDate(row.start_date))}` : ''}</small>
+    </span></div>`;
   }
 
-  function nextStep(gate4) {
-    const rows = gate4.content_links || [];
-    const first = rows[0] || null;
-    const projected = gate4.next_action || {};
-
-    if (gate4.phase === 'paused' || projected.code === 'paused') {
-      return {title: 'Pilot ist pausiert', text: 'Aktuell können keine neuen Pilotinhalte eingereicht werden. Bocholt erleben klärt den nächsten Schritt.', action: 'wait'};
-    }
-    if (gate4.phase === 'closing' || projected.code === 'closeout') {
-      return {title: 'Pilot wird abgeschlossen', text: 'Neue Pilotinhalte sind gesperrt. Die bisherigen Inhalte und Nutzungsnachweise bleiben als Verlauf erhalten.', action: 'wait'};
-    }
-    if (['ended_without_conversion', 'terminated', 'converted'].includes(gate4.phase) || projected.code === 'none') {
-      return {title: 'Pilot abgeschlossen', text: 'Für diesen Pilot sind keine weiteren Einreichungen vorgesehen. Es entsteht keine automatische kostenpflichtige Verlängerung.', action: 'wait'};
-    }
-    if (projected.code === 'closeout_due') {
-      return {title: 'Pilotlaufzeit beendet', text: 'Die sechsmonatige Laufzeit ist beendet. Neue Pilotinhalte sind bis zur Abschlussentscheidung gesperrt.', action: 'wait'};
-    }
-    if (projected.code === 'event_limit_full') {
-      return {title: 'Event-Limit erreicht', text: projected.label || 'Für diesen Pilotmonat sind alle vereinbarten Event-Einheiten genutzt.', action: 'wait'};
-    }
-    if (projected.code === 'activity_limit_full') {
-      return {title: 'Aktivitätsplatz belegt', text: 'Die vereinbarte gleichzeitige Aktivitätspräsenz ist vollständig belegt. Nach einem belegten Rückzug kann wieder eine Aktivität freigegeben werden.', action: 'wait'};
-    }
-
-    if (gate4.active && projected.code === 'submit_content') {
-      return {
-        title: projected.label || 'Weiteren Inhalt einreichen',
-        text: 'Der Inhalt wird redaktionell geprüft. Erst eine spätere Freigabe zählt zum vereinbarten Pilotverbrauch.',
-        action: 'submit', preferredType: projected.content_type || '',
-      };
-    }
-    if (!first) {
-      return {
-        title: 'Als Nächstes: ersten Inhalt einreichen',
-        text: 'Reiche eine Veranstaltung oder Aktivität ein. Wir prüfen und bereiten sie redaktionell vor; dadurch startet der Pilot noch nicht.',
-        action: 'submit', preferredType: projected.content_type || '',
-      };
-    }
-    if (first.status === 'draft') {
-      return {title: 'Dein erster Inhalt wird geprüft', text: 'Die Einreichung ist angekommen. Du musst aktuell nichts weiter tun; wir bereiten den Inhalt redaktionell vor.', action: 'wait'};
-    }
-    if (first.status === 'editorial_ready' || gate4.activation_ready) {
-      return {title: 'Von dir ist aktuell nichts mehr nötig', text: 'Der erste Inhalt ist vorbereitet. Bocholt erleben prüft die letzten Voraussetzungen und startet den Pilot anschließend ausdrücklich.', action: 'wait'};
-    }
-    if (first.status === 'rejected' || first.status === 'withdrawn') {
-      return {title: 'Als Nächstes: neuen Inhalt einreichen', text: 'Für den Pilot wird ein geeigneter erster Inhalt benötigt. Reiche bitte eine neue Veranstaltung oder Aktivität ein.', action: 'submit', preferredType: projected.content_type || ''};
-    }
-    return {title: 'Aktueller Pilotstand', text: projected.label || 'Sobald etwas von dir benötigt wird, erscheint es hier als nächster Schritt.', action: 'wait'};
+  function contentList(rows = []) {
+    if (!rows.length) return '<p class="content-note">Noch keine Inhalte eingereicht.</p>';
+    const newest = rows.slice().reverse();
+    const visible = newest.slice(0, 3);
+    const older = newest.slice(3);
+    return `<div class="content-links">${visible.map(contentRow).join('')}</div>${older.length ? `
+      <details class="content-disclosure"><summary>Weitere Inhalte anzeigen (${older.length})</summary>
+        <div class="content-links">${older.map(contentRow).join('')}</div>
+      </details>` : ''}`;
   }
 
   function allowedTypes(gate4) {
@@ -159,31 +117,109 @@
     };
   }
 
+  function submitCopy(gate4, preferredType = '') {
+    const allowed = allowedTypes(gate4);
+    if (preferredType === 'event' && allowed.event) {
+      return {title: 'Nächste Veranstaltung einreichen', cta: 'Veranstaltung einreichen', preferredType: 'event'};
+    }
+    if (preferredType === 'activity' && allowed.activity) {
+      return {title: 'Nächste Aktivität einreichen', cta: 'Aktivität einreichen', preferredType: 'activity'};
+    }
+    if (allowed.event && !allowed.activity) {
+      return {title: 'Nächste Veranstaltung einreichen', cta: 'Veranstaltung einreichen', preferredType: 'event'};
+    }
+    if (allowed.activity && !allowed.event) {
+      return {title: 'Nächste Aktivität einreichen', cta: 'Aktivität einreichen', preferredType: 'activity'};
+    }
+    return {title: 'Weiteren Inhalt einreichen', cta: 'Inhalt einreichen', preferredType: preferredType || 'event'};
+  }
+
+  function nextStep(gate4) {
+    const rows = gate4.content_links || [];
+    const first = rows[0] || null;
+    const projected = gate4.next_action || {};
+
+    if (gate4.phase === 'paused' || projected.code === 'paused') {
+      return {title: 'Aktuell nichts zu tun', text: 'Während der Pause sind keine neuen Einreichungen möglich. Bocholt erleben klärt mit dir das weitere Vorgehen.', action: 'wait'};
+    }
+    if (gate4.phase === 'closing' || projected.code === 'closeout') {
+      return {title: 'Aktuell nichts zu tun', text: 'Der Pilot wird abgeschlossen. Neue Einreichungen sind nicht mehr vorgesehen.', action: 'wait'};
+    }
+    if (['ended_without_conversion', 'terminated', 'converted'].includes(gate4.phase) || projected.code === 'none') {
+      return {title: 'Keine weitere Aktion erforderlich', text: 'Der Pilot ist abgeschlossen. Es entsteht keine automatische kostenpflichtige Verlängerung.', action: 'wait'};
+    }
+    if (projected.code === 'closeout_due') {
+      return {title: 'Aktuell nichts zu tun', text: 'Die sechsmonatige Laufzeit ist beendet. Bocholt erleben klärt mit dir den Abschluss.', action: 'wait'};
+    }
+    if (projected.code === 'event_limit_full') {
+      return {title: 'Aktuell keine weitere Veranstaltung möglich', text: 'Die vereinbarten Veranstaltungen für diesen Monat sind bereits ausgeschöpft.', action: 'wait'};
+    }
+    if (projected.code === 'activity_limit_full') {
+      return {title: 'Aktuell keine weitere Aktivität möglich', text: 'Der vereinbarte Aktivitätsplatz ist belegt. Sobald er wieder frei ist, kannst du eine weitere Aktivität einreichen.', action: 'wait'};
+    }
+
+    if (gate4.active && projected.code === 'submit_content') {
+      const copy = submitCopy(gate4, projected.content_type || '');
+      return {
+        ...copy,
+        text: 'Wir prüfen deine Angaben redaktionell vor jeder Veröffentlichung.',
+        action: 'submit',
+      };
+    }
+    if (!first) {
+      const copy = submitCopy(gate4, projected.content_type || '');
+      return {
+        ...copy,
+        title: copy.title.replace('Nächste', 'Erste').replace('Weiteren', 'Ersten'),
+        text: 'Reiche den ersten Inhalt ein. Wir prüfen und bereiten ihn redaktionell vor; dadurch startet der Pilot noch nicht.',
+        action: 'submit',
+      };
+    }
+    if (first.status === 'draft') {
+      return {title: 'Aktuell nichts zu tun', text: 'Deine Einreichung ist angekommen und wird redaktionell geprüft.', action: 'wait'};
+    }
+    if (first.status === 'editorial_ready' || gate4.activation_ready) {
+      return {title: 'Aktuell nichts zu tun', text: 'Dein erster Inhalt ist vorbereitet. Bocholt erleben prüft die letzten Voraussetzungen und startet den Pilot anschließend ausdrücklich.', action: 'wait'};
+    }
+    if (first.status === 'rejected' || first.status === 'withdrawn') {
+      const copy = submitCopy(gate4, projected.content_type || '');
+      return {
+        ...copy,
+        title: copy.title.replace('Nächste', 'Neue').replace('Weiteren', 'Neuen'),
+        text: 'Für den Pilot wird ein geeigneter Inhalt benötigt. Reiche bitte einen neuen Inhalt ein.',
+        action: 'submit',
+      };
+    }
+    return {title: 'Aktuell nichts zu tun', text: 'Sobald etwas von dir benötigt wird, erscheint es hier als nächster Schritt.', action: 'wait'};
+  }
+
   function contentForm(gate4, preferredType = '') {
     const allowed = allowedTypes(gate4);
     if (!allowed.event && !allowed.activity) return '<p class="content-note">Für den aktuellen Pilotstand ist keine weitere Einreichung verfügbar.</p>';
     const preferred = preferredType === 'activity' && allowed.activity ? 'activity' : allowed.event ? 'event' : 'activity';
+    const typeField = allowed.event && allowed.activity ? `
+          <label class="content-field"><span class="content-field__label">Was möchtest du einreichen?</span>
+            <select class="content-field__control" name="content_type">
+              <option value="event"${preferred === 'event' ? ' selected' : ''}>Veranstaltung</option>
+              <option value="activity"${preferred === 'activity' ? ' selected' : ''}>Aktivität</option>
+            </select>
+          </label>` : `<input name="content_type" type="hidden" value="${allowed.event ? 'event' : 'activity'}">`;
     return `
       <form class="content-form organizer-pilot-content-form" id="organizer-pilot-content-form" data-preferred-type="${escape(preferred)}">
         <div class="content-form-grid">
-          <label class="content-field"><span class="content-field__label">Inhaltstyp</span>
-            <select class="content-field__control" name="content_type">
-              ${allowed.event ? `<option value="event"${preferred === 'event' ? ' selected' : ''}>Veranstaltung</option>` : ''}
-              ${allowed.activity ? `<option value="activity"${preferred === 'activity' ? ' selected' : ''}>Aktivität</option>` : ''}
-            </select>
-          </label>
-          <label class="content-field"><span class="content-field__label">Titel *</span><input class="content-field__control" name="title" required maxlength="255"></label>
-          <label class="content-field"><span class="content-field__label">Ort oder Anbieter *</span><input class="content-field__control" name="location_name" required maxlength="255"></label>
+          ${typeField}
+          <label class="content-field"><span class="content-field__label" data-pilot-title-label>Titel der Veranstaltung *</span><input class="content-field__control" name="title" required maxlength="255"></label>
+          <label class="content-field"><span class="content-field__label" data-pilot-location-label>Veranstaltungsort / Location *</span><input class="content-field__control" name="location_name" required maxlength="255"></label>
           <label class="content-field" data-pilot-event-date><span class="content-field__label">Datum *</span><input class="content-field__control" name="start_date" type="date"></label>
-          <label class="content-field" data-pilot-event-time><span class="content-field__label">Uhrzeit oder Zeitraum</span><input class="content-field__control" name="time_text" maxlength="64"></label>
-          <label class="content-field content-field--full"><span class="content-field__label">Öffentliche Adresse oder Treffpunkt</span><input class="content-field__control" name="location_address" maxlength="500"></label>
-          <label class="content-field content-field--full"><span class="content-field__label">Informationsseite</span><input class="content-field__control" name="event_url" type="url" inputmode="url"></label>
+          <label class="content-field" data-pilot-event-time><span class="content-field__label">Uhrzeit</span><input class="content-field__control" name="time_text" maxlength="64"></label>
+          <label class="content-field content-field--full"><span class="content-field__label" data-pilot-address-label>Straße, Hausnummer / offizieller Treffpunkt</span><input class="content-field__control" name="location_address" maxlength="500"></label>
+          <label class="content-field content-field--full"><span class="content-field__label" data-pilot-url-label>Link zur Veranstaltungsseite</span><input class="content-field__control" name="event_url" type="url" inputmode="url"></label>
           <label class="content-field content-field--full" data-pilot-ticket-url><span class="content-field__label">Ticket- oder Anmeldelink</span><input class="content-field__control" name="ticket_url" type="url" inputmode="url"></label>
-          <label class="content-field content-field--full"><span class="content-field__label">Beschreibung und Hinweise</span><textarea class="content-field__control" name="description_text" rows="4" maxlength="20000"></textarea></label>
-          <label class="content-field content-field--full content-field--checkbox"><span class="content-field__hint"><input name="location_public_confirmed" type="checkbox" required> Ich darf die angegebenen Ortsdaten öffentlich nennen und diesen Inhalt einreichen.</span></label>
+          <label class="content-field content-field--full"><span class="content-field__label" data-pilot-description-label>Kurze Beschreibung / Hinweise</span><textarea class="content-field__control" name="description_text" rows="4" maxlength="20000"></textarea></label>
+          <label class="content-field content-field--full content-field--checkbox"><span class="content-field__hint"><input name="location_public_confirmed" type="checkbox" required> Ich bestätige, dass ich berechtigt bin, diesen Inhalt einzureichen, und dass der Ort öffentlich genannt werden darf.</span></label>
         </div>
-        <div class="content-actions content-actions--inline"><button class="content-cta content-cta--primary" type="submit">Kostenlos zur Prüfung einreichen</button></div>
-        <p class="content-note" data-pilot-submit-status aria-live="polite">Die Einreichung ist kostenlos und löst keine Zahlung aus. Eine redaktionelle Freigabe ist weiterhin erforderlich.</p>
+        <div class="content-actions content-actions--inline"><button class="content-cta content-cta--primary" type="submit">Zur Prüfung einreichen</button></div>
+        <p class="content-note" data-pilot-submit-status aria-live="polite">Im Startpartner-Pilot ist die Einreichung kostenlos. Veröffentlichung erst nach redaktioneller Freigabe.</p>
       </form>`;
   }
 
@@ -202,24 +238,29 @@
     const gate4 = data.gate4 || {};
     const pilot = gate4.pilot || {};
     const step = nextStep(gate4);
+    const submitBlock = step.action === 'submit' ? `
+      <div class="content-actions content-actions--inline">
+        <button class="content-cta content-cta--primary" id="organizer-pilot-open-form" type="button">${escape(step.cta)}</button>
+      </div>
+      <div id="organizer-pilot-form-shell" hidden>${contentForm(gate4, step.preferredType)}</div>` : '';
     card.hidden = false;
     card.innerHTML = `
-      <div class="content-form-section-head"><div><span class="content-kicker">Kostenloser Startpartner-Pilot</span><h2>${escape(phaseLabel(gate4.phase))}</h2></div></div>
-      <p>${escape(gate4.active ? 'Die sechsmonatige Pilotphase läuft. Es gibt keine automatische kostenpflichtige Verlängerung.' : 'Die Pilotlaufzeit beginnt nur durch den ausdrücklichen Start und wird nicht automatisch kostenpflichtig verlängert.')}</p>
+      <div class="content-form-section-head"><div><span class="content-kicker">Startpartner · 6 Monate kostenlos</span><h2>${escape(phaseLabel(gate4.phase))}</h2></div></div>
       ${successMessage ? `<div class="content-note" role="status">${escape(successMessage)}</div>` : ''}
-      <section class="content-card content-card--primary organizer-pilot-next-step" aria-label="Nächster Schritt"><span class="content-kicker">Nächster Schritt</span><h3>${escape(step.title)}</h3><p>${escape(step.text)}</p></section>
-      ${step.action === 'submit' ? contentForm(gate4, step.preferredType) : ''}
+      <section class="organizer-pilot-next-step" aria-label="Nächster Schritt">
+        <span class="content-kicker">Nächster Schritt</span><h3>${escape(step.title)}</h3><p class="content-note">${escape(step.text)}</p>${submitBlock}
+      </section>
       <section class="organizer-pilot-content-area" aria-label="Inhalte im Pilot"><h3>Deine Inhalte</h3>${contentList(gate4.content_links)}</section>
       ${operationalNote(gate4)}
-      <details class="content-disclosure"><summary>Pilotumfang und Laufzeit</summary>
+      <details class="content-disclosure"><summary>Pilotdetails</summary>
         <dl class="organizer-tariff-table">
-          <div><dt>Vereinbarter Umfang</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
-          ${limitText(gate4) ? `<div><dt>Aktueller Limitstand</dt><dd>${escape(limitText(gate4))}</dd></div>` : ''}
+          <div><dt>Vereinbarter Rahmen</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
+          ${usageText(gate4) ? `<div><dt>Aktuelle Nutzung</dt><dd>${escape(usageText(gate4))}</dd></div>` : ''}
           <div><dt>Pilotstart</dt><dd>${escape(formatDate(pilot.activation_date_local))}</dd></div>
           <div><dt>Geplantes Ende</dt><dd>${escape(formatDate(pilot.planned_end_date))}</dd></div>
-          <div><dt>Freigegebene Pilotinhalte</dt><dd>${escape(String((gate4.content_links || []).filter(row => row.status === 'approved').length))}</dd></div>
+          <div><dt>Freigegebene Inhalte</dt><dd>${escape(String((gate4.content_links || []).filter(row => row.status === 'approved').length))}</dd></div>
         </dl>
-        <p class="content-note">Der Pilot ist kostenlos und wird nicht automatisch kostenpflichtig verlängert. Veröffentlichungen bleiben redaktionell geprüft.</p>
+        <p class="content-note">Keine Zahlungsart erforderlich und keine automatische kostenpflichtige Verlängerung. Veröffentlichungen bleiben redaktionell geprüft.</p>
       </details>`;
     bindForm();
   }
@@ -241,16 +282,35 @@
   }
 
   function bindForm() {
+    const openButton = document.getElementById('organizer-pilot-open-form');
+    const formShell = document.getElementById('organizer-pilot-form-shell');
     const form = document.getElementById('organizer-pilot-content-form');
+    if (openButton && formShell && form) {
+      openButton.addEventListener('click', () => {
+        openButton.hidden = true;
+        formShell.hidden = false;
+        form.querySelector('select:not([hidden]), input:not([type="hidden"])')?.focus();
+      });
+    }
     if (!form) return;
     const type = form.elements.content_type;
     const dateRow = form.querySelector('[data-pilot-event-date]');
     const timeRow = form.querySelector('[data-pilot-event-time]');
     const ticketRow = form.querySelector('[data-pilot-ticket-url]');
+    const titleLabel = form.querySelector('[data-pilot-title-label]');
+    const locationLabel = form.querySelector('[data-pilot-location-label]');
+    const addressLabel = form.querySelector('[data-pilot-address-label]');
+    const urlLabel = form.querySelector('[data-pilot-url-label]');
+    const descriptionLabel = form.querySelector('[data-pilot-description-label]');
     const sync = () => {
       const isEvent = type.value === 'event';
       dateRow.hidden = !isEvent; timeRow.hidden = !isEvent; ticketRow.hidden = !isEvent;
       form.elements.start_date.required = isEvent;
+      titleLabel.textContent = isEvent ? 'Titel der Veranstaltung *' : 'Name der Aktivität *';
+      locationLabel.textContent = isEvent ? 'Veranstaltungsort / Location *' : 'Name des Standorts *';
+      addressLabel.textContent = isEvent ? 'Straße, Hausnummer / offizieller Treffpunkt' : 'Adresse / offizieller Treffpunkt';
+      urlLabel.textContent = isEvent ? 'Link zur Veranstaltungsseite' : 'Website / Buchungslink';
+      descriptionLabel.textContent = isEvent ? 'Kurze Beschreibung / Hinweise' : 'Kurzbeschreibung der Aktivität';
       if (!isEvent) {
         form.elements.start_date.value = ''; form.elements.time_text.value = ''; form.elements.ticket_url.value = '';
       }
