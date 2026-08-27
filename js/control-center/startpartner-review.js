@@ -92,6 +92,9 @@ function decision(data){
   const current=data.decision;if(!current)return '';
   return `<section class="cc-startpartner-state-card"><span class="cc-kicker">Aktuelle Entscheidung</span><strong>${escapeHtml(statusLabels[current.result]||current.result)}</strong><p>${escapeHtml(current.reason||'')}</p>${current.regular_alternative?`<small>Alternative: ${escapeHtml(current.regular_alternative)}</small>`:''}</section>`;
 }
+function scopeSummary(gate3){
+  return asArray(gate3.scopes).filter(scope=>['events','activities'].includes(scope.scope_key)).map(scope=>`${scope.scope_key==='events'?'Veranstaltungen':'Aktivitäten'}: ${scope.is_unlimited?'unbegrenzt':scope.limit_value||'–'}${scope.period_unit==='pilot_month'?' pro Monat':scope.period_unit==='concurrent'?' gleichzeitig':''}`).join(' · ');
+}
 function gate3Summary(data){
   if(data.status!=='accepted_pending_terms'&&!data?.gate3?.pilot)return '';
   const gate3=data.gate3||{};
@@ -101,8 +104,18 @@ function gate3Summary(data){
     return `<section class="cc-startpartner-panel"><header><div><span class="cc-kicker">Pilotbedingungen und Veranstalterzugang</span><h3>Vorbereitung noch offen</h3></div><span class="cc-pill">Bedingungen offen</span></header><p>${escapeHtml(blocker?.message||'Bestätigung, Veranstalterzugang und Pilotfreigabe fehlen.')}</p></section>`;
   }
   const terms=gate3.terms_acceptance||{},organizer=gate3.organizer||{},pilot=gate3.pilot||{},entitlement=gate3.entitlement||{};
-  const scopes=asArray(gate3.scopes).filter(scope=>['events','activities'].includes(scope.scope_key)).map(scope=>`${scope.scope_key==='events'?'Veranstaltungen':'Aktivitäten'}: ${scope.is_unlimited?'unbegrenzt':scope.limit_value||'–'}${scope.period_unit==='pilot_month'?' pro Monat':scope.period_unit==='concurrent'?' gleichzeitig':''}`).join(' · ');
+  const scopes=scopeSummary(gate3);
   return `<section class="cc-startpartner-panel"><header><div><span class="cc-kicker">Pilotbedingungen und Veranstalterzugang</span><h3>Piloteinrichtung vorbereitet</h3></div><span class="cc-pill">Pilotstart ausstehend</span></header><dl class="cc-startpartner-facts"><div><dt>Bedingungen</dt><dd>${escapeHtml(terms.terms_version||'–')} · ${escapeHtml(formatDateTime(terms.accepted_at)||'–')}</dd></div><div><dt>Veranstalterzugang</dt><dd>${escapeHtml(organizer.organization_name||'–')} · ${escapeHtml(organizer.email||'–')}</dd></div><div><dt>Pilot</dt><dd>${escapeHtml(pilotStatusLabels[pilot.status]||pilot.status||'Einrichtung läuft')}</dd></div><div><dt>Pilotfreigabe</dt><dd>${escapeHtml(entitlementStatusLabels[entitlement.status]||entitlement.status||'Noch nicht aktiv')} · Veröffentlichung noch nicht freigeschaltet</dd></div></dl>${scopes?`<p>${escapeHtml(scopes)}</p>`:''}</section>`;
+}
+function gate3HistorySummary(data){
+  const gate3=data.gate3||{};
+  if(!gate3.complete)return gate3Summary(data);
+  const terms=gate3.terms_acceptance||{},organizer=gate3.organizer||{};
+  const scopes=scopeSummary(gate3);
+  return `<section class="cc-startpartner-panel"><header><div><span class="cc-kicker">Aufnahme und Piloteinrichtung</span><h3>Vor Pilotstart abgeschlossen</h3></div><span class="cc-pill">Abgeschlossen</span></header><dl class="cc-startpartner-facts"><div><dt>Bedingungen</dt><dd>${escapeHtml(terms.terms_version||'–')} · ${escapeHtml(formatDateTime(terms.accepted_at)||'–')}</dd></div><div><dt>Veranstalterzugang</dt><dd>${escapeHtml(organizer.organization_name||'–')} · ${escapeHtml(organizer.email||'–')}</dd></div></dl>${scopes?`<p>${escapeHtml(scopes)}</p>`:''}</section>`;
+}
+function organizationPanel(data,item){
+  return `<section class="cc-startpartner-panel"><span class="cc-kicker">Organisation und Kontakt</span><h3>${escapeHtml(data.organization_name||item.title||'Startpartner')}</h3><dl class="cc-startpartner-facts"><div><dt>Herkunft</dt><dd>${escapeHtml(sourceLabels[data.source]||data.source||'–')}</dd></div><div><dt>Inhaltsumfang</dt><dd>${escapeHtml(scopeLabels[data.desired_content_scope]||data.desired_content_scope||'–')}</dd></div><div><dt>Website</dt><dd>${data.website_url?`<a href="${escapeHtml(data.website_url)}" target="_blank" rel="noopener">Website öffnen</a>`:'–'}</dd></div></dl>${contacts(data)}${data.description_text?`<p class="cc-startpartner-description">${escapeHtml(data.description_text)}</p>`:''}</section>`;
 }
 function audit(data){
   const events=[...asArray(data.events),...asArray(data?.gate3?.events)];if(!events.length)return '<p class="cc-muted">Noch kein Verlauf vorhanden.</p>';
@@ -110,8 +123,15 @@ function audit(data){
 }
 function actionLabel(action){return action?.label||'';}
 
-export function renderStartpartnerReview(item={}){
+export function renderStartpartnerReview(item={},options={}){
   const data=candidate(item);const capacity=data.capacity||{};const reviewing=startpartnerAiReviewStatuses.has(String(data.status||''));
+  if(options.history){
+    return `<section class="cc-startpartner-review cc-startpartner-review--history" data-startpartner-status="${escapeHtml(data.status||'')}">
+      ${gate3HistorySummary(data)}
+      ${organizationPanel(data,item)}
+      <details class="cc-disclosure cc-startpartner-evidence"><summary>Nachweise und Verlauf</summary><div>${audit(data)}</div></details>
+    </section>`;
+  }
   const primary=reviewing?null:item.primary_action;
   const displayStatus=data?.gate3?.complete
     ? 'Piloteinrichtung'
@@ -126,7 +146,7 @@ export function renderStartpartnerReview(item={}){
     </section>
     ${renderStartpartnerAiReview(data)}
     ${gate3Summary(data)}
-    <section class="cc-startpartner-grid"><section class="cc-startpartner-panel"><span class="cc-kicker">Organisation und Kontakt</span><h3>${escapeHtml(data.organization_name||item.title||'Startpartner')}</h3><dl class="cc-startpartner-facts"><div><dt>Herkunft</dt><dd>${escapeHtml(sourceLabels[data.source]||data.source||'–')}</dd></div><div><dt>Inhaltsumfang</dt><dd>${escapeHtml(scopeLabels[data.desired_content_scope]||data.desired_content_scope||'–')}</dd></div><div><dt>Website</dt><dd>${data.website_url?`<a href="${escapeHtml(data.website_url)}" target="_blank" rel="noopener">Website öffnen</a>`:'–'}</dd></div></dl>${contacts(data)}${data.description_text?`<p class="cc-startpartner-description">${escapeHtml(data.description_text)}</p>`:''}</section><section class="cc-startpartner-panel"><span class="cc-kicker">Platz und weiterer Weg</span><h3>${escapeHtml(capacityText(capacity))}</h3>${reservation(data)}${decision(data)}</section></section>
+    <section class="cc-startpartner-grid">${organizationPanel(data,item)}<section class="cc-startpartner-panel"><span class="cc-kicker">Platz und weiterer Weg</span><h3>${escapeHtml(capacityText(capacity))}</h3>${reservation(data)}${decision(data)}</section></section>
     <details class="cc-disclosure cc-startpartner-evidence"><summary>Nachweise und Verlauf</summary><div>${audit(data)}</div></details>
   </section>`;
 }
@@ -207,7 +227,7 @@ function actionPayload(action){
 async function workflowDialog(item,action,reload){
   setStatus('Aktueller Startpartner-Stand wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;const found=[item.primary_action,...asArray(item.secondary_actions)].find(entry=>entry?.key===action);const label=actionLabel(found)||'Aktion bestätigen';const destructive=['reject','withdraw','expire','release_reservation'].includes(action);openDialog(`<h2>${escapeHtml(label)}</h2><p>${escapeHtml(data?.gate3?.complete?'Piloteinrichtung':(statusLabels[data.status]||data.status))}</p><div id="cc-dialog-message"></div><div class="cc-stack">${actionDialogContent(action,data)}${confirmButton(label,destructive?'danger':'primary')}</div>`,'cc-dialog--wide');setStatus('');document.querySelector('#sp-confirm')?.addEventListener('click',async event=>{event.currentTarget.disabled=true;const prefix=action==='confirm_pilot_terms'?'gate3:231':'gate2:199';const result=await mutate('/api/startpartner/action.php',data,actionPayload(action),reload,action==='confirm_pilot_terms'?'Bedingungen, Veranstalterzugang und Pilot wurden gespeichert und vollständig neu geladen.':'Aktion gespeichert und aktueller Stand neu geladen.',prefix);if(!result)event.currentTarget.disabled=false;});}catch(error){setStatus(error.message,'attention');}
 }
-async function detailsDialog(item){setStatus('Verlauf wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;openDialog(`<h2>${escapeHtml(data.organization_name)}</h2>${renderStartpartnerReview({...item,startpartner_candidate:data,primary_action:null})}`,'cc-dialog--wide');setStatus('');}catch(error){setStatus(error.message,'attention');}}
+async function detailsDialog(item){setStatus('Verlauf wird geladen …');try{const detail=await latest(item);const data=detail.startpartner_candidate;const history=['active','paused','closing','ended_without_conversion','terminated','converted'].includes(String(data?.gate4?.phase||''));openDialog(`<h2>${escapeHtml(data.organization_name)}</h2>${renderStartpartnerReview({...item,startpartner_candidate:data,primary_action:null},{history})}`,'cc-dialog--wide');setStatus('');}catch(error){setStatus(error.message,'attention');}}
 export async function handleStartpartnerAction(item,action,reload){
   if(action==='edit_profile')return profileDialog(item,reload);
   if(await handleStartpartnerAiReviewAction(item,action,reload))return;
