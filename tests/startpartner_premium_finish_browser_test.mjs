@@ -55,14 +55,16 @@ async function operatorContract(browser,viewport,name){
     return Boolean(panel&&history&&(panel.compareDocumentPosition(history)&Node.DOCUMENT_POSITION_FOLLOWING));
   });
   assert(order,`${name}: aktueller Pilotbereich muss vor der Historie stehen`);
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth);
+  assert(!overflow,`${name}: horizontaler Überlauf`);
+  await page.screenshot({path:path.join(outDir,`${name}.png`),fullPage:true});
+
   await history.locator(':scope > summary').click();
   const historyText=await history.innerText();
   assert(includes(historyText,'Vor Pilotstart abgeschlossen'),`${name}: historische Einrichtung ist nicht als abgeschlossen bezeichnet`);
   assert(includes(historyText,'Abgeschlossen'),`${name}: Abschlussstatus der Historie fehlt`);
   for(const stale of ['Piloteinrichtung vorbereitet','Pilotstart ausstehend','Veröffentlichung noch nicht freigeschaltet','Platz reserviert · Bedingungen offen'])assert(!includes(historyText,stale),`${name}: historische Detailkopie bleibt zukunftsgerichtet: ${stale}`);
-  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth);
-  assert(!overflow,`${name}: horizontaler Überlauf`);
-  await page.screenshot({path:path.join(outDir,`${name}.png`),fullPage:true});
+  await page.screenshot({path:path.join(outDir,`${name}-history-open.png`),fullPage:true});
   await context.close();
 }
 
@@ -108,13 +110,67 @@ async function partnerContract(browser){
   await context.close();
 }
 
+async function visualSignature(page){
+  return page.evaluate(()=>{
+    const read=(selector,properties)=>{
+      const element=document.querySelector(selector);
+      if(!element)return null;
+      const styles=getComputedStyle(element);
+      return Object.fromEntries(properties.map(property=>[property,styles[property]]));
+    };
+    return {
+      hero:read('.content-hero--panel',['borderRadius','boxShadow','paddingTop','paddingLeft','backgroundColor']),
+      heading:read('.content-hero--panel h1',['fontFamily','fontWeight','lineHeight','letterSpacing']),
+      card:read('.content-card',['borderRadius','boxShadow']),
+      primary:read('.content-cta--primary',['borderRadius','minHeight','fontSize','fontWeight']),
+    };
+  });
+}
+
+function assertVisualMatch(actual,reference,label){
+  for(const group of Object.keys(reference)){
+    assert(actual[group]&&reference[group],`${label}: visuelle Gruppe fehlt: ${group}`);
+    for(const [property,value] of Object.entries(reference[group])){
+      assert(actual[group][property]===value,`${label}: ${group}.${property} weicht ab (${actual[group][property]} != ${value})`);
+    }
+  }
+}
+
+async function publicFunnelContract(browser){
+  const context=await browser.newContext({viewport:{width:390,height:844}});
+  const page=await context.newPage();
+  const routes=[
+    {name:'events-publish',path:'/events-veroeffentlichen/',markers:['Veranstaltung sichtbar machen','Wähle den passenden Veröffentlichungsweg']},
+    {name:'activity-presence',path:'/aktivitaeten/sichtbar-werden/',markers:['Als Aktivität bei Bocholt erleben sichtbar werden','Wähle den passenden Tarif']},
+    {name:'startpartner-public',path:'/startpartner/',markers:['Als Startpartner 6 Monate kostenlos testen','Veranstaltungen, Aktivitäten oder beides testen','ohne Zahlungsart','keine automatische kostenpflichtige Verlängerung','Wir prüfen, ob Startpartner zu deinem Angebot passt']},
+  ];
+  let reference=null;
+  for(const route of routes){
+    const response=await page.goto(`${baseUrl}${route.path}`,{waitUntil:'networkidle'});
+    assert(response?.status()===200,`${route.name}: HTTP 200 fehlt`);
+    const text=await page.locator('body').innerText();
+    for(const marker of route.markers)assert(includes(text,marker),`${route.name}: Marker fehlt: ${marker}`);
+    assert(await page.locator('main.page--publish').count()===1,`${route.name}: gemeinsame Publish-Familie fehlt`);
+    assert(await page.locator('.content-hero--panel').count()===1,`${route.name}: gemeinsamer Hero fehlt`);
+    assert(await page.locator('.content-card').count()>0,`${route.name}: gemeinsame Card-Primitives fehlen`);
+    assert(await page.locator('.content-cta--primary').count()>0,`${route.name}: gemeinsame Primäraktion fehlt`);
+    if(route.name==='startpartner-public')assert(await page.locator('.content-kicker').count()===0,'startpartner-public: unnötiger Kicker sichtbar');
+    const signature=await visualSignature(page);
+    if(!reference)reference=signature;else assertVisualMatch(signature,reference,`${route.name}: visuelle Funnel-Konsistenz`);
+    assert(!(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)),`${route.name}: horizontaler Überlauf`);
+    await page.screenshot({path:path.join(outDir,`${route.name}-mobile-fold.png`)});
+  }
+  await context.close();
+}
+
 const browser=await chromium.launch({headless:true});
 try{
   await operatorContract(browser,{width:390,height:844},'startpartner-premium-operator-mobile');
   await operatorContract(browser,{width:1440,height:900},'startpartner-premium-operator-desktop');
   await partnerContract(browser);
+  await publicFunnelContract(browser);
 }finally{
   await browser.close();
 }
-fs.writeFileSync(path.join(outDir,'startpartner-premium-summary.json'),JSON.stringify({status:'OK',checks:['operator-mobile','operator-desktop','partner-mobile-compact','partner-mobile-form-open']},null,2)+'\n');
+fs.writeFileSync(path.join(outDir,'startpartner-premium-summary.json'),JSON.stringify({status:'OK',checks:['operator-mobile-default','operator-desktop-default','operator-history-open','partner-mobile-compact','partner-mobile-form-open','public-funnel-mobile-visual-consistency']},null,2)+'\n');
 console.log('=== Startpartner Premium Finish Browser Contract: OK ===');
