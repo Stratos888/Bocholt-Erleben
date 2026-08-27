@@ -170,12 +170,18 @@ async function organizerPortal(browser,viewport,name){
   await page.waitForSelector('#organizer-dashboard-pilot-card:not([hidden])');
   const card=page.locator('#organizer-dashboard-pilot-card');
   const initial=await card.innerText();
-  for(const marker of ['Kostenloser Startpartner-Pilot','Pilot wird eingerichtet','Nächster Schritt','Als Nächstes: ersten Inhalt einreichen','Deine Inhalte','Pilotumfang und Laufzeit'])assert(containsVisibleText(initial,marker),`${name}: Portalmarker fehlt: ${marker}`);
+  for(const marker of ['Startpartner · 6 Monate kostenlos','Pilot wird eingerichtet','Nächster Schritt','Ersten Inhalt einreichen','Deine Inhalte','Pilotdetails'])assert(containsVisibleText(initial,marker),`${name}: Portalmarker fehlt: ${marker}`);
   assert(!containsVisibleText(initial,'9 von 14'),`${name}: interne Gate-Zählung ist im Partnerportal sichtbar`);
   assert(!/\b(onboarding|draft|pending_activation)\b/.test(initial),`${name}: technischer Rohstatus sichtbar`);
   assert(await card.locator('.content-cta--primary:visible').count()===1,`${name}: erster Partnerzustand hat nicht genau eine prominente Aktion`);
   const form=page.locator('#organizer-pilot-content-form');
-  assert(containsVisibleText(await form.innerText(),'Einreichung ist kostenlos'),`${name}: Kostenhinweis fehlt im sichtbaren Einreichungsformular`);
+  assert(await form.count()===1,`${name}: Einreichungsformular fehlt im DOM`);
+  assert(await form.isHidden(),`${name}: Einreichungsformular ist initial nicht eingeklappt`);
+  const openButton=card.locator('#organizer-pilot-open-form');
+  assert(await openButton.isVisible(),`${name}: kompakte Öffnen-Aktion fehlt`);
+  await openButton.click();
+  assert(await form.isVisible(),`${name}: Einreichungsformular öffnet nicht`);
+  assert(containsVisibleText(await form.innerText(),'Einreichung ist kostenlos'),`${name}: Kostenhinweis fehlt im Einreichungsformular`);
   await form.locator('[name="content_type"]').selectOption('activity');
   assert(!(await isRequired(form.locator('[name="start_date"]'))),`${name}: Aktivität verlangt ein Veranstaltungsdatum`);
   assert(await form.locator('[data-pilot-event-date]').isHidden(),`${name}: Datumsfeld für Aktivität sichtbar`);
@@ -186,7 +192,7 @@ async function organizerPortal(browser,viewport,name){
   await form.locator('button[type="submit"]').click();
   await page.waitForFunction(()=>document.querySelector('#organizer-dashboard-pilot-card')?.textContent.includes('Einreichung 909'));
   const refreshedText=await card.innerText();
-  for(const marker of ['Dein erster Inhalt wird geprüft','Du musst aktuell nichts weiter tun','Synthetische Familienaktivität','Zur Prüfung eingereicht'])assert(containsVisibleText(refreshedText,marker),`${name}: Status nach Einreichung fehlt: ${marker}`);
+  for(const marker of ['Aktuell nichts zu tun','Deine Einreichung ist angekommen','Synthetische Familienaktivität','Zur Prüfung eingereicht'])assert(containsVisibleText(refreshedText,marker),`${name}: Status nach Einreichung fehlt: ${marker}`);
   assert(await card.locator('.content-cta--primary:visible').count()===0,`${name}: Wartezustand zeigt eine falsche prominente Partneraktion`);
   assert(await card.locator('#organizer-pilot-content-form').count()===0,`${name}: Wartezustand bietet fälschlich eine weitere Einreichung an`);
   assert(!(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)),`${name}: horizontaler Überlauf`);
@@ -208,6 +214,9 @@ async function organizerLifecycleState(browser,scenario,markers,expectedPrimary,
   if(verifyFollowUpForm){
     const form=card.locator('#organizer-pilot-content-form');
     assert(await form.count()===1,`organizer-${scenario}: Formular für weiteren Inhalt fehlt`);
+    assert(await form.isHidden(),`organizer-${scenario}: Formular ist initial nicht eingeklappt`);
+    await card.locator('#organizer-pilot-open-form').click();
+    assert(await form.isVisible(),`organizer-${scenario}: Formular öffnet nicht`);
     const type=form.locator('[name="content_type"]');
     assert(await type.locator('option[value="event"]').count()===1,`organizer-${scenario}: Event ist im Both-Scope nicht verfügbar`);
     assert(await type.locator('option[value="activity"]').count()===1,`organizer-${scenario}: Aktivität ist im Both-Scope nicht verfügbar`);
@@ -252,11 +261,11 @@ try{
 
   await organizerPortal(browser,{width:390,height:844},'gate4-organizer-mobile');
   await organizerPortal(browser,{width:1440,height:900},'gate4-organizer-desktop');
-  await organizerLifecycleState(browser,'active',['Pilotphase läuft','Nächsten Termin einreichen'],1,{verifyFollowUpForm:true});
-  await organizerLifecycleState(browser,'event_limit_full',['Event-Limit erreicht'],0);
-  await organizerLifecycleState(browser,'paused',['Pilot ist pausiert','keine neuen Pilotinhalte'],0);
-  await organizerLifecycleState(browser,'closing',['Pilot wird abgeschlossen','Neue Pilotinhalte sind gesperrt'],0);
-  await organizerLifecycleState(browser,'terminal',['Pilot abgeschlossen','keine weiteren Einreichungen'],0);
+  await organizerLifecycleState(browser,'active',['Pilotphase läuft','Nächste Veranstaltung einreichen'],1,{verifyFollowUpForm:true});
+  await organizerLifecycleState(browser,'event_limit_full',['Aktuell keine weitere Veranstaltung möglich','vereinbarten Veranstaltungen für diesen Monat'],0);
+  await organizerLifecycleState(browser,'paused',['Pilot ist pausiert','Aktuell nichts zu tun'],0);
+  await organizerLifecycleState(browser,'closing',['Pilot wird abgeschlossen','Aktuell nichts zu tun'],0);
+  await organizerLifecycleState(browser,'terminal',['Pilot ist abgeschlossen','Keine weitere Aktion erforderlich'],0);
 }finally{
   await browser.close();
 }
