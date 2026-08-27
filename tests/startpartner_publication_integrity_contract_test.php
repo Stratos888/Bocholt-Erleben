@@ -40,11 +40,19 @@ $assert(str_contains($lifecycle, 'historical_usage_retained'), 'Withdrawal must 
 $assert(str_contains($lifecycle, "WHERE pilot_id = :pilot_id AND status IN ('draft','editorial_ready')"), 'Terminal transition must not rewrite historical approved content links merely to hide them publicly.');
 
 $assert(str_contains($state, '&& $today >= $plannedEndDate;'), 'Backend state must own closeout due semantics on the planned end date.');
+$assert(str_contains($state, 'array $measurementRuntime'), 'Backend next-action owner must receive the authoritative measurement runtime state.');
+$assert(str_contains($state, "['query_or_attribution_problem', 'technical_not_ready']"), 'Backend state must own technical measurement-problem priority.');
+$assert(str_contains($state, "'measurement_problem'"), 'Backend state must expose a canonical measurement-problem next-action code.');
 $assert(str_contains($state, "['due', 'blocked']"), 'Backend state must own due and blocked distribution priority.');
 $assert(str_contains($state, "'distribution_blocked'"), 'Backend state must expose a canonical blocked-distribution next-action code.');
+$measurementPos = strpos($state, "'measurement_problem'");
 $distributionPos = strpos($state, "'distribution_blocked'");
 $contentPos = strpos($state, "'content_review'");
-$assert($distributionPos !== false && $contentPos !== false && $distributionPos < $contentPos, 'Backend next-action priority must evaluate distribution before active content review.');
+$assert(
+    $measurementPos !== false && $distributionPos !== false && $contentPos !== false
+        && $measurementPos < $distributionPos && $distributionPos < $contentPos,
+    'Backend next-action priority must evaluate measurement, then distribution, then active content review.'
+);
 
 $assert(!str_contains($projection, '$today >= $plannedEnd'), 'Control-case projection must not re-derive planned-end next-action semantics.');
 $assert(str_contains($projection, "\$next = is_array(\$gate4['next_action'] ?? null)"), 'Control-case projection must consume the backend next action.');
