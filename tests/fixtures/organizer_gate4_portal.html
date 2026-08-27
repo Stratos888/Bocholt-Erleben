@@ -6,14 +6,26 @@
   <title>Gate-4-Veranstalterportal – synthetische Fixture</title>
   <link rel="stylesheet" href="../../css/style.css?v=2026-06-22-css-governance-v1">
 </head>
-<body class="organizer-dashboard-page">
-  <header class="app-header"><div class="header-left"><span class="app-title">Bocholt erleben</span></div></header>
-  <main class="content-shell">
-    <section class="content-section">
-      <div class="content-form-section-head"><div><span class="content-kicker">Veranstalterbereich</span><h1>Pilotübersicht</h1></div></div>
-      <article class="organizer-dashboard-card" id="organizer-dashboard-pilot-card" hidden></article>
+<body>
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img src="../../icons/app/icon-192.png" alt="Bocholt erleben Logo" class="app-logo">
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
+
+  <main class="page page--organizers" data-organizer-page="dashboard">
+    <header class="content-hero content-hero--panel">
+      <h1>Veranstalterbereich</h1>
+      <p class="content-lead">Dein Startpartner-Status, deine Inhalte und der nächste Schritt an einem Ort.</p>
+    </header>
+
+    <section class="content-card content-card--primary" id="organizer-dashboard-pilot-card" aria-live="polite" hidden>
+      <h2>Startpartner wird geladen.</h2>
+      <p>Dein Pilotstatus und der nächste Schritt werden geladen.</p>
     </section>
   </main>
+
   <script src="../../js/organizer-pilot.js?v=2026-08-27-startpartner-premium-finish-v1" defer></script>
 </body>
 </html>

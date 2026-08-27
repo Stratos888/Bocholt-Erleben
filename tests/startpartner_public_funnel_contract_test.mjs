@@ -101,9 +101,11 @@ assert(membership.includes('>Startpartner anfragen</a>'), 'Membership: Startpart
 // /startpartner/: kurzer First-Party-Funnel mit vollständigem Nutzenversprechen im Hero, ohne redundante Detailblöcke.
 assert(startpartner.includes('<main class="page page--publish page--startpartner">'), 'Startpartner: Publish-Funnel-Familie fehlt');
 assert(startpartner.includes('<h1>Als Startpartner 6 Monate kostenlos testen</h1>'), 'Startpartner: klares Startpartner-Versprechen in der H1 fehlt');
-assert(startpartner.includes('Veranstaltungen, Aktivitäten oder beides – sechs Monate kostenlos testen.'), 'Startpartner: Umfang fehlt im Hero');
-assert(startpartner.includes('Keine Zahlungsart nötig'), 'Startpartner: Ausschluss einer Zahlungsart fehlt im Hero');
+assert(startpartner.includes('Veranstaltungen, Aktivitäten oder beides testen'), 'Startpartner: Umfang fehlt im Hero');
+assert(startpartner.includes('keine Zahlungsart erforderlich'), 'Startpartner: Ausschluss einer Zahlungsart fehlt im Hero');
 assert(startpartner.includes('keine automatische kostenpflichtige Verlängerung'), 'Startpartner: Ausschluss automatischer Kosten fehlt im Hero');
+assert(!startpartner.includes('ohne Zahlungsart'), 'Startpartner: alte Zahlungsart-Variante darf nicht zurückkehren');
+assert(startpartner.includes('Wir prüfen, ob Startpartner zu deinem Angebot passt'), 'Startpartner: klare Prüfkommunikation fehlt');
 assert(!startpartner.includes('class="content-kicker"'), 'Startpartner: Kicker darf nicht zurückkehren');
 assert(!startpartner.includes('Was kann der Pilot umfassen?'), 'Startpartner: redundanter Scope-Erklärblock darf nicht zurückkehren');
 assert(!startpartner.includes('So läuft der Start ab'), 'Startpartner: redundanter Ablaufblock darf nicht zurückkehren');
@@ -146,8 +148,10 @@ assert(explainer.includes('Sonderweg: Startpartner'), 'Erklärseite: kanonische 
 assert(explainer.includes('id="startpartner"'), 'Erklärseite: Startpartner-FAQ-Anker fehlt');
 assert(explainer.includes('Wie funktioniert Startpartner?'), 'Erklärseite: Startpartner-FAQ fehlt');
 assert(explainer.includes('sechs Monate kostenlos'), 'Erklärseite: Sechs-Monats-Modell fehlt');
-assert(explainer.includes('keine Zahlungsart'), 'Erklärseite: Zahlungsart-Ausschluss fehlt');
-assert(explainer.includes('keine automatische kostenpflichtige Umwandlung'), 'Erklärseite: automatische Bezahlumwandlung muss ausgeschlossen bleiben');
+assert(explainer.includes('Keine Zahlungsart erforderlich'), 'Erklärseite: Zahlungsart-Ausschluss fehlt');
+assert(explainer.includes('keine automatische kostenpflichtige Verlängerung'), 'Erklärseite: automatische kostenpflichtige Verlängerung muss ausgeschlossen bleiben');
+assert(!explainer.includes('kostenpflichtige Umwandlung'), 'Erklärseite: alte Umwandlungs-Sprache darf nicht zurückkehren');
+assert(!explainer.includes('kostenpflichtigen Tarif umgewandelt'), 'Erklärseite: alte Umwandlungs-Sprache darf nicht zurückkehren');
 assert(explainer.includes('Nach sechs Monaten werten wir die Wirkung gemeinsam aus'), 'Erklärseite: gemeinsame Auswertung fehlt');
 
 // Runtime: First-Party-Submit, Idempotenz, Fehlererhalt und Redirect in Erfolgszustand.
