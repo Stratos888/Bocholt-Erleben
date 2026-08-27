@@ -239,8 +239,8 @@ try{
   await controlState(browser,'end_due',{width:390,height:844},'gate4-mobile-end-due',['Pilotphase läuft','26.08.2026','Pilotende jetzt entscheiden'],{visibleAction:'gate4:lifecycle:start_closeout',visibleActionCount:1});
   await controlState(browser,'checkpoint_due',{width:390,height:844},'gate4-mobile-checkpoint-due',['Pilotphase läuft','Fälligen Pilot-Checkpoint abschließen'],{visibleAction:'gate4:checkpoint:day_30',visibleActionCount:1});
   await controlState(browser,'terminal',{width:390,height:844},'gate4-mobile-terminal',['Pilot beendet','Pilot abgeschlossen'],{visibleActionCount:0});
-  await controlState(browser,'event_limit_full',{width:390,height:844},'gate4-mobile-event-limit',['Pilotphase läuft','8 / 8','Event-Limit erreicht'],{visibleActionCount:0});
-  await controlState(browser,'activity_limit_full',{width:390,height:844},'gate4-mobile-activity-limit',['Pilotphase läuft','1 / 1','Aktivitätsplatz belegt'],{visibleActionCount:0});
+  await controlState(browser,'event_limit_full',{width:390,height:844},'gate4-mobile-event-limit',['Pilotphase läuft','8 / 8','Aktiven Pilot beobachten'],{visibleActionCount:0});
+  await controlState(browser,'activity_limit_full',{width:390,height:844},'gate4-mobile-activity-limit',['Pilotphase läuft','1 / 1','Aktiven Pilot beobachten'],{visibleActionCount:0});
 
   await dialogContract(browser,'content',`gate4:content-ready:${firstId}`,['Inhalt für den Pilotstart vorbereiten','Noch nicht freigegeben','Pilot startet dadurch noch nicht','Redaktionell vorbereiten'],'gate4-content-ready-dialog');
   await dialogContract(browser,'measurement','gate4:measurement',['Technische Erfolgsmessung erneut prüfen','keine Testwerte erzeugt','Technische Prüfung erneut ausführen'],'gate4-measurement-dialog');
