@@ -153,10 +153,19 @@ async function visualSignature(page){
     return {
       hero:read('.content-hero--panel',['borderRadius','boxShadow','paddingTop','paddingLeft','backgroundColor']),
       heading:read('.content-hero--panel h1',['fontFamily','fontWeight','lineHeight','letterSpacing']),
-      card:read('.content-card',['borderRadius','boxShadow']),
+      card:read('.content-card',['borderRadius']),
       primary:read('.content-cta--primary',['borderRadius','minHeight','fontSize','fontWeight']),
     };
   });
+}
+
+async function componentSignature(page,selector,properties,label){
+  const locator=page.locator(selector).first();
+  assert(await locator.count()===1,`${label}: Referenzkomponente fehlt: ${selector}`);
+  return locator.evaluate((element,props)=>{
+    const styles=getComputedStyle(element);
+    return Object.fromEntries(props.map(property=>[property,styles[property]]));
+  },properties);
 }
 
 function assertVisualMatch(actual,reference,label){
@@ -172,6 +181,12 @@ async function publicFunnelContract(browser,profile){
   const {viewport,name}=profile;
   const context=await browser.newContext({viewport});
   const page=await context.newPage();
+
+  const formReferenceResponse=await page.goto(`${baseUrl}/events-veroeffentlichen/anbindung/`,{waitUntil:'networkidle'});
+  assert(formReferenceResponse?.status()===200,`publish-form-reference-${name}: HTTP 200 fehlt`);
+  const publishStartCardReference=await componentSignature(page,'.publish-start-card',['borderRadius','boxShadow'],`publish-form-reference-${name}`);
+  assert(!(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)),`publish-form-reference-${name}: horizontaler Überlauf`);
+
   const routes=[
     {name:'events-publish',path:'/events-veroeffentlichen/',markers:['Veranstaltung sichtbar machen','Wähle den passenden Veröffentlichungsweg']},
     {name:'activity-presence',path:'/aktivitaeten/sichtbar-werden/',markers:['Als Aktivität bei Bocholt erleben sichtbar werden','Wähle den passenden Tarif']},
@@ -188,7 +203,11 @@ async function publicFunnelContract(browser,profile){
     assert(await page.locator('.content-hero--panel').count()===1,`${route.name}-${name}: gemeinsamer Hero fehlt`);
     assert(await page.locator('.content-card').count()>0,`${route.name}-${name}: gemeinsame Card-Primitives fehlen`);
     assert(await page.locator('.content-cta--primary').count()>0,`${route.name}-${name}: gemeinsame Primäraktion fehlt`);
-    if(route.name==='startpartner-public')assert(await page.locator('.content-kicker').count()===0,`${name}: Startpartner darf keinen unnötigen Kicker haben`);
+    if(route.name==='startpartner-public'){
+      assert(await page.locator('.content-kicker').count()===0,`${name}: Startpartner darf keinen unnötigen Kicker haben`);
+      const startpartnerFormCard=await componentSignature(page,'.publish-start-card',['borderRadius','boxShadow'],`startpartner-public-${name}`);
+      assertVisualMatch({publishStartCard:startpartnerFormCard},{publishStartCard:publishStartCardReference},`startpartner-public-${name}: etablierte Publish-Form-Card-DNA`);
+    }
     const signature=await visualSignature(page);
     if(!reference)reference=signature;else assertVisualMatch(signature,reference,`${route.name}-${name}: visuelle Funnel-Konsistenz`);
     assert(!(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)),`${route.name}-${name}: horizontaler Überlauf`);
@@ -218,6 +237,7 @@ fs.writeFileSync(path.join(outDir,'startpartner-premium-summary.json'),JSON.stri
     'partner-form-one-column-below-900-and-two-columns-from-900',
     'partner-no-payment-boundary',
     'public-funnel-responsive-visual-consistency',
+    'publish-start-card-shadow-matches-established-form-owner',
     'no-horizontal-overflow-across-established-widths',
   ],
 },null,2)+'\n');
