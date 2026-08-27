@@ -31,6 +31,7 @@ done
 rm -rf "$SMOKE_OUT_DIR"; mkdir -p "$SMOKE_OUT_DIR"
 node "$ROOT/tests/control_center_mobile_exception_review_browser_test.mjs" --base-url "http://127.0.0.1:$port" --out-dir "$SMOKE_OUT_DIR" 2>&1 | tee "$SMOKE_OUT_DIR/browser-test.log"
 node "$ROOT/tests/startpartner_gate4_browser_test.mjs" --base-url "http://127.0.0.1:$port" --out-dir "$SMOKE_OUT_DIR" 2>&1 | tee "$SMOKE_OUT_DIR/gate4-browser-test.log"
+node "$ROOT/tests/startpartner_premium_finish_browser_test.mjs" --base-url "http://127.0.0.1:$port" --out-dir "$SMOKE_OUT_DIR" 2>&1 | tee "$SMOKE_OUT_DIR/startpartner-premium-browser-test.log"
 cleanup; trap - EXIT
 after_snapshot="$(snapshot_checkout)"
 if [ "$before_snapshot" != "$after_snapshot" ]; then echo "CONTROL_CENTER_MOBILE_EXCEPTION_REVIEW: checkout changed during smoke" >&2; exit 1; fi

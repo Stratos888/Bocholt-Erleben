@@ -14,7 +14,7 @@ const directInboxWriteback=read('api/control-center/_inbox_decision_writeback.ph
 const sheetInboxSource=read('api/control-center/_sheet_inbox_source.php'),submissionSource=read('api/control-center/_submission_source.php'),sources=read('api/control-center/_sources.php');
 const backlogApi=read('api/growth-backlog/list.php'),backlogLib=read('api/growth-backlog-lib.php'),backlogCreate=read('api/growth-backlog/create.php'),backlogUpdate=read('api/growth-backlog/update.php');
 const errors=[];
-const buildKey='2026-08-21-startpartner-ai-review-v1';
+const buildKey='2026-08-27-startpartner-premium-finish-v1';
 const aiReviewKey='2026-08-21-ai-assisted-review-v1';
 const cssGovernanceKey='2026-06-22-css-governance-v1';
 for(const asset of ['control-center-environment.js','control-center.js','control-center-seo-embed.js'])if(!html.includes(asset))errors.push(`required script missing: ${asset}`);
@@ -22,12 +22,12 @@ for(const asset of ['control-center-source-editors.js','control-center-final-bri
 for(const marker of ['control-center/app.js','import(path)','2026-07-16-exception-review-v1',buildKey])if(!loader.includes(marker))errors.push(`module loader missing: ${marker}`);
 if(loader.includes('startGate4ReviewEnhancement')||loader.includes("import(resolve('/js/control-center/startpartner-gate4.js"))errors.push('Gate-4 must not start as a second DOM-patching controller.');
 if(!html.includes(`control-center.js?v=${buildKey}`))errors.push('top-level control-center script cache key is stale');
-if(!html.includes('data-control-center-build="startpartner-ai-review-v1"'))errors.push('control-center build marker is stale');
+if(!html.includes('data-control-center-build="startpartner-premium-finish-v1"'))errors.push('control-center build marker is stale');
 if(!html.includes(`style.css?v=${cssGovernanceKey}`))errors.push('top-level control-center stylesheet must keep the CSS governance key');
 if(!style.includes(`control-center-exception-review.css?v=${cssGovernanceKey}`))errors.push('exception-review stylesheet must keep the CSS governance key');
 if(!app.includes(`review.js?v=${buildKey}`))errors.push('app review-module cache key is stale');
 if(!review.includes(`review-render.js?v=${buildKey}`))errors.push('review renderer cache key is stale');
-if(!review.includes(`startpartner-review.js?v=${buildKey}`)||!reviewRender.includes(`startpartner-review.js?v=${aiReviewKey}`))errors.push('Startpartner review module cache key is stale');
+if(!review.includes(`startpartner-review.js?v=${buildKey}`)||!reviewRender.includes(`startpartner-review.js?v=${buildKey}`))errors.push('Startpartner review module cache key is stale');
 if(!startpartnerReview.includes(`startpartner-ai-review.js?v=${aiReviewKey}`)||!reviewRender.includes(`startpartner-ai-review.js?v=${aiReviewKey}`))errors.push('Startpartner AI review module cache key is stale');
 if(!review.includes('startpartner-gate4.js?v=2026-08-01-startpartner-gate4-audit-v1')||!reviewRender.includes('startpartner-gate4.js?v=2026-08-01-startpartner-gate4-audit-v1'))errors.push('Startpartner Gate-4 module cache key is stale');
 for(const marker of ['edit_and_approve','decision_class','operation_id','Ablehnungsgrund auswählen','source_fingerprint','content_fingerprint','current_description_hash','data-manage-details','Live öffnen','Öffentliche Wirkung wird geprüft · Versuch','be_cc_draft:','Automatisierte Verbesserung','Promise.allSettled','resolve_review_task','task_revision','data-review-task-resolution','visual_asset_id'])if(!modules.includes(marker)&&!caseApi.includes(marker))errors.push(`frontend contract missing: ${marker}`);
