@@ -39,6 +39,7 @@ validate_frontend_syntax() {
   node --check js/seo-schema.js
   node --check js/organizer-pilot.js
   node --check js/startpartner-funnel.js
+  node --check js/activity-submission-feed.js
   node --input-type=module --check < js/control-center/startpartner-gate4.js
   node --check scripts/render-static-content.mjs
   for file in js/control-center/*.js; do
@@ -95,6 +96,7 @@ validate_php_tests() {
     php tests/startpartner_gate4_submission_contract_test.php
     php tests/startpartner_gate4_side_effect_contract_test.php
     php tests/startpartner_active_pilot_lifecycle_contract_test.php
+    php tests/startpartner_publication_integrity_contract_test.php
   fi
   if component_enabled submissions; then
     for file in tests/submission_*.php; do

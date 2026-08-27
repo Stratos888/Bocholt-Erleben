@@ -258,11 +258,11 @@ function be_startpartner_gate4_approve_content(PDO $pdo, string $candidateId, ar
                 'content_type' => $contentType,
                 'pilot_month_index' => (int)$window['pilot_month_index'],
                 'limit' => $limitMeta,
-                'publication_effect' => 'none',
+                'publication_effect' => 'public_projection_eligible',
                 'payment_effect' => 'none',
             ]);
             return [
-                'status_reason' => 'Pilotinhalt redaktionell freigegeben und einmalig dem Pilotverbrauch zugeordnet.',
+                'status_reason' => 'Pilotinhalt redaktionell freigegeben, für die öffentliche Projektion berechtigt und einmalig dem Pilotverbrauch zugeordnet.',
                 'content_link_id' => $contentLinkId,
                 'submission_id' => (int)$content['submission_id'],
                 'usage_units' => 1,
@@ -351,10 +351,12 @@ function be_startpartner_gate4_withdraw_content(PDO $pdo, string $candidateId, a
                 'submission_id' => (int)$content['submission_id'],
                 'previous_status' => (string)$content['status'],
                 'usage_effect' => 'historical_usage_retained',
-                'publication_effect' => 'none',
+                'publication_effect' => (string)$content['status'] === 'approved'
+                    ? 'public_projection_withdrawn'
+                    : 'none',
             ]);
             return [
-                'status_reason' => 'Pilotzuordnung des Inhalts zurückgezogen; historische Freigabe-/Usage-Evidence bleibt erhalten.',
+                'status_reason' => 'Pilotzuordnung des Inhalts zurückgezogen; öffentliche Sichtbarkeit endet, falls der Inhalt bereits freigegeben war. Historische Freigabe-/Usage-Evidence bleibt erhalten.',
                 'content_link_id' => $contentLinkId,
             ];
         },
@@ -486,7 +488,10 @@ function be_startpartner_gate4_transition_lifecycle(
                     default => 'ended',
                 },
                 'usage_effect' => 'none',
-                'publication_effect' => 'none',
+                'publication_effect' => match ($transition) {
+                    'pause', 'resume', 'start_closeout' => 'approved_content_retained',
+                    'end_without_conversion', 'terminate' => 'active_startpartner_public_projection_ended',
+                },
                 'payment_effect' => 'none',
             ]);
             return [

@@ -22,17 +22,6 @@ function be_startpartner_gate4_project_control_case(PDO $pdo, array $candidate, 
     $phase = (string)($gate4['phase'] ?? 'onboarding');
     $firstBlocker = (string)($gate4['blockers'][0]['message'] ?? 'Onboarding prüfen.');
     $next = is_array($gate4['next_action'] ?? null) ? $gate4['next_action'] : [];
-
-    $plannedEnd = trim((string)($gate4['pilot']['planned_end_date'] ?? ''));
-    $today = (new DateTimeImmutable('today', new DateTimeZone('Europe/Berlin')))->format('Y-m-d');
-    if (in_array($phase, ['active', 'paused'], true) && $plannedEnd !== '' && $today >= $plannedEnd) {
-        $next = [
-            'code' => 'closeout_required',
-            'label' => 'Pilotende jetzt entscheiden',
-            'action' => 'start_closeout',
-        ];
-    }
-
     $nextAction = trim((string)($next['label'] ?? '')) !== ''
         ? (string)$next['label']
         : $firstBlocker;
@@ -57,9 +46,6 @@ function be_startpartner_gate4_project_control_case(PDO $pdo, array $candidate, 
     };
     $projectedState = $terminal ? 'done' : 'in_progress';
     $nextReviewAt = $gate4['next_review_at'] ?? null;
-    if ($nextCode === 'closeout_required' && $plannedEnd !== '') {
-        $nextReviewAt = $plannedEnd;
-    }
 
     $payload = json_encode([
         'candidate_id' => $candidateId,

@@ -351,7 +351,7 @@ function be_startpartner_gate4_checkpoint_readback(PDO $pdo, array $pilot): arra
     $terminal = in_array((string)$pilot['status'], BE_STARTPARTNER_GATE4_TERMINAL_PILOT_STATUSES, true);
     $closeoutRequired = !$terminal
         && in_array((string)$pilot['status'], ['active', 'paused'], true)
-        && $today > $plannedEndDate;
+        && $today >= $plannedEndDate;
     return [
         'items' => $items,
         'next_review_at' => $terminal ? null : ($nextReviewAt ?? $plannedEndDate),
@@ -603,6 +603,7 @@ function be_startpartner_gate4_next_action(
     bool $ready,
     array $checkpoints,
     array $content,
+    array $measurementRuntime,
     array $distributionRuntime
 ): array {
     $status = (string)$pilot['status'];
@@ -645,6 +646,25 @@ function be_startpartner_gate4_next_action(
         return ['code' => 'activate', 'label' => 'Pilot jetzt starten', 'action' => 'activate'];
     }
     if ($status === 'active') {
+        if (in_array((string)($measurementRuntime['status'] ?? ''), ['query_or_attribution_problem', 'technical_not_ready'], true)) {
+            return [
+                'code' => 'measurement_problem',
+                'label' => 'Technische Erfolgsmessung prüfen',
+                'action' => 'measurement',
+            ];
+        }
+        if (in_array((string)($distributionRuntime['status'] ?? ''), ['due', 'blocked'], true)
+            && trim((string)($distributionRuntime['commitment']['id'] ?? '')) !== '') {
+            $distributionStatus = (string)$distributionRuntime['status'];
+            return [
+                'code' => $distributionStatus === 'blocked' ? 'distribution_blocked' : 'distribution_due',
+                'label' => $distributionStatus === 'blocked'
+                    ? 'Blockierten Reichweitenbeitrag klären'
+                    : 'Fälligen Reichweitenbeitrag dokumentieren',
+                'action' => 'set_distribution_fulfillment',
+                'distribution_id' => (string)$distributionRuntime['commitment']['id'],
+            ];
+        }
         foreach ($content as $row) {
             if ((string)($row['status'] ?? '') === 'draft') {
                 return [
@@ -662,14 +682,6 @@ function be_startpartner_gate4_next_action(
                     'content_link_id' => (string)$row['id'],
                 ];
             }
-        }
-        if ((string)($distributionRuntime['status'] ?? '') === 'due') {
-            return [
-                'code' => 'distribution_due',
-                'label' => 'Reichweitenbeitrag als erfüllt, blockiert oder ausgefallen dokumentieren',
-                'action' => 'set_distribution_fulfillment',
-                'distribution_id' => (string)($distributionRuntime['commitment']['id'] ?? ''),
-            ];
         }
         return [
             'code' => 'monitor_active_pilot',
@@ -841,6 +853,7 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
         $ready,
         $checkpoints,
         $content,
+        $measurementRuntime,
         $distributionRuntime
     );
 
