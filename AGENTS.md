@@ -168,6 +168,16 @@ Feature-Branch -> staging -> main
 - größere Code-/Build-/UI-Arbeit benötigt Checkout und lokale Tests; viele Remote-Einzelpatches ersetzen keinen Checkout;
 - Workpack-Merge nur nach dem vorgesehenen finalen Validation-Lauf auf exakt aktuellem PR-Head.
 
+### Main-Release: letzter manueller Product-Owner-E2E
+
+Für **jeden** Release von `staging` nach `main` gilt zusätzlich verbindlich:
+
+1. Zuerst werden alle technischen, fachlichen, visuellen und regressionsbezogenen Prüfungen abgeschlossen und der **exakte finale Staging-SHA** erfolgreich nach Staging deployt.
+2. **Das letzte Release-Gate ist immer ein manueller End-to-End-Check durch den Product Owner/Nutzer auf genau diesem final deployten Staging-Stand.**
+3. Ein `staging -> main`-Release-PR darf **erst nach dem ausdrücklichen manuellen `PASS`** des Product Owners/Nutzers erstellt werden.
+4. Jede Änderung des `staging`-SHA nach diesem manuellen `PASS` invalidiert die Freigabe; der manuelle E2E ist dann auf dem neuen finalen Staging-Stand erneut erforderlich.
+5. Automatisierte Browser-/Screenshot-/Smoke-Evidence ergänzt dieses Gate, ersetzt es aber nicht.
+
 ## 10. Documentation Discipline und Lernen aus realen Ergebnissen
 
 Dauerhafte Dokumentation ist Produkt-/Systemspeicher, kein Arbeitstagebuch:
