@@ -175,7 +175,7 @@ async function publicFunnelContract(browser,profile){
   const routes=[
     {name:'events-publish',path:'/events-veroeffentlichen/',markers:['Veranstaltung sichtbar machen','Wähle den passenden Veröffentlichungsweg']},
     {name:'activity-presence',path:'/aktivitaeten/sichtbar-werden/',markers:['Als Aktivität bei Bocholt erleben sichtbar werden','Wähle den passenden Tarif']},
-    {name:'startpartner-public',path:'/startpartner/',markers:['Als Startpartner 6 Monate kostenlos testen','Veranstaltungen, Aktivitäten oder beides testen','ohne Zahlungsart','keine automatische kostenpflichtige Verlängerung','Wir prüfen, ob Startpartner zu deinem Angebot passt']},
+    {name:'startpartner-public',path:'/startpartner/',markers:['Als Startpartner 6 Monate kostenlos testen','Veranstaltungen, Aktivitäten oder beides testen','keine Zahlungsart erforderlich','keine automatische kostenpflichtige Verlängerung','Wir prüfen, ob Startpartner zu deinem Angebot passt']},
   ];
   let reference=null;
   for(const route of routes){
@@ -183,6 +183,7 @@ async function publicFunnelContract(browser,profile){
     assert(response?.status()===200,`${route.name}-${name}: HTTP 200 fehlt`);
     const text=await page.locator('body').innerText();
     for(const marker of route.markers)assert(includes(text,marker),`${route.name}-${name}: Marker fehlt: ${marker}`);
+    if(route.name==='startpartner-public')assert(!includes(text,'ohne Zahlungsart'),`${name}: alte Zahlungsart-Variante sichtbar`);
     assert(await page.locator('main.page--publish').count()===1,`${route.name}-${name}: gemeinsame Publish-Familie fehlt`);
     assert(await page.locator('.content-hero--panel').count()===1,`${route.name}-${name}: gemeinsamer Hero fehlt`);
     assert(await page.locator('.content-card').count()>0,`${route.name}-${name}: gemeinsame Card-Primitives fehlen`);
