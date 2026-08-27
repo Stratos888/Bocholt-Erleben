@@ -14,12 +14,14 @@ assert(html.includes('organizer-dashboard-pilot-card'), 'Dashboard needs a dedic
 assert(html.includes('/js/organizer-pilot.js?v=2026-08-27-startpartner-premium-finish-v1'), 'Dashboard must load the premium pilot UI from the established asset owner.');
 assert(js.includes('/api/organizer-portal/pilot.php'), 'Portal must read the canonical pilot state.');
 assert(js.includes('/api/startpartner/content.php'), 'Portal must prepare content through the Gate-4 submission integration.');
-assert(js.includes('nicht automatisch kostenpflichtig verlängert'), 'Pilot UI must state the no-auto-renewal boundary.');
+assert(js.includes('keine automatische kostenpflichtige Verlängerung'), 'Pilot UI must state the no-auto-renewal boundary in the canonical public wording.');
 assert(js.includes('Nächster Schritt'), 'Partner portal must lead with one explicit next-step area.');
-assert(js.includes('Als Nächstes: ersten Inhalt einreichen'), 'A partner without pilot content must get an explicit first-content action.');
-assert(js.includes('Dein erster Inhalt wird geprüft'), 'Pre-activation submission must remain a waiting state.');
+assert(js.includes("if (!first)"), 'Partner portal must preserve a dedicated first-content state.');
+assert(js.includes("title: copy.title.replace('Nächste', 'Erste').replace('Weiteren', 'Ersten')") && js.includes('Reiche den ersten Inhalt ein.'), 'A partner without pilot content must get an explicit first-content action.');
+assert(js.includes("if (first.status === 'draft')") && js.includes('Deine Einreichung ist angekommen und wird redaktionell geprüft.') && js.includes("action: 'wait'"), 'Pre-activation submission must remain a waiting state.');
 assert(js.includes('Pilot ist pausiert') && js.includes('Pilot wird abgeschlossen'), 'Partner portal must translate pause and closing states.');
-assert(js.includes('Event-Limit erreicht') && js.includes('Aktivitätsplatz belegt'), 'Partner portal must explain both fail-closed limit states.');
+assert(js.includes("projected.code === 'event_limit_full'") && js.includes('Die vereinbarten Veranstaltungen für diesen Monat sind bereits ausgeschöpft.'), 'Partner portal must explain the fail-closed event limit without technical state language.');
+assert(js.includes("projected.code === 'activity_limit_full'") && js.includes('Der vereinbarte Aktivitätsplatz ist belegt.'), 'Partner portal must explain the fail-closed activity limit without technical state language.');
 assert(js.includes("projected.code === 'submit_content'"), 'Active partner CTA must come from the canonical next-action projection.');
 assert(!js.includes('Weiteren Inhalt einreichen</summary>'), 'Non-action states must not retain a hidden secondary submission path.');
 assert(js.includes('pendingClientReference') && js.includes('if (!pendingClientReference) pendingClientReference = newClientReference()'), 'Ambiguous partner retries must keep one stable client_reference.');
@@ -28,11 +30,12 @@ assert(js.includes("error?.status === 409"), 'Payload-bound replay conflicts nee
 assert(!js.includes('von ${Number(gate4.onboarding'), 'Partner UI must not expose the internal Gate-4 checklist count.');
 assert(!js.includes('Schritten erledigt'), 'Partner UI must not present internal readiness as a fourteen-step journey.');
 assert(js.includes('Deine Inhalte'), 'Pilot content must be a primary partner work area.');
-assert(js.includes('Pilotumfang und Laufzeit'), 'Terms-relevant pilot details must remain available as secondary information.');
+assert(js.includes('<summary>Pilotdetails</summary>') && js.includes('Vereinbarter Rahmen') && js.includes('Pilotstart') && js.includes('Geplantes Ende'), 'Terms-relevant pilot scope and lifetime must remain available as secondary Pilotdetails.');
 assert(js.includes('form.reset(); sync();'), 'Form reset must immediately restore event-date visibility and validation.');
 assert(js.includes('await load(`Einreichung'), 'Successful submissions must refresh the canonical portal state.');
 assert(js.includes('contentStatus'), 'Portal must translate internal content states.');
 assert(!js.includes('phaseBadge') && !js.includes('organizer-status-badge'), 'Partner portal must not repeat the phase with a redundant status badge.');
+assert(!js.includes('Event-Limit erreicht') && !js.includes('Pilotverbrauch') && !js.includes('Pilotumfang und Laufzeit'), 'Partner portal must not regress to old technical or status-document wording.');
 assert(!js.includes('create-billing-portal-session'), 'Pilot UI must not expose Stripe billing as the pilot contract.');
 
 assert(pilotApi.includes('be_startpartner_gate4_portal_projection'), 'Portal API must use the minimized projection.');
