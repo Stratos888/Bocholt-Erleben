@@ -55,7 +55,7 @@ async function operatorContract(browser,viewport,name){
     return Boolean(panel&&history&&(panel.compareDocumentPosition(history)&Node.DOCUMENT_POSITION_FOLLOWING));
   });
   assert(order,`${name}: aktueller Pilotbereich muss vor der Historie stehen`);
-  await history.locator('summary').click();
+  await history.locator(':scope > summary').click();
   const historyText=await history.innerText();
   assert(includes(historyText,'Vor Pilotstart abgeschlossen'),`${name}: historische Einrichtung ist nicht als abgeschlossen bezeichnet`);
   assert(includes(historyText,'Abgeschlossen'),`${name}: Abschlussstatus der Historie fehlt`);
