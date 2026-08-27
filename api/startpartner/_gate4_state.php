@@ -197,7 +197,7 @@ function be_startpartner_gate4_automatic_onboarding_items(array $gate3, string $
             'maintenance_path_agreed',
             is_array($maintenanceScope),
             'Die laufende Pflege und der Änderungsweg sind vereinbart.',
-            is_array($maintenanceScope) ? 'automatic-source' : null,
+            is_array($maintenanceScope) ? 'maintenance-service' : null,
             $operator
         ),
     ];
