@@ -74,12 +74,37 @@ async function partnerContract(browser){
   await page.waitForSelector('#organizer-dashboard-pilot-card:not([hidden])');
   const card=page.locator('#organizer-dashboard-pilot-card');
   const text=await card.innerText();
+  assert(includes(text,'Startpartner · 6 Monate kostenlos'),'partner-premium: kompakter Pilotkontext fehlt');
   assert(includes(text,'Pilotphase läuft'),'partner-premium: aktuelle Phase fehlt');
-  assert(includes(text,'Nächsten Termin einreichen'),'partner-premium: primärer nächster Schritt fehlt');
+  assert(includes(text,'Nächste Veranstaltung einreichen'),'partner-premium: primärer nächster Schritt fehlt');
+  assert(includes(text,'Deine Inhalte'),'partner-premium: Inhaltsbereich fehlt');
+  assert(includes(text,'Pilotdetails'),'partner-premium: sekundäre Pilotdetails fehlen');
+  for(const stale of ['Event-Limit','Pilotverbrauch','Pilotumfang und Laufzeit','Kostenlos zur Prüfung einreichen'])assert(!includes(text,stale),`partner-premium: interne/alte Sprache sichtbar: ${stale}`);
   assert(await card.locator('.organizer-status-badge').count()===0,'partner-premium: redundanter Status-Badge ist noch vorhanden');
+  assert(await card.locator('.content-card .content-card').count()===0,'partner-premium: verschachtelte Kartenhierarchie im Pilotbereich');
   assert(await card.locator('.content-cta--primary:visible').count()===1,'partner-premium: genau eine prominente Aktion erwartet');
+  const openButton=card.locator('#organizer-pilot-open-form');
+  const shell=card.locator('#organizer-pilot-form-shell');
+  const form=card.locator('#organizer-pilot-content-form');
+  assert(await openButton.isVisible(),'partner-premium: kompakte Einreichungsaktion fehlt');
+  assert(await shell.isHidden(),'partner-premium: vollständiges Formular ist initial sichtbar');
+  assert(await form.isHidden(),'partner-premium: Formular muss initial eingeklappt sein');
   assert(!(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)),'partner-premium: horizontaler Überlauf');
   await page.screenshot({path:path.join(outDir,'startpartner-premium-partner-mobile.png'),fullPage:true});
+
+  await openButton.click();
+  assert(await openButton.isHidden(),'partner-premium: Öffnen-Aktion bleibt nach Formularöffnung sichtbar');
+  assert(await shell.isVisible(),'partner-premium: Formular öffnet nicht');
+  assert(await card.locator('.content-cta--primary:visible').count()===1,'partner-premium: nach Formularöffnung mehr als eine Primäraktion sichtbar');
+  assert(includes(await form.innerText(),'Zur Prüfung einreichen'),'partner-premium: kanonischer Einreichungs-CTA fehlt');
+  assert(includes(await form.innerText(),'Titel der Veranstaltung'),'partner-premium: Event-Feldsprache ist nicht am regulären Funnel ausgerichtet');
+  assert(includes(await form.innerText(),'Veranstaltungsort / Location'),'partner-premium: Event-Ortsfeld ist nicht konsistent');
+  const type=form.locator('[name="content_type"]');
+  await type.selectOption('activity');
+  const activityText=await form.innerText();
+  for(const marker of ['Name der Aktivität','Name des Standorts','Adresse / offizieller Treffpunkt','Website / Buchungslink','Kurzbeschreibung der Aktivität'])assert(includes(activityText,marker),`partner-premium: Activity-Feldsprache fehlt: ${marker}`);
+  assert(await form.locator('[data-pilot-event-date]').isHidden(),'partner-premium: Eventdatum bleibt bei Aktivität sichtbar');
+  await page.screenshot({path:path.join(outDir,'startpartner-premium-partner-mobile-form-open.png'),fullPage:true});
   await context.close();
 }
 
@@ -91,5 +116,5 @@ try{
 }finally{
   await browser.close();
 }
-fs.writeFileSync(path.join(outDir,'startpartner-premium-summary.json'),JSON.stringify({status:'OK',checks:['operator-mobile','operator-desktop','partner-mobile']},null,2)+'\n');
+fs.writeFileSync(path.join(outDir,'startpartner-premium-summary.json'),JSON.stringify({status:'OK',checks:['operator-mobile','operator-desktop','partner-mobile-compact','partner-mobile-form-open']},null,2)+'\n');
 console.log('=== Startpartner Premium Finish Browser Contract: OK ===');
