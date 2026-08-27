@@ -11,7 +11,7 @@ const failures = [];
 const assert = (ok, message) => { if (!ok) failures.push(message); };
 
 assert(html.includes('organizer-dashboard-pilot-card'), 'Dashboard needs a dedicated pilot card inside the existing portal.');
-assert(html.includes('/js/organizer-pilot.js?v=2026-08-25-startpartner-journey-v2'), 'Dashboard must load the pilot UI from the established asset owner.');
+assert(html.includes('/js/organizer-pilot.js?v=2026-08-27-startpartner-premium-finish-v1'), 'Dashboard must load the premium pilot UI from the established asset owner.');
 assert(js.includes('/api/organizer-portal/pilot.php'), 'Portal must read the canonical pilot state.');
 assert(js.includes('/api/startpartner/content.php'), 'Portal must prepare content through the Gate-4 submission integration.');
 assert(js.includes('nicht automatisch kostenpflichtig verlängert'), 'Pilot UI must state the no-auto-renewal boundary.');
@@ -31,7 +31,8 @@ assert(js.includes('Deine Inhalte'), 'Pilot content must be a primary partner wo
 assert(js.includes('Pilotumfang und Laufzeit'), 'Terms-relevant pilot details must remain available as secondary information.');
 assert(js.includes('form.reset(); sync();'), 'Form reset must immediately restore event-date visibility and validation.');
 assert(js.includes('await load(`Einreichung'), 'Successful submissions must refresh the canonical portal state.');
-assert(js.includes('phaseBadge') && js.includes('contentStatus'), 'Portal must translate internal phase and content states.');
+assert(js.includes('contentStatus'), 'Portal must translate internal content states.');
+assert(!js.includes('phaseBadge') && !js.includes('organizer-status-badge'), 'Partner portal must not repeat the phase with a redundant status badge.');
 assert(!js.includes('create-billing-portal-session'), 'Pilot UI must not expose Stripe billing as the pilot contract.');
 
 assert(pilotApi.includes('be_startpartner_gate4_portal_projection'), 'Portal API must use the minimized projection.');
