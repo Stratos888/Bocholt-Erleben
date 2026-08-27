@@ -46,14 +46,6 @@
     })[phase] || 'Pilot wird eingerichtet';
   }
 
-  function phaseBadge(phase) {
-    return ({
-      onboarding: 'Einrichtung', activation_ready: 'Startbereit', active: 'Aktiv',
-      paused: 'Pausiert', closing: 'Abschluss', ended_without_conversion: 'Beendet',
-      terminated: 'Beendet', converted: 'Beendet',
-    })[phase] || 'Einrichtung';
-  }
-
   function contentStatus(status) {
     return ({
       draft: 'Zur Prüfung eingereicht', editorial_ready: 'Redaktionell vorbereitet',
@@ -212,7 +204,7 @@
     const step = nextStep(gate4);
     card.hidden = false;
     card.innerHTML = `
-      <div class="content-form-section-head"><div><span class="content-kicker">Kostenloser Startpartner-Pilot</span><h2>${escape(phaseLabel(gate4.phase))}</h2></div><span class="organizer-status-badge">${escape(phaseBadge(gate4.phase))}</span></div>
+      <div class="content-form-section-head"><div><span class="content-kicker">Kostenloser Startpartner-Pilot</span><h2>${escape(phaseLabel(gate4.phase))}</h2></div></div>
       <p>${escape(gate4.active ? 'Die sechsmonatige Pilotphase läuft. Es gibt keine automatische kostenpflichtige Verlängerung.' : 'Die Pilotlaufzeit beginnt nur durch den ausdrücklichen Start und wird nicht automatisch kostenpflichtig verlängert.')}</p>
       ${successMessage ? `<div class="content-note" role="status">${escape(successMessage)}</div>` : ''}
       <section class="content-card content-card--primary organizer-pilot-next-step" aria-label="Nächster Schritt"><span class="content-kicker">Nächster Schritt</span><h3>${escape(step.title)}</h3><p>${escape(step.text)}</p></section>
