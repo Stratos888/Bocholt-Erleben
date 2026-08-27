@@ -184,9 +184,10 @@ async function runProfile(browser, profileName, viewport) {
   await page.locator('#startpartner-request-form').waitFor({ state: 'visible' });
   const startpartnerText = await assertCanonicalNaming(page, `${profileName}: Startpartner`);
   assert(await page.getByRole('heading', { level: 1, name: 'Als Startpartner 6 Monate kostenlos testen' }).count() === 1, `${profileName}: klares Startpartner-Versprechen in der H1 fehlt`);
-  for (const marker of ['Veranstaltungen, Aktivitäten oder beides', 'Keine Zahlungsart nötig', 'keine automatische kostenpflichtige Verlängerung']) {
+  for (const marker of ['Veranstaltungen, Aktivitäten oder beides testen', 'ohne Zahlungsart', 'keine automatische kostenpflichtige Verlängerung']) {
     assert(startpartnerText.includes(marker), `${profileName}: Premium-Hero-Marker fehlt: ${marker}`);
   }
+  assert(startpartnerText.includes('Wir prüfen, ob Startpartner zu deinem Angebot passt'), `${profileName}: klare Prüfkommunikation fehlt`);
   assert(await page.locator('.content-kicker').count() === 0, `${profileName}: Kicker darf nicht vorhanden sein`);
   assert(!startpartnerText.includes('Was kann der Pilot umfassen?'), `${profileName}: redundanter Scope-Block sichtbar`);
   assert(!startpartnerText.includes('So läuft der Start ab'), `${profileName}: redundanter Ablaufblock sichtbar`);
@@ -256,7 +257,9 @@ async function runProfile(browser, profileName, viewport) {
   assert(explainerText.includes('Sonderweg: Startpartner'), `${profileName}: Startpartner-Sonderweg fehlt`);
   assert(explainerText.includes('sechs Monate kostenlos'), `${profileName}: Sechs-Monats-Erklärung fehlt`);
   assert(explainerText.includes('keine Zahlungsart'), `${profileName}: Zahlungsart-Ausschluss fehlt`);
-  assert(explainerText.includes('nicht automatisch in einen kostenpflichtigen Tarif umgewandelt'), `${profileName}: Auto-Umwandlungs-Ausschluss fehlt`);
+  assert(explainerText.includes('keine automatische kostenpflichtige Verlängerung'), `${profileName}: Ausschluss automatischer Kosten fehlt`);
+  assert(!explainerText.includes('kostenpflichtige Umwandlung'), `${profileName}: alte Umwandlungs-Sprache sichtbar`);
+  assert(!explainerText.includes('kostenpflichtigen Tarif umgewandelt'), `${profileName}: alte Umwandlungs-Sprache sichtbar`);
   const details = page.locator('details#startpartner');
   assert(await details.count() === 1, `${profileName}: Startpartner-FAQ fehlt`);
   await page.waitForFunction(() => document.querySelector('details#startpartner')?.open === true, null, { timeout: 4000 });
