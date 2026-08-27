@@ -14,7 +14,7 @@
   <form id="cc-auth-form" hidden><input id="cc-password"><button id="cc-refresh"></button><button id="cc-menu-button"></button></form><section id="cc-auth" hidden></section><b id="cc-badge-review" hidden></b><b id="cc-badge-backlog" hidden></b>
   <script type="module">
     import { state, closeDialog } from '../../js/control-center/shared.js?v=2026-07-16-e2e-state-v5';
-    import { configureReviewRenderer, renderReview } from '../../js/control-center/review-render.js?v=2026-08-21-startpartner-ai-review-v1';
+    import { configureReviewRenderer, renderReview } from '../../js/control-center/review-render.js?v=2026-08-27-startpartner-premium-finish-v1';
     import { handleGate4Action } from '../../js/control-center/startpartner-gate4.js?v=2026-08-26-active-pilot-lifecycle-v1';
 
     const response = await fetch('/api/control-center/case.php?id=fixture-gate4', {cache:'no-store'});
