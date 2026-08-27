@@ -102,8 +102,9 @@ assert(membership.includes('>Startpartner anfragen</a>'), 'Membership: Startpart
 assert(startpartner.includes('<main class="page page--publish page--startpartner">'), 'Startpartner: Publish-Funnel-Familie fehlt');
 assert(startpartner.includes('<h1>Als Startpartner 6 Monate kostenlos testen</h1>'), 'Startpartner: klares Startpartner-Versprechen in der H1 fehlt');
 assert(startpartner.includes('Veranstaltungen, Aktivitäten oder beides testen'), 'Startpartner: Umfang fehlt im Hero');
-assert(startpartner.includes('ohne Zahlungsart'), 'Startpartner: Ausschluss einer Zahlungsart fehlt im Hero');
+assert(startpartner.includes('keine Zahlungsart erforderlich'), 'Startpartner: Ausschluss einer Zahlungsart fehlt im Hero');
 assert(startpartner.includes('keine automatische kostenpflichtige Verlängerung'), 'Startpartner: Ausschluss automatischer Kosten fehlt im Hero');
+assert(!startpartner.includes('ohne Zahlungsart'), 'Startpartner: alte Zahlungsart-Variante darf nicht zurückkehren');
 assert(startpartner.includes('Wir prüfen, ob Startpartner zu deinem Angebot passt'), 'Startpartner: klare Prüfkommunikation fehlt');
 assert(!startpartner.includes('class="content-kicker"'), 'Startpartner: Kicker darf nicht zurückkehren');
 assert(!startpartner.includes('Was kann der Pilot umfassen?'), 'Startpartner: redundanter Scope-Erklärblock darf nicht zurückkehren');
