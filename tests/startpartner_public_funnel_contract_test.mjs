@@ -98,10 +98,12 @@ assert(membership.includes('<strong>Startpartner</strong>'), 'Membership: Startp
 assert(membership.includes('href="/startpartner/?scope=events"'), 'Membership: Event-Scope fehlt');
 assert(membership.includes('>Startpartner anfragen</a>'), 'Membership: Startpartner-CTA inkonsistent');
 
-// /startpartner/: kurzer First-Party-Funnel ohne Kicker und ohne redundante Detailblöcke.
+// /startpartner/: kurzer First-Party-Funnel mit vollständigem Nutzenversprechen im Hero, ohne redundante Detailblöcke.
 assert(startpartner.includes('<main class="page page--publish page--startpartner">'), 'Startpartner: Publish-Funnel-Familie fehlt');
-assert(startpartner.includes('<h1>6 Monate kostenlos testen</h1>'), 'Startpartner: kompakte H1 fehlt');
-assert(startpartner.includes('Teste Bocholt erleben sechs Monate kostenlos und finde heraus, ob es zu deinem Angebot passt.'), 'Startpartner: kurzer Lead fehlt');
+assert(startpartner.includes('<h1>Als Startpartner 6 Monate kostenlos testen</h1>'), 'Startpartner: klares Startpartner-Versprechen in der H1 fehlt');
+assert(startpartner.includes('Veranstaltungen, Aktivitäten oder beides – sechs Monate kostenlos testen.'), 'Startpartner: Umfang fehlt im Hero');
+assert(startpartner.includes('Keine Zahlungsart nötig'), 'Startpartner: Ausschluss einer Zahlungsart fehlt im Hero');
+assert(startpartner.includes('keine automatische kostenpflichtige Verlängerung'), 'Startpartner: Ausschluss automatischer Kosten fehlt im Hero');
 assert(!startpartner.includes('class="content-kicker"'), 'Startpartner: Kicker darf nicht zurückkehren');
 assert(!startpartner.includes('Was kann der Pilot umfassen?'), 'Startpartner: redundanter Scope-Erklärblock darf nicht zurückkehren');
 assert(!startpartner.includes('So läuft der Start ab'), 'Startpartner: redundanter Ablaufblock darf nicht zurückkehren');
