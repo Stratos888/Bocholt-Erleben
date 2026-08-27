@@ -184,9 +184,10 @@ async function runProfile(browser, profileName, viewport) {
   await page.locator('#startpartner-request-form').waitFor({ state: 'visible' });
   const startpartnerText = await assertCanonicalNaming(page, `${profileName}: Startpartner`);
   assert(await page.getByRole('heading', { level: 1, name: 'Als Startpartner 6 Monate kostenlos testen' }).count() === 1, `${profileName}: klares Startpartner-Versprechen in der H1 fehlt`);
-  for (const marker of ['Veranstaltungen, Aktivitäten oder beides testen', 'ohne Zahlungsart', 'keine automatische kostenpflichtige Verlängerung']) {
+  for (const marker of ['Veranstaltungen, Aktivitäten oder beides testen', 'keine Zahlungsart erforderlich', 'keine automatische kostenpflichtige Verlängerung']) {
     assert(startpartnerText.includes(marker), `${profileName}: Premium-Hero-Marker fehlt: ${marker}`);
   }
+  assert(!startpartnerText.includes('ohne Zahlungsart'), `${profileName}: alte Zahlungsart-Variante sichtbar`);
   assert(startpartnerText.includes('Wir prüfen, ob Startpartner zu deinem Angebot passt'), `${profileName}: klare Prüfkommunikation fehlt`);
   assert(await page.locator('.content-kicker').count() === 0, `${profileName}: Kicker darf nicht vorhanden sein`);
   assert(!startpartnerText.includes('Was kann der Pilot umfassen?'), `${profileName}: redundanter Scope-Block sichtbar`);
