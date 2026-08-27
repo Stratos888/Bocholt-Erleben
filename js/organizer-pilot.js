@@ -219,7 +219,7 @@
           <label class="content-field content-field--full content-field--checkbox"><span class="content-field__hint"><input name="location_public_confirmed" type="checkbox" required> Ich bestätige, dass ich berechtigt bin, diesen Inhalt einzureichen, und dass der Ort öffentlich genannt werden darf.</span></label>
         </div>
         <div class="content-actions content-actions--inline"><button class="content-cta content-cta--primary" type="submit">Zur Prüfung einreichen</button></div>
-        <p class="content-note" data-pilot-submit-status aria-live="polite">Im Startpartner-Pilot ist die Einreichung kostenlos. Veröffentlichung erst nach redaktioneller Freigabe.</p>
+        <p class="content-note" data-pilot-submit-status aria-live="polite">Die Einreichung ist kostenlos und löst keine Zahlung aus. Veröffentlichung erst nach redaktioneller Freigabe.</p>
       </form>`;
   }
 
