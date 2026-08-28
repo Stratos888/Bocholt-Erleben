@@ -106,15 +106,16 @@ function be_startpartner_gate4_portal_access_readback(PDO $pdo, array $gate3): ?
            AND ml.revoked_at IS NULL
            AND ml.intended_action = 'portal_login'
            AND ml.consumed_at IS NOT NULL
-           AND ml.consumed_at >= :accepted_at
-           AND s.created_at >= :accepted_at
+           AND ml.consumed_at >= :accepted_at_magic_link
+           AND s.created_at >= :accepted_at_session
            AND LOWER(TRIM(ml.email_snapshot)) = :email
          ORDER BY s.created_at DESC, s.id DESC
          LIMIT 1"
     );
     $statement->execute([
         'organizer_id' => $organizerId,
-        'accepted_at' => $acceptedAt,
+        'accepted_at_magic_link' => $acceptedAt,
+        'accepted_at_session' => $acceptedAt,
         'email' => $email,
     ]);
     $row = $statement->fetch(PDO::FETCH_ASSOC);
@@ -597,7 +598,6 @@ function be_startpartner_gate4_current_onboarding_items(
     }
     return $result;
 }
-
 function be_startpartner_gate4_next_action(
     array $pilot,
     bool $ready,
