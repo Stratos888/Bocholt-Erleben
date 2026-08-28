@@ -152,6 +152,7 @@ validate_repository() {
   node tests/neutral-selection.test.mjs
   node tests/static-render-fixture.test.mjs
   python3 tests/test_seo_static_contract.py
+  python3 tests/test_sitemap_event_detail_contract.py
   python3 tests/test_event_offer_contract.py
   python3 tests/test_event_detail_schema_contract.py
 }
