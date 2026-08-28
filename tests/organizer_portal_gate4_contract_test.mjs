@@ -4,6 +4,7 @@ const read = path => fs.readFileSync(new URL(`../${path}`, import.meta.url), 'ut
 const html = read('fuer-veranstalter/dashboard/index.html');
 const fixture = read('tests/fixtures/organizer_gate4_portal.html');
 const js = read('js/organizer-pilot.js');
+const organizerPortal = read('js/organizer-portal.js');
 const pilotApi = read('api/organizer-portal/pilot.php');
 const projection = read('api/startpartner/_gate4_projection.php');
 const contentApi = read('api/startpartner/content.php');
@@ -13,6 +14,7 @@ const assert = (ok, message) => { if (!ok) failures.push(message); };
 
 assert(html.includes('organizer-dashboard-pilot-card'), 'Dashboard needs a dedicated pilot card inside the existing portal.');
 assert(html.includes('/js/organizer-pilot.js?v=2026-08-27-startpartner-premium-finish-v1'), 'Dashboard must load the premium pilot UI from the established asset owner.');
+assert(html.includes('/js/organizer-portal.js?v=2026-08-28-phase-a-single-status-repair-v1'), 'Dashboard must cache-bust the corrected organizer portal renderer.');
 assert(fixture.includes('<main class="page page--organizers" data-organizer-page="dashboard">'), 'Synthetic partner evidence must use the real organizer dashboard page shell.');
 assert(fixture.includes('class="content-card content-card--primary" id="organizer-dashboard-pilot-card"'), 'Synthetic partner evidence must use the real dashboard pilot-card primitives.');
 assert(!fixture.includes('class="content-shell"') && !fixture.includes('class="content-section"') && !fixture.includes('class="organizer-dashboard-card"'), 'Synthetic partner evidence must not reintroduce a parallel simplified dashboard layout.');
@@ -41,6 +43,14 @@ assert(js.includes('contentStatus'), 'Portal must translate internal content sta
 assert(!js.includes('phaseBadge') && !js.includes('organizer-status-badge'), 'Partner portal must not repeat the phase with a redundant status badge.');
 assert(!js.includes('Event-Limit erreicht') && !js.includes('Pilotverbrauch') && !js.includes('Pilotumfang und Laufzeit'), 'Partner portal must not regress to old technical or status-document wording.');
 assert(!js.includes('create-billing-portal-session'), 'Pilot UI must not expose Stripe billing as the pilot contract.');
+
+assert(organizerPortal.includes('? formatSubmissionStatusLabel(latestSubmission)'), 'Single-status hero must use submission-kind-aware status labels.');
+assert(organizerPortal.includes('isSingleStatusView && isLatestSubmissionActivity'), 'Single-status CTA must branch on an Activity submission.');
+assert(organizerPortal.includes('label: "Weitere Aktivität einreichen"'), 'Single-status Activity CTA must remain Activity-specific.');
+assert(organizerPortal.includes('${isLatestSubmissionActivity ? "Einreichung" : "Termin"}: ${latestDateText}'), 'Single-status metadata must not label an Activity as a Termin.');
+assert(organizerPortal.includes('? formatSubmissionStatusDescription(latestSubmission)'), 'Single-status status copy must derive from the canonical submission status description.');
+assert(!organizerPortal.includes('? "Einreichung erhalten. Die Veröffentlichung erfolgt nach Prüfung."'), 'Single-status published content must not be forced back into a pending-review message.');
+assert(organizerPortal.includes('["Bereich", latestSubmission ? formatSubmissionKindLabel(latestSubmission) : "–"]'), 'Single-status overview must show the actual submission kind instead of hard-coded Einzeltermin.');
 
 assert(pilotApi.includes('be_startpartner_gate4_portal_projection'), 'Portal API must use the minimized projection.');
 assert(!pilotApi.includes("'candidate'=>$candidate") && !pilotApi.includes("'candidate' => $candidate"), 'Portal API must not expose the internal candidate object.');

@@ -934,12 +934,12 @@ function normalizeExternalUrl(value) {
 
     if (context?.isSingleStatusView) {
       summary.textContent = latestSubmission
-        ? `${formatStatusLabel(latestSubmission.status)} · ${formatDate(latestSubmission.start_date || latestSubmission.created_at)}`
+        ? `${formatSubmissionStatusLabel(latestSubmission)} · ${formatDate(latestSubmission.start_date || latestSubmission.created_at)}`
         : "Noch keine Einreichung gefunden.";
 
       overview.innerHTML = [
-        ["Bereich", "Einzeltermin"],
-        ["Status", latestSubmission ? formatStatusLabel(latestSubmission.status) : "–"],
+        ["Bereich", latestSubmission ? formatSubmissionKindLabel(latestSubmission) : "–"],
+        ["Status", latestSubmission ? formatSubmissionStatusLabel(latestSubmission) : "–"],
         ["Ort", latestSubmission ? (safeText(latestSubmission.location_name) || "–") : "–"]
       ].map(([label, value]) => `
         <span class="organizer-submission-summary-item" role="listitem">
@@ -1258,7 +1258,7 @@ function normalizeExternalUrl(value) {
       ? safeText(latestSubmission.title) || "Ohne Titel"
       : "Noch keine Einreichung";
     const latestStatusText = latestSubmission
-      ? formatStatusLabel(latestSubmission.status)
+      ? formatSubmissionStatusLabel(latestSubmission)
       : "Noch kein Status";
     const latestDateText = latestSubmission
       ? formatDate(latestSubmission.start_date || latestSubmission.created_at)
@@ -1266,6 +1266,8 @@ function normalizeExternalUrl(value) {
     const latestLocationText = latestSubmission
       ? safeText(latestSubmission.location_name)
       : "";
+    const latestSubmissionKind = safeText(latestSubmission?.submission_kind || "event").toLowerCase();
+    const isLatestSubmissionActivity = latestSubmissionKind === "activity";
 
     const isSingleStatusView =
       effectivePlanKey === "single" &&
@@ -1332,6 +1334,13 @@ function normalizeExternalUrl(value) {
     const dashboardStatusType = safeText(dashboardStatus?.type || "ok").toLowerCase();
     const shouldOpenSubmissionsFromHero = dashboardStatusType === "action" || dashboardStatusType === "draft";
     const submissionCtaConfig = (() => {
+      if (isSingleStatusView && isLatestSubmissionActivity) {
+        return {
+          href: "/aktivitaeten/sichtbar-werden/",
+          label: "Weitere Aktivität einreichen"
+        };
+      }
+
       if (isActivityPlanView && !hasEventPresencePlan) {
         return {
           href: "/aktivitaeten/sichtbar-werden/",
@@ -1452,7 +1461,7 @@ function normalizeExternalUrl(value) {
 
       if (isSingleStatusView) {
         quotaPeriod.textContent = latestSubmission
-          ? `Termin: ${latestDateText}`
+          ? `${isLatestSubmissionActivity ? "Einreichung" : "Termin"}: ${latestDateText}`
           : "Veranstaltung einreichen";
       } else {
         const compactPrice = monthlyTotal || "–";
@@ -1500,7 +1509,7 @@ function normalizeExternalUrl(value) {
       if (isSingleStatusView) {
         quotaSummary.hidden = false;
         quotaSummary.textContent = latestSubmission
-          ? "Einreichung erhalten. Die Veröffentlichung erfolgt nach Prüfung."
+          ? formatSubmissionStatusDescription(latestSubmission)
           : "Noch keine Einreichung gefunden.";
       } else {
         quotaSummary.textContent = "";

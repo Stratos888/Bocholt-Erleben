@@ -67,7 +67,11 @@ function be_startpartner_gate4_add_calendar_months(string $localDate, int $month
     $monthIndex = ($year * 12 + ($month - 1)) + $months;
     $targetYear = intdiv($monthIndex, 12);
     $targetMonth = ($monthIndex % 12) + 1;
-    $lastDay = cal_days_in_month(CAL_GREGORIAN, $targetMonth, $targetYear);
+    $targetMonthStart = new DateTimeImmutable(
+        sprintf('%04d-%02d-01', $targetYear, $targetMonth),
+        new DateTimeZone('Europe/Berlin')
+    );
+    $lastDay = (int)$targetMonthStart->modify('last day of this month')->format('j');
     return sprintf('%04d-%02d-%02d', $targetYear, $targetMonth, min($day, $lastDay));
 }
 
