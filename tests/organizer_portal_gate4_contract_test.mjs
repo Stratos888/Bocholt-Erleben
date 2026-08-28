@@ -13,7 +13,7 @@ const failures = [];
 const assert = (ok, message) => { if (!ok) failures.push(message); };
 
 assert(html.includes('organizer-dashboard-pilot-card'), 'Dashboard needs a dedicated pilot card inside the existing portal.');
-assert(html.includes('/js/organizer-pilot.js?v=2026-08-27-startpartner-premium-finish-v1'), 'Dashboard must load the premium pilot UI from the established asset owner.');
+assert(html.includes('/js/organizer-pilot.js?v=2026-08-28-startpartner-single-primary-v1'), 'Dashboard must cache-bust the Startpartner single-primary-action owner.');
 assert(html.includes('/js/organizer-portal.js?v=2026-08-28-phase-a-single-status-repair-v1'), 'Dashboard must cache-bust the corrected organizer portal renderer.');
 assert(fixture.includes('<main class="page page--organizers" data-organizer-page="dashboard">'), 'Synthetic partner evidence must use the real organizer dashboard page shell.');
 assert(fixture.includes('class="content-card content-card--primary" id="organizer-dashboard-pilot-card"'), 'Synthetic partner evidence must use the real dashboard pilot-card primitives.');
@@ -22,6 +22,11 @@ assert(js.includes('/api/organizer-portal/pilot.php'), 'Portal must read the can
 assert(js.includes('/api/startpartner/content.php'), 'Portal must prepare content through the Gate-4 submission integration.');
 assert(js.includes('keine automatische kostenpflichtige Verlängerung'), 'Pilot UI must state the no-auto-renewal boundary in the canonical public wording.');
 assert(js.includes('Nächster Schritt'), 'Partner portal must lead with one explicit next-step area.');
+assert(js.includes("document.getElementById('organizer-dashboard-primary-cta')"), 'Successful pilot rendering must be able to claim the generic dashboard primary-action owner.');
+assert(js.includes("['onboarding', 'activation_ready', 'active', 'paused', 'closing'].includes(phase)"), 'Only nonterminal pilot phases may take over the generic dashboard primary action.');
+assert(js.includes('dashboardActions.hidden = pilotOwnsPrimaryAction'), 'Nonterminal pilot state must suppress the competing generic hero action container.');
+assert(js.includes("dashboardActions.dataset.startpartnerPrimaryOwner = 'pilot'"), 'Pilot UI must mark the canonical primary-action ownership.');
+assert(js.includes('syncDashboardPrimaryActionOwner(gate4);'), 'Successful pilot render must synchronize the single primary-action owner.');
 assert(js.includes("if (!first)"), 'Partner portal must preserve a dedicated first-content state.');
 assert(js.includes("title: copy.title.replace('Nächste', 'Erste').replace('Weiteren', 'Ersten')") && js.includes('Reiche den ersten Inhalt ein.'), 'A partner without pilot content must get an explicit first-content action.');
 assert(js.includes("if (first.status === 'draft')") && js.includes('Deine Einreichung ist angekommen und wird redaktionell geprüft.') && js.includes("action: 'wait'"), 'Pre-activation submission must remain a waiting state.');
