@@ -13,6 +13,32 @@
     .replaceAll("'", '&#39;');
   let pendingClientReference = '';
 
+  function syncDashboardPrimaryActionOwner(gate4) {
+    const dashboardPrimaryCta = document.getElementById('organizer-dashboard-primary-cta');
+    if (!dashboardPrimaryCta) return;
+
+    const phase = safe(gate4?.phase);
+    const pilotOwnsPrimaryAction = ['onboarding', 'activation_ready', 'active', 'paused', 'closing'].includes(phase);
+    const dashboardActions = dashboardPrimaryCta.closest('.content-actions');
+
+    if (dashboardActions) {
+      dashboardActions.hidden = pilotOwnsPrimaryAction;
+      if (pilotOwnsPrimaryAction) {
+        dashboardActions.dataset.startpartnerPrimaryOwner = 'pilot';
+      } else {
+        delete dashboardActions.dataset.startpartnerPrimaryOwner;
+      }
+      return;
+    }
+
+    dashboardPrimaryCta.hidden = pilotOwnsPrimaryAction;
+    if (pilotOwnsPrimaryAction) {
+      dashboardPrimaryCta.dataset.startpartnerPrimaryOwner = 'pilot';
+    } else {
+      delete dashboardPrimaryCta.dataset.startpartnerPrimaryOwner;
+    }
+  }
+
   async function requestJson(url, options = {}) {
     const response = await fetch(url, {
       credentials: 'same-origin',
@@ -238,6 +264,7 @@
     const gate4 = data.gate4 || {};
     const pilot = gate4.pilot || {};
     const step = nextStep(gate4);
+    syncDashboardPrimaryActionOwner(gate4);
     const submitBlock = step.action === 'submit' ? `
       <div class="content-actions content-actions--inline">
         <button class="content-cta content-cta--primary" id="organizer-pilot-open-form" type="button">${escape(step.cta)}</button>
