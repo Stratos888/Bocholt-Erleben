@@ -21,4 +21,6 @@ for filename in ("index.html", "events/index.html", "aktivitaeten/index.html"):
 home=(ROOT/"index.html").read_text(); events=(ROOT/"events/index.html").read_text(); activities=(ROOT/"aktivitaeten/index.html").read_text()
 assert '/events/' in home and '/aktivitaeten/' in home and '/aktivitaeten/' in events and '/events/' in activities
 assert '"@type": "Event"' not in events
+assert events.count('data-date-month-label>Monat</div>') == 2
+assert 'März 2026' not in events
 print("SEO static/no-JS contract: OK")

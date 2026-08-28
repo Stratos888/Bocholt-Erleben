@@ -6,7 +6,6 @@ from __future__ import annotations
 import json
 import sys
 import xml.etree.ElementTree as ET
-from datetime import date
 from pathlib import Path
 
 NS = "http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -32,7 +31,6 @@ def main() -> int:
     tree = ET.parse(sitemap_path)
     root = tree.getroot()
     existing = {loc.text.strip() for loc in root.findall(f"{{{NS}}}url/{{{NS}}}loc") if loc.text}
-    today = date.today().isoformat()
     added = 0
 
     for page in pages:
@@ -42,12 +40,6 @@ def main() -> int:
         url_el = ET.SubElement(root, f"{{{NS}}}url")
         loc_el = ET.SubElement(url_el, f"{{{NS}}}loc")
         loc_el.text = url
-        lastmod_el = ET.SubElement(url_el, f"{{{NS}}}lastmod")
-        lastmod_el.text = today
-        changefreq_el = ET.SubElement(url_el, f"{{{NS}}}changefreq")
-        changefreq_el.text = "daily"
-        priority_el = ET.SubElement(url_el, f"{{{NS}}}priority")
-        priority_el.text = "0.70"
         existing.add(url)
         added += 1
 
