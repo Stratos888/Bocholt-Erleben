@@ -51,6 +51,21 @@ foreach ($calendarCases as [$sourceDate, $months, $expectedDate]) {
     );
 }
 
+$assert(
+    str_contains($state, 'ml.consumed_at >= :accepted_at_magic_link')
+        && str_contains($state, 's.created_at >= :accepted_at_session'),
+    'Portal-access readback must use distinct named placeholders under native PDO prepares.'
+);
+$assert(
+    str_contains($state, "'accepted_at_magic_link' => \$acceptedAt")
+        && str_contains($state, "'accepted_at_session' => \$acceptedAt"),
+    'Portal-access readback must bind both accepted-at placeholders explicitly.'
+);
+$assert(
+    !str_contains($state, "ml.consumed_at >= :accepted_at\n           AND s.created_at >= :accepted_at"),
+    'Portal-access readback must not reuse one named placeholder with native PDO prepares.'
+);
+
 $assert(str_contains($portal, 'be_startpartner_gate4_portal_payload_hash'), 'Portal replay must be payload bound.');
 $assert(str_contains($portal, 'client_reference wurde bereits mit anderen Inhaltsdaten verwendet.'), 'Changed payload under the same client reference must fail closed.');
 $assert(str_contains($portal, 'be_startpartner_gate4_portal_assert_active_capacity'), 'Active portal submit must check effective window and current limit state.');
