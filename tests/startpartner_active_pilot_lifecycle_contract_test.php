@@ -34,6 +34,22 @@ $assert(str_contains($lifecycle, 'historical_usage_retained'), 'Withdrawal must 
 $assert(str_contains($lifecycle, "content_type = 'activity' AND status = 'approved'"), 'Activity concurrency must derive from approved pilot links.');
 $assert(str_contains($contract, 'be_startpartner_gate4_pilot_month_window'), 'Calendar pilot-month helper is missing.');
 $assert(str_contains($contract, "BE_STARTPARTNER_GATE4_CHECKPOINT_KEYS = ['day_30', 'day_90', 'month_5', 'final']"), 'Checkpoint schedule contract is incomplete.');
+$assert(!str_contains($contract, 'cal_days_in_month'), 'Lifecycle calendar arithmetic must not depend on the optional PHP Calendar extension.');
+$assert(str_contains($contract, "modify('last day of this month')"), 'Lifecycle calendar arithmetic must use portable DateTime month-end calculation.');
+
+require_once $root . '/api/startpartner/_gate4_contract.php';
+$calendarCases = [
+    ['2026-01-31', 1, '2026-02-28'],
+    ['2024-01-31', 1, '2024-02-29'],
+    ['2026-08-25', 6, '2027-02-25'],
+];
+foreach ($calendarCases as [$sourceDate, $months, $expectedDate]) {
+    $actualDate = be_startpartner_gate4_add_calendar_months($sourceDate, $months);
+    $assert(
+        $actualDate === $expectedDate,
+        "Portable calendar arithmetic failed for {$sourceDate} + {$months} month(s): expected {$expectedDate}, got {$actualDate}."
+    );
+}
 
 $assert(str_contains($portal, 'be_startpartner_gate4_portal_payload_hash'), 'Portal replay must be payload bound.');
 $assert(str_contains($portal, 'client_reference wurde bereits mit anderen Inhaltsdaten verwendet.'), 'Changed payload under the same client reference must fail closed.');
