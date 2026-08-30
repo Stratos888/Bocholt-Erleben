@@ -63,7 +63,48 @@ jobs:
           FAIL_ON_PENDING_MANUAL: "false"
         run: |
           set -e
-          python scripts/weekly-ki-websearch-to-manual-inbox.py
+          python - <<'PY'
+          import importlib.util
+          import sys
+          from pathlib import Path
+
+          scripts_dir = Path("scripts").resolve()
+          if str(scripts_dir) not in sys.path:
+              sys.path.insert(0, str(scripts_dir))
+
+          from content_coverage_metrics import augment_weekly_diagnostics, response_telemetry
+
+          target = scripts_dir / "weekly-ki-websearch-to-manual-inbox.py"
+          spec = importlib.util.spec_from_file_location("weekly_ki_runtime", target)
+          if spec is None or spec.loader is None:
+              raise RuntimeError(f"Weekly runtime nicht ladbar: {target}")
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+
+          captured = {}
+          original_search = module.search_with_openai
+
+          def observed_search(messages):
+              raw_candidates, raw_source_candidates, response = original_search(messages)
+              captured["telemetry"] = response_telemetry(response)
+              return raw_candidates, raw_source_candidates, response
+
+          module.search_with_openai = observed_search
+          module.main()
+
+          diagnostics_path = Path(".tmp/weekly-ki-eventsuche/weekly_event_diagnostics.json")
+          measurement = augment_weekly_diagnostics(
+              diagnostics_path,
+              captured.get("telemetry", {"responses_api_calls": 1, "usage_status": "response_not_captured"}),
+              scheduled_runs_per_week=1,
+          )
+          print("WEEKLY COVERAGE MEASUREMENT")
+          print(f"- recurring_cost_delta: {measurement['cost_and_cadence']['recurring_cost_delta']}")
+          print(f"- total_tokens: {measurement['cost_and_cadence'].get('total_tokens')}")
+          print(f"- web_search_calls: {measurement['cost_and_cadence'].get('web_search_calls')}")
+          print(f"- selected_yield: {measurement['candidate_yield'].get('selected_yield')}")
+          print(f"- known_target_presence_rate: {measurement['known_target_baseline'].get('presence_rate')}")
+          PY
 
           MANUAL_HAS_ITEMS="$(python - <<'PY'
           import json
