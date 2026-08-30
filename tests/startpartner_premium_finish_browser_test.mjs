@@ -54,7 +54,59 @@ function activeCandidate(){
 
 function partnerProjection(){
   const candidate=activeCandidate();
-  return {organizer_id:401,gate4:{...candidate.gate4,next_action:{code:'submit_content',label:'Nächsten Termin einreichen',content_type:'event'}}};
+  return {organizer_id:401,gate4:{
+    ...candidate.gate4,
+    next_action:{code:'submit_content',label:'Nächsten Termin einreichen',content_type:'event'},
+    distribution:{status:'due'},
+    measurement:{status:'no_data_yet_or_too_short'},
+  }};
+}
+
+function zeroImpactMetrics(){
+  return {website_clicks:0,maps_clicks:0,location_clicks:0,organizer_cta_clicks:0,share_clicks:0,copy_link_clicks:0,detail_views:0,total_interactions:0};
+}
+
+function organizerPortalProjection(){
+  const submission={
+    id:4241,
+    submission_kind:'event',
+    status:'approved',
+    payment_kind:'single',
+    title:'Synthetischer Startpartner-Kulturtag',
+    start_date:'2026-09-12',
+    time_text:'19:00 Uhr',
+    location_name:'Kulturort Bocholt',
+    location_address:'Musterstraße 1, Bocholt',
+    event_url:'https://example.org/event',
+    ticket_url:'',
+    description_text:'Synthetischer Browsernachweis ohne Produktionswirkung.',
+    location_public_confirmed:1,
+    created_at:'2026-08-25 10:00:00',
+    updated_at:'2026-08-25 12:00:00',
+    impact_entity_id:'4241',
+    impact_metrics:zeroImpactMetrics(),
+    impact_last_interaction_at:null,
+  };
+  return {
+    organizer:{id:401,organization_name:'Gate-4-Kulturverein Bocholt',contact_name:'Erika Beispiel',email:'erika@example.org',default_plan_key:'single',stripe_customer_id:null},
+    portal_session:{id:7001,expires_at_utc:'2026-09-30 00:00:00',last_seen_at_utc:'2026-08-30 20:00:00'},
+    subscription:null,
+    active_subscriptions:[],
+    quota:{entitlement_count:0,has_unlimited:false,included_total:0,consumed_total:0,remaining_total:0,current_period_start:null,current_period_end:null},
+    quota_by_plan:[],
+    billing_summary:{currency:'EUR',subscription_count:0,monthly_total_cents:0,monthly_total_label:'0,00 € / Monat',items:[]},
+    impact_summary:{
+      status:'ok',
+      reporting_target:{type:'organizer',id:'401'},
+      period:{start_date:'2026-08-03',end_date:'2026-08-30'},
+      previous_period:{start_date:'2026-07-06',end_date:'2026-08-02'},
+      metrics:zeroImpactMetrics(),
+      previous_metrics:zeroImpactMetrics(),
+      items:[],
+    },
+    recent_submissions:[submission],
+    published_content:[submission],
+  };
 }
 
 async function operatorContract(browser,profile){
@@ -95,8 +147,9 @@ async function partnerContract(browser,profile){
   const {viewport,name,mode}=profile;
   const context=await browser.newContext({viewport});
   const page=await context.newPage();
+  await page.route('**/api/organizer-portal/me.php',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'ok',data:organizerPortalProjection()})}));
   await page.route('**/api/organizer-portal/pilot.php',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'ok',data:partnerProjection()})}));
-  await page.goto(`${baseUrl}/tests/fixtures/organizer_gate4_portal.html`,{waitUntil:'networkidle'});
+  await page.goto(`${baseUrl}/fuer-veranstalter/dashboard/`,{waitUntil:'networkidle'});
   await page.waitForSelector('#organizer-dashboard-pilot-card:not([hidden])');
   const card=page.locator('#organizer-dashboard-pilot-card');
   const text=await card.innerText();
@@ -106,9 +159,22 @@ async function partnerContract(browser,profile){
   assert(includes(text,'Deine Inhalte'),`${name}: Inhaltsbereich fehlt`);
   assert(includes(text,'Pilotdetails'),`${name}: sekundäre Pilotdetails fehlen`);
   for(const stale of ['Event-Limit','Pilotverbrauch','Pilotumfang und Laufzeit','Kostenlos zur Prüfung einreichen'])assert(!includes(text,stale),`${name}: interne/alte Sprache sichtbar: ${stale}`);
+  for(const operational of ['Reichweitenbeitrag ist fällig','belastbare Nutzungsbewertung'])assert(!includes(text,operational),`${name}: operative/no-data Erklärung ist im Premium-Partnerkontext sichtbar: ${operational}`);
   assert(await card.locator('.organizer-status-badge').count()===0,`${name}: redundanter Status-Badge ist noch vorhanden`);
   assert(await card.locator('.content-card .content-card').count()===0,`${name}: verschachtelte Kartenhierarchie im Pilotbereich`);
   assert(await card.locator('.content-cta--primary:visible').count()===1,`${name}: genau eine prominente Aktion erwartet`);
+
+  const genericHero=page.locator('main.page--organizers > .content-hero--panel');
+  const genericSubmissions=page.locator('#organizer-dashboard-submissions-card');
+  const genericSummary=page.locator('#organizer-dashboard-summary');
+  const genericImpact=page.locator('#organizer-dashboard-impact-card');
+  assert(await genericHero.isHidden(),`${name}: generischer Meine-Einreichung-Hero konkurriert mit dem Startpartner-Kontext`);
+  assert(await genericSubmissions.isHidden(),`${name}: generische Einreichungs-/Statuskarte dupliziert den Pilotinhalt im Defaultzustand`);
+  assert(await genericSummary.isHidden(),`${name}: generische Status-/Einreichungskarten duplizieren den aktiven Pilotkontext`);
+  assert(await genericImpact.isHidden(),`${name}: Wirkung ohne belastbare Aktionen darf nicht als zusätzlicher leerer Bereich erscheinen`);
+  const visibleText=await page.locator('body').innerText();
+  assert(!includes(visibleText,'Für diese Einreichung ist keine Mitgliedschaft aktiv.'),`${name}: reguläre Mitgliedschafts-Negativbotschaft widerspricht dem aktiven kostenlosen Pilotkontext`);
+
   const openButton=card.locator('#organizer-pilot-open-form');
   const shell=card.locator('#organizer-pilot-form-shell');
   const form=card.locator('#organizer-pilot-content-form');
@@ -233,6 +299,8 @@ fs.writeFileSync(path.join(outDir,'startpartner-premium-summary.json'),JSON.stri
   },
   checks:[
     'operator-responsive-matrix-default-and-collapsed-history',
+    'partner-real-dashboard-integrated-with-organizer-portal-and-pilot-renderer',
+    'partner-single-current-context-without-generic-status-chain',
     'partner-responsive-matrix-compact-and-form-open',
     'partner-form-one-column-below-900-and-two-columns-from-900',
     'partner-no-payment-boundary',
