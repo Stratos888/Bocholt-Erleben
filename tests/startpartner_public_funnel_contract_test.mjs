@@ -51,26 +51,33 @@ assert(feedbackJs.includes('ensureLauncher();'), 'Feedback: globaler Launcher fe
 assert(siteFooterJs.includes('data-feedback-open="missing"'), 'Footer: Missing-Trigger fehlt');
 assert(siteFooterJs.includes('data-feedback-open="global"'), 'Footer: globaler Feedback-Trigger fehlt');
 
-// Event-Funnel: reguläre Wege bleiben, Startpartner wird konsistent benannt und kontextuell vorausgewählt.
+// Event-Funnel: drei primäre Veröffentlichungswege, Startpartner vor der sekundären automatischen Übernahme.
 for (const marker of [
   'Wähle den passenden Veröffentlichungsweg',
   'Einzelne Veranstaltung einreichen',
   'Mitgliedschaft für regelmäßige Termine',
-  'Automatische Übernahme prüfen',
-  '<h2 id="publish-startpartner-title">Startpartner</h2>',
-  '6 Monate kostenlos testen',
+  '<strong>Startpartner</strong>',
+  '6 Monate kostenlos',
   'Startpartner anfragen',
+  'Termine schon gepflegt? Automatische Übernahme prüfen',
   'Wie funktioniert Startpartner? Kurz erklärt',
 ]) {
   assert(eventPublish.includes(marker), `Event-Funnel: Marker fehlt: ${marker}`);
 }
 assert(eventPublish.includes('href="/startpartner/?scope=events"'), 'Event-Funnel: Event-Scope fehlt');
-assert(eventPublish.includes('href="/veroeffentlichung-erklaert/#startpartner"'), 'Event-Funnel: Startpartner-Erklärlink fehlt');
-assert(eventPublish.indexOf('Wähle den passenden Veröffentlichungsweg') < eventPublish.indexOf('<h2 id="publish-startpartner-title">Startpartner</h2>'), 'Event-Funnel: Startpartner muss nach den regulären Wegen stehen');
+assert(eventPublish.includes('href="/events-veroeffentlichen/anbindung/"'), 'Event-Funnel: sekundärer Automatik-Pfad fehlt');
+assert(eventPublish.includes('href="/veroeffentlichung-erklaert/#startpartner-weg"'), 'Event-Funnel: Startpartner-Erklärlink fehlt');
 assert(!eventPublish.includes('/events-veroeffentlichen/mitgliedschaft/'), 'Event-Funnel: zusätzliche Membership-Unterroute darf nicht existieren');
-const eventStartpartnerSection = sectionFrom(eventPublish, 'aria-labelledby="publish-startpartner-title"');
-assert(eventStartpartnerSection.includes('publish-membership-card publish-models-card'), 'Event-Funnel: Startpartner muss gemeinsame Card-Primitives nutzen');
-assert(eventStartpartnerSection.includes('class="publish-model-list"'), 'Event-Funnel: Startpartner muss Model-Liste nutzen');
+const eventPathsSection = sectionFrom(eventPublish, 'aria-labelledby="publish-paths-title"');
+assert(eventPathsSection.includes('publish-membership-card publish-models-card'), 'Event-Funnel: gemeinsame Card-Primitives fehlen');
+assert(eventPathsSection.includes('class="publish-model-list"'), 'Event-Funnel: Model-Liste fehlt');
+assert(count(eventPathsSection, 'class="publish-model-copy"') === 3, 'Event-Funnel: genau drei primäre Veröffentlichungswege erwartet');
+const singleIndex = eventPathsSection.indexOf('<strong>Einzelne Veranstaltung einreichen</strong>');
+const membershipIndex = eventPathsSection.indexOf('<strong>Mitgliedschaft für regelmäßige Termine</strong>');
+const startpartnerIndex = eventPathsSection.indexOf('<strong>Startpartner</strong>');
+const automationIndex = eventPathsSection.indexOf('Termine schon gepflegt? Automatische Übernahme prüfen');
+assert(singleIndex >= 0 && membershipIndex > singleIndex && startpartnerIndex > membershipIndex, 'Event-Funnel: Reihenfolge der drei primären Veröffentlichungswege ist falsch');
+assert(automationIndex > startpartnerIndex, 'Event-Funnel: automatische Übernahme muss nach Startpartner als sekundärer Pfad stehen');
 
 // Aktivitäts-Funnel: Eignung/Tarife/Ablauf bleiben, Startpartner liegt weiter zwischen Tarif und Ablauf.
 for (const marker of [
@@ -122,7 +129,7 @@ for (const value of ['events', 'activities', 'both', 'unsure']) {
   assert(startpartner.includes(`value="${value}"`), `Startpartner: Scope-Option fehlt: ${value}`);
 }
 assert(startpartner.includes('id="startpartner-request-submit" type="submit">Startpartner anfragen</button>'), 'Startpartner: Submit inkonsistent');
-assert(startpartner.includes('href="/veroeffentlichung-erklaert/#startpartner"'), 'Startpartner: Erklärlink fehlt');
+assert(startpartner.includes('href="/veroeffentlichung-erklaert/#startpartner-weg"'), 'Startpartner: Erklärlink fehlt');
 assert(startpartner.includes('Wie funktioniert Startpartner? Kurz erklärt'), 'Startpartner: Erklärlink nicht verständlich');
 assert(startpartner.includes('<h2 id="startpartner-regular-paths-title">Lieber regulär veröffentlichen?</h2>'), 'Startpartner: reguläre Alternativen fehlen');
 const regularPathsSection = sectionFrom(startpartner, 'aria-labelledby="startpartner-regular-paths-title"');
