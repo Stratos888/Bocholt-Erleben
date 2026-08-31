@@ -298,7 +298,45 @@
       </div>`;
   }
 
-  function render(data, successMessage = '') {
+  function regularMembershipDetails(portalData) {
+    const subscriptions = Array.isArray(portalData?.active_subscriptions)
+      ? portalData.active_subscriptions.filter(row => ['active', 'trialing', 'past_due'].includes(safe(row?.status).toLowerCase()))
+      : [];
+    if (!subscriptions.length) return '';
+
+    const quotas = Array.isArray(portalData?.quota_by_plan) ? portalData.quota_by_plan : [];
+    const billing = portalData?.billing_summary || {};
+    const rows = subscriptions.map(subscription => {
+      const planKey = safe(subscription?.plan_key);
+      const label = safe(subscription?.plan_label) || planKey || 'Regulärer Tarif';
+      const amount = safe(subscription?.monthly_amount_label);
+      const quota = quotas.find(row => safe(row?.plan_key) === planKey) || null;
+      let usage = '';
+      if (quota) {
+        usage = quota.has_unlimited
+          ? 'unbegrenzt'
+          : `${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} genutzt`;
+      }
+      return `<div><dt>${escape(label)}</dt><dd>${escape([amount, usage].filter(Boolean).join(' · '))}</dd></div>`;
+    }).join('');
+
+    const amountSummary = subscriptions.length === 1
+      ? safe(subscriptions[0]?.monthly_amount_label)
+      : safe(billing?.monthly_total_label);
+    const summary = `${subscriptions.length === 1 ? 'Reguläre Mitgliedschaft' : 'Reguläre Mitgliedschaften'}${amountSummary ? ` · ${amountSummary}` : ''}`;
+
+    return `
+      <details class="content-disclosure" data-startpartner-regular-membership>
+        <summary>${escape(summary)}</summary>
+        <dl class="organizer-tariff-table">${rows}</dl>
+        <p class="content-note">Diese reguläre Mitgliedschaft läuft unabhängig von deiner kostenlosen Startpartner-Pilotphase und nutzt ihr eigenes Kontingent.</p>
+        <div class="content-actions content-actions--inline organizer-pilot-secondary-actions">
+          <button class="content-cta" id="organizer-pilot-manage-membership" type="button">Mitgliedschaft verwalten</button>
+        </div>
+      </details>`;
+  }
+
+  function render(data, portalData = null, successMessage = '') {
     const gate4 = data.gate4 || {};
     const pilot = gate4.pilot || {};
     const step = nextStep(gate4);
@@ -316,6 +354,7 @@
         <span class="content-kicker">Nächster Schritt</span><h3>${escape(step.title)}</h3><p class="content-note">${escape(step.text)}</p>${submitBlock}
       </section>
       <section class="organizer-pilot-content-area" aria-label="Inhalte im Pilot"><h3>Deine Inhalte</h3>${contentList(gate4.content_links)}${secondaryContentDetails(gate4)}</section>
+      ${regularMembershipDetails(portalData)}
       <details class="content-disclosure"><summary>Pilotdetails</summary>
         <dl class="organizer-tariff-table">
           <div><dt>Vereinbarter Rahmen</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
@@ -327,6 +366,7 @@
       </details>`;
     bindForm();
     bindSecondaryContentDetails();
+    bindRegularMembership();
   }
 
   function friendlyError(error) {
@@ -337,8 +377,11 @@
   }
 
   async function load(successMessage = '') {
-    const data = await requestJson('/api/organizer-portal/pilot.php');
-    render(data, successMessage);
+    const [data, portalData] = await Promise.all([
+      requestJson('/api/organizer-portal/pilot.php'),
+      requestJson('/api/organizer-portal/me.php').catch(() => null),
+    ]);
+    render(data, portalData, successMessage);
   }
 
   function newClientReference() {
@@ -368,6 +411,26 @@
       if (list) list.hidden = false;
 
       submissionsCard.scrollIntoView({behavior: 'smooth', block: 'start'});
+    });
+  }
+
+  function bindRegularMembership() {
+    const button = document.getElementById('organizer-pilot-manage-membership');
+    if (!button) return;
+
+    button.addEventListener('click', async () => {
+      const defaultLabel = button.textContent || 'Mitgliedschaft verwalten';
+      button.disabled = true;
+      button.textContent = 'Wird geöffnet …';
+      try {
+        const result = await requestJson('/api/organizer-portal/create-billing-portal-session.php', {method: 'POST'});
+        const url = safe(result?.url);
+        if (!url) throw new Error('billing_portal_url_missing');
+        window.location.assign(url);
+      } catch (_error) {
+        button.disabled = false;
+        button.textContent = defaultLabel;
+      }
     });
   }
 
