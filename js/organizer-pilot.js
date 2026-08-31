@@ -4,6 +4,7 @@
   const card = document.getElementById('organizer-dashboard-pilot-card');
   if (!card) return;
 
+  const pageRoot = document.querySelector('.page--organizers[data-organizer-page="dashboard"]');
   const safe = value => String(value ?? '').trim();
   const escape = value => safe(value)
     .replaceAll('&', '&amp;')
@@ -11,19 +12,53 @@
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
+  const partnerContextPhases = new Set(['onboarding', 'activation_ready', 'active', 'paused', 'closing']);
   let pendingClientReference = '';
 
-  function syncDashboardPrimaryActionOwner(gate4) {
-    const dashboardPrimaryCta = document.getElementById('organizer-dashboard-primary-cta');
-    if (!dashboardPrimaryCta) return;
+  function pilotOwnsPartnerContext(gate4) {
+    return partnerContextPhases.has(safe(gate4?.phase));
+  }
 
-    const phase = safe(gate4?.phase);
-    const pilotOwnsPrimaryAction = ['onboarding', 'activation_ready', 'active', 'paused', 'closing'].includes(phase);
-    const dashboardActions = dashboardPrimaryCta.closest('.content-actions');
+  function persistHidden(element, hidden) {
+    if (!element) return;
+    if (hidden) {
+      element.hidden = true;
+      element.style.display = 'none';
+      return;
+    }
+    element.style.removeProperty('display');
+  }
+
+  function syncDashboardPartnerContextOwner(gate4) {
+    const pilotOwnsContext = pilotOwnsPartnerContext(gate4);
+    const dashboardPrimaryCta = document.getElementById('organizer-dashboard-primary-cta');
+    const dashboardActions = dashboardPrimaryCta?.closest('.content-actions') || null;
+    const genericHero = pageRoot?.querySelector(':scope > .content-hero') || null;
+    const summaryGrid = document.getElementById('organizer-dashboard-summary');
+    const submissionsCard = document.getElementById('organizer-dashboard-submissions-card');
+
+    if (pageRoot) {
+      if (pilotOwnsContext) {
+        pageRoot.dataset.startpartnerCurrentOwner = 'pilot';
+      } else {
+        delete pageRoot.dataset.startpartnerCurrentOwner;
+        delete pageRoot.dataset.startpartnerDetailsOpen;
+      }
+    }
+
+    persistHidden(genericHero, pilotOwnsContext);
+    persistHidden(summaryGrid, pilotOwnsContext);
+
+    if (pilotOwnsContext) {
+      const detailsOpen = pageRoot?.dataset.startpartnerDetailsOpen === 'true';
+      persistHidden(submissionsCard, !detailsOpen);
+    } else {
+      persistHidden(submissionsCard, false);
+    }
 
     if (dashboardActions) {
-      dashboardActions.hidden = pilotOwnsPrimaryAction;
-      if (pilotOwnsPrimaryAction) {
+      dashboardActions.hidden = pilotOwnsContext;
+      if (pilotOwnsContext) {
         dashboardActions.dataset.startpartnerPrimaryOwner = 'pilot';
       } else {
         delete dashboardActions.dataset.startpartnerPrimaryOwner;
@@ -31,11 +66,13 @@
       return;
     }
 
-    dashboardPrimaryCta.hidden = pilotOwnsPrimaryAction;
-    if (pilotOwnsPrimaryAction) {
-      dashboardPrimaryCta.dataset.startpartnerPrimaryOwner = 'pilot';
-    } else {
-      delete dashboardPrimaryCta.dataset.startpartnerPrimaryOwner;
+    if (dashboardPrimaryCta) {
+      dashboardPrimaryCta.hidden = pilotOwnsContext;
+      if (pilotOwnsContext) {
+        dashboardPrimaryCta.dataset.startpartnerPrimaryOwner = 'pilot';
+      } else {
+        delete dashboardPrimaryCta.dataset.startpartnerPrimaryOwner;
+      }
     }
   }
 
@@ -75,7 +112,7 @@
   function contentStatus(status) {
     return ({
       draft: 'Zur Prüfung eingereicht', editorial_ready: 'Redaktionell vorbereitet',
-      approved: 'Freigegeben', rejected: 'Nicht freigegeben', withdrawn: 'Zurückgezogen',
+      approved: 'Veröffentlicht', rejected: 'Nicht veröffentlicht', withdrawn: 'Zurückgezogen',
     })[status] || 'In Bearbeitung';
   }
 
@@ -244,27 +281,28 @@
           <label class="content-field content-field--full"><span class="content-field__label" data-pilot-description-label>Kurze Beschreibung / Hinweise</span><textarea class="content-field__control" name="description_text" rows="4" maxlength="20000"></textarea></label>
           <label class="content-field content-field--full content-field--checkbox"><span class="content-field__hint"><input name="location_public_confirmed" type="checkbox" required> Ich bestätige, dass ich berechtigt bin, diesen Inhalt einzureichen, und dass der Ort öffentlich genannt werden darf.</span></label>
         </div>
-        <div class="content-actions content-actions--inline"><button class="content-cta content-cta--primary" type="submit">Zur Prüfung einreichen</button></div>
+        <div class="content-actions content-actions--inline">
+          <button class="content-cta content-cta--primary" type="submit">Zur Prüfung einreichen</button>
+          <button class="content-cta" id="organizer-pilot-close-form" type="button">Formular schließen</button>
+        </div>
         <p class="content-note" data-pilot-submit-status aria-live="polite">Die Einreichung ist kostenlos und löst keine Zahlung aus. Veröffentlichung erst nach redaktioneller Freigabe.</p>
       </form>`;
   }
 
-  function operationalNote(gate4) {
-    const distribution = gate4.distribution || {};
-    const measurement = gate4.measurement || {};
-    const notes = [];
-    if (distribution.status === 'due') notes.push('Der vereinbarte Reichweitenbeitrag ist fällig und wird von Bocholt erleben nachgehalten.');
-    if (distribution.status === 'blocked') notes.push('Beim vereinbarten Reichweitenbeitrag besteht aktuell Klärungsbedarf.');
-    if (measurement.status === 'query_or_attribution_problem') notes.push('Die technische Erfolgsmessung wird aktuell geprüft; daraus wird keine Nullnutzung abgeleitet.');
-    if (measurement.status === 'no_data_yet_or_too_short') notes.push('Für eine belastbare Nutzungsbewertung liegen noch nicht genügend abgeschlossene Messdaten vor.');
-    return notes.length ? `<p class="content-note">${escape(notes.join(' '))}</p>` : '';
+  function secondaryContentDetails(gate4) {
+    const hasSubmission = (gate4.content_links || []).some(row => Number(row?.submission_id || 0) > 0);
+    if (!hasSubmission) return '';
+    return `
+      <div class="content-actions content-actions--inline organizer-pilot-secondary-actions">
+        <button class="content-cta" id="organizer-pilot-open-submission-details" type="button">Details & Änderungen</button>
+      </div>`;
   }
 
   function render(data, successMessage = '') {
     const gate4 = data.gate4 || {};
     const pilot = gate4.pilot || {};
     const step = nextStep(gate4);
-    syncDashboardPrimaryActionOwner(gate4);
+    syncDashboardPartnerContextOwner(gate4);
     const submitBlock = step.action === 'submit' ? `
       <div class="content-actions content-actions--inline">
         <button class="content-cta content-cta--primary" id="organizer-pilot-open-form" type="button">${escape(step.cta)}</button>
@@ -277,19 +315,18 @@
       <section class="organizer-pilot-next-step" aria-label="Nächster Schritt">
         <span class="content-kicker">Nächster Schritt</span><h3>${escape(step.title)}</h3><p class="content-note">${escape(step.text)}</p>${submitBlock}
       </section>
-      <section class="organizer-pilot-content-area" aria-label="Inhalte im Pilot"><h3>Deine Inhalte</h3>${contentList(gate4.content_links)}</section>
-      ${operationalNote(gate4)}
+      <section class="organizer-pilot-content-area" aria-label="Inhalte im Pilot"><h3>Deine Inhalte</h3>${contentList(gate4.content_links)}${secondaryContentDetails(gate4)}</section>
       <details class="content-disclosure"><summary>Pilotdetails</summary>
         <dl class="organizer-tariff-table">
           <div><dt>Vereinbarter Rahmen</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
           ${usageText(gate4) ? `<div><dt>Aktuelle Nutzung</dt><dd>${escape(usageText(gate4))}</dd></div>` : ''}
           <div><dt>Pilotstart</dt><dd>${escape(formatDate(pilot.activation_date_local))}</dd></div>
           <div><dt>Geplantes Ende</dt><dd>${escape(formatDate(pilot.planned_end_date))}</dd></div>
-          <div><dt>Freigegebene Inhalte</dt><dd>${escape(String((gate4.content_links || []).filter(row => row.status === 'approved').length))}</dd></div>
         </dl>
         <p class="content-note">Keine Zahlungsart erforderlich und keine automatische kostenpflichtige Verlängerung. Veröffentlichungen bleiben redaktionell geprüft.</p>
       </details>`;
     bindForm();
+    bindSecondaryContentDetails();
   }
 
   function friendlyError(error) {
@@ -308,8 +345,35 @@
     return `gate4-344-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
   }
 
+  function bindSecondaryContentDetails() {
+    const trigger = document.getElementById('organizer-pilot-open-submission-details');
+    const submissionsCard = document.getElementById('organizer-dashboard-submissions-card');
+    if (!trigger || !submissionsCard || !pageRoot) return;
+
+    trigger.addEventListener('click', () => {
+      pageRoot.dataset.startpartnerDetailsOpen = 'true';
+      submissionsCard.style.removeProperty('display');
+      submissionsCard.hidden = false;
+
+      const head = document.getElementById('organizer-dashboard-submissions-head');
+      const summary = document.getElementById('organizer-dashboard-submissions-summary');
+      const overview = document.getElementById('organizer-dashboard-submissions-overview');
+      const nextStep = document.getElementById('organizer-dashboard-next-step');
+      const toggle = document.getElementById('organizer-dashboard-submissions-toggle');
+      const list = document.getElementById('organizer-dashboard-submissions-list');
+
+      if (head) head.textContent = 'Details & Änderungen';
+      [summary, overview, nextStep].forEach(node => persistHidden(node, true));
+      if (toggle) toggle.hidden = true;
+      if (list) list.hidden = false;
+
+      submissionsCard.scrollIntoView({behavior: 'smooth', block: 'start'});
+    });
+  }
+
   function bindForm() {
     const openButton = document.getElementById('organizer-pilot-open-form');
+    const closeButton = document.getElementById('organizer-pilot-close-form');
     const formShell = document.getElementById('organizer-pilot-form-shell');
     const form = document.getElementById('organizer-pilot-content-form');
     if (openButton && formShell && form) {
@@ -317,6 +381,13 @@
         openButton.hidden = true;
         formShell.hidden = false;
         form.querySelector('select:not([hidden]), input:not([type="hidden"])')?.focus();
+      });
+    }
+    if (closeButton && openButton && formShell) {
+      closeButton.addEventListener('click', () => {
+        formShell.hidden = true;
+        openButton.hidden = false;
+        openButton.focus();
       });
     }
     if (!form) return;
