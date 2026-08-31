@@ -2216,13 +2216,8 @@ select.content-field__control{
     border-left: 1px solid var(--cmp-divider-strong);
   }
 
-  .page--publish.page--startpartner .publish-model-list.publish-model-list{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .page--publish.page--startpartner .publish-model-list.publish-model-list li{
-    grid-template-rows: minmax(0, 1fr) auto;
-  }
+  .page--publish.page--startpartner .publish-model-list.publish-model-list{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .page--publish.page--startpartner .publish-model-list.publish-model-list li{grid-template-rows:minmax(0,1fr) auto;}
 
   .page--organizers .content-lead{
     max-width: min(68ch, 100%);
