@@ -221,6 +221,9 @@ function applyPlanPresetFromUrl() {
     const submitSection = byId("publish-submit");
     const form = byId("publish-standard-form");
     const trigger = byId("publish-standard-pay");
+    const pageHero = document.querySelector(".page--publish > .content-hero");
+    const heroTitle = pageHero?.querySelector("h1") || null;
+    const heroLead = pageHero?.querySelector(".content-lead") || null;
     if (!submitSection || !form || !routeState) return;
 
     let guard = document.querySelector("[data-startpartner-route-guard]");
@@ -233,9 +236,11 @@ function applyPlanPresetFromUrl() {
     }
 
     if (routeState.usePilot) {
+      if (heroTitle) heroTitle.textContent = "Veranstaltung über Startpartner einreichen";
+      if (heroLead) heroLead.textContent = "Du kannst diesen Termin im Rahmen deiner Startpartner-Pilotphase kostenlos einreichen.";
       guard.innerHTML = `
-        <h2>Über Startpartner einreichen</h2>
-        <p class="content-note">Du hast einen Startpartner-Zugang für Veranstaltungen. Reiche diesen Termin dort kostenlos ein; dadurch entsteht keine separate Einzeltermin-Zahlung.</p>
+        <h2>Weiter im Veranstalterbereich</h2>
+        <p class="content-note">Dort wird die Einreichung deiner Pilotphase zugeordnet. Es entsteht keine separate Einzeltermin-Zahlung.</p>
         <div class="content-actions content-actions--inline">
           <a class="content-cta content-cta--primary" href="/fuer-veranstalter/dashboard/">Im Startpartner-Bereich einreichen</a>
         </div>
