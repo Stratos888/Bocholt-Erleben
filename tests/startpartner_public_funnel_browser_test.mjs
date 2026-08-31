@@ -132,23 +132,31 @@ async function runProfile(browser, profileName, viewport) {
   const referenceSignature = await formFunnelSignature(page);
   await assertNoOverflow(page, `${profileName}: Anfrage-Referenz`);
 
-  // Event-Funnel: reguläre Wege bleiben, Startpartner ist konsistent benannt.
+  // Event-Funnel: drei primäre Wege; automatische Übernahme bleibt ein sekundärer Sonderpfad.
   await open(page, '/events-veroeffentlichen/');
   const eventText = await assertCanonicalNaming(page, `${profileName}: Event-Funnel`);
   for (const marker of [
     'Wähle den passenden Veröffentlichungsweg',
     'Einzelne Veranstaltung einreichen',
     'Mitgliedschaft für regelmäßige Termine',
-    'Automatische Übernahme prüfen',
     'Startpartner',
-    '6 Monate kostenlos testen',
+    '6 Monate kostenlos',
+    'Termine schon gepflegt? Automatische Übernahme prüfen',
     'Wie funktioniert Startpartner? Kurz erklärt',
   ]) {
     assert(eventText.includes(marker), `${profileName}: Event-Marker fehlt: ${marker}`);
   }
+  const eventModels = await page.locator('.publish-model-list > li').evaluateAll((nodes) => nodes.map((node) => node.querySelector('strong')?.textContent?.trim() || ''));
+  assert(JSON.stringify(eventModels) === JSON.stringify([
+    'Einzelne Veranstaltung einreichen',
+    'Mitgliedschaft für regelmäßige Termine',
+    'Startpartner',
+  ]), `${profileName}: Event-Funnel muss genau die drei primären Wege in Zielreihenfolge zeigen`);
+  assert(await page.locator('.publish-model-list a[href="/events-veroeffentlichen/anbindung/"]').count() === 0, `${profileName}: automatische Übernahme darf kein primäres Modell mehr sein`);
+  assert(await page.locator('a[href="/events-veroeffentlichen/anbindung/"]').count() === 1, `${profileName}: sekundärer Automatik-Pfad fehlt`);
   assert(await page.locator('a[href="/startpartner/?scope=events"]').count() === 1, `${profileName}: Event-Startpartner-Scope fehlt`);
   assert(await page.getByRole('link', { name: 'Startpartner anfragen' }).count() === 1, `${profileName}: Event-Startpartner-CTA fehlt`);
-  assert(eventText.indexOf('Wähle den passenden Veröffentlichungsweg') < eventText.lastIndexOf('Startpartner'), `${profileName}: Startpartner steht nicht nach regulären Event-Wegen`);
+  assert(await page.locator('a[href="/veroeffentlichung-erklaert/#startpartner-weg"]').count() === 1, `${profileName}: Event-Startpartner-Erkläranker fehlt`);
   await assertNoOverflow(page, `${profileName}: Event-Funnel`);
 
   // Aktivitäts-Funnel: Tarifstruktur bleibt, Startpartner ist konsistent benannt.
@@ -197,6 +205,7 @@ async function runProfile(browser, profileName, viewport) {
   assert(await page.locator('#startpartner-contact').count() === 1, `${profileName}: Ansprechperson fehlt`);
   assert(await page.locator('#startpartner-website').count() === 1, `${profileName}: Website/Quelle fehlt`);
   assert(await page.getByRole('link', { name: 'Wie funktioniert Startpartner? Kurz erklärt' }).count() === 1, `${profileName}: zentraler Erklärlink fehlt`);
+  assert(await page.locator('a[href="/veroeffentlichung-erklaert/#startpartner-weg"]').count() === 1, `${profileName}: Startpartner-Erklärlink muss auf den kanonischen Weg-Anker zeigen`);
 
   const regularSection = page.locator('section[aria-labelledby="startpartner-regular-paths-title"]');
   assert(await regularSection.count() === 1, `${profileName}: Bereich für reguläre Alternativen fehlt`);
@@ -252,8 +261,8 @@ async function runProfile(browser, profileName, viewport) {
   assert(await page.locator('#startpartner-organization').inputValue() === organizationBefore, `${profileName}: Fehler darf Formulardaten nicht leeren`);
   assert(page.url().includes('/startpartner/?scope=activities'), `${profileName}: Fehler darf nicht auf Erfolgsseite navigieren`);
 
-  // Detailwissen liegt nur auf der Erklärseite.
-  await open(page, '/veroeffentlichung-erklaert/#startpartner');
+  // Detailwissen liegt auf der Erklärseite; der öffentliche Link landet auf dem sichtbaren Startpartner-Weg.
+  await open(page, '/veroeffentlichung-erklaert/#startpartner-weg');
   const explainerText = await assertCanonicalNaming(page, `${profileName}: Erklärseite`);
   assert(explainerText.includes('Sonderweg: Startpartner'), `${profileName}: Startpartner-Sonderweg fehlt`);
   assert(explainerText.includes('sechs Monate kostenlos'), `${profileName}: Sechs-Monats-Erklärung fehlt`);
@@ -263,7 +272,10 @@ async function runProfile(browser, profileName, viewport) {
   assert(!explainerText.includes('kostenpflichtigen Tarif umgewandelt'), `${profileName}: alte Umwandlungs-Sprache sichtbar`);
   const details = page.locator('details#startpartner');
   assert(await details.count() === 1, `${profileName}: Startpartner-FAQ fehlt`);
-  await page.waitForFunction(() => document.querySelector('details#startpartner')?.open === true, null, { timeout: 4000 });
+  if (!(await details.evaluate((node) => node.open))) {
+    await details.locator('summary').click();
+  }
+  assert(await details.evaluate((node) => node.open), `${profileName}: Startpartner-FAQ lässt sich nicht öffnen`);
   await assertNoOverflow(page, `${profileName}: Erklärseite`);
 
   assert(formspreeRequests === 0, `${profileName}: Browser-Test hat unerwartet Formspree aufgerufen`);
@@ -282,7 +294,7 @@ async function runProfile(browser, profileName, viewport) {
       '/startpartner/?scope=events',
       '/startpartner/?scope=activities',
       '/startpartner/erfolg/?mail=sent',
-      '/veroeffentlichung-erklaert/#startpartner',
+      '/veroeffentlichung-erklaert/#startpartner-weg',
     ],
   };
 }
