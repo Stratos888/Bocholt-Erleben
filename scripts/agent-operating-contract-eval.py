@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Zero-incremental-cost behavioral contract checks for Bocholt erleben Agent OS V1.
+"""Zero-incremental-cost behavioral contract checks for Bocholt erleben Agent OS.
 
 This runner does not call any model, API, web search, repository write, database,
-mail, payment or publication endpoint. It validates the curated scenario corpus,
-checks the unchanged V1 blob, evaluates deterministic decision vectors, rejects
-adversarial fixtures, and emits a machine-readable baseline summary.
+mail, payment or publication endpoint. It validates the immutable historical V1
+scenario corpus, evaluates the current contract against its behavior markers,
+rejects adversarial fixtures, and emits a machine-readable baseline summary.
 """
 
 from __future__ import annotations
@@ -205,12 +205,8 @@ def build_baseline(
     contract_bytes = contract_path.read_bytes()
     contract_text = contract_bytes.decode("utf-8")
     actual_blob = git_blob_sha_bytes(contract_bytes)
-    expected_blob = corpus["contract"]["expected_git_blob_sha"]
-    if actual_blob != expected_blob:
-        raise ContractEvalError(
-            f"V1 contract changed: expected blob {expected_blob}, got {actual_blob}. "
-            "Gate B requires byte-identical AGENTS.md."
-        )
+    historical_v1_blob = corpus["contract"]["expected_git_blob_sha"]
+    matches_historical_v1 = actual_blob == historical_v1_blob
 
     fields = corpus["decision_fields"]
     marker_results = [contract_marker_status(case, contract_text) for case in corpus["cases"]]
@@ -223,7 +219,7 @@ def build_baseline(
             f"{item['case_id']} ({len(item['missing_markers'])} missing)"
             for item in missing_required_markers
         )
-        raise ContractEvalError(f"Covered cases lost required V1 markers: {details}")
+        raise ContractEvalError(f"Covered cases lost required contract markers: {details}")
 
     adversarial_results: list[dict[str, Any]] = []
     accidentally_accepted: list[str] = []
@@ -257,9 +253,9 @@ def build_baseline(
         "mode": "zero_incremental_cost",
         "contract": {
             "path": str(contract_path),
-            "expected_blob_sha": expected_blob,
-            "actual_blob_sha": actual_blob,
-            "byte_identical_v1": True,
+            "historical_v1_blob_sha": historical_v1_blob,
+            "current_blob_sha": actual_blob,
+            "matches_historical_v1": matches_historical_v1,
         },
         "cases_total": len(corpus["cases"]),
         "static_assessment": static_counts,
@@ -298,6 +294,7 @@ def main() -> int:
             f"({baseline['cases_total']} cases; "
             f"{baseline['adversarial_fixtures_rejected']} adversarial fixtures rejected; "
             f"static={baseline['static_assessment']}; "
+            f"matches historical V1={baseline['contract']['matches_historical_v1']}; "
             "external calls=0)"
         )
         if baseline["cases_requiring_stronger_evidence_or_contract_review"]:
