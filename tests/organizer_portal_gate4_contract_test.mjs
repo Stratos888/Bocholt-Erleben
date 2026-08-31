@@ -13,7 +13,7 @@ const failures = [];
 const assert = (ok, message) => { if (!ok) failures.push(message); };
 
 assert(html.includes('organizer-dashboard-pilot-card'), 'Dashboard needs a dedicated pilot card inside the existing portal.');
-assert(html.includes('/js/organizer-pilot.js?v=2026-08-31-startpartner-mixed-state-v1'), 'Dashboard must cache-bust the Startpartner mixed-state owner.');
+assert(html.includes('/js/organizer-pilot.js?v=2026-08-31-startpartner-direct-handoff-v1'), 'Dashboard must cache-bust the current Startpartner direct-handoff owner.');
 assert(html.includes('/js/organizer-portal.js?v=2026-08-28-phase-a-single-status-repair-v1'), 'Dashboard must cache-bust the corrected organizer portal renderer.');
 assert(fixture.includes('<main class="page page--organizers" data-organizer-page="dashboard">'), 'Synthetic partner evidence must use the real organizer dashboard page shell.');
 assert(fixture.includes('class="content-card content-card--primary" id="organizer-dashboard-pilot-card"'), 'Synthetic partner evidence must use the real dashboard pilot-card primitives.');
