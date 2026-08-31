@@ -13,7 +13,7 @@ const failures = [];
 const assert = (ok, message) => { if (!ok) failures.push(message); };
 
 assert(html.includes('organizer-dashboard-pilot-card'), 'Dashboard needs a dedicated pilot card inside the existing portal.');
-assert(html.includes('/js/organizer-pilot.js?v=2026-08-31-startpartner-partner-context-v1'), 'Dashboard must cache-bust the consolidated Startpartner partner-context owner.');
+assert(html.includes('/js/organizer-pilot.js?v=2026-08-31-startpartner-mixed-state-v1'), 'Dashboard must cache-bust the Startpartner mixed-state owner.');
 assert(html.includes('/js/organizer-portal.js?v=2026-08-28-phase-a-single-status-repair-v1'), 'Dashboard must cache-bust the corrected organizer portal renderer.');
 assert(fixture.includes('<main class="page page--organizers" data-organizer-page="dashboard">'), 'Synthetic partner evidence must use the real organizer dashboard page shell.');
 assert(fixture.includes('class="content-card content-card--primary" id="organizer-dashboard-pilot-card"'), 'Synthetic partner evidence must use the real dashboard pilot-card primitives.');
@@ -53,7 +53,10 @@ assert(js.includes("approved: 'Veröffentlicht'") && js.includes("rejected: 'Nic
 assert(!js.includes('phaseBadge') && !js.includes('organizer-status-badge'), 'Partner portal must not repeat the phase with a redundant status badge.');
 assert(!js.includes('Event-Limit erreicht') && !js.includes('Pilotverbrauch') && !js.includes('Pilotumfang und Laufzeit'), 'Partner portal must not regress to old technical or status-document wording.');
 assert(!js.includes('Reichweitenbeitrag ist fällig') && !js.includes('belastbare Nutzungsbewertung'), 'Partner default must not expose operational distribution or no-data measurement copy.');
-assert(!js.includes('create-billing-portal-session'), 'Pilot UI must not expose Stripe billing as the pilot contract.');
+const billingPortalMatches = js.match(/create-billing-portal-session\.php/g) || [];
+assert(billingPortalMatches.length === 1, 'Billing portal access may exist exactly once and only for an independently active regular membership.');
+assert(js.includes('data-startpartner-regular-membership') && js.includes('Diese reguläre Mitgliedschaft läuft unabhängig von deiner kostenlosen Startpartner-Pilotphase und nutzt ihr eigenes Kontingent.'), 'Any billing access in the pilot-owned dashboard must be explicitly isolated as a regular membership with separate quota semantics.');
+assert(js.includes("document.getElementById('organizer-pilot-manage-membership')") && js.includes("requestJson('/api/organizer-portal/create-billing-portal-session.php'"), 'Regular membership management must stay behind its dedicated secondary mixed-state control.');
 
 assert(organizerPortal.includes('? formatSubmissionStatusLabel(latestSubmission)'), 'Single-status hero must use submission-kind-aware status labels.');
 assert(organizerPortal.includes('isSingleStatusView && isLatestSubmissionActivity'), 'Single-status CTA must branch on an Activity submission.');
