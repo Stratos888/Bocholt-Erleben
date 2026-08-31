@@ -1,4 +1,4 @@
-# Agent Operating Contract V1 – Bocholt erleben
+# Agent Operating Contract V1.1 – Bocholt erleben
 
 Status: **verbindlicher AI Entry Point**. Diese Datei steuert, **wie** KI-Arbeit im Repository ausgeführt wird. Fachliche Wahrheiten bleiben in ihren bestehenden Ownern.
 
@@ -102,6 +102,8 @@ Nach dem ersten kohärenten Lösungsentwurf genau auf **materielles** Verbesseru
 Ergibt der Challenge einen materiellen Vorteil, Lösung adaptieren und erneut validieren. Ergibt er nur kosmetische oder theoretische Verbesserungen, stoppen.
 
 Sobald eine reale Prüfung die nächste relevante Unsicherheit günstiger auflösen kann, wird getestet statt weiter intern iteriert.
+
+Vor `DONE_VERIFIED` den finalen tatsächlichen Diff einmal als Ganzes gegen Target State und Invarianten challengen. Insbesondere Scope Drift, unnötige Sonder-, Override-, Wrapper- oder Parallellogik, tote oder nur für Debugging verbleibende Reste und ungeprüfte Annahmen korrigieren oder entfernen. Nur bei materiellem Delta die betroffene Evidence erneut validieren; rein kosmetische oder theoretische Punkte stoppen.
 
 ## 6. Repeated-Patch- und Contradiction-Trigger
 
