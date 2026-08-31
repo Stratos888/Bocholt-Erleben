@@ -13,7 +13,7 @@ const failures = [];
 const assert = (ok, message) => { if (!ok) failures.push(message); };
 
 assert(html.includes('organizer-dashboard-pilot-card'), 'Dashboard needs a dedicated pilot card inside the existing portal.');
-assert(html.includes('/js/organizer-pilot.js?v=2026-08-28-startpartner-single-primary-v1'), 'Dashboard must cache-bust the Startpartner single-primary-action owner.');
+assert(html.includes('/js/organizer-pilot.js?v=2026-08-31-startpartner-partner-context-v1'), 'Dashboard must cache-bust the consolidated Startpartner partner-context owner.');
 assert(html.includes('/js/organizer-portal.js?v=2026-08-28-phase-a-single-status-repair-v1'), 'Dashboard must cache-bust the corrected organizer portal renderer.');
 assert(fixture.includes('<main class="page page--organizers" data-organizer-page="dashboard">'), 'Synthetic partner evidence must use the real organizer dashboard page shell.');
 assert(fixture.includes('class="content-card content-card--primary" id="organizer-dashboard-pilot-card"'), 'Synthetic partner evidence must use the real dashboard pilot-card primitives.');
@@ -22,11 +22,13 @@ assert(js.includes('/api/organizer-portal/pilot.php'), 'Portal must read the can
 assert(js.includes('/api/startpartner/content.php'), 'Portal must prepare content through the Gate-4 submission integration.');
 assert(js.includes('keine automatische kostenpflichtige Verlängerung'), 'Pilot UI must state the no-auto-renewal boundary in the canonical public wording.');
 assert(js.includes('Nächster Schritt'), 'Partner portal must lead with one explicit next-step area.');
-assert(js.includes("document.getElementById('organizer-dashboard-primary-cta')"), 'Successful pilot rendering must be able to claim the generic dashboard primary-action owner.');
-assert(js.includes("['onboarding', 'activation_ready', 'active', 'paused', 'closing'].includes(phase)"), 'Only nonterminal pilot phases may take over the generic dashboard primary action.');
-assert(js.includes('dashboardActions.hidden = pilotOwnsPrimaryAction'), 'Nonterminal pilot state must suppress the competing generic hero action container.');
-assert(js.includes("dashboardActions.dataset.startpartnerPrimaryOwner = 'pilot'"), 'Pilot UI must mark the canonical primary-action ownership.');
-assert(js.includes('syncDashboardPrimaryActionOwner(gate4);'), 'Successful pilot render must synchronize the single primary-action owner.');
+assert(js.includes("document.getElementById('organizer-dashboard-primary-cta')"), 'Successful pilot rendering must be able to suppress the generic dashboard primary-action owner.');
+assert(js.includes("const partnerContextPhases = new Set(['onboarding', 'activation_ready', 'active', 'paused', 'closing'])"), 'Only nonterminal pilot phases may own the current partner context.');
+assert(js.includes('dashboardActions.hidden = pilotOwnsContext'), 'Active partner context must suppress the competing generic hero action container.');
+assert(js.includes("pageRoot.dataset.startpartnerCurrentOwner = 'pilot'"), 'Pilot UI must mark the canonical current partner-context ownership.');
+assert(js.includes('persistHidden(genericHero, pilotOwnsContext)') && js.includes('persistHidden(summaryGrid, pilotOwnsContext)'), 'Active pilot context must suppress the parallel generic hero and summary grid.');
+assert(js.includes('persistHidden(submissionsCard, !detailsOpen)'), 'Generic submission details must stay secondary until explicitly opened.');
+assert(js.includes('syncDashboardPartnerContextOwner(gate4);'), 'Successful pilot render must synchronize the consolidated partner-context owner.');
 assert(js.includes("if (!first)"), 'Partner portal must preserve a dedicated first-content state.');
 assert(js.includes("title: copy.title.replace('Nächste', 'Erste').replace('Weiteren', 'Ersten')") && js.includes('Reiche den ersten Inhalt ein.'), 'A partner without pilot content must get an explicit first-content action.');
 assert(js.includes("if (first.status === 'draft')") && js.includes('Deine Einreichung ist angekommen und wird redaktionell geprüft.') && js.includes("action: 'wait'"), 'Pre-activation submission must remain a waiting state.');
@@ -41,12 +43,16 @@ assert(js.includes("error?.status === 409"), 'Payload-bound replay conflicts nee
 assert(!js.includes('von ${Number(gate4.onboarding'), 'Partner UI must not expose the internal Gate-4 checklist count.');
 assert(!js.includes('Schritten erledigt'), 'Partner UI must not present internal readiness as a fourteen-step journey.');
 assert(js.includes('Deine Inhalte'), 'Pilot content must be a primary partner work area.');
+assert(js.includes('Details & Änderungen') && js.includes('organizer-pilot-open-submission-details'), 'Existing submission details and edit access must remain available as an explicit secondary path.');
 assert(js.includes('<summary>Pilotdetails</summary>') && js.includes('Vereinbarter Rahmen') && js.includes('Pilotstart') && js.includes('Geplantes Ende'), 'Terms-relevant pilot scope and lifetime must remain available as secondary Pilotdetails.');
+assert(!js.includes('<dt>Freigegebene Inhalte</dt>'), 'Pilotdetails must not duplicate the primary content list with a released-content counter.');
 assert(js.includes('form.reset(); sync();'), 'Form reset must immediately restore event-date visibility and validation.');
 assert(js.includes('await load(`Einreichung'), 'Successful submissions must refresh the canonical portal state.');
 assert(js.includes('contentStatus'), 'Portal must translate internal content states.');
+assert(js.includes("approved: 'Veröffentlicht'") && js.includes("rejected: 'Nicht veröffentlicht'"), 'Published-content labels must use clear partner language.');
 assert(!js.includes('phaseBadge') && !js.includes('organizer-status-badge'), 'Partner portal must not repeat the phase with a redundant status badge.');
 assert(!js.includes('Event-Limit erreicht') && !js.includes('Pilotverbrauch') && !js.includes('Pilotumfang und Laufzeit'), 'Partner portal must not regress to old technical or status-document wording.');
+assert(!js.includes('Reichweitenbeitrag ist fällig') && !js.includes('belastbare Nutzungsbewertung'), 'Partner default must not expose operational distribution or no-data measurement copy.');
 assert(!js.includes('create-billing-portal-session'), 'Pilot UI must not expose Stripe billing as the pilot contract.');
 
 assert(organizerPortal.includes('? formatSubmissionStatusLabel(latestSubmission)'), 'Single-status hero must use submission-kind-aware status labels.');
