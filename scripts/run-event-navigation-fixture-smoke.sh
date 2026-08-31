@@ -117,6 +117,12 @@ PY
       --base-url "http://127.0.0.1:$port" \
       --out-dir "$SMOKE_OUT_DIR/startpartner-public-funnel"
   fi
+
+  if [ -f "$ROOT/tests/startpartner_mixed_state_browser_test.mjs" ]; then
+    node "$ROOT/tests/startpartner_mixed_state_browser_test.mjs" \
+      --base-url "http://127.0.0.1:$port" \
+      --out-dir "$SMOKE_OUT_DIR"
+  fi
 )
 smoke_status=$?
 set -e
