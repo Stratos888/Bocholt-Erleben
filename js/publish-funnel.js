@@ -163,6 +163,106 @@ function applyPlanPresetFromUrl() {
     return data?.data || null;
   }
 
+  async function tryLoadOrganizerPilotState() {
+    try {
+      const response = await fetch("/api/organizer-portal/pilot.php", {
+        method: "GET",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: {
+          Accept: "application/json"
+        }
+      });
+
+      if (response.status === 401 || response.status === 404) return null;
+      const rawText = await response.text();
+      let data = null;
+      try {
+        data = rawText ? JSON.parse(rawText) : null;
+      } catch (_error) {
+        data = null;
+      }
+      if (!response.ok) return null;
+      return data?.data || null;
+    } catch (_error) {
+      return null;
+    }
+  }
+
+  function startpartnerEventRouteState(pilotData) {
+    const gate4 = pilotData?.gate4 || null;
+    if (!gate4) return null;
+
+    const phase = safeText(gate4.phase).toLowerCase();
+    const hasEventScope = Array.isArray(gate4.scopes)
+      && gate4.scopes.some((row) => safeText(row?.scope_key) === "events");
+
+    if (!hasEventScope) {
+      return { usePilot: false, reason: "no_event_scope" };
+    }
+
+    if (phase === "paused") return { usePilot: false, reason: "paused" };
+    if (phase === "closing") return { usePilot: false, reason: "closing" };
+
+    if (phase === "active") {
+      const eventLimit = gate4.limits?.event || {};
+      if (eventLimit.full === true) return { usePilot: false, reason: "event_limit_full" };
+      return { usePilot: true, reason: "available" };
+    }
+
+    if (["onboarding", "activation_ready"].includes(phase)) {
+      return { usePilot: true, reason: "available" };
+    }
+
+    return { usePilot: false, reason: "not_active" };
+  }
+
+  function renderStartpartnerRouteGuard(routeState) {
+    const submitSection = byId("publish-submit");
+    const form = byId("publish-standard-form");
+    const trigger = byId("publish-standard-pay");
+    if (!submitSection || !form || !routeState) return;
+
+    let guard = document.querySelector("[data-startpartner-route-guard]");
+    if (!guard) {
+      guard = document.createElement("section");
+      guard.className = "content-card";
+      guard.setAttribute("data-startpartner-route-guard", "");
+      guard.setAttribute("aria-label", "Startpartner und reguläre Einreichung");
+      submitSection.insertAdjacentElement("beforebegin", guard);
+    }
+
+    if (routeState.usePilot) {
+      guard.innerHTML = `
+        <h2>Über Startpartner einreichen</h2>
+        <p class="content-note">Du hast einen Startpartner-Zugang für Veranstaltungen. Reiche diesen Termin dort kostenlos ein; dadurch entsteht keine separate Einzeltermin-Zahlung.</p>
+        <div class="content-actions content-actions--inline">
+          <a class="content-cta content-cta--primary" href="/fuer-veranstalter/dashboard/">Im Startpartner-Bereich einreichen</a>
+        </div>
+      `;
+      submitSection.hidden = true;
+      form.dataset.startpartnerRouteBlocked = "true";
+      if (trigger) trigger.disabled = true;
+      return;
+    }
+
+    const explanation = ({
+      event_limit_full: "Dein kostenloser Startpartner-Rahmen für Veranstaltungen ist aktuell ausgeschöpft. Wenn du diesen Termin trotzdem veröffentlichen möchtest, kannst du ihn hier regulär als Einzeltermin einreichen.",
+      paused: "Dein Startpartner-Pilot ist aktuell pausiert. Diese Veranstaltung kannst du hier unabhängig davon regulär als Einzeltermin einreichen.",
+      closing: "Dein Startpartner-Pilot wird gerade abgeschlossen. Diese Veranstaltung kannst du hier unabhängig davon regulär als Einzeltermin einreichen.",
+      no_event_scope: "Dein Startpartner-Pilot umfasst aktuell keine Veranstaltungen. Diese Veranstaltung kannst du hier regulär als Einzeltermin einreichen.",
+      not_active: "Über den Startpartner-Pilot ist aktuell keine neue Veranstaltung möglich. Der reguläre Einzeltermin-Weg bleibt davon unabhängig verfügbar."
+    })[routeState.reason] || "Der reguläre Einzeltermin-Weg bleibt unabhängig von deinem Startpartner-Status verfügbar.";
+
+    guard.innerHTML = `
+      <h2>Startpartner und regulärer Weg</h2>
+      <p class="content-note">${explanation}</p>
+    `;
+    submitSection.hidden = false;
+    form.dataset.startpartnerRouteBlocked = "false";
+    if (trigger) trigger.disabled = false;
+  }
+
   async function syncStandardFormWithPortalSession() {
     /* === BEGIN FUNCTION: syncStandardFormWithPortalSession | Zweck: übernimmt aktive Veranstalter-Session auch auf der Einzelterminseite und sperrt bekannte Stammdaten; Umfang: komplette Funktion === */
     const form = byId("publish-standard-form");
@@ -176,6 +276,15 @@ function applyPlanPresetFromUrl() {
 
     const organizer = portalData.organizer || {};
     const subscription = portalData.subscription || null;
+
+    if (pageMode === "single") {
+      const pilotData = await tryLoadOrganizerPilotState();
+      const pilotRouteState = startpartnerEventRouteState(pilotData);
+      if (pilotRouteState) {
+        renderStartpartnerRouteGuard(pilotRouteState);
+        if (pilotRouteState.usePilot) return;
+      }
+    }
 
     const planField = byId("publish-standard-plan");
     const organizationField = byId("publish-standard-organization");
@@ -704,6 +813,7 @@ function validateAutomationContext(context, form) {
 
     trigger.addEventListener("click", async (event) => {
       event.preventDefault();
+      if (form.dataset.startpartnerRouteBlocked === "true") return;
 
       clearStandardValidationState(form);
 
