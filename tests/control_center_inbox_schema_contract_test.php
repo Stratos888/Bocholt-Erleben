@@ -72,6 +72,7 @@ $repairedTable = be_cc_inbox_table_from_values([$repairedHeader, array_merge($ci
 $assert(count($repairedTable['rows']) === 1, 'Reparierter CityArt-Rohzustand muss genau eine Zeile liefern.');
 $repairedPayload = $repairedTable['rows'][0] ?? [];
 unset($repairedPayload['_raw']);
+$repairedPayload['_review_today'] = '2026-08-30';
 $review = be_cc_event_candidate_review_contract($repairedPayload);
 $assert(($review['facts']['time'] ?? '') === '11:00', 'CityArt-Beginnzeit muss aus der benannten Spalte gelesen werden.');
 $assert(($review['facts']['time_status'] ?? '') === 'fixed_time', 'CityArt-Zeitstatus muss aus W gelesen werden.');
@@ -83,7 +84,7 @@ $assert(!empty($review['decision_gate']['ready']), 'Vollständig reparierter Cit
 
 $blockedReview = be_cc_event_candidate_review_contract([
     'title'=>'CityArt ohne Visual','date'=>'2026-08-30','time'=>'11:00','city'=>'Bocholt','location'=>'Markt',
-    'category'=>'Kultur','source_url'=>'https://example.org/cityart','description'=>'Lokaler Kunstmarkt.',
+    'category'=>'Kultur','source_url'=>'https://example.org/cityart','description'=>'Lokaler Kunstmarkt.','_review_today'=>'2026-08-30',
 ]);
 $blockedActions = array_column((array)($blockedReview['actions'] ?? []), 'enabled', 'key');
 $readyActions = array_column((array)($review['actions'] ?? []), 'enabled', 'key');

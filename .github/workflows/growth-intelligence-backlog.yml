@@ -84,15 +84,90 @@ jobs:
           set -e
           export GSC_SITE_URL="${GSC_SITE_URL:-${SEARCH_METRICS_GOOGLE_SITE_URL:-}}"
           python - <<'PY'
+          import json
           from pathlib import Path
           import runpy
+          import sys
 
+          scripts_dir = Path("scripts").resolve()
+          if str(scripts_dir) not in sys.path:
+              sys.path.insert(0, str(scripts_dir))
+
+          from content_coverage_metrics import augment_growth_summary, build_portfolio_coverage
+
+          summary_path = Path("data/growth-intelligence-summary.json")
           ns = runpy.run_path(
               "scripts/growth-intelligence-backlog.py",
               run_name="__growth_runtime__",
-              init_globals={"GROWTH_SUMMARY_PATH": Path("data/growth-intelligence-summary.json")},
+              init_globals={"GROWTH_SUMMARY_PATH": summary_path},
           )
-          ns["main"]()
+          runtime = ns["main"].__globals__
+
+          captured = {
+              "gsc_rows": [],
+              "ga4_rows": [],
+              "value_rows": [],
+              "event_sheet_rows": [],
+          }
+          original_fetch_gsc = runtime["fetch_gsc"]
+          original_fetch_ga4 = runtime["fetch_ga4"]
+          original_fetch_value_metrics = runtime["fetch_value_metrics"]
+          original_values_get = runtime["values_get"]
+
+          def observed_fetch_gsc(*args, **kwargs):
+              rows = original_fetch_gsc(*args, **kwargs)
+              captured["gsc_rows"] = rows
+              return rows
+
+          def observed_fetch_ga4(*args, **kwargs):
+              rows, diagnostic = original_fetch_ga4(*args, **kwargs)
+              captured["ga4_rows"] = rows
+              return rows, diagnostic
+
+          def observed_fetch_value_metrics(*args, **kwargs):
+              rows = original_fetch_value_metrics(*args, **kwargs)
+              captured["value_rows"] = rows
+              return rows
+
+          def observed_values_get(sheets, spreadsheet_id, tab, rng="A:ZZ"):
+              rows = original_values_get(sheets, spreadsheet_id, tab, rng)
+              if tab == "Events":
+                  captured["event_sheet_rows"] = rows
+              return rows
+
+          runtime["fetch_gsc"] = observed_fetch_gsc
+          runtime["fetch_ga4"] = observed_fetch_ga4
+          runtime["fetch_value_metrics"] = observed_fetch_value_metrics
+          runtime["values_get"] = observed_values_get
+          runtime["main"]()
+
+          offers_path = Path("data/offers.json")
+          targets_path = Path("data/event_coverage_targets.json")
+          offers_payload = json.loads(offers_path.read_text(encoding="utf-8")) if offers_path.exists() else {"offers": []}
+          targets_payload = json.loads(targets_path.read_text(encoding="utf-8")) if targets_path.exists() else []
+
+          coverage = build_portfolio_coverage(
+              captured["gsc_rows"],
+              captured["event_sheet_rows"],
+              offers_payload,
+              targets_payload,
+              ga4_rows=captured["ga4_rows"],
+              value_rows=captured["value_rows"],
+              infer_intent=runtime["infer_intent"],
+              canonical_topic=runtime["canonical_topic"],
+              min_impressions=runtime["MIN_IMPRESSIONS"],
+          )
+          augment_growth_summary(summary_path, coverage)
+          print("GROWTH PORTFOLIO COVERAGE")
+          print(f"- demand_clusters: {len(coverage['demand_clusters'])}")
+          print(f"- demand_gap_count: {coverage['demand_gap_count']}")
+          print(f"- offers_total: {coverage['activity_inventory']['offers_total']}")
+          print(f"- events_total: {coverage['event_inventory']['events_total']}")
+          print(f"- known_target_presence_rate: {coverage['event_inventory']['known_target_presence_rate']}")
+          print(f"- additional_ai_calls: {coverage['cost']['additional_ai_calls']}")
+          print(f"- additional_web_search_calls: {coverage['cost']['additional_web_search_calls']}")
+          print(f"- additional_gsc_calls: {coverage['cost']['additional_gsc_calls']}")
+          print(f"- additional_ga4_calls: {coverage['cost']['additional_ga4_calls']}")
           PY
 
       # === BEGIN BLOCK: CONTENT_OPS_RECORD_GROWTH_IMPACT_V1 | Zweck: persistiert Growth-/Acquisition-Signale in der gemeinsamen Verwaltungs-Metrikschicht; Umfang: keine Aenderung an Backlog-Erzeugung ===
