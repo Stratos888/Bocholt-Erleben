@@ -323,14 +323,18 @@ async function singleEventRouteContract(browser, { eventFull, label }) {
   const guard = page.locator('[data-startpartner-route-guard]');
   await guard.waitFor({ state: 'visible', timeout: 8000 });
   const guardText = await guard.innerText();
+  const heroText = await page.locator('.page--publish > .content-hero').innerText();
 
   if (!eventFull) {
-    assert(includes(guardText, 'Startpartner'), `${label}: Startpartner-Hinweis fehlt`);
-    assert(includes(guardText, 'kostenlos'), `${label}: kostenloser Pilotweg wird nicht erklärt`);
+    assert(includes(heroText, 'Veranstaltung über Startpartner einreichen'), `${label}: Seitenkontext bleibt fälschlich auf dem regulären Einzelterminweg`);
+    assert(!includes(heroText, 'Zahlungslink'), `${label}: nutzbarer Pilot darf im Hero keine Zahlungsankündigung zeigen`);
+    assert(includes(guardText, 'Startpartner') || includes(heroText, 'Startpartner'), `${label}: Startpartner-Hinweis fehlt`);
+    assert(includes(guardText, 'kostenlos') || includes(heroText, 'kostenlos'), `${label}: kostenloser Pilotweg wird nicht erklärt`);
     assert(await page.locator('#publish-submit').isHidden(), `${label}: reguläres 9,90-EUR-Formular muss bei nutzbarem Pilot zurücktreten`);
     const pilotLink = guard.locator('a[href="/fuer-veranstalter/dashboard/"]');
     assert(await pilotLink.count() === 1, `${label}: CTA zum Startpartner-Bereich fehlt`);
   } else {
+    assert(includes(heroText, 'Einzeltermin zur Prüfung einreichen'), `${label}: regulärer Hero muss bei ausgeschöpftem Pilot erhalten bleiben`);
     assert(includes(guardText, 'ausgeschöpft'), `${label}: Pilotlimit-Abgrenzung fehlt`);
     assert(includes(guardText, 'regulär'), `${label}: regulärer Alternativweg wird nicht klar erklärt`);
     assert(await page.locator('#publish-submit').isVisible(), `${label}: regulärer Einzeltermin muss bei ausgeschöpftem Pilot verfügbar bleiben`);
