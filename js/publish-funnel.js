@@ -242,7 +242,7 @@ function applyPlanPresetFromUrl() {
         <h2>Weiter im Veranstalterbereich</h2>
         <p class="content-note">Dort wird die Einreichung deiner Pilotphase zugeordnet. Es entsteht keine separate Einzeltermin-Zahlung.</p>
         <div class="content-actions content-actions--inline">
-          <a class="content-cta content-cta--primary" href="/fuer-veranstalter/dashboard/">Im Startpartner-Bereich einreichen</a>
+          <a class="content-cta content-cta--primary" href="/fuer-veranstalter/dashboard/?startpartner_submit=event">Im Startpartner-Bereich einreichen</a>
         </div>
       `;
       submitSection.hidden = true;
