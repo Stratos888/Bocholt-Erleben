@@ -306,7 +306,7 @@ async function publicFunnelContract(browser,profile){
       assertVisualMatch({publishStartCard:startpartnerFormCard},{publishStartCard:publishStartCardReference},`startpartner-public-${name}: etablierte Publish-Form-Card-DNA`);
       assert(await page.locator('a[href="/veroeffentlichung-erklaert/#startpartner-weg"]').count()===1,`${name}: Startpartner-Formular verweist nicht auf den sichtbaren Erklärabschnitt`);
       if(mode==='desktop'){
-        const regularActions=page.locator('#startpartner-regular-paths-title').locator('xpath=..').locator('.publish-model-list > li .content-actions');
+        const regularActions=page.locator('section[aria-labelledby="startpartner-regular-paths-title"] .publish-model-list > li .content-actions');
         assert(await regularActions.count()===2,`${name}: zwei reguläre Alternativen erwartet`);
         const boxes=await Promise.all([regularActions.nth(0).boundingBox(),regularActions.nth(1).boundingBox()]);
         assert(boxes[0]&&boxes[1]&&Math.abs(boxes[0].y-boxes[1].y)<=3,`${name}: reguläre Startpartner-Alternativen sind desktopseitig nicht sauber ausgerichtet`);
