@@ -246,6 +246,7 @@ async function dashboardContract(browser, viewport, label) {
   assert(includes(pilotText, 'Startpartner Kulturtag'), `${label}: Pilotinhalt fehlt`);
   assert(!includes(pilotText, 'Regulärer Mitgliedschaftstermin'), `${label}: regulärer Inhalt darf nicht als Pilotinhalt erscheinen`);
   assert(await pilotCard.locator('.content-cta--primary:visible').count() === 1, `${label}: genau eine primäre Pilotaktion erwartet`);
+  assert(await page.locator('#organizer-pilot-form-shell').isHidden(), `${label}: Dashboard ohne Handoff-Intent darf das Formular nicht automatisch öffnen`);
 
   const regularMembership = pilotCard.locator('[data-startpartner-regular-membership]');
   assert(await regularMembership.count() === 1, `${label}: aktive reguläre Mitgliedschaft wird im Pilotkontext verschluckt`);
@@ -299,6 +300,7 @@ async function singleEventRouteContract(browser, { eventFull, label }) {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   let regularSubmissionRequests = 0;
+  let pilotContentRequests = 0;
 
   await page.route('**/api/organizer-portal/me.php', (route) => route.fulfill({
     status: 200,
@@ -318,6 +320,14 @@ async function singleEventRouteContract(browser, { eventFull, label }) {
       body: JSON.stringify({ status: 'ok', data: { submission_id: 9999, payment_reference_key: 'synthetic' } }),
     });
   });
+  await page.route('**/api/startpartner/content.php', (route) => {
+    pilotContentRequests += 1;
+    return route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({ status: 'ok', data: { submission_id: 9998 } }),
+    });
+  });
 
   await open(page, '/events-veroeffentlichen/einreichen/');
   const guard = page.locator('[data-startpartner-route-guard]');
@@ -331,18 +341,28 @@ async function singleEventRouteContract(browser, { eventFull, label }) {
     assert(includes(guardText, 'Startpartner') || includes(heroText, 'Startpartner'), `${label}: Startpartner-Hinweis fehlt`);
     assert(includes(guardText, 'kostenlos') || includes(heroText, 'kostenlos'), `${label}: kostenloser Pilotweg wird nicht erklärt`);
     assert(await page.locator('#publish-submit').isHidden(), `${label}: reguläres 9,90-EUR-Formular muss bei nutzbarem Pilot zurücktreten`);
-    const pilotLink = guard.locator('a[href="/fuer-veranstalter/dashboard/"]');
-    assert(await pilotLink.count() === 1, `${label}: CTA zum Startpartner-Bereich fehlt`);
+    const pilotLink = guard.locator('a[href="/fuer-veranstalter/dashboard/?startpartner_submit=event"]');
+    assert(await pilotLink.count() === 1, `${label}: direkter CTA zum Startpartner-Eventformular fehlt`);
+
+    await pilotLink.click();
+    const formShell = page.locator('#organizer-pilot-form-shell');
+    await formShell.waitFor({ state: 'visible', timeout: 8000 });
+    assert(await page.locator('#organizer-pilot-open-form').isHidden(), `${label}: redundanter zweiter Öffnen-Klick ist noch erforderlich`);
+    assert(await page.locator('#organizer-pilot-content-form').isVisible(), `${label}: bestehendes Pilotformular wurde nicht direkt geöffnet`);
+    assert(await page.locator('#organizer-pilot-content-form').getAttribute('data-preferred-type') === 'event', `${label}: Event-Handoff wählt nicht Veranstaltung vor`);
+    assert(!includes(page.url(), 'startpartner_submit='), `${label}: UI-Handoff-Intent muss nach erfolgreichem Konsum aus der URL entfernt werden`);
+    await noOverflow(page, `${label}: direkt geöffnetes Pilotformular`);
   } else {
     assert(includes(heroText, 'Einzeltermin zur Prüfung einreichen'), `${label}: regulärer Hero muss bei ausgeschöpftem Pilot erhalten bleiben`);
     assert(includes(guardText, 'ausgeschöpft'), `${label}: Pilotlimit-Abgrenzung fehlt`);
     assert(includes(guardText, 'regulär'), `${label}: regulärer Alternativweg wird nicht klar erklärt`);
     assert(await page.locator('#publish-submit').isVisible(), `${label}: regulärer Einzeltermin muss bei ausgeschöpftem Pilot verfügbar bleiben`);
     assert(await page.locator('#publish-standard-pay').isVisible(), `${label}: regulärer Submit-CTA fehlt`);
+    await noOverflow(page, `${label}: Einzeltermin`);
   }
 
   assert(regularSubmissionRequests === 0, `${label}: Browser-Evidence darf keine reguläre Submission erzeugen`);
-  await noOverflow(page, `${label}: Einzeltermin`);
+  assert(pilotContentRequests === 0, `${label}: Handoff darf keine Pilot-Submission erzeugen`);
   await page.screenshot({ path: path.join(outDir, `single-event-${label}.png`), fullPage: true });
   await context.close();
 }
