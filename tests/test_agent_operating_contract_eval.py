@@ -11,6 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "agent-operating-contract-eval.py"
 CORPUS = ROOT / "tests" / "agent_operating_contract_eval_cases.json"
 AGENTS = ROOT / "AGENTS.md"
+HISTORICAL_V1_BLOB = "7d26122b9be063a20d6715c89703783482a4cc93"
+FINAL_DIFF_MARKER = "Vor `DONE_VERIFIED` den finalen tatsächlichen Diff einmal als Ganzes"
 
 spec = importlib.util.spec_from_file_location("agent_contract_eval", SCRIPT)
 assert spec and spec.loader
@@ -32,15 +34,44 @@ class AgentOperatingContractEvalTests(unittest.TestCase):
         ids = [case["id"] for case in self.corpus["cases"]]
         self.assertEqual(len(ids), len(set(ids)))
 
-    def test_v1_contract_is_byte_identical(self) -> None:
+    def test_historical_v1_baseline_identity_is_immutable(self) -> None:
+        self.assertEqual(
+            HISTORICAL_V1_BLOB,
+            self.corpus["contract"]["expected_git_blob_sha"],
+        )
+
+    def test_current_contract_is_versioned_evolution_not_rewritten_v1(self) -> None:
         actual = module.git_blob_sha_bytes(AGENTS.read_bytes())
-        self.assertEqual(actual, self.corpus["contract"]["expected_git_blob_sha"])
+        self.assertNotEqual(HISTORICAL_V1_BLOB, actual)
+        text = AGENTS.read_text(encoding="utf-8")
+        self.assertTrue(text.startswith("# Agent Operating Contract V1.1 – Bocholt erleben"))
+
+    def test_baseline_distinguishes_historical_v1_from_current_contract(self) -> None:
+        baseline = module.build_baseline(self.corpus, AGENTS)
+        self.assertEqual(HISTORICAL_V1_BLOB, baseline["contract"]["historical_v1_blob_sha"])
+        self.assertFalse(baseline["contract"]["matches_historical_v1"])
+        self.assertEqual(
+            module.git_blob_sha_bytes(AGENTS.read_bytes()),
+            baseline["contract"]["current_blob_sha"],
+        )
 
     def test_baseline_uses_zero_external_calls(self) -> None:
         baseline = module.build_baseline(self.corpus, AGENTS)
         self.assertEqual(baseline["external_model_calls"], 0)
         self.assertEqual(baseline["external_api_calls"], 0)
         self.assertEqual(baseline["repository_writes"], 0)
+
+    def test_current_contract_has_exactly_one_final_diff_challenge(self) -> None:
+        text = AGENTS.read_text(encoding="utf-8")
+        self.assertEqual(1, text.count(FINAL_DIFF_MARKER))
+        self.assertIn("Scope Drift", text)
+        self.assertIn("Nur bei materiellem Delta die betroffene Evidence erneut validieren", text)
+
+    def test_no_blanket_best_of_n_or_fixed_iteration_rule_was_added(self) -> None:
+        text = AGENTS.read_text(encoding="utf-8")
+        self.assertNotIn("Best-of-N", text)
+        self.assertIn("NOT TO A FIXED COUNT", text)
+        self.assertIn("keine feste Patch-Anzahl", text)
 
     def test_all_adversarial_fixtures_are_rejected(self) -> None:
         fields = self.corpus["decision_fields"]
