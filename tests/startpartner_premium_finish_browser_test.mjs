@@ -35,6 +35,7 @@ const responsiveProfiles=[
 
 const formScreenshotProfiles=new Set(['mobile-390x844','pre-desktop-899','desktop-900','desktop-1280','desktop-1478']);
 const historyScreenshotProfiles=new Set(['mobile-390x844','desktop-900','desktop-1440']);
+const anchorEvidenceProfiles=new Set(['mobile-390x844','desktop-1280']);
 
 function activeCandidate(){
   const onboardingKeys=['terms_confirmed','organizer_linked','contact_confirmed','portal_access_tested','pilot_entitlement_readback','service_scope_confirmed','sources_recorded','maintenance_path_agreed','content_rights_cleared','first_content_ready','editorial_review_ready','measurement_ready','distribution_ready','activation_target_set'];
@@ -157,8 +158,10 @@ async function partnerContract(browser,profile){
   assert(includes(text,'Pilotphase läuft'),`${name}: aktuelle Phase fehlt`);
   assert(includes(text,'Nächste Veranstaltung einreichen'),`${name}: primärer nächster Schritt fehlt`);
   assert(includes(text,'Deine Inhalte'),`${name}: Inhaltsbereich fehlt`);
+  assert(includes(text,'Veröffentlicht'),`${name}: veröffentlichter Pilotinhalt ist nicht verständlich bezeichnet`);
   assert(includes(text,'Pilotdetails'),`${name}: sekundäre Pilotdetails fehlen`);
-  for(const stale of ['Event-Limit','Pilotverbrauch','Pilotumfang und Laufzeit','Kostenlos zur Prüfung einreichen'])assert(!includes(text,stale),`${name}: interne/alte Sprache sichtbar: ${stale}`);
+  assert(includes(text,'Details & Änderungen'),`${name}: sekundärer Detail-/Änderungspfad fehlt`);
+  for(const stale of ['Event-Limit','Pilotverbrauch','Pilotumfang und Laufzeit','Kostenlos zur Prüfung einreichen','Freigegebene Inhalte'])assert(!includes(text,stale),`${name}: interne/alte oder redundante Sprache sichtbar: ${stale}`);
   for(const operational of ['Reichweitenbeitrag ist fällig','belastbare Nutzungsbewertung'])assert(!includes(text,operational),`${name}: operative/no-data Erklärung ist im Premium-Partnerkontext sichtbar: ${operational}`);
   assert(await card.locator('.organizer-status-badge').count()===0,`${name}: redundanter Status-Badge ist noch vorhanden`);
   assert(await card.locator('.content-card .content-card').count()===0,`${name}: verschachtelte Kartenhierarchie im Pilotbereich`);
@@ -190,6 +193,7 @@ async function partnerContract(browser,profile){
   assert(await card.locator('.content-cta--primary:visible').count()===1,`${name}: nach Formularöffnung mehr als eine Primäraktion sichtbar`);
   const formText=await form.innerText();
   assert(includes(formText,'Zur Prüfung einreichen'),`${name}: kanonischer Einreichungs-CTA fehlt`);
+  assert(includes(formText,'Formular schließen'),`${name}: klarer Rückweg aus dem langen Formular fehlt`);
   assert(includes(formText,'Die Einreichung ist kostenlos und löst keine Zahlung aus.'),`${name}: fail-closed Zahlungsgrenze fehlt`);
   assert(includes(formText,'Titel der Veranstaltung'),`${name}: Event-Feldsprache ist nicht am regulären Funnel ausgerichtet`);
   assert(includes(formText,'Veranstaltungsort / Location'),`${name}: Event-Ortsfeld ist nicht konsistent`);
@@ -204,6 +208,21 @@ async function partnerContract(browser,profile){
     const activityText=await form.innerText();
     for(const marker of ['Name der Aktivität','Name des Standorts','Adresse / offizieller Treffpunkt','Website / Buchungslink','Kurzbeschreibung der Aktivität'])assert(includes(activityText,marker),`partner-premium: Activity-Feldsprache fehlt: ${marker}`);
     assert(await form.locator('[data-pilot-event-date]').isHidden(),'partner-premium: Eventdatum bleibt bei Aktivität sichtbar');
+  }
+
+  await card.locator('#organizer-pilot-close-form').click();
+  assert(await shell.isHidden(),`${name}: Formular lässt sich nicht wieder schließen`);
+  assert(await openButton.isVisible(),`${name}: kompakte Einreichungsaktion kehrt nach dem Schließen nicht zurück`);
+
+  if(name==='mobile-390x844'){
+    await card.locator('#organizer-pilot-open-submission-details').click();
+    assert(await genericSubmissions.isVisible(),'partner-premium: sekundärer Detail-/Änderungsbereich öffnet nicht');
+    assert(includes(await page.locator('#organizer-dashboard-submissions-head').innerText(),'Details & Änderungen'),'partner-premium: sekundärer Detailbereich bleibt als konkurrierende aktuelle Einreichung bezeichnet');
+    assert(await page.locator('#organizer-dashboard-submissions-summary').isHidden(),'partner-premium: redundante generische Statuszusammenfassung bleibt im Detailpfad sichtbar');
+    assert(await page.locator('#organizer-dashboard-next-step').isHidden(),'partner-premium: redundanter generischer nächster Schritt bleibt im Detailpfad sichtbar');
+    assert(await genericSummary.isHidden(),'partner-premium: generische Statuskarten werden durch den Detailpfad wieder eingeblendet');
+    assert(!(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)),'partner-premium: Detail-/Änderungspfad erzeugt horizontalen Überlauf');
+    await page.screenshot({path:path.join(outDir,'startpartner-premium-partner-mobile-390x844-details-open.png'),fullPage:true});
   }
   await context.close();
 }
@@ -244,7 +263,7 @@ function assertVisualMatch(actual,reference,label){
 }
 
 async function publicFunnelContract(browser,profile){
-  const {viewport,name}=profile;
+  const {viewport,name,mode}=profile;
   const context=await browser.newContext({viewport});
   const page=await context.newPage();
 
@@ -269,15 +288,55 @@ async function publicFunnelContract(browser,profile){
     assert(await page.locator('.content-hero--panel').count()===1,`${route.name}-${name}: gemeinsamer Hero fehlt`);
     assert(await page.locator('.content-card').count()>0,`${route.name}-${name}: gemeinsame Card-Primitives fehlen`);
     assert(await page.locator('.content-cta--primary').count()>0,`${route.name}-${name}: gemeinsame Primäraktion fehlt`);
+
+    if(route.name==='events-publish'){
+      const pathLabels=await page.locator('.publish-model-list > li .publish-model-copy strong').allTextContents();
+      assert(pathLabels.length===3,`${name}: drei primäre Veröffentlichungswege erwartet`);
+      assert(pathLabels[0]?.trim()==='Einzelne Veranstaltung einreichen',`${name}: Einzeltermin ist nicht erster Veröffentlichungsweg`);
+      assert(pathLabels[1]?.trim()==='Mitgliedschaft für regelmäßige Termine',`${name}: Mitgliedschaft ist nicht zweiter Veröffentlichungsweg`);
+      assert(pathLabels[2]?.trim()==='Startpartner',`${name}: Startpartner ist nicht dritter primärer Veröffentlichungsweg`);
+      assert(!pathLabels.some(label=>includes(label,'Automatische Übernahme')),`${name}: automatische Übernahme konkurriert weiter als primärer Veröffentlichungsweg`);
+      assert(await page.locator('a.content-link[href="/events-veroeffentlichen/anbindung/"]').count()===1,`${name}: sekundärer Pfad zur automatischen Übernahme fehlt`);
+      assert(await page.locator('a[href="/veroeffentlichung-erklaert/#startpartner-weg"]').count()===1,`${name}: Startpartner-Erklärlink zeigt nicht auf den sichtbaren Abschnitt`);
+    }
+
     if(route.name==='startpartner-public'){
       assert(await page.locator('.content-kicker').count()===0,`${name}: Startpartner darf keinen unnötigen Kicker haben`);
       const startpartnerFormCard=await componentSignature(page,'.publish-start-card',['borderRadius','boxShadow'],`startpartner-public-${name}`);
       assertVisualMatch({publishStartCard:startpartnerFormCard},{publishStartCard:publishStartCardReference},`startpartner-public-${name}: etablierte Publish-Form-Card-DNA`);
+      assert(await page.locator('a[href="/veroeffentlichung-erklaert/#startpartner-weg"]').count()===1,`${name}: Startpartner-Formular verweist nicht auf den sichtbaren Erklärabschnitt`);
+      if(mode==='desktop'){
+        const regularActions=page.locator('#startpartner-regular-paths-title').locator('xpath=..').locator('.publish-model-list > li .content-actions');
+        assert(await regularActions.count()===2,`${name}: zwei reguläre Alternativen erwartet`);
+        const boxes=await Promise.all([regularActions.nth(0).boundingBox(),regularActions.nth(1).boundingBox()]);
+        assert(boxes[0]&&boxes[1]&&Math.abs(boxes[0].y-boxes[1].y)<=3,`${name}: reguläre Startpartner-Alternativen sind desktopseitig nicht sauber ausgerichtet`);
+      }
     }
+
     const signature=await visualSignature(page);
     if(!reference)reference=signature;else assertVisualMatch(signature,reference,`${route.name}-${name}: visuelle Funnel-Konsistenz`);
     assert(!(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)),`${route.name}-${name}: horizontaler Überlauf`);
     await page.screenshot({path:path.join(outDir,`${route.name}-${name}-fold.png`)});
+  }
+
+  if(anchorEvidenceProfiles.has(name)){
+    await page.locator('a[href="/veroeffentlichung-erklaert/#startpartner-weg"]').click();
+    await page.waitForLoadState('networkidle');
+    assert(page.url().includes('/veroeffentlichung-erklaert/#startpartner-weg'),`${name}: Startpartner-Erklärlink landet nicht am kanonischen Abschnitt`);
+    const geometry=await page.evaluate(()=>{
+      const header=document.querySelector('.app-header');
+      const target=document.getElementById('startpartner-weg');
+      const heading=document.getElementById('publish-explainer-startpartner-title');
+      if(!target||!heading)return null;
+      const headerBottom=header?.getBoundingClientRect().bottom||0;
+      const targetBox=target.getBoundingClientRect();
+      const headingBox=heading.getBoundingClientRect();
+      return {headerBottom,targetTop:targetBox.top,headingTop:headingBox.top,headingBottom:headingBox.bottom,viewportHeight:window.innerHeight};
+    });
+    assert(geometry,`${name}: Startpartner-Sprungziel fehlt`);
+    assert(geometry.headingTop>=geometry.headerBottom+8,`${name}: Startpartner-Überschrift wird nach Sprung vom Header verdeckt`);
+    assert(geometry.headingBottom<geometry.viewportHeight,`${name}: Startpartner-Überschrift ist nach Sprung nicht im sichtbaren Viewport`);
+    await page.screenshot({path:path.join(outDir,`startpartner-explainer-anchor-${name}.png`)});
   }
   await context.close();
 }
@@ -301,9 +360,13 @@ fs.writeFileSync(path.join(outDir,'startpartner-premium-summary.json'),JSON.stri
     'operator-responsive-matrix-default-and-collapsed-history',
     'partner-real-dashboard-integrated-with-organizer-portal-and-pilot-renderer',
     'partner-single-current-context-without-generic-status-chain',
-    'partner-responsive-matrix-compact-and-form-open',
+    'partner-secondary-details-and-edit-path',
+    'partner-responsive-matrix-compact-form-open-and-close',
     'partner-form-one-column-below-900-and-two-columns-from-900',
     'partner-no-payment-boundary',
+    'events-publish-startpartner-primary-hierarchy-before-secondary-automation',
+    'startpartner-explainer-anchor-visible-below-header',
+    'startpartner-regular-alternatives-desktop-alignment',
     'public-funnel-responsive-visual-consistency',
     'publish-start-card-shadow-matches-established-form-owner',
     'no-horizontal-overflow-across-established-widths',
