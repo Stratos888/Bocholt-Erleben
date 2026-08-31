@@ -20,12 +20,14 @@ foreach($fixture['event_cases']??[] as $case){
         if(!empty($case['task_state']))$assert(($tasks[0]['state']??'')===$case['task_state'],'Prüfpunktzustand: '.$case['name']);
     }
 }
-$city=be_cc_event_candidate_review_contract($fixture['event_cases'][5]['payload']);
+$cityPayload=$fixture['event_cases'][5]['payload'];
+$cityPayload['_review_today']='2026-08-30';
+$city=be_cc_event_candidate_review_contract($cityPayload);
 $cityTask=array_values(array_filter($city['review_tasks'],static fn(array $task):bool=>$task['task_id']==='visual.asset'))[0]??[];
 $asset=$cityTask['evidence']['asset']??[];
 $assert(($asset['id']??'')==='motif-gap-art-market-01','CityArt löst konkretes ready-Asset auf.');
 $assert(($city['summary']['headline']??'')==='Noch 2 Punkte klären','CityArt zeigt exakt zwei offene Ausnahmen.');
-$cityWaiting=$fixture['event_cases'][5]['payload'];$cityWaiting['visual_gap_id']='visual-gap-cityart-existing';
+$cityWaiting=$cityPayload;$cityWaiting['visual_gap_id']='visual-gap-cityart-existing';
 $cityCandidate=be_cc_event_candidate_review_contract($cityWaiting);
 $cityCandidateTask=array_values(array_filter($cityCandidate['review_tasks'],static fn(array $task):bool=>$task['task_id']==='visual.asset'))[0]??[];
 $assert(($cityCandidateTask['state']??'')==='candidate_ready','Ein fertiges Asset kehrt als sichtbarer Kandidat in denselben Visual-Prüfpunkt zurück.');
