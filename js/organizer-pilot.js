@@ -15,6 +15,18 @@
   const partnerContextPhases = new Set(['onboarding', 'activation_ready', 'active', 'paused', 'closing']);
   let pendingClientReference = '';
 
+  function requestedSubmitType() {
+    const requested = safe(new URLSearchParams(window.location.search).get('startpartner_submit')).toLowerCase();
+    return ['event', 'activity'].includes(requested) ? requested : '';
+  }
+
+  function clearRequestedSubmitType() {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has('startpartner_submit')) return;
+    url.searchParams.delete('startpartner_submit');
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  }
+
   function pilotOwnsPartnerContext(gate4) {
     return partnerContextPhases.has(safe(gate4?.phase));
   }
@@ -341,7 +353,11 @@
   function render(data, portalData = null, successMessage = '') {
     const gate4 = data.gate4 || {};
     const pilot = gate4.pilot || {};
-    const step = nextStep(gate4);
+    const requestedType = requestedSubmitType();
+    let step = nextStep(gate4);
+    const allowed = allowedTypes(gate4);
+    const directType = step.action === 'submit' && requestedType && allowed[requestedType] ? requestedType : '';
+    if (directType) step = {...step, ...submitCopy(gate4, directType)};
     syncDashboardPartnerContextOwner(gate4);
     const submitBlock = step.action === 'submit' ? `
       <div class="content-actions content-actions--inline">
@@ -366,7 +382,8 @@
         </dl>
         <p class="content-note">Keine Zahlungsart erforderlich und keine automatische kostenpflichtige Verlängerung. Veröffentlichungen bleiben redaktionell geprüft.</p>
       </details>`;
-    bindForm();
+    bindForm(Boolean(directType));
+    if (requestedType) clearRequestedSubmitType();
     bindSecondaryContentDetails();
     bindRegularMembership();
   }
@@ -436,17 +453,20 @@
     });
   }
 
-  function bindForm() {
+  function bindForm(openOnLoad = false) {
     const openButton = document.getElementById('organizer-pilot-open-form');
     const closeButton = document.getElementById('organizer-pilot-close-form');
     const formShell = document.getElementById('organizer-pilot-form-shell');
     const form = document.getElementById('organizer-pilot-content-form');
+    const openForm = () => {
+      if (!openButton || !formShell || !form) return;
+      openButton.hidden = true;
+      formShell.hidden = false;
+      form.querySelector('select:not([hidden]), input:not([type="hidden"])')?.focus();
+    };
     if (openButton && formShell && form) {
-      openButton.addEventListener('click', () => {
-        openButton.hidden = true;
-        formShell.hidden = false;
-        form.querySelector('select:not([hidden]), input:not([type="hidden"])')?.focus();
-      });
+      openButton.addEventListener('click', openForm);
+      if (openOnLoad) openForm();
     }
     if (closeButton && openButton && formShell) {
       closeButton.addEventListener('click', () => {
