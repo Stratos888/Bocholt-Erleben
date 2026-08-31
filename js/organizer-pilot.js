@@ -306,24 +306,26 @@
 
     const quotas = Array.isArray(portalData?.quota_by_plan) ? portalData.quota_by_plan : [];
     const billing = portalData?.billing_summary || {};
-    const rows = subscriptions.map(subscription => {
+    const membershipRows = subscriptions.map(subscription => {
       const planKey = safe(subscription?.plan_key);
       const label = safe(subscription?.plan_label) || planKey || 'Regulärer Tarif';
       const amount = safe(subscription?.monthly_amount_label);
       const quota = quotas.find(row => safe(row?.plan_key) === planKey) || null;
-      let usage = '';
-      if (quota) {
-        usage = quota.has_unlimited
+      const usage = quota
+        ? (quota.has_unlimited
           ? 'unbegrenzt'
-          : `${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} genutzt`;
-      }
-      return `<div><dt>${escape(label)}</dt><dd>${escape([amount, usage].filter(Boolean).join(' · '))}</dd></div>`;
-    }).join('');
+          : `${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} genutzt`)
+        : '';
+      return {label, amount, usage};
+    });
+    const rows = membershipRows.map(row =>
+      `<div><dt>${escape(row.label)}</dt><dd>${escape([row.amount, row.usage].filter(Boolean).join(' · '))}</dd></div>`
+    ).join('');
 
-    const amountSummary = subscriptions.length === 1
-      ? safe(subscriptions[0]?.monthly_amount_label)
-      : safe(billing?.monthly_total_label);
-    const summary = `${subscriptions.length === 1 ? 'Reguläre Mitgliedschaft' : 'Reguläre Mitgliedschaften'}${amountSummary ? ` · ${amountSummary}` : ''}`;
+    const single = membershipRows.length === 1 ? membershipRows[0] : null;
+    const summary = single
+      ? ['Reguläre Mitgliedschaft', single.label, single.amount, single.usage].filter(Boolean).join(' · ')
+      : ['Reguläre Mitgliedschaften', safe(billing?.monthly_total_label)].filter(Boolean).join(' · ');
 
     return `
       <details class="content-disclosure" data-startpartner-regular-membership>
