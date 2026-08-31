@@ -1688,7 +1688,6 @@ select.content-field__control{
   line-height: 1.45;
 }
 
-
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-submissions-list{
   gap: 0;
 }
@@ -2216,6 +2215,9 @@ select.content-field__control{
     border-top: 0;
     border-left: 1px solid var(--cmp-divider-strong);
   }
+
+  .page--publish.page--startpartner .publish-model-list.publish-model-list{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .page--publish.page--startpartner .publish-model-list.publish-model-list li{grid-template-rows:minmax(0,1fr) auto;}
 
   .page--organizers .content-lead{
     max-width: min(68ch, 100%);
@@ -3146,7 +3148,6 @@ select.content-field__control{
 }
 /* === END BLOCK: SUBPAGE_REFERENCE_SYSTEM_V3 === */
 
-
 /* === BEGIN BLOCK: ACTIVITY_PRESENCE_OPENING_COMPACT_UI_V1 | Zweck: verdichtet die regelmaessigen Oeffnungszeiten im Aktivitaetspraesenz-Formular; Umfang: nur .page--activity-presence Oeffnungszeitenblock === */
 .page--publish.page--activity-presence .activity-presence-opening-week{
   display: grid;
@@ -3257,7 +3258,6 @@ select.content-field__control{
   gap: 12px;
   min-width: 0;
 }
-
 
 .page--image-credits .content-lead{
   max-width: 720px;
@@ -3561,7 +3561,6 @@ select.content-field__control{
   box-shadow: inset 0 -0.22em 0 var(--cmp-inline-link-rule-hover);
 }
 /* === END BLOCK: IMAGE_CREDITS_LINK_PREMIUM_V1 === */
-
 
 @media (max-width: 640px){
   .page--image-credits{
