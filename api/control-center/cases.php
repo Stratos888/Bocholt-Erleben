@@ -55,6 +55,7 @@ function be_cc_enrich_startpartner_cases(PDO $pdo, array $cases): array
         $candidateId = trim((string)($case['object']['id'] ?? $case['object_id'] ?? $case['source']['reference'] ?? $case['source_reference'] ?? ''));
         if ($candidateId === '') continue;
         try {
+            // Gate-4 detail is the authoritative superset of be_startpartner_gate3_candidate_detail after pilot creation.
             $candidate = be_startpartner_gate4_candidate_detail($pdo, $candidateId);
             $case = be_startpartner_gate3_present_case($case, $candidate);
         } catch (RuntimeException $error) {
