@@ -48,6 +48,7 @@
     const genericHero = pageRoot?.querySelector(':scope > .content-hero') || null;
     const summaryGrid = document.getElementById('organizer-dashboard-summary');
     const submissionsCard = document.getElementById('organizer-dashboard-submissions-card');
+    const genericImpact = document.getElementById('organizer-dashboard-impact-card');
 
     if (pageRoot) {
       if (pilotOwnsContext) {
@@ -60,6 +61,7 @@
 
     persistHidden(genericHero, pilotOwnsContext);
     persistHidden(summaryGrid, pilotOwnsContext);
+    if (pilotOwnsContext) persistHidden(genericImpact, true);
 
     if (pilotOwnsContext) {
       const detailsOpen = pageRoot?.dataset.startpartnerDetailsOpen === 'true';
