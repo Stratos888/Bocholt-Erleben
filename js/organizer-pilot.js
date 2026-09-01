@@ -205,7 +205,7 @@
         <ul class="publish-benefits-grid">
           <li><div><strong>Redaktionelle Prüfung</strong><span>Jede Einreichung wird vor der Veröffentlichung geprüft.</span></div></li>
           <li><div><strong>Aufbereitung für Bocholt erleben</strong><span>Deine Angaben werden für eine klare Darstellung redaktionell eingeordnet.</span></div></li>
-          <li><div><strong>Veröffentlichung im vereinbarten Rahmen</strong><span>${published ? 'Freigegebene Inhalte sind auf Bocholt erleben sichtbar.' : 'Freigegebene Inhalte werden im vereinbarten Pilotumfang sichtbar.'}</span></div></li>
+          <li><div><strong>Veröffentlichung im vereinbarten Rahmen</strong><span>${published ? 'Veröffentlichte Inhalte sind auf Bocholt erleben sichtbar.' : 'Freigegebene Inhalte werden im vereinbarten Pilotumfang sichtbar.'}</span></div></li>
         </ul>
       </section>`;
   }
@@ -493,20 +493,49 @@
     const closeButton = document.getElementById('organizer-pilot-close-form');
     const formShell = document.getElementById('organizer-pilot-form-shell');
     const form = document.getElementById('organizer-pilot-content-form');
+    const cockpitGrid = card.querySelector('.organizer-pilot-cockpit-grid');
+    const nextStepArea = card.querySelector('.organizer-pilot-next-step');
+    const desktopQuery = window.matchMedia('(min-width: 900px)');
+    const syncCockpitLayout = () => {
+      const formOpen = Boolean(formShell && !formShell.hidden);
+      if (cockpitGrid) {
+        cockpitGrid.style.gridTemplateColumns = desktopQuery.matches && !formOpen
+          ? 'minmax(0, 0.82fr) minmax(0, 1.18fr)'
+          : 'minmax(0, 1fr)';
+      }
+      if (nextStepArea) {
+        nextStepArea.style.gridColumn = formOpen ? '1 / -1' : '';
+      }
+      if (formOpen) {
+        card.dataset.startpartnerFormOpen = 'true';
+      } else {
+        delete card.dataset.startpartnerFormOpen;
+      }
+    };
+    if (card._startpartnerLayoutMedia && card._startpartnerLayoutHandler) {
+      card._startpartnerLayoutMedia.removeEventListener?.('change', card._startpartnerLayoutHandler);
+    }
+    card._startpartnerLayoutMedia = desktopQuery;
+    card._startpartnerLayoutHandler = syncCockpitLayout;
+    desktopQuery.addEventListener?.('change', syncCockpitLayout);
+
     const openForm = () => {
       if (!openButton || !formShell || !form) return;
       openButton.hidden = true;
       formShell.hidden = false;
+      syncCockpitLayout();
       form.querySelector('select:not([hidden]), input:not([type="hidden"])')?.focus();
     };
     if (openButton && formShell && form) {
       openButton.addEventListener('click', openForm);
       if (openOnLoad) openForm();
+      else syncCockpitLayout();
     }
     if (closeButton && openButton && formShell) {
       closeButton.addEventListener('click', () => {
         formShell.hidden = true;
         openButton.hidden = false;
+        syncCockpitLayout();
         openButton.focus();
       });
     }
