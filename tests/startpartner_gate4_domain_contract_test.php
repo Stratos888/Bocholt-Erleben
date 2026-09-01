@@ -34,6 +34,15 @@ $expectDomain(static fn()=>be_startpartner_gate4_manual_onboarding_key('terms_co
 $expectInvalid(static fn()=>be_startpartner_gate4_validate_local_date('2026-02-30'),'Invalid local dates must fail.');
 $expectInvalid(static fn()=>be_startpartner_gate4_content_type('place'),'Unsupported content types must fail.');
 
+$root=dirname(__DIR__);
+$casesSource=(string)file_get_contents($root.'/api/control-center/cases.php');
+$detailSource=(string)file_get_contents($root.'/api/control-center/case.php');
+$assert(str_contains($casesSource,"/startpartner/_gate4_domain.php"),'Control-center case list must load the Gate-4 domain.');
+$assert(str_contains($casesSource,'be_startpartner_gate4_candidate_detail($pdo, $candidateId)'),'Control-center case list must enrich Startpartner cases from the authoritative Gate-4 candidate detail.');
+$assert(!str_contains($casesSource,'be_startpartner_gate3_candidate_detail($pdo, $candidateId, true)'),'Control-center case list must not stop at the Gate-3 projection after a pilot exists.');
+$assert(str_contains($casesSource,'STARTPARTNER_GATE4_SCHEMA_MISSING:'),'Control-center case list must fail closed when the Gate-4 schema is unavailable.');
+$assert(str_contains($detailSource,'be_startpartner_gate4_candidate_detail($pdo, $candidateId)'),'Single-case readback must use the same Gate-4 candidate owner as the list projection.');
+
 if($failures){
     fwrite(STDERR,"=== Startpartner Gate-4 Domain Contract: FAILED ===\n".implode("\n",array_map(static fn($v)=>'- '.$v,$failures))."\n");
     exit(1);
