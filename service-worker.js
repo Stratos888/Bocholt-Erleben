@@ -356,6 +356,19 @@ async function networkFirst(request) {
 
   /* === END BLOCK: JSON NETWORK-FIRST WITH ignoreSearch FALLBACK === */
 }
+
+/* === BEGIN BLOCK: PRIVATE_API_NETWORK_ONLY_V1 | Zweck: verhindert stale/private API-Antworten im originweiten PWA-Cache; Umfang: same-origin API-GETs außer explizit öffentlichen Cache-Routen === */
+async function networkOnly(request) {
+  try {
+    return await fetch(request, { cache: "no-store" });
+  } catch (_) {
+    return new Response("Offline", {
+      status: 503,
+      headers: { "Content-Type": "text/plain; charset=utf-8" }
+    });
+  }
+}
+/* === END BLOCK: PRIVATE_API_NETWORK_ONLY_V1 === */
 /* === END BLOCK: CACHING HELPERS (cache-busting works) === */
 
 
@@ -365,6 +378,8 @@ async function networkFirst(request) {
 Zweck: Einheitliche Fetch-Strategien:
 - navigate: network first, fallback auf cached /index.html
 - /data/*.json: network-first (immer aktuell)
+- /api/events/public.php: öffentlicher Feed network-first mit Offline-Fallback
+- restliche /api/* GETs: network-only/no-store, niemals CacheStorage
 - restliche Assets: stale-while-revalidate
 Fixes:
 - Event heißt "fetch" (nicht leer)
@@ -405,6 +420,13 @@ self.addEventListener("fetch", (event) => {
   }
   /* === END BLOCK: PUBLIC_EVENT_FEED_NETWORK_FIRST_V1 === */
 
+  /* === BEGIN BLOCK: PRIVATE_API_NETWORK_ONLY_ROUTE_V1 | Zweck: hält authentifizierte und sonstige dynamische API-Readbacks frisch und aus CacheStorage heraus; Umfang: alle übrigen same-origin /api/* GETs === */
+  if (url.pathname.startsWith("/api/")) {
+    event.respondWith(networkOnly(req));
+    return;
+  }
+  /* === END BLOCK: PRIVATE_API_NETWORK_ONLY_ROUTE_V1 === */
+
   /* === BEGIN BLOCK: MANIFEST FETCH SAFETY (prevent 503 spam) ===
 Zweck: manifest.json darf niemals als 503 "Offline" enden,
        da Browser/PWA es regelmäßig und aggressiv anfragt.
@@ -442,7 +464,6 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
-
 
 
 
