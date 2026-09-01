@@ -158,16 +158,31 @@
         : `Veranstaltungen: ${Number(event.used || 0)} von ${Number(event.limit || 0)} in diesem Monat`);
     }
     if (activity?.available) {
-      parts.push(`Aktivitäten: ${Number(activity.used || 0)} von ${Number(activity.limit || 0)} gleichzeitig belegt`);
+      const used = Number(activity.used || 0);
+      parts.push(used === 0
+        ? 'Aktivitäten: aktuell keine Aktivität online'
+        : used === 1
+          ? 'Aktivitäten: aktuell eine Aktivität online'
+          : `Aktivitäten: aktuell ${used} Aktivitäten online`);
     }
     return parts.join(' · ');
   }
 
+  function contentTypeLabel(row) {
+    return row?.content_type === 'activity' ? 'Aktivität' : 'Veranstaltung';
+  }
+
   function contentRow(row) {
-    return `<div class="content-link"><span>
-      <strong>${escape(row.title || `${row.content_type === 'activity' ? 'Aktivität' : 'Veranstaltung'} ${row.submission_id || ''}`)}</strong>
-      <small>${escape(contentStatus(row.status))}${row.start_date ? ` · ${escape(formatDate(row.start_date))}` : ''}</small>
-    </span></div>`;
+    const type = contentTypeLabel(row);
+    const meta = [row.start_date ? formatDate(row.start_date) : '', safe(row.location_name)].filter(Boolean).join(' · ');
+    return `<article class="organizer-submission-summary-item organizer-pilot-content-item" data-content-type="${escape(row.content_type)}">
+      <div class="organizer-pilot-content-item__topline">
+        <span class="content-kicker">${escape(type)}</span>
+        <span class="organizer-pilot-content-status">${escape(contentStatus(row.status))}</span>
+      </div>
+      <strong class="organizer-pilot-content-title">${escape(row.title || `${type} ${row.submission_id || ''}`)}</strong>
+      ${meta ? `<small class="content-note">${escape(meta)}</small>` : ''}
+    </article>`;
   }
 
   function contentList(rows = []) {
@@ -175,10 +190,24 @@
     const newest = rows.slice().reverse();
     const visible = newest.slice(0, 3);
     const older = newest.slice(3);
-    return `<div class="content-links">${visible.map(contentRow).join('')}</div>${older.length ? `
+    return `<div class="organizer-pilot-content-list">${visible.map(contentRow).join('')}</div>${older.length ? `
       <details class="content-disclosure"><summary>Weitere Inhalte anzeigen (${older.length})</summary>
-        <div class="content-links">${older.map(contentRow).join('')}</div>
+        <div class="organizer-pilot-content-list">${older.map(contentRow).join('')}</div>
       </details>` : ''}`;
+  }
+
+  function serviceValue(gate4) {
+    const published = (gate4.content_links || []).some(row => row.status === 'approved');
+    return `
+      <section class="organizer-pilot-value-area" aria-labelledby="organizer-pilot-value-head">
+        <span class="content-kicker">Dein Service im Pilot</span>
+        <h3 id="organizer-pilot-value-head">Was Bocholt erleben für dich übernimmt</h3>
+        <ul class="publish-benefits-grid">
+          <li><div><strong>Redaktionelle Prüfung</strong><span>Jede Einreichung wird vor der Veröffentlichung geprüft.</span></div></li>
+          <li><div><strong>Aufbereitung für Bocholt erleben</strong><span>Deine Angaben werden für eine klare Darstellung redaktionell eingeordnet.</span></div></li>
+          <li><div><strong>Veröffentlichung im vereinbarten Rahmen</strong><span>${published ? 'Freigegebene Inhalte sind auf Bocholt erleben sichtbar.' : 'Freigegebene Inhalte werden im vereinbarten Pilotumfang sichtbar.'}</span></div></li>
+        </ul>
+      </section>`;
   }
 
   function allowedTypes(gate4) {
@@ -364,24 +393,30 @@
         <button class="content-cta content-cta--primary" id="organizer-pilot-open-form" type="button">${escape(step.cta)}</button>
       </div>
       <div id="organizer-pilot-form-shell" hidden>${contentForm(gate4, step.preferredType)}</div>` : '';
+    const period = pilot.planned_end_date ? `Geplant bis ${formatDate(pilot.planned_end_date)}` : '';
     card.hidden = false;
     card.innerHTML = `
-      <div class="content-form-section-head"><div><span class="content-kicker">Startpartner · 6 Monate kostenlos</span><h2>${escape(phaseLabel(gate4.phase))}</h2></div></div>
+      <div class="content-form-section-head organizer-pilot-head"><div><span class="content-kicker">Startpartner · 6 Monate kostenlos</span><h2>${escape(phaseLabel(gate4.phase))}</h2>${period ? `<p class="content-note">${escape(period)}</p>` : ''}</div></div>
       ${successMessage ? `<div class="content-note" role="status">${escape(successMessage)}</div>` : ''}
-      <section class="organizer-pilot-next-step" aria-label="Nächster Schritt">
-        <span class="content-kicker">Nächster Schritt</span><h3>${escape(step.title)}</h3><p class="content-note">${escape(step.text)}</p>${submitBlock}
-      </section>
-      <section class="organizer-pilot-content-area" aria-label="Inhalte im Pilot"><h3>Deine Inhalte</h3>${contentList(gate4.content_links)}${secondaryContentDetails(gate4)}</section>
-      ${regularMembershipDetails(portalData)}
-      <details class="content-disclosure"><summary>Pilotdetails</summary>
-        <dl class="organizer-tariff-table">
-          <div><dt>Vereinbarter Rahmen</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
-          ${usageText(gate4) ? `<div><dt>Aktuelle Nutzung</dt><dd>${escape(usageText(gate4))}</dd></div>` : ''}
-          <div><dt>Pilotstart</dt><dd>${escape(formatDate(pilot.activation_date_local))}</dd></div>
-          <div><dt>Geplantes Ende</dt><dd>${escape(formatDate(pilot.planned_end_date))}</dd></div>
-        </dl>
-        <p class="content-note">Keine Zahlungsart erforderlich und keine automatische kostenpflichtige Verlängerung. Veröffentlichungen bleiben redaktionell geprüft.</p>
-      </details>`;
+      <div class="content-grid content-grid--2 organizer-pilot-cockpit-grid">
+        <section class="organizer-pilot-next-step" aria-label="Nächster Schritt">
+          <span class="content-kicker">Nächster Schritt</span><h3>${escape(step.title)}</h3><p class="content-note">${escape(step.text)}</p>${submitBlock}
+        </section>
+        <section class="organizer-pilot-content-area" aria-label="Inhalte im Pilot"><span class="content-kicker">Dein Ergebnis</span><h3>Deine Inhalte</h3>${contentList(gate4.content_links)}${secondaryContentDetails(gate4)}</section>
+      </div>
+      ${serviceValue(gate4)}
+      <div class="organizer-pilot-secondary-meta">
+        ${regularMembershipDetails(portalData)}
+        <details class="content-disclosure"><summary>Pilotdetails</summary>
+          <dl class="organizer-tariff-table">
+            <div><dt>Vereinbarter Rahmen</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
+            ${usageText(gate4) ? `<div><dt>Aktuelle Nutzung</dt><dd>${escape(usageText(gate4))}</dd></div>` : ''}
+            <div><dt>Pilotstart</dt><dd>${escape(formatDate(pilot.activation_date_local))}</dd></div>
+            <div><dt>Geplantes Ende</dt><dd>${escape(formatDate(pilot.planned_end_date))}</dd></div>
+          </dl>
+          <p class="content-note">Keine Zahlungsart erforderlich und keine automatische kostenpflichtige Verlängerung. Veröffentlichungen bleiben redaktionell geprüft.</p>
+        </details>
+      </div>`;
     bindForm(Boolean(directType));
     if (requestedType) clearRequestedSubmitType();
     bindSecondaryContentDetails();
