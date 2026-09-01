@@ -175,13 +175,13 @@
   function contentRow(row) {
     const type = contentTypeLabel(row);
     const meta = [row.start_date ? formatDate(row.start_date) : '', safe(row.location_name)].filter(Boolean).join(' · ');
-    return `<article class="organizer-submission-summary-item organizer-pilot-content-item" data-content-type="${escape(row.content_type)}">
-      <div class="organizer-pilot-content-item__topline">
+    return `<article class="organizer-pilot-content-item" data-content-type="${escape(row.content_type)}" style="display:grid;gap:5px;min-width:0;padding:12px 14px;border:1px solid var(--cmp-divider-strong);border-radius:14px;background:rgba(255,255,255,0.48)">
+      <div class="organizer-pilot-content-item__topline" style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;flex-wrap:wrap">
         <span class="content-kicker">${escape(type)}</span>
-        <span class="organizer-pilot-content-status">${escape(contentStatus(row.status))}</span>
+        <span class="organizer-pilot-content-status" style="display:inline-flex;align-items:center;min-height:24px;padding:2px 8px;border:1px solid color-mix(in srgb,var(--color-primary) 30%,var(--cmp-divider-strong));border-radius:999px;background:color-mix(in srgb,var(--color-primary-muted) 38%,white);color:var(--color-text-primary);font-size:0.76rem;font-weight:700;line-height:1.1">${escape(contentStatus(row.status))}</span>
       </div>
-      <strong class="organizer-pilot-content-title">${escape(row.title || `${type} ${row.submission_id || ''}`)}</strong>
-      ${meta ? `<small class="content-note">${escape(meta)}</small>` : ''}
+      <strong class="organizer-pilot-content-title" style="display:block;min-width:0;color:var(--color-text-primary);font-size:1rem;line-height:1.22">${escape(row.title || `${type} ${row.submission_id || ''}`)}</strong>
+      ${meta ? `<small class="content-note" style="display:block">${escape(meta)}</small>` : ''}
     </article>`;
   }
 
@@ -190,9 +190,9 @@
     const newest = rows.slice().reverse();
     const visible = newest.slice(0, 3);
     const older = newest.slice(3);
-    return `<div class="organizer-pilot-content-list">${visible.map(contentRow).join('')}</div>${older.length ? `
+    return `<div class="organizer-pilot-content-list" style="display:grid;gap:8px">${visible.map(contentRow).join('')}</div>${older.length ? `
       <details class="content-disclosure"><summary>Weitere Inhalte anzeigen (${older.length})</summary>
-        <div class="organizer-pilot-content-list">${older.map(contentRow).join('')}</div>
+        <div class="organizer-pilot-content-list" style="display:grid;gap:8px">${older.map(contentRow).join('')}</div>
       </details>` : ''}`;
   }
 
