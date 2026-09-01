@@ -43,6 +43,10 @@ assert(js.includes("error?.status === 409"), 'Payload-bound replay conflicts nee
 assert(!js.includes('von ${Number(gate4.onboarding'), 'Partner UI must not expose the internal Gate-4 checklist count.');
 assert(!js.includes('Schritten erledigt'), 'Partner UI must not present internal readiness as a fourteen-step journey.');
 assert(js.includes('Deine Inhalte'), 'Pilot content must be a primary partner work area.');
+assert(js.includes('organizer-pilot-cockpit-grid') && js.includes('content-grid content-grid--2'), 'Active Pilot desktop must use the existing two-column content grid as a deliberate cockpit instead of one mostly-empty full-width stack.');
+assert(js.includes('organizer-pilot-content-item') && js.includes('content_type'), 'Pilot content must be presented as a visible typed partner outcome rather than a bare title line.');
+assert(js.includes('Was Bocholt erleben für dich übernimmt') && js.includes('Redaktionelle Prüfung') && js.includes('Aufbereitung für Bocholt erleben') && js.includes('Veröffentlichung im vereinbarten Rahmen'), 'Partner dashboard must make truthful service value visible without inventing reach metrics.');
+assert(!js.includes('gleichzeitig belegt'), 'Pilotdetails must avoid accounting-like concurrent-occupancy wording.');
 assert(js.includes('Details & Änderungen') && js.includes('organizer-pilot-open-submission-details'), 'Existing submission details and edit access must remain available as an explicit secondary path.');
 assert(js.includes('<summary>Pilotdetails</summary>') && js.includes('Vereinbarter Rahmen') && js.includes('Pilotstart') && js.includes('Geplantes Ende'), 'Terms-relevant pilot scope and lifetime must remain available as secondary Pilotdetails.');
 assert(!js.includes('<dt>Freigegebene Inhalte</dt>'), 'Pilotdetails must not duplicate the primary content list with a released-content counter.');
