@@ -45,6 +45,8 @@ assert(!js.includes('Schritten erledigt'), 'Partner UI must not present internal
 assert(js.includes('Deine Inhalte'), 'Pilot content must be a primary partner work area.');
 assert(js.includes('organizer-pilot-cockpit-grid') && js.includes('content-grid content-grid--2'), 'Active Pilot desktop must use the existing two-column content grid as a deliberate cockpit instead of one mostly-empty full-width stack.');
 assert(js.includes('organizer-pilot-content-item') && js.includes('content_type'), 'Pilot content must be presented as a visible typed partner outcome rather than a bare title line.');
+assert(!js.includes('organizer-submission-summary-item organizer-pilot-content-item'), 'Pilot outcome objects must not inherit the generic mobile submission-summary flattening contract.');
+assert(js.includes("window.matchMedia('(min-width: 900px)')") && js.includes("gridColumn = formOpen ? '1 / -1' : ''"), 'Opening the Pilot form must promote the next-step area to a full-width desktop work surface.');
 assert(js.includes('Was Bocholt erleben für dich übernimmt') && js.includes('Redaktionelle Prüfung') && js.includes('Aufbereitung für Bocholt erleben') && js.includes('Veröffentlichung im vereinbarten Rahmen'), 'Partner dashboard must make truthful service value visible without inventing reach metrics.');
 assert(!js.includes('gleichzeitig belegt'), 'Pilotdetails must avoid accounting-like concurrent-occupancy wording.');
 assert(js.includes('Details & Änderungen') && js.includes('organizer-pilot-open-submission-details'), 'Existing submission details and edit access must remain available as an explicit secondary path.');
