@@ -5,6 +5,7 @@ require __DIR__ . '/_schema.php';
 require_once __DIR__ . '/_domain.php';
 require_once dirname(__DIR__) . '/startpartner/_gate3_domain.php';
 require_once dirname(__DIR__) . '/startpartner/_gate3_presentation.php';
+require_once dirname(__DIR__) . '/startpartner/_gate4_domain.php';
 
 be_require_review_access();
 
@@ -54,7 +55,7 @@ function be_cc_enrich_startpartner_cases(PDO $pdo, array $cases): array
         $candidateId = trim((string)($case['object']['id'] ?? $case['object_id'] ?? $case['source']['reference'] ?? $case['source_reference'] ?? ''));
         if ($candidateId === '') continue;
         try {
-            $candidate = be_startpartner_gate3_candidate_detail($pdo, $candidateId, true);
+            $candidate = be_startpartner_gate4_candidate_detail($pdo, $candidateId);
             $case = be_startpartner_gate3_present_case($case, $candidate);
         } catch (RuntimeException $error) {
             $case['startpartner_error'] = $error->getMessage();
@@ -163,7 +164,8 @@ try {
     be_json_response(422, ['status' => 'error', 'message' => $error->getMessage()]);
 } catch (RuntimeException $error) {
     $schemaMissing = str_starts_with($error->getMessage(), 'STARTPARTNER_SCHEMA_MISSING:')
-        || str_starts_with($error->getMessage(), 'STARTPARTNER_GATE3_SCHEMA_MISSING:');
+        || str_starts_with($error->getMessage(), 'STARTPARTNER_GATE3_SCHEMA_MISSING:')
+        || str_starts_with($error->getMessage(), 'STARTPARTNER_GATE4_SCHEMA_MISSING:');
     be_json_response($schemaMissing ? 503 : 500, [
         'status' => 'error',
         'message' => $schemaMissing ? 'Startpartner schema is not ready.' : 'Die Vorgänge konnten nicht verarbeitet werden.',
