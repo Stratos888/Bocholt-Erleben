@@ -259,6 +259,7 @@ async function dashboardContract(browser, viewport, label) {
 
   assert(await page.locator('main.page--organizers > .content-hero--panel').isHidden(), `${label}: generischer Hero konkurriert mit Pilot`);
   assert(await page.locator('#organizer-dashboard-summary').isHidden(), `${label}: generische Summary darf nicht als zweiter aktueller Owner erscheinen`);
+  assert(await page.locator('#organizer-dashboard-impact-card').isHidden(), `${label}: generische Null-KPI-Wirkung darf den Pilotkontext nicht als prominente leere KPI-Fläche ergänzen`);
 
   await pilotCard.locator('#organizer-pilot-open-submission-details').click();
   const submissions = page.locator('#organizer-dashboard-submissions-card');

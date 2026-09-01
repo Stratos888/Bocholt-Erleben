@@ -48,6 +48,7 @@
     const genericHero = pageRoot?.querySelector(':scope > .content-hero') || null;
     const summaryGrid = document.getElementById('organizer-dashboard-summary');
     const submissionsCard = document.getElementById('organizer-dashboard-submissions-card');
+    const genericImpact = document.getElementById('organizer-dashboard-impact-card');
 
     if (pageRoot) {
       if (pilotOwnsContext) {
@@ -60,6 +61,7 @@
 
     persistHidden(genericHero, pilotOwnsContext);
     persistHidden(summaryGrid, pilotOwnsContext);
+    if (pilotOwnsContext) persistHidden(genericImpact, true);
 
     if (pilotOwnsContext) {
       const detailsOpen = pageRoot?.dataset.startpartnerDetailsOpen === 'true';
@@ -158,16 +160,31 @@
         : `Veranstaltungen: ${Number(event.used || 0)} von ${Number(event.limit || 0)} in diesem Monat`);
     }
     if (activity?.available) {
-      parts.push(`Aktivitäten: ${Number(activity.used || 0)} von ${Number(activity.limit || 0)} gleichzeitig belegt`);
+      const used = Number(activity.used || 0);
+      parts.push(used === 0
+        ? 'Aktivitäten: aktuell keine Aktivität online'
+        : used === 1
+          ? 'Aktivitäten: aktuell eine Aktivität online'
+          : `Aktivitäten: aktuell ${used} Aktivitäten online`);
     }
     return parts.join(' · ');
   }
 
+  function contentTypeLabel(row) {
+    return row?.content_type === 'activity' ? 'Aktivität' : 'Veranstaltung';
+  }
+
   function contentRow(row) {
-    return `<div class="content-link"><span>
-      <strong>${escape(row.title || `${row.content_type === 'activity' ? 'Aktivität' : 'Veranstaltung'} ${row.submission_id || ''}`)}</strong>
-      <small>${escape(contentStatus(row.status))}${row.start_date ? ` · ${escape(formatDate(row.start_date))}` : ''}</small>
-    </span></div>`;
+    const type = contentTypeLabel(row);
+    const meta = [row.start_date ? formatDate(row.start_date) : '', safe(row.location_name)].filter(Boolean).join(' · ');
+    return `<article class="organizer-pilot-content-item" data-content-type="${escape(row.content_type)}" style="display:grid;gap:5px;min-width:0;padding:12px 14px;border:1px solid var(--cmp-divider-strong);border-radius:14px;background:rgba(255,255,255,0.48)">
+      <div class="organizer-pilot-content-item__topline" style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;flex-wrap:wrap">
+        <span class="content-kicker">${escape(type)}</span>
+        <span class="organizer-pilot-content-status" style="display:inline-flex;align-items:center;min-height:24px;padding:2px 8px;border:1px solid color-mix(in srgb,var(--color-primary) 30%,var(--cmp-divider-strong));border-radius:999px;background:color-mix(in srgb,var(--color-primary-muted) 38%,white);color:var(--color-text-primary);font-size:0.76rem;font-weight:700;line-height:1.1">${escape(contentStatus(row.status))}</span>
+      </div>
+      <strong class="organizer-pilot-content-title" style="display:block;min-width:0;color:var(--color-text-primary);font-size:1rem;line-height:1.22">${escape(row.title || `${type} ${row.submission_id || ''}`)}</strong>
+      ${meta ? `<small class="content-note" style="display:block">${escape(meta)}</small>` : ''}
+    </article>`;
   }
 
   function contentList(rows = []) {
@@ -175,10 +192,24 @@
     const newest = rows.slice().reverse();
     const visible = newest.slice(0, 3);
     const older = newest.slice(3);
-    return `<div class="content-links">${visible.map(contentRow).join('')}</div>${older.length ? `
+    return `<div class="organizer-pilot-content-list" style="display:grid;gap:8px">${visible.map(contentRow).join('')}</div>${older.length ? `
       <details class="content-disclosure"><summary>Weitere Inhalte anzeigen (${older.length})</summary>
-        <div class="content-links">${older.map(contentRow).join('')}</div>
+        <div class="organizer-pilot-content-list" style="display:grid;gap:8px">${older.map(contentRow).join('')}</div>
       </details>` : ''}`;
+  }
+
+  function serviceValue(gate4) {
+    const published = (gate4.content_links || []).some(row => row.status === 'approved');
+    return `
+      <section class="organizer-pilot-value-area" aria-labelledby="organizer-pilot-value-head">
+        <span class="content-kicker">Dein Service im Pilot</span>
+        <h3 id="organizer-pilot-value-head">Was Bocholt erleben für dich übernimmt</h3>
+        <ul class="publish-benefits-grid">
+          <li><div><strong>Redaktionelle Prüfung</strong><span>Jede Einreichung wird vor der Veröffentlichung geprüft.</span></div></li>
+          <li><div><strong>Aufbereitung für Bocholt erleben</strong><span>Deine Angaben werden für eine klare Darstellung redaktionell eingeordnet.</span></div></li>
+          <li><div><strong>Veröffentlichung im vereinbarten Rahmen</strong><span>${published ? 'Veröffentlichte Inhalte sind auf Bocholt erleben sichtbar.' : 'Freigegebene Inhalte werden im vereinbarten Pilotumfang sichtbar.'}</span></div></li>
+        </ul>
+      </section>`;
   }
 
   function allowedTypes(gate4) {
@@ -364,24 +395,30 @@
         <button class="content-cta content-cta--primary" id="organizer-pilot-open-form" type="button">${escape(step.cta)}</button>
       </div>
       <div id="organizer-pilot-form-shell" hidden>${contentForm(gate4, step.preferredType)}</div>` : '';
+    const period = pilot.planned_end_date ? `Geplant bis ${formatDate(pilot.planned_end_date)}` : '';
     card.hidden = false;
     card.innerHTML = `
-      <div class="content-form-section-head"><div><span class="content-kicker">Startpartner · 6 Monate kostenlos</span><h2>${escape(phaseLabel(gate4.phase))}</h2></div></div>
+      <div class="content-form-section-head organizer-pilot-head"><div><span class="content-kicker">Startpartner · 6 Monate kostenlos</span><h2>${escape(phaseLabel(gate4.phase))}</h2>${period ? `<p class="content-note">${escape(period)}</p>` : ''}</div></div>
       ${successMessage ? `<div class="content-note" role="status">${escape(successMessage)}</div>` : ''}
-      <section class="organizer-pilot-next-step" aria-label="Nächster Schritt">
-        <span class="content-kicker">Nächster Schritt</span><h3>${escape(step.title)}</h3><p class="content-note">${escape(step.text)}</p>${submitBlock}
-      </section>
-      <section class="organizer-pilot-content-area" aria-label="Inhalte im Pilot"><h3>Deine Inhalte</h3>${contentList(gate4.content_links)}${secondaryContentDetails(gate4)}</section>
-      ${regularMembershipDetails(portalData)}
-      <details class="content-disclosure"><summary>Pilotdetails</summary>
-        <dl class="organizer-tariff-table">
-          <div><dt>Vereinbarter Rahmen</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
-          ${usageText(gate4) ? `<div><dt>Aktuelle Nutzung</dt><dd>${escape(usageText(gate4))}</dd></div>` : ''}
-          <div><dt>Pilotstart</dt><dd>${escape(formatDate(pilot.activation_date_local))}</dd></div>
-          <div><dt>Geplantes Ende</dt><dd>${escape(formatDate(pilot.planned_end_date))}</dd></div>
-        </dl>
-        <p class="content-note">Keine Zahlungsart erforderlich und keine automatische kostenpflichtige Verlängerung. Veröffentlichungen bleiben redaktionell geprüft.</p>
-      </details>`;
+      <div class="content-grid content-grid--2 organizer-pilot-cockpit-grid">
+        <section class="organizer-pilot-next-step" aria-label="Nächster Schritt">
+          <span class="content-kicker">Nächster Schritt</span><h3>${escape(step.title)}</h3><p class="content-note">${escape(step.text)}</p>${submitBlock}
+        </section>
+        <section class="organizer-pilot-content-area" aria-label="Inhalte im Pilot"><span class="content-kicker">Dein Ergebnis</span><h3>Deine Inhalte</h3>${contentList(gate4.content_links)}${secondaryContentDetails(gate4)}</section>
+      </div>
+      ${serviceValue(gate4)}
+      <div class="organizer-pilot-secondary-meta">
+        ${regularMembershipDetails(portalData)}
+        <details class="content-disclosure"><summary>Pilotdetails</summary>
+          <dl class="organizer-tariff-table">
+            <div><dt>Vereinbarter Rahmen</dt><dd>${escape(scopeText(gate4.scopes) || 'Wird eingerichtet')}</dd></div>
+            ${usageText(gate4) ? `<div><dt>Aktuelle Nutzung</dt><dd>${escape(usageText(gate4))}</dd></div>` : ''}
+            <div><dt>Pilotstart</dt><dd>${escape(formatDate(pilot.activation_date_local))}</dd></div>
+            <div><dt>Geplantes Ende</dt><dd>${escape(formatDate(pilot.planned_end_date))}</dd></div>
+          </dl>
+          <p class="content-note">Keine Zahlungsart erforderlich und keine automatische kostenpflichtige Verlängerung. Veröffentlichungen bleiben redaktionell geprüft.</p>
+        </details>
+      </div>`;
     bindForm(Boolean(directType));
     if (requestedType) clearRequestedSubmitType();
     bindSecondaryContentDetails();
@@ -458,20 +495,49 @@
     const closeButton = document.getElementById('organizer-pilot-close-form');
     const formShell = document.getElementById('organizer-pilot-form-shell');
     const form = document.getElementById('organizer-pilot-content-form');
+    const cockpitGrid = card.querySelector('.organizer-pilot-cockpit-grid');
+    const nextStepArea = card.querySelector('.organizer-pilot-next-step');
+    const desktopQuery = window.matchMedia('(min-width: 900px)');
+    const syncCockpitLayout = () => {
+      const formOpen = Boolean(formShell && !formShell.hidden);
+      if (cockpitGrid) {
+        cockpitGrid.style.gridTemplateColumns = desktopQuery.matches && !formOpen
+          ? 'minmax(0, 0.82fr) minmax(0, 1.18fr)'
+          : 'minmax(0, 1fr)';
+      }
+      if (nextStepArea) {
+        nextStepArea.style.gridColumn = formOpen ? '1 / -1' : '';
+      }
+      if (formOpen) {
+        card.dataset.startpartnerFormOpen = 'true';
+      } else {
+        delete card.dataset.startpartnerFormOpen;
+      }
+    };
+    if (card._startpartnerLayoutMedia && card._startpartnerLayoutHandler) {
+      card._startpartnerLayoutMedia.removeEventListener?.('change', card._startpartnerLayoutHandler);
+    }
+    card._startpartnerLayoutMedia = desktopQuery;
+    card._startpartnerLayoutHandler = syncCockpitLayout;
+    desktopQuery.addEventListener?.('change', syncCockpitLayout);
+
     const openForm = () => {
       if (!openButton || !formShell || !form) return;
       openButton.hidden = true;
       formShell.hidden = false;
+      syncCockpitLayout();
       form.querySelector('select:not([hidden]), input:not([type="hidden"])')?.focus();
     };
     if (openButton && formShell && form) {
       openButton.addEventListener('click', openForm);
       if (openOnLoad) openForm();
+      else syncCockpitLayout();
     }
     if (closeButton && openButton && formShell) {
       closeButton.addEventListener('click', () => {
         formShell.hidden = true;
         openButton.hidden = false;
+        syncCockpitLayout();
         openButton.focus();
       });
     }
