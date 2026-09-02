@@ -8,9 +8,12 @@ import { fileURLToPath } from "node:url";
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fixture = (events, offers, now = "2026-07-22T10:00:00Z") => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "seo-static-"));
-  fs.mkdirSync(path.join(root, "events")); fs.mkdirSync(path.join(root, "aktivitaeten")); fs.mkdirSync(path.join(root, "data"));
+  fs.mkdirSync(path.join(root, "events/wochenende"), { recursive: true });
+  fs.mkdirSync(path.join(root, "aktivitaeten"));
+  fs.mkdirSync(path.join(root, "data"));
   fs.copyFileSync(path.join(repo, "index.html"), path.join(root, "index.html"));
   fs.copyFileSync(path.join(repo, "events/index.html"), path.join(root, "events/index.html"));
+  fs.copyFileSync(path.join(repo, "events/wochenende/index.html"), path.join(root, "events/wochenende/index.html"));
   fs.copyFileSync(path.join(repo, "aktivitaeten/index.html"), path.join(root, "aktivitaeten/index.html"));
   fs.writeFileSync(path.join(root, "data/events.json"), JSON.stringify(events));
   fs.writeFileSync(path.join(root, "data/offers.json"), JSON.stringify({ offers }));
@@ -18,7 +21,14 @@ const fixture = (events, offers, now = "2026-07-22T10:00:00Z") => {
     env: { ...process.env, STATIC_RENDER_ROOT: root, STATIC_RENDER_NOW: now }, encoding: "utf8"
   });
   const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
-  return { root, run, home: read("index.html"), events: read("events/index.html"), activities: read("aktivitaeten/index.html") };
+  return {
+    root,
+    run,
+    home: read("index.html"),
+    events: read("events/index.html"),
+    weekend: read("events/wochenende/index.html"),
+    activities: read("aktivitaeten/index.html")
+  };
 };
 const assertHomeMainLinks = (html) => {
   assert.match(html, /class="today-more__link" href="\/events\/"/);
@@ -34,17 +44,38 @@ assert.match(result.home, /data-static-event-context="today"/);
 assert.match(result.home, /data-item-id="today"/);
 assert.doesNotMatch(result.home, /data-item-id="future"/);
 assertHomeMainLinks(result.home);
+assert.match(result.events, /href="\/events\/wochenende\/"/);
 assert.match(result.events, /href="\/events\/future\/"/);
 assert.match(result.activities, /Aasee erleben/);
+assert.match(result.weekend, /Aktuell sind noch keine freigegebenen Termine eingetragen/);
+
 result = fixture([future], [activity]);
 assert.equal(result.run.status, 0, result.run.stderr);
 assert.match(result.home, /Nächste Termine/);
 assert.match(result.home, /data-static-event-context="upcoming"/);
 assertHomeMainLinks(result.home);
+
+result = fixture([
+  { id: "thu", title: "Donnerstag", date: "2026-09-03", location: "Bocholt" },
+  { id: "fri", title: "Freitag", date: "2026-09-04", location: "Bocholt" },
+  { id: "range", title: "Mehrtag", date: "2026-09-02", endDate: "2026-09-05", location: "Bocholt" },
+  { id: "sun", title: "Sonntag", date: "2026-09-06", location: "Bocholt" },
+  { id: "mon", title: "Montag", date: "2026-09-07", location: "Bocholt" }
+], [activity], "2026-09-02T10:00:00Z");
+assert.equal(result.run.status, 0, result.run.stderr);
+assert.match(result.weekend, /Freitag, 0?4\. September bis Sonntag, 0?6\. September/i);
+assert.match(result.weekend, /data-item-id="range"/);
+assert.match(result.weekend, /data-item-id="fri"/);
+assert.match(result.weekend, /data-item-id="sun"/);
+assert.doesNotMatch(result.weekend, /data-item-id="thu"/);
+assert.doesNotMatch(result.weekend, /data-item-id="mon"/);
+
 result = fixture([{ id: "berlin-day", title: "Berliner Tag", date: "2026-03-29", location: "Bocholt" }], [activity], "2026-03-28T23:30:00Z");
 assert.equal(result.run.status, 0, result.run.stderr);
 assert.match(result.home, /data-static-event-context="today"/);
+assert.match(result.weekend, /data-item-id="berlin-day"/);
 assertHomeMainLinks(result.home);
+
 for (const [events, offers] of [[[], [activity]], [[future], []]]) {
   result = fixture(events, offers);
   assert.notEqual(result.run.status, 0);

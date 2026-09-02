@@ -17,6 +17,36 @@
     return `${parts.year}-${parts.month}-${parts.day}`;
   }
 
+  function addDaysIso(value, days) {
+    const valid = isoDate(value);
+    if (!valid) return "";
+    const [year, month, day] = valid.split("-").map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    date.setUTCDate(date.getUTCDate() + Number(days || 0));
+    return date.toISOString().slice(0, 10);
+  }
+
+  function weekdayIso(value) {
+    const valid = isoDate(value);
+    if (!valid) return null;
+    const [year, month, day] = valid.split("-").map(Number);
+    return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+  }
+
+  function weekendRange(options) {
+    const opts = options || {};
+    const today = isoDate(opts.today) || localDate(opts.now, opts.timeZone);
+    const weekday = weekdayIso(today);
+    if (weekday == null) throw new TypeError("Invalid local date");
+    let fridayOffset;
+    if (weekday === 5) fridayOffset = 0;
+    else if (weekday === 6) fridayOffset = -1;
+    else if (weekday === 0) fridayOffset = -2;
+    else fridayOffset = (5 - weekday + 7) % 7;
+    const start = addDaysIso(today, fridayOffset);
+    return { start, end: addDaysIso(start, 2) };
+  }
+
   function isCurrentEvent(item, today) {
     if (!identity(item) || !text(item.title)) return false;
     const start = isoDate(item.date);
@@ -56,6 +86,25 @@
       .slice(0, Number.isInteger(opts.limit) ? opts.limit : 3);
   }
 
+  function selectWeekendEvents(items, options) {
+    const opts = options || {};
+    const range = weekendRange(opts);
+    const limit = Number.isInteger(opts.limit) ? opts.limit : Number.MAX_SAFE_INTEGER;
+    const seen = new Set();
+    return (Array.isArray(items) ? items : [])
+      .filter((item) => {
+        const id = identity(item);
+        const start = isoDate(item && item.date);
+        const end = isoDate(item && (item.endDate || item.end_date)) || start;
+        if (!id || !text(item && item.title) || !start || end < start || seen.has(id)) return false;
+        if (end < range.start || start > range.end) return false;
+        seen.add(id);
+        return true;
+      })
+      .sort((a, b) => text(a.date).localeCompare(text(b.date)) || baseScore(b) - baseScore(a) || identity(a).localeCompare(identity(b)))
+      .slice(0, limit);
+  }
+
   function selectActivities(items, options) {
     const limit = Number.isInteger(options && options.limit) ? options.limit : 6;
     const seen = new Set();
@@ -70,5 +119,15 @@
       .slice(0, limit);
   }
 
-  return { identity, localDate, isCurrentEvent, baseScore, selectEvents, selectTodayEvents, selectActivities };
+  return {
+    identity,
+    localDate,
+    weekendRange,
+    isCurrentEvent,
+    baseScore,
+    selectEvents,
+    selectTodayEvents,
+    selectWeekendEvents,
+    selectActivities
+  };
 });
