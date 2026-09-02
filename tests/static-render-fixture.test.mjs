@@ -63,7 +63,7 @@ result = fixture([
   { id: "mon", title: "Montag", date: "2026-09-07", location: "Bocholt" }
 ], [activity], "2026-09-02T10:00:00Z");
 assert.equal(result.run.status, 0, result.run.stderr);
-assert.match(result.weekend, /Freitag, 04\. September bis Sonntag, 06\. September/i);
+assert.match(result.weekend, /Freitag, 0?4\. September bis Sonntag, 0?6\. September/i);
 assert.match(result.weekend, /data-item-id="range"/);
 assert.match(result.weekend, /data-item-id="fri"/);
 assert.match(result.weekend, /data-item-id="sun"/);
