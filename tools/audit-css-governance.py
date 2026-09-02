@@ -12,7 +12,7 @@ CSS_ENTRY_VERSION='2026-06-22-css-governance-v1'
 STYLE_TARGET='css/style.css'
 EVENT_DETAIL_PAGE_CSS_VERSION='2026-07-03-event-detail-scroll-share-v1'
 EVENT_DETAIL_PAGE_TARGET='css/pages.css'
-EXPECTED_IMPORTS=['base.css','pages.css','components.css','home.css','today.css','overlays.css','control-center.css','control-center-final.css','control-center-editorial.css','control-center-exception-review.css']
+EXPECTED_IMPORTS=['base.css','pages.css','components.css','home.css','event-card-geometry.css','weekend.css','today.css','overlays.css','control-center.css','control-center-final.css','control-center-editorial.css','control-center-exception-review.css']
 CSS_LINE_LIMITS={'style.css':40,'base.css':950,'pages.css':3950,'components.css':2200,'home.css':5000,'today.css':1600,'overlays.css':3600,'control-center.css':1200,'control-center-final.css':300,'control-center-editorial.css':100,'control-center-exception-review.css':120,'legacy.css':50}
 STYLESHEET_LINK_RE=re.compile(r"<link\b(?=[^>]*\brel=[\"']stylesheet[\"'])(?=[^>]*\bhref=[\"']([^\"']+)[\"'])[^>]*>",re.IGNORECASE)
 IMPORT_RE=re.compile(r"^@import\s+(?:url\()?\s*[\"']?([^\"')\s]+)[\"']?\s*\)?\s*;$",re.IGNORECASE)
