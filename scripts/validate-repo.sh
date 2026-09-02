@@ -130,6 +130,7 @@ validate_frontend() {
   validate_frontend_syntax
   node tests/startpartner_public_funnel_contract_test.mjs
   node tests/organizer_portal_gate4_contract_test.mjs
+  node tests/startpartner_value_first_frontend_contract_test.mjs
   node tests/control_center_frontend_contract_test.mjs
   node tests/control_center_browser_secret_contract_test.mjs
   python3 tests/test_responsive_grid_cache_contract.py
