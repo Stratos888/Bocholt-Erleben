@@ -35,6 +35,14 @@ const assertHomeMainLinks = (html) => {
   assert.match(html, /class="today-more__link" href="\/aktivitaeten\/"/);
   assert.doesNotMatch(html, /today-intent-nav/);
 };
+const staticBlock = (html, marker) => {
+  const start = `<!-- STATIC:${marker}:START -->`;
+  const end = `<!-- STATIC:${marker}:END -->`;
+  const from = html.indexOf(start);
+  const to = html.indexOf(end);
+  assert.ok(from >= 0 && to > from, `missing ${marker} static block`);
+  return html.slice(from + start.length, to);
+};
 const activity = { id: "aasee", title: "Aasee erleben", description: "Freizeit am Wasser" };
 const today = { id: "today", title: "Heute", date: "2026-07-22", location: "Bocholt" };
 const future = { id: "future", title: "Später", date: "2026-07-23", location: "Bocholt", score: 99 };
@@ -63,12 +71,14 @@ result = fixture([
   { id: "mon", title: "Montag", date: "2026-09-07", location: "Bocholt" }
 ], [activity], "2026-09-02T10:00:00Z");
 assert.equal(result.run.status, 0, result.run.stderr);
-assert.match(result.weekend, /Freitag, 0?4\. September bis Sonntag, 0?6\. September/i);
-assert.match(result.weekend, /data-item-id="range"/);
-assert.match(result.weekend, /data-item-id="fri"/);
-assert.match(result.weekend, /data-item-id="sun"/);
-assert.doesNotMatch(result.weekend, /data-item-id="thu"/);
-assert.doesNotMatch(result.weekend, /data-item-id="mon"/);
+const weekendFeed = staticBlock(result.weekend, "WEEKEND");
+assert.match(weekendFeed, /Freitag, 0?4\. September bis Sonntag, 0?6\. September/i);
+assert.match(weekendFeed, /data-item-id="range"/);
+assert.match(weekendFeed, /data-item-id="fri"/);
+assert.match(weekendFeed, /data-item-id="sun"/);
+assert.doesNotMatch(weekendFeed, /data-item-id="thu"/);
+assert.doesNotMatch(weekendFeed, /data-item-id="mon"/);
+assert.doesNotMatch(weekendFeed, />Diese Woche</);
 
 result = fixture([{ id: "berlin-day", title: "Berliner Tag", date: "2026-03-29", location: "Bocholt" }], [activity], "2026-03-28T23:30:00Z");
 assert.equal(result.run.status, 0, result.run.stderr);
