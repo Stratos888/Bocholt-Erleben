@@ -30,7 +30,7 @@ function public_events_visual_fields_for_submission(array $row): array
     if (preg_match('/\b(playfountain|play fountain|wasserspaß|wasserspass|wasserspiel|wasserspielfläche|wasserspielflaeche)\b/u', $combined)) {
         return ['visual_key' => 'family_play_outdoor', 'visual_motif' => 'playfountain_water_splash'];
     }
-    return [];
+    return ['visual_key' => 'default_city', 'visual_motif' => 'default_city'];
 }
 
 function public_events_city_from_address(?string $address): string

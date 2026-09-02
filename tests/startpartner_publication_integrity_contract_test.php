@@ -32,6 +32,15 @@ foreach ([
     }
 }
 
+$specificVisualPos = strpos($eventReader, "return ['visual_key' => 'family_play_outdoor', 'visual_motif' => 'playfountain_water_splash'];");
+$defaultVisualPos = strpos($eventReader, "return ['visual_key' => 'default_city', 'visual_motif' => 'default_city'];");
+$assert($specificVisualPos !== false, 'Public event reader must preserve the existing specific visual mapping for recognized submissions.');
+$assert($defaultVisualPos !== false, 'Public DB events without a specific mapping must receive the ready default_city visual instead of rendering without media.');
+$assert(
+    $specificVisualPos !== false && $defaultVisualPos !== false && $specificVisualPos < $defaultVisualPos,
+    'Specific public-event visual mappings must retain precedence over the default_city fallback.'
+);
+
 $assert(str_contains($lifecycle, "'publication_effect' => 'public_projection_eligible'"), 'Approval audit must describe public projection eligibility.');
 $assert(str_contains($lifecycle, "? 'public_projection_withdrawn'"), 'Withdrawal audit must describe the end of public projection for previously approved content.');
 $assert(str_contains($lifecycle, "'pause', 'resume', 'start_closeout' => 'approved_content_retained'"), 'Pause/resume/closeout audit must document retention of already approved public content.');
