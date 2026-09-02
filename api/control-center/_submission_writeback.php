@@ -41,15 +41,6 @@ function be_cc_submission_current_status(PDO $pdo, int $submissionId): string
     return trim((string)$status);
 }
 
-function be_cc_submission_current_payment_kind(PDO $pdo, int $submissionId): string
-{
-    $stmt = $pdo->prepare('SELECT payment_kind FROM submissions WHERE id=:id LIMIT 1');
-    $stmt->execute(['id' => $submissionId]);
-    $paymentKind = $stmt->fetchColumn();
-    if ($paymentKind === false) throw new RuntimeException('Submission konnte für die Zahlungsart nicht zurückgelesen werden.');
-    return trim((string)$paymentKind);
-}
-
 function be_cc_verify_submission_status(PDO $pdo, int $submissionId, array $expected): string
 {
     $status = be_cc_submission_current_status($pdo, $submissionId);
@@ -81,10 +72,6 @@ function be_cc_writeback_submission(array $case, string $action, array $payload)
     $status = trim((string)($source['status'] ?? ''));
     if ($submissionId <= 0) throw new RuntimeException('Submission id is invalid.');
     $pdo = be_db();
-    $paymentKind = be_cc_submission_current_payment_kind($pdo, $submissionId);
-    if ($paymentKind === 'startpartner_pilot') {
-        throw new DomainException('Startpartner-Pilotinhalte werden ausschließlich über den geschützten Startpartner-Pilotprozess bearbeitet.');
-    }
 
     if ($action === 'approve') {
         if ($status === 'pending_review') {
