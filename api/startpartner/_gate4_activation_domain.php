@@ -10,7 +10,11 @@ function be_startpartner_gate4_activate(PDO $pdo, string $candidateId, array $in
         $input,
         static function(PDO $pdo, array $candidate, array $pilot, string $operator, string $operationId, array $input): array {
             $state = be_startpartner_gate4_state($pdo, (string)$candidate['id'], false);
-            if (!$state['activation_ready'] || (string)$pilot['status'] !== 'activation_ready') {
+            $pilotStatusBefore = (string)$pilot['status'];
+            if (
+                !$state['activation_ready']
+                || !in_array($pilotStatusBefore, ['onboarding', 'activation_ready'], true)
+            ) {
                 throw new DomainException('Pilot is not activation ready.');
             }
             $window = be_startpartner_gate4_activation_window((string)($input['activation_date_local'] ?? ''));
@@ -26,8 +30,8 @@ function be_startpartner_gate4_activate(PDO $pdo, string $candidateId, array $in
             if (!is_array($content) || (string)$content['status'] !== 'editorial_ready') {
                 throw new DomainException('First pilot content is not editorially ready.');
             }
-            if (!is_array($measurement) || !is_array($distribution)) {
-                throw new DomainException('Measurement and distribution readiness are required.');
+            if (!is_array($measurement)) {
+                throw new DomainException('Measurement readiness is required.');
             }
             $entitlementStatement = $pdo->prepare(
                 'SELECT * FROM startpartner_pilot_entitlements WHERE pilot_id = :pilot_id LIMIT 1 FOR UPDATE'
@@ -50,6 +54,19 @@ function be_startpartner_gate4_activate(PDO $pdo, string $candidateId, array $in
             if (!is_array($reservationRow)) {
                 throw new DomainException('Active pilot reservation is missing.');
             }
+
+            if ($pilotStatusBefore === 'onboarding') {
+                $readyStatusUpdate = $pdo->prepare(
+                    "UPDATE startpartner_pilots
+                     SET status = 'activation_ready'
+                     WHERE id = :id AND status = 'onboarding'"
+                );
+                $readyStatusUpdate->execute(['id' => (string)$pilot['id']]);
+                if ($readyStatusUpdate->rowCount() !== 1) {
+                    throw new RuntimeException('Pilot readiness state could not be synchronized for activation.');
+                }
+            }
+
             $beforeCapacity = be_startpartner_gate4_capacity($pdo);
 
             $submission = $pdo->prepare(
@@ -167,7 +184,9 @@ function be_startpartner_gate4_activate(PDO $pdo, string $candidateId, array $in
                     'content_link_id' => (string)$content['id'],
                     'submission_id' => (int)$content['submission_id'],
                     'measurement_preflight_id' => (string)$measurement['id'],
-                    'distribution_id' => (string)$distribution['id'],
+                    'distribution_id' => is_array($distribution) ? (string)$distribution['id'] : null,
+                    'distribution_requirement' => 'optional_not_required_for_activation',
+                    'pilot_status_before_activation' => $pilotStatusBefore,
                     'reservation_id' => (int)$reservationRow['id'],
                 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
             ]);
