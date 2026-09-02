@@ -1,4 +1,4 @@
-/* === BEGIN BLOCK: BOTTOM_SHELL_NAV_RENDERER_V3 | Zweck: rendert mobile Bottom-Navigation und Desktop-Bereichs-Navigation aus genau einer zentralen Route-Definition, verhindert Reload auf dem aktiven Ziel und wärmt die Gegenseite per Prefetch/Prerender vor | Umfang: kompletter zentrale Shell-Navigation inkl. Mobile/Desktop-Rendering, Path-Normalisierung, Active-Guard, Warmup und Icon-Hydration === */
+/* === BEGIN BLOCK: BOTTOM_SHELL_NAV_RENDERER_V4 | Zweck: rendert mobile Bottom-Navigation und Desktop-Bereichs-Navigation aus genau einer zentralen Route-Definition, verhindert Reload nur auf dem exakten aktiven Hauptziel und lässt aktive Unterrouten sauber zum Bereichsroot zurückführen; Umfang: kompletter zentrale Shell-Navigation inkl. Mobile/Desktop-Rendering, Path-Normalisierung, Root-Active-Guard, Warmup und Icon-Hydration === */
 (() => {
   "use strict";
 
@@ -205,12 +205,19 @@
   function bindNavBehavior(root, activeItem) {
     if (!root || !activeItem) return;
 
+    const currentPath = normalizePath(window.location.pathname);
+
     root.querySelectorAll("[data-tab-key]").forEach((link) => {
       const key = String(link.getAttribute("data-tab-key") || "").trim();
       const item = ITEMS.find((entry) => entry.key === key);
       if (!item) return;
 
-      if (item.key === activeItem.key) {
+      const isExactActiveTarget = (
+        item.key === activeItem.key &&
+        currentPath === normalizePath(item.href)
+      );
+
+      if (isExactActiveTarget) {
         link.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
@@ -309,4 +316,4 @@
     render();
   }
 })();
-/* === END BLOCK: BOTTOM_SHELL_NAV_RENDERER_V3 === */
+/* === END BLOCK: BOTTOM_SHELL_NAV_RENDERER_V4 === */
