@@ -48,11 +48,30 @@ for filename in core_files:
 
 weekend_path = ROOT / "events/wochenende/index.html"
 weekend, weekend_page = parse("events/wochenende/index.html")
+assert weekend_path.exists()
 assert (weekend_page.h1, weekend_page.title, weekend_page.canonical, weekend_page.noindex) == (1, 1, 1, False)
 assert "STATIC:WEEKEND:START" in weekend and "STATIC:WEEKEND:END" in weekend
 assert "Veranstaltungen am Wochenende in Bocholt" in weekend
 assert 'href="https://bocholt-erleben.de/events/wochenende/"' in weekend
-assert '/events/' in weekend_page.links
+
+# Weekend route reuses the existing Event-Hub interaction owners instead of
+# maintaining a second simple content-card experience.
+for required in (
+    'class="desktop-hero"',
+    'id="search-filter"',
+    'id="filter-time-pill"',
+    'id="filter-category-pill"',
+    'id="event-cards"',
+    'id="event-detail-panel"',
+    'src="/js/events.js',
+    'src="/js/filter.js',
+    'src="/js/main.js',
+):
+    assert required in weekend, f"weekend Event-UX contract missing {required}"
+assert "content-hero content-hero--panel" not in weekend
+assert 'data-time="weekend"' in weekend
+assert "weekendRouteInit" in weekend
+assert "weekendButton.click()" in weekend
 
 home, home_page = parse("index.html")
 events, events_page = parse("events/index.html")
