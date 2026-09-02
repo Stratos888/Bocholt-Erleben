@@ -3,6 +3,7 @@ import {
   closeDialog, dialogMessage, field, textarea, value, operationId, setStatus,
 } from './shared.js?v=2026-07-16-e2e-state-v5';
 
+// Legacy contract term: Reichweitenbeitrag. Visible UI uses the value-first optional cooperation wording below.
 const itemLabels = {
   terms_confirmed: 'Pilotbedingungen ausdrücklich bestätigt', organizer_linked: 'Veranstalterzugang zugeordnet',
   contact_confirmed: 'Ansprechperson bestätigt', portal_access_tested: 'Partnerzugang genutzt',
