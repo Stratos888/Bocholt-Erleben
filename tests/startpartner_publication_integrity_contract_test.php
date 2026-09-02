@@ -44,6 +44,7 @@ $assert(
 $assert(str_contains($lifecycle, "'publication_effect' => 'public_projection_eligible'"), 'Approval audit must describe public projection eligibility.');
 $assert(str_contains($lifecycle, "? 'public_projection_withdrawn'"), 'Withdrawal audit must describe the end of public projection for previously approved content.');
 $assert(str_contains($lifecycle, "'pause', 'resume', 'start_closeout' => 'approved_content_retained'"), 'Pause/resume/closeout audit must document retention of already approved public content.');
+$assert(str_contains($lifecycle, "'end_without_conversion', 'terminate' => 'active_startpartner_public_projection_ended'"), 'Terminal lifecycle audit must document the end of active Startpartner public projection.');
 $assert(str_contains($lifecycle, 'historical_usage_retained'), 'Withdrawal must retain historical usage evidence.');
 $assert(str_contains($lifecycle, "WHERE pilot_id = :pilot_id AND status IN ('draft','editorial_ready')"), 'Terminal transition must not rewrite historical approved content links merely to hide them publicly.');
 
