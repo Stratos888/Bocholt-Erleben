@@ -57,8 +57,25 @@ function be_startpartner_gate3_primary_email(array $candidate): string
     return '';
 }
 
+function be_startpartner_gate3_present_operator_first_content(array $candidate): array
+{
+    $gate4 = is_array($candidate['gate4'] ?? null) ? $candidate['gate4'] : null;
+    if (!is_array($gate4) || is_array($gate4['first_content'] ?? null)) {
+        return $candidate;
+    }
+
+    foreach ((array)($gate4['content_links'] ?? []) as $row) {
+        if (!is_array($row)) continue;
+        if (!in_array((string)($row['status'] ?? ''), ['draft', 'editorial_ready', 'approved'], true)) continue;
+        $candidate['gate4']['first_content'] = $row;
+        break;
+    }
+    return $candidate;
+}
+
 function be_startpartner_gate3_present_case(array $item, array $candidate): array
 {
+    $candidate = be_startpartner_gate3_present_operator_first_content($candidate);
     $gate3 = is_array($candidate['gate3'] ?? null)
         ? $candidate['gate3']
         : ['complete' => false, 'blockers' => []];
