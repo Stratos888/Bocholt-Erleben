@@ -14,7 +14,6 @@ const BE_STARTPARTNER_GATE4_ONBOARDING_ITEMS = [
     'first_content_ready',
     'editorial_review_ready',
     'measurement_ready',
-    'distribution_ready',
     'activation_target_set',
 ];
 
