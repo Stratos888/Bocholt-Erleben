@@ -20,8 +20,8 @@ const postActivation=new Set(['active','active_draft','active_ready','measuremen
 
 function controlNextActionForScenario(scenario){
   if(scenario==='measurement_problem')return {code:'measurement_problem',label:'Technische Erfolgsmessung prüfen',action:'measurement'};
-  if(scenario==='distribution_due')return {code:'distribution_due',label:'Fälligen Reichweitenbeitrag dokumentieren',action:'set_distribution_fulfillment',distribution_id:distributionId};
-  if(scenario==='distribution_blocked')return {code:'distribution_blocked',label:'Blockierten Reichweitenbeitrag klären',action:'set_distribution_fulfillment',distribution_id:distributionId};
+  if(scenario==='distribution_due')return {code:'distribution_due',label:'Optionale Reichweitenkooperation dokumentieren',action:'set_distribution_fulfillment',distribution_id:distributionId};
+  if(scenario==='distribution_blocked')return {code:'distribution_blocked',label:'Optionale Reichweitenkooperation klären',action:'set_distribution_fulfillment',distribution_id:distributionId};
   if(scenario==='active_draft')return {code:'content_review',label:'Nächsten Pilotinhalt redaktionell prüfen',action:'mark_content_ready',content_link_id:secondId};
   if(scenario==='active_ready')return {code:'content_approval',label:'Vorbereiteten Pilotinhalt freigeben',action:'approve_content',content_link_id:secondId};
   if(scenario==='paused')return {code:'paused',label:'Pilot fortsetzen oder Abschluss einleiten',action:'resume'};
@@ -44,18 +44,17 @@ function partnerNextActionForScenario(scenario){
 }
 
 function gate4Candidate(scenario='access'){
-  const keys=['terms_confirmed','organizer_linked','contact_confirmed','portal_access_tested','pilot_entitlement_readback','service_scope_confirmed','sources_recorded','maintenance_path_agreed','content_rights_cleared','first_content_ready','editorial_review_ready','measurement_ready','distribution_ready','activation_target_set'];
+  const keys=['terms_confirmed','organizer_linked','contact_confirmed','portal_access_tested','pilot_entitlement_readback','service_scope_confirmed','sources_recorded','maintenance_path_agreed','content_rights_cleared','first_content_ready','editorial_review_ready','measurement_ready','activation_target_set'];
   const complete=new Set(['terms_confirmed','organizer_linked','contact_confirmed','pilot_entitlement_readback','service_scope_confirmed','sources_recorded','maintenance_path_agreed','content_rights_cleared','activation_target_set']);
   const afterPortal=scenario!=='access';
   if(afterPortal)complete.add('portal_access_tested');
-  if(['measurement','distribution','ready'].includes(scenario)||postActivation.has(scenario))for(const key of ['first_content_ready','editorial_review_ready'])complete.add(key);
-  if(['distribution','ready'].includes(scenario)||postActivation.has(scenario))complete.add('measurement_ready');
-  if(scenario==='ready'||postActivation.has(scenario))complete.add('distribution_ready');
+  if(['measurement','ready'].includes(scenario)||postActivation.has(scenario))for(const key of ['first_content_ready','editorial_review_ready'])complete.add(key);
+  if(scenario==='ready'||postActivation.has(scenario))complete.add('measurement_ready');
   const items=keys.map(key=>({item_key:key,status:complete.has(key)?'complete':'pending',is_required:1,is_hard_blocker:1,is_manual:0,evidence_text:complete.has(key)?`Systemnachweis ${key}`:null,revision:1}));
 
   const phase=scenario==='ready'?'activation_ready':scenario==='paused'?'paused':scenario==='closing'?'closing':scenario==='terminal'?'ended_without_conversion':postActivation.has(scenario)?'active':'onboarding';
   const activated=postActivation.has(scenario);
-  const firstStatus=scenario==='content'?'draft':['measurement','distribution','ready'].includes(scenario)?'editorial_ready':activated?'approved':null;
+  const firstStatus=scenario==='content'?'draft':['measurement','ready'].includes(scenario)?'editorial_ready':activated?'approved':null;
   const content=[];
   if(firstStatus)content.push({id:firstId,submission_id:4241,content_type:'event',status:firstStatus,title:'Synthetischer Startpartner-Kulturtag',start_date:'2026-09-12'});
   if(scenario==='active_draft')content.push({id:secondId,submission_id:4242,content_type:'activity',status:'draft',title:'Synthetische Familienaktivität',start_date:null});
@@ -68,15 +67,13 @@ function gate4Candidate(scenario='access'){
       ?{code:'required_item_open',item_key:'first_content_ready',message:'Der erste Inhalt ist noch nicht für den Pilotstart vorbereitet.'}
       :scenario==='measurement'
         ?{code:'required_item_open',item_key:'measurement_ready',message:'Die technische Erfolgsmessung ist noch nicht geprüft.'}
-        :scenario==='distribution'
-          ?{code:'required_item_open',item_key:'distribution_ready',message:'Der Reichweitenbeitrag ist noch nicht mit dem Partner vereinbart.'}
-          :null;
+        :null;
 
   const plannedEnd=scenario==='end_due'?'2026-08-26':activated?'2027-02-01':null;
   const pilot={id:'24100000-0000-4000-8000-000000000002',status:phase,revision:7,activation_date_local:activated?'2026-08-01':null,planned_end_date:plannedEnd};
-  const readyMeasurement=['distribution','ready'].includes(scenario)||activated?{id:'24100000-0000-4000-8000-000000000020',metrics_owner:'value_metric_daily',checked_at:'2026-08-01 10:00:00'}:null;
-  const commitment={id:distributionId,status:'ready',channel:'Newsletter',planned_at:'2026-08-20 12:00:00',target_reference:'https://example.org/reach',evidence_text:'Mit Partner vereinbart.'};
-  const readyDistribution=scenario==='ready'||activated?commitment:null;
+  const readyMeasurement=scenario==='ready'||activated?{id:'24100000-0000-4000-8000-000000000020',metrics_owner:'value_metric_daily',checked_at:'2026-08-01 10:00:00'}:null;
+  const commitment={id:distributionId,status:'ready',channel:'Newsletter',planned_at:'2026-08-20 12:00:00',target_reference:'https://example.org/reach',evidence_text:'Freiwillig mit Partner vereinbart.'};
+  const readyDistribution=activated?commitment:null;
   const measurementRuntime=activated?{
     status:scenario==='measurement_problem'?'query_or_attribution_problem':'usage_observed',
     observed_actions:scenario==='measurement_problem'?0:3,
@@ -84,7 +81,7 @@ function gate4Candidate(scenario='access'){
   const distributionRuntime=activated?{
     status:scenario==='distribution_due'?'due':scenario==='distribution_blocked'?'blocked':'planned',
     commitment,
-  }:{status:readyDistribution?'planned':'not_planned',commitment:readyDistribution};
+  }:{status:'not_planned',commitment:null};
   const limits={
     event:{available:true,used:scenario==='event_limit_full'?8:1,limit:8,is_unlimited:false,full:scenario==='event_limit_full',reset_date_local:'2026-09-01'},
     activity:{available:true,used:scenario==='activity_limit_full'?1:0,limit:1,is_unlimited:false,full:scenario==='activity_limit_full'},
@@ -100,7 +97,7 @@ function gate4Candidate(scenario='access'){
   const scopes=[{scope_key:'events',status:activated?'active':'planned',limit_value:8,is_unlimited:false,period_unit:'pilot_month'},{scope_key:'activities',status:activated?'active':'planned',limit_value:1,is_unlimited:false,period_unit:'concurrent'}];
   const gate4={
     phase,complete:scenario==='ready'||activated,active:phase==='active',effective_active:phase==='active'&&scenario!=='end_due',activation_ready:scenario==='ready',pilot,scopes,
-    onboarding:{ready:scenario==='ready'||activated,completed_count:items.filter(row=>row.status==='complete').length,total_count:14,items,blockers:blocker?[blocker]:[]},
+    onboarding:{ready:scenario==='ready'||activated,completed_count:items.filter(row=>row.status==='complete').length,total_count:13,items,blockers:blocker?[blocker]:[]},
     content_links:content,first_content:firstContent,ready_measurement:readyMeasurement,ready_distribution:readyDistribution,
     distribution_commitments:readyDistribution?[commitment]:[],measurement_runtime:measurementRuntime,distribution_runtime:distributionRuntime,
     lifecycle:{checkpoints,closeout_required:scenario==='end_due'},limits,next_action:nextAction,blockers:blocker?[blocker]:[],
@@ -151,7 +148,7 @@ async function dialogContract(browser,scenario,action,markers,name){
 }
 
 function portalPayload(submitted=false){
-  return {organizer_id:401,gate4:{phase:'onboarding',active:false,activation_ready:false,pilot:{status:'onboarding',activation_date_local:null,planned_end_date:null},scopes:[{scope_key:'events',status:'planned',limit_value:8,is_unlimited:false,period_unit:'pilot_month'},{scope_key:'activities',status:'planned',limit_value:1,is_unlimited:false,period_unit:'concurrent'}],onboarding:{complete_count:9,total_count:14},content_links:submitted?[{submission_id:909,content_type:'activity',status:'draft',title:'Synthetische Familienaktivität',start_date:null,location_name:'Bocholt'}]:[]}};
+  return {organizer_id:401,gate4:{phase:'onboarding',active:false,activation_ready:false,pilot:{status:'onboarding',activation_date_local:null,planned_end_date:null},scopes:[{scope_key:'events',status:'planned',limit_value:8,is_unlimited:false,period_unit:'pilot_month'},{scope_key:'activities',status:'planned',limit_value:1,is_unlimited:false,period_unit:'concurrent'}],onboarding:{complete_count:9,total_count:13},content_links:submitted?[{submission_id:909,content_type:'activity',status:'draft',title:'Synthetische Familienaktivität',start_date:null,location_name:'Bocholt'}]:[]}};
 }
 
 async function organizerPortal(browser,viewport,name){
@@ -171,7 +168,7 @@ async function organizerPortal(browser,viewport,name){
   const card=page.locator('#organizer-dashboard-pilot-card');
   const initial=await card.innerText();
   for(const marker of ['Startpartner · 6 Monate kostenlos','Pilot wird eingerichtet','Nächster Schritt','Ersten Inhalt einreichen','Deine Inhalte','Pilotdetails'])assert(containsVisibleText(initial,marker),`${name}: Portalmarker fehlt: ${marker}`);
-  assert(!containsVisibleText(initial,'9 von 14'),`${name}: interne Gate-Zählung ist im Partnerportal sichtbar`);
+  assert(!containsVisibleText(initial,'9 von 13'),`${name}: interne Gate-Zählung ist im Partnerportal sichtbar`);
   assert(!/\b(onboarding|draft|pending_activation)\b/.test(initial),`${name}: technischer Rohstatus sichtbar`);
   assert(await card.locator('.content-cta--primary:visible').count()===1,`${name}: erster Partnerzustand hat nicht genau eine prominente Aktion`);
   const form=page.locator('#organizer-pilot-content-form');
@@ -233,14 +230,13 @@ async function organizerLifecycleState(browser,scenario,markers,expectedPrimary,
 
 const browser=await chromium.launch({headless:true});
 try{
-  await controlState(browser,'access',{width:360,height:780},'gate4-mobile-access',['Piloteinrichtung','9 von 14 geprüft','Warten auf Partnerzugang','Erfolgsmessung','Reichweitenbeitrag'],{visibleActionCount:0});
-  await controlState(browser,'content',{width:390,height:844},'gate4-mobile-content',['Piloteinrichtung','10 von 14 geprüft','Nächsten Inhalt redaktionell vorbereiten','Zur Prüfung eingereicht'],{visibleAction:`gate4:content-ready:${firstId}`,visibleActionCount:1});
-  await controlState(browser,'measurement',{width:390,height:844},'gate4-mobile-measurement',['Piloteinrichtung','12 von 14 geprüft','Technische Erfolgsmessung prüfen','Technische Prüfung noch offen'],{visibleAction:'gate4:measurement',visibleActionCount:1});
-  await controlState(browser,'distribution',{width:390,height:844},'gate4-mobile-distribution',['Piloteinrichtung','13 von 14 geprüft','Reichweitenbeitrag vereinbaren','Noch nicht vereinbart'],{visibleAction:'gate4:distribution',visibleActionCount:1});
-  await controlState(browser,'ready',{width:390,height:844},'gate4-mobile-ready',['Bereit zum Start','14 von 14 geprüft','Pilot jetzt starten'],{visibleAction:'gate4:activate',visibleActionCount:1});
-  await controlState(browser,'active',{width:1440,height:900},'gate4-desktop-active',['Pilotphase läuft','01.08.2026','01.02.2027','Nutzung vorhanden','Vereinbart, noch nicht fällig','Aktiven Pilot beobachten'],{visibleActionCount:0});
+  await controlState(browser,'access',{width:360,height:780},'gate4-mobile-access',['Piloteinrichtung','9 von 13 geprüft','Warten auf Partnerzugang','Erfolgsmessung','Optionale Reichweitenkooperation'],{visibleActionCount:0});
+  await controlState(browser,'content',{width:390,height:844},'gate4-mobile-content',['Piloteinrichtung','10 von 13 geprüft','Nächsten Inhalt redaktionell vorbereiten','Zur Prüfung eingereicht'],{visibleAction:`gate4:content-ready:${firstId}`,visibleActionCount:1});
+  await controlState(browser,'measurement',{width:390,height:844},'gate4-mobile-measurement',['Piloteinrichtung','12 von 13 geprüft','Technische Erfolgsmessung prüfen','Technische Prüfung noch offen'],{visibleAction:'gate4:measurement',visibleActionCount:1});
+  await controlState(browser,'ready',{width:390,height:844},'gate4-mobile-ready',['Bereit zum Start','13 von 13 geprüft','Pilot jetzt starten','Nicht vereinbart (optional)'],{visibleAction:'gate4:activate',visibleActionCount:1});
+  await controlState(browser,'active',{width:1440,height:900},'gate4-desktop-active',['Pilotphase läuft','01.08.2026','01.02.2027','Nutzung vorhanden','Freiwillig vereinbart, noch nicht fällig','Aktiven Pilot beobachten'],{visibleActionCount:0});
   await controlState(browser,'measurement_problem',{width:390,height:844},'gate4-mobile-measurement-problem',['Pilotphase läuft','Technische Zuordnung prüfen','Technische Erfolgsmessung prüfen'],{visibleAction:'gate4:measurement',visibleActionCount:1});
-  await controlState(browser,'distribution_due',{width:390,height:844},'gate4-mobile-distribution-due',['Pilotphase läuft','Fällig','Fälligen Reichweitenbeitrag dokumentieren'],{visibleAction:`gate4:distribution-fulfillment:${distributionId}`,visibleActionCount:1});
+  await controlState(browser,'distribution_due',{width:390,height:844},'gate4-mobile-distribution-due',['Pilotphase läuft','Freiwillige Kooperation fällig','Optionale Reichweitenkooperation dokumentieren'],{visibleAction:`gate4:distribution-fulfillment:${distributionId}`,visibleActionCount:1});
   await controlState(browser,'active_draft',{width:390,height:844},'gate4-mobile-active-draft',['Pilotphase läuft','Nächsten Pilotinhalt redaktionell prüfen'],{visibleAction:`gate4:content-ready:${secondId}`,visibleActionCount:1});
   await controlState(browser,'active_ready',{width:390,height:844},'gate4-mobile-active-ready',['Pilotphase läuft','Vorbereiteten Pilotinhalt freigeben'],{visibleAction:`gate4:content-approve:${secondId}`,visibleActionCount:1});
   await controlState(browser,'paused',{width:390,height:844},'gate4-mobile-paused',['Pilot pausiert','Pilot fortsetzen oder Abschluss einleiten'],{visibleAction:'gate4:lifecycle:resume',visibleActionCount:1});
@@ -253,11 +249,10 @@ try{
 
   await dialogContract(browser,'content',`gate4:content-ready:${firstId}`,['Inhalt für den Pilotstart vorbereiten','Noch nicht freigegeben','Pilot startet dadurch noch nicht','Redaktionell vorbereiten'],'gate4-content-ready-dialog');
   await dialogContract(browser,'measurement','gate4:measurement',['Technische Erfolgsmessung erneut prüfen','keine Testwerte erzeugt','Technische Prüfung erneut ausführen'],'gate4-measurement-dialog');
-  await dialogContract(browser,'distribution','gate4:distribution',['Reichweitenbeitrag vereinbaren','noch kein Nachweis der späteren Erfüllung','Vereinbarter Kanal','Vereinbarter Zieltermin'],'gate4-distribution-dialog');
   await dialogContract(browser,'ready','gate4:activate',['Was beim Start passiert','keine Zahlung ausgelöst','Startdatum','Geplantes Ende'],'gate4-activation-dialog');
   await dialogContract(browser,'paused','gate4:lifecycle:resume',['Pilot fortsetzen','wirksame Laufzeit'],'gate4-resume-dialog');
   await dialogContract(browser,'checkpoint_due','gate4:checkpoint:day_30',['30-Tage-Checkpoint','keine Laufzeit verlängert','Checkpoint abschließen'],'gate4-checkpoint-dialog');
-  await dialogContract(browser,'distribution_due',`gate4:distribution-fulfillment:${distributionId}`,['Reichweitenbeitrag klären','tatsächliche Erfüllung','Neuer Stand'],'gate4-distribution-fulfillment-dialog');
+  await dialogContract(browser,'distribution_due',`gate4:distribution-fulfillment:${distributionId}`,['Optionale Reichweitenkooperation klären','freiwillig vereinbarte Kooperation','Neuer Stand'],'gate4-distribution-fulfillment-dialog');
 
   await organizerPortal(browser,{width:390,height:844},'gate4-organizer-mobile');
   await organizerPortal(browser,{width:1440,height:900},'gate4-organizer-desktop');
