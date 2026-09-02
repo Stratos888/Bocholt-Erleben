@@ -112,14 +112,14 @@ SQL);
   $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4','planned_at'=>$distributionDate,'status'=>'ready','evidence_text'=>'Synthetic distribution commitment.']);
   $ready=be_startpartner_gate4_candidate_detail($pdo,$candidate);$assert($ready['gate4']['activation_ready']===true,'Pilot must become activation ready.');
 
-  $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4','planned_at'=>$distributionDate,'status'=>'blocked','evidence_text'=>'Distribution owner has not approved the launch.']);
+  $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4','planned_at'=>$distributionDate,'status'=>'blocked','evidence_text'=>'Optional distribution cooperation is currently blocked.']);
   $blocked=be_startpartner_gate4_candidate_detail($pdo,$candidate);
-  $assert($blocked['gate4']['activation_ready']===false,'A newer blocked distribution must withdraw activation readiness.');
+  $assert($blocked['gate4']['activation_ready']===true,'A blocked optional reach cooperation must not withdraw activation readiness.');
   $cancelled=(int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_distribution_commitments WHERE status='cancelled'")->fetchColumn();
   $assert($cancelled>=1,'Older ready distribution must be superseded instead of remaining authoritative.');
 
-  $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4-final','planned_at'=>$distributionDate,'status'=>'ready','evidence_text'=>'Distribution owner approved the final launch.']);
-  $readyAgain=be_startpartner_gate4_candidate_detail($pdo,$candidate);$assert($readyAgain['gate4']['activation_ready']===true,'A new current ready distribution must restore activation readiness.');
+  $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4-final','planned_at'=>$distributionDate,'status'=>'ready','evidence_text'=>'Optional distribution cooperation planned.']);
+  $readyAgain=be_startpartner_gate4_candidate_detail($pdo,$candidate);$assert($readyAgain['gate4']['activation_ready']===true,'Updating an optional reach cooperation must keep activation readiness unchanged.');
 
   $portalProjection=be_startpartner_gate4_portal_projection($readyAgain);
   $assert(!array_key_exists('capacity',$portalProjection),'Portal projection must not expose internal capacity.');

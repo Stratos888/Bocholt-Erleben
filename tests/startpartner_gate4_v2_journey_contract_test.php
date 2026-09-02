@@ -55,21 +55,21 @@ $gate3 = [
 ];
 
 $assert(
-    be_startpartner_gate4_terms_v2_accepted($gate3) === true,
+    be_startpartner_gate4_terms_accepted($gate3) === true,
     'A bound v2 acceptance from an explicit partner evidence channel must be recognized.'
 );
 
 $operatorRecorded = $gate3;
 $operatorRecorded['terms_acceptance']['confirmation_channel'] = 'operator_recorded';
 $assert(
-    be_startpartner_gate4_terms_v2_accepted($operatorRecorded) === false,
+    be_startpartner_gate4_terms_accepted($operatorRecorded) === false,
     'operator_recorded alone must not become the production v2 partner-acceptance shortcut.'
 );
 
 $wrongReference = $gate3;
 $wrongReference['terms_acceptance']['terms_reference'] = 'system://startpartner/pilot-terms/not-v2';
 $assert(
-    be_startpartner_gate4_terms_v2_accepted($wrongReference) === false,
+    be_startpartner_gate4_terms_accepted($wrongReference) === false,
     'v2 derived rights require the canonical bound v2 terms reference.'
 );
 
