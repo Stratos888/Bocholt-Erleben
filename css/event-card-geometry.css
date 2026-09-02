@@ -1,0 +1,11 @@
+/* === BEGIN BLOCK: EVENT_CARD_MEDIA_ROW_GEOMETRY_GUARD_V1 | Zweck: hält Desktop-Eventbilder in zweispaltigen Feed-Zeilen unabhängig von unterschiedlicher Body-Höhe exakt im 16:9-Format; Umfang: ausschließlich Desktop-/events/-Cards mit ready Media === */
+@media (min-width: 900px){
+  body.is-tabbar-hidden .event-card.event-card--with-media{
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-media{
+    align-self: start;
+  }
+}
+/* === END BLOCK: EVENT_CARD_MEDIA_ROW_GEOMETRY_GUARD_V1 === */
