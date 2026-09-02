@@ -3,6 +3,30 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_sources.php';
 
+function be_cc_reconcile_domain_owned_startpartner_submission_cases(PDO $pdo): int
+{
+    $stmt = $pdo->query(
+        "SELECT DISTINCT c.source_reference, s.id, s.status
+         FROM control_cases c
+         INNER JOIN submissions s
+           ON c.source_system='submission_db'
+          AND c.source_reference=CONCAT('submission:', s.id)
+         WHERE c.source_system='submission_db'
+           AND s.payment_kind='startpartner_pilot'"
+    );
+    $reconciled = 0;
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $reference = trim((string)($row['source_reference'] ?? ''));
+        if ($reference === '') continue;
+        $reconciled += be_cc_reconcile_source_case($pdo, 'submission_db', $reference, 'done', [
+            'source_status' => trim((string)($row['status'] ?? '')),
+            'ownership' => 'startpartner_gate4',
+            'reason' => 'domain_owned_projection',
+        ]);
+    }
+    return $reconciled;
+}
+
 function be_cc_reconcile_submission_cases(PDO $pdo): int
 {
     $stmt = $pdo->query(
@@ -11,7 +35,8 @@ function be_cc_reconcile_submission_cases(PDO $pdo): int
          INNER JOIN submissions s
            ON c.source_system='submission_db'
           AND c.source_reference=CONCAT('submission:', s.id)
-         WHERE c.source_system='submission_db'"
+         WHERE c.source_system='submission_db'
+           AND COALESCE(s.payment_kind, '') <> 'startpartner_pilot'"
     );
     $reconciled = 0;
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -27,14 +52,16 @@ function be_cc_reconcile_submission_cases(PDO $pdo): int
 function be_cc_sync_submissions(): array
 {
     $pdo = be_db();
+    $domainOwnedReconciled = be_cc_reconcile_domain_owned_startpartner_submission_cases($pdo);
     $reconciled = be_cc_reconcile_submission_cases($pdo);
     $stmt = $pdo->query(
         'SELECT id, submission_kind, status, title, start_date, time_text, location_name, location_address,
                 description_text, event_url, ticket_url, organization_name_snapshot, intake_origin,
-                payment_released_at, payment_started_at, paid_at, created_at
+                payment_kind, payment_released_at, payment_started_at, paid_at, created_at
          FROM submissions
          WHERE submission_kind IN ("event","activity")
            AND status IN ("pending_review","payment_released","checkout_started","paid","in_review")
+           AND COALESCE(payment_kind, "") <> "startpartner_pilot"
          ORDER BY id ASC
          LIMIT 250'
     );
@@ -81,5 +108,10 @@ function be_cc_sync_submissions(): array
         }
         $count++;
     }
-    return ['seen' => count($items), 'upserted' => $count, 'reconciled' => $reconciled];
+    return [
+        'seen' => count($items),
+        'upserted' => $count,
+        'reconciled' => $reconciled,
+        'domain_owned_reconciled' => $domainOwnedReconciled,
+    ];
 }
