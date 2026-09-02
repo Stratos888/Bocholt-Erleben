@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 const BE_STARTPARTNER_GATE4_TERMS_V2 = 'startpartner-pilot-2026-08-v2';
 const BE_STARTPARTNER_GATE4_TERMS_REFERENCE_V2 = 'system://startpartner/pilot-terms/startpartner-pilot-2026-08-v2';
+const BE_STARTPARTNER_GATE4_TERMS_V3 = 'startpartner-pilot-2026-09-v3';
+const BE_STARTPARTNER_GATE4_TERMS_REFERENCE_V3 = 'system://startpartner/pilot-terms/startpartner-pilot-2026-09-v3';
 
 function be_startpartner_gate4_scope_row(array $scopes, string $key): ?array
 {
@@ -72,12 +74,18 @@ function be_startpartner_gate4_item_row(
     ];
 }
 
-function be_startpartner_gate4_terms_v2_accepted(array $gate3): bool
+function be_startpartner_gate4_terms_accepted(array $gate3): bool
 {
     $terms = is_array($gate3['terms_acceptance'] ?? null) ? $gate3['terms_acceptance'] : [];
+    $version = (string)($terms['terms_version'] ?? '');
+    $reference = (string)($terms['terms_reference'] ?? '');
+    $acceptedVersions = [
+        BE_STARTPARTNER_GATE4_TERMS_V2 => BE_STARTPARTNER_GATE4_TERMS_REFERENCE_V2,
+        BE_STARTPARTNER_GATE4_TERMS_V3 => BE_STARTPARTNER_GATE4_TERMS_REFERENCE_V3,
+    ];
     $channel = trim((string)($terms['confirmation_channel'] ?? ''));
-    return (string)($terms['terms_version'] ?? '') === BE_STARTPARTNER_GATE4_TERMS_V2
-        && (string)($terms['terms_reference'] ?? '') === BE_STARTPARTNER_GATE4_TERMS_REFERENCE_V2
+    return isset($acceptedVersions[$version])
+        && hash_equals($acceptedVersions[$version], $reference)
         && preg_match('/^[0-9a-f]{64}$/', (string)($terms['terms_digest'] ?? '')) === 1
         && trim((string)($terms['accepted_at'] ?? '')) !== ''
         && in_array($channel, ['email_reply', 'signed_document', 'portal'], true)
@@ -537,12 +545,13 @@ function be_startpartner_gate4_current_onboarding_items(
         $automatic[$key] = $row;
     }
 
-    if (be_startpartner_gate4_terms_v2_accepted($gate3)) {
+    if (be_startpartner_gate4_terms_accepted($gate3)) {
+        $terms = is_array($gate3['terms_acceptance'] ?? null) ? $gate3['terms_acceptance'] : [];
         $rights = be_startpartner_gate4_item_row(
             'content_rights_cleared',
             true,
             'Die Nutzungsfreigabe für vom Partner bereitgestellte Texte und Bilder ist Bestandteil der ausdrücklich bestätigten Pilotbedingungen.',
-            BE_STARTPARTNER_GATE4_TERMS_V2,
+            trim((string)($terms['terms_version'] ?? '')),
             'terms-readback'
         );
         $rights['is_manual'] = 0;
@@ -584,12 +593,6 @@ function be_startpartner_gate4_current_onboarding_items(
         is_array($readyMeasurement),
         'Die Erfolgsmessung ist dem Veranstalter und dem ersten Inhalt richtig zugeordnet.',
         is_array($readyMeasurement) ? (string)$readyMeasurement['id'] : null
-    );
-    $automatic['distribution_ready'] = be_startpartner_gate4_item_row(
-        'distribution_ready',
-        is_array($readyDistribution),
-        'Der Reichweitenbeitrag ist mit dem Partner vereinbart und mit Kanal und Zieltermin vorbereitet.',
-        is_array($readyDistribution) ? (string)$readyDistribution['id'] : null
     );
 
     $result = [];
@@ -659,8 +662,8 @@ function be_startpartner_gate4_next_action(
             return [
                 'code' => $distributionStatus === 'blocked' ? 'distribution_blocked' : 'distribution_due',
                 'label' => $distributionStatus === 'blocked'
-                    ? 'Blockierten Reichweitenbeitrag klären'
-                    : 'Fälligen Reichweitenbeitrag dokumentieren',
+                    ? 'Optionale Reichweitenkooperation klären'
+                    : 'Optionale Reichweitenkooperation dokumentieren',
                 'action' => 'set_distribution_fulfillment',
                 'distribution_id' => (string)$distributionRuntime['commitment']['id'],
             ];
@@ -796,12 +799,6 @@ function be_startpartner_gate4_state(PDO $pdo, string $candidateId, bool $includ
         $blockers[] = [
             'code' => 'measurement_not_ready',
             'message' => 'Die technische Erfolgsmessung ist noch nicht erfolgreich geprüft.',
-        ];
-    }
-    if ($reach === null) {
-        $blockers[] = [
-            'code' => 'distribution_not_ready',
-            'message' => 'Der Reichweitenbeitrag ist noch nicht mit dem Partner vereinbart und mit Kanal und Zieltermin vorbereitet.',
         ];
     }
     $entitlement = $gate3['entitlement'] ?? null;
