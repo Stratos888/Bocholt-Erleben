@@ -25,9 +25,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="stylesheet" href="/css/style.css?v=2026-06-22-css-governance-v1">
+  <link rel="stylesheet" href="/css/style.css?v=2026-09-02-weekend-route-v1">
 </head>
-<body class="is-tabbar-hidden has-bottom-tabbar page-route-events page-route-events-weekend">
+<body class="is-tabbar-hidden has-bottom-tabbar page-route-events page-route-events-weekend" data-event-time-default="weekend">
   <header class="app-header">
     <div class="header-left">
       <a class="subpage-brand-link" href="/" aria-label="Zur Startseite">
@@ -110,6 +110,13 @@
       </div>
     </div>
   </section>
+
+  <nav class="weekend-route-bridge" aria-label="Weitere Veranstaltungen">
+    <a class="weekend-route-bridge__link" href="/events/">
+      <span>Alle Veranstaltungen</span>
+      <span class="weekend-route-bridge__icon" data-ui-icon="chevron-right" aria-hidden="true"></span>
+    </a>
+  </nav>
 
   <div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
     <div class="filter-sheet__overlay" data-close-sheet></div>
@@ -237,29 +244,11 @@
   <script src="/js/image-attribution.js?v=2026-06-15-image-attribution-v7"></script>
   <script src="/js/details.js?v=2026-06-15-image-attribution-v7"></script>
   <script src="/js/events.js?v=2026-06-15-image-attribution-v7"></script>
-  <script src="/js/filter.js?v=2026-02-04-1"></script>
-  <script>
-  (() => {
-    const filters = window.FilterModule;
-    if (!filters || typeof filters.init !== "function") return;
-
-    const baseInit = filters.init;
-    filters.init = function weekendRouteInit(events) {
-      const result = baseInit.call(this, events);
-      if (this._isInit !== true) return result;
-
-      const weekendButton = document.querySelector('#sheet-time [data-time="weekend"]');
-      if (!weekendButton || weekendButton.disabled) return result;
-
-      weekendButton.click();
-      return result;
-    };
-  })();
-  </script>
+  <script src="/js/filter.js?v=2026-09-02-weekend-route-v1"></script>
   <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
   <script src="/js/seo-schema.js?v=2026-02-04-1"></script>
   <script src="/js/neutral-selection.js?v=2026-07-22-seo-recovery-v1"></script>
-  <script src="/js/bottom-tabbar.js?v=2026-05-29-today-nav-v1"></script>
+  <script src="/js/bottom-tabbar.js?v=2026-09-02-weekend-route-v1"></script>
   <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7"></script>
   <script src="/js/feedback.js?v=2026-04-17-1"></script>
   <script src="/js/main.js?v=2026-02-04-1"></script>

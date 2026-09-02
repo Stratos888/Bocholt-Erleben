@@ -8,7 +8,7 @@
 //
 // Verantwortlich für:
 // - Filter-State halten und ändern
-// - Sheet-Logik (Zeit/Kategorie)
+// - Sheet-Logik
 // - Reset-Logik
 // - Übergabe gefilterter Events an EventCards
 //
@@ -23,10 +23,11 @@
 // END: FILE_HEADER_FILTER
 
 
-/* === BEGIN BLOCK: FILTER MODULE STATE + DATE PICKER HELPERS_V2 | Zweck: erweitert den Filterzustand um einen integrierten Monatskalender und kapselt alle Datumshilfen zentral; Umfang: ersetzt die ersten Properties + Date-Helper innerhalb des FilterModules === */
+/* === BEGIN BLOCK: FILTER MODULE STATE + DATE PICKER HELPERS_V4 | Zweck: erweitert den Filterzustand um einen integrierten Monatskalender und einen deklarativen Seitendefault für Zeitraum-Routen; Umfang: Properties, Route-Default und Date-Helper innerhalb des FilterModules === */
 const FilterModule = {
   _isInit: false,
   _datePickerMonth: "",
+  _defaultTimeKey: "all",
   allEvents: [],
   filteredEvents: [],
 
@@ -36,6 +37,17 @@ const FilterModule = {
     kategorie: "",    // Single
     zeitraum: "all",  // all | today | week | weekend | nextweek | later
     selectedDate: ""  // exact day YYYY-MM-DD
+  },
+
+  getRouteDefaultTimeKey() {
+    const allowed = new Set(["all", "today", "week", "weekend", "nextweek", "later"]);
+    const raw = String(document.body?.dataset?.eventTimeDefault || "all").trim();
+    return allowed.has(raw) ? raw : "all";
+  },
+
+  getDefaultTimeKey() {
+    const value = String(this._defaultTimeKey || "all").trim();
+    return value || "all";
   },
 
   getTodayIso() {
@@ -427,7 +439,7 @@ const FilterModule = {
 
     this.renderDateCalendars();
   },
-/* === END BLOCK: FILTER MODULE STATE + DATE PICKER HELPERS_V3 === */
+/* === END BLOCK: FILTER MODULE STATE + DATE PICKER HELPERS_V4 === */
 
   /**
    * Init: Event Listeners registrieren
@@ -542,11 +554,12 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       dateModules: Array.from(document.querySelectorAll("[data-date-module]"))
     };
 
-    // Defaults (konsistent)
+    // Route-relativer Default: normale Events = all, kuratierte Entry-Routen können deklarativ abweichen.
+    this._defaultTimeKey = this.getRouteDefaultTimeKey();
     this.filters.searchText = "";
     this.filters.location = "";
     this.filters.kategorie = "";
-    this.filters.zeitraum = "all";
+    this.filters.zeitraum = this.getDefaultTimeKey();
     this.filters.selectedDate = "";
     this._datePickerMonth = this.getMonthKey(this.getTodayIso());
 
@@ -869,7 +882,11 @@ Umfang:
     // Initial render
     this.syncDateFilterUI();
     this.applyFilters();
-    this.setActiveOption(timeSheet, timeSheet.querySelector('[data-time="all"]'));
+    this.setActiveOption(
+      timeSheet,
+      timeSheet.querySelector(`[data-time="${this.filters.zeitraum}"]`)
+        || timeSheet.querySelector('[data-time="all"]')
+    );
     this.setActiveOption(catSheet, catSheet.querySelector('[data-category=""]'));
 
          /* === BEGIN BLOCK: FILTER INIT FINALIZE + PROOF LOGS ===
@@ -1130,7 +1147,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
   },
   /* === END BLOCK: FILTER_FACET_SYNC_HELPERS_V2 === */
 
-/* === BEGIN BLOCK: FILTER_BAR_UI_STATE_V5 | Zweck: hält Pill-Labels, Reset-Sichtbarkeit und Date-UI synchron zu Suche plus Facetten, damit Home denselben Desktop-Active-State wie Aktivitäten nutzt; Umfang: ersetzt updateFilterBarUI() und updateFacetOptionStates() für Zeitraum + exaktes Datum === */
+/* === BEGIN BLOCK: FILTER_BAR_UI_STATE_V6 | Zweck: hält Pill-Labels, route-relative Reset-Sichtbarkeit und Date-UI synchron zu Suche plus Facetten; Umfang: updateFilterBarUI() und updateFacetOptionStates() für Zeitraum + exaktes Datum === */
   updateFilterBarUI(timeValueEl, catValueEl, resetEl) {
     const timeMap = {
       all: "Alle",
@@ -1142,12 +1159,13 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     };
 
     const timeKey = (this.filters.zeitraum || "all").trim();
+    const defaultTimeKey = this.getDefaultTimeKey();
     const selectedDate = (this.filters.selectedDate || "").trim();
     const cat = (this.filters.kategorie || "").trim();
     const searchNeedle = (this.filters.searchText || "").trim();
     const hasActiveFilters = (
       searchNeedle.length > 0 ||
-      timeKey !== "all" ||
+      timeKey !== defaultTimeKey ||
       cat.length > 0 ||
       selectedDate.length > 0
     );
@@ -1182,6 +1200,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     if (!ui?.timeSheet || !ui?.catSheet) return;
 
     const timeKey = (this.filters.zeitraum || "all").trim();
+    const defaultTimeKey = this.getDefaultTimeKey();
     const selectedDate = (this.filters.selectedDate || "").trim();
     const catNeedle = (this.filters.kategorie || "").trim();
     const searchNeedle = (this.filters.searchText || "").trim().toLowerCase();
@@ -1239,9 +1258,13 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       if (canonical) catCounts[canonical] = (catCounts[canonical] ?? 0) + 1;
     }
 
-    const activeTimeOk = timeKey === "all" ? true : ((timeCounts[timeKey] ?? 0) > 0);
+    const activeTimeOk = (
+      timeKey === "all" ||
+      timeKey === defaultTimeKey ||
+      (timeCounts[timeKey] ?? 0) > 0
+    );
     if (!selectedDate && !activeTimeOk) {
-      this.filters.zeitraum = "all";
+      this.filters.zeitraum = defaultTimeKey;
       return this.applyFilters();
     }
 
@@ -1257,11 +1280,11 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     const timeButtons = this.getFacetButtons("time");
     const catButtons = this.getFacetButtons("category");
 
-    /* === BEGIN BLOCK: EVENTS_DESKTOP_FACET_COUNTS_PARITY_V1 | Zweck: entkoppelt das Events-Facet-Counting von der Mobile-Sheet-Klasse, damit Desktop-Popover dieselben Counts wie Mobile anzeigen und die bestehende Sortierung sichtbar konsistent wirkt; Umfang: ersetzt nur die Count-State-Schleifen für Zeit- und Kategorie-Facets in updateFacetOptionStates() === */
+    /* === BEGIN BLOCK: EVENTS_DESKTOP_FACET_COUNTS_PARITY_V2 | Zweck: hält den deklarativen Routendefault auch bei 0 Treffern wählbar, damit eine Weekend-URL nie still auf Alle umspringt; Umfang: Count-State-Schleifen für Zeit- und Kategorie-Facets === */
     timeButtons.forEach((button) => {
       const key = this.getFacetButtonValue(button, "time");
       const count = timeCounts[key] ?? 0;
-      const enabled = key === "all" ? true : count > 0;
+      const enabled = key === "all" || key === defaultTimeKey || count > 0;
       this.setFacetButtonState(button, { enabled, count, withCount: true });
     });
 
@@ -1285,7 +1308,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
         withCount: true
       });
     });
-    /* === END BLOCK: EVENTS_DESKTOP_FACET_COUNTS_PARITY_V1 === */
+    /* === END BLOCK: EVENTS_DESKTOP_FACET_COUNTS_PARITY_V2 === */
 
     const sortCategoryContainer = (container) => {
       if (!container) return;
@@ -1314,6 +1337,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       ? null
       : (
         timeButtons.find((button) => this.getFacetButtonValue(button, "time") === this.filters.zeitraum)
+        || timeButtons.find((button) => this.getFacetButtonValue(button, "time") === defaultTimeKey)
         || timeButtons.find((button) => this.getFacetButtonValue(button, "time") === "all")
       );
 
@@ -1324,16 +1348,17 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     this.setActiveOption(ui.catSheet, activeCatBtn);
     this.syncDateFilterUI();
   },
-  /* === END BLOCK: FILTER_BAR_UI_STATE_V5 === */
+  /* === END BLOCK: FILTER_BAR_UI_STATE_V6 === */
 
-  /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V7 | Zweck: setzt Suche, Zeit, Kategorie und exaktes Datum gemeinsam zurück, damit der Desktop-Reset exakt denselben Clear-Contract wie bei Aktivitäten erfüllt; Umfang: ersetzt resetFacetFilters() === */
+  /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V8 | Zweck: setzt Suche, Zeit, Kategorie und exaktes Datum gemeinsam auf den deklarativen Seitendefault zurück; Umfang: resetFacetFilters() === */
   resetFacetFilters() {
     const ui = this._ui || {};
     const searchInput = ui.searchInput || document.getElementById("search-filter");
+    const defaultTimeKey = this.getDefaultTimeKey();
 
     this.filters.searchText = "";
     this.filters.kategorie = "";
-    this.filters.zeitraum = "all";
+    this.filters.zeitraum = defaultTimeKey;
     this.filters.selectedDate = "";
     this._datePickerMonth = this.getMonthKey(this.getTodayIso());
 
@@ -1344,7 +1369,8 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     if (ui.timeSheet) {
       this.setActiveOption(
         ui.timeSheet,
-        ui.timeSheet.querySelector('[data-time="all"]')
+        ui.timeSheet.querySelector(`[data-time="${defaultTimeKey}"]`)
+          || ui.timeSheet.querySelector('[data-time="all"]')
       );
       ui.timeSheet.hidden = true;
     }
@@ -1382,9 +1408,9 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       ui.resetPill || document.getElementById("filter-reset-pill")
     );
 
-    debugLog("Filters and search reset");
+    debugLog("Filters and search reset to route default", { defaultTimeKey });
   },
-  /* === END BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V7 === */
+  /* === END BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V8 === */
 
   /**
    * Events neu laden (z. B. nach Airtable-Update)

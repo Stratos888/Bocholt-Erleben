@@ -54,8 +54,8 @@ assert "STATIC:WEEKEND:START" in weekend and "STATIC:WEEKEND:END" in weekend
 assert "Veranstaltungen am Wochenende in Bocholt" in weekend
 assert 'href="https://bocholt-erleben.de/events/wochenende/"' in weekend
 
-# Weekend route reuses the existing Event-Hub interaction owners instead of
-# maintaining a second simple content-card experience.
+# Weekend is an indexable route context of the same Event Hub, not a second
+# independently maintained product implementation.
 for required in (
     'class="desktop-hero"',
     'id="search-filter"',
@@ -69,9 +69,26 @@ for required in (
 ):
     assert required in weekend, f"weekend Event-UX contract missing {required}"
 assert "content-hero content-hero--panel" not in weekend
-assert 'data-time="weekend"' in weekend
-assert "weekendRouteInit" in weekend
-assert "weekendButton.click()" in weekend
+assert 'data-event-time-default="weekend"' in weekend
+assert 'class="weekend-route-bridge__link" href="/events/"' in weekend
+assert "Alle Veranstaltungen" in weekend
+assert "weekendRouteInit" not in weekend
+assert "weekendButton.click()" not in weekend
+
+filter_js = (ROOT / "js/filter.js").read_text()
+assert "getRouteDefaultTimeKey" in filter_js
+assert "getDefaultTimeKey" in filter_js
+assert 'this.filters.zeitraum = this.getDefaultTimeKey()' in filter_js
+assert "timeKey !== defaultTimeKey" in filter_js
+assert "this.filters.zeitraum = defaultTimeKey" in filter_js
+
+nav_js = (ROOT / "js/bottom-tabbar.js").read_text()
+assert "isExactActiveTarget" in nav_js
+assert "currentPath === normalizePath(item.href)" in nav_js
+
+style = (ROOT / "css/style.css").read_text()
+assert '@import url("./weekend.css?' in style
+assert (ROOT / "css/weekend.css").exists()
 
 home, home_page = parse("index.html")
 events, events_page = parse("events/index.html")

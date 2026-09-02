@@ -1,0 +1,104 @@
+/* === BEGIN BLOCK: WEEKEND_ROUTE_PRESENTATION_V1 | Zweck: hält /events/wochenende/ als dünne Variante des zentralen Event-Hubs, dosiert nur die längere Desktop-H1 und den ruhigen Rückweg zu allen Events; Umfang: ausschließlich page-route-events-weekend === */
+
+.weekend-route-bridge{
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  padding: 9px var(--gutter) 1px;
+}
+
+.weekend-route-bridge__link{
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 0 2px;
+  color: color-mix(in srgb, var(--home-copy-strong) 88%, var(--brand-green-700) 12%);
+  font-size: 0.92rem;
+  font-weight: 720;
+  line-height: 1.2;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.weekend-route-bridge__link:visited{
+  color: color-mix(in srgb, var(--home-copy-strong) 88%, var(--brand-green-700) 12%);
+}
+
+.weekend-route-bridge__link:hover{
+  color: var(--home-copy-contrast);
+  text-decoration: none;
+}
+
+.weekend-route-bridge__link:focus-visible{
+  outline: 2px solid var(--cmp-focus-ring-brand);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.weekend-route-bridge__icon{
+  --ui-icon-size: 15px;
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+@media (min-width: 900px){
+  body.page-route-events-weekend{
+    --desktop-copy-surface-max: 39rem;
+    --desktop-copy-max: 36rem;
+  }
+
+  body.page-route-events-weekend .desktop-entry__title{
+    max-width: 36rem;
+    font-size: clamp(2.48rem, 2.28rem + 0.72vw, 3.28rem);
+    line-height: 0.99;
+    letter-spacing: -0.052em;
+  }
+
+  body.page-route-events-weekend .desktop-entry__text{
+    max-width: 31rem;
+  }
+
+  .weekend-route-bridge{
+    max-width: var(--desktop-shell-max);
+    margin: 0 auto;
+    padding: 7px var(--desktop-shell-pad-x) 1px;
+    justify-content: flex-end;
+  }
+
+  .weekend-route-bridge__link{
+    min-height: 36px;
+    font-size: 0.86rem;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1199.98px){
+  body.page-route-events-weekend{
+    --desktop-copy-surface-max: 34rem;
+    --desktop-copy-max: 32rem;
+  }
+
+  body.page-route-events-weekend .desktop-entry__title{
+    max-width: 32rem;
+    font-size: clamp(2.24rem, 2.08rem + 0.62vw, 2.78rem);
+    line-height: 1;
+  }
+
+  body.page-route-events-weekend .desktop-entry__text{
+    max-width: 27rem;
+  }
+}
+
+@media (max-width: 899.98px){
+  .weekend-route-bridge{
+    padding-top: 8px;
+  }
+}
+
+/* === END BLOCK: WEEKEND_ROUTE_PRESENTATION_V1 === */

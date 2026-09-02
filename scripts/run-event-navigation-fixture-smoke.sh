@@ -53,23 +53,79 @@ set +e
 
   mkdir -p "$TMP/data"
   python3 - "$TMP/data/events.json" <<'PY'
+import datetime as dt
 import json
 import sys
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
-event = {
-    "id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2099-09-27",
-    "title": "Du wunderst mich – Die Kinderzaubershow mit Endrik Thier",
-    "date": "2099-09-27",
-    "time": "14:00",
-    "location": "Bocholt",
-    "city": "Bocholt",
-    "category": "Familie",
-    "description": "Deterministischer begrenzter PR-Gate-Zusatztest.",
-    "url": "https://yuki-magazin.de/veranstaltungen/du-wunderst-mich-die-kinderzaubershow-mit-endrik-thier/",
-}
+
+today = dt.datetime.now(ZoneInfo("Europe/Berlin")).date()
+weekday = today.weekday()  # Monday=0 ... Sunday=6
+if weekday == 4:
+    friday = today
+elif weekday == 5:
+    friday = today - dt.timedelta(days=1)
+elif weekday == 6:
+    friday = today - dt.timedelta(days=2)
+else:
+    friday = today + dt.timedelta(days=4 - weekday)
+
+saturday = friday + dt.timedelta(days=1)
+monday = friday + dt.timedelta(days=3)
+
+events = [
+    {
+        "id": "weekend-fixture-friday",
+        "title": "Weekend Fixture Freitag",
+        "date": friday.isoformat(),
+        "time": "18:00",
+        "location": "Bocholt",
+        "city": "Bocholt",
+        "category": "Musik & Bühne",
+        "kategorie": "Musik & Bühne",
+        "description": "Deterministischer Weekend-Route-Test.",
+        "url": "https://example.com/weekend-fixture-friday",
+    },
+    {
+        "id": "weekend-fixture-saturday",
+        "title": "Weekend Fixture Samstag",
+        "date": saturday.isoformat(),
+        "time": "14:00",
+        "location": "Bocholt",
+        "city": "Bocholt",
+        "category": "Kinder & Familie",
+        "kategorie": "Kinder & Familie",
+        "description": "Zweiter deterministischer Weekend-Route-Test.",
+        "url": "https://example.com/weekend-fixture-saturday",
+    },
+    {
+        "id": "outside-weekend-fixture",
+        "title": "Außerhalb Weekend Fixture",
+        "date": monday.isoformat(),
+        "time": "10:00",
+        "location": "Bocholt",
+        "city": "Bocholt",
+        "category": "Kultur & Kunst",
+        "kategorie": "Kultur & Kunst",
+        "description": "Darf im Weekend-Default nicht sichtbar sein.",
+        "url": "https://example.com/outside-weekend-fixture",
+    },
+    {
+        "id": "du-wunderst-mich-kinderzaubershow-endrik-thier-2099-09-27",
+        "title": "Du wunderst mich – Die Kinderzaubershow mit Endrik Thier",
+        "date": "2099-09-27",
+        "time": "14:00",
+        "location": "Bocholt",
+        "city": "Bocholt",
+        "category": "Familie",
+        "description": "Deterministischer begrenzter PR-Gate-Zusatztest.",
+        "url": "https://yuki-magazin.de/veranstaltungen/du-wunderst-mich-die-kinderzaubershow-mit-endrik-thier/",
+    },
+]
+
 Path(sys.argv[1]).write_text(
-    json.dumps([event], ensure_ascii=False, indent=2) + "\n",
+    json.dumps(events, ensure_ascii=False, indent=2) + "\n",
     encoding="utf-8",
 )
 PY
@@ -111,6 +167,10 @@ PY
     --profile all \
     --check event-navigation \
     --out-dir "$SMOKE_OUT_DIR"
+
+  node "$ROOT/tests/weekend_route_browser_test.mjs" \
+    --base-url "http://127.0.0.1:$port" \
+    --out-dir "$SMOKE_OUT_DIR/weekend-route"
 
   if [ -f "$ROOT/tests/startpartner_public_funnel_browser_test.mjs" ]; then
     node "$ROOT/tests/startpartner_public_funnel_browser_test.mjs" \
