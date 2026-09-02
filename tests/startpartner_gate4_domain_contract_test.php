@@ -40,6 +40,7 @@ $casesSource=(string)file_get_contents($root.'/api/control-center/cases.php');
 $detailSource=(string)file_get_contents($root.'/api/control-center/case.php');
 $stateSource=(string)file_get_contents($root.'/api/startpartner/_gate4_state.php');
 $termsSource=(string)file_get_contents($root.'/api/startpartner/_gate3_communication.php');
+$activationSource=(string)file_get_contents($root.'/api/startpartner/_gate4_activation_domain.php');
 $assert(str_contains($casesSource,"/startpartner/_gate4_domain.php"),'Control-center case list must load the Gate-4 domain.');
 $assert(str_contains($casesSource,'be_startpartner_gate4_candidate_detail($pdo, $candidateId)'),'Control-center case list must enrich Startpartner cases from the authoritative Gate-4 candidate detail.');
 $assert(!str_contains($casesSource,'be_startpartner_gate3_candidate_detail($pdo, $candidateId, true)'),'Control-center case list must not stop at the Gate-3 projection after a pilot exists.');
@@ -50,6 +51,12 @@ $assert(str_contains($stateSource,"BE_STARTPARTNER_GATE4_TERMS_V3"),'Gate 4 must
 $assert(str_contains($stateSource,"BE_STARTPARTNER_GATE4_TERMS_V2"),'Gate 4 must preserve compatibility with already accepted v2 terms.');
 $assert(str_contains($termsSource,"distribution_commitment_rule' => 'optional_not_required_for_activation'"),'Current terms must encode reach cooperation as optional and non-gating.');
 $assert(str_contains($termsSource,'keine Voraussetzung für Pilotstart oder Veröffentlichung'),'Current terms must explain the optional reach cooperation in partner-facing language.');
+$assert(str_contains($activationSource,"in_array(\$pilotStatusBefore, ['onboarding', 'activation_ready'], true)"),'Activation must accept a safely derived activation-ready legacy pilot whose persisted status is still onboarding.');
+$assert(str_contains($activationSource,"SET status = 'activation_ready'"),'Activation must synchronize a stale onboarding pilot to the canonical activation-ready state inside the activation transaction.');
+$assert(str_contains($activationSource,"if (!is_array(\$measurement))"),'Measurement readiness must remain a hard activation requirement.');
+$assert(!str_contains($activationSource,"!is_array(\$measurement) || !is_array(\$distribution)"),'Optional reach cooperation must not remain a hidden activation requirement.');
+$assert(str_contains($activationSource,"'distribution_id' => is_array(\$distribution) ? (string)\$distribution['id'] : null"),'Activation audit must tolerate a missing optional reach cooperation without fabricating evidence.');
+$assert(str_contains($activationSource,"'distribution_requirement' => 'optional_not_required_for_activation'"),'Activation audit must record the value-first optional reach contract explicitly.');
 
 if($failures){
     fwrite(STDERR,"=== Startpartner Gate-4 Domain Contract: FAILED ===\n".implode("\n",array_map(static fn($v)=>'- '.$v,$failures))."\n");
