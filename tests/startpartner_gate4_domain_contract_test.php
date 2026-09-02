@@ -22,9 +22,10 @@ $assert($window['starts_at_utc']==='2026-10-24 22:00:00','Berlin summer offset m
 $assert($window['ends_at_utc']==='2027-04-25 21:59:59','Berlin end date must convert with the current offset.');
 
 $readiness=be_startpartner_gate4_onboarding_readiness([]);
-$assert($readiness['total_count']===14&&$readiness['completed_count']===0,'Missing rows must produce fourteen fail-closed items.');
+$assert($readiness['total_count']===13&&$readiness['completed_count']===0,'Missing rows must produce thirteen fail-closed required items.');
+$assert(!in_array('distribution_ready',BE_STARTPARTNER_GATE4_ONBOARDING_ITEMS,true),'Optional reach cooperation must not be an activation onboarding item.');
 $complete=[];foreach(BE_STARTPARTNER_GATE4_ONBOARDING_ITEMS as $key){$complete[]=['item_key'=>$key,'status'=>'complete','is_required'=>1];}
-$assert(be_startpartner_gate4_onboarding_readiness($complete)['ready']===true,'All required complete items must be activation ready.');
+$assert(be_startpartner_gate4_onboarding_readiness($complete)['ready']===true,'All required complete items must be activation ready without a reach commitment.');
 
 $assert(BE_STARTPARTNER_GATE4_MANUAL_ONBOARDING_ITEMS===['portal_access_tested','content_rights_cleared','activation_target_set'],'Only the three genuinely manual checks may be writable.');
 $assert(be_startpartner_gate4_onboarding_item_is_manual('portal_access_tested'),'Portal access must remain a manual check.');
@@ -37,11 +38,18 @@ $expectInvalid(static fn()=>be_startpartner_gate4_content_type('place'),'Unsuppo
 $root=dirname(__DIR__);
 $casesSource=(string)file_get_contents($root.'/api/control-center/cases.php');
 $detailSource=(string)file_get_contents($root.'/api/control-center/case.php');
+$stateSource=(string)file_get_contents($root.'/api/startpartner/_gate4_state.php');
+$termsSource=(string)file_get_contents($root.'/api/startpartner/_gate3_communication.php');
 $assert(str_contains($casesSource,"/startpartner/_gate4_domain.php"),'Control-center case list must load the Gate-4 domain.');
 $assert(str_contains($casesSource,'be_startpartner_gate4_candidate_detail($pdo, $candidateId)'),'Control-center case list must enrich Startpartner cases from the authoritative Gate-4 candidate detail.');
 $assert(!str_contains($casesSource,'be_startpartner_gate3_candidate_detail($pdo, $candidateId, true)'),'Control-center case list must not stop at the Gate-3 projection after a pilot exists.');
 $assert(str_contains($casesSource,'STARTPARTNER_GATE4_SCHEMA_MISSING:'),'Control-center case list must fail closed when the Gate-4 schema is unavailable.');
 $assert(str_contains($detailSource,'be_startpartner_gate4_candidate_detail('),'Single-case readback must use the same Gate-4 candidate owner as the list projection.');
+$assert(!str_contains($stateSource,"'code' => 'distribution_not_ready'"),'Missing optional reach cooperation must not create a Gate-4 blocker.');
+$assert(str_contains($stateSource,"BE_STARTPARTNER_GATE4_TERMS_V3"),'Gate 4 must recognize the current value-first terms version.');
+$assert(str_contains($stateSource,"BE_STARTPARTNER_GATE4_TERMS_V2"),'Gate 4 must preserve compatibility with already accepted v2 terms.');
+$assert(str_contains($termsSource,"distribution_commitment_rule' => 'optional_not_required_for_activation'"),'Current terms must encode reach cooperation as optional and non-gating.');
+$assert(str_contains($termsSource,'keine Voraussetzung für Pilotstart oder Veröffentlichung'),'Current terms must explain the optional reach cooperation in partner-facing language.');
 
 if($failures){
     fwrite(STDERR,"=== Startpartner Gate-4 Domain Contract: FAILED ===\n".implode("\n",array_map(static fn($v)=>'- '.$v,$failures))."\n");
