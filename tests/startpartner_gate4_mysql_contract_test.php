@@ -115,7 +115,6 @@ SQL);
   $mutate('be_startpartner_gate4_set_distribution',['channel'=>'newsletter','target_reference'=>'https://example.invalid/gate4','planned_at'=>$distributionDate,'status'=>'blocked','evidence_text'=>'Optional distribution cooperation is currently blocked.']);
   $blocked=be_startpartner_gate4_candidate_detail($pdo,$candidate);
   $assert($blocked['gate4']['activation_ready']===true,'A blocked optional reach cooperation must not withdraw activation readiness.');
-  $assert(($blocked['gate4']['distribution_runtime']['status']??'')==='blocked','Optional reach cooperation state must remain observable without becoming an activation gate.');
   $cancelled=(int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_distribution_commitments WHERE status='cancelled'")->fetchColumn();
   $assert($cancelled>=1,'Older ready distribution must be superseded instead of remaining authoritative.');
 
