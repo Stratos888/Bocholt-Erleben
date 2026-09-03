@@ -35,7 +35,7 @@
 | Activities | Repo-/JSON-owned | Repo-/JSON-owned | normaler Branch-/PR-Pfad |
 | Visual-Pool/Assets | Repo | deployter Pool | normaler Branch-/PR-Pfad |
 | STRATO | Staging-Verzeichnis | Live-Webroot | nur `Deploy to STRATO`; nie parallel |
-| Stripe | Test-/Staging-Konfiguration | Live-Secrets | keine reale Zahlung ohne neue Freigabe; Startpartner-Pilot erzeugt keine Stripe-Subscription und benötigt keine Zahlungsart |
+| Stripe | Sandbox/Testkonfiguration; KI/MCP nur mit explizit begrenzten Custom-Rechten | produktiver Stripe-Account; KI/MCP Stripe-seitig ausschließlich `read-only` | Live-MCP ist niemals Writer; ChatGPT-interne Bestätigungsmodi sind nur Zusatzschutz; reale Zahlungs-/Billing-Mutationen nur über owning Produkt- oder ausdrücklich geschlossenen Adminvertrag |
 | Mail/SMTP | Testempfänger oder No-Send | echte Kandidaten und Partner | keine echte Nachricht ohne neue Freigabe; Zustellstatus und Fehler müssen fachlich sichtbar sein |
 | Search Console/Bing | read-only | read-only | keine Konfigurationsänderung im Produktworkpack |
 | GitHub Actions | Branch-/Workflowzustand | Main-Workflowzustand | Feature-Branches deployen nie |
@@ -152,6 +152,60 @@ Tarif und Preis anzeigen
 ```
 
 Keine rückwirkende Zahlung für Pilotmonate.
+
+## Stripe KI-/MCP-Zugriffsvertrag
+
+### Harte Berechtigungsgrenze
+
+- Der produktive Stripe-Account ist für KI-/MCP-Zugriff **Stripe-seitig ausschließlich read-only** autorisiert.
+- Diese Stripe-seitige Berechtigung ist die harte Safety-Grenze. ChatGPT-interne Einstellungen wie `Leseaktionen zulassen / vor Änderungen fragen` sind nur zusätzliche Defense-in-Depth und dürfen nicht als technische Write-Sperre vorausgesetzt werden.
+- Sandbox-/Testwrites sind nur innerhalb eines ausdrücklich begrenzten Test- oder Workpack-Vertrags zulässig. Vorherzustand, Zielobjekt, Mutation, Readback und Cleanup müssen feststehen.
+- Ein unerwarteter Sandbox-Write beendet den Versuch: Zustand sichern, Cleanup durchführen und Ursache klären. Derselbe Versuch wird **nicht** auf Live wiederholt.
+- Live-Stripe-Writes sind kein Diagnose-, Smoke- oder Release-Testinstrument. Eine spätere echte Live-Admin-Mutation benötigt weiterhin einen eigenen ausdrücklich autorisierten Vertrag und eine dafür geeignete Berechtigungsgrenze; der normale KI-/MCP-Livezugriff wird dafür nicht erweitert.
+
+### Read-only Reconciliation
+
+Bei Payment-, Checkout-, Subscription- oder Billing-Fragen wird vorhandene Stripe-Evidence genutzt, statt Status aus Code oder Screenshots zu erraten:
+
+```text
+Environment + livemode belegen
+-> relevantes Stripe-Objekt read-only über stabile interne Referenz/Metadata finden
+-> Checkout Session / Payment Intent / Charge / Invoice / Subscription soweit fachlich vorhanden lesen
+-> Webhook-Endpoint und relevante Eventfamilie read-only prüfen
+-> Stripe-Referenzen gegen kanonische interne Submission-/Organizer-/Subscription-Owner abgleichen
+-> Abweichung einem Owner zuordnen
+-> erst danach über eine Mutation oder einen separaten Fix-Workpack entscheiden
+```
+
+Dabei gelten:
+
+- keine PII, Secrets, vollständigen Checkout-IDs oder Account-IDs als dauerhafte Repository-Dokumentation speichern;
+- fehlende Connector-Berechtigung oder nicht lesbare Daten erzeugen `STOP_EVIDENCE_CEILING`, nicht automatisch eine Scope-Erweiterung;
+- Stripe-Readback beweist Stripe-Zustand, aber nicht automatisch korrekten internen DB-, Webhook- oder Publication-Zustand; diese Owner werden separat abgeglichen;
+- interne Daten allein beweisen umgekehrt keinen erfolgreichen Stripe-Zustand, wenn Stripe read-only direkt geprüft werden kann.
+
+### Payment-relevanter Release-Preflight
+
+Wenn ein Release-Diff Checkout, Preise, Billing, Stripe-Konfiguration, Webhook-Verarbeitung oder Subscription-Logik berührt, gehört zum Preflight soweit mit dem vorhandenen read-only Scope belegbar:
+
+- erwartete Live-Produkte und Preise existieren und sind aktiv;
+- die verwendeten Preis-/Produktmodelle entsprechen dem beabsichtigten Produktvertrag;
+- der kanonische Live-Webhook ist aktiviert, zeigt auf den owning Webhook-Pfad und besitzt die für den tatsächlichen Diff benötigten Eventfamilien;
+- relevante Checkout-/Payment-/Subscription-Zustände werden bei Bedarf read-only mit den internen Referenzen abgeglichen;
+- unerwartete Drift wird vor Release geklärt und nicht durch einen Live-Write „repariert“.
+
+Ein solcher Read-only-Preflight ist zusätzliche Runtime-Evidence. Er ersetzt weder Contracttests noch Staging-E2E und autorisiert keinen Live-Write.
+
+### Trigger für spätere Stripe-Workpacks
+
+Die Verfügbarkeit des Stripe-Zugriffs ist **kein eigener Featurebedarf**. Neue Payment-Workpacks werden aus realem Nutzungs- oder Fehler-Evidence abgeleitet, z. B.:
+
+- erster verifizierter Nicht-Test-Einzelpayment: End-to-End-Reconciliation `Checkout -> Payment -> Webhook -> interne Owner`;
+- erste verifizierte Nicht-Test-Subscription: realen Subscription-Lifecycle und interne Projektion prüfen;
+- erster echter Payment-Failure, Refund oder Dispute: genau diesen beobachteten Lifecycle gezielt prüfen;
+- wiederkehrendes reales Volumen: erst dann über automatisierte Reconciliation oder Monitoring entscheiden.
+
+Keine vorsorgliche Parallelarchitektur, kein künstliches Live-Testobjekt und kein großer Stripe-Workpack allein wegen verfügbarer Tools.
 
 ## Events-Overlay
 
