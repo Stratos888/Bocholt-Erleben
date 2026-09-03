@@ -206,6 +206,28 @@ function be_startpartner_gate4_partner_next_action(array $candidate, array $gate
     return ['code' => 'status_only', 'label' => 'Aktuellen Pilotstatus ansehen', 'content_type' => null];
 }
 
+/* === BEGIN BLOCK: STARTPARTNER_PORTAL_CONTENT_REVIEW_STATUS_V1 | Zweck: projiziert für bereits pilotseitig freigegebene Inhalte den aktuellen Submission-Reviewstatus, ohne den Pilot-/Usage-Lifecycle zu verändern; Umfang: Statusableitung ausschließlich für die Partner-Portalprojektion === */
+function be_startpartner_gate4_partner_content_status(array $row): string
+{
+    $pilotStatus = trim((string)($row['status'] ?? ''));
+    $submissionStatus = trim((string)($row['submission_status'] ?? ''));
+
+    if ($pilotStatus !== 'approved') {
+        return $pilotStatus;
+    }
+
+    if (in_array($submissionStatus, ['pending_review', 'paid', 'in_review'], true)) {
+        return 'in_review';
+    }
+
+    if ($submissionStatus === 'rejected') {
+        return 'rejected';
+    }
+
+    return $pilotStatus;
+}
+/* === END BLOCK: STARTPARTNER_PORTAL_CONTENT_REVIEW_STATUS_V1 === */
+
 function be_startpartner_gate4_portal_projection(array $candidate): array
 {
     $gate4 = is_array($candidate['gate4'] ?? null) ? $candidate['gate4'] : [];
@@ -235,7 +257,7 @@ function be_startpartner_gate4_portal_projection(array $candidate): array
             'id' => (string)($row['id'] ?? ''),
             'submission_id' => (int)($row['submission_id'] ?? 0),
             'content_type' => (string)($row['content_type'] ?? ''),
-            'status' => (string)($row['status'] ?? ''),
+            'status' => be_startpartner_gate4_partner_content_status($row),
             'title' => (string)($row['title'] ?? ''),
             'start_date' => $row['start_date'] ?? null,
             'location_name' => $row['location_name'] ?? null,

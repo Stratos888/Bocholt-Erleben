@@ -97,6 +97,7 @@ validate_php_tests() {
     php tests/startpartner_gate4_side_effect_contract_test.php
     php tests/startpartner_active_pilot_lifecycle_contract_test.php
     php tests/startpartner_publication_integrity_contract_test.php
+    php tests/startpartner_portal_status_projection_contract_test.php
   fi
   if component_enabled submissions; then
     for file in tests/submission_*.php; do
