@@ -59,7 +59,6 @@ assert 'href="https://bocholt-erleben.de/events/wochenende/"' in weekend
 for required in (
     'class="desktop-hero"',
     'id="search-filter"',
-    'id="filter-time-pill"',
     'id="filter-category-pill"',
     'id="event-cards"',
     'id="event-detail-panel"',
@@ -74,7 +73,17 @@ assert 'data-event-time-locked="true"' in weekend
 assert 'class="weekend-route-bridge__link" href="/events/"' in weekend
 assert "Alle Veranstaltungen" in weekend
 assert weekend.index("weekend-route-bridge") < weekend.index("<h1")
-assert 'id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time" hidden aria-hidden="true"' in weekend
+
+# No user-facing time selector remains on the Weekend landing page. The two
+# hidden nodes are only the minimum compatibility host required by the shared
+# FilterModule contract; the full time sheet/popover has been removed.
+assert '<button type="button" id="filter-time-pill" hidden aria-hidden="true" tabindex="-1">' in weekend
+assert '<div id="sheet-time" hidden aria-hidden="true">' in weekend
+assert 'id="popover-time"' not in weekend
+assert weekend.count('data-time="') == 1
+assert 'data-time="weekend" hidden' in weekend
+assert "Datum auswählen" not in weekend
+assert "data-date-module" not in weekend
 assert "weekendRouteInit" not in weekend
 assert "weekendButton.click()" not in weekend
 
