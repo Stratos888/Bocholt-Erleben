@@ -1,4 +1,4 @@
-# Agent Operating Contract V1.1 – Bocholt erleben
+# Agent Operating Contract V1.2 – Bocholt erleben
 
 Status: **verbindlicher AI Entry Point**. Diese Datei steuert, **wie** KI-Arbeit im Repository ausgeführt wird. Fachliche Wahrheiten bleiben in ihren bestehenden Ownern.
 
@@ -42,6 +42,22 @@ Vor jeder Mutation:
 3. fachliche und technische Owner des Ursprungswerts bestimmen;
 4. bestehende vergleichbare Implementierung und relevante Tests suchen;
 5. nur danach schreiben.
+
+### Execution Capability Preflight
+
+Nach diesem read-only Routing und **vor substantieller Repository-Mutation** den benötigten Ausführungsmodus bestimmen:
+
+- **`READ_ONLY`** – Analyse, Status-, Diff-, Issue-, PR- oder Runtime-Evidence ohne Repository-Mutation.
+- **`REMOTE_SMALL_WRITE`** – kleine, vollständig gelesene und deterministische Text- oder Konfigurationsänderung, für die weder repository-weite Implementierungssuche noch lokale Build-/Runtime-/DB-Tests oder eine zentrale Code-Risikogrenze erforderlich sind.
+- **`CHECKOUT_REQUIRED`** – sobald korrekte Umsetzung repository-weite Suche/Impact-Analyse über mehrere Owner, eine zusammenhängende Multi-Datei-Code-/Build-/UI-Änderung, lokale Build-/Browser-/Runtime-/DB-Tests oder Schema-, Auth-, Payment-, Deployment-, Governance-Code bzw. eine vergleichbare zentrale Risikogrenze benötigt. Die Einstufung folgt den benötigten Fähigkeiten und Risiken, **nicht der geschätzten Patchgröße**.
+
+Wenn `CHECKOUT_REQUIRED` gilt und der aktuelle Ausführungskontext keinen echten Repository-Checkout besitzt:
+
+1. **vor Implementation stoppen**; keine Remote-Einzelpatch-Kette als Ersatz für einen Checkout beginnen;
+2. vorhandenen Branch, PR, Workpack und Issue-Kontext weiterverwenden statt einen zweiten Lösungszweig zu eröffnen;
+3. falls für die Übergabe noch zwingend nötig, nur minimale Git-/Workpack-Metadaten vorbereiten, aber keinen Source-/Schema-/Runtime-Patch remote beginnen;
+4. einen kompakten Handoff mit `Repo`, `Branch`, `Baseline-SHA`, `Workpack/Issue`, `OBJECTIVE`, `INVARIANTS`, `OWNERS / IMPACT`, `Required Tests` und `Resume Point` erzeugen;
+5. im Checkout-Workspace an diesem Resume Point fortsetzen und die bereits belegte Analyse nicht bei null wiederholen.
 
 Für substantielle Änderungen mindestens `MASTER.md`, `ENGINEERING.md` und die betroffenen Teile von `docs/architecture/SYSTEM_MAP.md` berücksichtigen; dazu die fachlich relevante Authority. Nicht pauschal das gesamte Repository lesen, aber die reale Impact Surface darf nicht auf die zuerst sichtbare Datei verkürzt werden.
 
@@ -167,7 +183,7 @@ Feature-Branch -> staging -> main
 - vorhandene passende Arbeit fortsetzen statt zweiten Lösungszweig eröffnen;
 - ein Workpack besitzt genau ein aktives Issue, einen deklarierten Branch und einen PR;
 - mehrere **unabhängige** Workpacks/PRs dürfen existieren; derselbe oder fachlich abhängige zentrale Owner bleibt seriell;
-- größere Code-/Build-/UI-Arbeit benötigt Checkout und lokale Tests; viele Remote-Einzelpatches ersetzen keinen Checkout;
+- `CHECKOUT_REQUIRED`-Arbeit benötigt vollständigen Checkout und lokale Tests; viele Remote-Einzelpatches ersetzen keinen Checkout;
 - Workpack-Merge nur nach dem vorgesehenen finalen Validation-Lauf auf exakt aktuellem PR-Head.
 
 ### Main-Release: letzter manueller Product-Owner-E2E
