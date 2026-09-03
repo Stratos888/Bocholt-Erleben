@@ -59,7 +59,6 @@ assert 'href="https://bocholt-erleben.de/events/wochenende/"' in weekend
 for required in (
     'class="desktop-hero"',
     'id="search-filter"',
-    'id="filter-time-pill"',
     'id="filter-category-pill"',
     'id="event-cards"',
     'id="event-detail-panel"',
@@ -70,8 +69,21 @@ for required in (
     assert required in weekend, f"weekend Event-UX contract missing {required}"
 assert "content-hero content-hero--panel" not in weekend
 assert 'data-event-time-default="weekend"' in weekend
+assert 'data-event-time-locked="true"' in weekend
 assert 'class="weekend-route-bridge__link" href="/events/"' in weekend
 assert "Alle Veranstaltungen" in weekend
+assert weekend.index("weekend-route-bridge") < weekend.index("<h1")
+
+# No user-facing time selector remains on the Weekend landing page. The two
+# hidden nodes are only the minimum compatibility host required by the shared
+# FilterModule contract; the full time sheet/popover has been removed.
+assert '<button type="button" id="filter-time-pill" hidden aria-hidden="true" tabindex="-1">' in weekend
+assert '<div id="sheet-time" hidden aria-hidden="true">' in weekend
+assert 'id="popover-time"' not in weekend
+assert weekend.count('data-time="') == 1
+assert 'data-time="weekend" hidden' in weekend
+assert "Datum auswählen" not in weekend
+assert "data-date-module" not in weekend
 assert "weekendRouteInit" not in weekend
 assert "weekendButton.click()" not in weekend
 
@@ -85,10 +97,22 @@ assert "this.filters.zeitraum = defaultTimeKey" in filter_js
 nav_js = (ROOT / "js/bottom-tabbar.js").read_text()
 assert "isExactActiveTarget" in nav_js
 assert "currentPath === normalizePath(item.href)" in nav_js
+for forbidden in (
+    "EVENTS_WEEKEND_PATH",
+    "bindWeekendRouteSelection",
+    "applyWeekendRouteContext",
+    "window.location.assign(EVENTS_WEEKEND_PATH)",
+):
+    assert forbidden not in nav_js, f"shell nav must not own Weekend filter routing: {forbidden}"
 
 style = (ROOT / "css/style.css").read_text()
 assert '@import url("./weekend.css?' in style
-assert (ROOT / "css/weekend.css").exists()
+weekend_css_path = ROOT / "css/weekend.css"
+assert weekend_css_path.exists()
+weekend_css = weekend_css_path.read_text()
+assert "body.page-route-events-weekend #filter-time-pill" in weekend_css
+assert "display: none !important" in weekend_css
+assert "body.page-route-events-weekend .events-section-title" in weekend_css
 
 home, home_page = parse("index.html")
 events, events_page = parse("events/index.html")
@@ -97,6 +121,12 @@ assert '/events/' in home and '/aktivitaeten/' in home and '/aktivitaeten/' in e
 assert '"@type": "Event"' not in events
 assert events.count('data-date-month-label>Monat</div>') == 2
 assert 'März 2026' not in events
+
+# The selected SEO landing page is linked from both mobile sheet and desktop
+# popover with real anchors. Other time presets remain in-page filters.
+assert events.count('href="/events/wochenende/"') == 2
+assert events.count('data-time-route="weekend"') == 2
+assert 'data-time="weekend"' not in events
 
 # SEO intent ownership: / owns Today, /events/ owns the general calendar,
 # /events/wochenende/ owns Weekend. Interactive filters on /events/ may still

@@ -27,7 +27,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/style.css?v=2026-06-22-css-governance-v1">
 </head>
-<body class="is-tabbar-hidden has-bottom-tabbar page-route-events page-route-events-weekend" data-event-time-default="weekend">
+<body class="is-tabbar-hidden has-bottom-tabbar page-route-events page-route-events-weekend" data-event-time-default="weekend" data-event-time-locked="true">
   <header class="app-header">
     <div class="header-left">
       <a class="subpage-brand-link" href="/" aria-label="Zur Startseite">
@@ -62,6 +62,12 @@
     <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
       <div class="desktop-entry__inner">
         <div class="desktop-entry__content">
+          <nav class="weekend-route-bridge" aria-label="Übergeordnete Eventansicht">
+            <a class="weekend-route-bridge__link" href="/events/">
+              <span>Alle Veranstaltungen</span>
+              <span class="weekend-route-bridge__icon" data-ui-icon="chevron-right" aria-hidden="true"></span>
+            </a>
+          </nav>
           <h1 class="desktop-entry__title">Veranstaltungen am Wochenende in Bocholt</h1>
           <p class="desktop-entry__text">Aktuelle Events für Freitag, Samstag und Sonntag in Bocholt.</p>
         </div>
@@ -77,10 +83,9 @@
           </label>
         </div>
 
-        <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
-          <span class="filter-pill__label">Wann?</span>
-          <span class="filter-pill__value" id="filter-time-value">Dieses Wochenende</span>
-          <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+        <!-- Internal FilterModule contract only: the Weekend route has no user-facing time control. -->
+        <button type="button" id="filter-time-pill" hidden aria-hidden="true" tabindex="-1">
+          <span id="filter-time-value">Dieses Wochenende</span>
         </button>
 
         <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
@@ -111,45 +116,11 @@
     </div>
   </section>
 
-  <nav class="weekend-route-bridge" aria-label="Weitere Veranstaltungen">
-    <a class="weekend-route-bridge__link" href="/events/">
-      <span>Alle Veranstaltungen</span>
-      <span class="weekend-route-bridge__icon" data-ui-icon="chevron-right" aria-hidden="true"></span>
-    </a>
-  </nav>
-
-  <div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
-    <div class="filter-sheet__overlay" data-close-sheet></div>
-    <div class="filter-sheet__card">
-      <div class="filter-sheet__header">
-        <div class="filter-sheet__title">Wann?</div>
-        <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
-      </div>
-      <div class="filter-sheet__body">
-        <button type="button" class="filter-sheet-option" data-time="all">Alle</button>
-        <button type="button" class="filter-sheet-option" data-time="today">Heute</button>
-        <button type="button" class="filter-sheet-option" data-time="week">Diese Woche</button>
-        <button type="button" class="filter-sheet-option is-active" data-time="weekend">Dieses Wochenende</button>
-        <button type="button" class="filter-sheet-option" data-time="nextweek">Nächste Woche</button>
-        <button type="button" class="filter-sheet-option" data-time="later">Später</button>
-        <div class="filter-date-module" data-date-module>
-          <div class="filter-date-module__divider" aria-hidden="true"></div>
-          <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
-            <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
-            <span class="filter-date-trigger__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-          </button>
-          <div class="filter-date-panel" data-date-panel hidden>
-            <div class="filter-date-panel__header">
-              <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat"><span class="filter-date-nav__icon" data-ui-icon="chevron-left" aria-hidden="true"></span></button>
-              <div class="filter-date-month-label" data-date-month-label>Monat</div>
-              <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat"><span class="filter-date-nav__icon" data-ui-icon="chevron-right" aria-hidden="true"></span></button>
-            </div>
-            <div class="filter-date-weekdays" aria-hidden="true"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
-            <div class="filter-date-grid" data-date-grid></div>
-            <div class="filter-date-actions"><button type="button" class="filter-date-action" data-date-today>Heute</button></div>
-          </div>
-        </div>
-      </div>
+  <!-- Internal FilterModule contract host only. It is never presented as Weekend UI. -->
+  <div id="sheet-time" hidden aria-hidden="true">
+    <div class="filter-sheet__body">
+      <button type="button" class="filter-sheet-option" data-time="weekend" hidden>Dieses Wochenende</button>
+      <button type="button" data-close-sheet hidden tabindex="-1">Schließen</button>
     </div>
   </div>
 
@@ -197,34 +168,6 @@
 
   <div id="bottom-tabbar-root"></div>
   <footer data-site-footer></footer>
-
-  <div id="popover-time" class="filter-popover" hidden>
-    <div class="filter-popover__panel">
-      <button data-time="all">Alle</button>
-      <button data-time="today">Heute</button>
-      <button data-time="week">Diese Woche</button>
-      <button class="is-active" data-time="weekend">Dieses Wochenende</button>
-      <button data-time="nextweek">Nächste Woche</button>
-      <button data-time="later">Später</button>
-      <div class="filter-popover__divider" aria-hidden="true"></div>
-      <div class="filter-date-module filter-date-module--popover" data-date-module>
-        <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
-          <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
-          <span class="filter-date-trigger__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-        </button>
-        <div class="filter-date-panel" data-date-panel hidden>
-          <div class="filter-date-panel__header">
-            <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat"><span class="filter-date-nav__icon" data-ui-icon="chevron-left" aria-hidden="true"></span></button>
-            <div class="filter-date-month-label" data-date-month-label>Monat</div>
-            <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat"><span class="filter-date-nav__icon" data-ui-icon="chevron-right" aria-hidden="true"></span></button>
-          </div>
-          <div class="filter-date-weekdays" aria-hidden="true"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
-          <div class="filter-date-grid" data-date-grid></div>
-          <div class="filter-date-actions"><button type="button" class="filter-date-action" data-date-today>Heute</button></div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div id="popover-category" class="filter-popover" hidden>
     <div class="filter-popover__panel">
