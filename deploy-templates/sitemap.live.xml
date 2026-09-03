@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<!-- === BEGIN BLOCK: DEPLOY_TEMPLATE_SITEMAP_LIVE_V2 | Zweck: produktive Live-Sitemap fuer alle bewusst indexierbaren oeffentlichen Kernseiten; Umfang: gesamte Datei deploy-templates/sitemap.live.xml === -->
+<!-- === BEGIN BLOCK: DEPLOY_TEMPLATE_SITEMAP_LIVE_V3 | Zweck: produktive Live-Sitemap fuer alle bewusst indexierbaren oeffentlichen Kernseiten inklusive Weekend-Intent; Umfang: gesamte Datei deploy-templates/sitemap.live.xml === -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://bocholt-erleben.de/</loc>
   </url>
   <url>
     <loc>https://bocholt-erleben.de/events/</loc>
+  </url>
+  <url>
+    <loc>https://bocholt-erleben.de/events/wochenende/</loc>
   </url>
   <url>
     <loc>https://bocholt-erleben.de/aktivitaeten/</loc>
@@ -41,4 +44,4 @@
     <loc>https://bocholt-erleben.de/datenschutz/</loc>
   </url>
 </urlset>
-<!-- === END BLOCK: DEPLOY_TEMPLATE_SITEMAP_LIVE_V2 === -->
+<!-- === END BLOCK: DEPLOY_TEMPLATE_SITEMAP_LIVE_V3 === -->
