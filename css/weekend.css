@@ -1,4 +1,4 @@
-/* === BEGIN BLOCK: WEEKEND_ROUTE_PRESENTATION_V1 | Zweck: hält /events/wochenende/ als dünne Variante des zentralen Event-Hubs, dosiert nur die längere Desktop-H1 und den ruhigen Rückweg zu allen Events; Umfang: ausschließlich page-route-events-weekend === */
+/* === BEGIN BLOCK: WEEKEND_ROUTE_PRESENTATION_V2 | Zweck: hält /events/wochenende/ als dünne Variante des zentralen Event-Hubs, zeigt den Route-Kontext auch mobil, kennzeichnet den festen Weekend-Zeitraum und macht den Rückweg zu allen Events eindeutig; Umfang: ausschließlich page-route-events-weekend === */
 
 .weekend-route-bridge{
   box-sizing: border-box;
@@ -11,7 +11,7 @@
 .weekend-route-bridge__link{
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   min-height: 44px;
   padding: 0 2px;
   color: color-mix(in srgb, var(--home-copy-strong) 88%, var(--brand-green-700) 12%);
@@ -46,6 +46,18 @@
   width: 15px;
   height: 15px;
   flex: 0 0 auto;
+  order: -1;
+  transform: rotate(180deg);
+}
+
+body.page-route-events-weekend #filter-time-pill.is-route-context{
+  cursor: default;
+  opacity: 1;
+  -webkit-text-fill-color: currentColor;
+}
+
+body.page-route-events-weekend #filter-time-pill.is-route-context .filter-pill__chevron{
+  display: none;
 }
 
 @media (min-width: 900px){
@@ -96,9 +108,55 @@
 }
 
 @media (max-width: 899.98px){
+  body.page-route-events-weekend .desktop-entry{
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    padding: 13px var(--gutter) 7px;
+  }
+
+  body.page-route-events-weekend .desktop-entry__inner,
+  body.page-route-events-weekend .desktop-entry__content{
+    width: 100%;
+    min-width: 0;
+  }
+
+  body.page-route-events-weekend .desktop-entry__content{
+    gap: 4px;
+  }
+
+  body.page-route-events-weekend .desktop-entry__title{
+    max-width: 22rem;
+    margin: 0;
+    color: var(--home-copy-contrast);
+    font-size: clamp(1.28rem, 1.18rem + 0.46vw, 1.42rem);
+    font-weight: 790;
+    line-height: 1.08;
+    letter-spacing: -0.032em;
+  }
+
+  body.page-route-events-weekend .desktop-entry__text{
+    max-width: 31rem;
+    margin: 0;
+    color: var(--home-copy-secondary);
+    font-size: 0.84rem;
+    line-height: 1.34;
+  }
+
+  body.page-route-events-weekend #filter-time-pill.is-route-context .filter-pill__label{
+    display: none;
+  }
+
+  body.page-route-events-weekend #filter-time-pill.is-route-context .filter-pill__value{
+    min-width: 0;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+
   .weekend-route-bridge{
     padding-top: 8px;
   }
 }
 
-/* === END BLOCK: WEEKEND_ROUTE_PRESENTATION_V1 === */
+/* === END BLOCK: WEEKEND_ROUTE_PRESENTATION_V2 === */

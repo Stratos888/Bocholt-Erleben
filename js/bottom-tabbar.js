@@ -1,4 +1,4 @@
-/* === BEGIN BLOCK: BOTTOM_SHELL_NAV_RENDERER_V4 | Zweck: rendert mobile Bottom-Navigation und Desktop-Bereichs-Navigation aus genau einer zentralen Route-Definition, verhindert Reload nur auf dem exakten aktiven Hauptziel und lässt aktive Unterrouten sauber zum Bereichsroot zurückführen; Umfang: kompletter zentrale Shell-Navigation inkl. Mobile/Desktop-Rendering, Path-Normalisierung, Root-Active-Guard, Warmup und Icon-Hydration === */
+/* === BEGIN BLOCK: BOTTOM_SHELL_NAV_RENDERER_V5 | Zweck: rendert mobile Bottom-Navigation und Desktop-Bereichs-Navigation aus genau einer zentralen Route-Definition, verhindert Reload nur auf dem exakten aktiven Hauptziel, lässt aktive Unterrouten sauber zum Bereichsroot zurückführen und hält den Weekend-Zeitraum als festen Events-Unterrouten-Kontext; Umfang: komplette zentrale Shell-Navigation inkl. Mobile/Desktop-Rendering, Path-Normalisierung, Weekend-Routenübergang, Root-Active-Guard, Warmup und Icon-Hydration === */
 (() => {
   "use strict";
 
@@ -7,6 +7,8 @@
   const BODY_CLASS = "has-bottom-tabbar";
   const ROUTE_CLASS_PREFIX = "bottom-tabbar-route-";
   const SPECULATION_RULES_ID = "bottom-tabbar-speculation-rules";
+  const EVENTS_ROOT_PATH = "/events/";
+  const EVENTS_WEEKEND_PATH = "/events/wochenende/";
 
   const warmedUrls = new Set();
 
@@ -21,11 +23,11 @@
     },
     {
       key: "events",
-      href: "/events/",
+      href: EVENTS_ROOT_PATH,
       label: "Events",
       icon: "calendar-days",
       prefetch: ["/data/events.json"],
-      match: (path) => path === "/events/" || path.startsWith("/events/")
+      match: (path) => path === EVENTS_ROOT_PATH || path.startsWith(EVENTS_ROOT_PATH)
     },
     {
       key: "activities",
@@ -183,6 +185,40 @@
     window.setTimeout(run, 220);
   }
 
+  /* === BEGIN BLOCK: EVENTS_WEEKEND_ROUTE_CONTEXT_V1 | Zweck: behandelt den SEO-Weekend-Einstieg als festen Unterrouten-Kontext desselben Event-Hubs: die Weekend-Auswahl auf /events/ navigiert zur kanonischen URL, dort bleibt der Zeitraum sichtbar aber gesperrt; Umfang: nur Route-Navigation und UI-Semantik, keine Filterberechnung === */
+  function bindWeekendRouteSelection() {
+    document.addEventListener("click", (event) => {
+      if (normalizePath(window.location.pathname) !== EVENTS_ROOT_PATH) return;
+
+      const origin = event.target instanceof Element ? event.target : null;
+      const weekendOption = origin?.closest?.('[data-time="weekend"]');
+      if (!weekendOption) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      addDocumentPrefetch(EVENTS_WEEKEND_PATH);
+      warmDataUrl("/data/events.json");
+      window.location.assign(EVENTS_WEEKEND_PATH);
+    }, true);
+  }
+
+  function applyWeekendRouteContext(pathname) {
+    if (pathname !== EVENTS_WEEKEND_PATH) return;
+
+    const timePill = document.getElementById("filter-time-pill");
+    if (!timePill) return;
+
+    if ("disabled" in timePill) timePill.disabled = true;
+    timePill.classList.add("is-route-context");
+    timePill.setAttribute("aria-disabled", "true");
+    timePill.setAttribute("aria-label", "Zeitraum: Dieses Wochenende");
+    timePill.removeAttribute("aria-haspopup");
+    timePill.removeAttribute("aria-controls");
+    timePill.removeAttribute("aria-expanded");
+  }
+  /* === END BLOCK: EVENTS_WEEKEND_ROUTE_CONTEXT_V1 === */
+
   function createBottomItemMarkup(item, activeKey) {
     const isActive = item.key === activeKey;
 
@@ -290,6 +326,7 @@
     const activeItem = getActiveItem(pathname);
 
     clearBodyState(body);
+    applyWeekendRouteContext(pathname);
 
     if (!activeItem) {
       hideRoot(bottomRoot);
@@ -304,6 +341,8 @@
     warmInactiveRoutes(activeItem.key);
   }
 
+  bindWeekendRouteSelection();
+
   window.addEventListener("be:privacy-consent-changed", () => {
     const activeItem = getActiveItem(normalizePath(window.location.pathname));
     if (!activeItem) return;
@@ -316,4 +355,4 @@
     render();
   }
 })();
-/* === END BLOCK: BOTTOM_SHELL_NAV_RENDERER_V4 === */
+/* === END BLOCK: BOTTOM_SHELL_NAV_RENDERER_V5 === */
