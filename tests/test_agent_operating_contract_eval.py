@@ -11,8 +11,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "agent-operating-contract-eval.py"
 CORPUS = ROOT / "tests" / "agent_operating_contract_eval_cases.json"
 AGENTS = ROOT / "AGENTS.md"
+ENGINEERING = ROOT / "ENGINEERING.md"
 HISTORICAL_V1_BLOB = "7d26122b9be063a20d6715c89703783482a4cc93"
 FINAL_DIFF_MARKER = "Vor `DONE_VERIFIED` den finalen tatsächlichen Diff einmal als Ganzes"
+EXECUTION_PREFLIGHT_MARKER = "### Execution Capability Preflight"
 
 spec = importlib.util.spec_from_file_location("agent_contract_eval", SCRIPT)
 assert spec and spec.loader
@@ -44,7 +46,7 @@ class AgentOperatingContractEvalTests(unittest.TestCase):
         actual = module.git_blob_sha_bytes(AGENTS.read_bytes())
         self.assertNotEqual(HISTORICAL_V1_BLOB, actual)
         text = AGENTS.read_text(encoding="utf-8")
-        self.assertTrue(text.startswith("# Agent Operating Contract V1.1 – Bocholt erleben"))
+        self.assertTrue(text.startswith("# Agent Operating Contract V1.2 – Bocholt erleben"))
 
     def test_baseline_distinguishes_historical_v1_from_current_contract(self) -> None:
         baseline = module.build_baseline(self.corpus, AGENTS)
@@ -60,6 +62,42 @@ class AgentOperatingContractEvalTests(unittest.TestCase):
         self.assertEqual(baseline["external_model_calls"], 0)
         self.assertEqual(baseline["external_api_calls"], 0)
         self.assertEqual(baseline["repository_writes"], 0)
+
+    def test_current_contract_has_exactly_one_execution_capability_preflight(self) -> None:
+        text = AGENTS.read_text(encoding="utf-8")
+        self.assertEqual(1, text.count(EXECUTION_PREFLIGHT_MARKER))
+        self.assertLess(text.index(EXECUTION_PREFLIGHT_MARKER), text.index("## 3. Current State"))
+        self.assertIn("vor substantieller Repository-Mutation", text)
+        for mode in ("READ_ONLY", "REMOTE_SMALL_WRITE", "CHECKOUT_REQUIRED"):
+            self.assertIn(f"`{mode}`", text)
+        self.assertIn("nicht der geschätzten Patchgröße", text)
+
+    def test_checkout_handoff_is_early_and_reuses_existing_context(self) -> None:
+        text = AGENTS.read_text(encoding="utf-8")
+        self.assertIn("vor Implementation stoppen", text)
+        self.assertIn("keine Remote-Einzelpatch-Kette", text)
+        self.assertIn("vorhandenen Branch, PR, Workpack und Issue-Kontext weiterverwenden", text)
+        self.assertIn("die bereits belegte Analyse nicht bei null wiederholen", text)
+        for field in (
+            "`Repo`",
+            "`Branch`",
+            "`Baseline-SHA`",
+            "`Workpack/Issue`",
+            "`OBJECTIVE`",
+            "`INVARIANTS`",
+            "`OWNERS / IMPACT`",
+            "`Required Tests`",
+            "`Resume Point`",
+        ):
+            self.assertIn(field, text)
+
+    def test_engineering_checkout_rule_is_capability_based(self) -> None:
+        text = ENGINEERING.read_text(encoding="utf-8")
+        self.assertIn("nicht nach einer geschätzten Patchgröße", text)
+        self.assertIn("repository-weite Implementierungssuche", text)
+        self.assertIn("lokale Build-, Browser-, Runtime- oder Datenbanktests", text)
+        self.assertIn("`REMOTE_SMALL_WRITE`", text)
+        self.assertIn("Source-, Schema- oder Runtime-Patches beginnen erst im Checkout", text)
 
     def test_current_contract_has_exactly_one_final_diff_challenge(self) -> None:
         text = AGENTS.read_text(encoding="utf-8")

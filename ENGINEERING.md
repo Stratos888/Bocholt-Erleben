@@ -23,7 +23,7 @@ Nicht zulässig:
 - mehrere Schreiber an derselben Datei;
 - Wrapper auf Wrapper;
 - parallele Statusführung;
-- große Multi-Datei-Änderungen über die Contents API ohne Checkout und lokale Tests.
+- `CHECKOUT_REQUIRED`-Source-Änderungen über eine Kette von Contents-API-Einzelpatches statt in einem vollständigen Checkout mit lokalen Tests.
 
 Unabhängige Owner dürfen parallel bearbeitet werden. Zentrale Schema-, Authentifizierungs-, Zahlungs-, Deployment- und Governanceowner werden seriell geändert.
 
@@ -44,9 +44,20 @@ Feature-Branch -> staging -> main
 
 ## 4. Entwicklungsumgebung
 
-Größere Codearbeit benötigt einen vollständigen Checkout mit lokaler Suche, Patchbearbeitung und Tests.
+Der Ausführungsmodus wird gemäß `AGENTS.md` **vor substantieller Repository-Mutation** bestimmt. Ob ein Checkout erforderlich ist, richtet sich nach den für eine korrekte Umsetzung benötigten Fähigkeiten und Risiken, nicht nach einer geschätzten Patchgröße.
 
-Der GitHub-Connector dient primär für Lesen, Issues, PRs, Checks, Logs und Merge. Ohne Checkout sind nur kleine, vollständig gelesene und deterministische Text- oder Konfigurationsänderungen zulässig.
+`CHECKOUT_REQUIRED` gilt insbesondere, wenn die Umsetzung mindestens eines davon benötigt:
+
+- repository-weite Implementierungssuche oder Impact-Analyse über mehrere Owner;
+- zusammenhängende Multi-Datei-Code-, Build- oder UI-Änderung;
+- lokale Build-, Browser-, Runtime- oder Datenbanktests;
+- Schema-, Authentifizierungs-, Payment-, Deployment- oder Governance-Code bzw. eine vergleichbare zentrale Risikogrenze.
+
+Ein vollständiger Checkout bedeutet lokale Suche, zusammenhängende Patchbearbeitung, Diff-Review und die für den Scope relevanten lokalen Tests vor dem PR-Gate.
+
+Der GitHub-Connector ist primär Control Plane für Lesen, Issues, Branch-/PR-Metadaten, Checks, Logs und Merge. Ohne Checkout ist `REMOTE_SMALL_WRITE` nur für kleine, vollständig gelesene und deterministische Text- oder Konfigurationsänderungen zulässig, die keine der oben genannten Checkout-Fähigkeiten benötigen.
+
+Fehlt bei `CHECKOUT_REQUIRED` ein Checkout, wird **vor Implementation** in einen Checkout-Workspace übergeben. Dafür dürfen notwendige Branch-/Workpack-Metadaten vorbereitet werden; Source-, Schema- oder Runtime-Patches beginnen erst im Checkout. Der Handoff übernimmt den bereits belegten Task Frame und nennt mindestens Repo, Branch, Baseline-SHA, Workpack/Issue, Objective, Invarianten, Owner/Impact, Required Tests und Resume Point.
 
 ## 5. Tests und CI
 
