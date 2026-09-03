@@ -20,7 +20,7 @@ Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence
 | Bereich | Evidence | Dauerhaft belegter Stand |
 |---|---:|---|
 | Branch- und Deployrouting | E2 | nur `staging` und `main` dürfen deployen; Releasepfad `Feature-Branch -> staging -> main` |
-| Adaptiver Arbeitsweg | E2/E3 | normale Änderungen benötigen kein Workpack; der reale issuefreie Dokumentationsweg wurde mit Plan `docs`, Merge nach `staging` und normalem Deploy abgenommen; unabhängige PRs dürfen parallel laufen, während Dateiüberschidungen und doppelte PRs desselben Workpacks fail-closed blockiert werden |
+| Adaptiver Arbeitsweg | E2/E3 | normale Änderungen benötigen kein Workpack; der reale issuefreie Dokumentationsweg wurde mit Plan `docs`, Merge nach `staging` und normalem Deploy abgenommen; unabhängige PRs dürfen parallel laufen, während Dateiüberschneidungen und doppelte PRs desselben Workpacks fail-closed blockiert werden |
 | Optionaler Workpack | E2 | große, riskante, mehrchatfähige oder zentrale Governance-/Deploymentänderungen nutzen genau ein offenes `[ACTIVE WORKPACK]`-Issue, einen deklarierten Branch und einen PR |
 | PR-Scope-Vertrag | E2 | Workpack-PRs referenzieren nur ihr Issue; der aktuelle Live-Vertrag wird bei jedem PR-Gate-Lauf neu geladen und der vollständige Diff einschließlich Löschungen gegen `allowed_paths` und `locked_paths` geprüft; Hashkopien entfallen |
 | Adaptive PR-Integration | E2 | der Required Check `PR Gate` wählt `docs`, `quick`, `backend`, `frontend` oder `full`; kleine Backend- und Browserläufe werden auf betroffene Komponenten begrenzt, unklare oder große Änderungen fallen konservativ auf `full` zurück |
