@@ -27,7 +27,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/style.css?v=2026-06-22-css-governance-v1">
 </head>
-<body class="is-tabbar-hidden has-bottom-tabbar page-route-events page-route-events-weekend" data-event-time-default="weekend">
+<body class="is-tabbar-hidden has-bottom-tabbar page-route-events page-route-events-weekend" data-event-time-default="weekend" data-event-time-locked="true">
   <header class="app-header">
     <div class="header-left">
       <a class="subpage-brand-link" href="/" aria-label="Zur Startseite">
@@ -62,6 +62,12 @@
     <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
       <div class="desktop-entry__inner">
         <div class="desktop-entry__content">
+          <nav class="weekend-route-bridge" aria-label="Übergeordnete Eventansicht">
+            <a class="weekend-route-bridge__link" href="/events/">
+              <span>Alle Veranstaltungen</span>
+              <span class="weekend-route-bridge__icon" data-ui-icon="chevron-right" aria-hidden="true"></span>
+            </a>
+          </nav>
           <h1 class="desktop-entry__title">Veranstaltungen am Wochenende in Bocholt</h1>
           <p class="desktop-entry__text">Aktuelle Events für Freitag, Samstag und Sonntag in Bocholt.</p>
         </div>
@@ -77,7 +83,7 @@
           </label>
         </div>
 
-        <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
+        <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time" hidden aria-hidden="true">
           <span class="filter-pill__label">Wann?</span>
           <span class="filter-pill__value" id="filter-time-value">Dieses Wochenende</span>
           <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
@@ -110,13 +116,6 @@
       </div>
     </div>
   </section>
-
-  <nav class="weekend-route-bridge" aria-label="Weitere Veranstaltungen">
-    <a class="weekend-route-bridge__link" href="/events/">
-      <span>Alle Veranstaltungen</span>
-      <span class="weekend-route-bridge__icon" data-ui-icon="chevron-right" aria-hidden="true"></span>
-    </a>
-  </nav>
 
   <div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
     <div class="filter-sheet__overlay" data-close-sheet></div>
