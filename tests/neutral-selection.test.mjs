@@ -16,4 +16,16 @@ assert.deepEqual(select.selectTodayEvents([
   { id: "today", title: "Heute", date: "2026-07-22" },
   { id: "future", title: "Später", date: "2026-07-23", score: 99 }
 ], { today: "2026-07-22" }).map(select.identity), ["today"]);
+
+assert.deepEqual(select.weekendRange({ today: "2026-09-02" }), { start: "2026-09-04", end: "2026-09-06" });
+assert.deepEqual(select.weekendRange({ today: "2026-09-05" }), { start: "2026-09-04", end: "2026-09-06" });
+assert.deepEqual(select.weekendRange({ today: "2026-09-06" }), { start: "2026-09-04", end: "2026-09-06" });
+assert.deepEqual(select.selectWeekendEvents([
+  { id: "thu", title: "Donnerstag", date: "2026-09-03" },
+  { id: "fri", title: "Freitag", date: "2026-09-04" },
+  { id: "range", title: "Mehrtag", date: "2026-09-02", endDate: "2026-09-05" },
+  { id: "sun", title: "Sonntag", date: "2026-09-06" },
+  { id: "mon", title: "Montag", date: "2026-09-07" }
+], { today: "2026-09-02" }).map(select.identity), ["range", "fri", "sun"]);
+
 console.log("neutral selection contract: OK");

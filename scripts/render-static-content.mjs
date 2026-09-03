@@ -38,6 +38,14 @@ const homeMainLinks = `
     </span>
   </a>
 </section>`.trim();
+const weekendOverviewLink = `
+<article class="event-card static-content-card static-intent-card" data-item-id="weekend-intent">
+  <h3><a href="/events/wochenende/">Veranstaltungen am Wochenende</a></h3>
+  <p>Freitag bis Sonntag gezielt entdecken.</p>
+</article>`.trim();
+const formatWeekendDay = (value) => new Intl.DateTimeFormat("de-DE", {
+  weekday: "long", day: "2-digit", month: "long", timeZone: "UTC"
+}).format(new Date(`${value}T12:00:00Z`));
 
 const rawEvents = read("data/events.json");
 const events = selection.selectEvents(rawEvents, { now: process.env.STATIC_RENDER_NOW, timeZone: "Europe/Berlin", limit: 8 });
@@ -47,6 +55,13 @@ if (!events.length || !offers.length) throw new Error("Static content basis must
 const todayEvents = selection.selectTodayEvents(rawEvents, { now: process.env.STATIC_RENDER_NOW, timeZone: "Europe/Berlin", limit: 3 });
 const homeEvents = todayEvents.length ? todayEvents : events.slice(0, 3);
 const homeHeading = todayEvents.length ? "Heute in Bocholt" : "Nächste Termine";
-replace("events/index.html", "EVENTS", eventCards(events));
+const weekendRange = selection.weekendRange({ now: process.env.STATIC_RENDER_NOW, timeZone: "Europe/Berlin" });
+const weekendEvents = selection.selectWeekendEvents(rawEvents, { now: process.env.STATIC_RENDER_NOW, timeZone: "Europe/Berlin" });
+const weekendRangeCopy = `${formatWeekendDay(weekendRange.start)} bis ${formatWeekendDay(weekendRange.end)}`;
+const weekendFeed = weekendEvents.length
+  ? `<p class="content-note">${esc(weekendRangeCopy)}</p>\n${eventCards(weekendEvents)}`
+  : `<p class="content-note">${esc(weekendRangeCopy)}: Aktuell sind noch keine freigegebenen Termine eingetragen. <a href="/events/">Alle Veranstaltungen ansehen</a>.</p>`;
+replace("events/index.html", "EVENTS", `${weekendOverviewLink}\n${eventCards(events)}`);
+replace("events/wochenende/index.html", "WEEKEND", weekendFeed);
 replace("aktivitaeten/index.html", "ACTIVITIES", activityCards(offers));
 replace("index.html", "TODAY", `<section data-static-event-context="${todayEvents.length ? "today" : "upcoming"}"><h3>${homeHeading}</h3>${eventCards(homeEvents)}</section>` + activityCards(offers.slice(0, 3)) + homeMainLinks);
