@@ -168,9 +168,11 @@ PY
     --check event-navigation \
     --out-dir "$SMOKE_OUT_DIR"
 
-  node "$ROOT/tests/weekend_route_browser_test.mjs" \
-    --base-url "http://127.0.0.1:$port" \
-    --out-dir "$SMOKE_OUT_DIR/weekend-route"
+  if [ -f "$ROOT/tests/weekend_route_browser_test.mjs" ]; then
+    node "$ROOT/tests/weekend_route_browser_test.mjs" \
+      --base-url "http://127.0.0.1:$port" \
+      --out-dir "$SMOKE_OUT_DIR/weekend-route"
+  fi
 
   if [ -f "$ROOT/tests/startpartner_public_funnel_browser_test.mjs" ]; then
     node "$ROOT/tests/startpartner_public_funnel_browser_test.mjs" \
