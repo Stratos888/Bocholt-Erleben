@@ -149,34 +149,34 @@ body.page-route-events-weekend .events-feed-group{
     font-size: 0.8rem;
   }
 
-  /* Weekend hat genau einen nutzerseitigen Filter. Suche bleibt in Zeile 1,
-     Kategorie nutzt Zeile 2 vollständig. Sobald Reset erscheint, teilt nur
-     diese zweite Zeile ihre Breite mit dem X. */
-  body.page-route-events-weekend .desktop-hero__search-row{
+  /* Weekend hat genau einen nutzerseitigen Filter. Der Selektor spiegelt den
+     spezifischeren allgemeinen Desktop-Owner aus home.css und ergänzt die
+     Weekend-Routenklasse, damit diese Route ohne !important final gewinnt. */
+  body.is-tabbar-hidden.page-route-events-weekend .top-stack:not(.activity-finder) .desktop-hero__search-row{
     grid-template-columns: minmax(0, 1fr);
   }
 
-  body.page-route-events-weekend .desktop-hero__search-row > .desktop-hero__search-slot,
-  body.page-route-events-weekend .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__search-slot{
+  body.is-tabbar-hidden.page-route-events-weekend .top-stack:not(.activity-finder) .desktop-hero__search-row > .desktop-hero__search-slot,
+  body.is-tabbar-hidden.page-route-events-weekend .top-stack:not(.activity-finder) .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__search-slot{
     grid-column: 1 / -1;
     grid-row: 1;
   }
 
-  body.page-route-events-weekend .desktop-hero__search-row > #filter-category-pill{
+  body.is-tabbar-hidden.page-route-events-weekend .top-stack:not(.activity-finder) .desktop-hero__search-row > #filter-category-pill{
     grid-column: 1 / -1;
     grid-row: 2;
   }
 
-  body.page-route-events-weekend .desktop-hero__search-row.has-active-filter-reset{
+  body.is-tabbar-hidden.page-route-events-weekend .top-stack:not(.activity-finder) .desktop-hero__search-row.has-active-filter-reset{
     grid-template-columns: minmax(0, 1fr) var(--desktop-reset-w);
   }
 
-  body.page-route-events-weekend .desktop-hero__search-row.has-active-filter-reset > #filter-category-pill{
+  body.is-tabbar-hidden.page-route-events-weekend .top-stack:not(.activity-finder) .desktop-hero__search-row.has-active-filter-reset > #filter-category-pill{
     grid-column: 1;
     grid-row: 2;
   }
 
-  body.page-route-events-weekend .desktop-hero__search-row.has-active-filter-reset > #filter-reset-pill:not([hidden]){
+  body.is-tabbar-hidden.page-route-events-weekend .top-stack:not(.activity-finder) .desktop-hero__search-row.has-active-filter-reset > #filter-reset-pill:not([hidden]){
     grid-column: 2;
     grid-row: 2;
   }
