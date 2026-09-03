@@ -61,6 +61,42 @@ async function assertNoHorizontalOverflow(page, label) {
   }
 }
 
+async function assertWeekendSingleFilterGeometry(page, viewport, resetVisible = false) {
+  const searchBox = await page.locator('.desktop-hero__search-slot').boundingBox();
+  const categoryBox = await page.locator('#filter-category-pill').boundingBox();
+  if (!searchBox || !categoryBox) {
+    throw new Error(`${viewport.name}: Weekend search/category geometry unavailable`);
+  }
+
+  const tolerance = 4;
+  if (Math.abs(categoryBox.x - searchBox.x) > tolerance) {
+    throw new Error(`${viewport.name}: Weekend category must align left with search (${categoryBox.x}px vs ${searchBox.x}px)`);
+  }
+  if (categoryBox.y <= searchBox.y + tolerance) {
+    throw new Error(`${viewport.name}: Weekend category must occupy the filter row below search`);
+  }
+
+  if (!resetVisible) {
+    if (Math.abs(categoryBox.width - searchBox.width) > tolerance) {
+      throw new Error(`${viewport.name}: Weekend category must use full single-filter width (${categoryBox.width}px vs search ${searchBox.width}px)`);
+    }
+    return;
+  }
+
+  const resetBox = await page.locator('#filter-reset-pill').boundingBox();
+  if (!resetBox) {
+    throw new Error(`${viewport.name}: Weekend reset geometry unavailable after active filter state`);
+  }
+  if (Math.abs(resetBox.y - categoryBox.y) > tolerance) {
+    throw new Error(`${viewport.name}: Weekend reset must share the category filter row`);
+  }
+  const searchRight = searchBox.x + searchBox.width;
+  const resetRight = resetBox.x + resetBox.width;
+  if (Math.abs(resetRight - searchRight) > tolerance) {
+    throw new Error(`${viewport.name}: Weekend category + reset row must end with search width (${resetRight}px vs ${searchRight}px)`);
+  }
+}
+
 async function assertWeekendRouteInvariant(page, viewport) {
   const timePill = page.locator('#filter-time-pill');
   if (!(await timePill.isHidden())) {
@@ -129,6 +165,7 @@ async function assertInitialWeekendState(page, viewport) {
   }
 
   await assertWeekendRouteInvariant(page, viewport);
+  await assertWeekendSingleFilterGeometry(page, viewport, false);
   await assertNoHorizontalOverflow(page, viewport.name);
 }
 
@@ -136,6 +173,7 @@ async function assertResetReturnsToRouteDefault(page, viewport) {
   const search = page.locator('#search-filter');
   await search.fill('Weekend Fixture Freitag');
   await page.waitForFunction(() => !document.getElementById('filter-reset-pill')?.hidden);
+  await assertWeekendSingleFilterGeometry(page, viewport, true);
 
   const filteredText = await page.locator('#event-cards').innerText();
   if (!filteredText.includes('Weekend Fixture Freitag') || filteredText.includes('Weekend Fixture Samstag')) {
