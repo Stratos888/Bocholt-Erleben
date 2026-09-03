@@ -117,7 +117,17 @@ assert "body.page-route-events-weekend .events-section-title" in weekend_css
 home, home_page = parse("index.html")
 events, events_page = parse("events/index.html")
 activities, _ = parse("aktivitaeten/index.html")
-assert '/events/' in home and '/aktivitaeten/' in home and '/aktivitaeten/' in events and '/events/' in activities
+
+# Home keeps crawlable section crosslinks. Cross-section app navigation on the
+# section pages is owned centrally by the shared shell instead of duplicated
+# inline links in every page template.
+assert '/events/' in home and '/aktivitaeten/' in home
+for section in (events, activities):
+    assert 'id="desktop-section-nav-root"' in section
+    assert 'id="bottom-tabbar-root"' in section
+assert 'href: EVENTS_ROOT_PATH' in nav_js
+assert 'href: "/aktivitaeten/"' in nav_js
+
 assert '"@type": "Event"' not in events
 assert events.count('data-date-month-label>Monat</div>') == 2
 assert 'März 2026' not in events
