@@ -121,17 +121,16 @@ async function assertWeekendRouteInvariant(page, viewport) {
 
   const title = page.locator('.desktop-entry__title');
   const lead = page.locator('.desktop-entry__text');
-  const bridge = page.locator('.weekend-route-bridge__link');
   if (!(await title.isVisible())) throw new Error(`${viewport.name}: Weekend H1 not visible`);
   if (!(await lead.isVisible())) throw new Error(`${viewport.name}: Weekend lead not visible`);
-  if (!(await bridge.isVisible())) throw new Error(`${viewport.name}: parent navigation not visible`);
 
-  const bridgeBox = await bridge.boundingBox();
-  const titleBox = await title.boundingBox();
-  if (!bridgeBox || !titleBox || bridgeBox.y + bridgeBox.height > titleBox.y + 2) {
-    throw new Error(`${viewport.name}: parent navigation must appear before the Weekend H1`);
+  const redundantParentNavigation = await page.locator('.weekend-route-bridge, .weekend-route-bridge__link').count();
+  if (redundantParentNavigation !== 0) {
+    throw new Error(`${viewport.name}: Weekend route must rely on central Events navigation, not a redundant parent link`);
   }
 
+  const titleBox = await title.boundingBox();
+  if (!titleBox) throw new Error(`${viewport.name}: Weekend H1 geometry unavailable`);
   if (viewport.width < 900 && titleBox.height > 76) {
     throw new Error(`${viewport.name}: mobile Weekend H1 is too tall (${titleBox.height}px)`);
   }
@@ -149,11 +148,6 @@ async function assertInitialWeekendState(page, viewport) {
   const reset = page.locator('#filter-reset-pill');
   if (!(await reset.isHidden())) {
     throw new Error(`${viewport.name}: reset X must be hidden for the route default`);
-  }
-
-  const bridge = page.locator('.weekend-route-bridge__link');
-  if ((await bridge.getAttribute('href')) !== '/events/') {
-    throw new Error(`${viewport.name}: parent navigation must target /events/`);
   }
 
   const feedText = await page.locator('#event-cards').innerText();
@@ -221,7 +215,7 @@ async function assertCategoryRemainsSharedFilter(page, viewport) {
   }, null, { timeout: 6000 });
 }
 
-async function assertSectionRootNavigation(page, baseUrl, viewport) {
+async function assertSectionRootNavigation(page, viewport) {
   const navSelector = viewport.width >= 900
     ? '#desktop-section-nav-root [data-tab-key="events"]'
     : '#bottom-tabbar-root [data-tab-key="events"]';
@@ -233,12 +227,6 @@ async function assertSectionRootNavigation(page, baseUrl, viewport) {
   }
 
   await nav.click();
-  await page.waitForURL((url) => url.pathname === '/events/', { timeout: 8000 });
-  await waitForEventsRootReady(page);
-
-  await page.goto(absoluteUrl(baseUrl, '/events/wochenende/'), { waitUntil: 'domcontentloaded' });
-  await waitForWeekendReady(page);
-  await page.locator('.weekend-route-bridge__link').click();
   await page.waitForURL((url) => url.pathname === '/events/', { timeout: 8000 });
   await waitForEventsRootReady(page);
 }
@@ -304,7 +292,7 @@ async function main() {
           fullPage: true,
         });
 
-        await assertSectionRootNavigation(page, args.baseUrl, viewport);
+        await assertSectionRootNavigation(page, viewport);
         await assertWeekendSelectionUsesCanonicalAnchor(page, args.baseUrl, viewport);
         await assertNoHorizontalOverflow(page, `${viewport.name}-canonical-weekend`);
 
