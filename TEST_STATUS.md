@@ -1,6 +1,6 @@
 # Aktueller Proofindex – Bocholt erleben
 
-Stand: 2026-08-17
+Stand: 2026-09-03
 
 Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence-Grenzen. Operative Zwischenstände, vollständige Logs und laufende Run-IDs stehen im jeweiligen Workpack-Issue und in GitHub Actions.
 
@@ -20,7 +20,7 @@ Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence
 | Bereich | Evidence | Dauerhaft belegter Stand |
 |---|---:|---|
 | Branch- und Deployrouting | E2 | nur `staging` und `main` dürfen deployen; Releasepfad `Feature-Branch -> staging -> main` |
-| Adaptiver Arbeitsweg | E2/E3 | normale Änderungen benötigen kein Workpack; der reale issuefreie Dokumentationsweg wurde mit Plan `docs`, Merge nach `staging` und normalem Deploy abgenommen; unabhängige PRs dürfen parallel laufen, während Dateiüberschneidungen und doppelte PRs desselben Workpacks fail-closed blockiert werden |
+| Adaptiver Arbeitsweg | E2/E3 | normale Änderungen benötigen kein Workpack; der reale issuefreie Dokumentationsweg wurde mit Plan `docs`, Merge nach `staging` und normalem Deploy abgenommen; unabhängige PRs dürfen parallel laufen, während Dateiüberschidungen und doppelte PRs desselben Workpacks fail-closed blockiert werden |
 | Optionaler Workpack | E2 | große, riskante, mehrchatfähige oder zentrale Governance-/Deploymentänderungen nutzen genau ein offenes `[ACTIVE WORKPACK]`-Issue, einen deklarierten Branch und einen PR |
 | PR-Scope-Vertrag | E2 | Workpack-PRs referenzieren nur ihr Issue; der aktuelle Live-Vertrag wird bei jedem PR-Gate-Lauf neu geladen und der vollständige Diff einschließlich Löschungen gegen `allowed_paths` und `locked_paths` geprüft; Hashkopien entfallen |
 | Adaptive PR-Integration | E2 | der Required Check `PR Gate` wählt `docs`, `quick`, `backend`, `frontend` oder `full`; kleine Backend- und Browserläufe werden auf betroffene Komponenten begrenzt, unklare oder große Änderungen fallen konservativ auf `full` zurück |
@@ -49,6 +49,7 @@ Diese Datei enthält dauerhafte Prooffähigkeiten und aktuell relevante Evidence
 | Startpartner Gate-4-Schema und Domäne | E2/E4 | Migration `012` ist auf Staging angewendet. Die dauerhaften Gate-4-Owner bilden 14 Onboardingpunkte, Pilot-/Submission-Verknüpfung für Event und Aktivität, Messpreflight mit Owner `value_metric_daily`, Distributionsbereitschaft, Pilotnutzung sowie lokales Aktivierungs- und Enddatum ab. Reguläre Subscription-, Stripe-, Zahlungs-, Mail-, Magic-Link-, Veröffentlichungs- und Entitlement-Owner bleiben getrennt und unverändert. |
 | Startpartner Gate-4-Staging-Lifecycle und Rückbau | E4 | der authentifizierte No-Send-Lifecycle in Deploy Run `30714196723` belegte Replay/Idempotenz, Konfliktgrenzen, aktivierungsgebundene Kalenderdaten, unveränderte gesperrte Runtime-Owner und unveränderte Startpartner-Kapazität; Cleanup endete mit `residue.total = 0`. Der Completion-Marker wurde in Run `30714760725` kontrolliert `1 -> 0` entfernt, ohne den Lifecycle erneut auszuführen. PR `#265` entfernte anschließend exakt die drei temporären Evidence-Dateien und sämtliches temporäres Wiring; Removal-Deploy `30715216900`, Build `37c31add98f0`, HTTP-Smoke erfolgreich, Browser-Smoke 26/26 OK bei 0 Fehlern und 0 Warnungen. Eine permanente Negativgrenze verbietet die Dateien sowie Marker- und Lock-Tokens. Am 2026-08-17 bestätigte ein separater read-only HTTP-Statuscheck für alle drei ehemaligen Evidence-URLs jeweils HTTP `404` bei `0` Redirects; damit ist der vollständige Evidence-Rückbau auch auf HTTP-Ebene belegt. |
 | Event-Builder-Kompatibilität | E2 | vom Control-Center-Writer erzeugte Zeitformate werden vom normalen Event-Builder verarbeitet |
+| Stripe KI-/MCP Live-Read | E6 | Getrennte Sandbox- und Live-Umgebungen sind direkt adressierbar; Live wurde read-only für Produkte, Preise, Kunden, Subscriptions, Checkout Sessions und Webhook Endpoints belegt. Die harte KI-/MCP-Safety-Grenze ist der Stripe-seitige Live-`read-only`-Scope. ChatGPT-interne Bestätigungsmodi sind nur Zusatzschutz, da ein kontrollierter Sandbox-Write nicht zuverlässig einen separaten Bestätigungsdialog erzwang. Live-Write wurde nicht getestet und bleibt als Testinstrument unzulässig. |
 | Externe Live-Writes | Grenze | keine Live-Testschreibaktion; echte Live-Admin-Mutation nur nach ausdrücklicher Freigabe und Write-Vertrag |
 
 ## Prozessnachweis
