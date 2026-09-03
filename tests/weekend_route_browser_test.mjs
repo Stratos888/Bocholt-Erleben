@@ -32,11 +32,11 @@ function absoluteUrl(baseUrl, routePath) {
 }
 
 async function waitForWeekendReady(page) {
-  await page.locator('#filter-time-value').waitFor({ state: 'visible', timeout: 12000 });
+  await page.locator('#event-cards .event-card').first().waitFor({ state: 'visible', timeout: 12000 });
   await page.waitForFunction(() => {
-    const value = document.getElementById('filter-time-value')?.textContent?.trim();
     const cards = document.querySelectorAll('#event-cards .event-card').length;
-    return value === 'Dieses Wochenende' && cards >= 1;
+    const timeKey = window.FilterModule?.filters?.zeitraum;
+    return cards >= 1 && timeKey === 'weekend';
   }, null, { timeout: 12000 });
 }
 
@@ -61,55 +61,63 @@ async function assertNoHorizontalOverflow(page, label) {
   }
 }
 
-async function assertFixedWeekendTimeContext(page, viewport) {
+async function assertWeekendRouteInvariant(page, viewport) {
   const timePill = page.locator('#filter-time-pill');
-  if (!(await timePill.isDisabled())) {
-    throw new Error(`${viewport.name}: Weekend time pill must be disabled as fixed route context`);
-  }
-  if ((await timePill.getAttribute('aria-disabled')) !== 'true') {
-    throw new Error(`${viewport.name}: Weekend time pill must expose aria-disabled=true`);
-  }
-  if (await timePill.getAttribute('aria-haspopup')) {
-    throw new Error(`${viewport.name}: fixed Weekend time context must not advertise a dialog`);
+  if (!(await timePill.isHidden())) {
+    throw new Error(`${viewport.name}: Weekend route must not render a time pill`);
   }
 
-  if (viewport.width < 900) {
-    const title = page.locator('.desktop-entry__title');
-    const lead = page.locator('.desktop-entry__text');
-    if (!(await title.isVisible())) throw new Error(`${viewport.name}: mobile Weekend H1 not visible`);
-    if (!(await lead.isVisible())) throw new Error(`${viewport.name}: mobile Weekend lead not visible`);
+  if (!(await page.locator('#sheet-time').isHidden())) {
+    throw new Error(`${viewport.name}: Weekend route must not expose the time sheet`);
+  }
+  if (!(await page.locator('#popover-time').isHidden())) {
+    throw new Error(`${viewport.name}: Weekend route must not expose the time popover`);
+  }
 
-    const titleBox = await title.boundingBox();
-    if (!titleBox || titleBox.height > 76) {
-      throw new Error(`${viewport.name}: mobile Weekend H1 is too tall (${titleBox?.height ?? 'missing'}px)`);
-    }
+  const routeState = await page.evaluate(() => ({
+    defaultTime: document.body?.dataset?.eventTimeDefault || '',
+    locked: document.body?.dataset?.eventTimeLocked || '',
+    activeTime: window.FilterModule?.filters?.zeitraum || '',
+  }));
+  if (routeState.defaultTime !== 'weekend' || routeState.locked !== 'true' || routeState.activeTime !== 'weekend') {
+    throw new Error(`${viewport.name}: Weekend route invariant mismatch ${JSON.stringify(routeState)}`);
+  }
 
-    const pillBox = await timePill.boundingBox();
-    const valueBox = await page.locator('#filter-time-value').boundingBox();
-    if (!pillBox || !valueBox) {
-      throw new Error(`${viewport.name}: Weekend time context geometry missing`);
-    }
-    if (valueBox.x < pillBox.x - 1 || valueBox.x + valueBox.width > pillBox.x + pillBox.width + 1) {
-      throw new Error(`${viewport.name}: Dieses Wochenende is clipped outside the fixed time pill`);
-    }
+  const title = page.locator('.desktop-entry__title');
+  const lead = page.locator('.desktop-entry__text');
+  const bridge = page.locator('.weekend-route-bridge__link');
+  if (!(await title.isVisible())) throw new Error(`${viewport.name}: Weekend H1 not visible`);
+  if (!(await lead.isVisible())) throw new Error(`${viewport.name}: Weekend lead not visible`);
+  if (!(await bridge.isVisible())) throw new Error(`${viewport.name}: parent navigation not visible`);
+
+  const bridgeBox = await bridge.boundingBox();
+  const titleBox = await title.boundingBox();
+  if (!bridgeBox || !titleBox || bridgeBox.y + bridgeBox.height > titleBox.y + 2) {
+    throw new Error(`${viewport.name}: parent navigation must appear before the Weekend H1`);
+  }
+
+  if (viewport.width < 900 && titleBox.height > 76) {
+    throw new Error(`${viewport.name}: mobile Weekend H1 is too tall (${titleBox.height}px)`);
+  }
+  if (viewport.width >= 900 && titleBox.height > 155) {
+    throw new Error(`${viewport.name}: desktop Weekend H1 is too tall (${titleBox.height}px)`);
+  }
+
+  const visibleSectionTitles = await page.locator('#event-cards .events-section-title:visible').count();
+  if (visibleSectionTitles !== 0) {
+    throw new Error(`${viewport.name}: Weekend feed must not repeat a visible relative-time heading`);
   }
 }
 
 async function assertInitialWeekendState(page, viewport) {
-  const timeValue = (await page.locator('#filter-time-value').textContent())?.trim();
-  if (timeValue !== 'Dieses Wochenende') {
-    throw new Error(`${viewport.name}: expected Weekend default, got ${timeValue}`);
-  }
-
   const reset = page.locator('#filter-reset-pill');
   if (!(await reset.isHidden())) {
     throw new Error(`${viewport.name}: reset X must be hidden for the route default`);
   }
 
   const bridge = page.locator('.weekend-route-bridge__link');
-  if (!(await bridge.isVisible())) throw new Error(`${viewport.name}: Alle Veranstaltungen bridge missing`);
   if ((await bridge.getAttribute('href')) !== '/events/') {
-    throw new Error(`${viewport.name}: bridge must target /events/`);
+    throw new Error(`${viewport.name}: parent navigation must target /events/`);
   }
 
   const feedText = await page.locator('#event-cards').innerText();
@@ -117,22 +125,10 @@ async function assertInitialWeekendState(page, viewport) {
     throw new Error(`${viewport.name}: Weekend fixture events missing from default feed`);
   }
   if (feedText.includes('Außerhalb Weekend Fixture')) {
-    throw new Error(`${viewport.name}: non-weekend event leaked into Weekend default feed`);
-  }
-  if (/DIESE WOCHE/i.test(feedText)) {
-    throw new Error(`${viewport.name}: Weekend default feed contains a Diese-Woche group`);
+    throw new Error(`${viewport.name}: non-weekend event leaked into Weekend feed`);
   }
 
-  if (viewport.width >= 900) {
-    const title = page.locator('.desktop-entry__title');
-    if (!(await title.isVisible())) throw new Error(`${viewport.name}: desktop Weekend H1 not visible`);
-    const box = await title.boundingBox();
-    if (!box || box.height > 155) {
-      throw new Error(`${viewport.name}: Weekend H1 is too tall (${box?.height ?? 'missing'}px)`);
-    }
-  }
-
-  await assertFixedWeekendTimeContext(page, viewport);
+  await assertWeekendRouteInvariant(page, viewport);
   await assertNoHorizontalOverflow(page, viewport.name);
 }
 
@@ -149,9 +145,9 @@ async function assertResetReturnsToRouteDefault(page, viewport) {
   await page.locator('#filter-reset-pill').click();
   await page.waitForFunction(() => {
     const searchValue = document.getElementById('search-filter')?.value || '';
-    const timeValue = document.getElementById('filter-time-value')?.textContent?.trim();
+    const timeKey = window.FilterModule?.filters?.zeitraum;
     const resetHidden = document.getElementById('filter-reset-pill')?.hidden === true;
-    return searchValue === '' && timeValue === 'Dieses Wochenende' && resetHidden;
+    return searchValue === '' && timeKey === 'weekend' && resetHidden;
   });
 
   const resetFeed = await page.locator('#event-cards').innerText();
@@ -174,16 +170,16 @@ async function assertCategoryRemainsSharedFilter(page, viewport) {
     return feed.includes('Weekend Fixture Freitag') && !feed.includes('Weekend Fixture Samstag');
   }, null, { timeout: 6000 });
 
-  const timeValue = (await page.locator('#filter-time-value').textContent())?.trim();
-  if (timeValue !== 'Dieses Wochenende') {
-    throw new Error(`${viewport.name}: category filter changed fixed Weekend time context to ${timeValue}`);
+  const timeKey = await page.evaluate(() => window.FilterModule?.filters?.zeitraum || '');
+  if (timeKey !== 'weekend') {
+    throw new Error(`${viewport.name}: category filter changed Weekend route invariant to ${timeKey}`);
   }
 
   await page.locator('#filter-reset-pill').click();
   await page.waitForFunction(() => {
     const feed = document.getElementById('event-cards')?.innerText || '';
-    const value = document.getElementById('filter-time-value')?.textContent?.trim();
-    return value === 'Dieses Wochenende' && feed.includes('Weekend Fixture Freitag') && feed.includes('Weekend Fixture Samstag');
+    const time = window.FilterModule?.filters?.zeitraum;
+    return time === 'weekend' && feed.includes('Weekend Fixture Freitag') && feed.includes('Weekend Fixture Samstag');
   }, null, { timeout: 6000 });
 }
 
@@ -209,21 +205,26 @@ async function assertSectionRootNavigation(page, baseUrl, viewport) {
   await waitForEventsRootReady(page);
 }
 
-async function assertWeekendSelectionUsesCanonicalRoute(page, baseUrl, viewport) {
+async function assertWeekendSelectionUsesCanonicalAnchor(page, baseUrl, viewport) {
   await page.goto(absoluteUrl(baseUrl, '/events/'), { waitUntil: 'domcontentloaded' });
   await waitForEventsRootReady(page);
 
   await page.locator('#filter-time-pill').click();
   const optionSelector = viewport.width >= 900
-    ? '#popover-time [data-time="weekend"]'
-    : '#sheet-time [data-time="weekend"]';
+    ? '#popover-time a[data-time-route="weekend"][href="/events/wochenende/"]'
+    : '#sheet-time a[data-time-route="weekend"][href="/events/wochenende/"]';
   const option = page.locator(optionSelector);
   await option.waitFor({ state: 'visible', timeout: 6000 });
-  await option.click();
 
+  const tagName = await option.evaluate((node) => node.tagName);
+  if (tagName !== 'A') {
+    throw new Error(`${viewport.name}: Weekend preset must be a real anchor, got ${tagName}`);
+  }
+
+  await option.click();
   await page.waitForURL((url) => url.pathname === '/events/wochenende/' && url.search === '', { timeout: 8000 });
   await waitForWeekendReady(page);
-  await assertFixedWeekendTimeContext(page, viewport);
+  await assertWeekendRouteInvariant(page, viewport);
 }
 
 async function main() {
@@ -266,7 +267,7 @@ async function main() {
         });
 
         await assertSectionRootNavigation(page, args.baseUrl, viewport);
-        await assertWeekendSelectionUsesCanonicalRoute(page, args.baseUrl, viewport);
+        await assertWeekendSelectionUsesCanonicalAnchor(page, args.baseUrl, viewport);
         await assertNoHorizontalOverflow(page, `${viewport.name}-canonical-weekend`);
 
         if (pageErrors.length) {
