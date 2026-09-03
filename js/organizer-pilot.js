@@ -126,7 +126,7 @@
   function contentStatus(status) {
     return ({
       draft: 'Zur Prüfung eingereicht', editorial_ready: 'Redaktionell vorbereitet',
-      approved: 'Veröffentlicht', rejected: 'Nicht veröffentlicht', withdrawn: 'Zurückgezogen',
+      in_review: 'In Prüfung', approved: 'Veröffentlicht', rejected: 'Nicht veröffentlicht', withdrawn: 'Zurückgezogen',
     })[status] || 'In Bearbeitung';
   }
 
@@ -440,6 +440,31 @@
     render(data, portalData, successMessage);
   }
 
+  /* === BEGIN BLOCK: ORGANIZER_PILOT_SUBMISSION_EDIT_REFRESH_V1 | Zweck: lädt den kanonischen Startpartner-Owner nach einem erfolgreich gespeicherten generischen Submission-Edit neu; Umfang: Beobachter ausschließlich für den bestehenden Edit-Erfolgsstatus im gemeinsamen Dashboard === */
+  function bindSubmissionEditRefresh() {
+    const submissionsCard = document.getElementById('organizer-dashboard-submissions-card');
+    if (!submissionsCard || submissionsCard.dataset.startpartnerEditRefreshBound === 'true') return;
+
+    submissionsCard.dataset.startpartnerEditRefreshBound = 'true';
+    const refreshAfterSuccessfulEdit = () => {
+      const success = submissionsCard.querySelector('[data-submission-edit-status][data-status-variant="success"]');
+      if (!success || success.dataset.startpartnerPilotRefreshHandled === 'true') return;
+
+      success.dataset.startpartnerPilotRefreshHandled = 'true';
+      load().catch(error => {
+        console.warn('Startpartner portal: pilot refresh after submission edit failed.', error);
+      });
+    };
+    const observer = new MutationObserver(refreshAfterSuccessfulEdit);
+    observer.observe(submissionsCard, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['data-status-variant'],
+    });
+  }
+  /* === END BLOCK: ORGANIZER_PILOT_SUBMISSION_EDIT_REFRESH_V1 === */
+
   function newClientReference() {
     return `gate4-344-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
   }
@@ -596,6 +621,7 @@
     });
   }
 
+  bindSubmissionEditRefresh();
   load().catch(error => {
     if (![401, 404].includes(error.status)) {
       card.hidden = false;

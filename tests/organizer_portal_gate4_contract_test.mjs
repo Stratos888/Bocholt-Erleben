@@ -13,7 +13,7 @@ const failures = [];
 const assert = (ok, message) => { if (!ok) failures.push(message); };
 
 assert(html.includes('organizer-dashboard-pilot-card'), 'Dashboard needs a dedicated pilot card inside the existing portal.');
-assert(html.includes('/js/organizer-pilot.js?v=2026-09-01-startpartner-premium-cockpit-v1'), 'Dashboard must cache-bust the current Startpartner premium-cockpit owner.');
+assert(html.includes('/js/organizer-pilot.js?v=2026-09-03-startpartner-review-status-sync-v1'), 'Dashboard must cache-bust the current Startpartner review-status owner.');
 assert(html.includes('/js/organizer-portal.js?v=2026-08-28-phase-a-single-status-repair-v1'), 'Dashboard must cache-bust the corrected organizer portal renderer.');
 assert(fixture.includes('<main class="page page--organizers" data-organizer-page="dashboard">'), 'Synthetic partner evidence must use the real organizer dashboard page shell.');
 assert(fixture.includes('class="content-card content-card--primary" id="organizer-dashboard-pilot-card"'), 'Synthetic partner evidence must use the real dashboard pilot-card primitives.');
@@ -55,7 +55,8 @@ assert(!js.includes('<dt>Freigegebene Inhalte</dt>'), 'Pilotdetails must not dup
 assert(js.includes('form.reset(); sync();'), 'Form reset must immediately restore event-date visibility and validation.');
 assert(js.includes('await load(`Einreichung'), 'Successful submissions must refresh the canonical portal state.');
 assert(js.includes('contentStatus'), 'Portal must translate internal content states.');
-assert(js.includes("approved: 'Veröffentlicht'") && js.includes("rejected: 'Nicht veröffentlicht'"), 'Published-content labels must use clear partner language.');
+assert(js.includes("in_review: 'In Prüfung'") && js.includes("approved: 'Veröffentlicht'") && js.includes("rejected: 'Nicht veröffentlicht'"), 'Published and re-review content labels must use clear partner language.');
+assert(js.includes('new MutationObserver(refreshAfterSuccessfulEdit)') && js.includes('[data-submission-edit-status][data-status-variant="success"]') && js.includes('startpartnerPilotRefreshHandled'), 'A successful generic submission edit must refresh the canonical Startpartner owner without a page reload.');
 assert(!js.includes('phaseBadge') && !js.includes('organizer-status-badge'), 'Partner portal must not repeat the phase with a redundant status badge.');
 assert(!js.includes('Event-Limit erreicht') && !js.includes('Pilotverbrauch') && !js.includes('Pilotumfang und Laufzeit'), 'Partner portal must not regress to old technical or status-document wording.');
 assert(!js.includes('Reichweitenbeitrag ist fällig') && !js.includes('belastbare Nutzungsbewertung'), 'Partner default must not expose operational distribution or no-data measurement copy.');
@@ -77,6 +78,8 @@ assert(!pilotApi.includes("'candidate'=>$candidate") && !pilotApi.includes("'can
 assert(!pilotApi.includes('portal_session_id'), 'Portal API must not expose the internal session identifier.');
 assert(!pilotApi.includes('error_message'), 'Portal API must not leak internal exception messages.');
 assert(projection.includes('function be_startpartner_gate4_portal_projection'), 'Canonical projection owner must contain the portal projection.');
+assert(projection.includes('function be_startpartner_gate4_partner_content_status') && projection.includes("['pending_review', 'paid', 'in_review']"), 'Partner portal projection must overlay the current submission review state without mutating pilot approval history.');
+assert(projection.includes("'status' => be_startpartner_gate4_partner_content_status($row)"), 'Partner content status must come from the review-aware projection helper.');
 assert(projection.includes("'limits' => $safeLimits") && projection.includes("'measurement' => $safeMeasurement") && projection.includes("'distribution' => $safeDistribution"), 'Portal lifecycle fields must use minimized projections.');
 const portalProjection = projection.slice(projection.indexOf('function be_startpartner_gate4_portal_projection'));
 for (const forbidden of ['capacity', 'measurement_preflights', 'distribution_commitments', 'events', 'audit_json', 'evidence_json', 'operator_reference', 'error_message', 'reporting_target_id']) {
