@@ -62,6 +62,8 @@ for required in (
     'id="filter-category-pill"',
     'id="event-cards"',
     'id="event-detail-panel"',
+    'id="desktop-section-nav-root"',
+    'id="bottom-tabbar-root"',
     'src="/js/events.js',
     'src="/js/filter.js',
     'src="/js/main.js',
@@ -70,9 +72,7 @@ for required in (
 assert "content-hero content-hero--panel" not in weekend
 assert 'data-event-time-default="weekend"' in weekend
 assert 'data-event-time-locked="true"' in weekend
-assert 'class="weekend-route-bridge__link" href="/events/"' in weekend
-assert "Alle Veranstaltungen" in weekend
-assert weekend.index("weekend-route-bridge") < weekend.index("<h1")
+assert "weekend-route-bridge" not in weekend
 
 # No user-facing time selector remains on the Weekend landing page. The two
 # hidden nodes are only the minimum compatibility host required by the shared
@@ -113,6 +113,7 @@ weekend_css = weekend_css_path.read_text()
 assert "body.page-route-events-weekend #filter-time-pill" in weekend_css
 assert "display: none !important" in weekend_css
 assert "body.page-route-events-weekend .events-section-title" in weekend_css
+assert "weekend-route-bridge" not in weekend_css
 
 home, home_page = parse("index.html")
 events, events_page = parse("events/index.html")
@@ -122,7 +123,7 @@ activities, _ = parse("aktivitaeten/index.html")
 # section pages is owned centrally by the shared shell instead of duplicated
 # inline links in every page template.
 assert '/events/' in home and '/aktivitaeten/' in home
-for section in (events, activities):
+for section in (events, activities, weekend):
     assert 'id="desktop-section-nav-root"' in section
     assert 'id="bottom-tabbar-root"' in section
 assert 'href: EVENTS_ROOT_PATH' in nav_js

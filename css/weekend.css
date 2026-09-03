@@ -1,4 +1,4 @@
-/* === BEGIN BLOCK: WEEKEND_ROUTE_PRESENTATION_V4 | Zweck: finalisiert /events/wochenende/ als ruhige Unterroute des zentralen Event-Hubs: Parent-Link vor H1, kein sichtbarer Zeitfilter, flacher Weekend-Feed und passende Ein-Filter-Geometrie; Umfang: page-route-events-weekend plus die beiden echten Weekend-Routenlinks im allgemeinen Zeitfilter === */
+/* === BEGIN BLOCK: WEEKEND_ROUTE_PRESENTATION_V5 | Zweck: finalisiert /events/wochenende/ als ruhige Unterroute des zentralen Event-Hubs ohne redundante Parent-Navigation: kein sichtbarer Zeitfilter, flacher Weekend-Feed und passende Ein-Filter-Geometrie; Umfang: page-route-events-weekend plus die beiden echten Weekend-Routenlinks im allgemeinen Zeitfilter === */
 
 /* Echte Route-Links im normalen /events/-Zeitfilter behalten die bestehende
    Choice-Optik, sind aber semantisch Links statt JS-abgefangene Buttons. */
@@ -52,57 +52,6 @@
   }
 }
 
-/* Parent-Navigation ist Bestandteil der Hero-Copy und keine Feed-Aktion. */
-.weekend-route-bridge{
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-width: 0;
-  margin: 0 0 5px;
-}
-
-.weekend-route-bridge__link{
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 32px;
-  padding: 0;
-  color: color-mix(in srgb, var(--home-copy-strong) 86%, var(--brand-green-700) 14%);
-  font-size: 0.82rem;
-  font-weight: 740;
-  line-height: 1.2;
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.weekend-route-bridge__link:visited{
-  color: color-mix(in srgb, var(--home-copy-strong) 86%, var(--brand-green-700) 14%);
-}
-
-.weekend-route-bridge__link:hover{
-  color: var(--home-copy-contrast);
-  text-decoration: none;
-}
-
-.weekend-route-bridge__link:focus-visible{
-  outline: 2px solid var(--cmp-focus-ring-brand);
-  outline-offset: 3px;
-  border-radius: 6px;
-}
-
-.weekend-route-bridge__icon{
-  --ui-icon-size: 14px;
-  --ui-icon-stroke: var(--ui-icon-stroke-sm);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 14px;
-  height: 14px;
-  flex: 0 0 auto;
-  order: -1;
-  transform: rotate(180deg);
-}
-
 /* Der Zeitraum ist Route-Invariant. Das generische Contract-Markup bleibt für
    den gemeinsamen Filter-Owner inert im DOM, wird aber niemals gerendert. */
 body.page-route-events-weekend #filter-time-pill{
@@ -138,15 +87,6 @@ body.page-route-events-weekend .events-feed-group{
 
   body.page-route-events-weekend .desktop-entry__text{
     max-width: 31rem;
-  }
-
-  body.page-route-events-weekend .weekend-route-bridge{
-    margin-bottom: 6px;
-  }
-
-  body.page-route-events-weekend .weekend-route-bridge__link{
-    min-height: 30px;
-    font-size: 0.8rem;
   }
 
   /* Weekend hat genau einen nutzerseitigen Filter. Der Selektor spiegelt den
@@ -217,15 +157,6 @@ body.page-route-events-weekend .events-feed-group{
     gap: 4px;
   }
 
-  body.page-route-events-weekend .weekend-route-bridge{
-    margin-bottom: 2px;
-  }
-
-  body.page-route-events-weekend .weekend-route-bridge__link{
-    min-height: 28px;
-    font-size: 0.79rem;
-  }
-
   body.page-route-events-weekend .desktop-entry__title{
     max-width: 22rem;
     margin: 0;
@@ -268,4 +199,4 @@ body.page-route-events-weekend .events-feed-group{
   }
 }
 
-/* === END BLOCK: WEEKEND_ROUTE_PRESENTATION_V4 === */
+/* === END BLOCK: WEEKEND_ROUTE_PRESENTATION_V5 === */
