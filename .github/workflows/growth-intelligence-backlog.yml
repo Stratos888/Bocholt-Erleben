@@ -85,6 +85,7 @@ jobs:
           export GSC_SITE_URL="${GSC_SITE_URL:-${SEARCH_METRICS_GOOGLE_SITE_URL:-}}"
           python - <<'PY'
           import json
+          import os
           from pathlib import Path
           import runpy
           import sys
@@ -94,6 +95,7 @@ jobs:
               sys.path.insert(0, str(scripts_dir))
 
           from content_coverage_metrics import augment_growth_summary, build_portfolio_coverage
+          from gsc_history_snapshot import persist_gsc_snapshot
 
           summary_path = Path("data/growth-intelligence-summary.json")
           ns = runpy.run_path(
@@ -105,6 +107,8 @@ jobs:
 
           captured = {
               "gsc_rows": [],
+              "gsc_status": "not_run",
+              "gsc_error": "",
               "ga4_rows": [],
               "value_rows": [],
               "event_sheet_rows": [],
@@ -115,8 +119,14 @@ jobs:
           original_values_get = runtime["values_get"]
 
           def observed_fetch_gsc(*args, **kwargs):
-              rows = original_fetch_gsc(*args, **kwargs)
+              try:
+                  rows = original_fetch_gsc(*args, **kwargs)
+              except Exception as exc:
+                  captured["gsc_status"] = "error"
+                  captured["gsc_error"] = f"{type(exc).__name__}: {exc}"
+                  raise
               captured["gsc_rows"] = rows
+              captured["gsc_status"] = "ok"
               return rows
 
           def observed_fetch_ga4(*args, **kwargs):
@@ -140,6 +150,31 @@ jobs:
           runtime["fetch_value_metrics"] = observed_fetch_value_metrics
           runtime["values_get"] = observed_values_get
           runtime["main"]()
+
+          summary_payload = json.loads(summary_path.read_text(encoding="utf-8"))
+          if captured["gsc_status"] == "error":
+              gsc_history_snapshot = {
+                  "status": "skipped",
+                  "diagnostic": f"Query-page GSC read failed; complete snapshot not persisted: {captured['gsc_error']}",
+                  "additional_gsc_calls": 0,
+                  "query_page_rows": 0,
+              }
+          else:
+              creds = runtime["parse_sa"]()
+              gsc_history_snapshot = persist_gsc_snapshot(
+                  gsc_rows=captured["gsc_rows"],
+                  search_console=runtime["service"]("searchconsole", "v1", creds),
+                  sheets=runtime["service"]("sheets", "v4", creds),
+                  spreadsheet_id=os.environ["BE_SHEET_ID"],
+                  site_url=os.environ.get("GSC_SITE_URL", ""),
+                  period_start=str(summary_payload.get("period_start", "")),
+                  period_end=str(summary_payload.get("period_end", "")),
+                  captured_at=str(summary_payload.get("generated_at", "")),
+                  ensure_sheet=runtime["ensure_sheet"],
+                  append_records=runtime["append_records"],
+              )
+          summary_payload["gsc_history_snapshot"] = gsc_history_snapshot
+          summary_path.write_text(json.dumps(summary_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
           offers_path = Path("data/offers.json")
           targets_path = Path("data/event_coverage_targets.json")
@@ -168,6 +203,11 @@ jobs:
           print(f"- additional_web_search_calls: {coverage['cost']['additional_web_search_calls']}")
           print(f"- additional_gsc_calls: {coverage['cost']['additional_gsc_calls']}")
           print(f"- additional_ga4_calls: {coverage['cost']['additional_ga4_calls']}")
+          print("GSC HISTORY SNAPSHOT")
+          print(f"- status: {gsc_history_snapshot.get('status', '')}")
+          print(f"- snapshot_id: {gsc_history_snapshot.get('snapshot_id', '')}")
+          print(f"- query_page_rows: {gsc_history_snapshot.get('query_page_rows', 0)}")
+          print(f"- additional_gsc_calls: {gsc_history_snapshot.get('additional_gsc_calls', 0)}")
           PY
 
       # === BEGIN BLOCK: CONTENT_OPS_RECORD_GROWTH_IMPACT_V1 | Zweck: persistiert Growth-/Acquisition-Signale in der gemeinsamen Verwaltungs-Metrikschicht; Umfang: keine Aenderung an Backlog-Erzeugung ===

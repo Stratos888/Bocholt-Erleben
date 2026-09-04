@@ -146,6 +146,7 @@ validate_repository() {
   python3 tests/test_event_builder_control_center_contract.py
   python3 tests/test_event_identity.py
   python3 tests/test_content_coverage_metrics.py
+  python3 tests/test_gsc_history_snapshot.py
   node tests/neutral-selection.test.mjs
   node tests/static-render-fixture.test.mjs
   python3 tests/test_seo_static_contract.py
