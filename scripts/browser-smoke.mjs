@@ -350,13 +350,32 @@ async function checkEventCardNavigation(page, baseUrl, profileName, timeoutMs) {
   await internalTitleLink.waitFor({ state: 'attached', timeout: timeoutMs });
   const internalTarget = await internalTitleLink.getAttribute('href');
   const resolvedInternalTarget = internalTarget ? new URL(internalTarget, `${baseUrl}/`) : null;
-  const expectedDetailPath = '/events/du-wunderst-mich-kinderzaubershow-endrik-thier-2099-09-27/';
+  const cardEventId = await card.getAttribute('data-item-id');
+  if (!cardEventId) {
+    throw new Error('Eventkarte besitzt keine data-item-id für den kanonischen Linkvertrag.');
+  }
+  const expectedDetailPath = await page.evaluate(async (eventId) => {
+    const response = await fetch(`/data/events.json?browser_smoke=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Event-Feed für Linkvertrag nicht lesbar: HTTP ${response.status}`);
+    }
+    const events = await response.json();
+    const event = Array.isArray(events)
+      ? events.find((item) => String(item?.id || '') === String(eventId || ''))
+      : null;
+    return String(event?.detail_path || event?.detailPath || '');
+  }, cardEventId);
+  if (!expectedDetailPath.startsWith('/events/') || !expectedDetailPath.endsWith('/')) {
+    throw new Error(`Event-Feed besitzt keinen kanonischen detail_path für ${cardEventId}: ${expectedDetailPath || 'leer'}`);
+  }
   if (
     !resolvedInternalTarget ||
     resolvedInternalTarget.origin !== new URL(baseUrl).origin ||
     resolvedInternalTarget.pathname !== expectedDetailPath
   ) {
-    throw new Error(`Eventtitel besitzt keinen kanonischen internen Detail-Link: ${internalTarget || 'leer'}`);
+    throw new Error(
+      `Eventtitel besitzt nicht den kanonischen internen Detail-Link: href=${internalTarget || 'leer'}, erwartet=${expectedDetailPath}`
+    );
   }
   if (await internalTitleLink.getAttribute('tabindex') !== '-1') {
     throw new Error('Der kanonische Eventtitel-Link darf den bestehenden Karten-Tabvertrag nicht erweitern.');
