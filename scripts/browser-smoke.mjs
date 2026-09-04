@@ -350,23 +350,26 @@ async function checkEventCardNavigation(page, baseUrl, profileName, timeoutMs) {
   await internalTitleLink.waitFor({ state: 'attached', timeout: timeoutMs });
   const internalTarget = await internalTitleLink.getAttribute('href');
   const resolvedInternalTarget = internalTarget ? new URL(internalTarget, `${baseUrl}/`) : null;
-  const cardEventId = await card.getAttribute('data-item-id');
-  if (!cardEventId) {
-    throw new Error('Eventkarte besitzt keine data-item-id für den kanonischen Linkvertrag.');
+  const internalTitle = String(await internalTitleLink.innerText()).trim();
+  if (!internalTitle) {
+    throw new Error('Eventtitel-Link besitzt keinen lesbaren Titel für den kanonischen Linkvertrag.');
   }
-  const expectedDetailPath = await page.evaluate(async (eventId) => {
+  const expectedDetailPath = await page.evaluate(async (title) => {
     const response = await fetch(`/data/events.json?browser_smoke=${Date.now()}`, { cache: 'no-store' });
     if (!response.ok) {
       throw new Error(`Event-Feed für Linkvertrag nicht lesbar: HTTP ${response.status}`);
     }
     const events = await response.json();
-    const event = Array.isArray(events)
-      ? events.find((item) => String(item?.id || '') === String(eventId || ''))
-      : null;
-    return String(event?.detail_path || event?.detailPath || '');
-  }, cardEventId);
+    const matches = Array.isArray(events)
+      ? events.filter((item) => String(item?.title || '').trim() === String(title || '').trim())
+      : [];
+    if (matches.length !== 1) {
+      throw new Error(`Eventtitel ist im generierten Feed nicht eindeutig: ${title} (${matches.length} Treffer)`);
+    }
+    return String(matches[0]?.detail_path || matches[0]?.detailPath || '');
+  }, internalTitle);
   if (!expectedDetailPath.startsWith('/events/') || !expectedDetailPath.endsWith('/')) {
-    throw new Error(`Event-Feed besitzt keinen kanonischen detail_path für ${cardEventId}: ${expectedDetailPath || 'leer'}`);
+    throw new Error(`Event-Feed besitzt keinen kanonischen detail_path für ${internalTitle}: ${expectedDetailPath || 'leer'}`);
   }
   if (
     !resolvedInternalTarget ||
