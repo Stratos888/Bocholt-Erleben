@@ -350,13 +350,35 @@ async function checkEventCardNavigation(page, baseUrl, profileName, timeoutMs) {
   await internalTitleLink.waitFor({ state: 'attached', timeout: timeoutMs });
   const internalTarget = await internalTitleLink.getAttribute('href');
   const resolvedInternalTarget = internalTarget ? new URL(internalTarget, `${baseUrl}/`) : null;
-  const expectedDetailPath = '/events/du-wunderst-mich-kinderzaubershow-endrik-thier-2099-09-27/';
+  const internalTitle = String(await internalTitleLink.innerText()).trim();
+  if (!internalTitle) {
+    throw new Error('Eventtitel-Link besitzt keinen lesbaren Titel für den kanonischen Linkvertrag.');
+  }
+  const expectedDetailPath = await page.evaluate(async (title) => {
+    const response = await fetch(`/data/events.json?browser_smoke=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Event-Feed für Linkvertrag nicht lesbar: HTTP ${response.status}`);
+    }
+    const events = await response.json();
+    const matches = Array.isArray(events)
+      ? events.filter((item) => String(item?.title || '').trim() === String(title || '').trim())
+      : [];
+    if (matches.length !== 1) {
+      throw new Error(`Eventtitel ist im generierten Feed nicht eindeutig: ${title} (${matches.length} Treffer)`);
+    }
+    return String(matches[0]?.detail_path || matches[0]?.detailPath || '');
+  }, internalTitle);
+  if (!expectedDetailPath.startsWith('/events/') || !expectedDetailPath.endsWith('/')) {
+    throw new Error(`Event-Feed besitzt keinen kanonischen detail_path für ${internalTitle}: ${expectedDetailPath || 'leer'}`);
+  }
   if (
     !resolvedInternalTarget ||
     resolvedInternalTarget.origin !== new URL(baseUrl).origin ||
     resolvedInternalTarget.pathname !== expectedDetailPath
   ) {
-    throw new Error(`Eventtitel besitzt keinen kanonischen internen Detail-Link: ${internalTarget || 'leer'}`);
+    throw new Error(
+      `Eventtitel besitzt nicht den kanonischen internen Detail-Link: href=${internalTarget || 'leer'}, erwartet=${expectedDetailPath}`
+    );
   }
   if (await internalTitleLink.getAttribute('tabindex') !== '-1') {
     throw new Error('Der kanonische Eventtitel-Link darf den bestehenden Karten-Tabvertrag nicht erweitern.');
