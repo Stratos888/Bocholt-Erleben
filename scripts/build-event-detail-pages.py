@@ -16,10 +16,11 @@ import re
 import shutil
 import unicodedata
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, time as datetime_time, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
-from event_public_contract import build_offer_schema, normalize_public_event, numeric_price, public_http_url, schema_eligible
+from zoneinfo import ZoneInfo
+from event_public_contract import build_offer_schema, normalize_public_event, numeric_price, public_http_url
 
 ROOT = Path(__file__).resolve().parents[1]
 EVENTS_JSON = ROOT / "data" / "events.json"
@@ -34,6 +35,14 @@ DETAIL_PAGE_CSS_VERSION = "2026-07-03-event-detail-scroll-share-v1"
 
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RE_TIME = re.compile(r"\b(\d{1,2})[:.](\d{2})\b")
+RE_TIME_RANGE = re.compile(r"\b(\d{1,2})[:.](\d{2})\s*[-–]\s*(\d{1,2})[:.](\d{2})\b")
+RE_STREET_TRAILING_NUMBER = re.compile(r".*[A-Za-zÄÖÜäöüß].*\s\d+[A-Za-z]?(?:[-/]\d+[A-Za-z]?)?\s*$")
+DEFAULT_EVENT_IMAGE_SRC = "/assets/event-visuals/default-city-02-16x9.webp"
+NL_EVENT_CITIES = {"aalten", "bredevoort", "dinxperlo"}
+DE_EVENT_CITIES = {
+    "anholt", "bocholt", "borken", "dingden", "hamminkeln", "isselburg",
+    "kiel", "rees", "rhede",
+}
 
 
 @dataclass(frozen=True)
@@ -134,22 +143,74 @@ def format_date_long(value: str) -> str:
     return f"{weekdays[parsed.weekday()]}, {parsed.day}. {months[parsed.month - 1]} {parsed.year}"
 
 
+def valid_clock(hour: int, minute: int) -> bool:
+    return 0 <= hour <= 23 and 0 <= minute <= 59
+
+
 def extract_time(value: str) -> str:
     match = RE_TIME.search(normalize_text(value))
     if not match:
         return ""
-    return f"{int(match.group(1)):02d}:{match.group(2)}"
+    hour, minute = int(match.group(1)), int(match.group(2))
+    if not valid_clock(hour, minute):
+        return ""
+    return f"{hour:02d}:{minute:02d}"
+
+
+def extract_time_range(value: str) -> Optional[tuple[tuple[int, int], tuple[int, int]]]:
+    match = RE_TIME_RANGE.search(normalize_text(value))
+    if not match:
+        return None
+    start = (int(match.group(1)), int(match.group(2)))
+    end = (int(match.group(3)), int(match.group(4)))
+    if not valid_clock(*start) or not valid_clock(*end):
+        return None
+    return start, end
+
+
+def event_timezone(event: DetailEvent) -> ZoneInfo:
+    city = normalize_text(event.city).casefold()
+    return ZoneInfo("Europe/Amsterdam" if city in NL_EVENT_CITIES else "Europe/Berlin")
+
+
+def local_datetime_iso(day: date, clock: tuple[int, int], event: DetailEvent) -> str:
+    aware = datetime.combine(day, datetime_time(clock[0], clock[1]), tzinfo=event_timezone(event))
+    return aware.isoformat(timespec="seconds")
 
 
 def build_start_date(event: DetailEvent) -> str:
+    event_day = parse_iso_date(event.date)
+    if not event_day:
+        return event.date
+    time_range = extract_time_range(event.time)
+    if time_range:
+        return local_datetime_iso(event_day, time_range[0], event)
     start_time = extract_time(event.time)
-    if start_time:
-        return f"{event.date}T{start_time}:00+02:00"
-    return event.date
+    if not start_time:
+        return event.date
+    hour, minute = (int(part) for part in start_time.split(":"))
+    return local_datetime_iso(event_day, (hour, minute), event)
 
 
 def build_end_date(event: DetailEvent) -> str:
-    return event.end_date or event.date
+    start_day = parse_iso_date(event.date)
+    explicit_end_day = parse_iso_date(event.end_date)
+    time_range = extract_time_range(event.time)
+
+    if start_day and time_range:
+        start_clock, end_clock = time_range
+        end_day = explicit_end_day or start_day
+        if explicit_end_day is None and end_clock <= start_clock:
+            end_day += timedelta(days=1)
+        return local_datetime_iso(end_day, end_clock, event)
+
+    if explicit_end_day:
+        return event.end_date
+
+    if not extract_time(event.time):
+        return event.date
+
+    return ""
 
 
 def truncate(value: str, limit: int) -> str:
@@ -319,7 +380,7 @@ def choose_visual(raw: Dict[str, Any], visual_index: Dict[str, List[Dict[str, st
         selected = (fallback or pool)[0]
         return selected["src"], selected.get("alt") or ""
 
-    return "/assets/event-visuals/default-city-02-16x9.webp", "Symbolisches Stadtmotiv für Bocholt erleben"
+    return DEFAULT_EVENT_IMAGE_SRC, "Symbolisches Stadtmotiv für Bocholt erleben"
 
 
 def build_detail_event(raw: Dict[str, Any], is_past: bool, noindex: bool, visual_index: Dict[str, List[Dict[str, str]]]) -> Optional[DetailEvent]:
@@ -431,23 +492,86 @@ def event_place_line(event: DetailEvent) -> str:
     return location or city
 
 
+def schema_country_code(city: str) -> str:
+    key = normalize_text(city).casefold()
+    if key in NL_EVENT_CITIES:
+        return "NL"
+    if key in DE_EVENT_CITIES:
+        return "DE"
+    return ""
+
+
+def schema_street_address(location: str) -> str:
+    for part in (normalize_text(value) for value in normalize_text(location).split(",")):
+        if part and RE_STREET_TRAILING_NUMBER.fullmatch(part):
+            return part
+    return ""
+
+
+def schema_place_name(event: DetailEvent) -> str:
+    location = normalize_text(event.location)
+    city = normalize_text(event.city)
+    if not location or location.casefold() == city.casefold():
+        return ""
+    first = normalize_text(location.split(",", 1)[0])
+    if not first or first.casefold() == city.casefold():
+        return ""
+    if RE_STREET_TRAILING_NUMBER.fullmatch(first):
+        return ""
+    return first
+
+
+def schema_location(event: DetailEvent) -> Dict[str, Any]:
+    address: Dict[str, Any] = {"@type": "PostalAddress"}
+    street = schema_street_address(event.location)
+    if street:
+        address["streetAddress"] = street
+    if event.city:
+        address["addressLocality"] = event.city
+    country = schema_country_code(event.city)
+    if country:
+        address["addressCountry"] = country
+
+    location: Dict[str, Any] = {"@type": "Place", "address": address}
+    place_name = schema_place_name(event)
+    if place_name:
+        location["name"] = place_name
+    return location
+
+
+def schema_image_url(event: DetailEvent) -> str:
+    image_src = normalize_text(event.image_src)
+    if not image_src or image_src == DEFAULT_EVENT_IMAGE_SRC:
+        return ""
+    return absolute_url(image_src)
+
+
+def event_schema_eligible(event: DetailEvent) -> bool:
+    return bool(
+        not event.noindex
+        and normalize_text(event.title)
+        and parse_iso_date(event.date)
+        and (normalize_text(event.location) or normalize_text(event.city))
+    )
+
+
 def json_ld(event: DetailEvent) -> str:
     payload: Dict[str, Any] = {
         "@context": "https://schema.org",
         "@type": "Event",
         "name": event.title,
         "startDate": build_start_date(event),
-        "endDate": build_end_date(event),
         "eventStatus": "https://schema.org/EventScheduled",
         "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
         "url": event.detail_url,
-        "image": [absolute_url(event.image_src)] if event.image_src else [],
-        "location": {
-            "@type": "Place",
-            "name": event.location or event.city,
-            "address": " · ".join(part for part in [event.location, event.city] if part),
-        },
+        "location": schema_location(event),
     }
+    end_date = build_end_date(event)
+    if end_date:
+        payload["endDate"] = end_date
+    image_url = schema_image_url(event)
+    if image_url:
+        payload["image"] = [image_url]
     if event.description:
         payload["description"] = truncate(event.description, 280)
     offers = build_offer_schema(event.public)
@@ -597,7 +721,7 @@ def render_page(event: DetailEvent) -> str:
     """
 
     schema_html = ""
-    if schema_eligible(event.public):
+    if event_schema_eligible(event):
         schema_html = f'<script type="application/ld+json">\n{json_ld(event)}\n</script>'
 
     return f"""<!DOCTYPE html>
