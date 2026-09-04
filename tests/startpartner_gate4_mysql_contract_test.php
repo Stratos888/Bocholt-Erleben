@@ -139,9 +139,36 @@ SQL);
   $assert($before===$after,'Locked subscription and regular entitlement owners must remain unchanged.');
   $replay=be_startpartner_gate4_activate($pdo,$candidate,['activation_date_local'=>$activationDate,'operation_id'=>$activated['operation_id'],'operator_name'=>'Contract','expected_revision'=>$cr-1,'expected_pilot_revision'=>$pr-1]);
   $assert($replay['idempotent_replay']===true,'Activation retry must replay.');
+
+  $assert((int)$pdo->query("SELECT COUNT(*) FROM submission_publication_snapshots")->fetchColumn()===1,'First activation must create the general publication snapshot.');
+  $usageCount=(int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_usages")->fetchColumn();
+  $linkIdBefore=(string)$pdo->query("SELECT id FROM startpartner_pilot_content_links WHERE id=".$pdo->quote($contentId))->fetchColumn();
+  $exec("UPDATE submissions SET title='Private event revision',description_text='Must not leak',status='in_review' WHERE id=(SELECT submission_id FROM startpartner_pilot_content_links WHERE id=:id)",['id'=>$contentId]);
+  $oldTitle=(string)$pdo->query("SELECT title FROM submission_publication_snapshots WHERE submission_id=(SELECT submission_id FROM startpartner_pilot_content_links WHERE id=".$pdo->quote($contentId).")")->fetchColumn();
+  $assert($oldTitle==='Gate 4 Testevent','Event organizer revision must not leak into the public snapshot.');
+  $revisionState=be_startpartner_gate4_candidate_detail($pdo,$candidate);
+  $assert(($revisionState['gate4']['next_action']['code']??'')==='content_reapproval','Approved event revision must expose content_reapproval.');
+  $mutate('be_startpartner_gate4_approve_content',['content_link_id'=>$contentId]);
+  $assert((int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_usages")->fetchColumn()===$usageCount,'Event re-approval must not create a second usage.');
+  $assert((string)$pdo->query("SELECT id FROM startpartner_pilot_content_links WHERE id=".$pdo->quote($contentId))->fetchColumn()===$linkIdBefore,'Event re-approval must retain content-link identity.');
+  $assert((string)$pdo->query("SELECT title FROM submission_publication_snapshots WHERE submission_id=(SELECT submission_id FROM startpartner_pilot_content_links WHERE id=".$pdo->quote($contentId).")")->fetchColumn()==='Private event revision','Event re-approval must replace the snapshot.');
+  $exec("UPDATE submissions SET title='Rejected event revision',status='in_review' WHERE id=(SELECT submission_id FROM startpartner_pilot_content_links WHERE id=:id)",['id'=>$contentId]);
+  $mutate('be_startpartner_gate4_reject_content',['content_link_id'=>$contentId]);
+  $assert((string)$pdo->query("SELECT status FROM startpartner_pilot_content_links WHERE id=".$pdo->quote($contentId))->fetchColumn()==='approved','Rejecting an event revision must retain the approved link.');
+  $assert((string)$pdo->query("SELECT title FROM submission_publication_snapshots WHERE submission_id=(SELECT submission_id FROM startpartner_pilot_content_links WHERE id=".$pdo->quote($contentId).")")->fetchColumn()==='Private event revision','Rejecting an event revision must retain its last snapshot.');
+
+  $activityContentId=(string)$activityCreated['content_link']['id'];
+  $mutate('be_startpartner_gate4_mark_content_ready',['content_link_id'=>$activityContentId]);
+  $mutate('be_startpartner_gate4_approve_content',['content_link_id'=>$activityContentId]);
+  $activityUsageCount=(int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_usages WHERE content_type='activity'")->fetchColumn();
+  $exec("UPDATE submissions SET title='Private activity revision',status='in_review' WHERE id=:id",['id'=>$activitySubmission]);
+  $assert((string)$pdo->query("SELECT title FROM submission_publication_snapshots WHERE submission_id={$activitySubmission}")->fetchColumn()==='Gate 4 Testaktivität','Activity organizer revision must not leak into the public snapshot.');
+  $mutate('be_startpartner_gate4_approve_content',['content_link_id'=>$activityContentId]);
+  $assert((int)$pdo->query("SELECT COUNT(*) FROM startpartner_pilot_usages WHERE content_type='activity'")->fetchColumn()===$activityUsageCount,'Activity re-approval must not consume concurrent capacity again.');
+  $assert((string)$pdo->query("SELECT title FROM submission_publication_snapshots WHERE submission_id={$activitySubmission}")->fetchColumn()==='Private activity revision','Activity re-approval must replace the snapshot.');
 }catch(Throwable $error){$failures[]=$error::class.': '.$error->getMessage();}
 $pdo->exec('SET FOREIGN_KEY_CHECKS=0');
-foreach(['startpartner_candidate_operations','startpartner_pilot_events','startpartner_pilot_usages','startpartner_pilot_measurement_preflights','startpartner_pilot_distribution_commitments','startpartner_pilot_onboarding_items','startpartner_pilot_content_links','organizer_portal_sessions','submissions','startpartner_pilot_entitlements','startpartner_pilot_scopes','startpartner_pilots','startpartner_pilot_terms_acceptances','startpartner_candidate_reservations','startpartner_candidate_decisions','startpartner_candidate_contacts','control_case_events','control_cases','startpartner_candidates','organizers','value_metric_daily'] as $table){$pdo->exec("DELETE FROM {$table}");}
+foreach(['startpartner_candidate_operations','startpartner_pilot_events','startpartner_pilot_usages','startpartner_pilot_measurement_preflights','startpartner_pilot_distribution_commitments','startpartner_pilot_onboarding_items','startpartner_pilot_content_links','submission_publication_snapshots','organizer_portal_sessions','submissions','startpartner_pilot_entitlements','startpartner_pilot_scopes','startpartner_pilots','startpartner_pilot_terms_acceptances','startpartner_candidate_reservations','startpartner_candidate_decisions','startpartner_candidate_contacts','control_case_events','control_cases','startpartner_candidates','organizers','value_metric_daily'] as $table){$pdo->exec("DELETE FROM {$table}");}
 $pdo->exec('SET FOREIGN_KEY_CHECKS=1');
 $assert((int)$pdo->query('SELECT COUNT(*) FROM startpartner_candidates')->fetchColumn()===0,'Cleanup must leave zero candidate residue.');
 $assert((int)be_startpartner_gate4_capacity($pdo)['occupied_slots']===0,'Cleanup must leave capacity zero.');

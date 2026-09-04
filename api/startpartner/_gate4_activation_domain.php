@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once dirname(__DIR__) . '/submissions/_publication_snapshot.php';
+
 function be_startpartner_gate4_activate(PDO $pdo, string $candidateId, array $input): array
 {
     return be_startpartner_gate4_run_operation(
@@ -84,6 +86,7 @@ function be_startpartner_gate4_activate(PDO $pdo, string $candidateId, array $in
             if ($submission->rowCount() !== 1) {
                 throw new DomainException('First pilot submission could not be approved atomically.');
             }
+            be_replace_submission_publication_snapshot($pdo, (int)$content['submission_id']);
             $contentUpdate = $pdo->prepare(
                 "UPDATE startpartner_pilot_content_links
                  SET status = 'approved', approved_at = CURRENT_TIMESTAMP

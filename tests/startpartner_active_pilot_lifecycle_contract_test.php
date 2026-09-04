@@ -86,7 +86,7 @@ $assert(!str_contains($schema, "'terminated'"), 'Terminated pilots must not occu
 
 $manifestData = json_decode($manifest, true, 512, JSON_THROW_ON_ERROR);
 $migrationKeys = array_map(static fn(array $row): string => (string)$row['key'], (array)($manifestData['migrations'] ?? []));
-$assert(!array_filter($migrationKeys, static fn(string $key): bool => str_starts_with($key, '013')), 'Lifecycle workpack must not introduce migration 013.');
+$assert(count(array_filter($migrationKeys, static fn(string $key): bool => $key === '013_submission_publication_snapshots')) === 1, 'Publication integrity must register migration 013 exactly once.');
 
 $domain = $lifecycle . "\n" . $state . "\n" . $portal . "\n" . $projection;
 foreach (['stripe_checkout', 'stripe_subscription', 'be_send_mail', 'publication_consumptions', 'INSERT INTO publication_entitlements', 'UPDATE publication_entitlements'] as $forbidden) {

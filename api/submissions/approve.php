@@ -3,6 +3,7 @@ declare(strict_types=1);
 /* === BEGIN FILE: api/submissions/approve.php | Zweck: gibt eine bezahlte Submission frei, bucht genau eine Consumption und reduziert das passende Entitlement; Umfang: komplette Datei === */
 
 require dirname(__DIR__) . '/_bootstrap.php';
+require_once __DIR__ . '/_publication_snapshot.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     header('Allow: POST');
@@ -469,6 +470,7 @@ try {
 
     if (is_array($existingConsumption)) {
         sap_mark_submission_approved($pdo, $submissionId);
+        be_replace_submission_publication_snapshot($pdo, $submissionId);
         $quotaSummary = sap_build_quota_summary($pdo, (int)$submission['organizer_id']);
 
         $pdo->commit();
@@ -508,6 +510,7 @@ try {
         $submissionId
     );
     sap_mark_submission_approved($pdo, $submissionId);
+    be_replace_submission_publication_snapshot($pdo, $submissionId);
 
     $quotaSummary = sap_build_quota_summary($pdo, (int)$submission['organizer_id']);
 

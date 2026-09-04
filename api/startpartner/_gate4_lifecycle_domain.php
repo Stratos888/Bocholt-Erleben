@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once dirname(__DIR__) . '/submissions/_publication_snapshot.php';
+
 function be_startpartner_gate4_lifecycle_event(
     PDO $pdo,
     string $pilotId,
@@ -128,8 +130,10 @@ function be_startpartner_gate4_approve_content(PDO $pdo, string $candidateId, ar
             $entitlement = be_startpartner_gate4_lifecycle_entitlement($pdo, $pilotId);
             $window = be_startpartner_gate4_lifecycle_window($pilot, $entitlement);
             $content = be_startpartner_gate4_lifecycle_content($pdo, $pilotId, $contentLinkId);
-            if ((string)$content['status'] !== 'editorial_ready') {
-                throw new DomainException('Only editorially ready pilot content can be approved.');
+            $isReapproval = (string)$content['status'] === 'approved'
+                && (string)$content['submission_status'] === 'in_review';
+            if ((string)$content['status'] !== 'editorial_ready' && !$isReapproval) {
+                throw new DomainException('Only editorially ready or approved revised pilot content can be approved.');
             }
             if (!in_array((string)$content['submission_status'], ['pending_review', 'in_review'], true)) {
                 throw new DomainException('Submission is no longer in a reviewable state.');
@@ -146,7 +150,33 @@ function be_startpartner_gate4_approve_content(PDO $pdo, string $candidateId, ar
                 throw new DomainException('Submission target plan does not match the pilot scope.');
             }
 
-            if ($contentType === 'event') {
+            if ($isReapproval) {
+                $historicalUsage = $pdo->prepare(
+                    'SELECT id, pilot_month_index, units FROM startpartner_pilot_usages
+                     WHERE pilot_id = :pilot_id AND pilot_entitlement_id = :pilot_entitlement_id
+                       AND content_link_id = :content_link_id AND submission_id = :submission_id
+                       AND content_type = :content_type
+                     ORDER BY id FOR UPDATE'
+                );
+                $historicalUsage->execute([
+                    'pilot_id' => $pilotId,
+                    'pilot_entitlement_id' => (string)$entitlement['id'],
+                    'content_link_id' => $contentLinkId,
+                    'submission_id' => (int)$content['submission_id'],
+                    'content_type' => $contentType,
+                ]);
+                $usageRows = $historicalUsage->fetchAll(PDO::FETCH_ASSOC);
+                if (count($usageRows) !== 1 || (int)$usageRows[0]['units'] !== 1) {
+                    throw new DomainException('Re-approval requires exactly one matching historical pilot usage.');
+                }
+                $limitMeta = [
+                    'limit_type' => 'historical_reapproval',
+                    'pilot_month_index' => (int)$usageRows[0]['pilot_month_index'],
+                    'used_before' => 1,
+                    'limit' => null,
+                    'is_unlimited' => false,
+                ];
+            } elseif ($contentType === 'event') {
                 $unlimited = (int)($entitlement['is_event_unlimited'] ?? 0) === 1;
                 if ($unlimited !== ((int)($scope['is_unlimited'] ?? 0) === 1)) {
                     throw new DomainException('Event limit contract is inconsistent.');
@@ -224,16 +254,19 @@ function be_startpartner_gate4_approve_content(PDO $pdo, string $candidateId, ar
             if ($submission->rowCount() !== 1) {
                 throw new DomainException('Pilot submission could not be approved atomically.');
             }
-            $contentUpdate = $pdo->prepare(
+            be_replace_submission_publication_snapshot($pdo, (int)$content['submission_id']);
+
+            if (!$isReapproval) {
+                $contentUpdate = $pdo->prepare(
                 "UPDATE startpartner_pilot_content_links
                  SET status = 'approved', approved_at = COALESCE(approved_at, CURRENT_TIMESTAMP)
                  WHERE id = :id AND pilot_id = :pilot_id AND status = 'editorial_ready'"
-            );
-            $contentUpdate->execute(['id' => $contentLinkId, 'pilot_id' => $pilotId]);
-            if ($contentUpdate->rowCount() !== 1) {
-                throw new RuntimeException('Pilot content link could not be approved.');
-            }
-            $usage = $pdo->prepare(
+                );
+                $contentUpdate->execute(['id' => $contentLinkId, 'pilot_id' => $pilotId]);
+                if ($contentUpdate->rowCount() !== 1) {
+                    throw new RuntimeException('Pilot content link could not be approved.');
+                }
+                $usage = $pdo->prepare(
                 'INSERT INTO startpartner_pilot_usages (
                     pilot_id, pilot_entitlement_id, content_link_id, submission_id,
                     content_type, pilot_month_index, units
@@ -241,31 +274,36 @@ function be_startpartner_gate4_approve_content(PDO $pdo, string $candidateId, ar
                     :pilot_id, :pilot_entitlement_id, :content_link_id, :submission_id,
                     :content_type, :pilot_month_index, 1
                  )'
-            );
-            $usage->execute([
-                'pilot_id' => $pilotId,
-                'pilot_entitlement_id' => (string)$entitlement['id'],
-                'content_link_id' => $contentLinkId,
-                'submission_id' => (int)$content['submission_id'],
-                'content_type' => $contentType,
-                'pilot_month_index' => (int)$window['pilot_month_index'],
-            ]);
+                );
+                $usage->execute([
+                    'pilot_id' => $pilotId,
+                    'pilot_entitlement_id' => (string)$entitlement['id'],
+                    'content_link_id' => $contentLinkId,
+                    'submission_id' => (int)$content['submission_id'],
+                    'content_type' => $contentType,
+                    'pilot_month_index' => (int)$window['pilot_month_index'],
+                ]);
+            }
 
             be_startpartner_gate4_lifecycle_event($pdo, $pilotId, 'gate4_content_approved', $operator, [
                 'operation_id' => $operationId,
                 'content_link_id' => $contentLinkId,
                 'submission_id' => (int)$content['submission_id'],
                 'content_type' => $contentType,
-                'pilot_month_index' => (int)$window['pilot_month_index'],
+                'pilot_month_index' => $isReapproval
+                    ? (int)$limitMeta['pilot_month_index']
+                    : (int)$window['pilot_month_index'],
                 'limit' => $limitMeta,
                 'publication_effect' => 'public_projection_eligible',
                 'payment_effect' => 'none',
             ]);
             return [
-                'status_reason' => 'Pilotinhalt redaktionell freigegeben, für die öffentliche Projektion berechtigt und einmalig dem Pilotverbrauch zugeordnet.',
+                'status_reason' => $isReapproval
+                    ? 'Pilotinhalt erneut freigegeben; historische Nutzung und Kapazität bleiben unverändert.'
+                    : 'Pilotinhalt redaktionell freigegeben, für die öffentliche Projektion berechtigt und einmalig dem Pilotverbrauch zugeordnet.',
                 'content_link_id' => $contentLinkId,
                 'submission_id' => (int)$content['submission_id'],
-                'usage_units' => 1,
+                'usage_units' => $isReapproval ? 0 : 1,
                 'limit' => $limitMeta,
             ];
         },
@@ -286,16 +324,20 @@ function be_startpartner_gate4_reject_content(PDO $pdo, string $candidateId, arr
             }
             $contentLinkId = be_startpartner_gate4_required_text($input['content_link_id'] ?? null, 36, 'content_link_id');
             $content = be_startpartner_gate4_lifecycle_content($pdo, (string)$pilot['id'], $contentLinkId);
-            if (!in_array((string)$content['status'], ['draft', 'editorial_ready'], true)) {
-                throw new DomainException('Only unapproved pilot content can be rejected.');
+            $isRevision = (string)$content['status'] === 'approved'
+                && (string)$content['submission_status'] === 'in_review';
+            if (!in_array((string)$content['status'], ['draft', 'editorial_ready'], true) && !$isRevision) {
+                throw new DomainException('Only reviewable pilot content can be rejected.');
             }
-            $link = $pdo->prepare(
-                "UPDATE startpartner_pilot_content_links SET status = 'rejected'
-                 WHERE id = :id AND pilot_id = :pilot_id AND status IN ('draft','editorial_ready')"
-            );
-            $link->execute(['id' => $contentLinkId, 'pilot_id' => (string)$pilot['id']]);
-            if ($link->rowCount() !== 1) {
-                throw new RuntimeException('Pilot content link could not be rejected.');
+            if (!$isRevision) {
+                $link = $pdo->prepare(
+                    "UPDATE startpartner_pilot_content_links SET status = 'rejected'
+                     WHERE id = :id AND pilot_id = :pilot_id AND status IN ('draft','editorial_ready')"
+                );
+                $link->execute(['id' => $contentLinkId, 'pilot_id' => (string)$pilot['id']]);
+                if ($link->rowCount() !== 1) {
+                    throw new RuntimeException('Pilot content link could not be rejected.');
+                }
             }
             $submission = $pdo->prepare(
                 "UPDATE submissions
@@ -344,6 +386,9 @@ function be_startpartner_gate4_withdraw_content(PDO $pdo, string $candidateId, a
             $link->execute(['id' => $contentLinkId, 'pilot_id' => (string)$pilot['id']]);
             if ($link->rowCount() !== 1) {
                 throw new RuntimeException('Pilot content link could not be withdrawn.');
+            }
+            if ((string)$content['status'] === 'approved') {
+                be_remove_submission_publication_snapshot($pdo, (int)$content['submission_id']);
             }
             be_startpartner_gate4_lifecycle_event($pdo, (string)$pilot['id'], 'gate4_content_withdrawn', $operator, [
                 'operation_id' => $operationId,

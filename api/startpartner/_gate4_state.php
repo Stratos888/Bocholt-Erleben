@@ -669,6 +669,15 @@ function be_startpartner_gate4_next_action(
             ];
         }
         foreach ($content as $row) {
+            if ((string)($row['status'] ?? '') === 'approved'
+                && (string)($row['submission_status'] ?? '') === 'in_review') {
+                return [
+                    'code' => 'content_reapproval',
+                    'label' => 'Überarbeiteten Pilotinhalt erneut freigeben',
+                    'action' => 'approve_content',
+                    'content_link_id' => (string)$row['id'],
+                ];
+            }
             if ((string)($row['status'] ?? '') === 'draft') {
                 return [
                     'code' => 'content_review',
