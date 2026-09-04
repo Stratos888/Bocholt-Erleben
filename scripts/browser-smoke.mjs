@@ -346,6 +346,22 @@ async function checkEventCardNavigation(page, baseUrl, profileName, timeoutMs) {
   const card = page.locator('#event-cards .event-card').filter({ hasText: 'Kinderzaubershow' }).first();
   await card.waitFor({ state: 'visible', timeout: timeoutMs });
 
+  const internalTitleLink = card.locator('h3.event-title a.event-title__link[href]').first();
+  await internalTitleLink.waitFor({ state: 'attached', timeout: timeoutMs });
+  const internalTarget = await internalTitleLink.getAttribute('href');
+  const resolvedInternalTarget = internalTarget ? new URL(internalTarget, `${baseUrl}/`) : null;
+  const expectedDetailPath = '/events/du-wunderst-mich-kinderzaubershow-endrik-thier-2099-09-27/';
+  if (
+    !resolvedInternalTarget ||
+    resolvedInternalTarget.origin !== new URL(baseUrl).origin ||
+    resolvedInternalTarget.pathname !== expectedDetailPath
+  ) {
+    throw new Error(`Eventtitel besitzt keinen kanonischen internen Detail-Link: ${internalTarget || 'leer'}`);
+  }
+  if (await internalTitleLink.getAttribute('tabindex') !== '-1') {
+    throw new Error('Der kanonische Eventtitel-Link darf den bestehenden Karten-Tabvertrag nicht erweitern.');
+  }
+
   if (profileName === 'desktop') {
     const outboundLink = card.locator('a.event-card-primary-hitarea[href]').first();
     await outboundLink.waitFor({ state: 'visible', timeout: timeoutMs });
@@ -387,7 +403,7 @@ async function checkEventCardNavigation(page, baseUrl, profileName, timeoutMs) {
       throw new Error('Der Desktop-Direktlink darf die mobile Karte nicht überlagern.');
     }
 
-    await card.locator('h3').click({ timeout: 7000 });
+    await internalTitleLink.click({ timeout: 7000 });
     await expectVisible(page, '#event-detail-panel:not(.hidden)');
 
     await page.locator('#event-detail-panel .detail-panel-close').click().catch(async () => {
