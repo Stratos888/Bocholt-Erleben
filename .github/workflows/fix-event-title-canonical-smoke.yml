@@ -24,53 +24,61 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
-          path = Path('scripts/browser-smoke.mjs')
-          text = path.read_text(encoding='utf-8')
-          old = '''  const internalTarget = await internalTitleLink.getAttribute('href');
-  const resolvedInternalTarget = internalTarget ? new URL(internalTarget, `${baseUrl}/`) : null;
-  const expectedDetailPath = '/events/du-wunderst-mich-kinderzaubershow-endrik-thier-2099-09-27/';
-  if (
-    !resolvedInternalTarget ||
-    resolvedInternalTarget.origin !== new URL(baseUrl).origin ||
-    resolvedInternalTarget.pathname !== expectedDetailPath
-  ) {
-    throw new Error(`Eventtitel besitzt keinen kanonischen internen Detail-Link: ${internalTarget || 'leer'}`);
-  }
-'''
-          new = '''  const internalTarget = await internalTitleLink.getAttribute('href');
-  const resolvedInternalTarget = internalTarget ? new URL(internalTarget, `${baseUrl}/`) : null;
-  const cardEventId = await card.getAttribute('data-item-id');
-  if (!cardEventId) {
-    throw new Error('Eventkarte besitzt keine data-item-id für den kanonischen Linkvertrag.');
-  }
-  const expectedDetailPath = await page.evaluate(async (eventId) => {
-    const response = await fetch(`/data/events.json?browser_smoke=${Date.now()}`, { cache: 'no-store' });
-    if (!response.ok) {
-      throw new Error(`Event-Feed für Linkvertrag nicht lesbar: HTTP ${response.status}`);
-    }
-    const events = await response.json();
-    const event = Array.isArray(events)
-      ? events.find((item) => String(item?.id || '') === String(eventId || ''))
-      : null;
-    return String(event?.detail_path || event?.detailPath || '');
-  }, cardEventId);
-  if (!expectedDetailPath.startsWith('/events/') || !expectedDetailPath.endsWith('/')) {
-    throw new Error(`Event-Feed besitzt keinen kanonischen detail_path für ${cardEventId}: ${expectedDetailPath || 'leer'}`);
-  }
-  if (
-    !resolvedInternalTarget ||
-    resolvedInternalTarget.origin !== new URL(baseUrl).origin ||
-    resolvedInternalTarget.pathname !== expectedDetailPath
-  ) {
-    throw new Error(
-      `Eventtitel besitzt nicht den kanonischen internen Detail-Link: href=${internalTarget || 'leer'}, erwartet=${expectedDetailPath}`
-    );
-  }
-'''
+          def block(lines):
+              return "\n".join(lines)
+
+          path = Path("scripts/browser-smoke.mjs")
+          text = path.read_text(encoding="utf-8")
+
+          old = block([
+              "  const internalTarget = await internalTitleLink.getAttribute('href');",
+              "  const resolvedInternalTarget = internalTarget ? new URL(internalTarget, `${baseUrl}/`) : null;",
+              "  const expectedDetailPath = '/events/du-wunderst-mich-kinderzaubershow-endrik-thier-2099-09-27/';",
+              "  if (",
+              "    !resolvedInternalTarget ||",
+              "    resolvedInternalTarget.origin !== new URL(baseUrl).origin ||",
+              "    resolvedInternalTarget.pathname !== expectedDetailPath",
+              "  ) {",
+              "    throw new Error(`Eventtitel besitzt keinen kanonischen internen Detail-Link: ${internalTarget || 'leer'}`);",
+              "  }",
+          ])
+
+          new = block([
+              "  const internalTarget = await internalTitleLink.getAttribute('href');",
+              "  const resolvedInternalTarget = internalTarget ? new URL(internalTarget, `${baseUrl}/`) : null;",
+              "  const cardEventId = await card.getAttribute('data-item-id');",
+              "  if (!cardEventId) {",
+              "    throw new Error('Eventkarte besitzt keine data-item-id für den kanonischen Linkvertrag.');",
+              "  }",
+              "  const expectedDetailPath = await page.evaluate(async (eventId) => {",
+              "    const response = await fetch(`/data/events.json?browser_smoke=${Date.now()}`, { cache: 'no-store' });",
+              "    if (!response.ok) {",
+              "      throw new Error(`Event-Feed für Linkvertrag nicht lesbar: HTTP ${response.status}`);",
+              "    }",
+              "    const events = await response.json();",
+              "    const event = Array.isArray(events)",
+              "      ? events.find((item) => String(item?.id || '') === String(eventId || ''))",
+              "      : null;",
+              "    return String(event?.detail_path || event?.detailPath || '');",
+              "  }, cardEventId);",
+              "  if (!expectedDetailPath.startsWith('/events/') || !expectedDetailPath.endsWith('/')) {",
+              "    throw new Error(`Event-Feed besitzt keinen kanonischen detail_path für ${cardEventId}: ${expectedDetailPath || 'leer'}`);",
+              "  }",
+              "  if (",
+              "    !resolvedInternalTarget ||",
+              "    resolvedInternalTarget.origin !== new URL(baseUrl).origin ||",
+              "    resolvedInternalTarget.pathname !== expectedDetailPath",
+              "  ) {",
+              "    throw new Error(",
+              "      `Eventtitel besitzt nicht den kanonischen internen Detail-Link: href=${internalTarget || 'leer'}, erwartet=${expectedDetailPath}`",
+              "    );",
+              "  }",
+          ])
+
           count = text.count(old)
           if count != 1:
-              raise SystemExit(f'expected exactly one target block, found {count}')
-          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+              raise SystemExit(f"expected exactly one target block, found {count}")
+          path.write_text(text.replace(old, new, 1), encoding="utf-8")
           PY
 
           node --check scripts/browser-smoke.mjs
