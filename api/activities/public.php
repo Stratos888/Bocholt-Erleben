@@ -73,35 +73,31 @@ function public_activities_normalize_row(array $row): array
 
 try {
     $stmt = be_db()->prepare(
-        'SELECT s.id, s.organizer_id, s.organization_name_snapshot, s.title,
-                s.location_name, s.location_address, s.location_public_confirmed,
-                s.event_url, s.description_text, s.approved_at, s.updated_at
-         FROM submissions s
-         WHERE s.submission_kind = :submission_kind
-           AND s.status = :status
-           AND s.approved_at IS NOT NULL
-           AND s.title IS NOT NULL AND s.title <> ""
-           AND s.location_name IS NOT NULL AND s.location_name <> ""
-           AND s.location_public_confirmed = 1
+        'SELECT ps.submission_id AS id, ps.organizer_id, ps.organization_name_snapshot, ps.title,
+                ps.location_name, ps.location_address, ps.location_public_confirmed,
+                ps.event_url, ps.description_text, ps.approved_at, ps.published_at AS updated_at
+         FROM submission_publication_snapshots ps
+         WHERE ps.submission_kind = :submission_kind
+           AND ps.title IS NOT NULL AND ps.title <> ""
+           AND ps.location_name IS NOT NULL AND ps.location_name <> ""
+           AND ps.location_public_confirmed = 1
            AND (
                 NOT EXISTS (
-                    SELECT 1
-                    FROM startpartner_pilot_content_links pcl_any
-                    WHERE pcl_any.submission_id = s.id
+                    SELECT 1 FROM startpartner_pilot_content_links pcl_any
+                    WHERE pcl_any.submission_id = ps.submission_id
                 )
                 OR EXISTS (
-                    SELECT 1
-                    FROM startpartner_pilot_content_links pcl
+                    SELECT 1 FROM startpartner_pilot_content_links pcl
                     INNER JOIN startpartner_pilots sp ON sp.id = pcl.pilot_id
-                    WHERE pcl.submission_id = s.id
+                    WHERE pcl.submission_id = ps.submission_id
                       AND pcl.status = "approved"
                       AND sp.status IN ("active", "paused", "closing")
                 )
            )
-         ORDER BY s.approved_at DESC, s.id DESC
+         ORDER BY ps.approved_at DESC, ps.submission_id DESC
          LIMIT 250'
     );
-    $stmt->execute(['submission_kind' => 'activity', 'status' => 'approved']);
+    $stmt->execute(['submission_kind' => 'activity']);
     $activities = [];
     while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
         $activities[] = public_activities_normalize_row($row);

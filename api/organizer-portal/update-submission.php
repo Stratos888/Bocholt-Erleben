@@ -340,7 +340,6 @@ try {
             location_address = :location_address,
             location_public_confirmed = :location_public_confirmed,
             description_text = :description_text,
-            approved_at = CASE WHEN status = "approved" THEN NULL ELSE approved_at END,
             review_started_at = CASE WHEN status = "approved" THEN NULL ELSE review_started_at END,
             status = CASE WHEN status = "approved" THEN "in_review" ELSE status END,
             organizer_edited_at = UTC_TIMESTAMP(),

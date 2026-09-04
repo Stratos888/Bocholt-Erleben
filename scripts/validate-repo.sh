@@ -114,6 +114,7 @@ validate_startpartner_mysql() {
     bash tests/run_startpartner_gate2_mysql_contract.sh
     bash tests/run_startpartner_gate3_mysql_contract.sh
     bash tests/run_startpartner_gate4_mysql_contract.sh
+    bash tests/run_publication_snapshot_database_contract.sh
   fi
 }
 

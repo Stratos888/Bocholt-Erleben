@@ -10,6 +10,9 @@ $projection = (string)file_get_contents($root . '/api/startpartner/_gate4_projec
 $control = (string)file_get_contents($root . '/js/control-center/startpartner-gate4.js');
 $activityAdapter = (string)file_get_contents($root . '/js/activity-submission-feed.js');
 $activityPage = (string)file_get_contents($root . '/aktivitaeten/index.html');
+$snapshotWriter = (string)file_get_contents($root . '/api/submissions/_publication_snapshot.php');
+$activation = (string)file_get_contents($root . '/api/startpartner/_gate4_activation_domain.php');
+$validator = (string)file_get_contents($root . '/scripts/validate-repo.sh');
 
 $failures = [];
 $assert = static function(bool $ok, string $message) use (&$failures): void {
@@ -20,8 +23,8 @@ foreach ([
     'event' => $eventReader,
     'activity' => $activityReader,
 ] as $kind => $reader) {
-    $assert(str_contains($reader, 's.status = :status'), "Public {$kind} reader must require canonical approved submission status.");
-    $assert(str_contains($reader, 's.approved_at IS NOT NULL'), "Public {$kind} reader must require approval evidence.");
+    $assert(str_contains($reader, 'submission_publication_snapshots ps'), "Public {$kind} reader must consume the last approved snapshot.");
+    $assert(!str_contains($reader, 's.status = :status'), "Public {$kind} reader must not hide a snapshot while its current version is under review.");
     $assert(str_contains($reader, 'NOT EXISTS ('), "Public {$kind} reader must preserve normal approved submissions without a Startpartner link.");
     $assert(str_contains($reader, 'startpartner_pilot_content_links'), "Public {$kind} reader must inspect Startpartner content links.");
     $assert(str_contains($reader, 'startpartner_pilots'), "Public {$kind} reader must inspect Startpartner lifecycle state.");
@@ -31,6 +34,16 @@ foreach ([
         $assert(!str_contains($reader, $forbidden), "Public {$kind} reader must remain read-only: {$forbidden}");
     }
 }
+
+$assert(str_contains($snapshotWriter, 'ON DUPLICATE KEY UPDATE'), 'Snapshot replacement must remain one row per submission.');
+$assert(str_contains($snapshotWriter, 'status = "approved"'), 'Only an approved current version may replace the public snapshot.');
+$assert(str_contains($activation, 'be_replace_submission_publication_snapshot'), 'First activation must publish through the general snapshot owner.');
+$assert(str_contains($lifecycle, '$isReapproval'), 'Lifecycle approval must distinguish historical-link re-approval.');
+$assert(str_contains($lifecycle, 'count($usageRows) !== 1'), 'Re-approval must fail closed unless exactly one historical usage exists.');
+$assert(str_contains($lifecycle, 'if (!$isReapproval)'), 'Re-approval must bypass first-publication usage and link writes.');
+$assert(str_contains($state, "'code' => 'content_reapproval'"), 'State must expose canonical content re-approval work.');
+$assert(str_contains($state, "'action' => 'approve_content'"), 'Re-approval must reuse the existing approve-content action.');
+$assert(str_contains($validator, 'run_publication_snapshot_database_contract.sh'), 'Full backend validation must run the publication snapshot database contract.');
 
 $specificVisualPos = strpos($eventReader, "return ['visual_key' => 'family_play_outdoor', 'visual_motif' => 'playfountain_water_splash'];");
 $defaultVisualPos = strpos($eventReader, "return ['visual_key' => 'default_city', 'visual_motif' => 'default_city'];");

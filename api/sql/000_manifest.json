@@ -13,6 +13,7 @@
     {"key": "009_control_center_runtime_schema", "file": "009_control_center_runtime_schema.sql", "mode": "idempotent_create"},
     {"key": "010_startpartner_gate2_qualification_capacity", "file": "010_startpartner_gate2_qualification_capacity.sql", "mode": "idempotent_reconciliation"},
     {"key": "011_startpartner_gate3_terms_organizer_entitlement", "file": "011_startpartner_gate3_terms_organizer_entitlement.sql", "mode": "idempotent_create"},
-    {"key": "012_startpartner_gate4_onboarding_content_activation", "file": "012_startpartner_gate4_onboarding_content_activation.sql", "mode": "idempotent_reconciliation"}
+    {"key": "012_startpartner_gate4_onboarding_content_activation", "file": "012_startpartner_gate4_onboarding_content_activation.sql", "mode": "idempotent_reconciliation"},
+    {"key": "013_submission_publication_snapshots", "file": "013_submission_publication_snapshots.sql", "mode": "idempotent_create"}
   ]
 }
