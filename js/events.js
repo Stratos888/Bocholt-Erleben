@@ -857,9 +857,16 @@ function createCard(event, visualUsage = null) {
   const h3 = document.createElement("h3");
   h3.className = "event-title";
 
-  const titleText = document.createElement("span");
-  titleText.className = "event-title__text";
+  const canonicalDetailUrl = resolveEventDetailUrl(event);
+  const titleText = document.createElement(canonicalDetailUrl ? "a" : "span");
+  titleText.className = canonicalDetailUrl
+    ? "event-title__text event-title__link"
+    : "event-title__text";
   titleText.textContent = event?.title ? String(event.title) : "Event";
+  if (canonicalDetailUrl) {
+    titleText.href = canonicalDetailUrl;
+    titleText.tabIndex = -1;
+  }
   h3.appendChild(titleText);
 
   const kategorieRaw = String(event?.kategorie || "").trim();
@@ -1098,6 +1105,25 @@ function createCard(event, visualUsage = null) {
     }
   };
   /* === END BLOCK: RESPONSIVE_EVENT_CARD_NAVIGATION_V6 === */
+
+  /* === BEGIN BLOCK: EVENT_TITLE_CANONICAL_LINK_V1 | Purpose: expose the existing canonical event detail URL as a real internal href while preserving established mobile panel and desktop outbound behavior === */
+  if (canonicalDetailUrl) {
+    titleText.addEventListener("click", (e) => {
+      const isPlainPrimaryClick =
+        e.button === 0 &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !e.shiftKey &&
+        !e.altKey;
+
+      if (!isPlainPrimaryClick) return;
+
+      if (isDesktopViewport() && !primaryUrl) return;
+
+      openCard(e);
+    });
+  }
+  /* === END BLOCK: EVENT_TITLE_CANONICAL_LINK_V1 === */
 
   card.addEventListener("click", (e) => {
     if (e.target.closest("a, button, [data-image-credit-access]")) {
