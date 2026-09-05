@@ -7,3 +7,24 @@ data/events.json
 __pycache__/
 *.py[cod]
 # === END BLOCK: PYTHON_CACHE_IGNORE_V1 ===
+
+# === BEGIN BLOCK: LOCAL_SECRET_GUARD_V1 | Zweck: verhindert versehentliche Commits lokaler Secrets/Credentials in das oeffentliche Repository ===
+.env
+.env.*
+!.env.example
+!.env.sample
+.secrets/
+secrets/
+credentials*.json
+*credentials*.json
+service-account*.json
+*service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+# === END BLOCK: LOCAL_SECRET_GUARD_V1 ===
